@@ -1,6 +1,6 @@
 [project]
-name = "fm-data-processing"
-version = "0.2.0"
+name = "fm_data_processing"
+version = "0.0.1"
 requires-python = ">=3.9"
 description = "IBM FM Data Processing Library"
 authors = [
@@ -11,8 +11,6 @@ dependencies = [
     "ray[default]==2.9.1",
     "pyarrow==14.0.2",
     "boto3==1.28.60",
-    "pytz",
-    "pandas",
     # The version of urllib fixes a whitesource-identified security issue - dawood 10/19/2023,
     "urllib3>=1.26.18",
     "dmf-lib==1.2.5",
@@ -47,4 +45,4 @@ addopts = "--cov --cov-report term-missing --cov-fail-under 70"
 markers = ["unit: unit tests", "integration: integration tests"]
 
 [tool.coverage.run]
-include = ["src/mutate/*"]
+include = ["src/*"]
