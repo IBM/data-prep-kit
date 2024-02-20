@@ -1,8 +1,8 @@
 from data_processing.data_access.data_access_lh import DataAccessLakeHouse
 
 s3_cred = {
-    "access_key": "e49c0337161a424bb77061a23e5a853e",
-    "secret_key": "8431539f43d6df45c6acc39bee45ef291ac86188b3503ee3",
+    "access_key": "YOUR KEY",
+    "secret_key": "YOUR SECRET KEY",
     "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
@@ -14,7 +14,7 @@ lakehouse_config = {
     "input_version": "main",
     "output_table": "academic.ieee.lh_unittest",
     "output_path": "lh-test/tables/academic/ieee/lh_unittest",
-    "token": "eyJhbGciOiJIUzI1NiIsInppcCI6IkRFRiJ9.eJyrVkrNTczMUbJSqixNzEvOyHQoLdbLTMrVS87PVdJRKi5NwiWVmViiZGVobmBiaWhpbmKio5RaUQASMDQyszQFCtQCAGYOG84.oYILibFEhUzVTvmk9a4l-xBeZ4PIg237lDrvKlvl6Is",
+    "token": "YOUR TOKEN"
 }
 
 
