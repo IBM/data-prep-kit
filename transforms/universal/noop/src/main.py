@@ -1,3 +1,5 @@
+from data_processing.ray.launcher import TransformLauncher
+from noop import NOOPTransformRuntime
 
 if __name__ == "__main__":
     # Simply instantiate the driver and initialize with mutator specifics
@@ -11,4 +13,4 @@ if __name__ == "__main__":
 
     # Call the drivers main() method to create the ray actors and have them call the mutator on Tables read from parquet files.
     # Run this with --help to see the full set of available generic and mutator-specific CLI args.
-    launcher.execute()
+    launcher.launch()

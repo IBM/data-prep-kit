@@ -1,7 +1,7 @@
 from typing import Any
 
-from data_processing.cli import CLIArgumentProvider
-from data_processing.data_access import DataAccess
+from data_processing.cli.cli_arg_provider import CLIArgumentProvider
+from data_processing.data_access.data_access import DataAccess
 from data_processing.table_transform import AbstractTableTransform
 
 
@@ -12,16 +12,16 @@ class DefaultTableTransformRuntime:
 
     def __init__(self, params: dict[str, Any]):
         """
-        Create filter runtime
+        Create transform runtime
         :param params: parameters
         """
         self.params = params
 
     def set_environment(self, data_access: DataAccess) -> dict[str, Any]:
         """
-        Set environment for filter execution
+        Set environment for transform execution
         :param data_access - data access class
-        :return: dictionary of filter init params
+        :return: dictionary of transform init params
         """
         return self.params
 
@@ -44,27 +44,27 @@ class AbstractTableTransformRuntimeFactory(CLIArgumentProvider):
     ):
         """
         Initialization
-        :param runtime_class: implementation of the Filter runtime
-        :param transformer_class: implementation of the Filter
+        :param runtime_class: implementation of the Transform runtime
+        :param transformer_class: implementation of the Transform
         :return:
         """
-        self.runtime = runtime_class
-        self.transformer = transformer_class
+        self.runtime_class = runtime_class
+        self.transformer_class = transformer_class
         self.params = {}
 
     def create_transformer_runtime(self) -> DefaultTableTransformRuntime:
         """
-        Create Filter runtime
-        :return: fiter runtime object
+        Create transform runtime
+        :return: transform runtime object
         """
-        return self.runtime(self.params)
+        return self.runtime_class(self.params)
 
-    def get_transformer(self) -> type[AbstractTableTransform]:
+    def get_transformer_class(self) -> type[AbstractTableTransform]:
         """
         Create Mutator runtime
         :return: mutator class
         """
-        return self.transformer
+        return self.transformer_class
 
     def get_input_params_metadata(self) -> dict[str, Any]:
         """

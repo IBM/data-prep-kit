@@ -391,7 +391,7 @@ class TestReadPyarrowTable(TestInit):
 
     # Write the table to a parquet file
     pq_file_path = os.path.join(os.sep, "tmp", "test_file.parquet")
-    pq.write_table(table, pq_file_path)
+    pyarrow.parquet.write_table(table, pq_file_path)
 
     @pytest.mark.parametrize(
         "path, expected_error",

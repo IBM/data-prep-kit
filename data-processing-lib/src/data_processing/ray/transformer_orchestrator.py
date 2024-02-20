@@ -55,7 +55,7 @@ def transform_orchestrator(
         # create executors
         processor_params = {
             "data_access_factory": data_access_factory,
-            "processor": transformer_runtime_factory.get_transformer(),
+            "processor": transformer_runtime_factory.get_transformer_class(),
             "processor_params": runtime.set_environment(data_access=data_access),
             "stats": statistics,
         }

@@ -41,4 +41,4 @@ venv:	pyproject.toml
 	source venv/bin/activate; 	\
 	pip install --upgrade pip;	\
 	pip install -e .;		\
-	pip install pytest
+	pip install pytest pytest-cov

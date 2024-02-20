@@ -44,7 +44,7 @@ class TestLauncher(TransformLauncher):
     Test driver for validation of the functionality
     """
 
-    def submit_for_execution(self) -> int:
+    def _submit_for_execution(self) -> int:
         """
         Overwrite this method to just print all parameters to make sure that everything works
         :return:
@@ -73,7 +73,7 @@ def test_launcher():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 1 == res
     # Add S3 configuration
     params["s3_config"] = TestUtils.convert_to_ast(s3_conf)
@@ -83,7 +83,7 @@ def test_launcher():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 1 == res
     # Add S3 credentials
     params["s3_cred"] = TestUtils.convert_to_ast(s3_cred)
@@ -93,7 +93,7 @@ def test_launcher():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 0 == res
     # Add lake house
     params["lh_config"] = TestUtils.convert_to_ast(lakehouse_conf)
@@ -103,7 +103,7 @@ def test_launcher():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 1 == res
     # Add local config, should fail because now three different configs exist
     params["local_config"] = TestUtils.convert_to_ast(local_conf)
@@ -113,7 +113,7 @@ def test_launcher():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 1 == res
     # remove local config, should still fail, because two configs left
     del params["local_config"]
@@ -123,7 +123,7 @@ def test_launcher():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 1 == res
 
     # remove s3 config, now it should work
@@ -134,7 +134,7 @@ def test_launcher():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 0 == res
 
 
@@ -158,7 +158,7 @@ def test_local_config():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 0 == res
 
 
@@ -190,7 +190,7 @@ def test_local_config_validate():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 1 == res
     params["local_config"] = TestUtils.convert_to_ast(local_conf_no_input)
     sys.argv = TestUtils.dict_to_req(d=params)
@@ -199,7 +199,7 @@ def test_local_config_validate():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 1 == res
     params["local_config"] = TestUtils.convert_to_ast(local_conf_no_output)
     sys.argv = TestUtils.dict_to_req(d=params)
@@ -208,7 +208,7 @@ def test_local_config_validate():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 1 == res
     params["local_config"] = TestUtils.convert_to_ast(local_conf)
     sys.argv = TestUtils.dict_to_req(d=params)
@@ -217,5 +217,5 @@ def test_local_config_validate():
         transformer_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
-    ).execute()
+    ).launch()
     assert 0 == res

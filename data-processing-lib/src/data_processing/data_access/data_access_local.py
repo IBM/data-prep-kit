@@ -8,7 +8,7 @@ from typing import Any
 import pyarrow.parquet as pq
 import pyarrow as pa
 
-from data_processing.data_access import DataAccess, MB, GB
+from data_processing.data_access.data_access import DataAccess, MB, GB
 
 
 class DataAccessLocal(DataAccess):

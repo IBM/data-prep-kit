@@ -3,14 +3,12 @@ import time
 
 import ray
 
-from data_processing.cli import str2bool
-from data_processing.data_access import DataAccessFactory
+from data_processing.cli.cli_arg_provider import str2bool
+from data_processing.data_access.data_access_factory import DataAccessFactory
 from data_processing.ray.ray_orchestrator_configuration import RayOrchestratorConfiguration
+from data_processing.ray.transform_runtime import AbstractTableTransformRuntimeFactory
 from transformer_orchestrator import transform_orchestrator
 
-
-class AbstractDataTransformRuntimeFactory:
-    pass
 
 
 class TransformLauncher:
@@ -18,7 +16,7 @@ class TransformLauncher:
     Driver class starting Filter execution
     """
 
-    def __init__(self, name: str, transformer_factory: AbstractDataTransformRuntimeFactory):
+    def __init__(self, name: str, transformer_factory: AbstractTableTransformRuntimeFactory):
         """
         Creates driver
         :param name: name of the application
@@ -51,7 +49,7 @@ class TransformLauncher:
             and self.ray_orchestrator.validate_input_params(args=args)
         )
 
-    def submit_for_execution(self) -> int:
+    def _submit_for_execution(self) -> int:
         """
         Submit for Ray execution
         :return:
@@ -79,11 +77,11 @@ class TransformLauncher:
             ray.shutdown()
             return res
 
-    def execute(self) -> int:
+    def launch(self) -> int:
         """
         Execute method orchestrates driver invocation
         :return:
         """
         if self.__get_parameters():
-            return self.submit_for_execution()
+            return self._submit_for_execution()
         return 1
