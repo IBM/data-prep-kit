@@ -1,0 +1,30 @@
+# Ignore artifacts:
+build
+htmlcov
+reports
+.pytest_cache
+
+# Ignore all HTML files:
+*.html
+
+# Ignore some intentionally bad stuff
+bad_file.json
+
+# Ignore virtual environments
+venv
+
+# submods
+autopilot
+codeflare-cli
+codeflare-sdk
+datalake
+docker_build_scripts
+mcad
+torchx
+tsfm
+
+# built docs stuff
+docs/
+*.md
+
+tools/scripts/appwrapper-pytorchjob/chart/templates/*
