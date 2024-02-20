@@ -35,10 +35,13 @@ publish: check-env
 	#@git tag ${TAG}
 	#@git push origin ${TAG}
 
-venv:	pyproject.toml
+venv:	pyproject.toml check-env
 	rm -rf venv	
 	python -m venv venv
+	echo '[global]' > venv/pip.conf
+	echo "index-url = https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple" >> venv/pip.conf
 	source venv/bin/activate; 	\
 	pip install --upgrade pip;	\
 	pip install -e .;		\
 	pip install pytest pytest-cov
+
