@@ -2,8 +2,11 @@ import ast
 
 import argparse
 
-from data_processing.cli import CLIArgumentProvider, str2bool
-from data_processing.data_access import DataAccessLakeHouse, DataAccessLocal, DataAccess, DataAccessS3
+from data_processing.data_access.data_access import DataAccess
+from data_processing.data_access.data_access_lh import DataAccessLakeHouse
+from data_processing.data_access.data_access_local import DataAccessLocal
+from data_processing.data_access.data_access_s3 import DataAccessS3
+from data_processing.utils.cli_arg_provider import CLIArgumentProvider, str2bool
 
 
 class DataAccessFactory(CLIArgumentProvider):

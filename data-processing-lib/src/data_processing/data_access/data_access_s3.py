@@ -4,7 +4,7 @@ from typing import Any
 
 import pyarrow
 
-from data_processing.data_access import DataAccess, MB, GB
+from data_processing.data_access.data_access import DataAccess, MB, GB
 from data_processing.data_access.arrow_s3 import ArrowS3
 
 

@@ -2,7 +2,7 @@ import ast
 
 import argparse
 
-from data_processing.cli import CLIArgumentProvider
+from data_processing.utils.cli_arg_provider import CLIArgumentProvider
 
 
 class RayOrchestratorConfiguration(CLIArgumentProvider):

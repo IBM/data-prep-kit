@@ -3,10 +3,10 @@ import time
 
 import ray
 
-from data_processing.cli.cli_arg_provider import str2bool
 from data_processing.data_access.data_access_factory import DataAccessFactory
 from data_processing.ray.ray_orchestrator_configuration import RayOrchestratorConfiguration
 from data_processing.ray.transform_runtime import AbstractTableTransformRuntimeFactory
+from data_processing.utils.cli_arg_provider import str2bool
 from transformer_orchestrator import transform_orchestrator
 
 

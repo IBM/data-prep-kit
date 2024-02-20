@@ -2,8 +2,8 @@ from datetime import datetime
 
 import ray
 
-from data_processing.data_access import DataAccessFactory
-from data_processing.ray.launcher import AbstractDataTransformRuntimeFactory
+from data_processing.data_access.data_access_factory import DataAccessFactory
+from data_processing.ray.transform_runtime import AbstractTableTransformRuntimeFactory
 from data_processing.ray.transform_statistics import Statistics
 from ray_orchestrator_configuration import *
 from ray.util import ActorPool
@@ -16,7 +16,7 @@ from ray_utils import RayUtils
 def transform_orchestrator(
     preprocessing_params: RayOrchestratorConfiguration,
     data_access_factory: DataAccessFactory,
-    transformer_runtime_factory: AbstractDataTransformRuntimeFactory,
+    transformer_runtime_factory: AbstractTableTransformRuntimeFactory,
 ) -> int:
     """
     orchestrator for transformer execution

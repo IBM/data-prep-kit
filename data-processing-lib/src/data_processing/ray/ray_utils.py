@@ -6,7 +6,7 @@ from ray.types import ObjectRef
 from ray.util.actor_pool import ActorPool
 from ray.util.metrics import Gauge
 
-from data_processing.data_access import GB
+from data_processing.data_access.data_access import GB
 
 
 class RayUtils:
