@@ -1,4 +1,7 @@
-from data_processing.data_access.data_access_s3 import *
+import json
+from typing import Any
+
+import pyarrow
 from lakehouse import (
     CosCredentials,
     Datasource,
@@ -7,6 +10,8 @@ from lakehouse import (
     LakehouseForProcessingTask,
     SourceCodeDetails,
 )
+
+from data_processing.data_access import DataAccess, DataAccessS3
 
 
 class DataAccessLakeHouse(DataAccess):
@@ -67,7 +72,7 @@ class DataAccessLakeHouse(DataAccess):
         """
         return self.S3.get_files_to_process()
 
-    def get_table(self, path: str) -> pa.table:
+    def get_table(self, path: str) -> pyarrow.table:
         """
         Get pyArrow table for a given path
         :param path - file path
@@ -93,7 +98,7 @@ class DataAccessLakeHouse(DataAccess):
     #        diff = list(map(lambda x: input_path + x, diff))
     #        return diff
 
-    def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
+    def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
         """
         Save table to a given location
         :param path: location to save table

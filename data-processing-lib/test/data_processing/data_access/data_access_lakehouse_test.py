@@ -1,5 +1,4 @@
-from data_processing.data_access import *
-
+from data_processing.data_access.data_access_lh import DataAccessLakeHouse
 
 s3_cred = {
     "access_key": "e49c0337161a424bb77061a23e5a853e",

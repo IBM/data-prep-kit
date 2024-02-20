@@ -35,8 +35,10 @@ publish: check-env
 	#@git tag ${TAG}
 	#@git push origin ${TAG}
 
-venv:
+venv:	pyproject.toml
+	rm -rf venv	
 	python -m venv venv
 	source venv/bin/activate; 	\
-	pip install --upgrade pip	\
-	pip install -e .	\
+	pip install --upgrade pip;	\
+	pip install -e .;		\
+	pip install pytest

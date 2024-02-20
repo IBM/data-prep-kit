@@ -3,7 +3,7 @@ import ast
 import argparse
 
 from data_processing.cli import CLIArgumentProvider, str2bool
-from data_processing.data_access import DataAccessS3, DataAccessLakeHouse, DataAccessLocal, DataAccess
+from data_processing.data_access import DataAccessLakeHouse, DataAccessLocal, DataAccess, DataAccessS3
 
 
 class DataAccessFactory(CLIArgumentProvider):

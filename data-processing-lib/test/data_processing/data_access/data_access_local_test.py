@@ -4,10 +4,10 @@ import os
 from pathlib import Path
 from unittest.mock import patch
 
-import pyarrow as pa
-import pyarrow.parquet as pq
+import pyarrow
 import pytest
-from data_processing.data_access import *
+
+from data_processing.data_access.data_access_local import DataAccessLocal
 
 KB = 1024
 MB = 1024 * KB
@@ -384,10 +384,10 @@ class TestReadPyarrowTable(TestInit):
     data = {"col1": [1, 2, 3], "col2": ["a", "b", "c"]}
 
     # Create PyArrow schema
-    schema = pa.schema([pa.field("col1", pa.int32()), pa.field("col2", pa.string())])
+    schema = pyarrow.schema([pyarrow.field("col1", pyarrow.int32()), pyarrow.field("col2", pyarrow.string())])
 
     # Create PyArrow table
-    table = pa.Table.from_pydict(data, schema=schema)
+    table = pyarrow.Table.from_pydict(data, schema=schema)
 
     # Write the table to a parquet file
     pq_file_path = os.path.join(os.sep, "tmp", "test_file.parquet")
@@ -398,7 +398,7 @@ class TestReadPyarrowTable(TestInit):
         [
             ("non_existent_file.parquet", FileNotFoundError),
             ("invalid_file.txt", IOError),
-            ("malformed_parquet.parquet", pa.ArrowException),
+            ("malformed_parquet.parquet", pyarrow.ArrowException),
         ],
     )
     def test_error_handling(self, path, expected_error):
@@ -411,7 +411,7 @@ class TestReadPyarrowTable(TestInit):
     def test_successful_read(self):
         table = self.dal.get_table(self.pq_file_path)
         os.remove(self.pq_file_path)
-        assert isinstance(table, pa.Table)
+        assert isinstance(table, pyarrow.Table)
 
 
 class TestGetOutputLocation(TestInit):
@@ -424,7 +424,7 @@ class TestGetOutputLocation(TestInit):
 class TestSavePyarrowTable(TestInit):
 
     # Create a simple PyArrow table
-    table = pa.Table.from_pydict({"a": [1, 2], "b": ["string1", "string2"]})
+    table = pyarrow.Table.from_pydict({"a": [1, 2], "b": ["string1", "string2"]})
 
     # path to save parquet tables
     pq_file_path = os.path.join(os.sep, "tmp", "output.parquet")

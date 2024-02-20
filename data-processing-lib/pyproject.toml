@@ -16,7 +16,6 @@ dependencies = [
     "dmf-lib==1.2.5",
     "argparse",
     "mmh3",
-    "hashlib",
 ]
 
 

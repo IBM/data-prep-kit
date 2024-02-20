@@ -1,9 +1,10 @@
 import gzip
 import json
+from typing import Any
 
-from data_processing.data_access import *
+import pyarrow
 
-import pyarrow as pa
+from data_processing.data_access import DataAccess, MB, GB
 from data_processing.data_access.arrow_s3 import ArrowS3
 
 
@@ -179,7 +180,7 @@ class DataAccessS3(DataAccess):
             )
         return path_list, profile
 
-    def get_table(self, path: str) -> pa.table:
+    def get_table(self, path: str) -> pyarrow.table:
         """
         Get pyArrow table for a given path
         :param path - file path
@@ -195,7 +196,7 @@ class DataAccessS3(DataAccess):
         """
         return path.replace(self.input_folder, self.output_folder)
 
-    def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
+    def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
         """
         Save table to a given location
         :param path: location to save table
@@ -223,8 +224,8 @@ class DataAccessS3(DataAccess):
             field = table.field(index)
             fields.append(field.with_metadata({"PARQUET:field_id": f"{index + 1}"}))
             tbl_metadata[columns[index]] = json.dumps({"PARQUET:field_id": f"{index + 1}"}).encode()
-        schema = pa.schema(fields, metadata=tbl_metadata)
-        tbl = pa.Table.from_arrays(arrays=list(table.itercolumns()), schema=schema)
+        schema = pyarrow.schema(fields, metadata=tbl_metadata)
+        tbl = pyarrow.Table.from_arrays(arrays=list(table.itercolumns()), schema=schema)
         return self.arrS3.save_table(key=path, table=tbl)
 
     def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:

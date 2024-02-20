@@ -5,7 +5,8 @@ import ray
 from ray.types import ObjectRef
 from ray.util.actor_pool import ActorPool
 from ray.util.metrics import Gauge
-from fm_data_processing.data_access import *
+
+from data_processing.data_access import GB
 
 
 class RayUtils:

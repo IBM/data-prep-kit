@@ -1,6 +1,8 @@
 import ray
-from fm_data_processing.ray import *
-from fm_data_processing.data_access import *
+
+from data_processing.data_access.data_access import GB
+from data_processing.ray.ray_utils import RayUtils
+from data_processing.ray.transform_statistics import Statistics
 
 params = {}
 actor_options = {"num_cpus": 1, "memory": GB, "max_task_retries": 10}

@@ -2,8 +2,9 @@ import os
 import sys
 
 from data_processing.ray import *
-from data_processing.ray.launcher import TransformLauncher, AbstractTableTransformRuntimeFactory
-from data_processing.table_transform import DefaultTableTransformRuntime, AbstractTableTransform
+from data_processing.ray.launcher import TransformLauncher
+from data_processing.ray.transform_runtime import AbstractTableTransformRuntimeFactory, DefaultTableTransformRuntime
+from data_processing.table_transform import AbstractTableTransform
 from data_processing.utils import *
 
 

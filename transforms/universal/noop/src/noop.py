@@ -4,6 +4,9 @@ from argparse import ArgumentParser
 
 import pyarrow
 
+from data_processing.ray.transform_runtime import DefaultTableTransformRuntime
+from data_processing.table_transform import AbstractTableTransform
+
 
 class NOOPTransform(AbstractTableTransform):
     """
@@ -34,7 +37,8 @@ class NOOPTransform(AbstractTableTransform):
         return table, metadata
 
 
-class NOOPTransformRuntime(DefaultTransformRuntime):
+
+class NOOPTransformRuntime(DefaultTableTransformRuntime):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -71,7 +75,7 @@ class NOOPTransformRuntime(DefaultTransformRuntime):
 if __name__ == "__main__":
     # Not currently used, but shows how one might use the two classes above outside of ray.
     parser = argparse.ArgumentParser()
-    runtime = NOOPTransformRuntime().
+    runtime = NOOPTransformRuntime()
     runtime.add_input_arguments(parser)
     args = parser.parse_args()
     runtime.apply_input_arguments(args)

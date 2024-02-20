@@ -1,6 +1,4 @@
 import argparse
-import ast
-
 
 def str2bool(value: str) -> bool:
     """
@@ -15,21 +13,22 @@ def str2bool(value: str) -> bool:
 class CLIArgumentProvider:
     """
     Interface for the implementation of the classes that populate parser
-    with the required information and validate user provided information
+    with the required information and apply/validate user provided information
     """
 
-    def define_input_params(self, parser: argparse.ArgumentParser) -> None:
+    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
-        This method adds transformer specific parameter to parser
+        Add arguments to the given parser.
         :param parser: parser
         :return:
         """
         pass
 
-    def validate_input_params(self, args: argparse.Namespace) -> bool:
+    def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
-        Validate transformer specific parameters
-        :param args: user defined arguments
+        Validate and apply the arguments that have been parsed
+        :param args: user defined arguments including at least, but perhaps more,
+        arguments as defined by add_input_params().
         :return: True, if validate pass or False otherwise
         """
         return True

@@ -3,9 +3,9 @@ import time
 
 import ray
 
-from src.data_processing.cli import str2bool
-from src.data_processing.data_access import DataAccessFactory
-from src.data_processing.ray import RayOrchestratorConfiguration
+from data_processing.cli import str2bool
+from data_processing.data_access import DataAccessFactory
+from data_processing.ray.ray_orchestrator_configuration import RayOrchestratorConfiguration
 from transformer_orchestrator import transform_orchestrator
 
 
@@ -41,13 +41,13 @@ class TransformLauncher:
         )
         # add additional arguments
         self.transformer_factory.define_input_params(parser=parser)
-        self.data_access_factory.define_input_params(parser=parser)
+        self.data_access_factory.add_input_params(parser=parser)
         self.ray_orchestrator.define_input_params(parser=parser)
         args = parser.parse_args()
         self.run_locally = args.run_locally
         return (
             self.transformer_factory.validate_input_params(args=args)
-            and self.data_access_factory.validate_input_params(args=args)
+            and self.data_access_factory.apply_input_params(args=args)
             and self.ray_orchestrator.validate_input_params(args=args)
         )
 
