@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 import ray
 
@@ -14,6 +15,7 @@ from ray_utils import RayUtils
 
 @ray.remote(num_cpus=1, scheduling_strategy="SPREAD")
 def transform_orchestrator(
+    cli_args:dict[str,Any],
     preprocessing_params: RayOrchestratorConfiguration,
     data_access_factory: DataAccessFactory,
     transformer_runtime_factory: AbstractTableTransformRuntimeFactory,
@@ -53,10 +55,11 @@ def transform_orchestrator(
         # create statistics
         statistics = Statistics.remote()
         # create executors
+        runtime.set_data_access(data_access)    # todo: what is the reason for this?
         processor_params = {
             "data_access_factory": data_access_factory,
-            "processor": transformer_runtime_factory.get_transformer_class(),
-            "processor_params": runtime.set_environment(data_access=data_access),
+            "transform_class": transformer_runtime_factory.get_transform_class(),
+            "transform_params": cli_args,   # todo: contains all cli args, not just transform params.
             "stats": statistics,
         }
         processors = ActorPool(

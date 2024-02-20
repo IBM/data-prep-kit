@@ -1,29 +1,31 @@
 from typing import Any
 
+import argparse
+
 from data_processing.utils.cli import CLIArgumentProvider
 from data_processing.data_access.data_access import DataAccess
 from data_processing.table_transform import AbstractTableTransform
 
 
-class DefaultTableTransformRuntime:
+class DefaultTableTransformRuntime(CLIArgumentProvider):
     """
     Transform runtime used by processor to create Transform specific environment
     """
 
-    def __init__(self, params: dict[str, Any]):
+    def __init__(self, transform_class:type[AbstractTableTransform]):
         """
         Create transform runtime
         :param params: parameters
         """
-        self.params = params
+        self.transform_class = transform_class
 
-    def set_environment(self, data_access: DataAccess) -> dict[str, Any]:
+    def set_data_access(self, data_access: DataAccess) -> None:
         """
         Set environment for transform execution
         :param data_access - data access class
         :return: dictionary of transform init params
         """
-        return self.params
+        pass
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
         """
@@ -32,6 +34,12 @@ class DefaultTableTransformRuntime:
         :return: job execution statistics
         """
         return stats
+
+    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+        return None
+
+    def apply_input_params(self, args: argparse.Namespace) -> bool:
+        return True
 
 
 class AbstractTableTransformRuntimeFactory(CLIArgumentProvider):
@@ -50,16 +58,15 @@ class AbstractTableTransformRuntimeFactory(CLIArgumentProvider):
         """
         self.runtime_class = runtime_class
         self.transformer_class = transformer_class
-        self.params = {}
 
-    def create_transformer_runtime(self) -> DefaultTableTransformRuntime:
+    def create_transform_runtime(self) -> DefaultTableTransformRuntime:
         """
         Create transform runtime
         :return: transform runtime object
         """
-        return self.runtime_class(self.params)
+        return self.runtime_class()
 
-    def get_transformer_class(self) -> type[AbstractTableTransform]:
+    def get_transform_class(self) -> type[AbstractTableTransform]:
         """
         Create Mutator runtime
         :return: mutator class

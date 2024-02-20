@@ -18,20 +18,20 @@ class TableProcessor:
         Init method
         :param params: dictionary that has the following key
             data_access_factory: data access factory
-            processor: local processor (mutator) class
-            processor_params: dictionary of parameters for local processor
+            transform_class: local transform class
+            transform_params: dictionary of parameters for local transform creation
             stats: object reference to statistics
         """
         # Create data access
         self.data_access = params.get("data_access_factory", None).create_data_access()
         # Add data access ant statistics to the processor parameters
-        processor_params = params.get("processor_params", None)
-        processor_params["data_access"] = self.data_access
-        processor_params["statistics"] = params.get("stats", None)
+        transform_params = params.get("transform_params", None)
+        transform_params["data_access"] = self.data_access
+        transform_params["statistics"] = params.get("stats", None)
         # Create local processor
-        self.processor = params.get("processor", None)(processor_params)
+        self.transform = params.get("transform_class", None)(transform_params)
         # Create statistics
-        self.stats = processor_params.get("statistics", None)
+        self.stats = transform_params.get("statistics", None)
 
     def process_table(self, f_name: str) -> None:
         """
@@ -51,7 +51,7 @@ class TableProcessor:
         try:
             if table.num_rows > 0:
                 # execute local processing
-                out_tables = self.processor.transform(in_table=table)
+                out_tables = self.transform.transform(in_table=table)
                 if len(out_tables) == 0:
                     self.stats.add_stats.remote({"table_processing": time.time() - t_start})
                     return

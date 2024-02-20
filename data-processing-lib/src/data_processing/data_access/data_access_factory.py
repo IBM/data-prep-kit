@@ -121,7 +121,7 @@ class DataAccessFactory(CLIArgumentProvider):
         if s3_config_specified + lh_config_specified + local_config_specified == 0:
             print(
                 "No S3, lakehouse, or local configuration parameters defined,"
-                " at least one of them is required - exiting"
+                " at least one of them is required! "
             )
             return False
 

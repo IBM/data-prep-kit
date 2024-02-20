@@ -23,7 +23,7 @@ class NOOPTransform(AbstractTableTransform):
         super().__init__(config)
         self.sleep_msec = config.get("noop_sleep_msec", None)
 
-    def mutate(self, table: pyarrow.Table) -> tuple[pyarrow.Table, dict]:
+    def transform(self, table: pyarrow.Table) -> list[pyarrow.Table] :
         """
         Put Transform-specific to convert one Table to another Table.
         This implementation makes no modifications so effectively implements a copy of the input parquet to the output folder, without modification.
@@ -32,9 +32,7 @@ class NOOPTransform(AbstractTableTransform):
             print(f"Sleep for {self.sleep_msec} milliseconds")
             time.sleep(self.sleep_msec / 1000)
             print("Sleep completed - continue")
-        rows = len(table)
-        metadata = {"nrows": rows, "nfiles": 1}
-        return table, metadata
+        return [ table ]
 
 
 class NOOPTransformRuntime(DefaultTableTransformRuntime):
@@ -46,7 +44,7 @@ class NOOPTransformRuntime(DefaultTableTransformRuntime):
     def __init__(self):
         super().__init__(NOOPTransform)
 
-    def add_input_arguments(self, parser: ArgumentParser) -> None:
+    def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         This will be included in a dictionary used to initialize the NOOPTransform.
@@ -60,16 +58,16 @@ class NOOPTransformRuntime(DefaultTableTransformRuntime):
             help="Sleep actor for a number of milliseconds while processing the data frame, before writing the file to COS",
         )
 
-    def combine_metadata(self, m1: dict, m2: dict) -> dict:
-        """
-        Combine the metadata being produced across multiple calls to NOOPTransform.mutate()
-        """
-        m1_files = m1["nfiles"]
-        m2_files = m2["nfiles"]
-        m1_rows = m1["nrows"]
-        m2_rows = m2["nrows"]
-        combined = {"nrows": m1_rows + m2_rows, "nfiles": m1_files + m2_files}
-        return combined
+    # def combine_metadata(self, m1: dict, m2: dict) -> dict:
+    #     """
+    #     Combine the metadata being produced across multiple calls to NOOPTransform.mutate()
+    #     """
+    #     m1_files = m1["nfiles"]
+    #     m2_files = m2["nfiles"]
+    #     m1_rows = m1["nrows"]
+    #     m2_rows = m2["nrows"]
+    #     combined = {"nrows": m1_rows + m2_rows, "nfiles": m1_files + m2_files}
+    #     return combined
 
 class NOOPTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
 
