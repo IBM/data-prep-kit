@@ -1,7 +1,7 @@
 
 if __name__ == "__main__":
     # Simply instantiate the driver and initialize with mutator specifics
-    launcher = ShellRayLauncher(
+    launcher = TransformLauncher(
         # The name of the mutator to be using in logging and others.
         "NOOP",
         # A companion class for the mutator that runs in the driver to provide optional

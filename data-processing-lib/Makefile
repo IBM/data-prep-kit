@@ -1,3 +1,5 @@
+include ../makefile.include
+
 VERSION=0.2.0
 TAG := "v${VERSION}"
 LIBNAME=fm_data_processing
@@ -19,7 +21,7 @@ update-toml: check-env
 	sed -e 's/^version[ ]*=.*/version = "'${VERSION}'"/' pyproject.toml > tt.toml
 	mv tt.toml pyproject.toml
 
-build-package: update-toml 
+build: update-toml 
 	${PYTHON} -m pip install --upgrade build
 	${PYTHON} -m build
 
