@@ -2,17 +2,10 @@ import json
 from typing import Any
 
 import pyarrow
-from lakehouse import (
-    CosCredentials,
-    Datasource,
-    JobDetails,
-    JobStats,
-    LakehouseForProcessingTask,
-    SourceCodeDetails,
-)
-
 from data_processing.data_access.data_access import DataAccess
 from data_processing.data_access.data_access_s3 import DataAccessS3
+from lakehouse import (CosCredentials, Datasource, JobDetails, JobStats,
+                       LakehouseForProcessingTask, SourceCodeDetails)
 
 
 class DataAccessLakeHouse(DataAccess):
