@@ -2,29 +2,28 @@ from datetime import datetime
 from typing import Any
 
 import ray
+from ray._raylet import Gauge
 
 from data_processing.data_access.data_access_factory import DataAccessFactory
+from data_processing.ray.ray_orchestrator_configuration import RayOrchestratorConfiguration
+from data_processing.ray.ray_utils import RayUtils
+from data_processing.ray.table_processor import TableProcessor
 from data_processing.ray.transform_runtime import AbstractTableTransformRuntimeFactory
 from data_processing.ray.transform_statistics import Statistics
-from ray_orchestrator_configuration import *
-from ray.util import ActorPool
-from ray.util.metrics import Gauge
-from table_processor import TableProcessor
-from ray_utils import RayUtils
 
 
 @ray.remote(num_cpus=1, scheduling_strategy="SPREAD")
-def transform_orchestrator(
+def orchestrate(
     cli_args:dict[str,Any],
     preprocessing_params: RayOrchestratorConfiguration,
     data_access_factory: DataAccessFactory,
-    transformer_runtime_factory: AbstractTableTransformRuntimeFactory,
+    transform_runtime_factory: AbstractTableTransformRuntimeFactory,
 ) -> int:
     """
     orchestrator for transformer execution
     :param preprocessing_params: orchestrator configuration
     :param data_access_factory: data access factory
-    :param transformer_runtime_factory: transformer runtime factory
+    :param transform_runtime_factory: transformer runtime factory
     :return: 0 - success or 1 - failure
     """
     start_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -32,13 +31,14 @@ def transform_orchestrator(
         # create data access
         data_access = data_access_factory.create_data_access()
         if data_access is None:
+            print("No DataAccess instance provided - exiting", flush=True)
             return 1
         # Get files to process
         files, profile = data_access.get_files_to_process()
-        print(f"Number of s3 files is {len(files)}, source profile {profile}")
         if len(files) == 0:
-            print("No input files to process - exiting")
+            print("No input files to process - exiting", flush=True)
             return 0
+        print(f"Number of files is {len(files)}, source profile {profile}", flush=True)
         # Print interval
         print_interval = int(len(files) / 100)
         if print_interval == 0:
@@ -51,18 +51,18 @@ def transform_orchestrator(
             f"Number of workers - {preprocessing_params.n_workers} " f"with {preprocessing_params.worker_options} each"
         )
         # create transformer runtime
-        runtime = transformer_runtime_factory.create_transformer_runtime()
+        runtime = transform_runtime_factory.create_transform_runtime()
         # create statistics
         statistics = Statistics.remote()
         # create executors
         runtime.set_data_access(data_access)    # todo: what is the reason for this?
         processor_params = {
             "data_access_factory": data_access_factory,
-            "transform_class": transformer_runtime_factory.get_transform_class(),
+            "transform_class": transform_runtime_factory.get_transform_class(),
             "transform_params": cli_args,   # todo: contains all cli args, not just transform params.
             "stats": statistics,
         }
-        processors = ActorPool(
+        processors = ray.ActorPool(
             RayUtils.create_actors(
                 clazz=TableProcessor,
                 params=processor_params,
@@ -98,7 +98,7 @@ def transform_orchestrator(
             "pipeline": preprocessing_params.pipeline_id,
             "job details": preprocessing_params.job_details,
             "code": preprocessing_params.code_location,
-            "job_input_params": transformer_runtime_factory.get_input_params_metadata(),
+            "job_input_params": transform_runtime_factory.get_input_params_metadata(),
             "execution_stats": resources
             | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
             "job_output_stats": stats,

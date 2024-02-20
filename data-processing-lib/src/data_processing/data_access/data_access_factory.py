@@ -154,7 +154,7 @@ class DataAccessFactory(CLIArgumentProvider):
             self.local_config = args.local_config
             print(
                 f"Using local configuration with: "
-                f"input_folder - {self.local_config['input_folder']}"
+                f"input_folder - {self.local_config['input_folder']} "
                 f"output_folder - {self.local_config['output_folder']}"
             )
         self.checkpointing = args.checkpointing

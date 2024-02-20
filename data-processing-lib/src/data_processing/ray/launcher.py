@@ -5,6 +5,7 @@ import ray
 
 import data_processing
 from data_processing.data_access.data_access_factory import DataAccessFactory
+from data_processing.ray import transform_orchestrator
 from data_processing.ray.ray_orchestrator_configuration import RayOrchestratorConfiguration
 from data_processing.ray.transform_runtime import AbstractTableTransformRuntimeFactory
 from data_processing.utils.cli import str2bool
@@ -42,7 +43,7 @@ class TransformLauncher:
         """
         parser = argparse.ArgumentParser(description=f"Driver for {self.name} processing")
         parser.add_argument(
-            "--run_locally", type=lambda x: bool(str2bool(x)), default=False, help="running local flag"
+            "--run_locally", type=lambda x: bool(str2bool(x)), default=False, help="running ray local flag"
         )
         # add additional arguments
         self.transform_factory.add_input_params(parser=parser)
@@ -51,7 +52,6 @@ class TransformLauncher:
         self.ray_orchestrator.add_input_params(parser=parser)
         args = parser.parse_args()
         self.parsed_args = args
-        self.run_locally = args.run_locally
         return (
             self.transform_factory.apply_input_params(args=args)
             and self.transform_runtime.apply_input_params(args=args)
@@ -67,7 +67,7 @@ class TransformLauncher:
         res = 1
         start = time.time()
         try:
-            if self.run_locally:
+            if self.parsed_args.run_locally:
                 # Will create a local Ray cluster
                 print("running locally creating Ray cluster")
                 ray.init()
@@ -76,13 +76,16 @@ class TransformLauncher:
                 print("Connecting to the existing Ray cluster")
                 ray.init(f"ray://localhost:10001", ignore_reinit_error=True)
             res = ray.get(
-                data_processing.ray.transform_orchestrator.transform_orchestrator.remote(
+                data_processing.ray.transform_orchestrator.orchestrate.remote(
+                    # orchestrate.remote(
                     vars(self.parsed_args),
                     preprocessing_params=self.ray_orchestrator,
                     data_access_factory=self.data_access_factory,
                     transform_runtime_factory=self.transform_factory,
                 )
             )
+        except Exception as e:
+            print(f"Exception running ray remote orchestration\n{e}")
         finally:
             print(f"Completed execution in {(time.time() - start)/60.} min, execution result {res}")
             ray.shutdown()
