@@ -20,7 +20,7 @@ class AbstractDataTransform:
         pass
 
 
-class DefaultDataTransformerRuntime:
+class DefaultDataTransformRuntime:
     """
     Fiter runtime used by processor to to create Mutator specific environment
     """
@@ -55,7 +55,7 @@ class AbstractDataTransformRuntimeFactory(CLIArgumentProvider):
     """
 
     def __init__(
-        self, runtime_class: type[DefaultDataTransformerRuntime], transformer_class: type[AbstractDataTransform]
+        self, runtime_class: type[DefaultDataTransformRuntime], transformer_class: type[AbstractDataTransform]
     ):
         """
         Initialization
@@ -67,7 +67,7 @@ class AbstractDataTransformRuntimeFactory(CLIArgumentProvider):
         self.transformer = transformer_class
         self.params = {}
 
-    def create_transformer_runtime(self) -> DefaultDataTransformerRuntime:
+    def create_transformer_runtime(self) -> DefaultDataTransformRuntime:
         """
         Create Filter runtime
         :return: fiter runtime object
