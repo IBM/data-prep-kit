@@ -1,0 +1,4 @@
+[tool.black]
+line-length = 119
+# 'extend-exclude' excludes files or directories in addition to the defaults
+exclude = '^/(autopilot|codeflare-cli|codeflare-sdk|datalake|docker_build_scripts|mcad|torchx|tsfm)/.*'
