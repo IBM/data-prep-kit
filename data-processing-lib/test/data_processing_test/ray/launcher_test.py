@@ -2,9 +2,13 @@ import os
 import sys
 
 from data_processing.ray.launcher import TransformLauncher
-from data_processing.ray.transform_runtime import AbstractTableTransformRuntimeFactory, DefaultTableTransformRuntime
+from data_processing.ray.transform_runtime import (
+    AbstractTableTransformRuntimeFactory,
+    DefaultTableTransformRuntime,
+)
 from data_processing.table_transform import AbstractTableTransform
 from data_processing_test.utils.tutils import TUtils
+
 
 """
  see: https://stackoverflow.com/questions/55259371/pytest-testing-parser-error-unrecognised-arguments
@@ -48,7 +52,7 @@ class TestLauncher(TransformLauncher):
         :return:
         """
         print("\n\nPrinting preprocessing parameters")
-        print(f"Run locally {self.run_locally}")
+        print(f"Run locally {self.parsed_args.run_locally}")
         return 0
 
 
@@ -68,7 +72,7 @@ def test_launcher():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -78,7 +82,7 @@ def test_launcher():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -88,7 +92,7 @@ def test_launcher():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -98,7 +102,7 @@ def test_launcher():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -108,7 +112,7 @@ def test_launcher():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -118,7 +122,7 @@ def test_launcher():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -129,7 +133,7 @@ def test_launcher():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -153,7 +157,7 @@ def test_local_config():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -185,7 +189,7 @@ def test_local_config_validate():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -194,7 +198,7 @@ def test_local_config_validate():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -203,7 +207,7 @@ def test_local_config_validate():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -212,7 +216,7 @@ def test_local_config_validate():
     sys.argv = TUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transformer_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()

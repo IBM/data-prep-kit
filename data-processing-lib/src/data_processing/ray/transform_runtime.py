@@ -1,10 +1,9 @@
+import argparse
 from typing import Any
 
-import argparse
-
-from data_processing.utils.cli import CLIArgumentProvider
 from data_processing.data_access.data_access import DataAccess
 from data_processing.table_transform import AbstractTableTransform
+from data_processing.utils.cli import CLIArgumentProvider
 
 
 class DefaultTableTransformRuntime(CLIArgumentProvider):
@@ -12,7 +11,7 @@ class DefaultTableTransformRuntime(CLIArgumentProvider):
     Transform runtime used by processor to create Transform specific environment
     """
 
-    def __init__(self, transform_class:type[AbstractTableTransform]):
+    def __init__(self, transform_class: type[AbstractTableTransform]):
         """
         Create transform runtime
         :param params: parameters
@@ -64,7 +63,7 @@ class AbstractTableTransformRuntimeFactory(CLIArgumentProvider):
         Create transform runtime
         :return: transform runtime object
         """
-        return self.runtime_class()
+        return self.runtime_class(self.transformer_class)
 
     def get_transform_class(self) -> type[AbstractTableTransform]:
         """

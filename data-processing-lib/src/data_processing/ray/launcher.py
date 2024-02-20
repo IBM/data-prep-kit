@@ -1,15 +1,15 @@
 import argparse
 import time
 
-import ray
-
 import data_processing
+import ray
 from data_processing.data_access.data_access_factory import DataAccessFactory
 from data_processing.ray import transform_orchestrator
-from data_processing.ray.ray_orchestrator_configuration import RayOrchestratorConfiguration
+from data_processing.ray.ray_orchestrator_configuration import (
+    RayOrchestratorConfiguration,
+)
 from data_processing.ray.transform_runtime import AbstractTableTransformRuntimeFactory
 from data_processing.utils.cli import str2bool
-
 
 
 class TransformLauncher:
@@ -17,22 +17,26 @@ class TransformLauncher:
     Driver class starting Filter execution
     """
 
-    def __init__(self, name: str, transform_factory: AbstractTableTransformRuntimeFactory,
-                 data_access_factory_class:type[DataAccessFactory]= None):
+    def __init__(
+        self,
+        name: str,
+        transform_runtime_factory: AbstractTableTransformRuntimeFactory,
+        data_access_factory_class: type[DataAccessFactory] = None,
+    ):
         """
         Creates driver
         :param name: name of the application
-        :param transform_factory: transform runtime factory
+        :param transform_runtime_factory: transform runtime factory
         :param data_access_factory_class: the factory to create DataAccess instances.
         """
         self.name = name
-        self.transform_factory = transform_factory
+        self.transform_runtime_factory = transform_runtime_factory
         if data_access_factory_class is None:
             self.data_access_factory = DataAccessFactory()
         else:
             self.data_access_factory = data_access_factory_class()
         self.ray_orchestrator = RayOrchestratorConfiguration(name=name)
-        self.transform_runtime = self.transform_factory.create_transform_runtime()
+        self.transform_runtime = self.transform_runtime_factory.create_transform_runtime()
         self.parsed_args = {}
 
     def __get_parameters(self) -> bool:
@@ -46,14 +50,14 @@ class TransformLauncher:
             "--run_locally", type=lambda x: bool(str2bool(x)), default=False, help="running ray local flag"
         )
         # add additional arguments
-        self.transform_factory.add_input_params(parser=parser)
+        self.transform_runtime_factory.add_input_params(parser=parser)
         self.transform_runtime.add_input_params(parser=parser)
         self.data_access_factory.add_input_params(parser=parser)
         self.ray_orchestrator.add_input_params(parser=parser)
         args = parser.parse_args()
         self.parsed_args = args
         return (
-            self.transform_factory.apply_input_params(args=args)
+            self.transform_runtime_factory.apply_input_params(args=args)
             and self.transform_runtime.apply_input_params(args=args)
             and self.data_access_factory.apply_input_params(args=args)
             and self.ray_orchestrator.apply_input_params(args=args)
@@ -81,7 +85,7 @@ class TransformLauncher:
                     vars(self.parsed_args),
                     preprocessing_params=self.ray_orchestrator,
                     data_access_factory=self.data_access_factory,
-                    transform_runtime_factory=self.transform_factory,
+                    transform_runtime_factory=self.transform_runtime_factory,
                 )
             )
         except Exception as e:
