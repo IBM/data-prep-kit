@@ -1,8 +1,7 @@
 import pyizumo
 import pyarrow as pa
 from transforms.universal.lang_id.watson_nlp import (
-    get_lang_ds_pa,
-    get_sentences_ds_pa
+    get_lang_ds_pa
 )
 
 def test_language_identification():
