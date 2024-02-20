@@ -2,8 +2,11 @@ import ast
 
 import argparse
 
-from data_processing.cli import CLIArgumentProvider, str2bool
-from data_processing.data_access import DataAccessLakeHouse, DataAccessLocal, DataAccess, DataAccessS3
+from data_processing.data_access.data_access import DataAccess
+from data_processing.data_access.data_access_lh import DataAccessLakeHouse
+from data_processing.data_access.data_access_local import DataAccessLocal
+from data_processing.data_access.data_access_s3 import DataAccessS3
+from data_processing.utils.cli import CLIArgumentProvider, str2bool
 
 
 class DataAccessFactory(CLIArgumentProvider):
@@ -25,7 +28,7 @@ class DataAccessFactory(CLIArgumentProvider):
         self.dsets = None
         self.max_files = -1
 
-    def define_input_params(self, parser: argparse.ArgumentParser) -> None:
+    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
         Define data access specific parameters
         The set of parameters here is a superset of parameters required for all
@@ -91,7 +94,7 @@ class DataAccessFactory(CLIArgumentProvider):
         )
         parser.add_argument("--data_sets", type=str, default=None, help="List of data sets")
 
-    def validate_input_params(self, args: argparse.Namespace) -> bool:
+    def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
         Validate data access specific parameters
         This might need to be extended if new data access implementation is added

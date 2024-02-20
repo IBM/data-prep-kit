@@ -1,13 +1,13 @@
 from typing import Any
 
-from data_processing.cli.cli_arg_provider import CLIArgumentProvider
+from data_processing.utils.cli import CLIArgumentProvider
 from data_processing.data_access.data_access import DataAccess
 from data_processing.table_transform import AbstractTableTransform
 
 
 class DefaultTableTransformRuntime:
     """
-    Fiter runtime used by processor to create Mutator specific environment
+    Transform runtime used by processor to create Transform specific environment
     """
 
     def __init__(self, params: dict[str, Any]):

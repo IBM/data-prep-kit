@@ -1,7 +1,7 @@
 from typing import Any
 
 
-class TestUtils:
+class TUtils:
     """
     Class implementing support methods for test implementation
     """

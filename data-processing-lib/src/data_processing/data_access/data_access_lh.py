@@ -11,7 +11,8 @@ from lakehouse import (
     SourceCodeDetails,
 )
 
-from data_processing.data_access import DataAccess, DataAccessS3
+from data_processing.data_access.data_access import DataAccess
+from data_processing.data_access.data_access_s3 import DataAccessS3
 
 
 class DataAccessLakeHouse(DataAccess):

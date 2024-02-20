@@ -28,7 +28,7 @@ class CLIArgumentProvider:
         """
         Validate and apply the arguments that have been parsed
         :param args: user defined arguments including at least, but perhaps more,
-        arguments as defined by add_input_params().
+        arguments as defined by add_input_arguments().
         :return: True, if validate pass or False otherwise
         """
         return True

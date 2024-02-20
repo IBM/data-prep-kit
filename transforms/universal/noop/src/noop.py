@@ -39,7 +39,7 @@ class NOOPTransform(AbstractTableTransform):
 
 class NOOPTransformRuntime(DefaultTableTransformRuntime):
 
-        """
+    """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
@@ -71,7 +71,7 @@ class NOOPTransformRuntime(DefaultTableTransformRuntime):
         combined = {"nrows": m1_rows + m2_rows, "nfiles": m1_files + m2_files}
         return combined
 
-class NOOPTransformRuntimeFactory(DefaultTableTransformRuntime):
+class NOOPTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
 
     def __init__(self):
         super().__init__(NOOPTransformRuntime, NOOPTransform)

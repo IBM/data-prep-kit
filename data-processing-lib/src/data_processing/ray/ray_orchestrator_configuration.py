@@ -2,7 +2,7 @@ import ast
 
 import argparse
 
-from data_processing.cli import CLIArgumentProvider
+from data_processing.utils.cli import CLIArgumentProvider
 
 
 class RayOrchestratorConfiguration(CLIArgumentProvider):
@@ -22,7 +22,7 @@ class RayOrchestratorConfiguration(CLIArgumentProvider):
         self.code_location = {}
         self.name = name
 
-    def define_input_params(self, parser: argparse.ArgumentParser) -> None:
+    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
         This method adds transformer specific parameter to parser
         :param parser: parser
@@ -65,7 +65,7 @@ class RayOrchestratorConfiguration(CLIArgumentProvider):
             help="ast string containing code location",
         )
 
-    def validate_input_params(self, args: argparse.Namespace) -> bool:
+    def apply_input_arguments(self, args: argparse.Namespace) -> bool:
         """
         Validate transformer specific parameters
         :param args: user defined arguments
