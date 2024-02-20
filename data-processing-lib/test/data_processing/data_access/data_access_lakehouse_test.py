@@ -1,4 +1,4 @@
-from fm_data_processing.data_access import *
+from data_processing.data_access import *
 
 
 s3_cred = {

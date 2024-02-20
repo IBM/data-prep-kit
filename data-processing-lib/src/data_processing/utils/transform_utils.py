@@ -7,7 +7,7 @@ import mmh3
 import pyarrow as pa
 
 
-class FilterUtils:
+class TransformUtils:
     """
     Class implementing support methods for filter implementation
     """
@@ -24,11 +24,11 @@ class FilterUtils:
         size = sys.getsizeof(ob)
         if isinstance(ob, (list, tuple, set)):
             for element in ob:
-                size += FilterUtils.deep_get_size(element)
+                size += TransformUtils.deep_get_size(element)
         if isinstance(ob, dict):
             for k, v in ob.items():
-                size += FilterUtils.deep_get_size(k)
-                size += FilterUtils.deep_get_size(v)
+                size += TransformUtils.deep_get_size(k)
+                size += TransformUtils.deep_get_size(v)
         return size
 
     @staticmethod

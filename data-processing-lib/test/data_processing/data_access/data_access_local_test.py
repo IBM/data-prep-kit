@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
-from fm_data_processing.data_access import *
+from data_processing.data_access import *
 
 KB = 1024
 MB = 1024 * KB

@@ -1,5 +1,9 @@
-from fm_data_processing.cli import *
-from fm_data_processing.data_access import *
+import ast
+
+import argparse
+
+from data_processing.cli import CLIArgumentProvider, str2bool
+from data_processing.data_access import DataAccessS3, DataAccessLakeHouse, DataAccessLocal, DataAccess
 
 
 class DataAccessFactory(CLIArgumentProvider):
@@ -199,7 +203,7 @@ class DataAccessFactory(CLIArgumentProvider):
             print("Invalid local configuration - exiting")
         return valid_config
 
-    def create_data_access(self) -> DataAccessBase:
+    def create_data_access(self) -> DataAccess:
         """
         Create data access based on the parameters
         :return: corresponding data access class

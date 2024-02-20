@@ -1,11 +1,12 @@
 from typing import Any
 
 import pyarrow as pa
-from fm_data_processing.cli import *
-from fm_data_processing.data_access import *
+
+from data_processing.cli import CLIArgumentProvider
+from data_processing.data_access import DataAccess
 
 
-class AbstractDataTransform:
+class AbstractTableTransform:
     """
     Converts input to output table
     Sub-classes must provide the filter() method to provide the conversion of one data frame to another.
@@ -17,10 +18,10 @@ class AbstractDataTransform:
         :param table: input table
         :return: a list of converted tables to be written to the output
         """
-        pass
+        raise NotImplemented()
 
 
-class DefaultDataTransformRuntime:
+class DefaultTableTransformRuntime:
     """
     Fiter runtime used by processor to to create Mutator specific environment
     """
@@ -49,13 +50,13 @@ class DefaultDataTransformRuntime:
         return stats
 
 
-class AbstractDataTransformRuntimeFactory(CLIArgumentProvider):
+class AbstractTableTransformRuntimeFactory(CLIArgumentProvider):
     """
     Provides support the configuration of a transformer.
     """
 
     def __init__(
-        self, runtime_class: type[DefaultDataTransformRuntime], transformer_class: type[AbstractDataTransform]
+        self, runtime_class: type[DefaultTableTransformRuntime], transformer_class: type[AbstractTableTransform]
     ):
         """
         Initialization
@@ -67,14 +68,14 @@ class AbstractDataTransformRuntimeFactory(CLIArgumentProvider):
         self.transformer = transformer_class
         self.params = {}
 
-    def create_transformer_runtime(self) -> DefaultDataTransformRuntime:
+    def create_transformer_runtime(self) -> DefaultTableTransformRuntime:
         """
         Create Filter runtime
         :return: fiter runtime object
         """
         return self.runtime(self.params)
 
-    def get_transformer(self) -> type[AbstractDataTransform]:
+    def get_transformer(self) -> type[AbstractTableTransform]:
         """
         Create Mutator runtime
         :return: mutator class

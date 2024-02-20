@@ -1,4 +1,4 @@
-from data_access_s3 import *
+from data_processing.data_access.data_access_s3 import *
 from lakehouse import (
     CosCredentials,
     Datasource,

@@ -1,6 +1,6 @@
 [project]
 name = "fm_data_processing"
-version = "0.0.1"
+version = "0.2.0"
 requires-python = ">=3.9"
 description = "IBM FM Data Processing Library"
 authors = [
@@ -15,6 +15,8 @@ dependencies = [
     "urllib3>=1.26.18",
     "dmf-lib==1.2.5",
     "argparse",
+    "mmh3",
+    "hashlib",
 ]
 
 

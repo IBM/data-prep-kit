@@ -1,9 +1,14 @@
 import glob
+import gzip
+import json
 import os
 from pathlib import Path
+from typing import Any
 
 import pyarrow.parquet as pq
-from data_access_s3 import *
+import pyarrow as pa
+
+from data_processing.data_access import DataAccess, MB, GB
 
 
 class DataAccessLocal(DataAccess):

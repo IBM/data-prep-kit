@@ -1,10 +1,10 @@
 import gzip
 import json
 
-from data_access import *
+from data_processing.data_access import *
 
 import pyarrow as pa
-from arrow_s3 import ArrowS3
+from data_processing.data_access.arrow_s3 import ArrowS3
 
 
 class DataAccessS3(DataAccess):
