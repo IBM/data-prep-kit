@@ -1,6 +1,6 @@
 from typing import Any
 
-from data_processing.utils.cli_arg_provider import CLIArgumentProvider
+from data_processing.utils.cli import CLIArgumentProvider
 from data_processing.data_access.data_access import DataAccess
 from data_processing.table_transform import AbstractTableTransform
 

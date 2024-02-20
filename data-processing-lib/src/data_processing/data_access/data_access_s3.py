@@ -207,7 +207,7 @@ class DataAccessS3(DataAccess):
         """
         return self.arrS3.save_table(key=path, table=table)
 
-    def save_table_with_schema(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
+    def save_table_with_schema(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
         """
         Save table to a given location fixing schema, required for lakehouse
         :param path: location to save table
