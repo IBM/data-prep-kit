@@ -13,5 +13,3 @@ class AbstractTableTransform:
         :return: a list of converted tables to be written to the output
         """
         raise NotImplemented()
-
-

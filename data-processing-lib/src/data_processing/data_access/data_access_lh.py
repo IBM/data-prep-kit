@@ -2,8 +2,10 @@ import json
 from typing import Any
 
 import pyarrow
-from data_processing.data_access.data_access import DataAccess
-from data_processing.data_access.data_access_s3 import DataAccessS3
+from data_processing.data_access import (
+    DataAccessS3,
+    DataAccess
+)
 from lakehouse import (
     CosCredentials,
     Datasource,
@@ -12,9 +14,6 @@ from lakehouse import (
     LakehouseForProcessingTask,
     SourceCodeDetails,
 )
-
-
-# test
 
 
 class DataAccessLakeHouse(DataAccess):

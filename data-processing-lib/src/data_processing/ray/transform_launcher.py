@@ -1,15 +1,14 @@
 import argparse
 import time
-
-import data_processing
 import ray
-from data_processing.data_access.data_access_factory import DataAccessFactory
-from data_processing.ray import transform_orchestrator
-from data_processing.ray.ray_orchestrator_configuration import (
-    RayOrchestratorConfiguration,
+
+from data_processing.data_access import DataAccessFactory
+from data_processing.ray import (
+    TransformOrchestratorConfiguration,
+    AbstractTableTransformRuntimeFactory,
 )
-from data_processing.ray.transform_runtime import AbstractTableTransformRuntimeFactory
-from data_processing.utils.cli import str2bool
+
+from data_processing.utils import str2bool
 
 
 class TransformLauncher:
@@ -35,7 +34,7 @@ class TransformLauncher:
             self.data_access_factory = DataAccessFactory()
         else:
             self.data_access_factory = data_access_factory_class()
-        self.ray_orchestrator = RayOrchestratorConfiguration(name=name)
+        self.ray_orchestrator = TransformOrchestratorConfiguration(name=name)
         self.transform_runtime = self.transform_runtime_factory.create_transform_runtime()
         self.parsed_args = {}
 
@@ -80,7 +79,7 @@ class TransformLauncher:
                 print("Connecting to the existing Ray cluster")
                 ray.init(f"ray://localhost:10001", ignore_reinit_error=True)
             res = ray.get(
-                data_processing.ray.transform_orchestrator.orchestrate.remote(
+                ray.transform_orchestrator.orchestrate.remote(
                     # orchestrate.remote(
                     vars(self.parsed_args),
                     preprocessing_params=self.ray_orchestrator,

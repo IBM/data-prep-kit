@@ -1,9 +1,9 @@
 from typing import Any
 
 
-class TUtils:
+class ParamsUtils:
     """
-    Class implementing support methods for test implementation
+    Class implementing support methods for parameters manipulation
     """
 
     @staticmethod

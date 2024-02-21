@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pyarrow
 import pytest
 
-from data_processing.data_access.data_access_local import DataAccessLocal
+from data_access import DataAccessLocal
 
 KB = 1024
 MB = 1024 * KB

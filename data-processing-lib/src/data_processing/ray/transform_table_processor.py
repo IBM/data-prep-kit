@@ -5,7 +5,7 @@ import ray
 
 
 @ray.remote(scheduling_strategy="SPREAD")
-class TableProcessor:
+class TransformTableProcessor:
     """
     This is the class implementing the actual work/actor processing of a single pyarrow file
     """

@@ -1,17 +1,10 @@
 from typing import Any
-
 import pyarrow as pa
-
-KB = 1024
-MB = 1024 * KB
-GB = 1024 * MB
-
 
 class DataAccess:
     """
     Base class for data access (interface), defining all the methods
     """
-
     def get_files_to_process(self) -> tuple[list[str], dict[str, float]]:
         """
         Get files to process

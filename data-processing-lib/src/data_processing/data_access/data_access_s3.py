@@ -4,8 +4,8 @@ from typing import Any
 
 import pyarrow
 
-from data_processing.data_access.data_access import DataAccess, MB, GB
-from data_processing.data_access.arrow_s3 import ArrowS3
+from data_processing.data_access import DataAccess, ArrowS3
+from data_processing.utils import MB, GB
 
 
 class DataAccessS3(DataAccess):

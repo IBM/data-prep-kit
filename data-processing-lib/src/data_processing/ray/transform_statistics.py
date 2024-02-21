@@ -5,13 +5,13 @@ from ray.util.metrics import Counter
 
 
 @ray.remote(num_cpus=0.25, scheduling_strategy="SPREAD")
-class Statistics(object):
+class TransformStatistics(object):
     """
     Basic statistics class collecting basic execution statistics.
     It can be extended for specific processors
     """
 
-    def __init__(self):
+    def __init__(self, params: dict[str, Any]):
         """
         Init - setting up variables All of the statistics is collected in the dictionary
         """

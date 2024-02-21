@@ -2,10 +2,10 @@ import ast
 
 import argparse
 
-from data_processing.utils.cli import CLIArgumentProvider
+from data_processing.utils import CLIArgumentProvider
 
 
-class RayOrchestratorConfiguration(CLIArgumentProvider):
+class TransformOrchestratorConfiguration(CLIArgumentProvider):
     """
     A class specifying and validating Ray orchestrator configuration
     """

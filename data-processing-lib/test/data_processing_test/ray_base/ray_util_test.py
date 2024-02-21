@@ -1,8 +1,10 @@
 import ray
 
-from data_processing.data_access.data_access import GB
-from data_processing.ray.ray_utils import RayUtils
-from data_processing.ray.transform_statistics import Statistics
+from data_processing.utils import GB
+from data_processing.ray import (
+    RayUtils,
+    TransformStatistics
+)
 
 params = {}
 actor_options = {"num_cpus": 1, "memory": GB, "max_task_retries": 10}
@@ -15,7 +17,7 @@ def test_actor_creation():
     res = support.get_available_resources()
     print(f"\navailable resources {res}")
 
-    execs = support.create_actors(clazz=Statistics, params=params, actor_options=actor_options, n_actors=1)
+    execs = support.create_actors(clazz=TransformStatistics, params=params, actor_options=actor_options, n_actors=1)
 
     execs[0].add_stats.remote({"source_documents": 1, "source_size": 500})
     execs[0].add_stats.remote({"source_documents": 1, "source_size": 500, "result_documents": 1, "result_size": 300})

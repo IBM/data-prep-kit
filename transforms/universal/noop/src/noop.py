@@ -1,11 +1,16 @@
 import argparse
 import time
 from argparse import ArgumentParser
+from typing import Any
 
-import pyarrow
+import pyarrow as pa
 
-from data_processing.ray.transform_runtime import DefaultTableTransformRuntime, AbstractTableTransformRuntimeFactory
-from data_processing.table_transform import AbstractTableTransform
+from data_processing.ray import (
+    DefaultTableTransformRuntime,
+    AbstractTableTransformRuntimeFactory,
+    TransformLauncher,
+)
+from data_processing.transform import AbstractTableTransform
 
 
 class NOOPTransform(AbstractTableTransform):
@@ -21,9 +26,9 @@ class NOOPTransform(AbstractTableTransform):
         these will be provided by that class with help from the RayMutatingDriver.
         """
         super().__init__(config)
-        self.sleep_msec = config.get("noop_sleep_msec", None)
+        self.sleep_msec = config.get("noop_sleep_msec", 1)
 
-    def transform(self, table: pyarrow.Table) -> list[pyarrow.Table] :
+    def transform(self, table: pa.Table) -> list[pa.Table] :
         """
         Put Transform-specific to convert one Table to another Table.
         This implementation makes no modifications so effectively implements a copy of the input parquet to the output folder, without modification.
@@ -35,14 +40,15 @@ class NOOPTransform(AbstractTableTransform):
         return [ table ]
 
 
-class NOOPTransformRuntime(DefaultTableTransformRuntime):
+class NOOPTableTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
 
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
     def __init__(self):
-        super().__init__(NOOPTransform)
+        super().__init__(runtime_class=DefaultTableTransformRuntime, transformer_class=NOOPTransform)
+        self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -54,32 +60,32 @@ class NOOPTransformRuntime(DefaultTableTransformRuntime):
         parser.add_argument(
             "--noop_sleep_msec",
             type=int,
-            required=False,
+            default=1,
             help="Sleep actor for a number of milliseconds while processing the data frame, before writing the file to COS",
         )
 
-    # def combine_metadata(self, m1: dict, m2: dict) -> dict:
-    #     """
-    #     Combine the metadata being produced across multiple calls to NOOPTransform.mutate()
-    #     """
-    #     m1_files = m1["nfiles"]
-    #     m2_files = m2["nfiles"]
-    #     m1_rows = m1["nrows"]
-    #     m2_rows = m2["nrows"]
-    #     combined = {"nrows": m1_rows + m2_rows, "nfiles": m1_files + m2_files}
-    #     return combined
+    def apply_input_params(self, args: argparse.Namespace) -> bool:
+        """
+        Validate and apply the arguments that have been parsed
+        :param args: user defined arguments including at least, but perhaps more,
+        arguments as defined by add_input_arguments().
+        :return: True, if validate pass or False otherwise
+        """
+        self.params["sleep"] = args.noop_sleep_msec
+        return True
 
-class NOOPTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
+    def get_input_params_metadata(self) -> dict[str, Any]:
+        """
+        get input parameters for job_input_params in metadata
+        :return:
+        """
+        return self.params
 
-    def __init__(self):
-        super().__init__(NOOPTransformRuntime, NOOPTransform)
 
 if __name__ == "__main__":
-    # Not currently used, but shows how one might use the two classes above outside of ray.
-    parser = argparse.ArgumentParser()
-    runtime = NOOPTransformRuntime()
-    runtime.add_input_arguments(parser)
-    args = parser.parse_args()
-    runtime.apply_input_arguments(args)
-    transform = NOOPTransform(vars(args))
-    print(f"transform={transform}")
+    # creat launcher
+    launcher = TransformLauncher(name="NOOP", transform_runtime_factory=NOOPTableTransformRuntimeFactory())
+    # create parameters
+
+    # launch
+    launcher.launch()

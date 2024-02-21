@@ -1,21 +1,22 @@
 from datetime import datetime
-from typing import Any
 
 import ray
-from ray._raylet import Gauge
+from ray.util.metrics import Gauge
+from ray.util import ActorPool
 
-from data_processing.data_access.data_access_factory import DataAccessFactory
-from data_processing.ray.ray_orchestrator_configuration import RayOrchestratorConfiguration
-from data_processing.ray.ray_utils import RayUtils
-from data_processing.ray.table_processor import TableProcessor
-from data_processing.ray.transform_runtime import AbstractTableTransformRuntimeFactory
-from data_processing.ray.transform_statistics import Statistics
+from data_processing.data_access import DataAccessFactory
+from data_processing.ray import (
+    TransformOrchestratorConfiguration,
+    RayUtils,
+    TransformTableProcessor,
+    AbstractTableTransformRuntimeFactory,
+    TransformStatistics
+)
 
 
 @ray.remote(num_cpus=1, scheduling_strategy="SPREAD")
 def orchestrate(
-    cli_args:dict[str,Any],
-    preprocessing_params: RayOrchestratorConfiguration,
+    preprocessing_params: TransformOrchestratorConfiguration,
     data_access_factory: DataAccessFactory,
     transform_runtime_factory: AbstractTableTransformRuntimeFactory,
 ) -> int:
@@ -53,18 +54,17 @@ def orchestrate(
         # create transformer runtime
         runtime = transform_runtime_factory.create_transform_runtime()
         # create statistics
-        statistics = Statistics.remote()
+        statistics = TransformStatistics.remote()
         # create executors
-        runtime.set_data_access(data_access)    # todo: what is the reason for this?
         processor_params = {
             "data_access_factory": data_access_factory,
-            "transform_class": transform_runtime_factory.get_transform_class(),
-            "transform_params": cli_args,   # todo: contains all cli args, not just transform params.
+            "processor": transform_runtime_factory.get_transformer(),
+            "processor_params": runtime.set_environment(data_access=data_access),
             "stats": statistics,
         }
-        processors = ray.ActorPool(
+        processors = ActorPool(
             RayUtils.create_actors(
-                clazz=TableProcessor,
+                clazz=TransformTableProcessor,
                 params=processor_params,
                 actor_options=preprocessing_params.worker_options,
                 n_actors=preprocessing_params.n_workers,
@@ -100,7 +100,7 @@ def orchestrate(
             "code": preprocessing_params.code_location,
             "job_input_params": transform_runtime_factory.get_input_params_metadata(),
             "execution_stats": resources
-            | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+                               | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
             "job_output_stats": stats,
         }
         data_access.save_job_metadata(metadata)

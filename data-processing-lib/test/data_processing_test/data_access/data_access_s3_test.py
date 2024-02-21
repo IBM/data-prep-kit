@@ -1,9 +1,9 @@
-from data_processing.data_access import *
+from data_processing.data_access import DataAccessS3
 
 
 s3_cred = {
-    "access_key": "key",
-    "secret_key": "secret",
+    "access_key": "bc03915a4b9f47448e06c064474010b5",
+    "secret_key": "ebe9153f8aacbb2dd2244beb9894bac8ec883e6dc42d0dee",
     "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 

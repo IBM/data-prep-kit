@@ -1,5 +1,9 @@
 import argparse
 
+KB = 1024
+MB = 1024 * KB
+GB = 1024 * MB
+
 def str2bool(value: str) -> bool:
     """
     Convert string to boolean. Helper for getting boolean parameters

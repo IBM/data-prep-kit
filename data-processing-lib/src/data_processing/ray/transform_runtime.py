@@ -1,9 +1,9 @@
 import argparse
 from typing import Any
 
-from data_processing.data_access.data_access import DataAccess
-from data_processing.table_transform import AbstractTableTransform
-from data_processing.utils.cli import CLIArgumentProvider
+from data_processing.data_access import DataAccess
+from data_processing.transform import AbstractTableTransform
+from data_processing.utils import CLIArgumentProvider
 
 
 class DefaultTableTransformRuntime(CLIArgumentProvider):
@@ -47,7 +47,8 @@ class AbstractTableTransformRuntimeFactory(CLIArgumentProvider):
     """
 
     def __init__(
-        self, runtime_class: type[DefaultTableTransformRuntime], transformer_class: type[AbstractTableTransform]
+        self, transformer_class: type[AbstractTableTransform],
+            runtime_class: type[DefaultTableTransformRuntime] = DefaultTableTransformRuntime
     ):
         """
         Initialization
