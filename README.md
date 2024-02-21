@@ -10,9 +10,10 @@ Opensource version of our data acquisition and processing modules and pipelines,
         * resize
         * tokenization 
     * code
-	* ...
+        * ...
     * language
-	* language_id
+        * language_id
+	* ...
 
 # Build and Makefiles
 Makefiles are used for operations performed across all projects in the directory tree.
