@@ -1,11 +1,14 @@
 import os
+
+
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
 from typing import List, Tuple
 
-import pyizumo
 import pyarrow
 import pyarrow as pa
+import pyizumo
+
 
 # On ROKS Cluster
 runtime_env = {
@@ -15,13 +18,16 @@ runtime_env = {
     }
 }
 
+
 def get_score(lang: str) -> float:
     # Note: pyizumo does not return confidence score. Set to 1.0 as default.
     # Other libraries may return confidence score.
     return 1.0
 
-def get_lang_ds_pa(table: pyarrow.table, nlp: pyizumo.model.Izumo, col_name :str = "contents") \
-        -> tuple[pyarrow.table, pyarrow.table]:
+
+def get_lang_ds_pa(
+    table: pyarrow.table, nlp: pyizumo.model.Izumo, col_name: str = "contents"
+) -> tuple[pyarrow.table, pyarrow.table]:
     try:
         detected_language = pa.array(list(map(lambda x: nlp(x).locale, table[col_name].to_pylist())))
     except Exception as e:
@@ -32,8 +38,10 @@ def get_lang_ds_pa(table: pyarrow.table, nlp: pyizumo.model.Izumo, col_name :str
     table = table.append_column("ft_score", pa.array(list(map(lambda x: get_score(x), table["ft_lang"].to_pylist()))))
     return table, stats
 
-def get_sentences_ds_pa(table: pyarrow.table, ft_lang: str, nlp: pyizumo.model.Izumo, col_name: str = "contents") \
-        -> list[pyarrow.table]:
+
+def get_sentences_ds_pa(
+    table: pyarrow.table, ft_lang: str, nlp: pyizumo.model.Izumo, col_name: str = "contents"
+) -> list[pyarrow.table]:
     """
     Converts a (batch) dataset where each record (row) is a document to a dataset
     where each record (row) is a sentence.
@@ -76,5 +84,3 @@ def get_sentences_ds_pa(table: pyarrow.table, ft_lang: str, nlp: pyizumo.model.I
     if len(result) > 0:
         new_tables.append(pa.Table.from_pydict(result))
     return new_tables
-
-
