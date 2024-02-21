@@ -1,5 +1,6 @@
 import pyarrow
 
+
 class AbstractTableTransform:
     """
     Converts input to output table

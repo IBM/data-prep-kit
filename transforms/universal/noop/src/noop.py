@@ -4,10 +4,9 @@ from argparse import ArgumentParser
 from typing import Any
 
 import pyarrow as pa
-
 from data_processing.ray import (
-    DefaultTableTransformRuntime,
     AbstractTableTransformRuntimeFactory,
+    DefaultTableTransformRuntime,
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
@@ -28,7 +27,7 @@ class NOOPTransform(AbstractTableTransform):
         super().__init__(config)
         self.sleep_msec = config.get("noop_sleep_msec", 1)
 
-    def transform(self, table: pa.Table) -> list[pa.Table] :
+    def transform(self, table: pa.Table) -> list[pa.Table]:
         """
         Put Transform-specific to convert one Table to another Table.
         This implementation makes no modifications so effectively implements a copy of the input parquet to the output folder, without modification.
@@ -37,7 +36,7 @@ class NOOPTransform(AbstractTableTransform):
             print(f"Sleep for {self.sleep_msec} milliseconds")
             time.sleep(self.sleep_msec / 1000)
             print("Sleep completed - continue")
-        return [ table ]
+        return [table]
 
 
 class NOOPTableTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
@@ -46,6 +45,7 @@ class NOOPTableTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
+
     def __init__(self):
         super().__init__(runtime_class=DefaultTableTransformRuntime, transformer_class=NOOPTransform)
         self.params = {}

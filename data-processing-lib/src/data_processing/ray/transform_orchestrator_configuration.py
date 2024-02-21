@@ -1,6 +1,5 @@
-import ast
-
 import argparse
+import ast
 
 from data_processing.utils import CLIArgumentProvider
 

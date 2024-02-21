@@ -1,17 +1,16 @@
 from datetime import datetime
 
 import ray
-from ray.util.metrics import Gauge
-from ray.util import ActorPool
-
 from data_processing.data_access import DataAccessFactory
 from data_processing.ray import (
-    TransformOrchestratorConfiguration,
-    RayUtils,
-    TransformTableProcessor,
     AbstractTableTransformRuntimeFactory,
-    TransformStatistics
+    RayUtils,
+    TransformOrchestratorConfiguration,
+    TransformStatistics,
+    TransformTableProcessor,
 )
+from ray.util import ActorPool
+from ray.util.metrics import Gauge
 
 
 @ray.remote(num_cpus=1, scheduling_strategy="SPREAD")
@@ -100,7 +99,7 @@ def orchestrate(
             "code": preprocessing_params.code_location,
             "job_input_params": transform_runtime_factory.get_input_params_metadata(),
             "execution_stats": resources
-                               | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
             "job_output_stats": stats,
         }
         data_access.save_job_metadata(metadata)

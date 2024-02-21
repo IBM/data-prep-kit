@@ -3,9 +3,8 @@ import json
 from typing import Any
 
 import pyarrow
-
-from data_processing.data_access import DataAccess, ArrowS3
-from data_processing.utils import MB, GB
+from data_processing.data_access import ArrowS3, DataAccess
+from data_processing.utils import GB, MB
 
 
 class DataAccessS3(DataAccess):

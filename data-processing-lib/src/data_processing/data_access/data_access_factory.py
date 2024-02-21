@@ -1,17 +1,13 @@
-import ast
-
 import argparse
+import ast
 
 from data_processing.data_access import (
     DataAccess,
     DataAccessLakeHouse,
     DataAccessLocal,
-    DataAccessS3
+    DataAccessS3,
 )
-from data_processing.utils import (
-    CLIArgumentProvider,
-    str2bool,
-)
+from data_processing.utils import CLIArgumentProvider, str2bool
 
 
 class DataAccessFactory(CLIArgumentProvider):
@@ -124,10 +120,7 @@ class DataAccessFactory(CLIArgumentProvider):
 
         # check that at least one (S3, LakeHouse, or Local) configuration is specified
         if s3_config_specified + lh_config_specified + local_config_specified == 0:
-            print(
-                "No S3, lakehouse, or local configuration parameters defined,"
-                " at least one of them is required! "
-            )
+            print("No S3, lakehouse, or local configuration parameters defined," " at least one of them is required! ")
             return False
 
         # further validate the specified configuration (S3, LakeHouse, or Local)

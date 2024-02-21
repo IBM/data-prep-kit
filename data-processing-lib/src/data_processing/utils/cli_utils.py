@@ -1,8 +1,10 @@
 import argparse
 
+
 KB = 1024
 MB = 1024 * KB
 GB = 1024 * MB
+
 
 def str2bool(value: str) -> bool:
     """
@@ -36,4 +38,3 @@ class CLIArgumentProvider:
         :return: True, if validate pass or False otherwise
         """
         return True
-

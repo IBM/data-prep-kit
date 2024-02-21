@@ -1,10 +1,7 @@
 import ray
-
+from data_processing.ray import RayUtils, TransformStatistics
 from data_processing.utils import GB
-from data_processing.ray import (
-    RayUtils,
-    TransformStatistics
-)
+
 
 params = {}
 actor_options = {"num_cpus": 1, "memory": GB, "max_task_retries": 10}

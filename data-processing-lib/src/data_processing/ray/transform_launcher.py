@@ -1,13 +1,12 @@
 import argparse
 import time
-import ray
 
+import ray
 from data_processing.data_access import DataAccessFactory
 from data_processing.ray import (
-    TransformOrchestratorConfiguration,
     AbstractTableTransformRuntimeFactory,
+    TransformOrchestratorConfiguration,
 )
-
 from data_processing.utils import str2bool
 
 

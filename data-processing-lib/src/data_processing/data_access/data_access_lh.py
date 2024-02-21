@@ -2,10 +2,7 @@ import json
 from typing import Any
 
 import pyarrow
-from data_processing.data_access import (
-    DataAccessS3,
-    DataAccess
-)
+from data_processing.data_access import DataAccess, DataAccessS3
 from lakehouse import (
     CosCredentials,
     Datasource,

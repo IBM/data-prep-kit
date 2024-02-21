@@ -46,8 +46,9 @@ class AbstractTableTransformRuntimeFactory(CLIArgumentProvider):
     """
 
     def __init__(
-        self, transformer_class: type[AbstractTableTransform],
-            runtime_class: type[DefaultTableTransformRuntime] = DefaultTableTransformRuntime
+        self,
+        transformer_class: type[AbstractTableTransform],
+        runtime_class: type[DefaultTableTransformRuntime] = DefaultTableTransformRuntime,
     ):
         """
         Initialization

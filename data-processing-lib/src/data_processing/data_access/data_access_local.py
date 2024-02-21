@@ -5,23 +5,23 @@ import os
 from pathlib import Path
 from typing import Any
 
-import pyarrow.parquet as pq
 import pyarrow as pa
-
+import pyarrow.parquet as pq
 from data_processing.data_access import DataAccess
-from data_processing.utils import MB, GB
+from data_processing.utils import GB, MB
 
 
 class DataAccessLocal(DataAccess):
     """
     Implementation of the Base Data access class for local folder data access.
     """
+
     def __init__(
-            self,
-            path_config: dict[str, str],
-            d_sets: list[str],
-            checkpoint: bool,
-            m_files: int,
+        self,
+        path_config: dict[str, str],
+        d_sets: list[str],
+        checkpoint: bool,
+        m_files: int,
     ):
         """
         Create data access class for folder based configuration
@@ -34,7 +34,7 @@ class DataAccessLocal(DataAccess):
         self.m_files = m_files
 
     def _get_files_folder(
-            self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
+        self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
     ) -> tuple[list[str], dict[str, float]]:
         """
         Support method.  Lists all parquet files in a directory and their sizes.
@@ -69,12 +69,12 @@ class DataAccessLocal(DataAccess):
         )
 
     def _get_input_files(
-            self,
-            input_path: str,
-            output_path: str,
-            cm_files: int,
-            max_file_size: int = 0,
-            min_file_size: int = MB * GB,
+        self,
+        input_path: str,
+        output_path: str,
+        cm_files: int,
+        max_file_size: int = 0,
+        min_file_size: int = MB * GB,
     ) -> tuple[list[str], dict[str, float]]:
         """
         Get list and size of files from input path, that do not exist in the output path

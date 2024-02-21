@@ -1,10 +1,13 @@
 from typing import Any
+
 import pyarrow as pa
+
 
 class DataAccess:
     """
     Base class for data access (interface), defining all the methods
     """
+
     def get_files_to_process(self) -> tuple[list[str], dict[str, float]]:
         """
         Get files to process
