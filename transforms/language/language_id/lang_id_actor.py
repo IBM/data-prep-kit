@@ -11,14 +11,19 @@ from data_processing.ray import (
 )
 from data_processing.transform import AbstractTableTransform
 
-'''
+
+"""
 Reference https://github.ibm.com/ai-foundation/foundation-model-stack/blob/main/preprocessing/ray/language_identification_sentence_split/liss_actor.py
-'''
+"""
+
+
 class LangIdentificationTransform(AbstractTableTransform):
     """
     Implements language identification using IBM pyizumo to documents in a pyarrow Table.
     """
+
     import pyizumo
+
     from transforms.language.language_id.watson_nlp import get_lang_ds_pa
 
     def __init__(self, config: dict):
@@ -35,7 +40,6 @@ class LangIdentificationTransform(AbstractTableTransform):
             self.drop_column_if_existed = config["drop_column_if_existed"]
         else:
             self.drop_column_if_existed = True
-
 
     def transform(self, table: pa.Table) -> list[pa.Table]:
         """
@@ -72,8 +76,7 @@ class LangIdentificationTransformRuntimeFactory(AbstractTableTransformRuntimeFac
     """
 
     def __init__(self):
-        super().__init__(runtime_class=DefaultTableTransformRuntime,
-                         transformer_class=LangIdentificationTransform)
+        super().__init__(runtime_class=DefaultTableTransformRuntime, transformer_class=LangIdentificationTransform)
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -105,8 +108,9 @@ class LangIdentificationTransformRuntimeFactory(AbstractTableTransformRuntimeFac
 
 if __name__ == "__main__":
     # create launcher
-    launcher = TransformLauncher(name="LangIdentificationTransform",
-                                 transform_runtime_factory=LangIdentificationTransformRuntimeFactory())
+    launcher = TransformLauncher(
+        name="LangIdentificationTransform", transform_runtime_factory=LangIdentificationTransformRuntimeFactory()
+    )
     # create parameters
 
     # launch

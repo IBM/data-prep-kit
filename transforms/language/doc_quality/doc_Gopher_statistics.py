@@ -5,22 +5,15 @@
     based on Gopher paper (mostly in pages 39-41) https://arxiv.org/pdf/2112.11446.pdf
 """
 
-
-import os
-
 # for particular Japanese language:
 import re
-import sys
-
-import pyarrow.parquet as pq
-from pyarrow import fs
 
 
 hirakata_pat = re.compile(r"[ぁ-んァ-ン]")  # pattern for Japanese alphabets (Hiragana ぁ-ん and Katakana ァ-ン)
 kuten_pat = re.compile(r"。")
 
 
-def compute_word_statistics(text: str, symbols: list = ["#", "..."]):
+def compute_word_statistics(text: str, symbols: list = ["#", "..."]) -> tuple[int, int, int]:
     """
     Given a text document:
         - Count the total number of words (should be between 50 and 100,000 words)
@@ -44,7 +37,7 @@ def compute_word_statistics(text: str, symbols: list = ["#", "..."]):
     return total_words, mean_word_len, symbol_to_word_ratio
 
 
-def compute_bullet_point_ellipsis_alphabet_word_ratio(text: str, bullets: list = ["-", "*"]):
+def compute_bullet_point_ellipsis_alphabet_word_ratio(text: str, bullets: list = ["-", "*"]) -> tuple[int, int, int]:
     """
     Given a text document:
         - Compute the ratio of lines starting with a bullet point (should be <=90%)
@@ -150,44 +143,3 @@ def compute_average_japanese_sentence_length(text: str) -> int:
     else:
         avg_sent_len = int(len(text) / len(kutens))
     return avg_sent_len
-
-
-if __name__ == "__main__":
-    # quick test `compute_word_statistics()`
-    text = "This is a sample text document with some words. #hashtags #ellipses..."
-    total_words, mean_word_len, symbol_to_word_ratio = compute_word_statistics(text)
-    print(
-        f"== total_words: {total_words:,} mean_word_len: {mean_word_len:.1f} symbol_to_word_ratio: {symbol_to_word_ratio:.3f}"
-    )
-
-    # quick test `compute_bullet_point_ellipsis_alphabet_word_ratio()`
-    text = """
-    - First item 1000
-    - Second item 2000
-    * Third item
-    Some other text
-    * Fourth item... 4
-    """
-    bullet_point_ratio, ellipsis_line_ratio, alphabet_word_ratio = compute_bullet_point_ellipsis_alphabet_word_ratio(
-        text
-    )
-
-    print(
-        f"== bullet_point_ratio: {bullet_point_ratio:.2f} \n"
-        f"== ellipsis_line_ratio: {ellipsis_line_ratio:.2f}\n"
-        f"== alphabet_word_ratio: {alphabet_word_ratio:.2f}"
-    )
-
-    # quick test `contains_common_English_words()`
-    text1 = "The quick brown fox jumps over the lazy dog."
-    text2 = "To be or not to be, that is the question."
-    print(contains_common_English_words(text1, ft_lang="en"))  # False
-    print(contains_common_English_words(text2, ft_lang="en"))  # True
-
-    print(f"== Avg ja sentence length: {compute_average_japanese_sentence_length('今日の天気は晴れ。' * 30):,}")
-    text = "今日の天気は晴れ\n" * 30
-    print(f"== Avg ja sentence length: {compute_average_japanese_sentence_length(text):,}")
-
-    print(f"== First ja alphabet position: {find_first_japanese_alphabet_position('今日の天気は晴れ。'):,}")
-    print(f"== First ja alphabet position: {find_first_japanese_alphabet_position('成田空港第1ターミナルに向かう。'):,}")
-    print(f"== First ja alphabet position: {find_first_japanese_alphabet_position('本日晴天也。'):,}")
