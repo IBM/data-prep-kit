@@ -3,6 +3,7 @@ import pyizumo
 
 from transforms.language.language_id.watson_nlp import get_lang_ds_pa
 
+
 def test_language_identification(nlp_langid: pyizumo.model.Izumo):
     documents = pa.array(
         [
@@ -21,6 +22,7 @@ def test_language_identification(nlp_langid: pyizumo.model.Izumo):
     table = pa.Table.from_arrays([documents], names=["contents"])
     table, stats = get_lang_ds_pa(table, nlp_langid, col_name="contents")
     assert table["ft_lang"].to_pylist() == ["de", "pt", "ja", "fr", "es"]
+
 
 if __name__ == "__main__":
     nlp_langid = pyizumo.load(parsers=["langdetect"])

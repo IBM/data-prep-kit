@@ -191,4 +191,3 @@ if __name__ == "__main__":
     print(f"== First ja alphabet position: {find_first_japanese_alphabet_position('今日の天気は晴れ。'):,}")
     print(f"== First ja alphabet position: {find_first_japanese_alphabet_position('成田空港第1ターミナルに向かう。'):,}")
     print(f"== First ja alphabet position: {find_first_japanese_alphabet_position('本日晴天也。'):,}")
-

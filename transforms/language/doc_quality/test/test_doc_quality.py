@@ -1,4 +1,5 @@
 import pyarrow as pa
+
 from transforms.language.doc_quality.doc_Gopher_statistics import (
     compute_average_japanese_sentence_length,
     compute_bullet_point_ellipsis_alphabet_word_ratio,
@@ -7,6 +8,7 @@ from transforms.language.doc_quality.doc_Gopher_statistics import (
     find_first_japanese_alphabet_position,
 )
 from transforms.language.doc_quality.perplexity import KenLMModel
+
 
 def test_gopher_stats():
     document_ids = pa.array([1001])
@@ -21,18 +23,23 @@ def test_gopher_stats():
         ]
     )
     table = pa.Table.from_arrays([document_ids, documents], names=["document_id", "contents"])
-    ft_lang = 'ja'
+    ft_lang = "ja"
 
-    for text in table['contents'].to_pylist():
+    for text in table["contents"].to_pylist():
         (total_words, mean_word_len, symbol_to_word_ratio) = compute_word_statistics(text)
         assert 0.0 == symbol_to_word_ratio
         assert False == contains_common_English_words(text, ft_lang)
         assert 51 == compute_average_japanese_sentence_length(text)
         assert 0 == find_first_japanese_alphabet_position(text)
-        (bullet_point_ratio, ellipsis_line_ratio, alphabet_word_ratio) = compute_bullet_point_ellipsis_alphabet_word_ratio(text)
+        (
+            bullet_point_ratio,
+            ellipsis_line_ratio,
+            alphabet_word_ratio,
+        ) = compute_bullet_point_ellipsis_alphabet_word_ratio(text)
         assert 0.0 == bullet_point_ratio
         assert 0.0 == ellipsis_line_ratio
         assert 1.0 == alphabet_word_ratio
+
 
 def test_kenlm_score(klm: KenLMModel):
     document_ids = pa.array([1001])
@@ -47,13 +54,14 @@ def test_kenlm_score(klm: KenLMModel):
         ]
     )
     table = pa.Table.from_arrays([document_ids, documents], names=["document_id", "contents"])
-    ft_lang = 'ja'
+    ft_lang = "ja"
     strip_accent = True
 
-    for text in table['contents'].to_pylist():
+    for text in table["contents"].to_pylist():
         assert 177.9 == klm.get_perplexity(text)
 
+
 if __name__ == "__main__":
-    klm = KenLMModel.from_pretrained(model_path='/Docfilter/lm_sp/', language=ft_lang, strip_accent=strip_accent)
+    klm = KenLMModel.from_pretrained(model_path="/Docfilter/lm_sp/", language=ft_lang, strip_accent=strip_accent)
     test_kenlm_score(klm)
     test_gopher_stats()

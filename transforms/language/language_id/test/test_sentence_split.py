@@ -3,6 +3,7 @@ import pyizumo
 
 from transforms.language.language_id.watson_nlp import get_sentences_ds_pa
 
+
 def test_sentence_split(nlp_sentence: pyizumo.model.Izumo):
     document_ids = pa.array([1001])
     documents = pa.array(

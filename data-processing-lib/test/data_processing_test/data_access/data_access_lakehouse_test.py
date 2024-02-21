@@ -1,5 +1,6 @@
 from data_access import DataAccessLakeHouse
 
+
 s3_cred = {
     "access_key": "YOUR KEY",
     "secret_key": "YOUR SECRET KEY",
@@ -14,7 +15,7 @@ lakehouse_config = {
     "input_version": "main",
     "output_table": "academic.ieee.lh_unittest",
     "output_path": "lh-test/tables/academic/ieee/lh_unittest",
-    "token": "YOUR TOKEN"
+    "token": "YOUR TOKEN",
 }
 
 
@@ -65,23 +66,22 @@ def test_get_folder():
     )
     # get the folder
     files = d_a.get_files_to_process()
-    print(f"got {len(files[0])} files")
+    print(f"got {len(files[0])} files to process with checkpoint False")
     assert 14 == len(files[0])
 
 
 def test_get_todo_list():
     """
-    Testing get_input_missing_from_output
+    Testing get todo list by setting checkpoint to True
     : return: None
     """
     # create data access
     d_a = DataAccessLakeHouse(
-        s3_credentials=s3_cred, lakehouse_config=lakehouse_config, d_sets=None, checkpoint=False, m_files=-1
+        s3_credentials=s3_cred, lakehouse_config=lakehouse_config, d_sets=None, checkpoint=True, m_files=-1
     )
 
-
-#    print(f"got {len(d_a.get_input_missing_from_output())} files to process")
-#    assert 12 == len(d_a.get_input_missing_from_output())
+    print(f"got {len(d_a.get_files_to_process()[0])} files to process with checkpoint True")
+    assert 12 == len(d_a.get_files_to_process()[0])
 
 
 def test_files_to_process():
@@ -94,46 +94,54 @@ def test_files_to_process():
         "input_folder": "lh-test/tables/academic/ieee/data/version=0.0.1/language=en/",
         "output_folder": "lh-test/tables/academic/ieee/lh_unittest/data/version=0.0.1/language=en/",
     }
+    # get files to process with checkpoint set to False
     d_a = DataAccessLakeHouse(
         s3_credentials=s3_cred, lakehouse_config=lakehouse_config, d_sets=None, checkpoint=False, m_files=-1
     )
-    # get files to process
-    # files, profile = d_a.get_files_to_process(d_sets=None, checkpoint=False)
     files, profile = d_a.get_files_to_process()
-    print(f"files {len(files)}, profile {profile}")
+    print(f"files with checkpointing set to False {len(files)}, profile {profile}")
     assert 14 == len(files)
     assert 344.0891418457031 == profile["max_file_size"]
     assert 0.00907135009765625 == profile["min_file_size"]
     assert 1794.700538635254 == profile["total_file_size"]
 
-    """
     # use checkpoint
-    # files, profile = d_a.get_files_to_process(d_sets=None, checkpoint=True)
+    d_a = DataAccessLakeHouse(
+        s3_credentials=s3_cred, lakehouse_config=lakehouse_config, d_sets=None, checkpoint=True, m_files=-1
+    )
     files, profile = d_a.get_files_to_process()
-    print(f"files with checkpointing {len(files)}, profile {profile}")
-    assert 14 == len(files)
-    assert 182.44072341918945 == profile["max_file_size"]
-    assert 5.962291717529297 == profile["min_file_size"]
-    assert 561.1689929962158 == profile["total_file_size"]
+    print(f"files with checkpointing set to True {len(files)}, profile {profile}")
+    assert 12 == len(files)
+    assert 344.0891418457031 == profile["max_file_size"]
+    assert 0.00907135009765625 == profile["min_file_size"]
+    assert 1463.8405895233154 == profile["total_file_size"]
+
     # using data sets
-    files, profile = d_a.get_files_to_process(d_sets=["dataset=textbooks"], checkpoint=False)
+    lakehouse_config["input_table"] = "bluepile.academic.doabooks"
+    lakehouse_config["input_dataset"] = "doabooks"
+    d_a = DataAccessLakeHouse(
+        s3_credentials=s3_cred, lakehouse_config=lakehouse_config, d_sets=["doabooks"], checkpoint=False, m_files=-1
+    )
+    files, profile = d_a.get_files_to_process()
     print(f"using data sets files {len(files)}, profile {profile}")
-    assert 9 == len(files)
-    assert 320.3226261138916 == profile["max_file_size"]
-    assert 5.962291717529297 == profile["min_file_size"]
-    assert 881.4916191101074 == profile["total_file_size"]
+    assert 26 == len(files)
+    assert 666.0280637741089 == profile["max_file_size"]
+    assert 0.05837726593017578 == profile["min_file_size"]
+    assert 1439.3532075881958 == profile["total_file_size"]
     # using data sets with checkpointing
-    files, profile = d_a.get_files_to_process(d_sets=["dataset=textbooks"], checkpoint=True)
+    d_a = DataAccessLakeHouse(
+        s3_credentials=s3_cred, lakehouse_config=lakehouse_config, d_sets=["doabooks"], checkpoint=True, m_files=-1
+    )
+    files, profile = d_a.get_files_to_process()
     print(f"using data sets files {len(files)}, profile {profile}")
-    assert 8 == len(files)
-    assert 182.44072341918945 == profile["max_file_size"]
-    assert 5.962291717529297 == profile["min_file_size"]
-    assert 561.1689929962158 == profile["total_file_size"]
-    """
+    assert 26 == len(files)
+    assert 666.0280637741089 == profile["max_file_size"]
+    assert 0.05837726593017578 == profile["min_file_size"]
+    assert 1439.3532075881958 == profile["total_file_size"]
 
 
 if __name__ == "__main__":
     test_table_read_write()
     test_get_folder()
-    test_files_to_process()
     test_get_todo_list()
+    test_files_to_process()
