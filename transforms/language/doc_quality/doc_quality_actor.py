@@ -1,5 +1,4 @@
 import argparse
-import time
 from argparse import ArgumentParser
 from typing import Any
 
@@ -11,9 +10,13 @@ from data_processing.ray import (
 )
 from data_processing.transform import AbstractTableTransform
 
+
 """
 Reference https://github.ibm.com/ai-foundation/foundation-model-stack/blob/main/preprocessing/ray/doc_quality_annotation/doc_annotation_actor.py
 """
+
+# TODO: Update following path to folder containing files of bad words for each language:
+BAD_WORD_DIR = "/Docfilter/docq/ldnoobw/"
 
 
 class DocQualityTransform(AbstractTableTransform):
@@ -28,12 +31,19 @@ class DocQualityTransform(AbstractTableTransform):
         by the companion runtime, NOOPTransformRuntime.  If running inside the RayMutatingDriver,
         these will be provided by that class with help from the RayMutatingDriver.
         """
+        from doc_c4_statistics import c4_load_ldnoobw_words
+
         from transforms.language.doc_quality.perplexity import KenLMModel
+
         super().__init__(config)
         self.warning_issued = False
-        ft_lang = config["ft_lang"]
+        self.ft_lang = config["ft_lang"]
+        self.bad_word_filepath = f"{BAD_WORD_DIR}{self.ft_lang}"
+        self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.ft_lang, file_path=self.bad_word_filepath)
         strip_accent = True
-        self.klm = KenLMModel.from_pretrained(model_path="/Docfilter/lm_sp/", language=ft_lang, strip_accent=strip_accent)
+        self.klm = KenLMModel.from_pretrained(
+            model_path="/Docfilter/lm_sp/", language=self.ft_lang, strip_accent=strip_accent
+        )
         if "drop_column_if_existed" in config:
             self.drop_column_if_existed = config["drop_column_if_existed"]
         else:
@@ -41,18 +51,18 @@ class DocQualityTransform(AbstractTableTransform):
 
     def transform(self, table: pa.Table) -> list[pa.Table]:
 
+        from doc_c4_statistics import (
+            c4_contain_pattern_ratio,
+            c4_contains_ldnoobw_words,
+            c4_sentence_count,
+        )
+
         from transforms.language.doc_quality.doc_Gopher_statistics import (
             compute_average_japanese_sentence_length,
             compute_bullet_point_ellipsis_alphabet_word_ratio,
             compute_word_statistics,
             contains_common_English_words,
             find_first_japanese_alphabet_position,
-        )
-        from doc_c4_statistics import (
-            c4_contain_pattern_ratio,
-            c4_contains_ldnoobw_words,
-            c4_load_ldnoobw_words,
-            c4_sentence_count,
         )
 
         """
@@ -182,7 +192,7 @@ class DocQualityTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument("-f", "--ft_lang", default="en")
-        parser.add_argument("-dr", "--drop_column_if_existed", default=False, help="drop columns if existed")
+        parser.add_argument("-dr", "--drop_column_if_existed", default=True, help="drop columns if existed")
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
