@@ -1,10 +1,9 @@
 import pyarrow as pa
 import pyizumo
 
-from transforms.universal.lang_id.watson_nlp import get_sentences_ds_pa
+from transforms.language.language_id.watson_nlp import get_sentences_ds_pa
 
-
-def test_sentence_split():
+def test_sentence_split(nlp_sentence: pyizumo.model.Izumo):
     document_ids = pa.array([1001])
     documents = pa.array(
         [
@@ -17,10 +16,11 @@ def test_sentence_split():
         ]
     )
     table = pa.Table.from_arrays([document_ids, documents], names=["document_id", "contents"])
-    nlp_sentence = pyizumo.load("ja", parsers=["sentence"])
+
     tables = get_sentences_ds_pa(table, "ja", nlp_sentence, col_name="contents")
     assert tables[0].shape[0] == 6
 
 
 if __name__ == "__main__":
-    test_sentence_split()
+    nlp_sentence = pyizumo.load("ja", parsers=["sentence"])
+    test_sentence_split(nlp_sentence)

@@ -1,10 +1,9 @@
 import pyarrow as pa
 import pyizumo
 
-from transforms.universal.lang_id.watson_nlp import get_lang_ds_pa
+from transforms.language.language_id.watson_nlp import get_lang_ds_pa
 
-
-def test_language_identification():
+def test_language_identification(nlp_langid: pyizumo.model.Izumo):
     documents = pa.array(
         [
             "Der Tell Sabi Abyad („Hügel des weißen Jungen“) ist eine historische "
@@ -20,10 +19,9 @@ def test_language_identification():
         ]
     )
     table = pa.Table.from_arrays([documents], names=["contents"])
-    nlp_langid = pyizumo.load(parsers=["langdetect"])
     table, stats = get_lang_ds_pa(table, nlp_langid, col_name="contents")
     assert table["ft_lang"].to_pylist() == ["de", "pt", "ja", "fr", "es"]
 
-
 if __name__ == "__main__":
-    test_language_identification()
+    nlp_langid = pyizumo.load(parsers=["langdetect"])
+    test_language_identification(nlp_langid)

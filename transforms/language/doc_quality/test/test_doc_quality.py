@@ -1,12 +1,12 @@
 import pyarrow as pa
-from transforms.universal.doc_qual.doc_Gopher_statistics import (
+from transforms.language.doc_quality.doc_Gopher_statistics import (
     compute_average_japanese_sentence_length,
     compute_bullet_point_ellipsis_alphabet_word_ratio,
     compute_word_statistics,
     contains_common_English_words,
     find_first_japanese_alphabet_position,
 )
-from transforms.universal.doc_qual.perplexity import KenLMModel
+from transforms.language.doc_quality.perplexity import KenLMModel
 
 def test_gopher_stats():
     document_ids = pa.array([1001])
@@ -34,8 +34,7 @@ def test_gopher_stats():
         assert 0.0 == ellipsis_line_ratio
         assert 1.0 == alphabet_word_ratio
 
-
-def test_kenlm_score():
+def test_kenlm_score(klm: KenLMModel):
     document_ids = pa.array([1001])
     documents = pa.array(
         [
@@ -50,10 +49,11 @@ def test_kenlm_score():
     table = pa.Table.from_arrays([document_ids, documents], names=["document_id", "contents"])
     ft_lang = 'ja'
     strip_accent = True
-    klm = KenLMModel.from_pretrained(model_path='/Docfilter/lm_sp/', language=ft_lang, strip_accent=strip_accent)
+
     for text in table['contents'].to_pylist():
         assert 177.9 == klm.get_perplexity(text)
 
 if __name__ == "__main__":
-    test_kenlm_score()
+    klm = KenLMModel.from_pretrained(model_path='/Docfilter/lm_sp/', language=ft_lang, strip_accent=strip_accent)
+    test_kenlm_score(klm)
     test_gopher_stats()
