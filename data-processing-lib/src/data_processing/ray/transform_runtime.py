@@ -11,12 +11,11 @@ class DefaultTableTransformRuntime(CLIArgumentProvider):
     Transform runtime used by processor to create Transform specific environment
     """
 
-    def __init__(self, transform_class: type[AbstractTableTransform]):
+    def __init__(self):
         """
         Create transform runtime
         :param params: parameters
         """
-        self.transform_class = transform_class
 
     def set_data_access(self, data_access: DataAccess) -> None:
         """
@@ -63,7 +62,7 @@ class AbstractTableTransformRuntimeFactory(CLIArgumentProvider):
         Create transform runtime
         :return: transform runtime object
         """
-        return self.runtime_class(self.transformer_class)
+        return self.runtime_class()
 
     def get_transform_class(self) -> type[AbstractTableTransform]:
         """

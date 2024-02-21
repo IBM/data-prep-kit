@@ -3,8 +3,10 @@ import time
 from argparse import ArgumentParser
 
 import pyarrow
-
-from data_processing.ray.transform_runtime import DefaultTableTransformRuntime, AbstractTableTransformRuntimeFactory
+from data_processing.ray.transform_runtime import (
+    AbstractTableTransformRuntimeFactory,
+    DefaultTableTransformRuntime,
+)
 from data_processing.table_transform import AbstractTableTransform
 
 
@@ -23,7 +25,7 @@ class NOOPTransform(AbstractTableTransform):
         super().__init__(config)
         self.sleep_msec = config.get("noop_sleep_msec", None)
 
-    def transform(self, table: pyarrow.Table) -> list[pyarrow.Table] :
+    def transform(self, table: pyarrow.Table) -> list[pyarrow.Table]:
         """
         Put Transform-specific to convert one Table to another Table.
         This implementation makes no modifications so effectively implements a copy of the input parquet to the output folder, without modification.
@@ -32,7 +34,7 @@ class NOOPTransform(AbstractTableTransform):
             print(f"Sleep for {self.sleep_msec} milliseconds")
             time.sleep(self.sleep_msec / 1000)
             print("Sleep completed - continue")
-        return [ table ]
+        return [table]
 
 
 class NOOPTransformRuntime(DefaultTableTransformRuntime):
@@ -41,8 +43,9 @@ class NOOPTransformRuntime(DefaultTableTransformRuntime):
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
+
     def __init__(self):
-        super().__init__(NOOPTransform)
+        super().__init__()
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -69,10 +72,11 @@ class NOOPTransformRuntime(DefaultTableTransformRuntime):
     #     combined = {"nrows": m1_rows + m2_rows, "nfiles": m1_files + m2_files}
     #     return combined
 
-class NOOPTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
 
+class NOOPTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
     def __init__(self):
         super().__init__(NOOPTransformRuntime, NOOPTransform)
+
 
 if __name__ == "__main__":
     # Not currently used, but shows how one might use the two classes above outside of ray.
