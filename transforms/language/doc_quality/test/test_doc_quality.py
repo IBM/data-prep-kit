@@ -54,14 +54,14 @@ def test_kenlm_score(klm: KenLMModel):
         ]
     )
     table = pa.Table.from_arrays([document_ids, documents], names=["document_id", "contents"])
-    ft_lang = "ja"
-    strip_accent = True
 
     for text in table["contents"].to_pylist():
         assert 177.9 == klm.get_perplexity(text)
 
 
 if __name__ == "__main__":
+    ft_lang = "ja"
+    strip_accent = True
     klm = KenLMModel.from_pretrained(model_path="/Docfilter/lm_sp/", language=ft_lang, strip_accent=strip_accent)
     test_kenlm_score(klm)
     test_gopher_stats()
