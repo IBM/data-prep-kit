@@ -1,6 +1,5 @@
-import argparse
 import time
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
@@ -63,7 +62,7 @@ class NOOPTableTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
             help="Sleep actor for a number of milliseconds while processing the data frame, before writing the file to COS",
         )
 
-    def apply_input_params(self, args: argparse.Namespace) -> bool:
+    def apply_input_params(self, args: Namespace) -> bool:
         """
         Validate and apply the arguments that have been parsed
         :param args: user defined arguments including at least, but perhaps more,
@@ -71,11 +70,5 @@ class NOOPTableTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
         :return: True, if validate pass or False otherwise
         """
         self.params["sleep"] = args.noop_sleep_msec
+        print(f"noop parameters are : {self.params}")
         return True
-
-    def get_input_params_metadata(self) -> dict[str, Any]:
-        """
-        get input parameters for job_input_params in metadata
-        :return:
-        """
-        return self.params

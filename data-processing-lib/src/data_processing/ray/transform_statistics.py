@@ -18,8 +18,8 @@ class TransformStatistics(object):
         self.stats = {}
         self.data_write_counter = Counter("data_written", "Total data written bytes")
         self.data_read_counter = Counter("data_read", "Total data read bytes")
-        self.source_document_counter = Counter("source_docs_processed", "Total source document processed")
-        self.result_document_counter = Counter("result_docs_written", "Total result documents written")
+        self.source_document_counter = Counter("source_files_processed", "Total source document processed")
+        self.result_document_counter = Counter("result_files_written", "Total result documents written")
 
     def add_stats(self, stats=dict[str, Any]) -> None:
         """
@@ -29,11 +29,11 @@ class TransformStatistics(object):
         """
         for key, val in stats.items():
             self.stats[key] = self.stats.get(key, 0) + val
-            if key == "source_documents":
+            if key == "source_files":
                 self.source_document_counter.inc(val)
             if key == "source_size":
                 self.data_read_counter.inc(val)
-            if key == "result_documents":
+            if key == "result_files":
                 self.result_document_counter.inc(val)
             if key == "result_size":
                 self.data_write_counter.inc(val)

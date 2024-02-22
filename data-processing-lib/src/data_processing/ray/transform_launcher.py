@@ -82,6 +82,7 @@ class TransformLauncher:
                     transform_runtime_factory=self.transform_runtime_factory,
                 )
             )
+            time.sleep(10)
         except Exception as e:
             print(f"Exception running ray remote orchestration\n{e}")
         finally:

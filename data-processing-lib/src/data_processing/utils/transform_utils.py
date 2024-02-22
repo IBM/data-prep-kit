@@ -1,9 +1,7 @@
-import hashlib
 import string
 import sys
 from typing import Any
 
-import mmh3
 import pyarrow as pa
 
 
@@ -32,24 +30,6 @@ class TransformUtils:
         return size
 
     @staticmethod
-    def str_to_hash(val: str) -> str:
-        """
-        compute string hash
-        :param val: string
-        :return: hash value
-        """
-        return hashlib.sha256(val.encode("utf-8")).hexdigest()
-
-    @staticmethod
-    def str_to_int(s: str) -> int:
-        """
-        Convert string to int using mmh3 hashing. Ensures predictable result by setting seed
-        :param s: string
-        :return: int hash
-        """
-        return mmh3.hash(s, seed=42, signed=False)
-
-    @staticmethod
     def normalize_string(doc: str) -> str:
         """
         Normalize string
@@ -66,7 +46,7 @@ class TransformUtils:
         :param required: list of required columns
         :return: true, if all columns exist, false otherwise
         """
-        columns = table.columns
+        columns = table.schema.names
         result = True
         for r in required:
             if r not in columns:

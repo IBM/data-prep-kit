@@ -46,7 +46,7 @@ class TransformTableProcessor:
         table = self.data_access.get_table(path=f_name)
         if table is None:
             return
-        self.stats.add_stats.remote({"source_documents": 1, "source_size": table.nbytes})
+        self.stats.add_stats.remote({"source_files": 1, "source_size": table.nbytes})
         # Process input table
         try:
             if table.num_rows > 0:
@@ -71,7 +71,7 @@ class TransformTableProcessor:
                     # Store execution statistics. Doing this async
                     self.stats.add_stats.remote(
                         {
-                            "result_documents": 1,
+                            "result_files": 1,
                             "result_size": out_tables[0].nbytes,
                             "table_processing": time.time() - t_start,
                         }
@@ -89,7 +89,7 @@ class TransformTableProcessor:
                         break
                 self.stats.add_stats.remote(
                     {
-                        "result_documents": len(out_tables),
+                        "result_files": len(out_tables),
                         "result_size": table_sizes,
                         "table_processing": time.time() - t_start,
                     }
