@@ -71,11 +71,3 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
         :return: mutator class
         """
         return self.transformer
-
-    #
-    # def get_input_params(self) -> dict[str, Any]:
-    #     """
-    #     get input parameters for job_input_params in metadata
-    #     :return:
-    #     """
-    #     return self.params

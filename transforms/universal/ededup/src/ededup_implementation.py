@@ -196,9 +196,7 @@ class EdedupRuntime(DefaultTableTransformRuntime):
             actor_options={"num_cpus": self.params.get("hash_cpu", 0.5)},
             n_actors=self.params.get("num_hashes", 1),
         )
-        result = {"hashes": self.filters}
-        result.update(self.params)
-        return result
+        return {"hashes": self.filters} | self.params
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
         """
@@ -219,9 +217,7 @@ class EdedupRuntime(DefaultTableTransformRuntime):
                 sum_hash_mem = sum_hash_mem + h_memory
             remote_replies = not_ready
         dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 0))
-        result = {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst}
-        result.update(stats)
-        return result
+        return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
 
 
 class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):

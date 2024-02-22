@@ -1,5 +1,6 @@
 import argparse
 import ast
+from typing import Any
 
 from data_processing.data_access import (
     DataAccess,
@@ -163,6 +164,20 @@ class DataAccessFactory(CLIArgumentProvider):
             self.dsets = args.data_sets.split(",")
             print(f"Using data sets {self.dsets}, checkpointing {self.checkpointing}, max files {self.max_files}")
         return True
+
+
+    def get_input_params(self) -> dict[str, Any]:
+        """
+        get input parameters for job_input_params for metadata
+        :return: dictionary of params
+        """
+        params = {"checkpointing": self.checkpointing,
+                "max_files": self.max_files,
+                }
+        if self.dsets is not None:
+            params["data sets"] = self.dsets
+        return params
+
 
     @staticmethod
     def __validate_s3_cred(s3_credentials: dict[str, str]) -> bool:
