@@ -98,7 +98,7 @@ class LangIdentificationTransformRuntimeFactory(AbstractTableTransformRuntimeFac
         self.params["drop_column_if_existed"] = args.drop_column_if_existed
         return True
 
-    def get_input_params_metadata(self) -> dict[str, Any]:
+    def get_input_params(self) -> dict[str, Any]:
         """
         get input parameters for job_input_params in metadata
         :return:

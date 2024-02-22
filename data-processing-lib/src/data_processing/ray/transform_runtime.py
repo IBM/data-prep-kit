@@ -69,7 +69,7 @@ class AbstractTableTransformRuntimeFactory(CLIArgumentProvider):
         """
         return self.transformer
 
-    def get_input_params_metadata(self) -> dict[str, Any]:
+    def get_input_params(self) -> dict[str, Any]:
         """
         get input parameters for job_input_params in metadata
         :return:
