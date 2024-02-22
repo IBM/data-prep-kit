@@ -6,7 +6,7 @@ from ededup_implementation import EdedupTableTransformConfiguration
 
 
 # create launcher
-launcher = TransformLauncher(name="ededup", transform_runtime_factory=EdedupTableTransformConfiguration())
+launcher = TransformLauncher(name="ededup", transform_runtime_config=EdedupTableTransformConfiguration())
 # create parameters
 s3_cred = {
     "access_key": "access",

@@ -37,25 +37,34 @@ class DefaultTableTransformRuntime:
 
 class DefaultTableTransformConfiguration(CLIArgumentProvider):
     """
-    Provides support the configuration of a transformer.
+    Provides support the configuration of a transformer running in the ray environment.
+    It holds the following:
+        1) The type of the concrete AbstractTransform class having a zero-args initializer. This
+            will be created in the ray worker to perform that table transformations.
+        2) The type of the of DefaultTableTransformRuntime that supports operation of the transform
+            on the ray orchestrator side.  It is create with an initializer that takes the dictionary
+            of CLI arguments, optionally defined in this class.
+    Sub-classes may extend this class to override the following:
+        1) add_input_params() to add CLI argument definitions used in creating both the AbstractTransform
+            and the DefaultTableTransformRuntime.
     """
 
     def __init__(
         self,
         cli_argnames: list[str],
-        transformer_class: type[AbstractTableTransform],
+        transform_class: type[AbstractTableTransform],
         runtime_class: type[DefaultTableTransformRuntime] = DefaultTableTransformRuntime,
     ):
         super().__init__(cli_argnames)
         """
         Initialization
-        :param cli_argnames: list of strings naming the arguments defined in add_input_arguments without the -- or -.
+        :param cli_argnames: list of strings naming the arguments defined in add_input_arguments() without the -- or -.
+        :param transform_class: implementation of the Filter
         :param runtime_class: implementation of the Filter runtime
-        :param transformer_class: implementation of the Filter
         :return:
         """
         self.runtime = runtime_class
-        self.transformer = transformer_class
+        self.transform_class = transform_class
         self.params = {}
 
     def create_transform_runtime(self) -> DefaultTableTransformRuntime:
@@ -65,9 +74,9 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
         """
         return self.runtime(self.params)
 
-    def get_transformer(self) -> type[AbstractTableTransform]:
+    def get_transform_class(self) -> type[AbstractTableTransform]:
         """
         Create Mutator runtime
         :return: mutator class
         """
-        return self.transformer
+        return self.transform_class

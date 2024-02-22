@@ -19,17 +19,17 @@ class TransformLauncher:
     def __init__(
         self,
         name: str,
-        transform_runtime_factory: DefaultTableTransformConfiguration,
+        transform_runtime_config: DefaultTableTransformConfiguration,
         data_access_factory: DataAccessFactory = DataAccessFactory(),
     ):
         """
         Creates driver
         :param name: name of the application
-        :param transform_runtime_factory: transform runtime factory
+        :param transform_runtime_config: transform runtime factory
         :param data_access_factory: the factory to create DataAccess instances.
         """
         self.name = name
-        self.transform_runtime_factory = transform_runtime_factory
+        self.transform_runtime_config = transform_runtime_config
         self.data_access_factory = data_access_factory
         self.ray_orchestrator = TransformOrchestratorConfiguration(name=name)
 
@@ -44,7 +44,7 @@ class TransformLauncher:
             "--run_locally", type=lambda x: bool(str2bool(x)), default=False, help="running ray local flag"
         )
         # add additional arguments
-        self.transform_runtime_factory.add_input_params(parser=parser)
+        self.transform_runtime_config.add_input_params(parser=parser)
         self.data_access_factory.add_input_params(parser=parser)
         self.ray_orchestrator.add_input_params(parser=parser)
         args = parser.parse_args()
@@ -54,7 +54,7 @@ class TransformLauncher:
         else:
             print("connecting to existing cluster")
         return (
-            self.transform_runtime_factory.apply_input_params(args=args)
+            self.transform_runtime_config.apply_input_params(args=args)
             and self.data_access_factory.apply_input_params(args=args)
             and self.ray_orchestrator.apply_input_params(args=args)
         )
@@ -79,7 +79,7 @@ class TransformLauncher:
                 orchestrate.remote(
                     preprocessing_params=self.ray_orchestrator,
                     data_access_factory=self.data_access_factory,
-                    transform_runtime_factory=self.transform_runtime_factory,
+                    transform_runtime_config=self.transform_runtime_config,
                 )
             )
             time.sleep(10)

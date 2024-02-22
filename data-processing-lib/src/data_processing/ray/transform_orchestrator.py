@@ -17,13 +17,13 @@ from ray.util.metrics import Gauge
 def orchestrate(
     preprocessing_params: TransformOrchestratorConfiguration,
     data_access_factory: DataAccessFactory,
-    transform_runtime_factory: DefaultTableTransformConfiguration,
+    transform_runtime_config: DefaultTableTransformConfiguration,
 ) -> int:
     """
     orchestrator for transformer execution
     :param preprocessing_params: orchestrator configuration
     :param data_access_factory: data access factory
-    :param transform_runtime_factory: transformer runtime factory
+    :param transform_runtime_config: transformer runtime configuration
     :return: 0 - success or 1 - failure
     """
     start_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -51,13 +51,13 @@ def orchestrate(
             f"Number of workers - {preprocessing_params.n_workers} " f"with {preprocessing_params.worker_options} each"
         )
         # create transformer runtime
-        runtime = transform_runtime_factory.create_transform_runtime()
+        runtime = transform_runtime_config.create_transform_runtime()
         # create statistics
         statistics = TransformStatistics.remote({})
         # create executors
         processor_params = {
             "data_access_factory": data_access_factory,
-            "transform_class": transform_runtime_factory.get_transformer(),
+            "transform_class": transform_runtime_config.get_transform_class(),
             "transform_params": runtime.set_environment(data_access=data_access),
             "stats": statistics,
         }
@@ -97,8 +97,9 @@ def orchestrate(
             "pipeline": preprocessing_params.pipeline_id,
             "job details": preprocessing_params.job_details,
             "code": preprocessing_params.code_location,
-            "job_input_params": transform_runtime_factory.get_input_params() |
-            data_access_factory.get_input_params() | preprocessing_params.get_input_params(),
+            "job_input_params": transform_runtime_config.get_input_params()
+            | data_access_factory.get_input_params()
+            | preprocessing_params.get_input_params(),
             "execution_stats": resources
             | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
             "job_output_stats": stats,

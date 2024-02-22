@@ -49,7 +49,7 @@ class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
         super().__init__(
             cli_argnames=["noop_sleep_msec"],
             runtime_class=DefaultTableTransformRuntime,
-            transformer_class=NOOPTransform,
+            transform_class=NOOPTransform,
         )
         self.params = {}
 
@@ -69,6 +69,5 @@ class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-
-    launcher = TransformLauncher(name="NOOP", transform_runtime_factory=NOOPTableTransformConfiguration())
+    launcher = TransformLauncher(name="NOOP", transform_runtime_config=NOOPTableTransformConfiguration())
     launcher.launch()

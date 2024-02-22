@@ -8,7 +8,7 @@ from noop_implementation import NOOPTableTransformConfiguration
 
 print(os.environ)
 # create launcher
-launcher = TransformLauncher(name="NOOP", transform_runtime_factory=NOOPTableTransformConfiguration())
+launcher = TransformLauncher(name="NOOP", transform_runtime_config=NOOPTableTransformConfiguration())
 # create parameters
 s3_cred = {
     "access_key": os.environ.get("COS_ACCESS_KEY", "secret"),

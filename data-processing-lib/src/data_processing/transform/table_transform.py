@@ -4,13 +4,13 @@ import pyarrow as pa
 class AbstractTableTransform:
     """
     Converts input to output table
-    Sub-classes must provide the filter() method to provide the conversion of one data frame to another.
+    Sub-classes must provide the transform() method to provide the conversion of one table to 0 or more new tables.
     """
 
     def transform(self, table: pa.Table) -> list[pa.Table]:
         """
-        converting input table into an output tablr
+        Converts input table into an output table
         :param table: input table
-        :return: a list of converted tables to be written to the output
+        :return: a list of 0 or more converted tables.
         """
         raise NotImplemented()
