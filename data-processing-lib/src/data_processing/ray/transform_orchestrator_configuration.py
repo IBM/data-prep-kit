@@ -1,5 +1,6 @@
 import argparse
 import ast
+from typing import Any
 
 from data_processing.utils import CLIArgumentProvider
 
@@ -90,3 +91,13 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
         print(f"code location {self.code_location}")
         print(f"actor creation delay {self.creation_delay}")
         return True
+
+    def get_input_params(self) -> dict[str, Any]:
+        """
+        get input parameters for job_input_params in metadata
+        :return: dictionary of parameters
+        """
+        return {"number of workers": self.n_workers,
+                "worker options": self.worker_options,
+                "actor creation delay": self.creation_delay
+                }

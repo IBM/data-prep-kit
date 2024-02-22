@@ -1,4 +1,5 @@
 import argparse
+from typing import Any
 
 
 KB = 1024
@@ -38,3 +39,10 @@ class CLIArgumentProvider:
         :return: True, if validate pass or False otherwise
         """
         return True
+
+    def get_input_params(self) -> dict[str, Any]:
+        """
+        get input parameters for job_input_params in metadata
+        :return: dictionary of parameters
+        """
+        return self.params
