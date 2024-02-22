@@ -58,13 +58,14 @@ class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
         Add Transform-specific arguments to the given  parser.
         This will be included in a dictionary used to initialize the NOOPTransform.
         By convention a common prefix should be used for all transform-specific CLI args
-        (e.g, noop_, pii_, etc.)
+        (e.g, noop_, pii_, etc.).  The options added here should also appear in the list
+        of cli_argnames provided to the super class initializer (without -- or -).
         """
         parser.add_argument(
             "--noop_sleep_msec",
             type=int,
             default=1,
-            help="Sleep actor for a number of milliseconds while processing the data frame, before writing the file to COS",
+            help="Sleep actor for a number of milliseconds while processing the data frame, before returning",
         )
 
 

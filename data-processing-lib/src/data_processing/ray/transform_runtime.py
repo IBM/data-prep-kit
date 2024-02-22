@@ -8,13 +8,19 @@ from data_processing.utils import CLIArgumentProvider
 
 class DefaultTableTransformRuntime:
     """
-    Transformer runtime used by processor to to create Mutator specific environment
+    This class is created in the ray orchestrator and provides orchestrator-side support for the transform running
+    in the ray environment.  Creation/initialization is provided a dictionary of configuration value parsed from
+    the command line as defined by the associate *TableTransformConfiguration's add_input_params() method.
+    It provides the following key function:
+        1) Using the set_environment() method, it can add ray-specific components (e.g. shared ray data object) to the
+            initialization parameters provided to the Transform when it is created in the ray actor.
     """
 
     def __init__(self, params: dict[str, Any]):
         """
         Create filter runtime
-        :param params: parameters
+        :param params: parameters generally parsed from the command line as defined by the arguments added in
+        the associated *TableTransformConfiguration's add_input_params() method.
         """
         self.params = params
 
@@ -38,15 +44,20 @@ class DefaultTableTransformRuntime:
 class DefaultTableTransformConfiguration(CLIArgumentProvider):
     """
     Provides support the configuration of a transformer running in the ray environment.
-    It holds the following:
-        1) The type of the concrete AbstractTransform class having a zero-args initializer. This
-            will be created in the ray worker to perform that table transformations.
-        2) The type of the of DefaultTableTransformRuntime that supports operation of the transform
-            on the ray orchestrator side.  It is create with an initializer that takes the dictionary
-            of CLI arguments, optionally defined in this class.
-    Sub-classes may extend this class to override the following:
-        1) add_input_params() to add CLI argument definitions used in creating both the AbstractTransform
-            and the DefaultTableTransformRuntime.
+    Because this class is passed between ray nodes, this class and extensions must be python pickleable.
+    This implementation holds/defines the following:
+        1) defines a set of optional CLI arguments that are provided by the ray orchestration to
+            both the Transform initializer and the Runtime initializer.
+        2) holds the class of the concrete AbstractTransform class or extension having an initializer that takes a
+            dictionary of configuration key/value pairs. The dictionary provided for initialization is defined by
+            the CLI arguments defined in this class via add_input_params().  AbstractTransform-extending class
+            will be created in the ray worker to perform the table transformations.
+        3) holds the class of the DefaultTableTransformRuntime or extension that supports operation of the transform
+            on the ray orchestrator side.  It is created with an initializer that takes the dictionary
+            of CLI arguments, optionally defined in this class, similar to the transform.
+    To define configuration data provided to both of the transform and runtime classes during initialization,
+    sub-classes should provide an implementation of add_input_params().  Argument names defined here must
+    then also be provided to this class's initializer in the cli_argnames list.
     """
 
     def __init__(
@@ -76,7 +87,7 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
 
     def get_transform_class(self) -> type[AbstractTableTransform]:
         """
-        Create Mutator runtime
-        :return: mutator class
+        Get the concrete class extending AbstractTableTransform which is to be run in the ray actor.
+        :return: transform class
         """
         return self.transform_class
