@@ -2,7 +2,7 @@ import os
 import sys
 
 from data_processing.ray import (
-    AbstractTableTransformRuntimeFactory,
+    DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
     TransformLauncher,
 )
@@ -72,7 +72,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -82,7 +82,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -92,7 +92,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -102,7 +102,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -112,7 +112,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -122,7 +122,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -133,7 +133,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -157,7 +157,7 @@ def test_local_config():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -189,7 +189,7 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -198,7 +198,7 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -207,7 +207,7 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()
@@ -216,7 +216,7 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         name="test",
-        transform_runtime_factory=AbstractTableTransformRuntimeFactory(
+        transform_runtime_factory=DefaultTableTransformConfiguration(
             runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
         ),
     ).launch()

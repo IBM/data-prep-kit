@@ -2,7 +2,7 @@ from data_processing.ray.ray_utils import RayUtils
 from data_processing.ray.transform_statistics import TransformStatistics
 from data_processing.ray.transform_table_processor import TransformTableProcessor
 from data_processing.ray.transform_runtime import (
-    AbstractTableTransformRuntimeFactory,
+    DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
 )
 from data_processing.ray.transform_orchestrator_configuration import TransformOrchestratorConfiguration

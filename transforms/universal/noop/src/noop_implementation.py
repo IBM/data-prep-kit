@@ -4,8 +4,9 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.ray import (
-    AbstractTableTransformRuntimeFactory,
+    DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
+    TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 
@@ -37,7 +38,7 @@ class NOOPTransform(AbstractTableTransform):
         return [table]
 
 
-class NOOPTableTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
+class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -72,3 +73,8 @@ class NOOPTableTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
         self.params["sleep"] = args.noop_sleep_msec
         print(f"noop parameters are : {self.params}")
         return True
+
+
+if __name__ == "__main__":
+    launcher = TransformLauncher(name="NOOP", transform_runtime_factory=NOOPTableTransformConfiguration())
+    launcher.launch()

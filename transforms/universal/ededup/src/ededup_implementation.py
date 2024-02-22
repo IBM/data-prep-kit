@@ -1,18 +1,19 @@
-import ray
-import mmh3
 import hashlib
-from typing import Any
 from argparse import ArgumentParser, Namespace
+from typing import Any
 
-from data_processing.utils import TransformUtils, GB
+import mmh3
 import pyarrow as pa
+import ray
+from data_processing.data_access import DataAccess
 from data_processing.ray import (
-    AbstractTableTransformRuntimeFactory,
+    DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
     RayUtils,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.data_access import DataAccess
+from data_processing.utils import GB, TransformUtils
+
 
 REQUEST_LEN = 8192
 
@@ -45,6 +46,7 @@ class HashFilter:
     """
     Implements an element of distributed cache of hashes
     """
+
     def __init__(self, params: dict[str, Any]):
         """
         initialize set of local hashes
@@ -77,6 +79,7 @@ class EdedupTransform(AbstractTableTransform):
     """
     Implements dedup table transformer.
     """
+
     def __init__(self, config: dict):
         """
         Initialize based on the dictionary of configuration information.
@@ -168,6 +171,7 @@ class EdedupRuntime(DefaultTableTransformRuntime):
     """
     Exact dedup runtime support
     """
+
     def __init__(self, params: dict[str, Any]):
         """
         Create filter runtime
@@ -214,16 +218,13 @@ class EdedupRuntime(DefaultTableTransformRuntime):
                 sum_hash = sum_hash + h_size
                 sum_hash_mem = sum_hash_mem + h_memory
             remote_replies = not_ready
-        dedup_prst = 100 * (1. - stats.get("result_documents", 1)/stats.get("source_documents", 0))
-        result = {"number of hashes": sum_hash,
-                  "hash memory, GB": sum_hash_mem,
-                  "de duplication %": dedup_prst
-                  }
+        dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 0))
+        result = {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst}
         result.update(stats)
         return result
 
 
-class EdedupTableTransformRuntimeFactory(AbstractTableTransformRuntimeFactory):
+class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.

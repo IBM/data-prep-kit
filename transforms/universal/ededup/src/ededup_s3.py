@@ -2,11 +2,11 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from ededup_implementation import EdedupTableTransformRuntimeFactory
+from ededup_implementation import EdedupTableTransformConfiguration
 
 
 # create launcher
-launcher = TransformLauncher(name="ededup", transform_runtime_factory=EdedupTableTransformRuntimeFactory())
+launcher = TransformLauncher(name="ededup", transform_runtime_factory=EdedupTableTransformConfiguration())
 # create parameters
 s3_cred = {
     "access_key": "access",
@@ -31,7 +31,7 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    "hash_cpu": .5,
+    "hash_cpu": 0.5,
     "num_hashes": 2,
     "doc_column": "contents",
 }

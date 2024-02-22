@@ -4,7 +4,7 @@ import time
 import ray
 from data_processing.data_access import DataAccessFactory
 from data_processing.ray import (
-    AbstractTableTransformRuntimeFactory,
+    DefaultTableTransformConfiguration,
     TransformOrchestratorConfiguration,
     orchestrate,
 )
@@ -19,7 +19,7 @@ class TransformLauncher:
     def __init__(
         self,
         name: str,
-        transform_runtime_factory: AbstractTableTransformRuntimeFactory,
+        transform_runtime_factory: DefaultTableTransformConfiguration,
         data_access_factory: DataAccessFactory = DataAccessFactory(),
     ):
         """

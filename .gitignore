@@ -130,3 +130,4 @@ dmypy.json
 .pyre/
 .project
 *.swp
+data-processing-lib/.DS_Store

@@ -3,7 +3,7 @@ from datetime import datetime
 import ray
 from data_processing.data_access import DataAccessFactory
 from data_processing.ray import (
-    AbstractTableTransformRuntimeFactory,
+    DefaultTableTransformConfiguration,
     RayUtils,
     TransformOrchestratorConfiguration,
     TransformStatistics,
@@ -17,7 +17,7 @@ from ray.util.metrics import Gauge
 def orchestrate(
     preprocessing_params: TransformOrchestratorConfiguration,
     data_access_factory: DataAccessFactory,
-    transform_runtime_factory: AbstractTableTransformRuntimeFactory,
+    transform_runtime_factory: DefaultTableTransformConfiguration,
 ) -> int:
     """
     orchestrator for transformer execution
@@ -97,7 +97,7 @@ def orchestrate(
             "pipeline": preprocessing_params.pipeline_id,
             "job details": preprocessing_params.job_details,
             "code": preprocessing_params.code_location,
-            "job_input_params": transform_runtime_factory.get_input_params_metadata(),
+            "job_input_params": transform_runtime_factory.get_input_params(),
             "execution_stats": resources
             | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
             "job_output_stats": stats,
