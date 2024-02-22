@@ -42,11 +42,14 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
 
     def __init__(
         self,
+        cli_argnames: list[str],
         transformer_class: type[AbstractTableTransform],
         runtime_class: type[DefaultTableTransformRuntime] = DefaultTableTransformRuntime,
     ):
+        super().__init__(cli_argnames)
         """
         Initialization
+        :param cli_argnames: list of strings naming the arguments defined in add_input_arguments without the -- or -.
         :param runtime_class: implementation of the Filter runtime
         :param transformer_class: implementation of the Filter
         :return:
@@ -69,9 +72,10 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
         """
         return self.transformer
 
-    def get_input_params(self) -> dict[str, Any]:
-        """
-        get input parameters for job_input_params in metadata
-        :return:
-        """
-        return self.params
+    #
+    # def get_input_params(self) -> dict[str, Any]:
+    #     """
+    #     get input parameters for job_input_params in metadata
+    #     :return:
+    #     """
+    #     return self.params

@@ -46,7 +46,11 @@ class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(runtime_class=DefaultTableTransformRuntime, transformer_class=NOOPTransform)
+        super().__init__(
+            cli_argnames=["noop_sleep_msec"],
+            runtime_class=DefaultTableTransformRuntime,
+            transformer_class=NOOPTransform,
+        )
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -63,18 +67,19 @@ class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
             help="Sleep actor for a number of milliseconds while processing the data frame, before writing the file to COS",
         )
 
-    def apply_input_params(self, args: Namespace) -> bool:
-        """
-        Validate and apply the arguments that have been parsed
-        :param args: user defined arguments including at least, but perhaps more,
-        arguments as defined by add_input_arguments().
-        :return: True, if validate pass or False otherwise
-        """
-        self.params["sleep"] = args.noop_sleep_msec
-        print(f"noop parameters are : {self.params}")
-        return True
+    # def apply_input_params(self, args: Namespace) -> bool:
+    #     """
+    #     Validate and apply the arguments that have been parsed
+    #     :param args: user defined arguments including at least, but perhaps more,
+    #     arguments as defined by add_input_arguments().
+    #     :return: True, if validate pass or False otherwise
+    #     """
+    #     self.params["sleep"] = args.noop_sleep_msec
+    #     print(f"noop parameters are : {self.params}")
+    #     return True
 
 
 if __name__ == "__main__":
+
     launcher = TransformLauncher(name="NOOP", transform_runtime_factory=NOOPTableTransformConfiguration())
     launcher.launch()
