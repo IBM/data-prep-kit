@@ -67,17 +67,6 @@ class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
             help="Sleep actor for a number of milliseconds while processing the data frame, before writing the file to COS",
         )
 
-    # def apply_input_params(self, args: Namespace) -> bool:
-    #     """
-    #     Validate and apply the arguments that have been parsed
-    #     :param args: user defined arguments including at least, but perhaps more,
-    #     arguments as defined by add_input_arguments().
-    #     :return: True, if validate pass or False otherwise
-    #     """
-    #     self.params["sleep"] = args.noop_sleep_msec
-    #     print(f"noop parameters are : {self.params}")
-    #     return True
-
 
 if __name__ == "__main__":
 

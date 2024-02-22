@@ -29,6 +29,8 @@ class CLIArgumentProvider:
         :param keys:  a list of argument names as used in add_input_params().  If provided,
         and this implementation of apply_input_params() is called, then get_input_params()
         will return a dictionary containing the given keys and values parsed by argparse.
+        If keys is provided and overriding apply_input_params() you will need to call this
+        implementation to get the key values returned by get_input_params().
         """
         self.keys = keys
         self.params = None
