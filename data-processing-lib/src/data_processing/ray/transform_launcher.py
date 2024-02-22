@@ -6,6 +6,7 @@ from data_processing.data_access import DataAccessFactory
 from data_processing.ray import (
     AbstractTableTransformRuntimeFactory,
     TransformOrchestratorConfiguration,
+    orchestrate,
 )
 from data_processing.utils import str2bool
 
@@ -19,23 +20,18 @@ class TransformLauncher:
         self,
         name: str,
         transform_runtime_factory: AbstractTableTransformRuntimeFactory,
-        data_access_factory_class: type[DataAccessFactory] = None,
+        data_access_factory: DataAccessFactory = DataAccessFactory(),
     ):
         """
         Creates driver
         :param name: name of the application
         :param transform_runtime_factory: transform runtime factory
-        :param data_access_factory_class: the factory to create DataAccess instances.
+        :param data_access_factory: the factory to create DataAccess instances.
         """
         self.name = name
         self.transform_runtime_factory = transform_runtime_factory
-        if data_access_factory_class is None:
-            self.data_access_factory = DataAccessFactory()
-        else:
-            self.data_access_factory = data_access_factory_class()
+        self.data_access_factory = data_access_factory
         self.ray_orchestrator = TransformOrchestratorConfiguration(name=name)
-        self.transform_runtime = self.transform_runtime_factory.create_transform_runtime()
-        self.parsed_args = {}
 
     def __get_parameters(self) -> bool:
         """
@@ -49,14 +45,16 @@ class TransformLauncher:
         )
         # add additional arguments
         self.transform_runtime_factory.add_input_params(parser=parser)
-        self.transform_runtime.add_input_params(parser=parser)
         self.data_access_factory.add_input_params(parser=parser)
         self.ray_orchestrator.add_input_params(parser=parser)
         args = parser.parse_args()
-        self.parsed_args = args
+        self.run_locally = args.run_locally
+        if self.run_locally:
+            print("running locally")
+        else:
+            print("connecting to existing cluster")
         return (
             self.transform_runtime_factory.apply_input_params(args=args)
-            and self.transform_runtime.apply_input_params(args=args)
             and self.data_access_factory.apply_input_params(args=args)
             and self.ray_orchestrator.apply_input_params(args=args)
         )
@@ -69,7 +67,7 @@ class TransformLauncher:
         res = 1
         start = time.time()
         try:
-            if self.parsed_args.run_locally:
+            if self.run_locally:
                 # Will create a local Ray cluster
                 print("running locally creating Ray cluster")
                 ray.init()
@@ -78,9 +76,7 @@ class TransformLauncher:
                 print("Connecting to the existing Ray cluster")
                 ray.init(f"ray://localhost:10001", ignore_reinit_error=True)
             res = ray.get(
-                ray.transform_orchestrator.orchestrate.remote(
-                    # orchestrate.remote(
-                    vars(self.parsed_args),
+                orchestrate.remote(
                     preprocessing_params=self.ray_orchestrator,
                     data_access_factory=self.data_access_factory,
                     transform_runtime_factory=self.transform_runtime_factory,

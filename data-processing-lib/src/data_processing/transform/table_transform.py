@@ -1,4 +1,4 @@
-import pyarrow
+import pyarrow as pa
 
 
 class AbstractTableTransform:
@@ -7,7 +7,7 @@ class AbstractTableTransform:
     Sub-classes must provide the filter() method to provide the conversion of one data frame to another.
     """
 
-    def transform(self, table: pyarrow.Table) -> list[pyarrow.Table]:
+    def transform(self, table: pa.Table) -> list[pa.Table]:
         """
         converting input table into an output tablr
         :param table: input table

@@ -53,12 +53,12 @@ def orchestrate(
         # create transformer runtime
         runtime = transform_runtime_factory.create_transform_runtime()
         # create statistics
-        statistics = TransformStatistics.remote()
+        statistics = TransformStatistics.remote({})
         # create executors
         processor_params = {
             "data_access_factory": data_access_factory,
-            "processor": transform_runtime_factory.get_transformer(),
-            "processor_params": runtime.set_environment(data_access=data_access),
+            "transform_class": transform_runtime_factory.get_transformer(),
+            "transform_params": runtime.set_environment(data_access=data_access),
             "stats": statistics,
         }
         processors = ActorPool(

@@ -6,24 +6,25 @@ from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider
 
 
-class DefaultTableTransformRuntime(CLIArgumentProvider):
+class DefaultTableTransformRuntime:
     """
-    Transform runtime used by processor to create Transform specific environment
+    Transformer runtime used by processor to to create Mutator specific environment
     """
 
-    def __init__(self):
+    def __init__(self, params: dict[str, Any]):
         """
-        Create transform runtime
+        Create filter runtime
         :param params: parameters
         """
+        self.params = params
 
-    def set_data_access(self, data_access: DataAccess) -> None:
+    def set_environment(self, data_access: DataAccess) -> dict[str, Any]:
         """
-        Set environment for transform execution
+        Set environment for filter execution
         :param data_access - data access class
-        :return: dictionary of transform init params
+        :return: dictionary of filter init params
         """
-        pass
+        return self.params
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
         """
@@ -32,12 +33,6 @@ class DefaultTableTransformRuntime(CLIArgumentProvider):
         :return: job execution statistics
         """
         return stats
-
-    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
-        return None
-
-    def apply_input_params(self, args: argparse.Namespace) -> bool:
-        return True
 
 
 class AbstractTableTransformRuntimeFactory(CLIArgumentProvider):
@@ -52,30 +47,31 @@ class AbstractTableTransformRuntimeFactory(CLIArgumentProvider):
     ):
         """
         Initialization
-        :param runtime_class: implementation of the Transform runtime
-        :param transformer_class: implementation of the Transform
+        :param runtime_class: implementation of the Filter runtime
+        :param transformer_class: implementation of the Filter
         :return:
         """
-        self.runtime_class = runtime_class
-        self.transformer_class = transformer_class
+        self.runtime = runtime_class
+        self.transformer = transformer_class
+        self.params = {}
 
     def create_transform_runtime(self) -> DefaultTableTransformRuntime:
         """
-        Create transform runtime
-        :return: transform runtime object
+        Create Filter runtime
+        :return: fiter runtime object
         """
-        return self.runtime_class()
+        return self.runtime(self.params)
 
-    def get_transform_class(self) -> type[AbstractTableTransform]:
+    def get_transformer(self) -> type[AbstractTableTransform]:
         """
         Create Mutator runtime
         :return: mutator class
         """
-        return self.transformer_class
+        return self.transformer
 
     def get_input_params_metadata(self) -> dict[str, Any]:
         """
         get input parameters for job_input_params in metadata
         :return:
         """
-        pass
+        return self.params

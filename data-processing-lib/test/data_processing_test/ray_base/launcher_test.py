@@ -52,7 +52,7 @@ class TestLauncher(TransformLauncher):
         :return:
         """
         print("\n\nPrinting preprocessing parameters")
-        print(f"Run locally {self.parsed_args.run_locally}")
+        print(f"Run locally {self.run_locally}")
         return 0
 
 

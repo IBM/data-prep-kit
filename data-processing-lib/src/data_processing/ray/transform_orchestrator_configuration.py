@@ -64,7 +64,7 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
             help="ast string containing code location",
         )
 
-    def apply_input_arguments(self, args: argparse.Namespace) -> bool:
+    def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
         Validate transformer specific parameters
         :param args: user defined arguments
@@ -84,7 +84,7 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
         self.code_location = (args.code_location,)
 
         # print them
-        print(f"worker options {self.worker_options}")
+        print(f"number of workers {self.n_workers} worker options {self.worker_options}")
         print(f"pipeline id {self.pipeline_id}; number workers {self.n_workers}")
         print(f"job details {self.job_details}")
         print(f"code location {self.code_location}")

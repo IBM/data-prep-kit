@@ -51,7 +51,7 @@ class TransformTableProcessor:
         try:
             if table.num_rows > 0:
                 # execute local processing
-                out_tables = self.transform.transform(in_table=table)
+                out_tables = self.transform.transform(table=table)
                 if len(out_tables) == 0:
                     self.stats.add_stats.remote({"table_processing": time.time() - t_start})
                     return
