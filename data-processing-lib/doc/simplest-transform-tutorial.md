@@ -1,28 +1,31 @@
 # Simplest Transform Tutorial
 In this example, we implement a _noop_ transform that takes no action
-on the input table and returns its unmodified.
+on the input table and returns it unmodified - a _no operation_ (noop).
 This effectively enables a copy of a directory tree of 
 parquet files to an output directory.
-This is functionally not too interesting but allows use to focus
+This is functionally not too powerful, but allows us to focus
 on the minimum requirements for a simple transform that converts
 one table to another.  That said, we will show the following:
 
-* How to define command line arguments that can be used to configure
-the operation of our _noop_ transform.
+* How to write the _noop_ transform to generate the output table.
 * How to define transform-specific metadata that can be associated
 with each table transformation and aggregated across all transformations
 in a single run of the transform.
+* How to define command line arguments that can be used to configure
+  the operation of our _noop_ transform.
 
 We will **not** be showing the following:
 * The creation of a custom TransformRuntime that would enable more global
-state and/or coordination among the transforms running in other RayActors.
+state and/or coordination among the transforms running in other ray actors.
 This will be covered in an advanced tutorial.
 
-The complete task involves create the following:
+The complete task involves the following:
 * NOOPTransform - class that implements the specific transformation
 * NOOPTableTransformConfiguration - class that provides configuration for the 
 NOOPTransform, specifically the command line arguments used to configure it.
 * main() - simple creation and use of the TransformLauncher. 
+ 
+Finally, we show to use the command line to run the transform in a local ray cluster
 
 ### NOOPTransform
 
@@ -45,7 +48,7 @@ import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-import pyarrow as pa
+import pyarrow as pa 
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
@@ -61,10 +64,13 @@ class NOOPTransform(AbstractTableTransform):
 The `NOOPTransform` class extends the `AbstractTableTransform`, which defines the required methods.
 
 For purposes of the tutorial and to simulate a more complex processing
-job, we allow our transform to be configurable
+job, our initializer allows our transform to be configurable
 with an amount of seconds to sleep/delay during the call to `transform()`.
 Configuration is provided by the framework in a dictionary provided to the initializer.
 Below we will cover how this `sleep` argument is made available to the initializer.
+
+Note that in more complex transforms that might, for example, load a hugging face or other model,
+or perform other deep initializations, these can be done in the initializer.
 
 Next we define the `transform()` method itself, which includes the addition of some
 almost trivial metadata.
@@ -77,11 +83,12 @@ almost trivial metadata.
         metadata = {"nfiles": 1, "nrows": len(table)}
         return [table], metadata
 ```
+The single input to this method is the in-memory pyarrow table to be transformed.
 The return of this function is a list of tables and optional metadata.  In this
 case of simple 1:1 table conversion the list will contain a single table, the input.
 The metadata is a free-form dictionary of keys with numeric values that will be aggregated
 by the framework and reported as aggregated job statistics metadata. 
-If there is not metadata then simply return an empty dictionary.
+If there is no metadata then simply return an empty dictionary.
 
 ### NOOPTransformConfiguration
 Next we define the `NOOPTransformConfiguration` class and its initializer that define the following:
@@ -107,12 +114,14 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
 ```
 The initializer extends the DefaultTableTransformConfiguration which provides simple
 capture of our configuration data and enables picklability through the network.
+It also adds a `params` field that will be used below to hold the transform's 
+configuration data (used in `NOOPTransform.init()` above).
 
 Next, we provide two methods that define and capture the command line configuration that 
 is specific to the `NOOPTransform`, in this case the number of seconds to sleep during transformation.
-First we define the method establishes the command line arguments.  
+First we define the method establishes the command line arguments.
 This method is given a global argument parser to which the `NOOPTransform` arguments are added.
-It is good practice to include common prefix to all transform-specific options (i.e. pii, lang, etc).
+It is good practice to include a common prefix to all transform-specific options (i.e. pii, lang, etc).
 In our case we will use `noop_`.
 ```python
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -120,7 +129,7 @@ In our case we will use `noop_`.
             "--noop_sleep_sec",
             type=int,
             default=1,
-            help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
+            help="Sleep actor for a number of seconds while processing the data frame",
         )
 ```
 Next we implement a method that is called after the framework has parsed the CLI args
@@ -137,7 +146,7 @@ and which allows us to capture the `NOOPTransform`-specific arguments and option
 That's it, the `NOOPTransformConfiguration` is complete.
 
 ### main()
-Lastly we show how to launch the framework with the `NOOPTransform` using the 
+Next, we show how to launch the framework with the `NOOPTransform` using the 
 framework's `TransformLauncher` class.
 ```python
 ...
@@ -145,7 +154,8 @@ if __name__ == "__main__":
     launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
     launcher.launch()
 ```
-The launcher requires only an instance of DefaultTableTransformCOnfiguration (our `n` class).  
+The launcher requires only an instance of DefaultTableTransformConfiguration 
+(our `NOOPTransformConfiguration` class).
 A single method `launch()` is then invoked to run the transform in a Ray cluster.
 
 ### Running
@@ -157,6 +167,6 @@ python noop_main.py --noop_sleep_msec 2 \
   --s3_cred "{'access_key': 'KEY', 'secret_key': 'SECRET', 'cos_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}" \
   --s3_config "{'input_folder': 'cos-optimal-llm-pile/test/david/input/', 'output_folder': 'cos-optimal-llm-pile/test/david/output/'}"
 ```
-This is a minimal set of options to run locally.  
+This is a minimal set of options to run locally.
 See the [launcher options](launcher-options.md) for a complete list of
 transform-independent command line options.
