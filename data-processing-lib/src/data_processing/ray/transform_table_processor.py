@@ -51,49 +51,50 @@ class TransformTableProcessor:
         try:
             if table.num_rows > 0:
                 # execute local processing
-                out_tables = self.transform.transform(table=table)
-                if len(out_tables) == 0:
-                    self.stats.add_stats.remote({"table_processing": time.time() - t_start})
-                    return
+                out_tables, stats = self.transform.transform(table=table)
             else:
                 print(f"table: {f_name} is empty, skipping processing")
                 out_tables = [table]
+                stats = {}
             # Compute output file location. Preserve sub folders for Wisdom
             output_name = self.data_access.get_output_location(path=f_name)
             # save results
-            if len(out_tables) == 0:
-                # Nothing to write - return
-                return
-            if len(out_tables) == 1:
-                # we have exactly 1 table
-                output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
-                if save_res is not None:
-                    # Store execution statistics. Doing this async
+            match len(out_tables):
+                case 0:
+                    # no tables - do nothing
+                    pass
+                case 1:
+                    # we have exactly 1 table
+                    output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
+                    if save_res is not None:
+                        # Store execution statistics. Doing this async
+                        self.stats.add_stats.remote(
+                            {
+                                "result_files": 1,
+                                "result_size": out_tables[0].nbytes,
+                                "table_processing": time.time() - t_start,
+                            }
+                        )
+                case _:
+                    # we have more then 1 table
+                    table_sizes = 0
+                    output_file_name = output_name.removesuffix(".parquet")
+                    for index in range(len(out_tables)):
+                        table_sizes += out_tables[index].nbytes
+                        output_file_size, save_res = self.data_access.save_table(
+                            path=f"{output_file_name}_{index}.parquet", table=out_tables[index]
+                        )
+                        if save_res is None:
+                            break
                     self.stats.add_stats.remote(
                         {
-                            "result_files": 1,
-                            "result_size": out_tables[0].nbytes,
+                            "result_files": len(out_tables),
+                            "result_size": table_sizes,
                             "table_processing": time.time() - t_start,
                         }
                     )
-            else:
-                # We have multiple tables
-                table_sizes = 0
-                output_file_name = output_name.removesuffix(".parquet")
-                for index in range(len(out_tables)):
-                    table_sizes += out_tables[index].nbytes
-                    output_file_size, save_res = self.data_access.save_table(
-                        path=f"{output_file_name}_{index}.parquet", table=out_tables[index]
-                    )
-                    if save_res is None:
-                        break
-                self.stats.add_stats.remote(
-                    {
-                        "result_files": len(out_tables),
-                        "result_size": table_sizes,
-                        "table_processing": time.time() - t_start,
-                    }
-                )
+            if len(stats) > 0:
+                self.stats.add_stats.remote(stats)
 
         except Exception as e:
             print(f"Exception {e} processing file {f_name}")

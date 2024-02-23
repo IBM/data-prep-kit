@@ -6,7 +6,6 @@ import pyarrow as pa
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
-    TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 
@@ -23,19 +22,22 @@ class NOOPTransform(AbstractTableTransform):
         by the companion runtime, NOOPTransformRuntime.  If running inside the RayMutatingDriver,
         these will be provided by that class with help from the RayMutatingDriver.
         """
-        self.sleep_msec = config.get("noop_sleep_msec", 1)
+        # Make sure that the param name corresponds to the name used in apply_input_params method
+        # of NOOPTableTransformConfiguration class
+        self.sleep = config.get("sleep", 1)
 
-    def transform(self, table: pa.Table) -> list[pa.Table]:
+    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
-        Put Transform-specific to convert one Table to another Table.
+        Put Transform-specific to convert one Table to 0 or more tables. It also returns
+        a dictionary of execution statistics - arbitrary dictionary
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
-        if self.sleep_msec is not None:
-            print(f"Sleep for {self.sleep_msec} milliseconds")
-            time.sleep(self.sleep_msec / 1000)
+        if self.sleep is not None:
+            print(f"Sleep for {self.sleep} seconds")
+            time.sleep(self.sleep)
             print("Sleep completed - continue")
-        return [table]
+        return [table], {}
 
 
 class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
@@ -46,11 +48,7 @@ class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(
-            cli_argnames=["noop_sleep_msec"],
-            runtime_class=DefaultTableTransformRuntime,
-            transform_class=NOOPTransform,
-        )
+        super().__init__(runtime_class=DefaultTableTransformRuntime, transform_class=NOOPTransform)
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -61,13 +59,18 @@ class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            "--noop_sleep_msec",
+            "--noop_sleep_sec",
             type=int,
             default=1,
-            help="Sleep actor for a number of milliseconds while processing the data frame, before writing the file to COS",
+            help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
         )
 
-
-if __name__ == "__main__":
-    launcher = TransformLauncher(name="NOOP", transform_runtime_config=NOOPTableTransformConfiguration())
-    launcher.launch()
+    def apply_input_params(self, args: Namespace) -> bool:
+        """
+        Validate and apply the arguments that have been parsed
+        :param args: user defined arguments.
+        :return: True, if validate pass or False otherwise
+        """
+        self.params["sleep"] = args.noop_sleep_sec
+        print(f"noop parameters are : {self.params}")
+        return True

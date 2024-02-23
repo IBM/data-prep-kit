@@ -88,19 +88,21 @@ class EdedupTransform(AbstractTableTransform):
             hashes - list of hash actors, references
             statistics - reference to statistics class
         """
+        # Make sure that the param name corresponds to the name used in apply_input_params method
+        # of EdedupTableTransformConfiguration class
         self.doc_column = config.get("doc_column", "")
         self.hashes = config.get("hashes", [])
         self.stats = config.get("statistics", [])
 
-    def transform(self, table: pa.Table) -> list[pa.Table]:
+    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         De duping table content.
         """
         # make sure that the doc column exists
         if not TransformUtils.validata_columns(table=table, required=[self.doc_column]):
-            return []
+            return [], {}
         # report number of source documents
-        self.stats.add_stats.remote({"source_documents": table.num_rows})
+        stats = {"source_documents": table.num_rows}
         # Inner variables
         hashes = set()
         unique = []
@@ -131,8 +133,8 @@ class EdedupTransform(AbstractTableTransform):
         # Create output table
         out_table = table.filter(mask)
         # report number of source documents
-        self.stats.add_stats.remote({"result_documents": out_table.num_rows})
-        return [out_table]
+        stats["result_documents"] = out_table.num_rows
+        return [out_table], stats
 
     def _process_remote_hashes(self, hd: dict[str, str]) -> list[str]:
         """
@@ -244,6 +246,9 @@ class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
+        if args.num_hashes <= 0:
+            print(f"Number of hashes should be greater then zero, provided {args.num_hashes}")
+            return False
         self.params["doc_column"] = args.doc_column
         self.params["hash_cpu"] = args.hash_cpu
         self.params["num_hashes"] = args.num_hashes

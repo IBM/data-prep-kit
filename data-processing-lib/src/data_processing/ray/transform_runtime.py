@@ -39,8 +39,8 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
     """
     Provides support the configuration of a transformer running in the ray environment.
     It holds the following:
-        1) The type of the concrete AbstractTransform class having a zero-args initializer. This
-            will be created in the ray worker to perform that table transformations.
+        1) The type of the concrete AbstractTransform class, that is created by a the ray worker with a
+            dictionary of parameters to perform that table transformations.
         2) The type of the of DefaultTableTransformRuntime that supports operation of the transform
             on the ray orchestrator side.  It is create with an initializer that takes the dictionary
             of CLI arguments, optionally defined in this class.
@@ -51,14 +51,11 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
 
     def __init__(
         self,
-        cli_argnames: list[str],
         transform_class: type[AbstractTableTransform],
         runtime_class: type[DefaultTableTransformRuntime] = DefaultTableTransformRuntime,
     ):
-        super().__init__(cli_argnames)
         """
         Initialization
-        :param cli_argnames: list of strings naming the arguments defined in add_input_arguments() without the -- or -.
         :param transform_class: implementation of the Filter
         :param runtime_class: implementation of the Filter runtime
         :return:
