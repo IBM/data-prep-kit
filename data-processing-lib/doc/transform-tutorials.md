@@ -1,0 +1,13 @@
+# Transform Tutorials
+
+All transforms operate on a [pyarrow Table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
+read for it by the RayWorker and produce zero or more transformed tables.
+The transformed tables are then written out by the RayWorker - the transform need not
+worry about I/O associated with the tables.
+This means the Transform itself need only be concerned with the conversion of one
+in memory table at a time.
+
+With this in mind, we start with a simple example and progress to more complex transforms:
+* [Simplest transform](simplest-transform-tutorial.md)
+Here we will take a simple example to show the basics of creating a simple transform
+that takes a single input Table, and produces a single Table.
