@@ -11,7 +11,7 @@ print(os.environ)
 launcher = TransformLauncher(name="NOOP", transform_runtime_config=NOOPTableTransformConfiguration())
 # create parameters
 s3_cred = {
-    "access_key": os.environ.get("COS_ACCESS_KEY", "secret"),
+    "access_key": os.environ.get("COS_ACCESS_KEY", "access"),
     "secret_key": os.environ.get("COS_SECRET_KEY", "secret"),
     "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
@@ -33,7 +33,7 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    "noop_sleep_msec": 5,
+    "noop_sleep_sec": 5,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 
