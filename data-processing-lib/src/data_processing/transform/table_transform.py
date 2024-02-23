@@ -16,3 +16,14 @@ class AbstractTableTransform:
         propagated to metadata
         """
         raise NotImplemented()
+
+    def flush(self) -> tuple[list[pa.Table], dict[str, Any]]:
+        """
+        This is supporting method for transformers, that implement buffering of tables, for example coalesce.
+        These transformers can have buffers containing tables that were not written to the output. Flush is
+        the hook for them to return back locally stored tables and their statistics. The majority of transformers
+        should use default implementation.
+        :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
+        propagated to metadata
+        """
+        return [], {}

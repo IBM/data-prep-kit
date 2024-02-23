@@ -16,8 +16,8 @@ s3_cred = {
     "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 s3_conf = {
-    "input_folder": "cos-optimal-llm-pile/test/david/input",
-    "output_folder": "cos-optimal-llm-pile/test/david/output",
+    "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=text/",
+    "output_folder": "cos-optimal-llm-pile/boris-da-test/",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}

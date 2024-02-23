@@ -38,7 +38,7 @@ class TransformStatistics(object):
             if key == "result_size":
                 self.data_write_counter.inc(val)
 
-    def execution_stats(self) -> dict[str, Any]:
+    def get_execution_stats(self) -> dict[str, Any]:
         """
         Get execution statistics
         :return:
