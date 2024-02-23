@@ -1,5 +1,6 @@
-import pyarrow as pa
 from typing import Any
+
+import pyarrow as pa
 
 
 class AbstractTableTransform:

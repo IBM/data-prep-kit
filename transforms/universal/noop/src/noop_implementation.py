@@ -6,6 +6,7 @@ import pyarrow as pa
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
+    TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 
@@ -77,3 +78,8 @@ class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["sleep"] = args.noop_sleep_sec
         print(f"noop parameters are : {self.params}")
         return True
+
+
+if __name__ == "__main__":
+    launcher = TransformLauncher(name="NOOP", transform_runtime_config=NOOPTableTransformConfiguration())
+    launcher.launch()

@@ -39,7 +39,12 @@ class TransformLauncher:
         and does parameters validation
         :return: True id validation passe or False, if not
         """
-        parser = argparse.ArgumentParser(description=f"Driver for {self.name} processing")
+        parser = argparse.ArgumentParser(
+            description=f"Driver for {self.name} processing",
+            # RawText is used to allow better formatting of ast-based arguments
+            # See uses of ParamsUtils.dict_to_str()
+            formatter_class=argparse.RawTextHelpFormatter,
+        )
         parser.add_argument(
             "--run_locally", type=lambda x: bool(str2bool(x)), default=False, help="running ray local flag"
         )

@@ -8,7 +8,7 @@ from data_processing.data_access import (
     DataAccessLocal,
     DataAccessS3,
 )
-from data_processing.utils import CLIArgumentProvider, str2bool
+from data_processing.utils import CLIArgumentProvider, ParamsUtils, str2bool
 
 
 class DataAccessFactory(CLIArgumentProvider):
@@ -40,55 +40,70 @@ class DataAccessFactory(CLIArgumentProvider):
         :param parser: parser
         :return: None
         """
-        """ 
-        AST defining cos_cred  should contain the following keys:
-            access_key - access key
-            secret_key: secret key
-            cos_url cos url
-        Only required for S3/COS and Lake House    
-        """
+
+        help_example_dict = {
+            "access_key": ["AFDSASDFASDFDSF ", "access key help text"],
+            "secret_key": ["XSDFYZZZ", "secret key help text"],
+            "cos_url": ["s3:/cos-optimal-llm-pile/test/", "COS url"],
+        }
         parser.add_argument(
             "--s3_cred",
             type=ast.literal_eval,
             default=None,
-            help="ast string of options for cos credentials",
+            help="AST string of options for cos credentials. Only required for COS or Lakehouse.\n"
+            + ParamsUtils.get_ast_help_text(help_example_dict),
         )
-        """ 
-        AST defining S3/COS parameters should contain the following keys:
-            input_path -input path
-            output_path - output path
-                
-        """
+        help_example_dict = {
+            "input_path": [
+                "/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup",
+                "Path to input folder of files to be processed",
+            ],
+            "output_path": [
+                "/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed",
+                "Path to outpu folder of processed files",
+            ],
+        }
         parser.add_argument(
-            "--s3_config", type=ast.literal_eval, default=None, help="ast string containing input/output S3/COS"
+            "--s3_config",
+            type=ast.literal_eval,
+            default=None,
+            help="AST string containing input/output paths.\n" + ParamsUtils.get_ast_help_text(help_example_dict),
         )
-        """ 
-        AST defining LH parameters should contain the following keys:
-            input_table -input table name
-            input_dataset - input dataset name
-            input_version - input version
-            output_table - output table name
-            output_path - output path
-            token - lake house access token
-            lh_environment - STAGING or PROD
-        """
+        help_example_dict = {
+            "input_table": [
+                "/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup",
+                "Path to input folder of files to be processed",
+            ],
+            "input_dataset": [
+                "/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed",
+                "Path to outpu folder of processed files",
+            ],
+            "input_version": ["1.0", "Version number to be associated with the input."],
+            "output_table": ["ededup", "Name of table into which data is written"],
+            "output_path": [
+                "/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed",
+                "Path to output folder of processed files",
+            ],
+            "token": ["AASDFZDF", "The token to use for Lakehouse authentication"],
+            "lh_environment": ["STAGING", "Operational environment. One of STAGING or PROD"],
+        }
         parser.add_argument(
             "--lh_config",
             type=ast.literal_eval,
             default=None,
-            help="ast string containing input/output using lakehouse",
+            help="AST string containing input/output using lakehouse.\n"
+            + ParamsUtils.get_ast_help_text(help_example_dict),
         )
-        """ 
-        AST defining local config parameters should contain the following keys:
-            input_path -input folder
-            output_path - output folder
-                
-        """
+        help_example_dict = {
+            "input_path": ["./input", "Path to input folder of files to be processed"],
+            "output_path": ["/tmp/output", "Path to output folder of processed files"],
+        }
         parser.add_argument(
             "--local_config",
             type=ast.literal_eval,
             default=None,
-            help="ast string containing input/output folders using local fs",
+            help="ast string containing input/output folders using local fs.\n"
+            + ParamsUtils.get_ast_help_text(help_example_dict),
         )
         parser.add_argument("--max_files", type=int, default=-1, help="Max amount of files to process")
         parser.add_argument(
@@ -165,19 +180,18 @@ class DataAccessFactory(CLIArgumentProvider):
             print(f"Using data sets {self.dsets}, checkpointing {self.checkpointing}, max files {self.max_files}")
         return True
 
-
     def get_input_params(self) -> dict[str, Any]:
         """
         get input parameters for job_input_params for metadata
         :return: dictionary of params
         """
-        params = {"checkpointing": self.checkpointing,
-                "max_files": self.max_files,
-                }
+        params = {
+            "checkpointing": self.checkpointing,
+            "max_files": self.max_files,
+        }
         if self.dsets is not None:
             params["data sets"] = self.dsets
         return params
-
 
     @staticmethod
     def __validate_s3_cred(s3_credentials: dict[str, str]) -> bool:

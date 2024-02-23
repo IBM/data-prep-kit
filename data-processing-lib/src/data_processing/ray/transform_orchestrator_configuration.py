@@ -2,7 +2,7 @@ import argparse
 import ast
 from typing import Any
 
-from data_processing.utils import CLIArgumentProvider
+from data_processing.utils import CLIArgumentProvider, ParamsUtils
 
 
 class TransformOrchestratorConfiguration(CLIArgumentProvider):
@@ -58,11 +58,16 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
             commit_hash - commit hash
             path - path within github
         """
+        help_example_dict = {
+            "github": ["https://github.com/somerepo", "Github repository URL."],
+            "commit_hash": ["13241231asdfaed", "github commit hash"],
+            "path": ["transforms/universal/ededup", "Path within the repository"],
+        }
         parser.add_argument(
             "--code_location",
             type=ast.literal_eval,
-            default="{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-            help="ast string containing code location",
+            default=None,
+            help="AST string containing code location\n" + ParamsUtils.get_ast_help_text(help_example_dict),
         )
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
@@ -97,7 +102,8 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
         get input parameters for job_input_params in metadata
         :return: dictionary of parameters
         """
-        return {"number of workers": self.n_workers,
-                "worker options": self.worker_options,
-                "actor creation delay": self.creation_delay
-                }
+        return {
+            "number of workers": self.n_workers,
+            "worker options": self.worker_options,
+            "actor creation delay": self.creation_delay,
+        }
