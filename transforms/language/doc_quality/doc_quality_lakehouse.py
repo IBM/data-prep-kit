@@ -3,37 +3,45 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from noop_implementation import NOOPTableTransformConfiguration
+from doc_quality_implementation import DocQualityTableTransformConfiguration
 
 
 print(os.environ)
 # create launcher
-launcher = TransformLauncher(name="NOOP", transform_runtime_config=NOOPTableTransformConfiguration())
+launcher = TransformLauncher(name="DocQuality", transform_runtime_config=DocQualityTableTransformConfiguration())
 # create parameters
+
 s3_cred = {
-    "access_key": os.environ.get("COS_ACCESS_KEY", "access"),
-    "secret_key": os.environ.get("COS_SECRET_KEY", "secret"),
+    "access_key": "YOUR KEY",
+    "secret_key": "YOUR SECRET KEY",
     "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
-s3_conf = {
-    "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=text/",
-    "output_folder": "cos-optimal-llm-pile/boris-da-test/",
+
+# Configure lakehouse unit test tables
+lakehouse_config = {
+    "lh_environment": "STAGING",
+    "input_table": "academic.ieee",
+    "input_dataset": "",
+    "input_version": "main",
+    "output_table": "academic.ieee_doc_quality_0223_20",
+    "output_path": "lh-test/tables/academic/ieee_doc_quality_0223_20",
+    "token": "YOUR LAKEHOUSE TOKEN",
 }
-worker_options = {"num_cpus": 0.8}
+
+worker_options = {"num_cpus": 1}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
     "run_locally": True,
     "max_files": -1,
     "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    "lh_config": ParamsUtils.convert_to_ast(lakehouse_config),
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "num_workers": 5,
+    "num_workers": 2,
     "checkpointing": False,
     "pipeline_id": "pipeline_id",
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    "noop_sleep_sec": 5,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

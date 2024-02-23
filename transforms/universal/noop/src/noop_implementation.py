@@ -74,6 +74,9 @@ class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
+        if args.noop_sleep_sec <= 0:
+            print(f"Parameter noop_sleep_sec should be greater then 0, you specified {args.noop_sleep_sec}")
+            return False
         self.params["sleep"] = args.noop_sleep_sec
         print(f"noop parameters are : {self.params}")
         return True

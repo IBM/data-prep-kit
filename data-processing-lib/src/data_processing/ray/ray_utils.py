@@ -149,3 +149,17 @@ class RayUtils:
             )
 
         print(f"Completed processing in {(time.time() - t_start)/60.} min")
+
+    @staticmethod
+    def wait_for_execution_completion(replies: list[ray.ObjectRef]) -> None:
+        """
+        Wait for all requests completed
+        :param replies: list of request futures
+        :return: None
+        """
+        start = time.time()
+        while replies:
+            # Wait for replies
+            ready, not_ready = ray.wait(replies)
+            replies = not_ready
+        print(f"done flushing in {time.time() - start} sec")
