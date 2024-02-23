@@ -116,7 +116,7 @@ class DocQualityTransform(AbstractTableTransform):
             docq_avg_ja_sentence_len = []
             docq_first_ja_alphabet_pos = []
 
-        for text in table['contents'].to_pylist()[:10]:
+        for text in table["contents"].to_pylist()[:10]:
             total_words, mean_word_len, symbol_to_word_ratio = compute_word_statistics(text)
             docq_total_words.append(total_words)
             docq_mean_word_len.append(mean_word_len)
@@ -152,7 +152,7 @@ class DocQualityTransform(AbstractTableTransform):
                 docq_avg_ja_sentence_len.append(compute_average_japanese_sentence_length(text))
                 docq_first_ja_alphabet_pos.append(find_first_japanese_alphabet_position(text))
 
-        for text in table['contents'].to_pylist()[10:]:
+        for text in table["contents"].to_pylist()[10:]:
             docq_total_words.append(0)
             docq_mean_word_len.append(0)
             docq_symbol_to_word_ratio.append(0)
@@ -224,5 +224,3 @@ class DocQualityTableTransformConfiguration(DefaultTableTransformConfiguration):
         :return:
         """
         return self.params
-
-
