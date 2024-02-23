@@ -153,7 +153,7 @@ Assuming the above `main()` is placed in `noop_main.py` we can run the transform
 in COS as follows:
 ```shell
 python noop_main.py --noop_sleep_msec 2 \
-  --run_locally=True  \
+  --run_locally True  \
   --s3_cred "{'access_key': 'KEY', 'secret_key': 'SECRET', 'cos_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}" \
   --s3_config "{'input_folder': 'cos-optimal-llm-pile/test/david/input/', 'output_folder': 'cos-optimal-llm-pile/test/david/output/'}"
 ```

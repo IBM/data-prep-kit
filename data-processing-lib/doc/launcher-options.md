@@ -1,7 +1,8 @@
-# Framework options
-A number of command line options are available when running a transform.  
+# Launcher Command Line Options
+A number of command line options are available when launching a transform.  
 
-The following is a current --help output (a work in progress):
+The following is a current --help output (a work in progress) for 
+the `NOOPTransform` (note the --noop_sleep_sec option):
 
 ```
 usage: noop_implementation.py [-h] [--run_locally RUN_LOCALLY]
