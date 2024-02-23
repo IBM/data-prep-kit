@@ -23,8 +23,12 @@ The complete task involves the following:
 * NOOPTransform - class that implements the specific transformation
 * NOOPTableTransformConfiguration - class that provides configuration for the 
 NOOPTransform, specifically the command line arguments used to configure it.
-* main() - simple creation and use of the TransformLauncher. 
- 
+* main() - simple creation and use of the TransformLauncher.
+
+(Currently, the complete code for the noop transform used for this
+tutorial can be found in the
+[transforms/universal/noop](../../transforms/universal/noop) directory.
+
 Finally, we show to use the command line to run the transform in a local ray cluster
 
 ### NOOPTransform
