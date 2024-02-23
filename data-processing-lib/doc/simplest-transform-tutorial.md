@@ -158,5 +158,5 @@ python noop_main.py --noop_sleep_msec 2 \
   --s3_config "{'input_folder': 'cos-optimal-llm-pile/test/david/input/', 'output_folder': 'cos-optimal-llm-pile/test/david/output/'}"
 ```
 This is a minimal set of options to run locally.  
-See the [launcher options](launcher-options) for a complete list of
+See the [launcher options](launcher-options.md) for a complete list of
 transform-independent command line options.
