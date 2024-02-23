@@ -61,15 +61,14 @@ def orchestrate(
             "transform_params": runtime.set_environment(data_access=data_access),
             "stats": statistics,
         }
-        processors = ActorPool(
-            RayUtils.create_actors(
-                clazz=TransformTableProcessor,
-                params=processor_params,
-                actor_options=preprocessing_params.worker_options,
-                n_actors=preprocessing_params.n_workers,
-                creation_delay=preprocessing_params.creation_delay,
-            )
+        processors = RayUtils.create_actors(
+            clazz=TransformTableProcessor,
+            params=processor_params,
+            actor_options=preprocessing_params.worker_options,
+            n_actors=preprocessing_params.n_workers,
+            creation_delay=preprocessing_params.creation_delay,
         )
+        processors_pool = ActorPool(processors)
         # create gauges
         files_in_progress_gauge = Gauge("files_in_progress", "Number of files in progress")
         files_completed_gauge = Gauge("files_processed_total", "Number of files completed")
@@ -79,7 +78,7 @@ def orchestrate(
         available_object_memory_gauge = Gauge("available_object_store", "Available object store")
         # process data
         RayUtils.process_files(
-            executors=processors,
+            executors=processors_pool,
             files=files,
             print_interval=print_interval,
             files_in_progress_gauge=files_in_progress_gauge,
@@ -89,8 +88,11 @@ def orchestrate(
             available_memory_gauge=available_memory_gauge,
             object_memory_gauge=available_object_memory_gauge,
         )
+        # invoke flush to ensure that all results are returned
+        replies = [processor.flush.remote() for processor in processors]
+        RayUtils.wait_for_execution_completion(replies)
         # Compute execution statistics
-        stats = runtime.compute_execution_stats(ray.get(statistics.execution_stats.remote()))
+        stats = runtime.compute_execution_stats(ray.get(statistics.get_execution_stats.remote()))
 
         # build and save metadata
         metadata = {
