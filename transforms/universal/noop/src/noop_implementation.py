@@ -38,7 +38,9 @@ class NOOPTransform(AbstractTableTransform):
             print(f"Sleep for {self.sleep} seconds")
             time.sleep(self.sleep)
             print("Sleep completed - continue")
-        return [table], {}
+        # Add some sample metadata.
+        metadata = {"nfiles": 1, "nrows": len(table)}
+        return [table], metadata
 
 
 class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
