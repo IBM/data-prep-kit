@@ -3,12 +3,12 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from noop_implementation import NOOPTableTransformConfiguration
+from noop_implementation import NOOPTransformConfiguration
 
 
 print(os.environ)
 # create launcher
-launcher = TransformLauncher(name="NOOP", transform_runtime_config=NOOPTableTransformConfiguration())
+launcher = TransformLauncher(name="NOOP", transform_runtime_config=NOOPTransformConfiguration())
 # create parameters
 s3_cred = {
     "access_key": os.environ.get("COS_ACCESS_KEY", "access"),

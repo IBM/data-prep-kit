@@ -24,7 +24,7 @@ class NOOPTransform(AbstractTableTransform):
         these will be provided by that class with help from the RayMutatingDriver.
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
-        # of NOOPTableTransformConfiguration class
+        # of NOOPTransformConfiguration class
         self.sleep = config.get("sleep", 1)
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
@@ -43,7 +43,7 @@ class NOOPTransform(AbstractTableTransform):
         return [table], metadata
 
 
-class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
+class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -83,5 +83,5 @@ class NOOPTableTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(name="NOOP", transform_runtime_config=NOOPTableTransformConfiguration())
+    launcher = TransformLauncher(name="NOOP", transform_runtime_config=NOOPTransformConfiguration())
     launcher.launch()
