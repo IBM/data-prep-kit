@@ -38,6 +38,8 @@ params = {
     "noop_sleep_sec": 5,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
+# for arg in sys.argv:
+#     print(arg)
 
 # launch
 launcher.launch()

@@ -16,12 +16,13 @@ in a single run of the transform.
 We will **not** be showing the following:
 * The creation of a custom TransformRuntime that would enable more global
 state and/or coordination among the transforms running in other RayActors.
+This will be covered in an advanced tutorial.
 
 The complete task involves create the following:
 * NOOPTransform - class that implements the specific transformation
 * NOOPTableTransformConfiguration - class that provides configuration for the 
 NOOPTransform, specifically the command line arguments used to configure it.
-* main() - simple creation and use of the RayLauncher. 
+* main() - simple creation and use of the TransformLauncher. 
 
 ### NOOPTransform
 
@@ -136,7 +137,8 @@ and which allows us to capture the `NOOPTransform`-specific arguments and option
 That's it, the `NOOPTransformConfiguration` is complete.
 
 ### main()
-Lastly we show how to launch the framework with the NOOPTransform using the frameworks `TransformLauncher` class.
+Lastly we show how to launch the framework with the `NOOPTransform` using the 
+framework's `TransformLauncher` class.
 ```python
 ...
 if __name__ == "__main__":
@@ -145,3 +147,16 @@ if __name__ == "__main__":
 ```
 The launcher requires only an instance of DefaultTableTransformCOnfiguration (our `n` class).  
 A single method `launch()` is then invoked to run the transform in a Ray cluster.
+
+### Running
+Assuming the above `main()` is placed in `noop_main.py` we can run the transform on data 
+in COS as follows:
+```shell
+python noop_main.py --noop_sleep_msec 2 \
+  --run_locally=True  \
+  --s3_cred "{'access_key': 'KEY', 'secret_key': 'SECRET', 'cos_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}" \
+  --s3_config "{'input_folder': 'cos-optimal-llm-pile/test/david/input/', 'output_folder': 'cos-optimal-llm-pile/test/david/output/'}"
+```
+This is a minimal set of options to run locally.  
+See the [framework options](framework-options.md) for a complete list of
+transform-independent command line options.
