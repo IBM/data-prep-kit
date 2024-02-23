@@ -16,5 +16,5 @@ This might include provisioning of shared memory objects or creation of addition
 
 To learn more consider the following:
 * [Architecture Deep Dive](architecture.md)
-* [Transform Tutorial](transform-tutorials)
+* [Transform Tutorial](transform-tutorials.md)
 

@@ -37,7 +37,7 @@ table and any associated metadata for that table transformation.
 
 Other methods such as `flush()` need not be overridden/redefined for this simple example.
 
-We start with the simple definition of the class and the imports required
+We start with the simple definition of the class, its initializer and the imports required
 by subsequent code:
 ```python
 import time
@@ -53,21 +53,19 @@ from data_processing.ray import (
 from data_processing.transform import AbstractTableTransform
 
 class NOOPTransform(AbstractTableTransform):
-...
-```
-The `NOOPTransform` class extends the `AbstractTableTransform`, which defines
-the require methods.
-
-For purposes of the tutorial and to simulate a more complex processing
-job, we will allow our transform to be configurable
-with an amount of seconds to sleep/delay during the call to `transform()`.
-As such we have the following initializer,
-```python
+    
     def __init__(self, config: dict[str, Any]):
         self.sleep = config.get("sleep", 1)
 ```
+The `NOOPTransform` class extends the `AbstractTableTransform`, which defines the required methods.
+
+For purposes of the tutorial and to simulate a more complex processing
+job, we allow our transform to be configurable
+with an amount of seconds to sleep/delay during the call to `transform()`.
+Configuration is provided by the framework in a dictionary provided to the initializer.
 Below we will cover how this `sleep` argument is made available to the initializer.
-Next we define the `transform()` method itself, which includes addition of some
+
+Next we define the `transform()` method itself, which includes the addition of some
 almost trivial metadata.
 ```python
 
@@ -85,47 +83,49 @@ by the framework and reported as aggregated job statistics metadata.
 If there is not metadata then simply return an empty dictionary.
 
 ### NOOPTransformConfiguration
-Next we define the `NOOPTransformConfiguration`  class the defines the following:
+Next we define the `NOOPTransformConfiguration` class and its initializer that define the following:
 
+* The short name for the transform
 * The class implementing the transform - in our case NOOPTransform
 * Command line argument support.
 * The transform runtime class be used.  We will use the `DefaultTableTransformRuntime`
 which is sufficient for most 1:1 table transforms.  Extensions to this class can be
 used when more complex interactions among transform is required.*
-* 
+
+First we define the class and its initializer,
 ```python
 ...
 class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
-
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
-
+    
     def __init__(self):
-        super().__init__(runtime_class=DefaultTableTransformRuntime, transform_class=NOOPTransform)
+        super().__init__(name="NOOP", 
+                         runtime_class=DefaultTableTransformRuntime, 
+                         transform_class=NOOPTransform)
         self.params = {}
 
+```
+The initializer extends the DefaultTableTransformConfiguration which provides simple
+capture of our configuration data and enables picklability through the network.
+
+Next, we provide two methods that define and capture the command line configuration that 
+is specific to the `NOOPTransform`, in this case the number of seconds to sleep during transformation.
+First we define the method establishes the command line arguments.  
+This method is given a global argument parser to which the `NOOPTransform` arguments are added.
+It is good practice to include common prefix to all transform-specific options (i.e. pii, lang, etc).
+In our case we will use `noop_`.
+```python
     def add_input_params(self, parser: ArgumentParser) -> None:
-        """
-        Add Transform-specific arguments to the given  parser.
-        This will be included in a dictionary used to initialize the NOOPTransform.
-        By convention a common prefix should be used for all transform-specific CLI args
-        (e.g, noop_, pii_, etc.)
-        """
         parser.add_argument(
             "--noop_sleep_sec",
             type=int,
             default=1,
             help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
         )
-
+```
+Next we implement a method that is called after the framework has parsed the CLI args
+and which allows us to capture the `NOOPTransform`-specific arguments and optionally validate them.
+```python
     def apply_input_params(self, args: Namespace) -> bool:
-        """
-        Validate and apply the arguments that have been parsed
-        :param args: user defined arguments.
-        :return: True, if validate pass or False otherwise
-        """
         if args.noop_sleep_sec <= 0:
             print(f"Parameter noop_sleep_sec should be greater then 0, you specified {args.noop_sleep_sec}")
             return False
@@ -133,3 +133,15 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
         print(f"noop parameters are : {self.params}")
         return True
 ```
+That's it, the `NOOPTransformConfiguration` is complete.
+
+### main()
+Lastly we show how to launch the framework with the NOOPTransform using the frameworks `TransformLauncher` class.
+```python
+...
+if __name__ == "__main__":
+    launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
+    launcher.launch()
+```
+The launcher requires only an instance of DefaultTableTransformCOnfiguration (our `n` class).  
+A single method `launch()` is then invoked to run the transform in a Ray cluster.
