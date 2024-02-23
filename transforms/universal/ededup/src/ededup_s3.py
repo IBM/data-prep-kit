@@ -1,3 +1,4 @@
+import os
 import sys
 
 from data_processing.ray import TransformLauncher
@@ -6,16 +7,18 @@ from ededup_implementation import EdedupTableTransformConfiguration
 
 
 # create launcher
-launcher = TransformLauncher(name="ededup", transform_runtime_config=EdedupTableTransformConfiguration())
+launcher = TransformLauncher(transform_runtime_config=EdedupTableTransformConfiguration())
 # create parameters
 s3_cred = {
-    "access_key": "access",
-    "secret_key": "secret",
+    "access_key": os.environ.get("COS_ACCESS_KEY", "access"),
+    "secret_key": os.environ.get("COS_SECRET_KEY", "secret"),
     "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 s3_conf = {
     "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=text/",
     "output_folder": "cos-optimal-llm-pile/boris-da-test/",
+    # "input_folder": "cos-optimal-llm-pile/test/david/input/",
+    # "output_folder": "cos-optimal-llm-pile/test/david/output/",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}

@@ -51,6 +51,7 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
 
     def __init__(
         self,
+        name: str,
         transform_class: type[AbstractTableTransform],
         runtime_class: type[DefaultTableTransformRuntime] = DefaultTableTransformRuntime,
     ):
@@ -60,6 +61,7 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
         :param runtime_class: implementation of the Filter runtime
         :return:
         """
+        self.name = name
         self.runtime = runtime_class
         self.transform_class = transform_class
         self.params = {}
@@ -77,3 +79,6 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
         :return: mutator class
         """
         return self.transform_class
+
+    def get_name(self):
+        return self.name

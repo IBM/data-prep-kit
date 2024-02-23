@@ -51,7 +51,7 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(runtime_class=DefaultTableTransformRuntime, transform_class=NOOPTransform)
+        super().__init__(name="NOOP", runtime_class=DefaultTableTransformRuntime, transform_class=NOOPTransform)
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -83,5 +83,5 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(name="NOOP", transform_runtime_config=NOOPTransformConfiguration())
+    launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
     launcher.launch()

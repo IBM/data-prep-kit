@@ -18,7 +18,6 @@ class TransformLauncher:
 
     def __init__(
         self,
-        name: str,
         transform_runtime_config: DefaultTableTransformConfiguration,
         data_access_factory: DataAccessFactory = DataAccessFactory(),
     ):
@@ -28,10 +27,10 @@ class TransformLauncher:
         :param transform_runtime_config: transform runtime factory
         :param data_access_factory: the factory to create DataAccess instances.
         """
-        self.name = name
+        self.name = transform_runtime_config.get_name()
         self.transform_runtime_config = transform_runtime_config
         self.data_access_factory = data_access_factory
-        self.ray_orchestrator = TransformOrchestratorConfiguration(name=name)
+        self.ray_orchestrator = TransformOrchestratorConfiguration(name=self.name)
 
     def __get_parameters(self) -> bool:
         """
