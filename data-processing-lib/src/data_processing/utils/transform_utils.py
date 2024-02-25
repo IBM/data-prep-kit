@@ -3,6 +3,7 @@ import sys
 from typing import Any
 import pyarrow as pa
 import mmh3
+import hashlib
 
 
 RANDOM_SEED = 42
@@ -41,6 +42,15 @@ class TransformUtils:
         :return: normalized string
         """
         return doc.replace(" ", "").replace("\n", "").lower().translate(str.maketrans("", "", string.punctuation))
+
+    @staticmethod
+    def str_to_hash(val: str) -> str:
+        """
+        compute string hash
+        :param val: string
+        :return: hash value
+        """
+        return hashlib.sha256(val.encode("utf-8")).hexdigest()
 
     @staticmethod
     def str_to_int(s: str) -> int:

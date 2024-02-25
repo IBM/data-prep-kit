@@ -1,4 +1,3 @@
-import hashlib
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
@@ -15,20 +14,6 @@ from data_processing.utils import GB, TransformUtils
 
 
 REQUEST_LEN = 8192
-
-
-"""
-Support functions
-"""
-
-
-def str_to_hash(val: str) -> str:
-    """
-    compute string hash
-    :param val: string
-    :return: hash value
-    """
-    return hashlib.sha256(val.encode("utf-8")).hexdigest()
 
 
 @ray.remote(scheduling_strategy="SPREAD")
@@ -100,7 +85,7 @@ class EdedupTransform(AbstractTableTransform):
         # Compute unique hashes for the table
         for text in table[self.doc_column]:
             # Compute doc hash
-            h = str_to_hash(TransformUtils.normalize_string(str(text)))
+            h = TransformUtils.str_to_hash(TransformUtils.normalize_string(str(text)))
             if h not in hashes:  # Processing this hash for the first time
                 hashes.add(h)  # Remember it locally
                 hd[h] = str(text)
