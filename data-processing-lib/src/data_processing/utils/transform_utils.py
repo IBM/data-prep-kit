@@ -6,6 +6,7 @@ import mmh3
 
 
 RANDOM_SEED = 42
+LOCAL_TO_DISK = 2
 
 
 class TransformUtils:

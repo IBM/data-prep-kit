@@ -5,12 +5,9 @@ import pyarrow as pa
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
-    TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import MB
-
-LOCAL_TO_DISK = 2
+from data_processing.utils import MB, LOCAL_TO_DISK
 
 
 class CoalesceTransform(AbstractTableTransform):
@@ -21,7 +18,7 @@ class CoalesceTransform(AbstractTableTransform):
         """
         Initialize based on the dictionary of configuration information.
         """
-        self.coalesce_target = config.get("coalesce_target", 1.0)
+        self.coalesce_target = LOCAL_TO_DISK * MB * config.get("coalesce_target", 1.0)
         self.output_buffer = []
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
@@ -37,7 +34,7 @@ class CoalesceTransform(AbstractTableTransform):
         for (_, table_size) in self.output_buffer:
             total_size += table_size
         # Not enough data to output
-        if total_size / MB < (LOCAL_TO_DISK * self.coalesce_target):
+        if total_size < self.coalesce_target:
             return [], {}
         # Build table to return and return it
         return self._build_return_table()

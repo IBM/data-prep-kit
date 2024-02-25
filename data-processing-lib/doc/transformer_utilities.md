@@ -11,5 +11,9 @@ transformer's implementation. Currently it includes the following methods:
 * `add_column` adds column to the table avoiding duplicates. If the column with the given name already exists it will 
 be removed before it is added
 
+It also contain two variables:
+* `RANDOM_SEED` number that is used for methods that require seed
+* `LOCAL_TO_DISK` rough local size to size on disk/S3
+
 This class should be extended with additional methods, generally useful across multiple transformers and documentation 
 should be added here 
