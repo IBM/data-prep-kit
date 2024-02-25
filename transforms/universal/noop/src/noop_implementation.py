@@ -51,7 +51,7 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name="NOOP", runtime_class=DefaultTableTransformRuntime, transform_class=NOOPTransform)
+        super().__init__(name="NOOP", transform_class=NOOPTransform)
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
