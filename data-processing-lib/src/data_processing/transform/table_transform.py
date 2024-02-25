@@ -9,6 +9,15 @@ class AbstractTableTransform:
     Sub-classes must provide the transform() method to provide the conversion of one table to 0 or more new tables.
     """
 
+    def __init__(self, config: dict[str, Any]):
+        """
+        This is defined so that sub-classes can expect to receive a dictionary of configuration
+        information when created.  Currently the Ray work is expected to provide these from the CLI args
+        a defined by the associated configuration class.
+        param config: dictionary of configuration information used to control the operation of the transform.
+        """
+        pass
+
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         Converts input table into an output table
