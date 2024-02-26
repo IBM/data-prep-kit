@@ -10,7 +10,8 @@ from noop_implementation import NOOPTransform
 # specific instance of our test.
 def pytest_generate_tests(metafunc):
     """
-    Called by pytest to install our fixtures.
+    Called by pytest to install the fixtures for the test class in this file.
+    This will generally not change for all tests extending AbstractTransformTest test class.
     :param metafunc:
     :return:
     """
