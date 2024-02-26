@@ -15,6 +15,7 @@ dependencies = [
     "urllib3>=1.26.18",
     "dmf-lib==1.2.5",
     "argparse",
+    "mmh3"
 ]
 
 

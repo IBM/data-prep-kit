@@ -1,8 +1,13 @@
 import string
 import sys
 from typing import Any
-
 import pyarrow as pa
+import mmh3
+import hashlib
+
+
+RANDOM_SEED = 42
+LOCAL_TO_DISK = 2
 
 
 class TransformUtils:
@@ -39,7 +44,25 @@ class TransformUtils:
         return doc.replace(" ", "").replace("\n", "").lower().translate(str.maketrans("", "", string.punctuation))
 
     @staticmethod
-    def validata_columns(table: pa.Table, required: list[str]) -> bool:
+    def str_to_hash(val: str) -> str:
+        """
+        compute string hash
+        :param val: string
+        :return: hash value
+        """
+        return hashlib.sha256(val.encode("utf-8")).hexdigest()
+
+    @staticmethod
+    def str_to_int(s: str) -> int:
+        """
+        Convert string to int using mmh3 hashing. Ensures predictable result by setting seed
+        :param s: string
+        :return: int hash
+        """
+        return mmh3.hash(s, seed=RANDOM_SEED, signed=False)
+
+    @staticmethod
+    def validate_columns(table: pa.Table, required: list[str]) -> bool:
         """
         Check if required columns exist in the table
         :param table: table
@@ -66,7 +89,7 @@ class TransformUtils:
         :return: updated table, containing new column
         """
         # check if column already exist and drop it
-        if name in table.columns:
+        if name in table.schema.names:
             table = table.drop(columns=[name])
         # append column
         return table.append_column(field_=name, column=[content])

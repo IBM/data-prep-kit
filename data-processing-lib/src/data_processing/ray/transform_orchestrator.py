@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 
 import ray
@@ -89,8 +90,10 @@ def orchestrate(
             object_memory_gauge=available_object_memory_gauge,
         )
         # invoke flush to ensure that all results are returned
+        start = time.time()
         replies = [processor.flush.remote() for processor in processors]
         RayUtils.wait_for_execution_completion(replies)
+        print(f"done flushing in {time.time() - start} sec")
         # Compute execution statistics
         stats = runtime.compute_execution_stats(ray.get(statistics.get_execution_stats.remote()))
 

@@ -11,12 +11,8 @@ class AbstractTableTransform:
 
     def __init__(self, config: dict[str, Any]):
         """
-        This is defined so that sub-classes can expect to receive a dictionary of configuration
-        information when created.  Currently the Ray work is expected to provide these from the CLI args
-        a defined by the associated configuration class.
-        param config: dictionary of configuration information used to control the operation of the transform.
+        Initialize based on the dictionary of configuration information.
         """
-        pass
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """

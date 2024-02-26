@@ -1,8 +1,6 @@
-import hashlib
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-import mmh3
 import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccess
@@ -16,29 +14,6 @@ from data_processing.utils import GB, TransformUtils
 
 
 REQUEST_LEN = 8192
-
-
-"""
-Support functions
-"""
-
-
-def str_to_hash(val: str) -> str:
-    """
-    compute string hash
-    :param val: string
-    :return: hash value
-    """
-    return hashlib.sha256(val.encode("utf-8")).hexdigest()
-
-
-def str_to_int(s: str) -> int:
-    """
-    Convert string to int using mmh3 hashing. Ensures predictable result by setting seed
-    :param s: string
-    :return: int hash
-    """
-    return mmh3.hash(s, seed=42, signed=False)
 
 
 @ray.remote(scheduling_strategy="SPREAD")
@@ -86,20 +61,21 @@ class EdedupTransform(AbstractTableTransform):
         The dictionary should contain the following:
             doc_column - name of the doc column
             hashes - list of hash actors, references
-            statistics - reference to statistics class
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of EdedupTableTransformConfiguration class
+        super().__init__(config)
         self.doc_column = config.get("doc_column", "")
         self.hashes = config.get("hashes", [])
-        self.stats = config.get("statistics", [])
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         De duping table content.
+        :param table: table
+        :return: resulting table, statistics
         """
         # make sure that the doc column exists
-        if not TransformUtils.validata_columns(table=table, required=[self.doc_column]):
+        if not TransformUtils.validate_columns(table=table, required=[self.doc_column]):
             return [], {}
         # report number of source documents
         stats = {"source_documents": table.num_rows}
@@ -110,7 +86,7 @@ class EdedupTransform(AbstractTableTransform):
         # Compute unique hashes for the table
         for text in table[self.doc_column]:
             # Compute doc hash
-            h = str_to_hash(TransformUtils.normalize_string(str(text)))
+            h = TransformUtils.str_to_hash(TransformUtils.normalize_string(str(text)))
             if h not in hashes:  # Processing this hash for the first time
                 hashes.add(h)  # Remember it locally
                 hd[h] = str(text)
@@ -146,7 +122,7 @@ class EdedupTransform(AbstractTableTransform):
         request = [[] for _ in range(len(self.hashes))]
 
         for h in hd.keys():
-            request[str_to_int(h) % len(self.hashes)].append(h)
+            request[TransformUtils.str_to_int(h) % len(self.hashes)].append(h)
 
         # Submit requests to appropriate hash actors
         remote_replies = []

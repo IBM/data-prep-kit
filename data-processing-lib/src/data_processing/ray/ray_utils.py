@@ -157,9 +157,7 @@ class RayUtils:
         :param replies: list of request futures
         :return: None
         """
-        start = time.time()
         while replies:
             # Wait for replies
             ready, not_ready = ray.wait(replies)
             replies = not_ready
-        print(f"done flushing in {time.time() - start} sec")
