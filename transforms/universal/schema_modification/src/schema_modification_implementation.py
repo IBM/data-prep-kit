@@ -94,14 +94,14 @@ class SchemaRuntime(DefaultTableTransformRuntime):
         """
         super().__init__(params)
 
-    def set_environment(self, data_access: DataAccess) -> dict[str, Any]:
+    def set_environment(self, data_access: DataAccess, statistics: ray.ObjectRef) -> dict[str, Any]:
         """
         Set environment for filter execution
         :param data_access - data access class
+        :param statistics - statistics actor reference
         :return: dictionary of filter init params
         """
-        # create hashes
-
+        # create id generator
         return {"id_generator": IDGenerator.remote} | self.params
 
 

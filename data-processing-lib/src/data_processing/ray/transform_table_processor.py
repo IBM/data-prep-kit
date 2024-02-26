@@ -28,7 +28,6 @@ class TransformTableProcessor:
         # Add data access ant statistics to the processor parameters
         transform_params = params.get("transform_params", None)
         transform_params["data_access"] = self.data_access
-        transform_params["statistics"] = params.get("stats", None)
         # Create local processor
         self.transform = params.get("transform_class", None)(transform_params)
         # Create statistics
