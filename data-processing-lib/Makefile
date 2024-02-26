@@ -37,7 +37,7 @@ publish: check-env
 
 venv:	pyproject.toml check-env
 	rm -rf venv	
-	python -m venv venv
+	$(PYTHON) -m venv venv
 	echo '[global]' > venv/pip.conf
 	echo "extra-index-url = https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple" >> venv/pip.conf
 	source venv/bin/activate; 	\
