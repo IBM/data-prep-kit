@@ -62,7 +62,7 @@ class TransformUtils:
         return mmh3.hash(s, seed=RANDOM_SEED, signed=False)
 
     @staticmethod
-    def validata_columns(table: pa.Table, required: list[str]) -> bool:
+    def validate_columns(table: pa.Table, required: list[str]) -> bool:
         """
         Check if required columns exist in the table
         :param table: table

@@ -58,7 +58,7 @@ class SchemaTransform(AbstractTableTransform):
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
-        if self.doc_id_column is not None and TransformUtils.validata_columns(table=table, required=[self.doc_column]):
+        if self.doc_id_column is not None and TransformUtils.validate_columns(table=table, required=[self.doc_column]):
             # add doc id column
             docs = table[self.doc_column]
             doc_ids = [""] * table.num_rows
