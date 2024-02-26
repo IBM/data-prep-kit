@@ -24,6 +24,11 @@ expected_metadata = {"nfiles": 1, "nrows": 1}
 
 
 class TestNOOPTransform(AbstractTransformTest):
+    """
+    Extends the super-class to define the test data for the tests defined there.
+    The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
+    """
+
     def get_test_transform_fixtures(self) -> list[Tuple]:
         fixtures = [
             (NOOPTransform({"sleep": 0}), table, [expected_table], expected_metadata),
