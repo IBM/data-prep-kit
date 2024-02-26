@@ -19,6 +19,7 @@ class SplitFileTransform(AbstractTableTransform):
         """
         Initialize based on the dictionary of configuration information.
         """
+        super().__init__(config)
         self.max_documents_table = config.get("max_documents_table", 1.0)
         self.max_table_size = LOCAL_TO_DISK * MB * config.get("max_table_size", 1.0)
 

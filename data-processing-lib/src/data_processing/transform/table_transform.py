@@ -9,6 +9,12 @@ class AbstractTableTransform:
     Sub-classes must provide the transform() method to provide the conversion of one table to 0 or more new tables.
     """
 
+    def __init__(self, config: dict[str, Any]):
+        """
+        Initialize based on the dictionary of configuration information.
+        """
+        self.config = config
+
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         Converts input table into an output table

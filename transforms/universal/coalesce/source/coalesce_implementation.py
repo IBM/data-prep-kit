@@ -18,6 +18,7 @@ class CoalesceTransform(AbstractTableTransform):
         """
         Initialize based on the dictionary of configuration information.
         """
+        super().__init__(config)
         self.coalesce_target = LOCAL_TO_DISK * MB * config.get("coalesce_target", 1.0)
         self.output_buffer = []
 

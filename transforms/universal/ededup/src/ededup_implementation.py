@@ -64,6 +64,7 @@ class EdedupTransform(AbstractTableTransform):
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of EdedupTableTransformConfiguration class
+        super().__init__(config)
         self.doc_column = config.get("doc_column", "")
         self.hashes = config.get("hashes", [])
 
