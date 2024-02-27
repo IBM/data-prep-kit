@@ -11,17 +11,15 @@ class TransformTableProcessor:
     This is the class implementing the actual work/actor processing of a single pyarrow file
     """
 
-    def __init__(
-        self,
-        params: dict[str, Any],
-    ):
+    def __init__(self, params: dict[str, Any]):
         """
         Init method
         :param params: dictionary that has the following key
             data_access_factory: data access factory
             transform_class: local transform class
             transform_params: dictionary of parameters for local transform creation
-            stats: object reference to statistics
+            statistics: object reference to statistics
+            base_table_stats: boolean to peg base table stats
         """
         # Create data access
         self.data_access = params.get("data_access_factory", None).create_data_access()
@@ -32,6 +30,7 @@ class TransformTableProcessor:
         self.transform = params.get("transform_class", None)(transform_params)
         # Create statistics
         self.stats = params.get("statistics", None)
+        self.base_table_stats = params.get("base_table_stats", True)
         self.last_empty = ""
 
     def process_table(self, f_name: str) -> None:
@@ -47,7 +46,8 @@ class TransformTableProcessor:
         table = self.data_access.get_table(path=f_name)
         if table is None:
             return
-        self.stats.add_stats.remote({"source_files": 1, "source_size": table.nbytes})
+        if self.base_table_stats:
+            self.stats.add_stats.remote({"source_files": 1, "source_size": table.nbytes})
         # Process input table
         try:
             if table.num_rows > 0:
@@ -98,13 +98,14 @@ class TransformTableProcessor:
                 output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
                 if save_res is not None:
                     # Store execution statistics. Doing this async
-                    self.stats.add_stats.remote(
-                        {
-                            "result_files": 1,
-                            "result_size": out_tables[0].nbytes,
-                            "table_processing": time.time() - t_start,
-                        }
-                    )
+                    if self.base_table_stats:
+                        self.stats.add_stats.remote(
+                            {
+                                "result_files": 1,
+                                "result_size": out_tables[0].nbytes,
+                                "table_processing": time.time() - t_start,
+                            }
+                        )
             case _:
                 # we have more then 1 table
                 table_sizes = 0
@@ -116,13 +117,14 @@ class TransformTableProcessor:
                     )
                     if save_res is None:
                         break
-                self.stats.add_stats.remote(
-                    {
-                        "result_files": len(out_tables),
-                        "result_size": table_sizes,
-                        "table_processing": time.time() - t_start,
-                    }
-                )
-        # save statistics
+                if self.base_table_stats:
+                    self.stats.add_stats.remote(
+                        {
+                            "result_files": len(out_tables),
+                            "result_size": table_sizes,
+                            "table_processing": time.time() - t_start,
+                        }
+                    )
+        # save transformer's statistics
         if len(stats) > 0:
             self.stats.add_stats.remote(stats)
