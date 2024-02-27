@@ -21,14 +21,14 @@ class AbstractTransformTest:
         # Apply the fixtures for the method with these input names (i.e. test_transform()).
         if (
             "transform" in metafunc.fixturenames
-            and "in_table" in metafunc.fixturenames
+            and "in_table_list" in metafunc.fixturenames
             and "expected_table_list" in metafunc.fixturenames
-            and "expected_metadata" in metafunc.fixturenames
+            and "expected_metadata_list" in metafunc.fixturenames
         ):
             # Let the sub-class define the specific tests and test data for the transform under test.
             f = self.get_test_transform_fixtures()
             # Install the fixture, matching the parameter names used by test_transform() method.
-            metafunc.parametrize("transform,in_table,expected_table_list,expected_metadata", f)
+            metafunc.parametrize("transform,in_table_list,expected_table_list,expected_metadata_list", f)
 
     @staticmethod
     def validate_expected_tables(table_list: list[pa.Table], expected_table_list: list[pa.Table]):
@@ -56,6 +56,12 @@ class AbstractTransformTest:
                     f"Row {j} of table {i} are not equal\n" "\tTransformed: " + r1 + "\tExpected   : " + r2
                 )
 
+    def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
+        elen = len(expected_metadata)
+        assert len(metadata) == elen, f"Number of metadata dictionaries not the expected of {elen}"
+        for index in range(elen):
+            AbstractTransformTest.validate_expected_metadata(metadata[index], expected_metadata[index])
+
     @staticmethod
     def validate_expected_metadata(metadata: dict[str, float], expected_metadata: dict[str, float]):
         """
@@ -77,9 +83,9 @@ class AbstractTransformTest:
     def test_transform(
         self,
         transform: AbstractTableTransform,
-        in_table: pa.Table,
+        in_table_list: list[pa.Table],
         expected_table_list: list[pa.Table],
-        expected_metadata: dict[str, float],
+        expected_metadata_list: list[dict[str, float]],
     ):
         """
         Use the given transform to transform() the given table and compare the results (list of tables and metadata)
@@ -91,18 +97,19 @@ class AbstractTransformTest:
         :param expected_metadata:
         :return:
         """
-        table_list, metadata = transform.transform(in_table)
-        AbstractTransformTest.validate_expected_tables(table_list, expected_table_list)
-        AbstractTransformTest.validate_expected_metadata(metadata, expected_metadata)
+        all_table_list = []
+        all_metadata_list = []
+        for in_table in in_table_list:
+            table_list, metadata = transform.transform(in_table)
+        all_table_list.extend(table_list)
+        all_metadata_list.append(metadata)
+
         table_list, metadata = transform.flush()
-        assert (
-            table_list is not None
-        ), f"Flushing a simple transform returned None for the list of tables. Expected an empty list."
-        assert len(table_list) == 0, f"Flushing a simple transform returned a list of non-zero length"
-        assert (
-            metadata is not None
-        ), f"Flushing a simple transform returned None for metadata. Expected an empty dictionary."
-        assert len(metadata) == 0, f"Flushing a simple transform returned a dictionary of non-zero length"
+        all_table_list.extend(table_list)
+        all_metadata_list.append(metadata)
+
+        AbstractTransformTest.validate_expected_tables(all_table_list, expected_table_list)
+        AbstractTransformTest.validate_expected_metadata_lists(all_metadata_list, expected_metadata_list)
 
     def get_test_transform_fixtures(self) -> list[Tuple]:
         """
