@@ -77,8 +77,6 @@ class EdedupTransform(AbstractTableTransform):
         # make sure that the doc column exists
         if not TransformUtils.validate_columns(table=table, required=[self.doc_column]):
             return [], {}
-        # report number of source documents
-        stats = {"source_documents": table.num_rows}
         # Inner variables
         hashes = set()
         unique = []
@@ -108,8 +106,8 @@ class EdedupTransform(AbstractTableTransform):
             index += 1
         # Create output table
         out_table = table.filter(mask)
-        # report number of source documents
-        stats["result_documents"] = out_table.num_rows
+        # report statistics
+        stats = {"source_documents": table.num_rows, "result_documents": out_table.num_rows}
         return [out_table], stats
 
     def _process_remote_hashes(self, hd: dict[str, str]) -> list[str]:
@@ -161,11 +159,12 @@ class EdedupRuntime(DefaultTableTransformRuntime):
         super().__init__(params)
         self.filters = []
 
-    def set_environment(self, data_access: DataAccess, statistics: ray.ObjectRef) -> dict[str, Any]:
+    def set_environment(self, data_access: DataAccess, statistics: ray.ObjectRef, files: list[str]) -> dict[str, Any]:
         """
         Set environment for filter execution
         :param data_access - data access class
         :param statistics - reference to the statistics object
+        :param files - list of files to process
         :return: dictionary of filter init params
         """
         # create hashes
