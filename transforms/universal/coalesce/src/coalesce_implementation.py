@@ -7,13 +7,14 @@ from data_processing.ray import (
     DefaultTableTransformRuntime,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import MB, LOCAL_TO_DISK
+from data_processing.utils import LOCAL_TO_DISK, MB
 
 
 class CoalesceTransform(AbstractTableTransform):
     """
     Implements file coalescing small files into the larger ones.
     """
+
     def __init__(self, config: dict[str, Any]):
         """
         Initialize based on the dictionary of configuration information.
@@ -72,7 +73,9 @@ class CoalesceTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name="Coalesce", runtime_class=DefaultTableTransformRuntime, transform_class=CoalesceTransform)
+        super().__init__(
+            name="Coalesce", runtime_class=DefaultTableTransformRuntime, transform_class=CoalesceTransform
+        )
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
