@@ -3,7 +3,7 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccess
+from data_processing.data_access import DataAccessFactory
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
@@ -159,10 +159,11 @@ class EdedupRuntime(DefaultTableTransformRuntime):
         super().__init__(params)
         self.filters = []
 
-    def set_environment(self, data_access: DataAccess, statistics: ray.ObjectRef, files: list[str]) -> dict[str, Any]:
+    def set_environment(self, data_access_factory: DataAccessFactory, statistics: ray.ObjectRef, files: list[str]) \
+            -> dict[str, Any]:
         """
         Set environment for filter execution
-        :param data_access - data access class
+        :param data_access_factory - data access factory
         :param statistics - reference to the statistics object
         :param files - list of files to process
         :return: dictionary of filter init params
