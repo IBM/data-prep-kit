@@ -36,10 +36,10 @@ dev = [
 ]
 
 [options]
-package_dir = ["src"]
+package_dir = ["src","test"]
 
 [options.packages.find]
-where = ["src/mutate"]
+where = ["src/data_processing"]
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report term-missing --cov-fail-under 70"

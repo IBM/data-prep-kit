@@ -11,6 +11,8 @@ For more details see the [documentation](doc/framework.md).
 1. python 3.9 or later
 2. git command line tools
 3. [pre-commit](https://pre-commit.com/)
+4. twine (pip install twine)
+    * but on Mac you may have to include a dir in your PATH, such as `export PATH=$PATH:/Library/Frameworks/Python.framework/Versions/3.10/bin`
 
 ### Git
 Simple clone the repo and set up the pre-commit hooks.
