@@ -21,7 +21,7 @@ def pytest_generate_tests(metafunc):
 
 table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})
 expected_table = table  # We're a noop after all.
-expected_metadata = {"nfiles": 1, "nrows": 1}
+expected_metadata_list = [{"nfiles": 1, "nrows": 1}, {}]  # transform() result  # flush() result
 
 
 class TestNOOPTransform(AbstractTransformTest):
@@ -32,7 +32,7 @@ class TestNOOPTransform(AbstractTransformTest):
 
     def get_test_transform_fixtures(self) -> list[Tuple]:
         fixtures = [
-            (NOOPTransform({"sleep": 0}), table, [expected_table], expected_metadata),
-            (NOOPTransform({"sleep": 0}), table, [expected_table], expected_metadata),
+            (NOOPTransform({"sleep": 0}), [table], [expected_table], expected_metadata_list),
+            (NOOPTransform({"sleep": 0}), [table], [expected_table], expected_metadata_list),
         ]
         return fixtures

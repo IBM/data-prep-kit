@@ -131,3 +131,4 @@ dmypy.json
 .project
 *.swp
 data-processing-lib/.DS_Store
+.pydevproject

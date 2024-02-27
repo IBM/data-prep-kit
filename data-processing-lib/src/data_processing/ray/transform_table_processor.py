@@ -1,7 +1,7 @@
 import time
 from typing import Any
-import pyarrow as pa
 
+import pyarrow as pa
 import ray
 
 
@@ -78,8 +78,7 @@ class TransformTableProcessor:
         except Exception as e:
             print(f"Exception {e} flushing")
 
-    def _submit_table(self, f_name: str, t_start: float, out_tables: list[pa.Table], stats: dict[str, Any]) \
-            -> None:
+    def _submit_table(self, f_name: str, t_start: float, out_tables: list[pa.Table], stats: dict[str, Any]) -> None:
         """
         This is a helper method writing output tables and statistics
         :param f_name: input file n
