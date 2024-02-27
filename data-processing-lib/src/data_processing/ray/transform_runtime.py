@@ -2,7 +2,7 @@ import argparse
 from typing import Any
 
 import ray
-from data_processing.data_access import DataAccess
+from data_processing.data_access import DataAccess, DataAccessFactory
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider
 
@@ -19,10 +19,11 @@ class DefaultTableTransformRuntime:
         """
         self.params = params
 
-    def set_environment(self, data_access: DataAccess, statistics: ray.ObjectRef, files: list[str]) -> dict[str, Any]:
+    def set_environment(self, data_access_factory: DataAccessFactory, statistics: ray.ObjectRef, files: list[str]) \
+            -> dict[str, Any]:
         """
         Set environment for filter execution
-        :param data_access - data access class
+        :param data_access_factory - data access factory class
         :param statistics - reference to statistics actor
         :param files - list of files to process
         :return: dictionary of filter init params
