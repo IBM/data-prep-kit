@@ -183,10 +183,11 @@ class DataAccessLocal(DataAccess):
         """
 
         try:
-            table = pq.read_table(path)
+            file_path = os.path.join(self.input_folder, path)
+            table = pq.read_table(file_path)
             return table
         except (FileNotFoundError, IOError, pa.ArrowException) as e:
-            print(f"Error reading table from {path}: {e}")
+            print(f"Error reading table from {path}: {e.with_traceback(None)}")
             return None
 
     def get_output_location(self, path: str) -> str:
