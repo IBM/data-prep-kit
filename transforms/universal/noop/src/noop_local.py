@@ -4,7 +4,8 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from noop_implementation import NOOPTransformConfiguration
+from noop_transform import NOOPTransformConfiguration
+
 
 if __name__ == "__main__":
     # create launcher
