@@ -88,13 +88,18 @@ class AbstractTransformTest:
         expected_metadata_list: list[dict[str, float]],
     ):
         """
-        Use the given transform to transform() the given table and compare the results (list of tables and metadata)
+        Use the given transform to transform() the given table(s) and compare the results (list of tables and metadata)
         with the expected values as given.  The inputs are provided by the sub-class definition of
         get_test_transform_fixtures().
         :param transform: transform to test.
-        :param in_table:  table to transform
-        :param expected_table_list:
-        :param expected_metadata:
+        :param in_table_list:  table(s) to transform
+        :param expected_table_list: the expected accumulation of output tables produced by the transform() call.
+            This should include any empty tables if some of the calls to tranform() generate empty tables.
+            If the final call to flush() produces an empty list of tables, these will not be included here (duh!).
+            However, see expected_metadata_list for the handling of metadata produced by flush().
+        :param expected_metadata_list: the expected list of accumulated metadata dictionaries across all calls to
+            transform() and the final call to flush().  Transforms that produce nothing from flush() should include
+            and empty dictionary at the end of this list.
         :return:
         """
         all_table_list = []
