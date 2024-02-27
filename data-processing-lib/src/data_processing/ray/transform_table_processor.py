@@ -11,17 +11,14 @@ class TransformTableProcessor:
     This is the class implementing the actual work/actor processing of a single pyarrow file
     """
 
-    def __init__(
-        self,
-        params: dict[str, Any],
-    ):
+    def __init__(self, params: dict[str, Any]):
         """
         Init method
         :param params: dictionary that has the following key
             data_access_factory: data access factory
             transform_class: local transform class
             transform_params: dictionary of parameters for local transform creation
-            stats: object reference to statistics
+            statistics: object reference to statistics
         """
         # Create data access
         self.data_access = params.get("data_access_factory", None).create_data_access()
@@ -31,7 +28,7 @@ class TransformTableProcessor:
         # Create local processor
         self.transform = params.get("transform_class", None)(transform_params)
         # Create statistics
-        self.stats = transform_params.get("statistics", None)
+        self.stats = params.get("statistics", None)
         self.last_empty = ""
 
     def process_table(self, f_name: str) -> None:
