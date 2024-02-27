@@ -94,15 +94,16 @@ class SchemaRuntime(DefaultTableTransformRuntime):
         """
         super().__init__(params)
 
-    def set_environment(self, data_access: DataAccess, statistics: ray.ObjectRef) -> dict[str, Any]:
+    def set_environment(self, data_access: DataAccess, statistics: ray.ObjectRef, files: list[str]) -> dict[str, Any]:
         """
         Set environment for filter execution
         :param data_access - data access class
         :param statistics - statistics actor reference
+        :param files - list of files to process
         :return: dictionary of filter init params
         """
         # create id generator
-        return {"id_generator": IDGenerator.remote} | self.params
+        return {"id_generator": IDGenerator.remote()} | self.params
 
 
 class SchemaTransformConfiguration(DefaultTableTransformConfiguration):
@@ -146,5 +147,3 @@ class SchemaTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["columns_to_remove"] = args.columns_to_remove
         print(f"Schema modification parameters are : {self.params}")
         return True
-
-

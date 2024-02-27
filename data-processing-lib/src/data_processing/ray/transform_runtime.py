@@ -19,11 +19,12 @@ class DefaultTableTransformRuntime:
         """
         self.params = params
 
-    def set_environment(self, data_access: DataAccess, statistics: ray.ObjectRef) -> dict[str, Any]:
+    def set_environment(self, data_access: DataAccess, statistics: ray.ObjectRef, files: list[str]) -> dict[str, Any]:
         """
         Set environment for filter execution
         :param data_access - data access class
         :param statistics - reference to statistics actor
+        :param files - list of files to process
         :return: dictionary of filter init params
         """
         return self.params

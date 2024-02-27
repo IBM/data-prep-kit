@@ -198,7 +198,7 @@ class DataAccessLocal(DataAccess):
         """
         return path.replace(self.input_folder, self.output_folder)
 
-    def save_table(self, output_path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
+    def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
         """
         Saves a pyarrow table to a file and returns information about the operation.
 
@@ -217,6 +217,7 @@ class DataAccessLocal(DataAccess):
         # Get table size in memory
         size_in_memory = table.nbytes
         try:
+            output_path = os.path.join(self.output_folder, path)
             # Write the table to parquet format
             pq.write_table(table, output_path)
 
