@@ -17,7 +17,19 @@ class AbstractTransformTest:
             test_instance.install_fixtures(metafunc)    # Use it to install the fixtures
     """
 
-    def install_fixtures(self, metafunc):
+    @staticmethod
+    def pytest_generate_tests(metafunc):
+        """
+        Called by pytest to install the fixtures for the test class in this file.
+        This method name (i.e. pytest_generate_tests) must not be changed, otherwise the fixtures
+        will not be installed.
+        :param metafunc:
+        :return:
+        """
+        test_instance = metafunc.cls()  # Create the instance of the test class being used.
+        test_instance.__install_fixtures(metafunc)  # Use it to install the fixtures
+
+    def __install_fixtures(self, metafunc):
         # Apply the fixtures for the method with these input names (i.e. test_transform()).
         if (
             "transform" in metafunc.fixturenames

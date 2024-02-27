@@ -1,7 +1,7 @@
 import os
 import sys
 
-from coalesce_implementation import CoalesceTransformConfiguration
+from coalesce_transform import CoalesceTransformConfiguration
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
 
