@@ -517,7 +517,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             "number of docs": sum_docs,
             "number of removed docs": sum_removed,
             "number of min hashes": self.sum_mh,
-            "overall hash memory": overall_hash_memory,
+            "overall hash memory GB": overall_hash_memory,
             "de duplication %": dedup_prst,
         } | stats
 
