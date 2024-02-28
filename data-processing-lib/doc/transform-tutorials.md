@@ -13,3 +13,9 @@ Here we will take a simple example to show the basics of creating a simple trans
 that takes a single input Table, and produces a single Table.
 * [Advanced transform](advanced-transform-tutorial.md)
 * [Porting from GUF 0.1.6](transform-porting.md)
+
+Once a transform has been built, testing can be enabled with the testing framework:
+* [Transform Testing](testing-transforms.md) - shows how to test a transform
+independent of the ray framework.
+* [End-to-End Testing](testing-e2e-transform.md) - shows how to test the
+transform running in the ray environment.
