@@ -74,7 +74,7 @@ def orchestrate(
         # create gauges
         files_in_progress_gauge = Gauge("files_in_progress", "Number of files in progress")
         files_completed_gauge = Gauge("files_processed_total", "Number of files completed")
-        available_cpus_gauge = Gauge("AVAILABLE_CPUS", "Number of available CPUs")
+        available_cpus_gauge = Gauge("available_cpus", "Number of available CPUs")
         available_gpus_gauge = Gauge("available_gpus", "Number of available GPUs")
         available_memory_gauge = Gauge("available_memory", "Available memory")
         available_object_memory_gauge = Gauge("available_object_store", "Available object store")

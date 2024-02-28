@@ -3,6 +3,8 @@ from typing import Any
 
 import pyarrow as pa
 import ray
+from ray.actor import ActorHandle
+
 from data_processing.data_access import DataAccessFactory
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
@@ -159,7 +161,7 @@ class EdedupRuntime(DefaultTableTransformRuntime):
         super().__init__(params)
         self.filters = []
 
-    def set_environment(self, data_access_factory: DataAccessFactory, statistics: ray.ObjectRef, files: list[str]) \
+    def set_environment(self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]) \
             -> dict[str, Any]:
         """
         Set environment for filter execution
@@ -196,7 +198,11 @@ class EdedupRuntime(DefaultTableTransformRuntime):
                 sum_hash_mem = sum_hash_mem + h_memory
             remote_replies = not_ready
         dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 0))
-        return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
+        return {
+            "number of hashes": sum_hash,
+            "hash memory, GB": sum_hash_mem,
+            "de duplication %": dedup_prst
+        } | stats
 
 
 class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):

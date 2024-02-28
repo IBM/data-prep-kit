@@ -1,8 +1,13 @@
 from scipy.integrate import quad as integrate
 from data_processing.utils import TransformUtils, RANDOM_SEED, GB
 import numpy as np
-from typing import Any, Iterator
+from typing import Any, Iterator, Union
 import ray
+from ray.actor import ActorHandle
+from ray.util import ActorPool
+
+import time
+from data_processing.ray import RayUtils
 
 NO_SIMILARITY = -1
 REQUEST_LEN = 4096
@@ -207,7 +212,7 @@ class BucketsHash:
     """
     Actor storing buckets information
     """
-    def __init__(self):
+    def __init__(self, params: dict[str, Any]):
         """
         Initialization
         """
@@ -236,7 +241,7 @@ class BucketsHash:
                 else:
                     self.buckets[b_hash] = bucket[1]
 
-    def add_processing_submitter(self, submitter: ray.ObjectRef) -> None:
+    def add_processing_submitter(self, submitter: ActorHandle) -> None:
         """
         Add process submitter
         :param submitter: reference to submitter
@@ -279,3 +284,184 @@ class BucketsHash:
         :return: number of buckets and memory utilization
         """
         return self.n_buckets, self.bucket_memory
+
+
+@ray.remote(scheduling_strategy="SPREAD")
+class BucketsHashProcessor:
+    """
+    Actor for processing buckets
+    """
+    def __init__(self, params: dict[str, Any]):
+        """
+        Init method
+        :param params - dictionary of parameters containing the following keys
+            remote_docs - handles to the remote docs
+            remote_minhashes - handles to the remote minhashes
+            mm_min_hash - MurmurMH class
+            threshold - threshold
+            statistics - statistics actor
+        """
+        self.threshold = params["threshold"]
+        self.mm_min_hash = params["mm_min_hash"]
+        self.remote_docs = params["remote_docs"]
+        self.remote_minhashes = params["remote_minhashes"]
+        self.stats = params["statistics"]
+
+    def _submit_generated_docs(self, docs: dict[int, int], removed: set[int]) -> None:
+        """
+        Submit generated documents
+        :param docs: docs to submit
+        :param removed: removed documents
+        :return: None
+        """
+        # Remove doc ids that are already removed
+        for did in removed:
+            docs.pop(did, None)
+        # Build remote requests
+        request = [([], []) for _ in range(len(self.remote_docs))]
+        for key, value in docs.items():
+            req_tuple = request[key % len(self.remote_docs)]
+            req_tuple[0].append((key, value))
+        for did in removed:
+            req_tuple = request[did % len(self.remote_docs)]
+            req_tuple[1].append(did)
+        # Submit requests and wait for replies
+        remote_replies = []
+        i = 0
+        for req in request:
+            if len(req[0]) > 0 or len(req[1]) > 0:  # Only submit if the request has data
+                remote_replies.append(self.remote_docs[i].add_documents.remote(req))
+            i += 1
+        # Process replies
+        RayUtils.wait_for_execution_completion(replies=remote_replies)
+
+    # get minhashes and length for docs in the bucket
+    def _get_minhashes_docs(self, doc_ids: list[int]) -> dict[int, tuple[int, list[int]]]:
+        """
+        Get minhashes for documents by submitting requests to an appropriate doc collectors
+        :param doc_ids: doc ids
+        :return: doc ids with hashes
+        """
+        request = [[] for _ in range(len(self.remote_minhashes))]
+        for value in doc_ids:
+            request[value % len(self.remote_minhashes)].append(value)
+        remote_replies = []
+        i = 0
+        for req in request:
+            if len(req) > 0:  # Only submit if the length is greater then 0
+                remote_replies.append(self.remote_minhashes[i].get_minhashes.remote(req))
+            i += 1
+        # Process replies
+        hashes = {}
+        while remote_replies:
+            # Wait for replies
+            ready, not_ready = ray.wait(remote_replies)
+            reply = ray.get(ready)[0]
+            for r in reply:
+                hashes[r[0]] = (r[1], r[2])
+            remote_replies = not_ready
+        return hashes
+
+    def process_buckets(self, buckets: list[Union[int, list[int]]]) -> None:
+        """
+        process buckets to generate documents
+        :param buckets: buckets
+        :return: none
+        """
+        t_start = time.time()
+        docs = {}
+        removed = set()
+        for bucket in buckets:
+            if type(bucket) == int:
+                # This hash has a single document
+                if bucket not in docs:
+                    docs[bucket] = NO_SIMILARITY
+                continue
+            # multiple documents
+            start = time.time()
+            bucket_len = len(bucket)
+            very_long = bucket_len > 100000
+
+            hashes = self._get_minhashes_docs(bucket)
+            set_list = []
+            unvisited = set(bucket)
+
+            # combine similar documents
+            while len(unvisited) > 0:
+                current_doc_id = unvisited.pop()
+                current_mh = hashes[current_doc_id][1]
+                current_set = set()
+                for other_doc_id in bucket:
+                    if other_doc_id in unvisited:
+                        other_mh = hashes[other_doc_id][1]
+                        if self.mm_min_hash.jaccard(current_mh, other_mh) >= self.threshold:
+                            current_set.add(current_doc_id)
+                            current_set.add(other_doc_id)
+                            unvisited.discard(other_doc_id)
+                if len(current_set) > 0:
+                    set_list.append(current_set)
+
+            # process created sets
+            for current_set in set_list:
+                for d in current_set:
+                    bucket.remove(d)
+                removed.update(current_set)
+                for i, doc_id in enumerate(current_set):
+                    if i == 0:
+                        cluster_id = doc_id
+                        remaining = doc_id
+                        min_len = hashes[doc_id][0]
+                        max_len = min_len
+                        continue
+                    c_len = hashes[doc_id][0]
+                    if c_len > max_len:
+                        max_len = c_len
+                        remaining = doc_id
+                        continue
+                    if c_len <= min_len:
+                        min_len = c_len
+                        cluster_id = doc_id
+                docs[remaining] = cluster_id
+                removed.discard(remaining)
+
+            # if we did not find docs in connections, submit them as NO_SIMILARITY
+            for d in bucket:
+                if d not in docs:
+                    docs[d] = NO_SIMILARITY
+            if very_long:
+                print(
+                    f"Processed long ({bucket_len}) bucket in {(time.time() - start) / 60} "
+                    f"min; "
+                    f"docs chains {len(set_list)}"
+                )
+
+        # Submit docs
+        self._submit_generated_docs(docs, removed)
+        # peg stats
+        self.stats.add_stats.remote({"generated doc_ids": len(docs), "bucket processing time": time.time() - t_start})
+
+
+@ray.remote(scheduling_strategy="SPREAD")
+class BucketsHashProcessorInvoker(object):
+    """
+    Bucket hash processing coordinator (singleton)
+    """
+    def __init__(self, bucket_processors: list[ActorHandle]) -> None:
+        self.n_processors = len(bucket_processors)
+        self.pool = ActorPool(bucket_processors)
+        self.submitted = 0
+
+    def submit_for_processing(self, buckets: list[Union[int, list[int]]]) -> None:
+        # Get completed results
+        if self.submitted < self.n_processors:  # still have room
+            self.pool.submit(lambda a, v: a.process_buckets.remote(v), buckets)
+            self.submitted += 1
+            return
+        else:
+            self.pool.get_next_unordered()
+            self.pool.submit(lambda a, v: a.process_buckets.remote(v), buckets)
+            return
+
+    def wait_for_completion(self) -> None:
+        while self.pool.has_next():
+            self.pool.get_next_unordered()

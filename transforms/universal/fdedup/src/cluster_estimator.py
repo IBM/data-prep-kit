@@ -1,7 +1,7 @@
 import math
 
 from data_processing.utils import GB
-from support import fuzzy_optimal_param
+from fdedup_support import fuzzy_optimal_param
 
 
 """
