@@ -37,9 +37,9 @@ class DefaultTableTransformRuntime:
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
         """
-        Compute execution statistics
-        :param stats: output of statistics
-        :return: job execution statistics
+        Update/augment the given stats object with runtime-specific additions/modifications.
+        :param stats: output of statistics as aggregated across all calls to all transforms.
+        :return: job execution statistics.  These are generally reported as metadata by the Ray Orchestrator.
         """
         return stats
 
