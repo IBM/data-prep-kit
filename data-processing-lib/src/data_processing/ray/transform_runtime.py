@@ -1,9 +1,10 @@
 from typing import Any
 
-from ray.actor import ActorHandle
 from data_processing.data_access import DataAccessFactory
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider
+from ray.actor import ActorHandle
+from typing_extensions import deprecated
 
 
 class DefaultTableTransformRuntime:
@@ -13,19 +14,24 @@ class DefaultTableTransformRuntime:
 
     def __init__(self, params: dict[str, Any]):
         """
-        Create filter runtime
-        :param params: parameters
+        Create/config this runtime.
+        :param params: parameters, often provided by the CLI arguments as defined by a TableTansformConfiguration.
         """
         self.params = params
 
-    def set_environment(self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]) \
-            -> dict[str, Any]:
+    def get_transform_config(
+        self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
+    ) -> dict[str, Any]:
         """
-        Set environment for filter execution
-        :param data_access_factory - data access factory class
+        Get the dictionary of configuration that will be provided to the transform's initializer.
+        This is the opportunity for this runtime to create a new set of configuration based on the
+        config/params provided to this instance's initializer.  This may include the addition
+        of new configuration data such as ray shared memory, new actors, etc, that might be needed and
+        expected by the transform in its initializer and/or transform() methods.
+        :param data_access_factory - data access factory class being used by the RayOrchestrator.
         :param statistics - reference to statistics actor
         :param files - list of files to process
-        :return: dictionary of filter init params
+        :return: dictionary of transform init params
         """
         return self.params
 
@@ -65,21 +71,24 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
         :return:
         """
         self.name = name
-        self.runtime = runtime_class
+        self.runtime_class = runtime_class
         self.transform_class = transform_class
+        # These are expected to be updated later by the sub-class in apply_input_params().
         self.params = {}
 
     def create_transform_runtime(self) -> DefaultTableTransformRuntime:
         """
-        Create Filter runtime
-        :return: fiter runtime object
+        Create transform runtime with the parameters captured during apply_input_params()
+        :return: transform runtime object
         """
-        return self.runtime(self.params)
+        return self.runtime_class(self.params)
 
     def get_transform_class(self) -> type[AbstractTableTransform]:
         """
-        Create Mutator runtime
-        :return: mutator class
+        Get the class extending AbstractTableTransform which implements a specific transformation.
+        The class will generally be instantiated with a dictionary of configuration produced by
+        the associated TransformRuntime's get_transform_config() method.
+        :return: class extending AbstractTableTransform
         """
         return self.transform_class
 

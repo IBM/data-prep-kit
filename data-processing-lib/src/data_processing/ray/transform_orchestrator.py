@@ -59,8 +59,9 @@ def orchestrate(
         processor_params = {
             "data_access_factory": data_access_factory,
             "transform_class": transform_runtime_config.get_transform_class(),
-            "transform_params":
-                runtime.set_environment(data_access_factory=data_access_factory, statistics=statistics, files=files),
+            "transform_params": runtime.get_transform_config(
+                data_access_factory=data_access_factory, statistics=statistics, files=files
+            ),
             "statistics": statistics,
         }
         processors = RayUtils.create_actors(

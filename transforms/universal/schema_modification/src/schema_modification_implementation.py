@@ -1,17 +1,16 @@
-import ray
-from ray.actor import ActorHandle
-
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
+import ray
+from data_processing.data_access import DataAccessFactory
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
 )
-from data_processing.data_access import DataAccessFactory
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils
+from ray.actor import ActorHandle
 
 
 @ray.remote(num_cpus=0.25, scheduling_strategy="SPREAD")
@@ -19,6 +18,7 @@ class IDGenerator(object):
     """
     An actor maintaining unique integer ids
     """
+
     def __init__(self):
         """
         Initialization
@@ -96,8 +96,9 @@ class SchemaRuntime(DefaultTableTransformRuntime):
         """
         super().__init__(params)
 
-    def set_environment(self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]) \
-            -> dict[str, Any]:
+    def get_transform_config(
+        self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
+    ) -> dict[str, Any]:
         """
         Set environment for filter execution
         :param data_access_factory - data access factory
@@ -117,8 +118,7 @@ class SchemaTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name="SchemaTransform", runtime_class=SchemaRuntime,
-                         transform_class=SchemaTransform)
+        super().__init__(name="SchemaTransform", runtime_class=SchemaRuntime, transform_class=SchemaTransform)
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -132,8 +132,7 @@ class SchemaTransformConfiguration(DefaultTableTransformConfiguration):
         parser.add_argument("--id_column", type=str, default=None, help="doc data id column name")
         parser.add_argument("--int_id_column", type=str, default=None, help="int doc data id column name")
         # When using this specify columns as follows --columns_to_remove foo bar foobar
-        parser.add_argument("--columns_to_remove", type=str, default=None, nargs="+",
-                            help="List of columns to remove")
+        parser.add_argument("--columns_to_remove", type=str, default=None, nargs="+", help="List of columns to remove")
 
     def apply_input_params(self, args: Namespace) -> bool:
         """

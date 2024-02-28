@@ -1,39 +1,36 @@
+import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
+import mmh3
+import numpy as np
 import pyarrow as pa
 import ray
-from ray.util import ActorPool
-from ray.actor import ActorHandle
-from ray.util.metrics import Gauge
-
-
+import sentencepiece
 from data_processing.data_access import DataAccessFactory
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
-    TransformTableProcessor,
     RayUtils,
+    TransformTableProcessor,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import TransformUtils, RANDOM_SEED, str2bool
-from text_normalizer import normalize as text_normalize
-import numpy as np
-import mmh3
-import sentencepiece
-import time
-
+from data_processing.utils import RANDOM_SEED, TransformUtils, str2bool
 from fdedup_support import (
-    find,
-    fuzzy_optimal_param,
-    MurmurMH,
-    DocCollector,
-    DocsMinHash,
+    REQUEST_LEN,
     BucketsHash,
     BucketsHashProcessor,
     BucketsHashProcessorInvoker,
-    REQUEST_LEN
+    DocCollector,
+    DocsMinHash,
+    MurmurMH,
+    find,
+    fuzzy_optimal_param,
 )
+from ray.actor import ActorHandle
+from ray.util import ActorPool
+from ray.util.metrics import Gauge
+from text_normalizer import normalize as text_normalize
 
 
 class FdedupPreprocessor(AbstractTableTransform):
@@ -84,7 +81,7 @@ class FdedupPreprocessor(AbstractTableTransform):
                 words = self.sp.encode_as_pieces(text_normalize(text))
                 word_count = len(words)
                 for i in range(0, max(1, word_count - self.word_shingle_size + 1)):
-                    shingles.append(self.delimiter.join(words[i: i + self.word_shingle_size]))
+                    shingles.append(self.delimiter.join(words[i : i + self.word_shingle_size]))
             except Exception as e:
                 print(f"Exception during japanese shingle building {e}")
                 self.is_japanese = False
@@ -96,7 +93,7 @@ class FdedupPreprocessor(AbstractTableTransform):
                 return [text]
             bounds = [-1] + separators + [len(text)]
             return [
-                text[bounds[i] + 1: bounds[i + self.word_shingle_size]]
+                text[bounds[i] + 1 : bounds[i + self.word_shingle_size]]
                 for i in range(0, len(bounds) - self.word_shingle_size)
             ]
 
@@ -121,13 +118,14 @@ class FdedupPreprocessor(AbstractTableTransform):
         :return:
         """
         return [
-            mmh3.hash64(min_hashes[i * self.length_band: (i + 1) * self.length_band],
-                        seed=RANDOM_SEED, signed=False)[0]
+            mmh3.hash64(min_hashes[i * self.length_band : (i + 1) * self.length_band], seed=RANDOM_SEED, signed=False)[
+                0
+            ]
             for i in range(self.num_bands)
         ]
 
     def _submit_buckets_minhashes(
-            self, buckets: dict[int, list[int]], minhashes: list[tuple[int, int, np.array]]
+        self, buckets: dict[int, list[int]], minhashes: list[tuple[int, int, np.array]]
     ) -> None:
         """
         Submit buckets to hash
@@ -165,12 +163,13 @@ class FdedupPreprocessor(AbstractTableTransform):
         :param table: table
         :return: resulting table, statistics
         """
+
         def flush(limit: int) -> None:
             """
             flushing buckets and minhashes to dedicated actors
             :param limit: number of buckets to flush
             :return: None
-                """
+            """
             if len(buckets) >= limit:  # time to submit
                 nonlocal num_buckets
                 nonlocal num_minhashes
@@ -209,10 +208,7 @@ class FdedupPreprocessor(AbstractTableTransform):
                 flush(REQUEST_LEN)
         flush(0)
         # peg stats
-        stats = {
-            "generated buckets": num_buckets,
-            "generated minhashes": num_minhashes
-        }
+        stats = {"generated buckets": num_buckets, "generated minhashes": num_minhashes}
         return [], stats
 
 
@@ -220,6 +216,7 @@ class FdedupFilter(AbstractTableTransform):
     """
     Filtering documents
     """
+
     def __init__(self, config: dict):
         """
         Initialize based on the dictionary of configuration information.
@@ -288,6 +285,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
     Fuzzy dedup runtime support. Here we are using set environment to implement first two steps of fuzzy dedup
     processing - preprocessing and bucket hash processing
     """
+
     def __init__(self, params: dict[str, Any]):
         """
         Create filter runtime
@@ -317,8 +315,9 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         self.sum_mh_mem = 0
         self.document_collectors = []
 
-    def set_environment(self, data_access_factory: DataAccessFactory,
-                        statistics: ActorHandle, files: list[str]) -> dict[str, Any]:
+    def get_transform_config(
+        self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
+    ) -> dict[str, Any]:
         """
         Set environment for filter execution
         :param data_access_factory - data access factory
@@ -330,8 +329,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         num_permutations = self.params.get("num_permutations", 64)
         # compute fuzzy dedup parameters
         num_buckets, length_bucket = fuzzy_optimal_param(
-            threshold=threshold, num_perm=num_permutations,
-            false_positive_weight=0.5, false_negative_weight=0.5
+            threshold=threshold, num_perm=num_permutations, false_positive_weight=0.5, false_negative_weight=0.5
         )
         print(f"Fuzzy: num buckets {num_buckets}, bucket length {length_bucket}")
         mm_min_hash = MurmurMH(num_perm=num_permutations, seed=RANDOM_SEED)
@@ -353,9 +351,9 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         # At this point we do not need doc collectors, so we can increase the amount
         # of preprocessors to improve performance
         worker_options = self.params.get("worker_options", None)
-        n_readers = (self.params.get("n_preprocessors", 1) +
-                     int(self.params.get("d_actors", 1) * self.params.get("doc_cpu", 1) /
-                         worker_options["num_cpus"]))
+        n_readers = self.params.get("n_preprocessors", 1) + int(
+            self.params.get("d_actors", 1) * self.params.get("doc_cpu", 1) / worker_options["num_cpus"]
+        )
         print(f"Table preprocessing uses {n_readers} readers")
         # Create preprocessing actors
         processor_params = {
@@ -372,7 +370,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
                 "remote_buckets": bucket_collectors,
                 "remote_minhashes": minhash_collectors,
                 "is_japanese": self.params.get("is_japanese", False),
-                "delimiter": self.params.get("delimiter", " ")
+                "delimiter": self.params.get("delimiter", " "),
             },
             "base_table_stats": False,
         }
@@ -385,18 +383,18 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         print(f"created {len(processors_list)} table processor actors")
         # Execute preprocessing
         # create gauges
-        files_in_progress_gauge = Gauge("preprocessing_files_in_progress",
-                                        "Number of files in progress, preprocessing")
-        files_completed_gauge = Gauge("preprocessing_files_processed_total",
-                                      "Number of files completed, preprocessing")
-        available_cpus_gauge = Gauge("preprocessing_available_cpus",
-                                     "Number of available CPUs, preprocessing")
-        available_gpus_gauge = Gauge("preprocessing_available_gpus",
-                                     "Number of available GPUs, preprocessing")
-        available_memory_gauge = Gauge("preprocessing_available_memory",
-                                       "Available memory, preprocessing")
-        available_object_memory_gauge = Gauge("preprocessing_available_object_store",
-                                              "Available object store, preprocessing")
+        files_in_progress_gauge = Gauge(
+            "preprocessing_files_in_progress", "Number of files in progress, preprocessing"
+        )
+        files_completed_gauge = Gauge(
+            "preprocessing_files_processed_total", "Number of files completed, preprocessing"
+        )
+        available_cpus_gauge = Gauge("preprocessing_available_cpus", "Number of available CPUs, preprocessing")
+        available_gpus_gauge = Gauge("preprocessing_available_gpus", "Number of available GPUs, preprocessing")
+        available_memory_gauge = Gauge("preprocessing_available_memory", "Available memory, preprocessing")
+        available_object_memory_gauge = Gauge(
+            "preprocessing_available_object_store", "Available object store, preprocessing"
+        )
         print_interval = int(len(files) / 100)
         if print_interval == 0:
             print_interval = 1
@@ -440,8 +438,9 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         )
         print(f"created {len(bucket_processors_list)} bucket processor actors")
         # create bucket processors invoker
-        bucket_processor_invoker = (BucketsHashProcessorInvoker.options(num_cpus=self.params.get("bucket_cpu", 0.5)).
-                                    remote(bucket_processors=bucket_processors_list))
+        bucket_processor_invoker = BucketsHashProcessorInvoker.options(
+            num_cpus=self.params.get("bucket_cpu", 0.5)
+        ).remote(bucket_processors=bucket_processors_list)
         # Add invoker to the buckets
         bucket_replies = [
             collector.add_processing_submitter.remote(submitter=bucket_processor_invoker)
@@ -537,8 +536,7 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         Add Transform-specific arguments to the given  parser.
         """
         parser.add_argument("--doc_column", type=str, default="contents", help="document column name")
-        parser.add_argument("--id_column", type=str, default="int_document_id",
-                            help="integer document id column name")
+        parser.add_argument("--id_column", type=str, default="int_document_id", help="integer document id column name")
         parser.add_argument("--cluster_column", type=str, default="cluster", help="cluster column name")
         parser.add_argument("--bucket_cpu", type=float, default=0.5, help="number of CPUs per bucket hash")
         parser.add_argument("--mhash_cpu", type=float, default=0.5, help="number of CPUs per minhash hash")
@@ -580,7 +578,6 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["world_shingle_size"] = args.shingles_size
         self.params["is_japanese"] = args.japanese_data
         self.params["delimiters"] = args.delimiters
-
 
         print(f"fuzzy dedup params are {self.params}")
         return True
