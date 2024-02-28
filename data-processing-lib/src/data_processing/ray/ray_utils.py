@@ -4,6 +4,7 @@ from typing import Any
 import ray
 from data_processing.utils import GB
 from ray.types import ObjectRef
+from ray.actor import ActorHandle
 from ray.util.actor_pool import ActorPool
 from ray.util.metrics import Gauge
 
@@ -61,7 +62,7 @@ class RayUtils:
     @staticmethod
     def create_actors(
         clazz: type, params: dict[str, Any], actor_options: dict[str, Any], n_actors: int, creation_delay: int = 0
-    ) -> list[ObjectRef]:
+    ) -> list[ActorHandle]:
         """
         Create a set of actors
         :param clazz: actor class, has to be annotated as remote

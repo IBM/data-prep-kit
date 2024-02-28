@@ -1,4 +1,6 @@
 import ray
+from ray.actor import ActorHandle
+
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
@@ -94,7 +96,7 @@ class SchemaRuntime(DefaultTableTransformRuntime):
         """
         super().__init__(params)
 
-    def set_environment(self, data_access_factory: DataAccessFactory, statistics: ray.ObjectRef, files: list[str]) \
+    def set_environment(self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]) \
             -> dict[str, Any]:
         """
         Set environment for filter execution
