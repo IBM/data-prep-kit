@@ -6,8 +6,6 @@ ENV TZ=US \
 USER root
 
 WORKDIR /T5
-#RUN microdnf install yum 
-#RUN yum -y update && yum install -y vim sudo bash curl unzip procps 
 RUN apt -y update && apt install -y vim sudo bash curl unzip procps gcc
 
 ENV PYTHONPATH "$PYTHONPATH:/T5"
@@ -35,6 +33,8 @@ RUN rm /T5/requirements.txt
 # Do this before the chmod/chgrp stuff below
 RUN rm -rf /T5/.cache/pip
 
+# GCC only needed while installing some python modules
+RUN apt remove -y gcc
 
 # Expect the models to be avavilable in the host via "python preload.py" so that we don't trigger
 # watson_nlp's use of ARTIFACTORY env vars.
@@ -42,7 +42,7 @@ RUN rm -rf /T5/.cache/pip
 # Copy test source , but avoid copying any models (entity_*), we already did that above
 COPY ./src/ /T5/
 
-COPY scripts/*.sh /T5/
+#COPY scripts/*.sh /T5/
 
 # Do this because when running in the cluster, we may not be running as root.
 #RUN chgrp -R 0 /T5 && chmod -R g=u /T5
