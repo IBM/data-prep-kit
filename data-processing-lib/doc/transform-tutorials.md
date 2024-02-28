@@ -64,6 +64,11 @@ For example,
 launcher = TransformLauncher(MyTransformConfiguration())
 launcher.launch()
 ```
+Note that the launcher defines some additional CLI parameters that are used to
+control the operation of the orchestrator and workers.  Things such
+as memory, number of workers, where to locate the input and output files, etc.
+Discussion of these options is beyond the scope of this document 
+(see [Launcher Options](launcher-options.md) for a list of available options.)
 
 #### Transform Configuration
 The 
