@@ -45,7 +45,7 @@ class FdedupPreprocessor(AbstractTableTransform):
             doc_column - name of doc column
             doc_id_int_column - name of int doc id column
             word_shingle_size - word shingle size
-            mm_min_hash - MurmurMH class
+            mn_min_hash - MurmurMH class
             num_bands - number of bands
             length_band band length
             remote_buckets - bucket actors
@@ -58,7 +58,7 @@ class FdedupPreprocessor(AbstractTableTransform):
         self.doc_id_column = config.get("doc_id_int_column", "")
         self.word_shingle_size = config.get("word_shingle_size", 1)
         self.delimiter = config.get("delimiter", " ")
-        self.mn_min_hash = config.get("mm_min_hash", None)
+        self.mn_min_hash = config.get("mn_min_hash", None)
         self.num_bands = config.get("num_bands", 1)
         self.length_band = config.get("length_band", 1)
         self.buckets = config.get("remote_buckets", [])
@@ -325,14 +325,14 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         :param files - list of files to process
         :return: dictionary of filter init params
         """
-        threshold = self.params.get("threshold", 0.8)
-        num_permutations = self.params.get("num_permutations", 64)
         # compute fuzzy dedup parameters
         num_buckets, length_bucket = fuzzy_optimal_param(
-            threshold=threshold, num_perm=num_permutations, false_positive_weight=0.5, false_negative_weight=0.5
+            threshold=self.params.get("threshold", 0.8),
+            num_perm=self.params.get("num_permutations", 64),
+            false_positive_weight=0.5, false_negative_weight=0.5
         )
         print(f"Fuzzy: num buckets {num_buckets}, bucket length {length_bucket}")
-        mm_min_hash = MurmurMH(num_perm=num_permutations, seed=RANDOM_SEED)
+        mn_min_hash = MurmurMH(num_perm=self.params.get("num_permutations", 64), seed=RANDOM_SEED)
         # Build bucket and minhash collectors
         bucket_collectors = RayUtils.create_actors(
             clazz=BucketsHash,
@@ -348,73 +348,9 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             n_actors=self.params.get("m_actors", 1),
         )
         print(f"created {len(minhash_collectors)} minhash actors")
-        # At this point we do not need doc collectors, so we can increase the amount
-        # of preprocessors to improve performance
-        worker_options = self.params.get("worker_options", None)
-        n_readers = self.params.get("n_preprocessors", 1) + int(
-            self.params.get("d_actors", 1) * self.params.get("doc_cpu", 1) / worker_options["num_cpus"]
-        )
-        print(f"Table preprocessing uses {n_readers} readers")
-        # Create preprocessing actors
-        processor_params = {
-            "data_access_factory": data_access_factory,
-            "transform_class": FdedupPreprocessor,
-            "statistics": statistics,
-            "transform_params": {
-                "doc_column": self.params.get("doc_column", ""),
-                "doc_id_int_column": self.params.get("id_column", ""),
-                "word_shingle_size": self.params.get("world_shingle_size", 1),
-                "mm_min_hash": mm_min_hash,
-                "num_bands": num_buckets,
-                "length_band": length_bucket,
-                "remote_buckets": bucket_collectors,
-                "remote_minhashes": minhash_collectors,
-                "is_japanese": self.params.get("is_japanese", False),
-                "delimiter": self.params.get("delimiter", " "),
-            },
-            "base_table_stats": False,
-        }
-        processors_list = RayUtils.create_actors(
-            clazz=TransformTableProcessor,
-            params=processor_params,
-            actor_options=worker_options,
-            n_actors=n_readers,
-        )
-        print(f"created {len(processors_list)} table processor actors")
-        # Execute preprocessing
-        # create gauges
-        files_in_progress_gauge = Gauge(
-            "preprocessing_files_in_progress", "Number of files in progress, preprocessing"
-        )
-        files_completed_gauge = Gauge(
-            "preprocessing_files_processed_total", "Number of files completed, preprocessing"
-        )
-        available_cpus_gauge = Gauge("preprocessing_available_cpus", "Number of available CPUs, preprocessing")
-        available_gpus_gauge = Gauge("preprocessing_available_gpus", "Number of available GPUs, preprocessing")
-        available_memory_gauge = Gauge("preprocessing_available_memory", "Available memory, preprocessing")
-        available_object_memory_gauge = Gauge(
-            "preprocessing_available_object_store", "Available object store, preprocessing"
-        )
-        print_interval = int(len(files) / 100)
-        if print_interval == 0:
-            print_interval = 1
-        # process data
-        processors = ActorPool(processors_list)
-        RayUtils.process_files(
-            executors=processors,
-            files=files,
-            print_interval=print_interval,
-            files_in_progress_gauge=files_in_progress_gauge,
-            files_completed_gauge=files_completed_gauge,
-            available_cpus_gauge=available_cpus_gauge,
-            available_gpus_gauge=available_gpus_gauge,
-            available_memory_gauge=available_memory_gauge,
-            object_memory_gauge=available_object_memory_gauge,
-        )
-        # Clean up processors
-        for processor in processors_list:
-            ray.kill(actor=processor, no_restart=True)
-        del processors
+        self._preprocess_tables(data_access_factory=data_access_factory, statistics=statistics, files=files,
+                                mn_min_hash=mn_min_hash,num_buckets=num_buckets, length_bucket=length_bucket,
+                                bucket_collectors=bucket_collectors, minhash_collectors=minhash_collectors)
         # Create document collectors
         self.document_collectors = RayUtils.create_actors(
             clazz=DocCollector,
@@ -429,11 +365,11 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             params={
                 "remote_docs": self.document_collectors,
                 "remote_minhashes": minhash_collectors,
-                "mm_min_hash": mm_min_hash,
-                "threshold": threshold * num_permutations,
+                "mn_min_hash": mn_min_hash,
+                "threshold": self.params.get("threshold", 0.8) * self.params.get("num_permutations", 64),
                 "statistics": statistics,
             },
-            actor_options=worker_options,
+            actor_options=self.params.get("worker_options", None),
             n_actors=self.params.get("n_preprocessors", 1),
         )
         print(f"created {len(bucket_processors_list)} bucket processor actors")
@@ -487,6 +423,89 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             "cluster_column": self.params.get("cluster_column", ""),
             "remote_docs": self.document_collectors,
         }
+
+    def _preprocess_tables(self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str],
+                           mn_min_hash:MurmurMH, num_buckets: int, length_bucket: int,
+                           bucket_collectors: list[ActorHandle], minhash_collectors: list[ActorHandle]) -> None:
+        """
+        Preprocess tables - build, run and cleanup
+        :param data_access_factory - data access factory
+        :param statistics - statistics actor
+        :param files - list of files to process
+        :param mn_min_hash - MurmurMH class
+        :param num_buckets - number of buckets
+        :param length_bucket - bucket length
+        :param bucket_collectors - bucket collector actors
+        :param minhash_collectors - minhash_collector actors
+        :return: None
+        """
+        worker_options = self.params.get("worker_options", None)
+        # At this point we do not need doc collectors, so we can increase the amount
+        # of preprocessors to improve performance
+        n_readers = self.params.get("n_preprocessors", 1) + int(
+            self.params.get("d_actors", 1) * self.params.get("doc_cpu", 1) / worker_options["num_cpus"]
+        )
+        print(f"Table preprocessing uses {n_readers} readers")
+        # Create preprocessing actors
+        processor_params = {
+            "data_access_factory": data_access_factory,
+            "transform_class": FdedupPreprocessor,
+            "statistics": statistics,
+            "transform_params": {
+                "doc_column": self.params.get("doc_column", ""),
+                "doc_id_int_column": self.params.get("id_column", ""),
+                "word_shingle_size": self.params.get("world_shingle_size", 1),
+                "mn_min_hash": mn_min_hash,
+                "num_bands": num_buckets,
+                "length_band": length_bucket,
+                "remote_buckets": bucket_collectors,
+                "remote_minhashes": minhash_collectors,
+                "is_japanese": self.params.get("is_japanese", False),
+                "delimiter": self.params.get("delimiter", " "),
+            },
+            "base_table_stats": False,
+        }
+        processors_list = RayUtils.create_actors(
+            clazz=TransformTableProcessor,
+            params=processor_params,
+            actor_options=worker_options,
+            n_actors=n_readers,
+        )
+        print(f"created {len(processors_list)} table processor actors")
+        # Execute preprocessing
+        # create gauges
+        files_in_progress_gauge = Gauge(
+            "preprocessing_files_in_progress", "Number of files in progress, preprocessing"
+        )
+        files_completed_gauge = Gauge(
+            "preprocessing_files_processed_total", "Number of files completed, preprocessing"
+        )
+        available_cpus_gauge = Gauge("preprocessing_available_cpus", "Number of available CPUs, preprocessing")
+        available_gpus_gauge = Gauge("preprocessing_available_gpus", "Number of available GPUs, preprocessing")
+        available_memory_gauge = Gauge("preprocessing_available_memory", "Available memory, preprocessing")
+        available_object_memory_gauge = Gauge(
+            "preprocessing_available_object_store", "Available object store, preprocessing"
+        )
+        print_interval = int(len(files) / 100)
+        if print_interval == 0:
+            print_interval = 1
+        # process data
+        processors = ActorPool(processors_list)
+        RayUtils.process_files(
+            executors=processors,
+            files=files,
+            print_interval=print_interval,
+            files_in_progress_gauge=files_in_progress_gauge,
+            files_completed_gauge=files_completed_gauge,
+            available_cpus_gauge=available_cpus_gauge,
+            available_gpus_gauge=available_gpus_gauge,
+            available_memory_gauge=available_memory_gauge,
+            object_memory_gauge=available_object_memory_gauge,
+        )
+        # Clean up processors
+        for processor in processors_list:
+            ray.kill(actor=processor, no_restart=True)
+        del processors
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
         """

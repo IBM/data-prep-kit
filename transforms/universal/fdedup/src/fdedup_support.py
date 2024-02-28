@@ -297,12 +297,12 @@ class BucketsHashProcessor:
         :param params - dictionary of parameters containing the following keys
             remote_docs - handles to the remote docs
             remote_minhashes - handles to the remote minhashes
-            mm_min_hash - MurmurMH class
+            mn_min_hash - MurmurMH class
             threshold - threshold
             statistics - statistics actor
         """
         self.threshold = params["threshold"]
-        self.mm_min_hash = params["mm_min_hash"]
+        self.mn_min_hash = params["mn_min_hash"]
         self.remote_docs = params["remote_docs"]
         self.remote_minhashes = params["remote_minhashes"]
         self.stats = params["statistics"]
@@ -394,7 +394,7 @@ class BucketsHashProcessor:
                 for other_doc_id in bucket:
                     if other_doc_id in unvisited:
                         other_mh = hashes[other_doc_id][1]
-                        if self.mm_min_hash.jaccard(current_mh, other_mh) >= self.threshold:
+                        if self.mn_min_hash.jaccard(current_mh, other_mh) >= self.threshold:
                             current_set.add(current_doc_id)
                             current_set.add(other_doc_id)
                             unvisited.discard(other_doc_id)
