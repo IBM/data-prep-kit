@@ -1,3 +1,12 @@
+#
+# Include this to get access to a common set of rules for reuse 
+# Before including,  REPOROOT must be defined.  For example,
+# REPOROOT=../../..
+# Reusable rules begin with '.'. To reuse without modification, 
+# define your local Makefile rule as follows
+# clean: .clean
+#######################################################################################
+
 DOCKER=podman
 DOCKER_FILE=Dockerfile
 DOCKER_REGISTRY=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
@@ -15,7 +24,14 @@ help:
 		| sort \
 		| egrep -v -e '^[^[:alnum:]]' -e '^$@$$' \
 		| xargs -I _ sh -c 'printf "%-20s " _; make _ -nB | (grep -i "^# Help:" || echo "") | tail -1 | sed "s/^# Help: //g"'
+	@echo ""
+	@echo Overridable macro values include the following:
+	@echo DOCKER - the name of the docker executable to use.  Set to DOCKER=$(DOCKER)
+	@echo DOCKER_FILE - the name of the docker file to use.  Set to DOCKER_FILE=$(DOCKER_FILE)
+	@echo DOCKER_REGISTRY - the name of the docker registry to use.  Set to DOCKER_REGISTRY=$(DOCKER_REGISTRY)
+	@echo PYTHON - the python executable to use.  Set to PYTHON=$(PYTHON)
 
+.PHONY: .clean
 .clean: 
 	@# Help: Clean up the virtual environment.
 	rm -rf venv
@@ -24,7 +40,7 @@ help:
 # We upgrade pip as that seems to be required by watson_nlp
 .venv:	requirements.txt
 	@# Help: Create the virtual environment using requirements.txt
-	make check_env
+	$(MAKE) .check_env
 	$(PYTHON) -m venv venv
 	echo '[global]' > venv/pip.conf
 	echo "extra-index-url = https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple" >> venv/pip.conf
@@ -33,7 +49,7 @@ help:
 	$(PIP) install -r requirements.txt;	\
 	$(PIP) install pytest;			\
 
-check_env:
+.check_env:
 	@# Help: Check to be sure the Artifactory credentials are in place in the env vars
 	@if [ -z "$(ARTIFACTORY_USER)" ]; then \
 		echo "You must set ARTIFACTORY_USER and ARTIFACTORY_API_KEY env vars";\
@@ -43,12 +59,12 @@ check_env:
 # Create the docker image making sure the preloaded models are available to copy into the image
 .image: requirements.txt $(DOCKER_FILE)
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
-	make check_env
+	$(MAKE) .check_env
 	$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
 	$(DOCKER) build --build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) --build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
 		-f $(DOCKER_FILE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) .
 
-.PHONY: install_lib_source
+.PHONY: .install_lib_source
 .install_lib_source:
 	@# Help: Install the source from the data processing library for $(PYTHON) 
 	@echo Installing source from data processing library for `which $(PYTHON)`
@@ -59,3 +75,12 @@ check_env:
 		echo ERROR installing source into `which $(PYTHON)`;	\
 	fi
 
+.PHONY: .build
+.build:	# A rule expected by the CI/CD at the root
+	$(MAKE) venv
+
+.PHONY: .test
+.test: 
+	source venv/bin/activate;		\
+	export PYTHONPATH=src:test:$$PYTHONPATH; \
+	pytest test

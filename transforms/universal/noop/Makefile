@@ -8,10 +8,22 @@ REPOROOT=../../..
 # Use "make help" to see them. 
 include ../../makefile.common
 
+# Use default rule inherited from makefile.common
 clean: .clean
 
-venv: .venv
+# Use default rule inherited from makefile.common
+test: .test
 
+# Use default rule inherited from makefile.common
 image: .image
 
+# Use default rule inherited from makefile.common
+build: .build
+
+# Use default rule inherited from makefile.common
+venv: .venv
+
+# Use default rule inherited from makefile.common
 install_lib_source: .install_lib_source
+
+

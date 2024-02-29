@@ -7,11 +7,11 @@
 #
 # clean: 
 # build:
-# publish:
+# test:
 #
-# When finally getting to a makefile that requires a rule implementation, for example to publish the build,
+# When finally getting to a makefile that requires a rule implementation, for example to test the build,
 # that makefile should override/implement the rule to meet its needs.  Such a rule may continue to recurse
-# using "$(MAKE) <rule>-recurse", for example "$(MAKE) publish-recurse". 
+# using "$(MAKE) <rule>-recurse", for example "$(MAKE) test-recurse". 
 #
 # Each rule is called recursively on sub-directories and if a similar inclusion is done in the sub-Makefiles,
 # the rules will be applied/executed recursively in their sub-directories.
@@ -19,25 +19,28 @@
 #################################################################################################################
 
 # Rules with actual dependencies executed as commands
-.PHONY: __recurse __build-recurse __clean-recurse __publish-recurse 
 
 # By default recurse into all sub-directories that do not begin with .
 SUB_MAKE_DIRS=$(shell echo */) 
 
+.PHONY: __build-recurse
 __build-recurse:
 	$(MAKE) RULE=build __recurse
 
-__publish-recurse:
-	$(MAKE) RULE=publish __recurse
+.PHONY: __test-recurse
+__test-recurse:
+	$(MAKE) RULE=test __recurse
 
+.PHONY: __clean-recurse
 __clean-recurse:
 	$(MAKE) RULE=clean __recurse
 
+.PHONY: __recurse
 __recurse: 
 	@if [ ! -z "$(SUB_MAKE_DIRS)" ]; then	\
 	    for i in $(SUB_MAKE_DIRS); do	\
 		if [ -e $$i/Makefile ]; then	\
-		    echo Using recursive $(RULE) rule in $(shell pwd);	\
+		    echo Using recursive $(RULE) rule in $$i;	\
 		    (cd $$i; $(MAKE) $(RULE));	\
 		fi;				\
 	    done;				\
