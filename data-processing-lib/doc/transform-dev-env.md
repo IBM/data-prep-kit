@@ -53,6 +53,9 @@ fm-data-processing=x.y.z
 run the following
 ```
 make venv
+source venv/bin/activate
+...
+deactivate
 ```
 If you wish to use the [latest source from 
 data-processing-lib](../src) you can install the source over the 
