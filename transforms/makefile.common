@@ -1,0 +1,60 @@
+DOCKER=podman
+DOCKER_FILE=Dockerfile
+DOCKER_REGISTRY=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
+
+PYTHON=python
+PIP=$(PYTHON) -m pip
+
+# The following taken from https://stackoverflow.com/a/65243296/45375
+# Lists all targets and optional help text found in the target.
+help:
+	@printf "%-20s %s\n" "Target" "Description"
+	@printf "%-20s %s\n" "------" "-----------"
+	@make -pqR : 2>/dev/null \
+		| awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' \
+		| sort \
+		| egrep -v -e '^[^[:alnum:]]' -e '^$@$$' \
+		| xargs -I _ sh -c 'printf "%-20s " _; make _ -nB | (grep -i "^# Help:" || echo "") | tail -1 | sed "s/^# Help: //g"'
+
+clean: 
+	@# Help: Clean up the virtual environment.
+	rm -rf venv
+
+# Create the local virtual environment, assuming python is already installed and available
+# We upgrade pip as that seems to be required by watson_nlp
+venv:	requirements.txt
+	@# Help: Create the virtual environment using requirements.txt
+	make check_env
+	$(PYTHON) -m venv venv
+	echo '[global]' > venv/pip.conf
+	echo "extra-index-url = https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple" >> venv/pip.conf
+	. venv/bin/activate;			\
+	$(PIP) install --upgrade pip;		\
+	$(PIP) install -r requirements.txt;	\
+	$(PIP) install pytest;			\
+
+check_env:
+	@# Help: Check to be sure the Artifactory credentials are in place in the env vars
+	@if [ -z "$(ARTIFACTORY_USER)" ]; then \
+		echo "You must set ARTIFACTORY_USER and ARTIFACTORY_API_KEY env vars";\
+		exit;									\
+	fi
+
+# Create the docker image making sure the preloaded models are available to copy into the image
+image: requirements.txt $(DOCKER_FILE)
+	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
+	make check_env
+	$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
+	$(DOCKER) build --build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) --build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
+		-f $(DOCKER_FILE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) .
+
+install_lib_source:
+	@# Help: Install the source from the data processing library for $(PYTHON) 
+	@echo Installing source from data processing library for `which $(PYTHON)`
+	@$(PIPi install -e $(REPOROOT)/data-processing-lib/		;\
+	if [ $$? -eq 0 ]; then	\
+		echo Installed source from data processing library for `which $(PYTHON)`;	\
+	else \
+		echo ERROR installing source into `which $(PYTHON)`;	\
+	fi
+

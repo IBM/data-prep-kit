@@ -17,7 +17,7 @@
 #
 #################################################################################################################
 # Provides support for the recursive evaluation of rules in sub-directories and likely other function as we evolve.
-include makefile.include 
+include makefile.recurse
 
 # Add local or overriding rules here
 

@@ -128,7 +128,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
 .project
-*.swp
-data-processing-lib/.DS_Store
-.pydevproject
+**/*.swp
+**/.pydevproject
+**/.DS_Store

@@ -1,2 +1,2 @@
-include ../../makefile.include
+include ../../makefile.recurse
 

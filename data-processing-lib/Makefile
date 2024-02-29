@@ -1,4 +1,4 @@
-include ../makefile.include
+include ../makefile.recurse
 
 VERSION=0.2.0
 TAG := "v${VERSION}"
