@@ -42,3 +42,5 @@ image: requirements.txt
 		-f $(DOCKER_FILE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) .
 
 
+rebuild_library:
+	 pip3 install -e ../../../data-processing-lib/

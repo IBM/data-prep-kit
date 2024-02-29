@@ -31,7 +31,7 @@ class TransformTableProcessor:
         # Create statistics
         self.stats = params.get("statistics", None)
         self.base_table_stats = params.get("base_table_stats", True)
-        self.last_empty = ""
+        self.last_empty = " "
 
     def process_table(self, f_name: str) -> None:
         """
@@ -88,13 +88,13 @@ class TransformTableProcessor:
         :return: None
         """
         # Compute output file location. Preserve sub folders for Wisdom
-        output_name = self.data_access.get_output_location(path=f_name)
         match len(out_tables):
             case 0:
                 # no tables - save input file name for flushing
                 self.last_empty = f_name
             case 1:
                 # we have exactly 1 table
+                output_name = self.data_access.get_output_location(path=f_name)
                 output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
                 if save_res is not None:
                     # Store execution statistics. Doing this async
@@ -109,6 +109,7 @@ class TransformTableProcessor:
             case _:
                 # we have more then 1 table
                 table_sizes = 0
+                output_name = self.data_access.get_output_location(path=f_name)
                 output_file_name = output_name.removesuffix(".parquet")
                 for index in range(len(out_tables)):
                     table_sizes += out_tables[index].nbytes
