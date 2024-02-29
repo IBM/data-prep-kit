@@ -15,6 +15,7 @@
 DOCKER=podman
 DOCKER_FILE=Dockerfile
 DOCKER_REGISTRY=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
+EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
 
 PYTHON=python
 PIP=$(PYTHON) -m pip
@@ -35,6 +36,7 @@ help:
 	@echo DOCKER_FILE - the name of the docker file to use.  DOCKER_FILE=$(DOCKER_FILE)
 	@echo DOCKER_REGISTRY - the name of the docker registry to use.  DOCKER_REGISTRY=$(DOCKER_REGISTRY)
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
+	@echo EXTRA_ARTIFACTORY_URL - the url of an additional artifactory to satisfy dependencies.  EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL)
 	@echo ""
 	@echo Macros that require definition in the including Makefile
 	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
@@ -55,14 +57,17 @@ help:
 	@# Help: Clean up the virtual environment.
 	rm -rf venv
 
+
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
 .venv:	requirements.txt
 	$(MAKE) .check_env	# Put this first so we don't get its help
 	@# Help: Create the virtual environment using requirements.txt
 	$(PYTHON) -m venv venv
-	echo '[global]' > venv/pip.conf
-	echo "extra-index-url = https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple" >> venv/pip.conf
+	@if [ ! -z "$(EXTRA_ARTIFACTORY_URL)" ]; then				\
+	    echo '[global]' > venv/pip.conf;					\
+	    echo "extra-index-url = $(EXTRA_ARTIFACTORY_URL)" >> venv/pip.conf;	\
+	fi
 	. venv/bin/activate;			\
 	$(PIP) install --upgrade pip;		\
 	$(PIP) install -r requirements.txt;	\
