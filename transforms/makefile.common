@@ -16,13 +16,13 @@ help:
 		| egrep -v -e '^[^[:alnum:]]' -e '^$@$$' \
 		| xargs -I _ sh -c 'printf "%-20s " _; make _ -nB | (grep -i "^# Help:" || echo "") | tail -1 | sed "s/^# Help: //g"'
 
-clean: 
+.clean: 
 	@# Help: Clean up the virtual environment.
 	rm -rf venv
 
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
-venv:	requirements.txt
+.venv:	requirements.txt
 	@# Help: Create the virtual environment using requirements.txt
 	make check_env
 	$(PYTHON) -m venv venv
@@ -41,14 +41,15 @@ check_env:
 	fi
 
 # Create the docker image making sure the preloaded models are available to copy into the image
-image: requirements.txt $(DOCKER_FILE)
+.image: requirements.txt $(DOCKER_FILE)
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
 	make check_env
 	$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
 	$(DOCKER) build --build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) --build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
 		-f $(DOCKER_FILE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) .
 
-install_lib_source:
+.PHONY: install_lib_source
+.install_lib_source:
 	@# Help: Install the source from the data processing library for $(PYTHON) 
 	@echo Installing source from data processing library for `which $(PYTHON)`
 	@$(PIPi install -e $(REPOROOT)/data-processing-lib/		;\

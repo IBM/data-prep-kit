@@ -5,6 +5,13 @@ DOCKER_IMAGE_VERSION=0.6
 # know where they are running from.
 REPOROOT=../../..
 # Include the common rules.
-# Use "make targets" to see them. 
+# Use "make help" to see them. 
 include ../../makefile.common
 
+clean: .clean
+
+venv: .venv
+
+image: .image
+
+install_lib_source: .install_lib_source
