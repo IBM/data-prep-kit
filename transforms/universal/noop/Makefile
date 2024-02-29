@@ -6,7 +6,7 @@ DOCKER_IMAGE_VERSION=0.6
 REPOROOT=../../..
 # Include the common rules.
 # Use "make help" to see them. 
-include ../../makefile.common
+include ../../makefile.transforms
 
 # Use default rule inherited from makefile.common
 clean: .clean

@@ -1,10 +1,15 @@
 #
-# Include this to get access to a common set of rules for reuse 
+# Include this to get access to a common set of rules for reuse in transform projects.
 # Before including,  REPOROOT must be defined.  For example,
 # REPOROOT=../../..
-# Reusable rules begin with '.'. To reuse without modification, 
-# define your local Makefile rule as follows
+
+# Reusable rules begin with '.'. To reuse without modification, for example,
+# define your local Makefile rule as follows:
 # clean: .clean
+# To augment the the clean rule
+# clean: .clean
+# 	rm -rf other-stuff
+#
 #######################################################################################
 
 DOCKER=podman
@@ -29,7 +34,19 @@ help:
 	@echo DOCKER - the name of the docker executable to use.  Set to DOCKER=$(DOCKER)
 	@echo DOCKER_FILE - the name of the docker file to use.  Set to DOCKER_FILE=$(DOCKER_FILE)
 	@echo DOCKER_REGISTRY - the name of the docker registry to use.  Set to DOCKER_REGISTRY=$(DOCKER_REGISTRY)
+	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  Set to DOCKER_IMAGE_NAME=$(DOCKER_NAME)
+	@echo DOCKER_IMAGE_VERSION - the version of the docker image to produce.  Set to DOCKER_IMAGE_VERSION=$(DOCKER_IMAGE_VERSION)
 	@echo PYTHON - the python executable to use.  Set to PYTHON=$(PYTHON)
+	@$(MAKE) .check_required_macros
+
+.PHONY: .check_required_macros
+.check_required_macros:
+	@if [ -z "$(DOCKER_IMAGE_NAME)" ]; then		\
+	    echo ERROR: DOCKER_IMAGE_NAME is must be defined.;	\
+	fi
+	@if [ -z "$(DOCKER_IMAGE_VERSION)" ]; then	\
+	    echo ERROR: DOCKER_IMAGE_VERSION is must be defined.;	\
+	fi			
 
 .PHONY: .clean
 .clean: 
