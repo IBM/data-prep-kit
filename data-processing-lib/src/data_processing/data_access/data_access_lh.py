@@ -53,7 +53,7 @@ class DataAccessLakeHouse(DataAccess):
             s3_credentials=s3_credentials,
             s3_config={
                 "input_folder": self.lh.get_input_table_path(),
-                "output_folder": lakehouse_config["output_path"],
+                "output_folder": lakehouse_config["output_path"] + "/data/",
             },
             d_sets=d_sets,
             checkpoint=checkpoint,
@@ -86,17 +86,6 @@ class DataAccessLakeHouse(DataAccess):
         :return: output file location
         """
         return self.lh.get_output_file_path_from(file_path=path)
-
-    #    def get_input_missing_from_output(self) -> list[str]:
-    #        """
-    #        Compute the file difference between input and output folders, as in a set operation: A - B,
-    #        that is: files that are in input, that are not in output, ignoring any extra files in output
-    #        """
-    #        diff = self.lh.diff_parquet_input_output()
-    #        input_path = self.lh.get_input_table_path()
-    #        diff = list(map(lambda x: input_path + x, diff))
-    #        return diff
-
     def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
         """
         Save table to a given location
@@ -153,7 +142,7 @@ class DataAccessLakeHouse(DataAccess):
             "path": self.lh.output_path,
         }
         l, repl = self.S3.save_file(
-            path=f"{self.S3.output_folder}metadata.json", data=json.dumps(metadata, indent=2).encode()
+            path=f"{self.S3.output_folder}/metadata.json", data=json.dumps(metadata, indent=2).encode()
         )
         if repl is None:
             return l, repl
@@ -163,7 +152,7 @@ class DataAccessLakeHouse(DataAccess):
             job_details=JobDetails(
                 id=metadata["job details"]["job id"],
                 name=metadata["job details"]["job name"],
-                type=metadata["job details"]["job_type"],
+                type=metadata["job details"]["job type"],
                 category=metadata["job details"]["job category"],
                 status=metadata["job details"]["status"],
                 started_at=metadata["job details"]["start_time"],
