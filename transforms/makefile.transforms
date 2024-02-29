@@ -34,9 +34,11 @@ help:
 	@echo DOCKER - the name of the docker executable to use.  DOCKER=$(DOCKER)
 	@echo DOCKER_FILE - the name of the docker file to use.  DOCKER_FILE=$(DOCKER_FILE)
 	@echo DOCKER_REGISTRY - the name of the docker registry to use.  DOCKER_REGISTRY=$(DOCKER_REGISTRY)
-	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_NAME)
-	@echo DOCKER_IMAGE_VERSION - the version of the docker image to produce.  DOCKER_IMAGE_VERSION=$(DOCKER_IMAGE_VERSION)
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
+	@echo ""
+	@echo Macros that require definition in the including Makefile
+	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
+	@echo DOCKER_IMAGE_VERSION - the version of the docker image to produce.  DOCKER_IMAGE_VERSION=$(DOCKER_IMAGE_VERSION)
 	@$(MAKE) .check_required_macros
 
 .PHONY: .check_required_macros
