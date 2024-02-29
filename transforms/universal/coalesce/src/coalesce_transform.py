@@ -5,6 +5,7 @@ import pyarrow as pa
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
+    TransformLauncher
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import LOCAL_TO_DISK, MB
@@ -104,3 +105,9 @@ class CoalesceTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["coalesce_target"] = args.coalesce_target
         print(f"Coalesce parameters are : {self.params}")
         return True
+
+
+if __name__ == "__main__":
+
+    launcher = TransformLauncher(transform_runtime_config=CoalesceTransformConfiguration())
+    launcher.launch()

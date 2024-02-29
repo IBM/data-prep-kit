@@ -8,6 +8,7 @@ from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
     RayUtils,
+    TransformLauncher
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import GB, TransformUtils
@@ -234,3 +235,9 @@ class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["num_hashes"] = args.num_hashes
         print(f"exact dedup params are {self.params}")
         return True
+
+
+if __name__ == "__main__":
+
+    launcher = TransformLauncher(transform_runtime_config=EdedupTableTransformConfiguration())
+    launcher.launch()

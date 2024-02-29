@@ -13,6 +13,7 @@ from data_processing.ray import (
     DefaultTableTransformRuntime,
     RayUtils,
     TransformTableProcessor,
+    TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import RANDOM_SEED, TransformUtils, str2bool
@@ -600,3 +601,9 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
 
         print(f"fuzzy dedup params are {self.params}")
         return True
+
+
+if __name__ == "__main__":
+
+    launcher = TransformLauncher(transform_runtime_config=FdedupTableTransformConfiguration())
+    launcher.launch()

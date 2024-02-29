@@ -5,6 +5,7 @@ import pyarrow as pa
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
+    TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import MB, LOCAL_TO_DISK
@@ -104,3 +105,9 @@ class SplitFileTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["max_table_size"] = args.max_table_size
         print(f"Split file parameters are : {self.params}")
         return True
+
+
+if __name__ == "__main__":
+
+    launcher = TransformLauncher(transform_runtime_config=SplitFileTransformConfiguration())
+    launcher.launch()

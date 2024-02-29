@@ -8,6 +8,6 @@ RUN pip install --no-cache-dir -r  requirements.txt
 # remove credentials-containing file
 RUN rm requirements.txt
 
-COPY ./src/noop_transform.py transformer_launcher.py
+COPY ./src/schema_modification_implementation.py transformer_launcher.py
 ENV PYTHONPATH /home/ray
 
