@@ -3,7 +3,7 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from split_file_implementation import SplitFileTransformConfiguration
+from split_file_transform import SplitFileTransformConfiguration
 
 
 print(os.environ)
@@ -34,7 +34,7 @@ params = {
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
     "max_table_size": 1,
-#    "max_documents_table": 150
+    #    "max_documents_table": 150
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

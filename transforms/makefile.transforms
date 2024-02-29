@@ -61,7 +61,7 @@ help:
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
 .venv:	requirements.txt
-	$(MAKE) .check_env	# Put this first so we don't get its help
+	@$(MAKE) .check_env	# Put this first so we don't get its help
 	@# Help: Create the virtual environment using requirements.txt
 	$(PYTHON) -m venv venv
 	@if [ ! -z "$(EXTRA_ARTIFACTORY_URL)" ]; then				\
@@ -91,8 +91,12 @@ help:
 .PHONY: .install_lib_source
 .install_lib_source:
 	@# Help: Install the source from the data processing library for $(PYTHON) 
-	@echo Installing source from data processing library for `which $(PYTHON)`
-	@$(PIPi install -e $(REPOROOT)/data-processing-lib/		;\
+	@echo Installing source from data processing library for venv 
+	@source venv/bin/activate;					\
+	$(PIP) uninstall -y fm-data-processing;			\
+	$(PIP) install 						\
+		--extra-index-url $(EXTRA_ARTIFACTORY_URL)		\
+		-e $(REPOROOT)/data-processing-lib/;			\
 	if [ $$? -eq 0 ]; then	\
 		echo Installed source from data processing library for `which $(PYTHON)`;	\
 	else \

@@ -6,7 +6,7 @@ REPOROOT=../../..
 # Use "make help" to see them. 
 include ../../makefile.transforms
 
-DOCKER_IMAGE_NAME=coalesce
+DOCKER_IMAGE_NAME=fdedup
 DOCKER_IMAGE_VERSION=0.1
 
 # Use default rule inherited from makefile.common

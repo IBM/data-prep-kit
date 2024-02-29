@@ -8,7 +8,7 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import MB, LOCAL_TO_DISK
+from data_processing.utils import LOCAL_TO_DISK, MB
 
 
 class SplitFileTransform(AbstractTableTransform):
@@ -16,6 +16,7 @@ class SplitFileTransform(AbstractTableTransform):
     Implements splitting large files into smaller ones.
     Two flavours of splitting are supported - based on the amount of documents and based on the size
     """
+
     def __init__(self, config: dict[str, Any]):
         """
         Initialize based on the dictionary of configuration information.
@@ -65,8 +66,9 @@ class SplitFileTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name="SplitFile", runtime_class=DefaultTableTransformRuntime,
-                         transform_class=SplitFileTransform)
+        super().__init__(
+            name="SplitFile", runtime_class=DefaultTableTransformRuntime, transform_class=SplitFileTransform
+        )
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:

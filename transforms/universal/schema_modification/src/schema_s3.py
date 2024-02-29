@@ -3,7 +3,7 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from schema_modification_implementation import SchemaTransformConfiguration
+from schema_transform import SchemaTransformConfiguration
 
 
 # create launcher
@@ -34,7 +34,7 @@ params = {
     "code_location": ParamsUtils.convert_to_ast(code_location),
     "doc_column": "contents",
     "id_column": "id_column",
-    "int_id_column": "int_id_column"
+    "int_id_column": "int_id_column",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

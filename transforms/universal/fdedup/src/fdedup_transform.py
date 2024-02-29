@@ -12,8 +12,8 @@ from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
     RayUtils,
-    TransformTableProcessor,
     TransformLauncher,
+    TransformTableProcessor,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import RANDOM_SEED, TransformUtils, str2bool
@@ -34,7 +34,7 @@ from ray.util.metrics import Gauge
 from text_normalizer import normalize as text_normalize
 
 
-class FdedupPreprocessor(AbstractTableTransform):
+class FdedupTransform(AbstractTableTransform):
     """
     Implements fuzzy dedup data preprocessor (building tables and minhashes).
     """
@@ -330,7 +330,8 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         num_buckets, length_bucket = fuzzy_optimal_param(
             threshold=self.params.get("threshold", 0.8),
             num_perm=self.params.get("num_permutations", 64),
-            false_positive_weight=0.5, false_negative_weight=0.5
+            false_positive_weight=0.5,
+            false_negative_weight=0.5,
         )
         print(f"Fuzzy: num buckets {num_buckets}, bucket length {length_bucket}")
         mn_min_hash = MurmurMH(num_perm=self.params.get("num_permutations", 64), seed=RANDOM_SEED)
@@ -349,9 +350,16 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             n_actors=self.params.get("m_actors", 1),
         )
         print(f"created {len(minhash_collectors)} minhash actors")
-        self._preprocess_tables(data_access_factory=data_access_factory, statistics=statistics, files=files,
-                                mn_min_hash=mn_min_hash,num_buckets=num_buckets, length_bucket=length_bucket,
-                                bucket_collectors=bucket_collectors, minhash_collectors=minhash_collectors)
+        self._preprocess_tables(
+            data_access_factory=data_access_factory,
+            statistics=statistics,
+            files=files,
+            mn_min_hash=mn_min_hash,
+            num_buckets=num_buckets,
+            length_bucket=length_bucket,
+            bucket_collectors=bucket_collectors,
+            minhash_collectors=minhash_collectors,
+        )
         # Create document collectors
         self.document_collectors = RayUtils.create_actors(
             clazz=DocCollector,
@@ -425,9 +433,17 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             "remote_docs": self.document_collectors,
         }
 
-    def _preprocess_tables(self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str],
-                           mn_min_hash:MurmurMH, num_buckets: int, length_bucket: int,
-                           bucket_collectors: list[ActorHandle], minhash_collectors: list[ActorHandle]) -> None:
+    def _preprocess_tables(
+        self,
+        data_access_factory: DataAccessFactory,
+        statistics: ActorHandle,
+        files: list[str],
+        mn_min_hash: MurmurMH,
+        num_buckets: int,
+        length_bucket: int,
+        bucket_collectors: list[ActorHandle],
+        minhash_collectors: list[ActorHandle],
+    ) -> None:
         """
         Preprocess tables - build, run and cleanup
         :param data_access_factory - data access factory
@@ -450,7 +466,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         # Create preprocessing actors
         processor_params = {
             "data_access_factory": data_access_factory,
-            "transform_class": FdedupPreprocessor,
+            "transform_class": FdedupTransform,
             "statistics": statistics,
             "transform_params": {
                 "doc_column": self.params.get("doc_column", ""),

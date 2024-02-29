@@ -64,9 +64,7 @@ class AbstractTransformTest:
             for j in range(l1):
                 r1 = t1[j]
                 r2 = t2[j]
-                assert r1 == r2, (
-                    f"Row {j} of table {i} are not equal\n" "\tTransformed: " + r1 + "\tExpected   : " + r2
-                )
+                assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {2}"
 
     def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
         elen = len(expected_metadata)
@@ -89,7 +87,7 @@ class AbstractTransformTest:
         l1 = len(metadata)
         l2 = len(expected_metadata)
         assert metadata == expected_metadata, (
-            f"Metadata at not equal\n" "\tTransformed: " + metadata + "\tExpected   : " + expected_metadata
+            f"Metadata not equal\n" "\tTransformed: {metadata}  Expected   : {expected_metadata}"
         )
 
     def test_transform(

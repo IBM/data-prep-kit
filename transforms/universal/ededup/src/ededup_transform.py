@@ -8,7 +8,7 @@ from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
     RayUtils,
-    TransformLauncher
+    TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import GB, TransformUtils

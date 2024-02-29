@@ -44,6 +44,9 @@ but be sure to change the `DOCKER_IMAGE_NAME/VERSION` in the Makefile.
 ### Python environment and dependencies
 It is strongly recommended to use a virtual environment (venv) to
 install dependencies, including the `fm-data-processing` dependency.
+Furthermore, each transform project should use its own virtual environment
+so there is no contamination from non-essential dependencies and/or version
+changes.
 From within your transform project (e.g., noop, coalesce, etc.),
 and after having defined your requirements in requirements.txt to
 include

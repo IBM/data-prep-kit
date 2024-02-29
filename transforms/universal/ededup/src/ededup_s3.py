@@ -3,7 +3,7 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from ededup_implementation import EdedupTableTransformConfiguration
+from ededup_transform import EdedupTableTransformConfiguration
 
 
 # create launcher
@@ -17,8 +17,8 @@ s3_cred = {
 s3_conf = {
     "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=text/",
     "output_folder": "cos-optimal-llm-pile/boris-da-test/",
-    # "input_folder": "cos-optimal-llm-pile/test/david/input/",
-    # "output_folder": "cos-optimal-llm-pile/test/david/output/",
+    "input_folder": "cos-optimal-llm-pile/test/david/input/",
+    "output_folder": "cos-optimal-llm-pile/test/david/output/",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}

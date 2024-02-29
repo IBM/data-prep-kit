@@ -3,7 +3,7 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from fdedup_implementation import FdedupTableTransformConfiguration
+from fdedup_transform import FdedupTableTransformConfiguration
 
 
 # create launcher
@@ -39,9 +39,9 @@ params = {
     "id_column": "int_id_column",
     "cluster_column": "cluster",
     # infrastructure
-    "bucket_cpu": .5,
-    "doc_cpu": .5,
-    "mhash_cpu": .5,
+    "bucket_cpu": 0.5,
+    "doc_cpu": 0.5,
+    "mhash_cpu": 0.5,
     "num_doc_actors": 1,
     "num_bucket_actors": 1,
     "num_minhash_actors": 1,
@@ -51,7 +51,7 @@ params = {
     "threshold": 0.8,
     "shingles_size": 5,
     "japanese_data": False,
-    "delimiters": " "
+    "delimiters": " ",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 
