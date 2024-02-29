@@ -68,3 +68,5 @@ redeploy: undeploy
 undeploy:
 	-oc delete -f $(DEPLOYMENT_YML) 
 
+rebuild_library:
+	 pip3 install -e ../../../data-processing-lib/
