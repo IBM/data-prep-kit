@@ -102,13 +102,16 @@ def orchestrate(
         # build and save metadata
         metadata = {
             "pipeline": preprocessing_params.pipeline_id,
-            "job details": preprocessing_params.job_details,
+            "job details": preprocessing_params.job_details
+            | {"start_time": start_ts,
+               "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+               "status": "success"
+               },
             "code": preprocessing_params.code_location,
             "job_input_params": transform_runtime_config.get_input_params()
             | data_access_factory.get_input_params()
             | preprocessing_params.get_input_params(),
-            "execution_stats": resources
-            | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")},
+            "execution_stats": resources,
             "job_output_stats": stats,
         }
         data_access.save_job_metadata(metadata)
