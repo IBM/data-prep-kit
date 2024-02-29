@@ -10,7 +10,7 @@ Run the following command:
 kind create cluster -n goofy --config /Users/boris/Projects/fm-data-engineering/kind/cluster/kind-cluster-config.yaml
 ```
 
-## Add NGNIX
+## Install NGNIX
 
 Install with the following command:
 
@@ -35,17 +35,26 @@ kubectl wait --for condition=established --timeout=60s crd/applications.app.k8s.
 kubectl apply -k "github.com/kubeflow/pipelines/manifests/kustomize/env/dev?ref=$PIPELINE_VERSION"
 ```
 
-invoke 
+validate using
 ```shell
-get pods -n kubeflow
+kubectl get pods -n kubeflow
 ```
 
 and see the pods state. Wait for all pods to be running
 
-the pod `proxy-agent-xxxx` is failing. See [here](https://www.kubeflow.org/docs/components/pipelines/v1/installation/standalone-deployment/#disable-the-public-endpoint)
-how to disable it
+the pod `proxy-agent-xxxx` is failing. See [here](https://www.kubeflow.org/docs/components/pipelines/v1/installation/standalone-deployment/#disable-the-public-endpoint) (this might be a bit involved) on how to disable it
 
 Install [ingress](ingress.yaml)
 
 go to http://localhost:8080 and watch the UI
+
+## Install KubeRay
+
+Run the following:
+
+```shell
+helm repo add kuberay https://ray-project.github.io/kuberay-helm/
+helm repo update
+helm install kuberay-operator kuberay/kuberay-operator -n kuberay --version 1.0.0 --set image.pullPolicy=IfNotPresent --create-namespace 
+```
 
