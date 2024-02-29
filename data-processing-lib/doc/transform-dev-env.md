@@ -1,7 +1,7 @@
 # Transform Development Environment
 
 ### Transform project conventions
-The transform projects generally contains the following files/dirs: 
+The transform projects generally contain the following files and directories: 
 1. `src` directory - contain all transform source.
    * `xyz_transform.py` - contains 
       * transform class
@@ -38,7 +38,8 @@ DOCKER_IMAGE_NAME - the name of the docker image to produce. DOCKER_IMAGE_NAME=n
 DOCKER_IMAGE_VERSION - the version of the docker image to produce. DOCKER_IMAGE_VERSION=0.6
 
 ```  
-As a starting template, you can copy the [noop](../../transforms/universal/noop) project.
+As a starting template, you can copy the [noop](../../transforms/universal/noop) project,
+but be sure to change the `DOCKER_IMAGE_NAME/VERSION` in the Makefile.
 
 ### Python environment and dependencies
 It is strongly recommended to use a virtual environment (venv) to
