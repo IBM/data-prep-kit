@@ -16,5 +16,6 @@ This might include provisioning of shared memory objects or creation of addition
 
 To learn more consider the following:
 * [Architecture Deep Dive](architecture.md)
+* [Transform Development Environment](transform-dev-env.md)
 * [Transform Tutorials](transform-tutorials.md)
 

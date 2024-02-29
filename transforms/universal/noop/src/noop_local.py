@@ -1,6 +1,6 @@
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
@@ -10,7 +10,7 @@ from noop_transform import NOOPTransformConfiguration
 # create launcher
 launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'data'))
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data"))
 output_folder = os.path.join(input_folder, "output")
 Path(output_folder).mkdir(parents=True, exist_ok=True)
 local_conf = {
