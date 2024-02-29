@@ -4,7 +4,6 @@ from data_processing.data_access import DataAccessFactory
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider
 from ray.actor import ActorHandle
-from typing_extensions import deprecated
 
 
 class DefaultTableTransformRuntime:

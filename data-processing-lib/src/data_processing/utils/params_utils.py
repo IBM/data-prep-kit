@@ -28,24 +28,30 @@ class ParamsUtils:
         return ast_string
 
     @staticmethod
-    def dict_to_req(d: dict[str, Any]) -> list[str]:
+    def dict_to_req(d: dict[str, Any], executor: str = "") -> list[str]:
         """
         Convert dictionary to a list of string parameters
+        :param executor - executor name
         :param d: dictionary
         :return: an array of parameters
         """
-        res = [""]
+        if executor != "":
+            # local testing
+            res = [executor]
+        else:
+            # remote invoke
+            res = [f"python {executor}"]
         for key, value in d.items():
             res.append(f"--{key}={value}")
         return res
 
     @staticmethod
-    def __dict_to_str(help: dict[str, str], initial_indent: str, indent_per_level: str, as_value: bool) -> str:
+    def __dict_to_str(dict_val: dict[str, str], initial_indent: str, indent_per_level: str, as_value: bool) -> str:
         all_text = ""
         if as_value:
             all_text = all_text + "{ "
         first = True
-        for key, value in help.items():
+        for key, value in dict_val.items():
             if isinstance(value, dict):
                 text = ParamsUtils.__dict_to_str(value, initial_indent + indent_per_level, indent_per_level, as_value)
             else:

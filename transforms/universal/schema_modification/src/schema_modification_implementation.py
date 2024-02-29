@@ -7,6 +7,7 @@ from data_processing.data_access import DataAccessFactory
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
+    TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils
@@ -149,3 +150,9 @@ class SchemaTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["columns_to_remove"] = args.columns_to_remove
         print(f"Schema modification parameters are : {self.params}")
         return True
+
+
+if __name__ == "__main__":
+
+    launcher = TransformLauncher(transform_runtime_config=SchemaTransformConfiguration())
+    launcher.launch()
