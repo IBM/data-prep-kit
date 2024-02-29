@@ -44,7 +44,7 @@ and see the pods state. Wait for all pods to be running
 
 the pod `proxy-agent-xxxx` is failing. See [here](https://www.kubeflow.org/docs/components/pipelines/v1/installation/standalone-deployment/#disable-the-public-endpoint) (this might be a bit involved) on how to disable it
 
-Install [ingress](ingress.yaml)
+Install [ingress](kfp_ingress.yaml)
 
 go to http://localhost:8080 and watch the UI
 
@@ -58,3 +58,10 @@ helm repo update
 helm install kuberay-operator kuberay/kuberay-operator -n kuberay --version 1.0.0 --set image.pullPolicy=IfNotPresent --create-namespace 
 ```
 
+Now we can install API server using:
+
+```shell
+helm install -f /Users/boris/Projects/fm-data-engineering/kind/cluster/api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay --set image.pullPolicy=IfNotPresent 
+```
+
+If you want to enble apiserver externally, you can use this [ingress](apiserver_ingress.yaml)
