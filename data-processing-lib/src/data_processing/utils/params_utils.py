@@ -100,7 +100,7 @@ class ParamsUtils:
         Create some help text for an AST-formatted parameter value.
         :param help_example_dict:  This dictionary of lists, where they keys
         correspond to the parameter names and the list is a pair of values.
-        The value in the list is an example value for the option, the 2nd in is the help text.
+        The 1st value in the list is an example value for the option, the 2nd in is the help text.
         If you need to provide more than 1 example, use get_ast_help_and_example_text() which
         allows a list of examples.
         Example:
