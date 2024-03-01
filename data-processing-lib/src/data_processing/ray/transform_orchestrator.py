@@ -10,8 +10,12 @@ from data_processing.ray import (
     TransformStatistics,
     TransformTableProcessor,
 )
+from data_processing.utils import get_logger
 from ray.util import ActorPool
 from ray.util.metrics import Gauge
+
+
+logger = get_logger(__name__)
 
 
 @ray.remote(num_cpus=1, scheduling_strategy="SPREAD")
@@ -32,23 +36,23 @@ def orchestrate(
         # create data access
         data_access = data_access_factory.create_data_access()
         if data_access is None:
-            print("No DataAccess instance provided - exiting", flush=True)
+            logger.error("No DataAccess instance provided - exiting")
             return 1
         # Get files to process
         files, profile = data_access.get_files_to_process()
         if len(files) == 0:
-            print("No input files to process - exiting", flush=True)
+            logger.error("No input files to process - exiting")
             return 0
-        print(f"Number of files is {len(files)}, source profile {profile}", flush=True)
+        logger.info(f"Number of files is {len(files)}, source profile {profile}")
         # Print interval
         print_interval = int(len(files) / 100)
         if print_interval == 0:
             print_interval = 1
         # Get Resources for execution
         resources = RayUtils.get_cluster_resources()
-        print(f"Cluster resources: {resources}")
+        logger.info(f"Cluster resources: {resources}")
         # print execution params
-        print(
+        logger.info(
             f"Number of workers - {preprocessing_params.n_workers} " f"with {preprocessing_params.worker_options} each"
         )
         # create transformer runtime
@@ -95,7 +99,7 @@ def orchestrate(
         start = time.time()
         replies = [processor.flush.remote() for processor in processors]
         RayUtils.wait_for_execution_completion(replies)
-        print(f"done flushing in {time.time() - start} sec")
+        logger.info(f"done flushing in {time.time() - start} sec")
         # Compute execution statistics
         stats = runtime.compute_execution_stats(ray.get(statistics.get_execution_stats.remote()))
 
@@ -103,10 +107,7 @@ def orchestrate(
         metadata = {
             "pipeline": preprocessing_params.pipeline_id,
             "job details": preprocessing_params.job_details
-            | {"start_time": start_ts,
-               "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-               "status": "success"
-               },
+            | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "status": "success"},
             "code": preprocessing_params.code_location,
             "job_input_params": transform_runtime_config.get_input_params()
             | data_access_factory.get_input_params()
@@ -117,5 +118,5 @@ def orchestrate(
         data_access.save_job_metadata(metadata)
         return 0
     except Exception as e:
-        print(f"Exception during execution {e}")
+        logger.error(f"Exception during execution {e}")
         return 1

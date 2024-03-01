@@ -8,7 +8,10 @@ from data_processing.data_access import (
     DataAccessLocal,
     DataAccessS3,
 )
-from data_processing.utils import CLIArgumentProvider, ParamsUtils, str2bool
+from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger, str2bool
+
+
+logger = get_logger(__name__)
 
 
 class DataAccessFactory(CLIArgumentProvider):
@@ -95,8 +98,8 @@ class DataAccessFactory(CLIArgumentProvider):
             + ParamsUtils.get_ast_help_text(help_example_dict),
         )
         help_example_dict = {
-            "input_path": ["./input", "Path to input folder of files to be processed"],
-            "output_path": ["/tmp/output", "Path to output folder of processed files"],
+            "input_folder": ["./input", "Path to input folder of files to be processed"],
+            "output_folder": ["/tmp/output", "Path to output folder of processed files"],
         }
         parser.add_argument(
             "--local_config",
@@ -126,7 +129,7 @@ class DataAccessFactory(CLIArgumentProvider):
 
         # check that only one (S3, LakeHouse, or Local) configuration is specified
         if s3_config_specified + lh_config_specified + local_config_specified > 1:
-            print(
+            logger.error(
                 f"{'S3, ' if s3_config_specified == 1 else ''}"
                 f"{'Lakehouse, ' if lh_config_specified == 1 else ''}"
                 f"{'Local ' if local_config_specified == 1 else ''}"
@@ -136,7 +139,9 @@ class DataAccessFactory(CLIArgumentProvider):
 
         # check that at least one (S3, LakeHouse, or Local) configuration is specified
         if s3_config_specified + lh_config_specified + local_config_specified == 0:
-            print("No S3, lakehouse, or local configuration parameters defined," " at least one of them is required! ")
+            logger.error(
+                "No S3, lakehouse, or local configuration parameters defined," " at least one of them is required! "
+            )
             return False
 
         # further validate the specified configuration (S3, LakeHouse, or Local)
@@ -145,7 +150,7 @@ class DataAccessFactory(CLIArgumentProvider):
                 return False
             self.s3_cred = args.s3_cred
             self.s3_config = args.s3_config
-            print(
+            logger.info(
                 f'Using s3 configuration: input path - {self.s3_config["input_folder"]}, '
                 f'output path - {self.s3_config["output_folder"]}'
             )
@@ -154,7 +159,7 @@ class DataAccessFactory(CLIArgumentProvider):
                 return False
             self.s3_cred = args.s3_cred
             self.lh_config = args.lh_config
-            print(
+            logger.info(
                 f'Using lake house configuration: input table - {self.lh_config["input_table"]}, '
                 f'input_dataset - {self.lh_config["input_dataset"]}, '
                 f'input_version - {self.lh_config["input_version"]}, '
@@ -166,7 +171,7 @@ class DataAccessFactory(CLIArgumentProvider):
             if not self._validate_local(local_config=args.local_config):
                 return False
             self.local_config = args.local_config
-            print(
+            logger.info(
                 f"Using local configuration with: "
                 f"input_folder - {self.local_config['input_folder']} "
                 f"output_folder - {self.local_config['output_folder']}"
@@ -174,10 +179,12 @@ class DataAccessFactory(CLIArgumentProvider):
         self.checkpointing = args.checkpointing
         self.max_files = args.max_files
         if args.data_sets is None or len(args.data_sets) < 1:
-            print(f"Not using data sets, checkpointing {self.checkpointing}, max files {self.max_files}")
+            logger.info(f"Not using data sets, checkpointing {self.checkpointing}, max files {self.max_files}")
         else:
             self.dsets = args.data_sets.split(",")
-            print(f"Using data sets {self.dsets}, checkpointing {self.checkpointing}, max files {self.max_files}")
+            logger.info(
+                f"Using data sets {self.dsets}, checkpointing {self.checkpointing}, max files {self.max_files}"
+            )
         return True
 
     def get_input_params(self) -> dict[str, Any]:
@@ -201,14 +208,14 @@ class DataAccessFactory(CLIArgumentProvider):
         :return:
         """
         if s3_credentials is None:
-            print("Could not get cos credentials - exiting")
+            logger.error("Could not get cos credentials - exiting")
             return False
         if (
             s3_credentials.get("access_key", "") == ""
             or s3_credentials.get("secret_key", "") == ""
             or s3_credentials.get("cos_url", "") == ""
         ):
-            print("Could not get cos credentials - exiting")
+            logger.error("Could not get cos credentials - exiting")
             return False
         return True
 
@@ -220,17 +227,17 @@ class DataAccessFactory(CLIArgumentProvider):
         :return: True if local config is valid, False otherwise
         """
         if local_config is None:
-            print("Could not get local config - exiting")
+            logger.error("Could not get local config - exiting")
             return False
         valid_config = True
         if local_config.get("input_folder", "") == "":
             valid_config = False
-            print(f"Could not find input folder in local config")
+            logger.error(f"Could not find input folder in local config")
         if local_config.get("output_folder", "") == "":
             valid_config = False
-            print(f"Could not find output folder in local config")
+            logger.error(f"Could not find output folder in local config")
         if not valid_config:
-            print("Invalid local configuration - exiting")
+            logger.error("Invalid local configuration - exiting")
         return valid_config
 
     def create_data_access(self) -> DataAccess:
@@ -262,5 +269,5 @@ class DataAccessFactory(CLIArgumentProvider):
                 m_files=self.max_files,
             )
         else:
-            print("No data configuration is defined")
+            logger.error("No data configuration is defined")
             return None

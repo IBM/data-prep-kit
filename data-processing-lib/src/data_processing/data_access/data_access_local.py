@@ -8,7 +8,10 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 from data_processing.data_access import DataAccess
-from data_processing.utils import GB, MB
+from data_processing.utils import GB, MB, get_logger
+
+
+logger = get_logger(__name__)
 
 
 class DataAccessLocal(DataAccess):
@@ -187,7 +190,7 @@ class DataAccessLocal(DataAccess):
             table = pq.read_table(file_path)
             return table
         except (FileNotFoundError, IOError, pa.ArrowException) as e:
-            print(f"Error reading table from {path}: {e.with_traceback(None)}")
+            logger.error(f"Error reading table from {path}: {e.with_traceback(None)}")
             return None
 
     def get_output_location(self, path: str) -> str:
@@ -226,7 +229,7 @@ class DataAccessLocal(DataAccess):
             return size_in_memory, file_info
 
         except Exception as e:
-            print(f"Error saving table to {output_path}: {e}")
+            logger.error(f"Error saving table to {output_path}: {e}")
             return size_in_memory, None
 
     def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
@@ -276,7 +279,7 @@ class DataAccessLocal(DataAccess):
             return data
 
         except (FileNotFoundError, gzip.BadGzipFile) as e:
-            print(f"Error reading file {file_path}: {e}")
+            logger.error(f"Error reading file {file_path}: {e}")
             raise e
 
     def get_folder_files(self, folder_path: str, extensions: list[str]) -> list[bytes]:
@@ -321,5 +324,5 @@ class DataAccessLocal(DataAccess):
             return file_info
 
         except Exception as e:
-            print(f"Error saving bytes to file {file_path}: {e}")
+            logger.error(f"Error saving bytes to file {file_path}: {e}")
             return None
