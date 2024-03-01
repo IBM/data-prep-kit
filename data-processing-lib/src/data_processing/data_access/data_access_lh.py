@@ -208,11 +208,13 @@ class DataAccessLakeHouse(DataAccess):
         """
         return self.S3.save_file(path=path, data=data)
 
-    def get_folder_files(self, path: str, extensions: list[str]) -> list[bytes]:
+    def get_folder_files(self, path: str, extensions: list[str] = None) -> dict[str, bytes]:
         """
-        Get a list of byte content of files
+        Get a list of byte content of files. The path here is an absolute path and can be anywhere.
+        The current limitation for S3 and Lakehouse is that it has to be in the same bucket
         :param path: file path
-        :param extensions: a list of file extensions to include
-        :return:
+        :param extensions: a list of file extensions to include. If None, then all files from this and
+                           child ones will be returned
+        :return: A dictionary of file names/binary content will be returned
         """
         return self.S3.get_folder_files(path=path, extensions=extensions)
