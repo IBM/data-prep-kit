@@ -1,0 +1,8 @@
+--extra-index-url https://${ARTIFACTORY_USER}:${ARTIFACTORY_API_KEY}@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
+--extra-index-url https://${ARTIFACTORY_USER}:${ARTIFACTORY_API_KEY}@na.artifactory.swg-devops.com/artifactory/api/pypi/wcp-ai-foundation-team-pypi-virtual/simple
+dmf-lib==1.2.5
+fm-data-processing==0.2.0
+fasttext==0.9.2
+#pynlplib==0.3.0
+#pyizumo==1.22.0
+#pyarrow==14.0.2
