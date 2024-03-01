@@ -1,10 +1,11 @@
 import pyarrow as pa
-import pyizumo
+from lang_models import KIND_FASTTEXT, LangModel, LangModelFactory
+from watson_nlp import get_lang_ds_pa
 
-from transforms.language.language_id.watson_nlp import get_lang_ds_pa
 
-
-def test_language_identification(nlp_langid: pyizumo.model.Izumo):
+def test_language_identification():
+    nlp_langid = LangModelFactory.create_model(KIND_FASTTEXT, "/root/lid.176.ftz")
+    print("3")
     documents = pa.array(
         [
             "Der Tell Sabi Abyad („Hügel des weißen Jungen“) ist eine historische "
@@ -19,11 +20,11 @@ def test_language_identification(nlp_langid: pyizumo.model.Izumo):
             "hija de Forbante y nieta de Lápites. ",
         ]
     )
+    print("4")
     table = pa.Table.from_arrays([documents], names=["contents"])
+    print("5")
     table, stats = get_lang_ds_pa(table, nlp_langid, col_name="contents")
+    print("6")
+    print(stats)
+    print("7")
     assert table["ft_lang"].to_pylist() == ["de", "pt", "ja", "fr", "es"]
-
-
-if __name__ == "__main__":
-    nlp_langid = pyizumo.load(parsers=["langdetect"])
-    test_language_identification(nlp_langid)
