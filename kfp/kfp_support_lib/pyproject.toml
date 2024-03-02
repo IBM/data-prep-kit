@@ -1,24 +1,17 @@
 [project]
-name = "fm_data_processing"
-version = "0.2.0"
+name = "fm_data_processing_kfp"
+version = "0.0.1"
 requires-python = ">=3.10"
-description = "IBM FM Data Processing Library"
+description = "IBM FM Data Processing Library. KFP support"
 authors = [
     { name = "David Wood", email = "dawood@us.ibm.com" },
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
+    { name = "Alexey Roytman", email = "roytman@il.ibm.com" },
 ]
 dependencies = [
-    "ray[default]==2.9.1",
-    "pyarrow==14.0.2",
-    "boto3==1.28.60",
-    # The version of urllib fixes a whitesource-identified security issue - dawood 10/19/2023,
-    "urllib3>=1.26.18",
-    "dmf-lib==1.2.5",
-    "argparse",
-    "mmh3"
+    "kfp==2.7.0",
+    "requests",
 ]
-
-
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
@@ -39,7 +32,7 @@ dev = [
 package_dir = ["src","test"]
 
 [options.packages.find]
-where = ["src/data_processing"]
+where = ["src/kfp_support"]
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report term-missing --cov-fail-under 70"
