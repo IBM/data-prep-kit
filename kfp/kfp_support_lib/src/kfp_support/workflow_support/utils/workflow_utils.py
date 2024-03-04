@@ -156,7 +156,6 @@ class PipelinesUtils:
             print(f"Exception getting experiment {e}")
             return None
 
-
     def get_pipeline_by_name(self, name: str, np: int = 100) -> models.api_pipeline.ApiPipeline:
         """
         Given pipeline name, return the pipeline
@@ -208,3 +207,15 @@ class PipelinesUtils:
         except Exception as e:
             print(f"Failed waiting pipeline completion {e}")
             return "failed", e.__cause__
+
+
+class RayRemoteJobs:
+    """
+    class supporting Ray remote jobs
+    """
+    def __init__(self, server_url: str = "http://localhost:8080", wait_interval: int = 2):
+        """
+        Initialization
+        :param base:
+        :param wait_interval:
+        """
