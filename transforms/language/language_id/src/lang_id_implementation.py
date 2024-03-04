@@ -9,12 +9,17 @@ from data_processing.ray import (
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils
-from watson_nlp import get_lang_ds_pa
+from nlp import get_lang_ds_pa
 
 
 """
 Reference https://github.ibm.com/ai-foundation/foundation-model-stack/tree/main/preprocessing/ray/language_identification_sentence_split
 """
+
+PARAM_DROP_COLUMN_IF_EXISTED = "drop_column_if_existed"
+PARAM_MODEL_KIND = "model_kind"
+PARAM_MODEL_PATH = "model_path"
+PARAM_CONTENT_COLUMN_NAME = "content_column_name"
 
 
 class LangIdentificationTransform(AbstractTableTransform):
@@ -31,16 +36,17 @@ class LangIdentificationTransform(AbstractTableTransform):
         # super().__init__(config)
         from lang_models import LangModelFactory
 
-        self.nlp_langid = LangModelFactory.create_model(config["model_kind"], config.get("model_path", None))
+        self.nlp_langid = LangModelFactory.create_model(config[PARAM_MODEL_KIND], config.get(PARAM_MODEL_PATH))
+        self.column_name = config.get(PARAM_CONTENT_COLUMN_NAME)
 
-        if "drop_column_if_existed" in config:
-            self.drop_column_if_existed = config["drop_column_if_existed"]
+        if PARAM_DROP_COLUMN_IF_EXISTED in config:
+            self.drop_column_if_existed = config[PARAM_DROP_COLUMN_IF_EXISTED]
         else:
             self.drop_column_if_existed = True
 
-    def transform(self, table: pa.Table) -> list[pa.Table]:
+    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
 
-        if not TransformUtils.validate_columns(table, ["contents"]):
+        if not TransformUtils.validate_columns(table, [self.column_name]):
             exit(1)
 
         """
@@ -51,10 +57,8 @@ class LangIdentificationTransform(AbstractTableTransform):
         if not self.drop_column_if_existed and TransformUtils.validate_columns(table, new_columns):
             exit(1)
 
-        table, stats = get_lang_ds_pa(table, self.nlp_langid)
-
-        # TODO: submit stats to the statistics service passed in from configuration
-        return [table], {}
+        table, stats = get_lang_ds_pa(table, self.nlp_langid, self.column_name)
+        return [table], stats
 
 
 class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfiguration):
@@ -79,9 +83,10 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
         By convention a common prefix should be used for all transform-specific CLI args
         (e.g, noop_, pii_, etc.)
         """
-        parser.add_argument("-dr", "--drop_column_if_existed", default=True, help="drop columns if existed")
-        parser.add_argument("--model_kind", default="", help="Kind of model for language detection")
-        parser.add_argument("--model_path", default=None, help="Path to model for language detection")
+        parser.add_argument("-dr", f"--{PARAM_DROP_COLUMN_IF_EXISTED}", default=True, help="drop columns if existed")
+        parser.add_argument(f"--{PARAM_MODEL_KIND}", default="", help="Kind of model for language detection")
+        parser.add_argument(f"--{PARAM_MODEL_PATH}", default=None, help="Path to model for language detection")
+        parser.add_argument(f"--{PARAM_CONTENT_COLUMN_NAME}", default="contents", help="Column name to get content")
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
@@ -90,9 +95,10 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
         arguments as defined by add_input_arguments().
         :return: True, if validate pass or False otherwise
         """
-        self.params["drop_column_if_existed"] = args.drop_column_if_existed
-        self.params["model_kind"] = args.model_kind
-        self.params["model_path"] = args.model_path
+        self.params[PARAM_DROP_COLUMN_IF_EXISTED] = args.drop_column_if_existed
+        self.params[PARAM_MODEL_KIND] = args.model_kind
+        self.params[PARAM_MODEL_PATH] = args.model_path
+        self.params[PARAM_CONTENT_COLUMN_NAME] = args.content_column_name
         return True
 
     def get_input_params(self) -> dict[str, Any]:

@@ -22,15 +22,10 @@ s3_cred = {
     "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
-# Configure lakehouse unit test tables
-lakehouse_config = {
-    "lh_environment": "STAGING",
-    "input_table": "academic.ieee_lh_unittest",
-    "input_dataset": "",
-    "input_version": "main",
-    "output_table": "academic.ieee_lang_id_0304_02",
-    "output_path": "lh-test/tables/academic/ieee_lang_id_0304_02",
-    "token": "YOUR LAKEHOUSE TOKEN",
+# Configure s3 folders
+s3_conf = {
+    "input_folder": "lh-test/tables/academic/ieee_lh_unittest",
+    "output_folder": "lh-test/tables/academic/ieee_lang_id_0304_03/",
 }
 
 worker_options = {"num_cpus": 1}
@@ -39,7 +34,7 @@ params = {
     "run_locally": True,
     "max_files": -1,
     "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "lh_config": ParamsUtils.convert_to_ast(lakehouse_config),
+    "s3_config": ParamsUtils.convert_to_ast(s3_conf),
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "num_workers": 2,
     "checkpointing": False,
@@ -48,7 +43,8 @@ params = {
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
     PARAM_MODEL_KIND: KIND_FASTTEXT,
-    PARAM_MODEL_PATH: "PATH TO YOUR MODEL",
+    # PARAM_MODEL_PATH: "PATH TO YOUR MODEL",
+    PARAM_MODEL_PATH: "/root/lid.176.ftz",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

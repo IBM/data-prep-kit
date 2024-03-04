@@ -3,7 +3,7 @@ import os
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
-from typing import List, Tuple
+from typing import Any, List, Tuple
 
 import pyarrow
 import pyarrow as pa
@@ -29,16 +29,23 @@ def get_score(lang: str) -> float:
 
 def get_lang_ds_pa(
     table: pyarrow.table, nlp: LangModel, col_name: str = "contents"
-) -> tuple[pyarrow.table, pyarrow.table]:
+) -> tuple[pyarrow.table, dict[str, Any]]:
     try:
         detected_language = pa.array(list(map(lambda x: nlp.detect_lang(x), table[col_name].to_pylist())))
     except Exception as e:
         print("ERROR:", e, "skipping the file")
         return None, None
-    stats = pa.table([detected_language], names=["lang"]).group_by("lang").aggregate([("lang", "count")]).to_pandas()
-    table = table.append_column("ft_lang", detected_language)
-    table = table.append_column("ft_score", pa.array(list(map(lambda x: get_score(x), table["ft_lang"].to_pylist()))))
-    return table, stats
+    stats = pa.table([detected_language], names=["lang"]).group_by("lang").aggregate([("lang", "count")])
+    stats_dict = {}
+    for batch in stats.to_batches():
+        d = batch.to_pydict()
+        for lang, count in zip(d["lang"], d["lang_count"]):
+            stats_dict[lang] = count
+    result = pa.table([detected_language], names=["ft_lang"])
+    result = result.append_column(
+        "ft_score", pa.array(list(map(lambda x: get_score(x), result["ft_lang"].to_pylist())))
+    )
+    return result, stats_dict
 
 
 # def get_sentences_ds_pa(
