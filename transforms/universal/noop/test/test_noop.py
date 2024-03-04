@@ -1,7 +1,7 @@
 from typing import Tuple
 
 import pyarrow as pa
-from data_processing_test.transform.transform_test import AbstractTransformTest
+from data_processing.test_support.transform.transform_test import AbstractTransformTest
 from noop_transform import NOOPTransform
 
 

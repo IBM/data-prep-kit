@@ -1,9 +1,8 @@
-from abc import abstractmethod
-from typing import Tuple, Union
+from typing import Tuple
 
 import pyarrow as pa
+from data_processing.test_support.abstract_test import AbstractTest
 from data_processing.transform import AbstractTableTransform
-from data_processing_test.abstract_test import AbstractTest
 
 
 class AbstractTransformTest(AbstractTest):

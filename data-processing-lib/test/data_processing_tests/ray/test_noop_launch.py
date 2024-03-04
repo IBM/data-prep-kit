@@ -1,8 +1,8 @@
 from typing import Tuple
 
 import pyarrow as pa
-from data_processing_test.ray.transform_test import AbstractTransformLauncherTest
-from data_processing_test.transform.noop_transform import NOOPTransformConfiguration
+from data_processing.test_support.ray import AbstractTransformLauncherTest
+from data_processing.test_support.transform import NOOPTransformConfiguration
 
 
 table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})
