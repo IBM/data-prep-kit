@@ -182,7 +182,7 @@ class PipelinesUtils:
         """
         Waits for a pipeline run to complete
         :param run_id: run id
-        :param tmout: timeout (-1 wait forever)
+        :param tmout: timeout (sec) (-1 wait forever)
         :param wait: internal wait (sec)
         :return: Completion status and an error message if such exists
         """
@@ -191,19 +191,19 @@ class PipelinesUtils:
                 end = time.time() + tmout
             else:
                 end = 2**63 - 1
-            run_state = self.kfp_client.get_run(run_id=run_id)
-            status = run_state.run.status
+            run_details = self.kfp_client.get_run(run_id=run_id)
+            status = run_details.run.status
             while status is None or status.lower() not in ["succeeded", "completed", "failed", "skipped", "error"]:
-                time.sleep(60 * wait)
+                time.sleep(wait)
                 if (end - time.time()) < 0:
                     return "failed", f"Execution is taking too long"
-                run_state = self.kfp_client.get_run(run_id=run_id)
-                status = run_state.run.status
+                run_details = self.kfp_client.get_run(run_id=run_id)
+                status = run_details.run.status
                 print(f"Got pipeline execution status {status}")
 
             if status.lower() in ["succeeded", "completed"]:
                 return status, ""
-            return status, run_state.run.error
+            return status, run_details.run.error
 
         except Exception as e:
             print(f"Failed waiting pipeline completion {e}")
