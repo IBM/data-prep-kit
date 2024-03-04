@@ -9,10 +9,6 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import get_logger
-
-
-logger = get_logger(__name__)
 
 
 class NOOPTransform(AbstractTableTransform):
@@ -39,13 +35,11 @@ class NOOPTransform(AbstractTableTransform):
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
-        logger.debug(f"Transforming one table with {len(table)} rows")
         if self.sleep is not None:
-            logger.info(f"Sleep for {self.sleep} seconds")
+            print(f"Sleep for {self.sleep} seconds")
             time.sleep(self.sleep)
-            logger.info("Sleep completed - continue")
+            print("Sleep completed - continue")
         # Add some sample metadata.
-        logger.debug(f"Transformed one table with {len(table)} rows")
         metadata = {"nfiles": 1, "nrows": len(table)}
         return [table], metadata
 
@@ -81,8 +75,10 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        if args.noop_sleep_sec <= 0:
-            print(f"Parameter noop_sleep_sec should be greater then 0, you specified {args.noop_sleep_sec}")
+        if args.noop_sleep_sec < 0:
+            print(
+                f"Parameter noop_sleep_sec should be greater then or equal to 0, you specified {args.noop_sleep_sec}"
+            )
             return False
         self.params["sleep"] = args.noop_sleep_sec
         print(f"noop parameters are : {self.params}")
@@ -91,5 +87,4 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
 
 if __name__ == "__main__":
     launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
-    logger.info("Launching noop transform")
     launcher.launch()

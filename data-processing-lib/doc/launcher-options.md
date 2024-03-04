@@ -5,19 +5,16 @@ The following is a current --help output (a work in progress) for
 the `NOOPTransform` (note the --noop_sleep_sec option):
 
 ```
-usage: noop_implementation.py [-h] [--run_locally RUN_LOCALLY]
-                              [--noop_sleep_sec NOOP_SLEEP_SEC]
-                              [--s3_cred S3_CRED] [--s3_config S3_CONFIG]
-                              [--lh_config LH_CONFIG]
-                              [--local_config LOCAL_CONFIG]
-                              [--max_files MAX_FILES]
-                              [--checkpointing CHECKPOINTING]
-                              [--data_sets DATA_SETS]
-                              [--num_workers NUM_WORKERS]
-                              [--worker_options WORKER_OPTIONS]
-                              [--pipeline_id PIPELINE_ID] [--job_id JOB_ID]
-                              [--creation_delay CREATION_DELAY]
-                              [--code_location CODE_LOCATION]
+usage: noop_transform.py [-h] [--run_locally RUN_LOCALLY]
+                         [--noop_sleep_sec NOOP_SLEEP_SEC] [--s3_cred S3_CRED]
+                         [--s3_config S3_CONFIG] [--lh_config LH_CONFIG]
+                         [--local_config LOCAL_CONFIG] [--max_files MAX_FILES]
+                         [--checkpointing CHECKPOINTING]
+                         [--data_sets DATA_SETS] [--num_workers NUM_WORKERS]
+                         [--worker_options WORKER_OPTIONS]
+                         [--pipeline_id PIPELINE_ID] [--job_id JOB_ID]
+                         [--creation_delay CREATION_DELAY]
+                         [--code_location CODE_LOCATION]
 
 Driver for NOOP processing
 
@@ -49,9 +46,9 @@ options:
                         Example: { 'input_table': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'input_dataset': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'input_version': '1.0', 'output_table': 'ededup', 'output_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'token': 'AASDFZDF', 'lh_environment': 'STAGING' }
   --local_config LOCAL_CONFIG
                         ast string containing input/output folders using local fs.
-                        input_path: Path to input folder of files to be processed
-                        output_path: Path to output folder of processed files
-                        Example: { 'input_path': './input', 'output_path': '/tmp/output' }
+                        input_folder: Path to input folder of files to be processed
+                        output_folder: Path to output folder of processed files
+                        Example: { 'input_folder': './input', 'output_folder': '/tmp/output' }
   --max_files MAX_FILES
                         Max amount of files to process
   --checkpointing CHECKPOINTING
@@ -61,7 +58,16 @@ options:
   --num_workers NUM_WORKERS
                         number of workers
   --worker_options WORKER_OPTIONS
-                        ast string of options for worker execution
+                        AST string defining worker resource requirements.
+                        num_cpus: Required number of CPUs.
+                        num_gpus: Required number of GPUs
+                        resources: The complete list can be found at
+                                   https://docs.ray.io/en/latest/ray-core/api/doc/ray.remote_function.RemoteFunction.options.html#ray.remote_function.RemoteFunction.options
+                                   and contains accelerator_type, memory, name, num_cpus, num_gpus, object_store_memory, placement_group,
+                                   placement_group_bundle_index, placement_group_capture_child_tasks, resources, runtime_env,
+                                   scheduling_strategy, _metadata, concurrency_groups, lifetime, max_concurrency, max_restarts,
+                                   max_task_retries, max_pending_calls, namespace, get_if_exists
+                        Example: { 'num_cpus': '8', 'num_gpus': '1', 'resources': '{"special_hardware": 1, "custom_label": 1}' }
   --pipeline_id PIPELINE_ID
                         pipeline id
   --job_id JOB_ID       job id

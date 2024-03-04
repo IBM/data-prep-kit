@@ -19,7 +19,7 @@ def test_actor_creation():
     execs[0].add_stats.remote({"source_documents": 1, "source_size": 500})
     execs[0].add_stats.remote({"source_documents": 1, "source_size": 500, "result_documents": 1, "result_size": 300})
 
-    stats = ray.get(execs[0].execution_stats.remote())
+    stats = ray.get(execs[0].get_execution_stats.remote())
     print(stats)
 
     assert 2 == stats["source_documents"]

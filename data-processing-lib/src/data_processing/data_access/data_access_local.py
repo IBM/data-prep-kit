@@ -8,7 +8,10 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 from data_processing.data_access import DataAccess
-from data_processing.utils import GB, MB
+from data_processing.utils import GB, MB, get_logger
+
+
+logger = get_logger(__name__)
 
 
 class DataAccessLocal(DataAccess):
@@ -187,7 +190,7 @@ class DataAccessLocal(DataAccess):
             table = pq.read_table(file_path)
             return table
         except (FileNotFoundError, IOError, pa.ArrowException) as e:
-            print(f"Error reading table from {path}: {e.with_traceback(None)}")
+            logger.error(f"Error reading table from {path}: {e.with_traceback(None)}")
             return None
 
     def get_output_location(self, path: str) -> str:
@@ -226,7 +229,7 @@ class DataAccessLocal(DataAccess):
             return size_in_memory, file_info
 
         except Exception as e:
-            print(f"Error saving table to {output_path}: {e}")
+            logger.error(f"Error saving table to {output_path}: {e}")
             return size_in_memory, None
 
     def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
@@ -276,30 +279,29 @@ class DataAccessLocal(DataAccess):
             return data
 
         except (FileNotFoundError, gzip.BadGzipFile) as e:
-            print(f"Error reading file {file_path}: {e}")
+            logger.error(f"Error reading file {file_path}: {e}")
             raise e
 
-    def get_folder_files(self, folder_path: str, extensions: list[str]) -> list[bytes]:
+    def get_folder_files(self, directory_path: str, extensions: list[str] = None) -> dict[str, bytes]:
         """
-        Gets the byte contents of files with specific extensions in a directory.
-
-        Args:
-            folder_path (str): The directory path.
-            extensions (list): A list of file extensions (without dots).
-
-        Returns:
-            list: A list of byte arrays, where each element is the content of a file
-                matching the extensions.
+        Gets all files within a directory, with content as byte arrays, optionally filtered by extensions.
+        :param directory_path: the absolute path to the directory to search.
+        :param extensions: A list of file extensions (without the dot) to filter by. Defaults to None (all files).
+        :return: A dictionary where keys are filenames and values are byte arrays of their content.
         """
 
-        matching_files = []
-        for ext in extensions:
-            matching_files.extend(glob.glob(os.path.join(folder_path, f"*.{ext}")))
-
-        file_contents = []
-        for filename in matching_files:
-            file_contents.append(self.get_file(filename))
-        return file_contents
+        matching_files = {}
+        if extensions is None:
+            search_path = os.path.join(directory_path, "**")
+            for filename in glob.iglob(search_path, recursive=True):
+                if not os.path.isdir(filename):
+                    matching_files[filename] = self.get_file(filename)
+        else:
+            for ext in extensions:
+                search_path = os.path.join(directory_path, f"*.{ext}")
+                for filename in glob.iglob(search_path, recursive=True):
+                    matching_files[filename] = self.get_file(filename)
+        return matching_files
 
     def save_file(self, file_path: str, bytes_data: bytes) -> dict[str, Any]:
         """
@@ -321,5 +323,5 @@ class DataAccessLocal(DataAccess):
             return file_info
 
         except Exception as e:
-            print(f"Error saving bytes to file {file_path}: {e}")
+            logger.error(f"Error saving bytes to file {file_path}: {e}")
             return None

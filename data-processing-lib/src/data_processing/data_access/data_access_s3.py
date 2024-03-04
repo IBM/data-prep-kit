@@ -261,24 +261,33 @@ class DataAccessS3(DataAccess):
             filedata = gzip.decompress(filedata)
         return filedata
 
-    def get_folder_files(self, path: str, extensions: list[str]) -> list[bytes]:
+    def get_folder_files(self, path: str, extensions: list[str] = None) -> dict[str, bytes]:
         """
-        Get a list of byte content of files
+        Get a list of byte content of files. The path here is an absolute path and can be anywhere.
+        The current limitation for S3 and Lakehouse is that it has to be in the same bucket
         :param path: file path
-        :param extensions: a list of file extensions to include
-        :return:
+        :param extensions: a list of file extensions to include. If None, then all files from this and
+                           child ones will be returned
+        :return: A dictionary of file names/binary content will be returned
         """
-        result = []
+        result = {}
         files = self.arrS3.list_files(key=path)
         for file in files:
             f_name = str(file["name"])
-            for ext in extensions:
-                if f_name.endswith(ext):
-                    # include the file
+            if extensions is None:
+                if not f_name.endswith("/"):
+                    # skip folders
                     f_bytes = self.get_file(path=f_name)
                     if f_bytes is not None:
-                        result.append(f_bytes)
-                    break
+                        result[f_name] = f_bytes
+            else:
+                for ext in extensions:
+                    if f_name.endswith(ext):
+                        # include the file
+                        f_bytes = self.get_file(path=f_name)
+                        if f_bytes is not None:
+                            result[f_name] = f_bytes
+                        break
         return result
 
     def save_file(self, path: str, data: bytes) -> dict[str, Any]:

@@ -29,35 +29,31 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
         :return:
         """
         parser.add_argument("--num_workers", type=int, default=1, help="number of workers")
-        """ 
-        ASR defining worker resource requirements and can contain the following keys:
-            num_cpus - required number of cpus
-            num_gpus - required number of gpus
-            resources - required list of custom resources, 
-                for example: resources:{"special_hardware": 1, "custom_label": 1}
-            The complete list can be found at 
-            https://docs.ray.io/en/latest/ray-core/api/doc/ray.remote_function.RemoteFunction.options.html#ray.remote_function.RemoteFunction.options
-            and contains
-            accelerator_type, memory, name, num_cpus, num_gpus, object_store_memory, placement_group, 
-            placement_group_bundle_index, placement_group_capture_child_tasks, resources, runtime_env, 
-            scheduling_strategy, _metadata, concurrency_groups, lifetime, max_concurrency, max_restarts, 
-            max_task_retries, max_pending_calls, namespace, get_if_exists
-        """
+
+        help_example_dict = {
+            "num_cpus": ["8", "Required number of CPUs."],
+            "num_gpus": ["1", "Required number of GPUs"],
+            "resources": [
+                '{"special_hardware": 1, "custom_label": 1}',
+                """The complete list can be found at
+           https://docs.ray.io/en/latest/ray-core/api/doc/ray.remote_function.RemoteFunction.options.html#ray.remote_function.RemoteFunction.options
+           and contains accelerator_type, memory, name, num_cpus, num_gpus, object_store_memory, placement_group,
+           placement_group_bundle_index, placement_group_capture_child_tasks, resources, runtime_env,
+           scheduling_strategy, _metadata, concurrency_groups, lifetime, max_concurrency, max_restarts,
+           max_task_retries, max_pending_calls, namespace, get_if_exists""",
+            ],
+        }
         parser.add_argument(
             "--worker_options",
             type=ast.literal_eval,
             default="{'num_cpus': 0.8}",
-            help="ast string of options for worker execution",
+            help="AST string defining worker resource requirements.\n"
+            + ParamsUtils.get_ast_help_text(help_example_dict),
         )
         parser.add_argument("--pipeline_id", type=str, default="pipeline_id", help="pipeline id")
         parser.add_argument("--job_id", type=str, default="job_id", help="job id")
         parser.add_argument("--creation_delay", type=int, default=0, help="delay between actor' creation")
-        """ 
-        AST defining code location should contain the following keys:
-            github - github location
-            commit_hash - commit hash
-            path - path within github
-        """
+
         help_example_dict = {
             "github": ["https://github.com/somerepo", "Github repository URL."],
             "commit_hash": ["13241231asdfaed", "github commit hash"],

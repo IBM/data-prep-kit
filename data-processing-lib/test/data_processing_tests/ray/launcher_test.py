@@ -72,7 +72,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
@@ -81,7 +81,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
@@ -90,7 +90,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 0 == res
@@ -99,7 +99,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
@@ -108,7 +108,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
@@ -117,7 +117,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
@@ -127,7 +127,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 0 == res
@@ -150,7 +150,7 @@ def test_local_config():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 0 == res
@@ -181,7 +181,7 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
@@ -189,7 +189,7 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
@@ -197,7 +197,7 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
@@ -205,7 +205,7 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transformer_class=AbstractTableTransform
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 0 == res

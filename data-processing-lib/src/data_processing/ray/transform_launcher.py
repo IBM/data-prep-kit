@@ -8,7 +8,10 @@ from data_processing.ray import (
     TransformOrchestratorConfiguration,
     orchestrate,
 )
-from data_processing.utils import str2bool
+from data_processing.utils import get_logger, str2bool
+
+
+logger = get_logger(__name__)
 
 
 class TransformLauncher:
@@ -54,9 +57,9 @@ class TransformLauncher:
         args = parser.parse_args()
         self.run_locally = args.run_locally
         if self.run_locally:
-            print("running locally")
+            logger.info("Running locally")
         else:
-            print("connecting to existing cluster")
+            logger.info("connecting to existing cluster")
         return (
             self.transform_runtime_config.apply_input_params(args=args)
             and self.data_access_factory.apply_input_params(args=args)
@@ -73,11 +76,11 @@ class TransformLauncher:
         try:
             if self.run_locally:
                 # Will create a local Ray cluster
-                print("running locally creating Ray cluster")
+                logger.info("running locally creating Ray cluster")
                 ray.init()
             else:
                 # connect to the existing cluster
-                print("Connecting to the existing Ray cluster")
+                logger.info("Connecting to the existing Ray cluster")
                 ray.init(f"ray://localhost:10001", ignore_reinit_error=True)
             res = ray.get(
                 orchestrate.remote(
@@ -88,9 +91,9 @@ class TransformLauncher:
             )
             time.sleep(10)
         except Exception as e:
-            print(f"Exception running ray remote orchestration\n{e}")
+            logger.info(f"Exception running ray remote orchestration\n{e}")
         finally:
-            print(f"Completed execution in {(time.time() - start)/60.} min, execution result {res}")
+            logger.info(f"Completed execution in {(time.time() - start)/60.} min, execution result {res}")
             ray.shutdown()
             return res
 

@@ -21,7 +21,7 @@ update-toml: check-env
 	sed -e 's/^version[ ]*=.*/version = "'${VERSION}'"/' pyproject.toml > tt.toml
 	mv tt.toml pyproject.toml
 
-build: update-toml 
+build: update-toml venv
 	${PYTHON} -m pip install --upgrade build
 	${PYTHON} -m build
 
@@ -45,3 +45,9 @@ venv:	pyproject.toml check-env
 	pip install -e .;		\
 	pip install pytest pytest-cov
 
+.PHONY: test
+test:  
+	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
+	source venv/bin/activate;		\
+	export PYTHONPATH=src:test:$$PYTHONPATH; \
+	pytest test
