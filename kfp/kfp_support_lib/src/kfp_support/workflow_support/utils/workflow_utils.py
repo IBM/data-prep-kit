@@ -114,17 +114,21 @@ class PipelinesUtils:
     """
     Helper class for pipeline management
     """
+    def __init__(self, host: str = "http://localhost:8080"):
+        """
+        Initialization
+        :param host: host to connect to
+        """
+        self.kfp_client = Client(host=host)
 
-    @staticmethod
     def start_pipeline(
-            kfp_client: Client,
+            self,
             pipeline: models.api_pipeline.ApiPipeline,
             experiment: models.api_experiment.ApiExperiment,
             params: Optional[dict[str, Any]],
     ) -> str:
         """
         Start a specified pipeline.
-        :param kfp_client: kfp client
         :param pipeline: pipeline definition
         :param experiment: experiment to use
         :param params: pipeline parameters
@@ -132,19 +136,30 @@ class PipelinesUtils:
         """
         job_name = pipeline.name + " " + datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         try:
-            run_id = kfp_client.run_pipeline(experiment_id=experiment.id, job_name=job_name,
-                                             pipeline_id=pipeline.id, params=params)
+            run_id = self.kfp_client.run_pipeline(experiment_id=experiment.id, job_name=job_name,
+                                                  pipeline_id=pipeline.id, params=params)
             print("Pipeline submitted")
             return run_id.id
         except Exception as e:
             print(f"Exception starting pipeline {e}")
             return None
 
-    @staticmethod
-    def get_pipeline_by_name(kfp_client: Client, name: str, np: int = 100) -> models.api_pipeline.ApiPipeline:
+    def get_experiment_by_name(self, name: str = "Default") -> models.api_experiment.ApiExperiment:
+        """
+        Get experiment by name
+        :param name: name
+        :return: experiment
+        """
+        try:
+            return self.kfp_client.get_experiment(experiment_name=name)
+        except Exception as e:
+            print(f"Exception getting experiment {e}")
+            return None
+
+
+    def get_pipeline_by_name(self, name: str, np: int = 100) -> models.api_pipeline.ApiPipeline:
         """
         Given pipeline name, return the pipeline
-        :param kfp_client: kfp client
         :param name: pipeline name
         :param np: page size for pipeline query. For large clusters with many pipelines, you might need to
                    increase this number
@@ -152,38 +167,37 @@ class PipelinesUtils:
         """
         try:
             # Get all pipelines
-            pipelines = kfp_client.list_pipelines(page_size=np).pipelines
+            pipelines = self.kfp_client.list_pipelines(page_size=np).pipelines
             required = list(filter(lambda p: name in p.name, pipelines))
             if len(required) != 1:
                 print(f"Failure to get pipeline. Number of pipelines with name {name} is {len(required)}")
                 return None
             return required[0]
+
         except Exception as e:
             print(f"Exception getting pipeline {e}")
             return None
 
-    @staticmethod
-    def wait_pipeline_completion(kfp_client: Client, run_id: str, tmout: int = -1, wait: int = 10) -> tuple[str, str]:
+    def wait_pipeline_completion(self, run_id: str, tmout: int = -1, wait: int = 600) -> tuple[str, str]:
         """
         Waits for a pipeline run to complete
-        :param kfp_client: kfp client
         :param run_id: run id
         :param tmout: timeout (-1 wait forever)
-        :param wait: internal wait
+        :param wait: internal wait (sec)
         :return: Completion status and an error message if such exists
         """
         try:
             if tmout > 0:
-                end = time.time() + 60 * tmout
+                end = time.time() + tmout
             else:
                 end = 2**63 - 1
-            run_state = kfp_client.get_run(run_id=run_id)
+            run_state = self.kfp_client.get_run(run_id=run_id)
             status = run_state.run.status
             while status is None or status.lower() not in ["succeeded", "completed", "failed", "skipped", "error"]:
                 time.sleep(60 * wait)
                 if (end - time.time()) < 0:
                     return "failed", f"Execution is taking too long"
-                run_state = kfp_client.get_run(run_id=run_id)
+                run_state = self.kfp_client.get_run(run_id=run_id)
                 status = run_state.run.status
                 print(f"Got pipeline execution status {status}")
 
