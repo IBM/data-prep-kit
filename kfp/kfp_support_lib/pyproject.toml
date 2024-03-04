@@ -9,7 +9,7 @@ authors = [
     { name = "Alexey Roytman", email = "roytman@il.ibm.com" },
 ]
 dependencies = [
-    "kfp==2.7.0",
+    "kfp==1.8.22",
     "requests",
 ]
 
