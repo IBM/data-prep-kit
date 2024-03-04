@@ -1,4 +1,5 @@
 import time
+import traceback
 from datetime import datetime
 
 import ray
@@ -118,5 +119,5 @@ def orchestrate(
         data_access.save_job_metadata(metadata)
         return 0
     except Exception as e:
-        logger.error(f"Exception during execution {e}")
+        logger.error(f"Exception during execution {e}: {traceback.print_exc()}")
         return 1
