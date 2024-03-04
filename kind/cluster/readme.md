@@ -29,7 +29,7 @@ kubectl get pods -n ingress-nginx
 run the following:
 
 ```shell
-export PIPELINE_VERSION=2.0.5
+export PIPELINE_VERSION=1.8.5
 kubectl apply -k "github.com/kubeflow/pipelines/manifests/kustomize/cluster-scoped-resources?ref=$PIPELINE_VERSION"
 kubectl wait --for condition=established --timeout=60s crd/applications.app.k8s.io
 kubectl apply -k "github.com/kubeflow/pipelines/manifests/kustomize/env/dev?ref=$PIPELINE_VERSION"
@@ -64,4 +64,6 @@ Now we can install API server using:
 helm install -f /Users/boris/Projects/fm-data-engineering/kind/cluster/api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay --set image.pullPolicy=IfNotPresent 
 ```
 
-If you want to enble apiserver externally, you can use this [ingress](apiserver_ingress.yaml)
+If you want to enable api server externally, you can use this [ingress](apiserver_ingress.yaml). 
+
+Note. Both KFP and API server ingress are using the same endpoint, so only one of them should be used at a time 

@@ -3,12 +3,13 @@ kind: Ingress
 metadata:
   name: apiserver
   namespace: kuberay
+  annotations:
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
-          - path: /apiserver
+          - path: /
             pathType: Prefix
             backend:
               service:

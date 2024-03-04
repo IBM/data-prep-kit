@@ -3,7 +3,7 @@ This provides a python framework for developing _transforms_
 on data stored in files - currently parquet files are supported -
 and running them in a [ray](https://ray.com) cluster.
 Data files may be stored in the local file system, COS/S3 or Lakehouse.
-For more details see the [documentation](doc/framework.md).
+For more details see the [documentation](doc).
 
 ## Development
 
