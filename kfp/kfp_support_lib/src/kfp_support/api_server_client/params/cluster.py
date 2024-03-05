@@ -3,7 +3,7 @@ from typing import Any
 
 from kfp_support.api_server_client.params import (HeadNodeSpec, WorkerNodeSpec, EnvironmentVariables,
                                                   head_node_spec_decoder, worker_node_spec_decoder,
-                                                  environmentvariables_decoder)
+                                                  environment_variables_decoder)
 
 
 class Environment(enum.Enum):
@@ -28,7 +28,7 @@ class ClusterSpec:
     - to_string() -> str: convert toleration to string for printing
     - to_dict() -> dict[str, Any] convert to dict
     """
-    def __init__(self, head_node: HeadNodeSpec, worker_groups: list[WorkerNodeSpec] = None) -> None:
+    def __init__(self, head_node: HeadNodeSpec, worker_groups: list[WorkerNodeSpec] = None):
         """
         Initialization
         :param head_node - head node definition
@@ -77,7 +77,7 @@ class ClusterEvent:
         type - type of this event (Normal, Warning), new types could be added in the future
         count - number of times this event has occurred
     """
-    def __init__(self, dst: dict[str, Any]) -> None:
+    def __init__(self, dst: dict[str, Any]):
         """
         Initialization from dictionary
         :param dst: dictionary representation of cluster event
@@ -129,7 +129,7 @@ class Cluster:
                  deployment_environment: Environment = None, annotations: dict[str, str] = None,
                  cluster_environment: EnvironmentVariables = None, created_at: str = None,
                  deleted_at: str = None, cluster_status: str = None, events: list[ClusterEvent] = None,
-                 service_endpoint: dict[str, str] = None) -> None:
+                 service_endpoint: dict[str, str] = None):
         """
         Initialization
         :param name: cluster name
@@ -243,7 +243,7 @@ def cluster_decoder(dct: dict[str, Any]) -> Cluster:
         events = [ClusterEvent(c) for c in dct["events"]]
     envs = None
     if "envs" in dct:
-        envs = environmentvariables_decoder(dct.get("envs"))
+        envs = environment_variables_decoder(dct.get("envs"))
     return Cluster(name=dct.get("name", ""), namespace=dct.get("namespace", ""), user=dct.get("user", ""),
                    version=dct.get("version", ""), cluster_spec=cluster_spec_decoder(dct.get("clusterSpec")),
                    deployment_environment=environment, annotations=dct.get("annotations"),

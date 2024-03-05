@@ -59,7 +59,7 @@ class HostPathVolume(BaseVolume):
 
     """
     def __init__(self, name: str, mount_path: str, source: str, host_path_type: HostPath = None,
-                 mount_propagation: MountPropagationMode = None) -> None:
+                 mount_propagation: MountPropagationMode = None):
         """
         Initialization
         :param name: name
@@ -111,7 +111,7 @@ class PVCVolume(BaseVolume):
            mountPropagationMode - mount propagation: None (0), host to container (1) or bidirectional (2)
     """
     def __init__(self, name: str, mount_path: str, source: str, read_only: bool = False,
-                 mount_propagation: MountPropagationMode = None) -> None:
+                 mount_propagation: MountPropagationMode = None):
         """
         Initialization
         :param name: name
@@ -164,7 +164,7 @@ class EphemeralVolume(BaseVolume):
             mountPropagationMode - optional mount propagation: None (0), host to container (1) or bidirectional (2)
     """
     def __init__(self, name: str, mount_path: str, storage: str, storage_class: str = None,
-                 access_mode: AccessMode = None, mount_propagation: MountPropagationMode = None) -> None:
+                 access_mode: AccessMode = None, mount_propagation: MountPropagationMode = None):
         """
         Initialization
         :param name: name
@@ -219,7 +219,7 @@ class EmptyDirVolume(BaseVolume):
         Empty Dir specific parameters:
             storage - optional max storage size (valid k8 value, for example 5Gi)
     """
-    def __init__(self, name: str, mount_path: str, storage: str = None) -> None:
+    def __init__(self, name: str, mount_path: str, storage: str = None):
         """
         Initialization
         :param name: name
@@ -255,7 +255,7 @@ class ConfigMapVolume(BaseVolume):
             source - required, config map name
             items - optional, key/path items (optional)
     """
-    def __init__(self, name: str, mount_path: str, source: str, items: dict[str, str] = None,) -> None:
+    def __init__(self, name: str, mount_path: str, source: str, items: dict[str, str] = None,):
         """
         Initialization
         :param name: name
@@ -299,7 +299,7 @@ class SecretVolume(BaseVolume):
             source - required, secret name
             items - optional, key/path items (optional)
     """
-    def __init__(self, name: str, mount_path: str, source: str, items: dict[str, str] = None,) -> None:
+    def __init__(self, name: str, mount_path: str, source: str, items: dict[str, str] = None,):
         self.name = name
         self.mount_path = mount_path
         self.source = source

@@ -1,7 +1,7 @@
 from typing import Any
 
 from kfp_support.api_server_client.params import (BaseVolume, EnvironmentVariables,
-                                                  volume_decoder, environmentvariables_decoder)
+                                                  volume_decoder, environment_variables_decoder)
 
 DEFAULT_WORKER_START_PARAMS = {"node-ip-address": "$MY_POD_IP"}
 
@@ -27,11 +27,12 @@ class WorkerNodeSpec:
         annotations - optional, annotations for head node
         labels - optional, labels for head node
     """
-    def __init__(self, group_name: str, compute_template: str, replicas: int, min_replicas: int, max_replicas: int,
-                 ray_start_params: dict[str, str], image: str = None,
+    def __init__(self, group_name: str, compute_template: str, image: str, max_replicas: int,
+                 replicas: int = 1, min_replicas: int = 0,
+                 ray_start_params: dict[str, str] = DEFAULT_WORKER_START_PARAMS,
                  volumes: list[BaseVolume] = None, service_account: str = None, image_pull_secret: str = None,
                  environment: EnvironmentVariables = None, annotations: dict[str, str] = None,
-                 labels: dict[str, str] = None) -> None:
+                 labels: dict[str, str] = None):
         """
         Initialization
         :param group_name: name
@@ -143,7 +144,7 @@ def worker_node_spec_decoder(dct: dict[str, Any]) -> WorkerNodeSpec:
         volumes = [volume_decoder(v) for v in dct["volumes"]]
     environments = None
     if "environment" in dct and len(dct.get("environment")) > 0:
-        environments = environmentvariables_decoder(dct.get("environment"))
+        environments = environment_variables_decoder(dct.get("environment"))
     return WorkerNodeSpec(group_name=dct.get("groupName"), compute_template=dct.get("computeTemplate"),
                           replicas=dct.get("replicas", 0), min_replicas=dct.get("minReplicas", 0),
                           max_replicas=dct.get("maxReplicas", 0), ray_start_params=dct.get("rayStartParams"),
