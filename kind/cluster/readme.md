@@ -74,11 +74,21 @@ kubectl wait --namespace ingress-nginx \
           --for=condition=ready pod \
           --selector=app.kubernetes.io/component=controller \
           --timeout=90s
+```
+
+The endpoints for KFP and API server ingress use the same endpoint, hence only one of them should be employed concurrently.
+
+To deploy the ingress for apiserver:
+```shell
 kubectl apply -f $ROOT_DIR/cluster/apiserver_ingress.yaml
+```
+
+To deploy the ingress for kubeflow pipelines:
+```shell
 kubectl apply -f $ROOT_DIR/cluster/kfp_ingress.yaml
 ```
 
-Open the Kubeflow Pipelines UI at  http://localhost:8081/kfp/#/pipelines
+Open the Kubeflow Pipelines UI at  http://localhost:8080/#/pipelines
 
 Alternatively, port forwarding to localhost can be used to access the services externally:
 
