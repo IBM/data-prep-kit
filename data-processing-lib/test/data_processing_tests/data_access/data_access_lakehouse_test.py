@@ -1,4 +1,4 @@
-from data_access import DataAccessLakeHouse
+from data_processing.data_access import DataAccessLakeHouse
 
 
 s3_cred = {

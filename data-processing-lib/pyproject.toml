@@ -2,7 +2,7 @@
 name = "fm_data_processing"
 version = "0.2.0"
 requires-python = ">=3.10"
-description = "IBM FM Data Processing Library"
+description = "Data Processing Library"
 authors = [
     { name = "David Wood", email = "dawood@us.ibm.com" },
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
