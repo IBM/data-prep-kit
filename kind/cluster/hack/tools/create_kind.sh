@@ -9,7 +9,7 @@ kind_delete() {
 }
 
 kind_create() {
-  kind create cluster --name goofy --config ${ROOT_DIR}/cluster/kind-cluster-config.yaml
+  kind create cluster --name goofy --config ${ROOT_DIR}/hack/kind-cluster-config.yaml
 }
 
 case "$op" in

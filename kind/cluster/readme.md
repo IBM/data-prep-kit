@@ -19,8 +19,8 @@ Run the following command to create the cluster:
 cd /tmp
 git clone git@github.ibm.com:ai-models-data/fm-data-engineering.git
 cd fm-data-engineering
-ROOT_DIR=$PWD/kind/
-kind create cluster --name goofy --config ${ROOT_DIR}/cluster/kind-cluster-config.yaml
+ROOT_DIR=$PWD/kind/cluster/
+kind create cluster --name goofy --config ${ROOT_DIR}/hack/kind-cluster-config.yaml
 ```
 
 ## Install KFP
@@ -57,7 +57,7 @@ helm install kuberay-operator kuberay/kuberay-operator -n kuberay --version 1.0.
 Next install API server and wait for it to be ready:
 
 ```shell
-helm install -f ${ROOT_DIR}/cluster/api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay
+helm install -f ${ROOT_DIR}/hack/api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay
 kubectl wait --for=condition=ready --all pod -n kuberay --timeout=120s
 ```
 
@@ -80,12 +80,12 @@ The endpoints for KFP and API server ingress use the same endpoint, hence only o
 
 To deploy the ingress for apiserver:
 ```shell
-kubectl apply -f $ROOT_DIR/cluster/apiserver_ingress.yaml
+kubectl apply -f $ROOT_DIR/hack/apiserver_ingress.yaml
 ```
 
 To deploy the ingress for kubeflow pipelines:
 ```shell
-kubectl apply -f $ROOT_DIR/cluster/kfp_ingress.yaml
+kubectl apply -f $ROOT_DIR/hack/kfp_ingress.yaml
 ```
 
 Open the Kubeflow Pipelines UI at  http://localhost:8080/#/pipelines
