@@ -8,7 +8,7 @@ spec:
   rules:
     - http:
         paths:
-          - path: /
+          - path: "/kfp"
             pathType: Prefix
             backend:
               service:
