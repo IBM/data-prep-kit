@@ -12,14 +12,12 @@ setup-cluster:
 
 .PHONY: cluster-prepare
 cluster-prepare:
+	cd $(TOOLS_DIR) && ./install_nginx.sh deploy
 	cd $(TOOLS_DIR) && ./install_kubeflow.sh deploy
 	cd $(TOOLS_DIR) && ./install_kuberay.sh deploy
 
-.PHONY: cleanup-cluster
-cleanup-cluster:
-	$(MAKE) kind-cleanup
-
 .PHONY: cluster-prepare-wait
 cluster-prepare-wait:
+	cd $(TOOLS_DIR) && ./install_nginx.sh deploy-wait
 	cd $(TOOLS_DIR) && ./install_kubeflow.sh deploy-wait
 	cd $(TOOLS_DIR) && ./install_kuberay.sh deploy-wait

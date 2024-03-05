@@ -2,14 +2,14 @@ export K8S_VERSION:=${K8S_VERSION}
 export K8S_CLUSTER:=${K8S_CLUSTER}
 export KUBECONFIG:=${KUBECONFIG}
 
-.PHONY: kind-setup
-kind-setup:
-	cd $(TOOLS_DIR); ./create_kind.sh
+.PHONY: create-kind-cluster
+create-kind-cluster:
+	cd $(TOOLS_DIR); ./kind_management.sh create_cluster
 
-.PHONY: kind-cleanup
-kind-cleanup:
-	cd $(TOOLS_DIR); ./create_kind.sh cleanup
+.PHONY: delete-kind-cluster
+delete-kind-cluster:
+	cd $(TOOLS_DIR); ./kind_management.sh delete_cluster
 
 .PHONY: kind
-kind: kind-cleanup kind-setup
+kind: delete-kind-cluster create-kind-cluster
 

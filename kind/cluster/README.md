@@ -57,7 +57,7 @@ helm install kuberay-operator kuberay/kuberay-operator -n kuberay --version 1.0.
 Next install API server and wait for it to be ready:
 
 ```shell
-helm install -f ${ROOT_DIR}/hack/api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay
+helm install -f ${ROOT_DIR}/hack/ray_api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay
 kubectl wait --for=condition=ready --all pod -n kuberay --timeout=120s
 ```
 
@@ -80,7 +80,7 @@ The endpoints for KFP and API server ingress use the same endpoint, hence only o
 
 To deploy the ingress for apiserver:
 ```shell
-kubectl apply -f $ROOT_DIR/hack/apiserver_ingress.yaml
+kubectl apply -f $ROOT_DIR/hack/ray_api_server_ingress.yaml
 ```
 
 To deploy the ingress for kubeflow pipelines:

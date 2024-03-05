@@ -23,7 +23,7 @@ deploy_kubeflow() {
 	kubectl wait --for condition=established --timeout=60s crd/applications.app.k8s.io
 	# Disable the public endpoint
 	# ref: https://www.kubeflow.org/docs/components/pipelines/v1/installation/standalone-deployment/#disable-the-public-endpoint
-	sed -i '/inverse-proxy$/d' manifests/kustomize/env/dev/kustomization.yaml
+	sed -i.back '/inverse-proxy$/d' manifests/kustomize/env/dev/kustomization.yaml
 	deploy_with_retries "-k" "manifests/kustomize/env/dev" "$MAX_RETRIES" "$SLEEP_TIME" || EXIT_CODE=$?
 	if [[ $EXIT_CODE -ne 0 ]]
 	then
