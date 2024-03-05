@@ -44,9 +44,6 @@ Add permissions with RBAC role:
     kubectl create clusterrolebinding pipeline-runner-extend --clusterrole cluster-admin --serviceaccount=kubeflow:pipeline-runner
 ```
 
-Note that the pod `proxy-agent-xxxx` is failing. For instructions on disabling it, please refer to [this](https://www.kubeflow.org/docs/components/pipelines/v1/installation/standalone-deployment/#disable-the-public-endpoint) detailed guide. 
-
-
 ## Install KubeRay
 
 Install Kuberay:
