@@ -1,9 +1,11 @@
 import os
 import re
+import sys
 
 import datetime
 import time
 from typing import Optional, Any
+from ray.job_submission import JobStatus
 
 from kfp_server_api import models
 from kfp import Client
@@ -12,7 +14,6 @@ from kfp_support.api_server_client import KubeRayAPIs
 from kfp_support.api_server_client.params import (Template, DEFAULT_HEAD_START_PARAMS, DEFAULT_WORKER_START_PARAMS,
                                                   volume_decoder, HeadNodeSpec, WorkerNodeSpec, ClusterSpec, Cluster,
                                                   RayJobRequest)
-from data_processing.utils import ParamsUtils
 
 
 ONE_HOUR_SEC = 60 * 60
@@ -114,6 +115,13 @@ class KFPUtils:
         if run_id != "":
             return f"{ray_name[:9]}-{run_id[:5]}"
         return ray_name[:15]
+
+    @staticmethod
+    def dict_to_req(d: dict[str, Any], executor: str = "transformer_launcher.py") -> str:
+        res = f"python {executor} "
+        for key, value in d.items():
+            res += f"--{key}={value} "
+        return res
 
 
 class PipelinesUtils:
@@ -219,6 +227,8 @@ class RayRemoteJobs:
     """
     class supporting Ray remote jobs
     """
+    ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
+
     def __init__(self, server_url: str = "http://localhost:8080", wait_interval: int = 2):
         """
         Initialization
@@ -394,7 +404,7 @@ class RayRemoteJobs:
             submission id - submission id
         """
         # Build job request
-        job_request = RayJobRequest(entrypoint=ParamsUtils.dict_to_req(d=request, executor=executor))
+        job_request = RayJobRequest(entrypoint=KFPUtils.dict_to_req(d=request, executor=executor))
         if runtime_env is not None:
             job_request.runtime_env = runtime_env
         return self.api_server_client.submit_job(ns=namespace, name=name, job_request=job_request)
@@ -415,3 +425,67 @@ class RayRemoteJobs:
         if status != 200:
             return status, error, ""
         return status, error, info.status
+
+    @staticmethod
+    def _print_log(log: str, previous_log_len: int) -> None:
+        """
+        Prints the delta between current and previous logs
+        :param log: corrent log
+        :param previous_log_len: previous log length
+        :return: None
+        """
+        l_to_print = log[previous_log_len:]
+        if len(l_to_print) > 0:
+            l_to_print = RayRemoteJobs.ansi_escape.sub("", l_to_print)
+            print(l_to_print)
+
+    def follow_execution(self, name: str, namespace: str, submission_id: str, print_tmout: int = 120) \
+            -> None:
+        """
+        Follow remote job execution
+        :param name: cluster name
+        :param namespace: cluster namespace
+        :param submission_id: job submission ID
+        :param print_tmout: print interval
+        :return: None
+        """
+        # Wait for job to start running
+        job_status = JobStatus.PENDING
+        while job_status != JobStatus.RUNNING:
+            status, error, job_status = self._get_job_status(name=name, namespace=namespace,
+                                                             submission_id=submission_id)
+            if status != 200:
+                sys.exit(1)
+            if job_status in {JobStatus.STOPPED, JobStatus.SUCCEEDED, JobStatus.FAILED, JobStatus.RUNNING}:
+                break
+        print(f"job status is {job_status}")
+        #  While job is running print log
+        previous_log_len = 0
+        # At this point job could succeeded, failed, stop or running. So print log regardless
+        status, error, log = self.api_server_client.get_job_log(ns=namespace, name=name, sid=submission_id)
+        if status != 200:
+            sys.exit(1)
+        self._print_log(log=log, previous_log_len=previous_log_len)
+        previous_log_len = len(log)
+        # continue printing log, while job is running
+        while job_status == JobStatus.RUNNING:
+            time.sleep(print_tmout)
+            status, error, log = self.api_server_client.get_job_log(ns=namespace, name=name, sid=submission_id)
+            if status != 200:
+                sys.exit(1)
+            self._print_log(log=log, previous_log_len=previous_log_len)
+            previous_log_len = len(log)
+            status, error, job_status = self._get_job_status(name=name, namespace=namespace,
+                                                             submission_id=submission_id)
+            if status != 200:
+                sys.exit(1)
+        # Print the final log and execution status
+        time.sleep(2)
+        status, error, log = self.api_server_client.get_job_log(ns=namespace, name=name, sid=submission_id)
+        if status != 200:
+            sys.exit(1)
+        self._print_log(log=log, previous_log_len=previous_log_len)
+        print(f"Job completed with execution status {status}")
+
+
+
