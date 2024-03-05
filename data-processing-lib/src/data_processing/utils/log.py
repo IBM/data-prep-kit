@@ -2,17 +2,17 @@ import logging
 import os
 
 
+default_level = os.environ.get("DPF_LOG_LEVEL", "INFO").upper()
+
+
 def get_log_level(name: str = None):
     if name is None:
         level_name = os.environ.get("DPF_LOG_LEVEL", "INFO")
     else:
         name = name.upper()
         name = "DPF_" + name + "_LOG_LEVEL"
-        level_name = os.environ.get(name, "INFO")
+        level_name = os.environ.get(name, default_level)
     return level_name
-
-
-default_level = get_log_level()
 
 
 def get_logger(name: str, level=None, file=None):
@@ -23,8 +23,9 @@ def get_logger(name: str, level=None, file=None):
     c_handler = logging.StreamHandler()
     # msgfmt = '[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'
     # msgfmt = '%(asctime)s p%(process)s %(levelname)s %(filename)s:%(lineno)d - %(message)s'
-    if level is "DEBUG":
-        msgfmt = "%(asctime)s %(levelname)s %(filename)s:%(lineno)d - %(message)s"
+    if level == "DEBUG":
+        # When debugging, include the source link that pycharm understands.
+        msgfmt = '%(asctime)s %(levelname)s - %(message)s at "%(pathname)s:%(lineno)d"'
     else:
         msgfmt = "%(asctime)s %(levelname)s - %(message)s"
     timefmt = "%H:%M:%S"

@@ -1,8 +1,13 @@
 import time
+import traceback
 from typing import Any
 
 import pyarrow as pa
 import ray
+from data_processing.utils import get_logger
+
+
+logger = get_logger(__name__)
 
 
 @ray.remote(scheduling_strategy="SPREAD")
@@ -54,13 +59,13 @@ class TransformTableProcessor:
                 # execute local processing
                 out_tables, stats = self.transform.transform(table=table)
             else:
-                print(f"table: {f_name} is empty, skipping processing")
+                logger.info(f"table: {f_name} is empty, skipping processing")
                 out_tables = [table]
                 stats = {}
             # save results
             self._submit_table(f_name=f_name, t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
-            print(f"Exception {e} processing file {f_name}")
+            logger.warning(f"Exception {e} processing file {f_name}: {traceback.format_exc()}")
 
     def flush(self) -> None:
         """
@@ -76,7 +81,7 @@ class TransformTableProcessor:
             # Here we are using the name of the last table, that did not return anything
             self._submit_table(f_name=self.last_empty, t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
-            print(f"Exception {e} flushing")
+            logger.warning(f"Exception {e} flushing: {traceback.format_exc()}")
 
     def _submit_table(self, f_name: str, t_start: float, out_tables: list[pa.Table], stats: dict[str, Any]) -> None:
         """

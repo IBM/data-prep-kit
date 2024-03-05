@@ -50,12 +50,12 @@ class AbstractTest:
         for i in range(l1):
             t1 = table_list[i]
             t2 = expected_table_list[i]
-            l1 = len(t1)
-            l2 = len(t2)
+            l1 = t1.num_rows
+            l2 = t2.num_rows
             assert l1 == l2, f"Number of rows in table #{i} ({l1}) does not match expected number ({l2})"
             for j in range(l1):
-                r1 = t1[j]
-                r2 = t2[j]
+                r1 = t1.take([j])[0]
+                r2 = t2.take([j])[0]
                 assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {2}"
 
     def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):

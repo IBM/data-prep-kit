@@ -3,6 +3,7 @@ kind: Ingress
 metadata:
   name: apiserver
   namespace: kuberay
+  annotations:
 spec:
   ingressClassName: nginx
   rules:

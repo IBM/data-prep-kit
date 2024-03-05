@@ -1,8 +1,10 @@
 from typing import Tuple
 
+import blocklist_transform
 import pyarrow as pa
-from data_processing_test.transform.transform_test import AbstractTransformTest
-from noop_transform import NOOPTransform
+from blocklist_transform import BlockListTransformConfiguration
+from data_processing.test_support.ray import AbstractTransformLauncherTest
+from data_processing.test_support.transform import NOOPTransformConfiguration
 
 
 table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})
@@ -10,15 +12,14 @@ expected_table = table  # We're a noop after all.
 expected_metadata_list = [{"nfiles": 1, "nrows": 1}, {}]  # transform() result  # flush() result
 
 
-class TestNOOPTransform(AbstractTransformTest):
+class TestRayBlocklistTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
 
     def get_test_transform_fixtures(self) -> list[Tuple]:
-        fixtures = [
-            (NOOPTransform({"sleep": 0}), [table], [expected_table], expected_metadata_list),
-            (NOOPTransform({"sleep": 0}), [table], [expected_table], expected_metadata_list),
-        ]
+        basedir = "test-data/"
+        config = {blocklist_transform.blocked_domain_list_url_key: basedir + "domains/arjel"}
+        fixtures = [(BlockListTransformConfiguration(), config, basedir + "input", basedir + "expected")]
         return fixtures

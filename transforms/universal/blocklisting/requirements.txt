@@ -1,0 +1,7 @@
+# Ray/Mutator runtime
+# The following url for fm-data-processing.  Contact David Wood, dawood@us.ibm.com, if you don't have pypi access
+--extra-index-url https://${ARTIFACTORY_USER}:${ARTIFACTORY_API_KEY}@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
+fm-data-processing==0.2.0
+### For blocklist
+pygtrie>=2.5.0
+polars==0.20.6

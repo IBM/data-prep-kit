@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pyarrow
 import pytest
-from data_access import DataAccessLocal
+from data_processing.data_access import DataAccessLocal
 
 
 KB = 1024
@@ -538,29 +538,54 @@ class TestGetFolderFiles(TestInit):
     # create test folder and test files (text pdf and bin) inside test folder
     test_dir = os.path.join(os.sep, "tmp", "test_folder")
     os.makedirs(test_dir, exist_ok=True)
+    test_domain_dir = os.path.join(test_dir, "domains")
+    os.makedirs(test_domain_dir, exist_ok=True)
     text_file_path = os.path.join(test_dir, "test_file.txt")
     pdf_file_path = os.path.join(test_dir, "test_file.pdf")
     bin_file_path = os.path.join(test_dir, "invalid_bin_file.bin")
+    domain_file_path = os.path.join(test_domain_dir, "domains")
     with open(text_file_path, "wb") as f:
         f.write(b"This is text content.")
     with open(pdf_file_path, "wb") as f:
         f.write(b"\x25\x50\x44\x46")  # Sample PDF header
     with open(bin_file_path, "wb") as f:
         f.write(b"Not a text file")
+    with open(domain_file_path, "wb") as f:
+        f.write(b"asdf.qwer.com")
 
-    def test_existing_files(self):
-        contents = self.dal.get_folder_files(self.test_dir, ["txt", "pdf"])
-        os.remove(self.text_file_path)
-        os.remove(self.pdf_file_path)
-        os.remove(self.bin_file_path)
-        os.rmdir(self.test_dir)
-        assert len(contents) == 2
-        assert contents[0] == b"This is text content."
-        assert contents[1][:4] == b"\x25\x50\x44\x46"  # Check PDF header
+    def test_one_extension(self):
+        contents_txt = self.dal.get_folder_files(self.test_dir, ["txt"])
+        assert len(contents_txt) == 1
+        assert self.text_file_path in contents_txt
+        assert contents_txt[self.text_file_path] == b"This is text content."
+
+    def test_one_non_existing_extension(self):
+        contents_jpg = self.dal.get_folder_files(self.test_dir, ["jpg"])
+        assert not contents_jpg
+
+    def test_all_files(self):
+        contents_all = self.dal.get_folder_files(self.test_dir)
+        assert len(contents_all) == 4
+        assert contents_all[self.text_file_path] == b"This is text content."
+        assert contents_all[self.pdf_file_path][:4] == b"\x25\x50\x44\x46"
+        assert contents_all[self.bin_file_path] == b"Not a text file"
+        assert contents_all[self.domain_file_path] == b"asdf.qwer.com"
+
+    def test_multiple_extensions(self):
+        contents_txt_pdf = self.dal.get_folder_files(self.test_dir, ["txt", "pdf"])
+        assert len(contents_txt_pdf) == 2
+        assert contents_txt_pdf[self.text_file_path] == b"This is text content."
+        assert contents_txt_pdf[self.pdf_file_path][:4] == b"\x25\x50\x44\x46"  # Check PDF header
 
     def test_nonexistent_files(self):
         contents = self.dal.get_folder_files("nonexistent_dir", ["txt"])
-        assert contents == []
+        os.remove(self.text_file_path)
+        os.remove(self.pdf_file_path)
+        os.remove(self.bin_file_path)
+        os.remove(self.domain_file_path)
+        os.rmdir(self.test_domain_dir)
+        os.rmdir(self.test_dir)
+        assert not contents
 
 
 class TestSaveFile(TestInit):

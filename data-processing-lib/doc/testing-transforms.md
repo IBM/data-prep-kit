@@ -27,13 +27,13 @@ should be included in this list.
 length N+1 for the N calls to `transform(Table)` plus the finalizing call to `flush()`.
 
 As an example, consider the `NOOPTransformTest` developed as ane example of the testing
-framework.  
+framework.
 
 ```python
 from typing import Tuple
 
 import pyarrow as pa
-from data_processing_test.transform.transform_test import AbstractTransformTest
+from data_processing.test_support import AbstractTransformTest
 from noop_transform import NOOPTransform
 
 # Define the test input and expected outputs
@@ -41,15 +41,16 @@ table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})
 expected_table = table  # We're a noop after all.
 expected_metadata_list = [{"nfiles": 1, "nrows": 1}, {}]  # transform() result  # flush() result
 
+
 class TestNOOPTransform(AbstractTransformTest):
-  
-    # Define the method that provides the test fixtures to the test from the super class.
-    def get_test_transform_fixtures(self) -> list[Tuple]:
-        fixtures = [
-            (NOOPTransform({"sleep": 0}), [table], [expected_table], expected_metadata_list),
-            (NOOPTransform({"sleep": 1}), [table], [expected_table], expected_metadata_list),
-        ]
-        return fixtures
+
+  # Define the method that provides the test fixtures to the test from the super class.
+  def get_test_transform_fixtures(self) -> list[Tuple]:
+    fixtures = [
+      (NOOPTransform({"sleep": 0}), [table], [expected_table], expected_metadata_list),
+      (NOOPTransform({"sleep": 1}), [table], [expected_table], expected_metadata_list),
+    ]
+    return fixtures
 ```
 In the above we use the `NOOPTransform` to process the single input `table`, to produce
 the expected table `expected_table` and list of metadata in `expected_metadata_list`, 
