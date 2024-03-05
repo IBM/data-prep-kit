@@ -1,18 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: apiserver
-  namespace: kuberay
-  annotations:
+    name: apiserver
+    namespace: kuberay
+    annotations:
 spec:
-  ingressClassName: nginx
-  rules:
-    - http:
-        paths:
-          - path: "/"
-            pathType: Prefix
-            backend:
-              service:
-                name: kuberay-apiserver-service
-                port:
-                  name: http
+    ingressClassName: nginx
+    rules:
+        - http:
+              paths:
+                  - path: "/"
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: kuberay-apiserver-service
+                            port:
+                                name: http
