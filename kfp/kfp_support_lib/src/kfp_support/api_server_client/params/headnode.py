@@ -4,7 +4,7 @@ import enum
 from kfp_support.api_server_client.params import (BaseVolume, EnvironmentVariables,
                                                   volume_decoder, environmentvariables_decoder)
 
-DEFAULT_HEAD_START_PARAMS = {"dashboard-host": "0.0.0.0", "metrics-export-port": "8080"}
+DEFAULT_HEAD_START_PARAMS = {"dashboard-host": "0.0.0.0", "metrics-export-port": "8080", "num-cpus": "0"}
 
 
 class ServiceType(enum.Enum):

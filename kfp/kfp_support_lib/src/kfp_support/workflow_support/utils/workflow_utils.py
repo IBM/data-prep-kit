@@ -365,7 +365,7 @@ class RayRemoteJobs:
         # Wait for cluster ready
         return self.api_server_client.wait_cluster_ready(name=name, ns=namespace)
 
-    def clean_up_ray_cluster(self, name: str, namespace: str) -> tuple[int, str]:
+    def delete_ray_cluster(self, name: str, namespace: str) -> tuple[int, str]:
         """
         Clean up Ray cluster and supporting template
         :param name: cluster name
@@ -480,12 +480,10 @@ class RayRemoteJobs:
             if status != 200:
                 sys.exit(1)
         # Print the final log and execution status
+        # Sleep here to avoid racing conditions
         time.sleep(2)
         status, error, log = self.api_server_client.get_job_log(ns=namespace, name=name, sid=submission_id)
         if status != 200:
             sys.exit(1)
         self._print_log(log=log, previous_log_len=previous_log_len)
         print(f"Job completed with execution status {status}")
-
-
-
