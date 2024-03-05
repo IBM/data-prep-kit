@@ -27,11 +27,12 @@ class WorkerNodeSpec:
         annotations - optional, annotations for head node
         labels - optional, labels for head node
     """
-    def __init__(self, group_name: str, compute_template: str, replicas: int, min_replicas: int, max_replicas: int,
-                 ray_start_params: dict[str, str], image: str = None,
+    def __init__(self, group_name: str, compute_template: str, image: str, max_replicas: int,
+                 replicas: int = 1, min_replicas: int = 0,
+                 ray_start_params: dict[str, str] = DEFAULT_WORKER_START_PARAMS,
                  volumes: list[BaseVolume] = None, service_account: str = None, image_pull_secret: str = None,
                  environment: EnvironmentVariables = None, annotations: dict[str, str] = None,
-                 labels: dict[str, str] = None) -> None:
+                 labels: dict[str, str] = None):
         """
         Initialization
         :param group_name: name

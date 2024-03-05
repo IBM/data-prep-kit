@@ -35,11 +35,11 @@ class HeadNodeSpec:
         annotations - optional, annotations for head node
         labels - optional, labels for head node
     """
-    def __init__(self, compute_template: str, ray_start_params: dict[str, str], image: str = None,
-                 service_type: ServiceType = None, enable_ingress: bool = False,
+    def __init__(self, compute_template: str, image: str, ray_start_params: dict[str, str] = DEFAULT_HEAD_START_PARAMS,
+                 service_type: ServiceType = ServiceType.ClusterIP, enable_ingress: bool = False,
                  volumes: list[BaseVolume] = None, service_account: str = None, image_pull_secret: str = None,
                  environment: EnvironmentVariables = None, annotations: dict[str, str] = None,
-                 labels: dict[str, str] = None) -> None:
+                 labels: dict[str, str] = None):
         """
         Initialization
         :param compute_template: compute template

@@ -36,7 +36,7 @@ class Toleration:
     """
 
     def __init__(self, key: str, operator: TolerationOperation, effect: TolerationEffect,
-                 value: str = None) -> None:
+                 value: str = None):
         """
         Initialization
         :param key: key
@@ -98,7 +98,7 @@ class Template:
     - to_json() -> str convert to json string
     """
     def __init__(self, name: str, namespace: str, cpu: int, memory: int, gpu: int = 0,
-                 gpu_accelerator: str = None, tolerations: list[Toleration] = None) -> None:
+                 gpu_accelerator: str = None, tolerations: list[Toleration] = None):
         """
         Initialization
         :param name: name

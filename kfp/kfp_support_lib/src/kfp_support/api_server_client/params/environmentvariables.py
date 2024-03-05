@@ -26,7 +26,7 @@ class EnvVarFrom:
     - to_string() -> str: convert toleration to string for printing
     - to_dict() -> dict[str, Any] convert to dict
     """
-    def __init__(self, source: EnvVarSource, name: str, key: str) -> None:
+    def __init__(self, source: EnvVarSource, name: str, key: str):
         """
         Initialize
         :param source - source
@@ -64,7 +64,7 @@ class EnvironmentVariables:
     - to_string() -> str: convert toleration to string for printing
     - to_dict() -> dict[str, Any] convert to dict
     """
-    def __init__(self, key_value: dict[str, str] = None, from_ref: dict[str, EnvVarFrom] = None) -> None:
+    def __init__(self, key_value: dict[str, str] = None, from_ref: dict[str, EnvVarFrom] = None):
         """
         Initialization
         :param key_value: dictionary of key/value pairs for environment variables
