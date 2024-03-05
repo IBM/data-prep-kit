@@ -3,7 +3,7 @@ from typing import Any
 
 from kfp_support.api_server_client.params import (HeadNodeSpec, WorkerNodeSpec, EnvironmentVariables,
                                                   head_node_spec_decoder, worker_node_spec_decoder,
-                                                  environmentvariables_decoder)
+                                                  environment_variables_decoder)
 
 
 class Environment(enum.Enum):
@@ -243,7 +243,7 @@ def cluster_decoder(dct: dict[str, Any]) -> Cluster:
         events = [ClusterEvent(c) for c in dct["events"]]
     envs = None
     if "envs" in dct:
-        envs = environmentvariables_decoder(dct.get("envs"))
+        envs = environment_variables_decoder(dct.get("envs"))
     return Cluster(name=dct.get("name", ""), namespace=dct.get("namespace", ""), user=dct.get("user", ""),
                    version=dct.get("version", ""), cluster_spec=cluster_spec_decoder(dct.get("clusterSpec")),
                    deployment_environment=environment, annotations=dct.get("annotations"),

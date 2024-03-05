@@ -13,7 +13,7 @@ from kfp import Client
 from kfp_support.api_server_client import KubeRayAPIs
 from kfp_support.api_server_client.params import (Template, DEFAULT_HEAD_START_PARAMS, DEFAULT_WORKER_START_PARAMS,
                                                   volume_decoder, HeadNodeSpec, WorkerNodeSpec, ClusterSpec, Cluster,
-                                                  RayJobRequest)
+                                                  RayJobRequest, environment_variables_decoder)
 
 
 ONE_HOUR_SEC = 60 * 60
@@ -191,17 +191,17 @@ class PipelinesUtils:
             print(f"Exception getting pipeline {e}")
             return None
 
-    def wait_pipeline_completion(self, run_id: str, tmout: int = -1, wait: int = 600) -> tuple[str, str]:
+    def wait_pipeline_completion(self, run_id: str, timeout: int = -1, wait: int = 600) -> tuple[str, str]:
         """
         Waits for a pipeline run to complete
         :param run_id: run id
-        :param tmout: timeout (sec) (-1 wait forever)
+        :param timeout: timeout (sec) (-1 wait forever)
         :param wait: internal wait (sec)
         :return: Completion status and an error message if such exists
         """
         try:
-            if tmout > 0:
-                end = time.time() + tmout
+            if timeout > 0:
+                end = time.time() + timeout
             else:
                 end = 2**63 - 1
             run_details = self.kfp_client.get_run(run_id=run_id)
@@ -241,7 +241,7 @@ class RayRemoteJobs:
                            worker_nodes: list[dict[str, Any]]) -> tuple[int, str]:
         """
         Create Ray cluster
-        :param name: name
+        :param name: name, _ are not allowed in the name
         :param namespace: namespace
         :param head_node: head node specification dictionary including the following:
             mandatory fields:
@@ -287,14 +287,14 @@ class RayRemoteJobs:
         memory = head_node.get("memory", 1)
         gpus = head_node.get("gpu", 0)
         accelerator = head_node.get("gpu_accelerator", None)
-        head_node_teplate_name = f"{name}_head_template"
-        _, _ = self.api_server_client.delete_compute_template(ns="default", name=head_node_teplate_name)
-        head_template = Template(name=head_node_teplate_name, namespace=namespace, cpu=cpus, memory=memory,
+        head_node_template_name = f"{name}-head-template"
+        _, _ = self.api_server_client.delete_compute_template(ns=namespace, name=head_node_template_name)
+        head_template = Template(name=head_node_template_name, namespace=namespace, cpu=cpus, memory=memory,
                                  gpu=gpus, gpu_accelerator=accelerator)
         status, error = self.api_server_client.create_compute_template(head_template)
         if status != 200:
             return status, error
-        worker_templates = []
+        worker_template_names = [""] * len(worker_nodes)
         index = 0
         # For every worker group
         for worker_node in worker_nodes:
@@ -302,30 +302,34 @@ class RayRemoteJobs:
             memory = worker_node.get("memory", 1)
             gpus = worker_node.get("gpu", 0)
             accelerator = worker_node.get("gpu_accelerator", None)
-            worker_node_teplate_name = f"{name}_worker_template_{index}"
-            _, _ = self.api_server_client.delete_compute_template(ns="default", name=worker_node_teplate_name)
-            worker_template = Template(name=worker_node_teplate_name, namespace=namespace, cpu=cpus, memory=memory,
+            worker_node_template_name = f"{name}-worker-template-{index}"
+            _, _ = self.api_server_client.delete_compute_template(ns="default", name=worker_node_template_name)
+            worker_template = Template(name=worker_node_template_name, namespace=namespace, cpu=cpus, memory=memory,
                                        gpu=gpus, gpu_accelerator=accelerator)
             status, error = self.api_server_client.create_compute_template(worker_template)
             if status != 200:
                 return status, error
-            worker_templates.append(worker_template)
+            worker_template_names[index] = worker_node_template_name
             index += 1
         # Build head node spec
         image = head_node.get("image", "rayproject/ray:2.9.0-py310")
         image_pull_secret = head_node.get("image_pull_secret", None)
         ray_start_params = head_node.get("ray_start_params", DEFAULT_HEAD_START_PARAMS)
-        volumes = head_node.get("volumes", None)
+        volumes_dict = head_node.get("volumes", None)
         service_account = head_node.get("service_account", None)
-        environment = head_node.get("environment", None)
+        environment_dict = head_node.get("environment", None)
         annotations = head_node.get("annotations", None)
         labels = head_node.get("labels", None)
-        if volumes is not None:
-            volumes_array = [volume_decoder(v).to_dict() for v in volumes]
+        if volumes_dict is None:
+            volumes = None
         else:
-            volumes_array = None
-        head_node_spec = HeadNodeSpec(compute_template=head_node_teplate_name, image=image,
-                                      ray_start_params=ray_start_params, volumes=volumes_array,
+            volumes = [volume_decoder(v) for v in volumes_dict]
+        if environment_dict is None:
+            environment = None
+        else:
+            environment = environment_variables_decoder(environment_dict)
+        head_node_spec = HeadNodeSpec(compute_template=head_node_template_name, image=image,
+                                      ray_start_params=ray_start_params, volumes=volumes,
                                       service_account=service_account, image_pull_secret=image_pull_secret,
                                       environment=environment, annotations=annotations, labels=labels)
         # build worker nodes
@@ -338,20 +342,24 @@ class RayRemoteJobs:
             image = worker_node.get("image", "rayproject/ray:2.9.0-py310")
             image_pull_secret = worker_node.get("image_pull_secret", None)
             ray_start_params = worker_node.get("ray_start_params", DEFAULT_WORKER_START_PARAMS)
-            volumes = worker_node.get("volumes", None)
+            volumes_dict = worker_node.get("volumes", None)
             service_account = worker_node.get("service_account", None)
-            environment = worker_node.get("environment", None)
+            environment_dict = worker_node.get("environment", None)
             annotations = worker_node.get("annotations", None)
             labels = worker_node.get("labels", None)
-            if volumes is not None:
-                volumes_array = [volume_decoder(v).to_dict() for v in volumes]
+            if volumes_dict is None:
+                volumes = None
             else:
-                volumes_array = None
-            worker_groups.append(WorkerNodeSpec(group_name=f"worker_group_{index}",
-                                                compute_template=worker_templates[index], image=image,
+                volumes = [volume_decoder(v) for v in volumes_dict]
+            if environment_dict is None:
+                environment = None
+            else:
+                environment = environment_variables_decoder(environment_dict)
+            worker_groups.append(WorkerNodeSpec(group_name=f"worker-group-{index}",
+                                                compute_template=worker_template_names[index], image=image,
                                                 max_replicas=max_replicas, replicas=replicas,
                                                 min_replicas=min_replicas, ray_start_params=ray_start_params,
-                                                volumes=volumes_array, service_account=service_account,
+                                                volumes=volumes, service_account=service_account,
                                                 image_pull_secret=image_pull_secret, environment=environment,
                                                 annotations=annotations, labels=labels))
             index += 1
@@ -390,7 +398,7 @@ class RayRemoteJobs:
         return status, error
 
     def submit_job(self, name: str, namespace: str, request: dict[str, Any], runtime_env: str = None,
-                   executor: str = "transformer_launcher.py") -> tuple[str, str, str]:
+                   executor: str = "transformer_launcher.py") -> tuple[int, str, str]:
         """
         Submit job for execution
         :param name: cluster name
@@ -409,7 +417,7 @@ class RayRemoteJobs:
             job_request.runtime_env = runtime_env
         return self.api_server_client.submit_job(ns=namespace, name=name, job_request=job_request)
 
-    def _get_job_status(self, name: str, namespace: str, submission_id: str) -> tuple[str, str, str]:
+    def _get_job_status(self, name: str, namespace: str, submission_id: str) -> tuple[int, str, str]:
         """
         Get job status
         :param name: cluster name
@@ -430,7 +438,7 @@ class RayRemoteJobs:
     def _print_log(log: str, previous_log_len: int) -> None:
         """
         Prints the delta between current and previous logs
-        :param log: corrent log
+        :param log: current log
         :param previous_log_len: previous log length
         :return: None
         """
@@ -439,14 +447,14 @@ class RayRemoteJobs:
             l_to_print = RayRemoteJobs.ansi_escape.sub("", l_to_print)
             print(l_to_print)
 
-    def follow_execution(self, name: str, namespace: str, submission_id: str, print_tmout: int = 120) \
+    def follow_execution(self, name: str, namespace: str, submission_id: str, print_timeout: int = 120) \
             -> None:
         """
         Follow remote job execution
         :param name: cluster name
         :param namespace: cluster namespace
         :param submission_id: job submission ID
-        :param print_tmout: print interval
+        :param print_timeout: print interval
         :return: None
         """
         # Wait for job to start running
@@ -469,7 +477,7 @@ class RayRemoteJobs:
         previous_log_len = len(log)
         # continue printing log, while job is running
         while job_status == JobStatus.RUNNING:
-            time.sleep(print_tmout)
+            time.sleep(print_timeout)
             status, error, log = self.api_server_client.get_job_log(ns=namespace, name=name, sid=submission_id)
             if status != 200:
                 sys.exit(1)

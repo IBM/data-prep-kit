@@ -1,7 +1,7 @@
 from typing import Any
 
 from kfp_support.api_server_client.params import (BaseVolume, EnvironmentVariables,
-                                                  volume_decoder, environmentvariables_decoder)
+                                                  volume_decoder, environment_variables_decoder)
 
 DEFAULT_WORKER_START_PARAMS = {"node-ip-address": "$MY_POD_IP"}
 
@@ -144,7 +144,7 @@ def worker_node_spec_decoder(dct: dict[str, Any]) -> WorkerNodeSpec:
         volumes = [volume_decoder(v) for v in dct["volumes"]]
     environments = None
     if "environment" in dct and len(dct.get("environment")) > 0:
-        environments = environmentvariables_decoder(dct.get("environment"))
+        environments = environment_variables_decoder(dct.get("environment"))
     return WorkerNodeSpec(group_name=dct.get("groupName"), compute_template=dct.get("computeTemplate"),
                           replicas=dct.get("replicas", 0), min_replicas=dct.get("minReplicas", 0),
                           max_replicas=dct.get("maxReplicas", 0), ray_start_params=dct.get("rayStartParams"),
