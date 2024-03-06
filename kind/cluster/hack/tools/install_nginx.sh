@@ -2,17 +2,17 @@
 
 op=$1
 
-source ${ROOT_DIR}/hack/common.sh
-
 SLEEP_TIME="${SLEEP_TIME:-50}"
 MAX_RETRIES="${MAX_RETRIES:-10}"
 EXIT_CODE=0
 
-deploy_nginx() {
+source ${ROOT_DIR}/hack/common.sh
+
+deploy() {
 	kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 }
 
-wait_nginx(){
+wait(){
 	echo "Wait for nginx deployment."
 	wait_for_pods "ingress-nginx" "$MAX_RETRIES" "$SLEEP_TIME" || EXIT_CODE=$?
 
@@ -23,7 +23,7 @@ wait_nginx(){
 	fi
 }
 
-delete_nginx(){
+delete(){
 	kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 }
 
@@ -36,15 +36,15 @@ EOF
 case "$op" in
 	cleanup)
 		header_text "Uninstalling NGINX"
-		delete_nginx
+		delete
 		;;
 	deploy-wait)
 		header_text "wait for NGINX deployment"
-		wait_nginx
+		wait
 		;;
 	deploy)
 		header_text "Installing NGINX"
-		deploy_nginx
+		deploy
 		;;
 	*)
 		usage
