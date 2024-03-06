@@ -12,17 +12,14 @@ from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
 
 
-# create launcher
-launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
 # create parameters
 
 blocklist_conf_url = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "domains"))
-blocklist_annotation_column_name = "url_blocklisting_refinedweb"
+blocklist_annotation_column_name = "blocklisted"
 blocklist_doc_source_url_column = "title"
 
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
-output_folder = os.path.join(input_folder, "output")
-Path(output_folder).mkdir(parents=True, exist_ok=True)
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
@@ -44,7 +41,12 @@ params = {
     annotation_column_name_key: blocklist_annotation_column_name,
     source_url_column_name_key: blocklist_doc_source_url_column,
 }
-sys.argv = ParamsUtils.dict_to_req(d=params)
 
 # launch
-launcher.launch()
+if __name__ == "__main__":
+    sys.argv = ParamsUtils.dict_to_req(d=params)
+    # create launcher
+    Path(output_folder).mkdir(parents=True, exist_ok=True)
+    launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
+    # Launch the ray actor(s) to process the input
+    launcher.launch()
