@@ -27,6 +27,14 @@ In general, a common prefix (i.e. `mytransform_`) is used to help distinguish th
 for ease-of-use/readability command line use, logging, etc.  This is not required, but
 strongly recommended.
 
+## Building the docker image
+Generally to build a docker image, each project has the following
+* `Dockerfile`, 
+* `requirements.txt`, `src` 
+* `src` directory containing the transform source.  This is usually copied into the image.
+* `Makefile` - defines the DOCKER_IMAGE_NAME and DOCKER_IMAGE_VERSION and supports
+the conventional targets including `make build` that creates the image.
+
 ## IDE Setup
 When running in an IDE, such as PyCharm, the following are generally assumed:
 * Build the venv using `make venv` and add this as a virtual environment to the IDE's project.
