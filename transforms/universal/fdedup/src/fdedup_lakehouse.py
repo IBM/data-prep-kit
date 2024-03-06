@@ -3,7 +3,7 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from fdedup_implementation import FdedupTableTransformConfiguration
+from fdedup_transform import FdedupTableTransformConfiguration
 
 
 # create launcher

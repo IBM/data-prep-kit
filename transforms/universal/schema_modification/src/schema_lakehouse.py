@@ -3,7 +3,7 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from schema_modification_implementation import SchemaTransformConfiguration
+from schema_transform import SchemaTransformConfiguration
 
 
 # create launcher

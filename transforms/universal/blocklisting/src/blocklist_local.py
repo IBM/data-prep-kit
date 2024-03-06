@@ -2,11 +2,7 @@ import os
 import sys
 from pathlib import Path
 
-
-print(f"sys.path = {sys.path}")
-
 from blocklist_transform import (
-    BlockListTransform,
     BlockListTransformConfiguration,
     annotation_column_name_key,
     blocked_domain_list_url_key,
