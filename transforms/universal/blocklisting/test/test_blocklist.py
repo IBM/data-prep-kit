@@ -1,7 +1,8 @@
-from typing import Tuple
+import sys
+sys.path.append("../src")
 
+import pyarrow as pa
 import blocklist_transform
-import polars as pl
 from blocklist_transform import BlockListTransform
 from data_processing.data_access import DataAccessLocal
 from data_processing.test_support.transform import AbstractTransformTest
@@ -13,63 +14,48 @@ class TestBlockListTransform(AbstractTransformTest):
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
 
-    def get_test_transform_fixtures(self) -> list[Tuple]:
-        config = {blocklist_transform.blocked_domain_list_url_key: "test-data/domains/arjel"}
+    def get_test_transform_fixtures(self) -> list[tuple]:
+        config = {blocklist_transform.blocked_domain_list_url_key: "../test-data/domains/arjel"}
         fixtures = [
             (
                 BlockListTransform(config),
-                [self.input_df.to_arrow()],
-                [self.expected_output_df.to_arrow()],
+                [self.input_df],
+                [self.expected_output_df],
                 self.expected_metadata_list,
             ),
         ]
         return fixtures
 
     # test data
-    input_df = pl.DataFrame(
-        {
-            "title": [
-                "https://poker",
-                "https://poker.fr",
-                "https://poker.foo.bar",
-                "https://abc.efg.com",
-                "http://asdf.qwer.com/welcome.htm",
-                "http://aasdf.qwer.com/welcome.htm",
-                "https://zxcv.xxx/index.asp",
-            ]
-        }
-    )
+    titles = pa.array([
+        "https://poker",
+        "https://poker.fr",
+        "https://poker.foo.bar",
+        "https://abc.efg.com",
+        "http://asdf.qwer.com/welcome.htm",
+        "http://aasdf.qwer.com/welcome.htm",
+        "https://zxcv.xxx/index.asp",
+    ])
+    names = ["title"]
+    input_df = pa.Table.from_arrays([titles], names=names)
     # poker
     # poker.fr
     # poker.foo.bar
-
-    expected_output_df = pl.DataFrame(
-        {
-            "title": [
-                "https://poker",
-                "https://poker.fr",
-                "https://poker.foo.bar",
-                "https://abc.efg.com",
-                "http://asdf.qwer.com/welcome.htm",
-                "http://aasdf.qwer.com/welcome.htm",
-                "https://zxcv.xxx/index.asp",
-            ],
-            "url_blocklisting_refinedweb": [
-                "poker",
-                "poker.fr",
-                "poker.foo.bar",
-                "",
-                "",
-                "",
-                "",
-            ],
-        }
-    )
-
+    block_list = pa.array([
+        "poker",
+        "poker.fr",
+        "poker.foo.bar",
+        "",
+        "",
+        "",
+        "",
+    ])
+    names1 = ["title", "url_blocklisting_refinedweb"]
+    expected_output_df = pa.Table.from_arrays([titles, block_list], names=names1)
     expected_metadata_list = [
         {
             "total_docs_count": 7,
-            "blocklisted_docs_count": 3,
+            "block_listed_docs_count": 3,
         },  # transform() metadata
         {},  # Empty flush() metadata
     ]
