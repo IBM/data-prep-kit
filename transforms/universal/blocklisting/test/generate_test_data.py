@@ -6,8 +6,8 @@ from test_blocklist import TestBlockListTransform
 # It generates the test and out put data into the input and expected directories.
 if __name__ == "__main__":
     t = TestBlockListTransform()
-    inp = t.input_df.to_arrow()
-    out = t.expected_output_df.to_arrow()
+    inp = t.input_df
+    out = t.expected_output_df
     config = {"input_folder": "../test-data", "output_folder": "../test-data"}
     data_access = DataAccessLocal(config, [], False, -1)
     data_access.save_table("input/test1.parquet", inp)

@@ -15,11 +15,11 @@ class KubeRayAPIs:
             base - the URL of the API server (default is set to the standalone API server)
             wait interval - the amount of sec to wait between checking for cluster ready
     """
-    def __init__(self, server_url: str = "http://localhost:8080", token: str = None, http_retries: int = 5,
-                 wait_interval: int = 2):
+    def __init__(self, server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
+                 token: str = None, http_retries: int = 5, wait_interval: int = 2):
         """
         Initializer
-        :param server_url: API server url
+        :param server_url: API server url - default assuming running it inside the cluster
         :param token: token, only used for API server with security enabled
         :param wait_interval: wait interval
         :param http_retries: http retries
@@ -39,6 +39,8 @@ class KubeRayAPIs:
             message - only returned if http return code is not equal to 200
             list of compute templates
         """
+        status = 200
+        message = None
         # Execute HTTP request
         url = self.server_url + self.api_base + "compute_templates"
         for i in range(self.http_retries):
@@ -48,10 +50,14 @@ class KubeRayAPIs:
                     return response.status_code, None, templates_decoder(response.json())
                 else:
                     print(f"Failed to list compute templates, status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to list compute templates, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"], None
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message, None
 
     def list_compute_templates_namespace(self, ns: str) -> tuple[int, str, list[Template]]:
         """
@@ -62,6 +68,8 @@ class KubeRayAPIs:
             message - only returned if http return code is not equal to 200
             list of compute templates
         """
+        status = 200
+        message = None
         # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/compute_templates"
         for i in range(self.http_retries):
@@ -71,10 +79,14 @@ class KubeRayAPIs:
                     return response.status_code, None, templates_decoder(response.json())
                 else:
                     print(f"Failed to list compute templates for namespace {ns}, status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to list compute templates for namespace {ns}, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"], None
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message, None
 
     def get_compute_template(self, ns: str, name: str) -> tuple[int, str, Template]:
         """
@@ -86,6 +98,8 @@ class KubeRayAPIs:
             message - only returned if http return code is not equal to 200
             compute templates
         """
+        status = 200
+        message = None
         # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/compute_templates/{name}"
         for i in range(self.http_retries):
@@ -95,10 +109,14 @@ class KubeRayAPIs:
                     return response.status_code, None, template_decoder(response.json())
                 else:
                     print(f"Failed to get compute template {name} for namespace {ns}, status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to get compute template {name} for namespace {ns}, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"], None
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message, None
 
     def create_compute_template(self, template: Template) -> tuple[int, str]:
         """
@@ -108,6 +126,8 @@ class KubeRayAPIs:
             http return code
             message - only returned if http return code is not equal to 200
         """
+        status = 200
+        message = None
         # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{template.namespace}/compute_templates"
         for i in range(self.http_retries):
@@ -117,10 +137,14 @@ class KubeRayAPIs:
                     return response.status_code, None
                 else:
                     print(f"Failed to create compute template, status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to create compute template, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"]
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message
 
     def delete_compute_template(self, ns: str, name: str) -> tuple[int, str]:
         """
@@ -131,6 +155,8 @@ class KubeRayAPIs:
             http return code
             message - only returned if http return code is not equal to 200
         """
+        status = 200
+        message = None
         # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/compute_templates/{name}"
         for i in range(self.http_retries):
@@ -140,10 +166,14 @@ class KubeRayAPIs:
                     return response.status_code, None
                 else:
                     print(f"Failed to delete compute template, status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to delete compute template, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"]
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message
 
     def list_clusters(self) -> tuple[int, str, list[Cluster]]:
         """
@@ -153,6 +183,8 @@ class KubeRayAPIs:
             message - only returned if http return code is not equal to 200
             list of clusters
         """
+        status = 200
+        message = None
         # Execute HTTP request
         url = self.server_url + self.api_base + "clusters"
         for i in range(self.http_retries):
@@ -162,10 +194,14 @@ class KubeRayAPIs:
                     return response.status_code, None, clusters_decoder(response.json())
                 else:
                     print(f"Failed to list cluster, status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to list cluster, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"], None
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message, None
 
     def list_clusters_namespace(self, ns: str) -> tuple[int, str, list[Cluster]]:
         """
@@ -176,6 +212,8 @@ class KubeRayAPIs:
             message - only returned if http return code is not equal to 200
             list of clusters
         """
+        status = 200
+        message = None
         # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/clusters"
         for i in range(self.http_retries):
@@ -185,10 +223,14 @@ class KubeRayAPIs:
                     return response.status_code, None, clusters_decoder(response.json())
                 else:
                     print(f"Failed to list clusters in namespace {ns}, status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to list clusters in namespace {ns}, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"], None
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message, None
 
     def get_cluster(self, ns: str, name: str) -> tuple[int, str, Cluster]:
         """
@@ -200,6 +242,8 @@ class KubeRayAPIs:
             message - only returned if http return code is not equal to 200
             clusters definition
         """
+        status = 200
+        message = None
         # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/clusters/{name}"
         for i in range(self.http_retries):
@@ -209,10 +253,14 @@ class KubeRayAPIs:
                     return response.status_code, None, cluster_decoder(response.json())
                 else:
                     print(f"Failed to get cluster {name} in namespace {ns}, status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to get cluster {name} in namespace {ns}, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"], None
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message, None
 
     def create_cluster(self, cluster: Cluster) -> tuple[int, str]:
         """
@@ -222,6 +270,8 @@ class KubeRayAPIs:
             http return code
             message - only returned if http return code is not equal to 200
         """
+        status = 200
+        message = None
         # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{cluster.namespace}/clusters"
         for i in range(self.http_retries):
@@ -231,10 +281,14 @@ class KubeRayAPIs:
                     return response.status_code, None
                 else:
                     print(f"Failed to create cluster , status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to create cluster , exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"]
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message
 
     def get_cluster_status(self, ns: str, name: str) -> tuple[int, str, str]:
         """
@@ -310,6 +364,8 @@ class KubeRayAPIs:
             http return code
             message - only returned if http return code is not equal to 200
         """
+        status = 200
+        message = None
         # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/clusters/{name}"
         for i in range(self.http_retries):
@@ -319,10 +375,14 @@ class KubeRayAPIs:
                     return response.status_code, None
                 else:
                     print(f"Failed to delete cluster , status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to delete cluster , exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"]
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message
 
     def submit_job(self, ns: str, name: str, job_request: RayJobRequest) -> tuple[int, str, str]:
         """
@@ -335,6 +395,9 @@ class KubeRayAPIs:
             message - only returned if http return code is not equal to 200
             submission id
         """
+        status = 200
+        message = None
+        # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}"
         for i in range(self.http_retries):
             try:
@@ -344,10 +407,14 @@ class KubeRayAPIs:
                 else:
                     print(f"Failed to submit job to the cluster {name} in namespace {ns}, "
                           f"status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to submit job to the cluster {name} in namespace {ns}, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"], None
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message, None
 
     def get_job_info(self, ns: str, name: str, sid: str) -> tuple[int, str, RayJobInfo]:
         """
@@ -360,6 +427,9 @@ class KubeRayAPIs:
             message - only returned if http return code is not equal to 200
             RayJobInfo object
         """
+        status = 200
+        message = None
+        # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}/{sid}"
         for i in range(self.http_retries):
             try:
@@ -369,10 +439,14 @@ class KubeRayAPIs:
                 else:
                     print(f"Failed to get job {sid} from the cluster {name} in namespace {ns}, "
                           f"status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to get job {sid} from the cluster {name} in namespace {ns}, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"], None
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message, None
 
     def list_job_info(self, ns: str, name: str) -> tuple[int, str, list[RayJobInfo]]:
         """
@@ -384,6 +458,9 @@ class KubeRayAPIs:
             message - only returned if http return code is not equal to 200
             list of RayJobInfo object
         """
+        status = 200
+        message = None
+        # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}"
         for i in range(self.http_retries):
             try:
@@ -394,10 +471,14 @@ class KubeRayAPIs:
                 else:
                     print(f"Failed to list jobs from the cluster {name} in namespace {ns}, "
                           f"status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to list jobs from the cluster {name} in namespace {ns}, exception : {e}")
-                time.sleep(1)
-        return response.status_code, None, []
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message, []
 
     def get_job_log(self, ns: str, name: str, sid: str) -> tuple[int, str, str]:
         """
@@ -410,6 +491,9 @@ class KubeRayAPIs:
             message - only returned if http return code is not equal to 200
             log
         """
+        status = 200
+        message = None
+        # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}/log/{sid}"
         for i in range(self.http_retries):
             try:
@@ -417,11 +501,16 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, response.json().get("log", "")
                 else:
-                    print(f"Failed to get log for jobs {sid} from the cluster {name} in namespace {ns}, status : {response.status_code}")
+                    print(f"Failed to get log for jobs {sid} from the cluster {name} in namespace {ns}, "
+                          f"status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to get log for jobs {sid} from the cluster {name} in namespace {ns}, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"], None
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message, None
 
     def stop_ray_job(self, ns: str, name: str, sid: str) -> tuple[int, str]:
         """
@@ -433,6 +522,9 @@ class KubeRayAPIs:
             http return code
             message - only returned if http return code is not equal to 200
         """
+        status = 200
+        message = None
+        # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}/{sid}"
         for i in range(self.http_retries):
             try:
@@ -440,11 +532,16 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 else:
-                    print(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, status : {response.status_code}")
+                    print(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, "
+                          f"status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"]
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message
 
     def delete_ray_job(self, ns: str, name: str, sid: str) -> tuple[int, str]:
         """
@@ -456,6 +553,9 @@ class KubeRayAPIs:
             http return code
             message - only returned if http return code is not equal to 200
         """
+        status = 200
+        message = None
+        # Execute HTTP request
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}/{sid}"
         for i in range(self.http_retries):
             try:
@@ -465,7 +565,11 @@ class KubeRayAPIs:
                 else:
                     print(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, "
                           f"status : {response.status_code}")
+                    status = response.status_code
+                    message = response.json()["message"]
             except Exception as e:
                 print(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, exception : {e}")
-                time.sleep(1)
-        return response.status_code, response.json()["message"]
+                status = 500
+                message = str(e)
+            time.sleep(1)
+        return status, message

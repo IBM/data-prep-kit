@@ -3,7 +3,7 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from split_file_implementation import SplitFileTransformConfiguration
+from split_file_transform import SplitFileTransformConfiguration
 
 
 print(os.environ)

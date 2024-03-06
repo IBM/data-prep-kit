@@ -8,7 +8,7 @@ from ray.actor import ActorHandle
 
 class DefaultTableTransformRuntime:
     """
-    Transformer runtime used by processor to to create Mutator specific environment
+    Transformer runtime used by processor to to create Transform specific environment
     """
 
     def __init__(self, params: dict[str, Any]):

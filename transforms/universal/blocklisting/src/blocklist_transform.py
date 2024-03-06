@@ -3,7 +3,6 @@ import re
 from typing import Any
 from urllib.parse import urlparse
 
-import polars as pl
 import pyarrow as pa
 import pygtrie
 import ray
@@ -14,9 +13,7 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import get_logger
-
-# from blocklist_utils import build_trie_struct, read_domain_list, reverse_url
+from data_processing.utils import TransformUtils, get_logger
 from ray.actor import ActorHandle
 
 
@@ -24,19 +21,19 @@ logger = get_logger(__name__)
 
 
 def reverse_url(url: str) -> str:
-    urllist = re.sub("[a-zA-Z]+:/+", "", url).split(".")
-    urllist.reverse()
-    return ".".join(urllist)
+    url_list = re.sub("[a-zA-Z]+:/+", "", url).split(".")
+    url_list.reverse()
+    return ".".join(url_list)
 
 
-def get_domain_list(domainlist_url: str, data_access: DataAccess = None):
+def get_domain_list(domain_list_url: str, data_access: DataAccess = None):
     domain_list = []
     if data_access is None:
-        logger.info(f"Reading domain list in from {domainlist_url} as ")
+        logger.info(f"Reading domain list in from {domain_list_url} as ")
         config = {"input_folder": "/tmp", "output_folder": "/tmp"}
         data_access = DataAccessLocal(config, [], False, -1)
-    logger.info(f"Reading domain list from {domainlist_url} ")
-    blocklist_file_dict = data_access.get_folder_files(domainlist_url)
+    logger.info(f"Reading domain list from {domain_list_url} ")
+    blocklist_file_dict = data_access.get_folder_files(domain_list_url)
     for file_name, file_contents in blocklist_file_dict.items():
         domains = file_contents.decode("utf-8").split("\n")
         domain_list_from_file = [domain.strip() for domain in domains if not domain.startswith("#")]
@@ -47,27 +44,25 @@ def get_domain_list(domainlist_url: str, data_access: DataAccess = None):
     return domain_list
 
 
-### Configuration keys
-
 annotation_column_name_key = "bl_annotation_column_name"
 """ Key holds the name of the column to create in the output table"""
 source_url_column_name_key = "bl_source_url_column_name"
 """ Key holds the name of the column holding the URL from which the document was retrieved"""
 blocked_domain_list_path_key = "bl_blocked_domain_list_path"
 """ Key holds the directory holding 1 or more domain* files listing the urls to identify """
-blocked_domain_list_url_default = "cos-optimal-llm-pile/spark_test/remove-cma-1/blocklists_refinedweb_subset/"
+blocked_domain_list_path_default = "cos-optimal-llm-pile/spark_test/remove-cma-1/blocklists_refinedweb_subset/"
 """ The default value for the domain list URL"""
 annotation_column_name_default = "blocklisted"
-""" """
+""" The default name of the annotation column """
 source_column_name_default = "title"
-""" """
+""" The default name of the column containing the source url"""
 domain_refs_key = "__domain_refs"
 """ A hidden key used by the runtime to pass a ray object reference to the transform"""
 
 
 class BlockListTransform(AbstractTableTransform):
     """
-    Implements blocklisting - given a set of documents and the URLs they were
+    Implements block listing - given a set of documents and the URLs they were
     downloaded from, mark the documents that are from block listed domains
     """
 
@@ -84,36 +79,40 @@ class BlockListTransform(AbstractTableTransform):
         self.blocklist_annotation_column_name = config.get(annotation_column_name_key, annotation_column_name_default)
         self.source_url_column_name = config.get(source_url_column_name_key, source_column_name_default)
         runtime_provided_domain_refs = config.get(domain_refs_key, None)
-        domain_list = None
-
-        if runtime_provided_domain_refs is not None:  # The load the blocklist here.
-            try:
-                domain_list = ray.get(runtime_provided_domain_refs)
-            except Exception as e:
-                msg1 = "Exception loading list of block listed domains from ray runtime"
-                msg2 = f"Exception loading list of block listed domains from ray runtime: {e}"
-                logger.error(msg2)
-        if domain_list is None:
-            url = config.get(blocked_domain_list_path_key, blocked_domain_list_url_default)
+        if runtime_provided_domain_refs is None:
+            # this is only useful during local debugging without Ray
+            url = config.get(blocked_domain_list_path_key, blocked_domain_list_path_default)
             if url is None:
                 raise RuntimeError(f"Missing configuration value for key {annotation_column_name_key}")
             domain_list = get_domain_list(url)
-
+        else:
+            # This is recommended for production approach. In this case domain list is build by the
+            # runtime once, loaded to the object store and can be accessed by actors without additional reads
+            try:
+                domain_list = ray.get(runtime_provided_domain_refs)
+            except Exception as e:
+                logger.info(f"Exception loading list of block listed domains from ray object storage {e}")
+                raise RuntimeError(f"exception loading from object storage for key {runtime_provided_domain_refs}")
         # build trie structure for block listing
         self.trie = pygtrie.StringTrie(separator=".")
-
         for url in domain_list:
             self.trie[reverse_url(url)] = ""
         del domain_list
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
         """
-        TODO: update this description (Put Transform-specific to convert one Table to another Table.
-        This implementation makes no modifications so effectively implements a copy of the input parquet to the output folder, without modification.)
+        This implementation makes no modifications so effectively implements a copy of the input
+        parquet to the output folder, without modification.
+        :param table: input table
+        :return: list of output tables and custom statistics
         """
 
-        def check_blocklist_trie(url):
-            # to block
+        def check_blocklist_trie(url) -> str:
+            """
+            Check if url is block listed
+            :param url:
+            :return: block listing value
+            """
             url_netloc = urlparse(url).netloc
             if isinstance(
                 self.trie.shortest_prefix(reverse_url(url_netloc)),
@@ -123,28 +122,22 @@ class BlockListTransform(AbstractTableTransform):
             else:
                 return ""
 
-        in_df = pl.from_arrow(table)
-        out_df = in_df.with_columns(
-            pl.col(self.source_url_column_name)
-            .map_elements(check_blocklist_trie)
-            .alias(self.blocklist_annotation_column_name)
-        )
-        out_table = out_df.to_arrow()
-        # metadata for block listing includes the total number of documents
-        # and the count of block listed documents
-        total_docs_count = len(out_table)
-        blocklisted_docs_count = len(
-            out_df.select(
-                pl.col(self.blocklist_annotation_column_name).filter(
-                    pl.col(self.blocklist_annotation_column_name).ne("")
-                )
-            )
-        )
+        block_listed = [""] * table.num_rows
+        index = 0
+        block_listed_docs_count = 0
+        for url_value in table[self.source_url_column_name]:
+            block_listed_value = check_blocklist_trie(str(url_value))
+            if block_listed_value != "":
+                block_listed_docs_count += 1
+            block_listed[index] = block_listed_value
+            index += 1
         metadata = {
-            "total_docs_count": total_docs_count,
-            "blocklisted_docs_count": blocklisted_docs_count,
+            "total_docs_count": table.num_rows,
+            "block_listed_docs_count": block_listed_docs_count,
         }
-        return [out_table], metadata
+        return [
+            TransformUtils.add_column(table=table, name=self.blocklist_annotation_column_name, content=block_listed)
+        ], metadata
 
 
 class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
@@ -169,7 +162,7 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
             f"--{blocked_domain_list_path_key}",
             type=str,
             required=False,
-            default=blocked_domain_list_url_default,
+            default=blocked_domain_list_path_default,
             help="COS URL or local folder (file or directory) that points to the list of block listed domains.  "
             "If not running in Ray, this must be a local folder.",
         )
@@ -238,29 +231,6 @@ class BlockListRuntime(DefaultTableTransformRuntime):
         return {domain_refs_key: domain_refs} | self.params
 
 
-# if __name__ == "__main__":
-#     launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
-#     launcher.launch()
-
-
 if __name__ == "__main__":
     launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
     launcher.launch()
-
-# if __name__ == "__main__":
-#     # Not currently used, but shows how one might use the two classes above outside of ray.
-#     dotenv_path = os.path.join(os.getenv("HOME"), ".gmf_env")
-#     load_dotenv(dotenv_path=dotenv_path)
-#     parser = argparse.ArgumentParser()
-#     runtime = BlockListTransformRuntime()
-#     runtime.add_mutator_cli_args(parser)
-#     args = parser.parse_args()
-#     mutator = BlockListTransform(vars(args))
-#     # Sample table
-#     pq_path = os.path.join(os.getenv("HOME"), "de", "blocklist.parquet")
-#     df_pl = pl.read_parquet(pq_path)
-#     tbl_arrow = df_pl.to_arrow()
-#     out_table, meta = mutator.mutate(tbl_arrow)
-#     out_df = pl.from_arrow(out_table)
-#     print(out_df)
-#     print(json.dumps(meta, indent=2, default=str))

@@ -2,7 +2,7 @@ from typing import Any
 import enum
 
 from kfp_support.api_server_client.params import (BaseVolume, EnvironmentVariables,
-                                                  volume_decoder, environmentvariables_decoder)
+                                                  volume_decoder, environment_variables_decoder)
 
 DEFAULT_HEAD_START_PARAMS = {"dashboard-host": "0.0.0.0", "metrics-export-port": "8080", "num-cpus": "0"}
 
@@ -149,7 +149,7 @@ def head_node_spec_decoder(dct: dict[str, Any]) -> HeadNodeSpec:
         volumes = [volume_decoder(v) for v in dct["volumes"]]
     environments = None
     if "environment" in dct and len(dct.get("environment")) > 0:
-        environments = environmentvariables_decoder(dct.get("environment"))
+        environments = environment_variables_decoder(dct.get("environment"))
     return HeadNodeSpec(compute_template=dct.get("computeTemplate"), ray_start_params=dct.get("rayStartParams"),
                         image=dct.get("image"), service_type=service_type,
                         enable_ingress=dct.get("enableIngress", False),

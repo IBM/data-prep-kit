@@ -13,7 +13,7 @@ def test_templates():
     Test template
     """
     # create API server
-    apis = KubeRayAPIs()
+    apis = KubeRayAPIs(server_url="http://localhost:8080/ray")
     # cleanup
     _, _ = apis.delete_compute_template(ns="default", name="default-template")
     # create
@@ -58,7 +58,7 @@ def test_cluster():
     Test cluster
     """
     # create API server
-    apis = KubeRayAPIs()
+    apis = KubeRayAPIs(server_url="http://localhost:8080/ray")
     # cleanup
     _, _ = apis.delete_compute_template(ns="default", name="default-template")
     _, _ = apis.delete_cluster(ns="default", name="test")
@@ -135,7 +135,7 @@ def test_job_submission():
     :return: 
     """
     # create API server
-    apis = KubeRayAPIs()
+    apis = KubeRayAPIs(server_url="http://localhost:8080/ray")
     # cleanup
     _, _ = apis.delete_compute_template(ns="default", name="default-template")
     _, _ = apis.delete_cluster(ns="default", name="test-job")
