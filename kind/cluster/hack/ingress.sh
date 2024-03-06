@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -x
+
 op=$1
 
 source ${ROOT_DIR}/hack/common.sh
