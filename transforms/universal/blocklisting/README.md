@@ -8,11 +8,11 @@ testing and IDE set up.
 The block listing annotator/transform maps an input table to an output table
 by  using a list of domains that are intended to be blocked 
 (i.e. ultimately removed from the tables).
-The input table contains column, by default named `title`,
+The input table contains a column, by default named `title`,
 that holds the source url for the content in a given row.
 The output table is annotated to include a new column,
 named `blocklisted` by default, that contains the name
-of the blocked domain.  If the value in the `title` column
+of the blocked domain.  If the value of the source url 
 does not match any of the blocked domains, it will be empty.
 
 ## Configuration and command line Options
