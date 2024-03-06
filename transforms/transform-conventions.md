@@ -2,10 +2,12 @@
 
 The transform projects leverage the recursive `make` targets defined at the top of the repo (e.g. build, clean, test, etc).
  
-## Organization
+## Project Organization
+1. `src` directory contain python source for the transform
+1. `test` directory contains test sources - usually a standalone test and ray launcher test.
+1. `requirements.txt` - used to create both the `venv` directory and docker image
 1. A virtual environment (created in `venv` directory) is used for development and testing
 1. A generic `Dockerfile` is available that should be sufficient for most transforms.  
-1. `requirements.txt` is used to create both the `venv` directory and docker image
 1. Makefile is used for most common operations
     * venv - builds the python virtual environment for CLI and IDE use
     * test - runs the test in the `test` directory.
@@ -28,12 +30,9 @@ for ease-of-use/readability command line use, logging, etc.  This is not require
 strongly recommended.
 
 ## Building the docker image
-Generally to build a docker image, each project has the following
-* `Dockerfile`, 
-* `requirements.txt`, `src` 
-* `src` directory containing the transform source.  This is usually copied into the image.
-* `Makefile` - defines the DOCKER_IMAGE_NAME and DOCKER_IMAGE_VERSION and supports
-the conventional targets including `make build` that creates the image.
+Generally to build a docker image, one uses the `make build` command, which uses
+the `Dockerfile`, which in turn uses the `src` and `requirements.txt` to build the image. 
+Note that the `Makefile` defines the DOCKER_IMAGE_NAME and DOCKER_IMAGE_VERSION.
 
 ## IDE Setup
 When running in an IDE, such as PyCharm, the following are generally assumed:
