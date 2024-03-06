@@ -19,6 +19,8 @@ deploy() {
 	# Disable the public endpoint
 	# ref: https://www.kubeflow.org/docs/components/pipelines/v1/installation/standalone-deployment/#disable-the-public-endpoint
 	sed -i.back '/inverse-proxy$/d' manifests/kustomize/env/dev/kustomization.yaml
+	sed -i.back 's/30Mi/60Mi/' manifests/kustomize/third-party/application/application-controller-deployment.yaml
+	sed -i.back 's/20Mi/60Mi/' manifests/kustomize/third-party/application/application-controller-deployment.yaml
 	deploy_with_retries "-k" "manifests/kustomize/env/dev" "$MAX_RETRIES" "$SLEEP_TIME" || EXIT_CODE=$?
 	if [[ $EXIT_CODE -ne 0 ]]
 	then

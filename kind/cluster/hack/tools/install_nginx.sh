@@ -27,6 +27,12 @@ delete_nginx(){
 	kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 }
 
+usage(){
+        cat <<EOF
+"Usage: ./install_nginx.sh [cleanup|deploy-wait|deploy]"
+EOF
+}
+
 case "$op" in
 	cleanup)
 		header_text "Uninstalling NGINX"
@@ -36,9 +42,12 @@ case "$op" in
 		header_text "wait for NGINX deployment"
 		wait_nginx
 		;;
-	*)
+	deploy)
 		header_text "Installing NGINX"
 		deploy_nginx
+		;;
+	*)
+		usage
 		;;
 esac
 
