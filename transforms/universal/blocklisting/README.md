@@ -32,6 +32,7 @@ transform the `test1.parquet` file in [test input data](test-data/input)
 to an `output` directory.  The directory will contain both the new
 annotated `test.parquet` file and the `metadata.json` file.
 <pre>
+% make venv
 % source venv/bin/activate
 (venv) % cd src
 (venv) % python blocklist_local.py
