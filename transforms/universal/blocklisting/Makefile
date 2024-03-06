@@ -12,7 +12,9 @@ DOCKER_IMAGE_VERSION=0.1.0
 # Use default rule inherited from makefile.common
 clean: .clean
 
+	#export PYTHONPATH=../src:.:$$PYTHONPATH; \
 # Use default rule inherited from makefile.common
+
 test: .test
 
 # Use default rule inherited from makefile.common

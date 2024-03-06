@@ -111,6 +111,6 @@ help:
 .PHONY: .test
 .test:  
 	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
-	source venv/bin/activate;		\
-	export PYTHONPATH=src:test:$$PYTHONPATH; \
-	pytest test
+	source venv/bin/activate;			\
+	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
+	cd test; pytest . 

@@ -50,6 +50,7 @@ class AbstractTest:
         for i in range(l1):
             t1 = table_list[i]
             t2 = expected_table_list[i]
+            assert t1.schema == t2.schema, f"Schema of the two tables is not the same"
             l1 = t1.num_rows
             l2 = t2.num_rows
             assert l1 == l2, f"Number of rows in table #{i} ({l1}) does not match expected number ({l2})"

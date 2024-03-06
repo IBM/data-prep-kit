@@ -1,8 +1,5 @@
 import argparse
-import json
 import re
-import sys
-import urllib
 from typing import Any
 from urllib.parse import urlparse
 
@@ -20,7 +17,6 @@ from data_processing.transform import AbstractTableTransform
 from data_processing.utils import get_logger
 
 # from blocklist_utils import build_trie_struct, read_domain_list, reverse_url
-from dotenv import load_dotenv
 from ray.actor import ActorHandle
 
 
@@ -54,11 +50,17 @@ def get_domain_list(domainlist_url: str, data_access: DataAccess = None):
 ### Configuration keys
 
 annotation_column_name_key = "bl_annotation_column_name"
+""" Key holds the name of the column to create in the output table"""
 source_url_column_name_key = "bl_source_url_column_name"
-blocked_domain_list_url_key = "bl_blocked_domain_list_url"
+""" Key holds the name of the column holding the URL from which the document was retrieved"""
+blocked_domain_list_path_key = "bl_blocked_domain_list_path"
+""" Key holds the directory holding 1 or more domain* files listing the urls to identify """
 blocked_domain_list_url_default = "cos-optimal-llm-pile/spark_test/remove-cma-1/blocklists_refinedweb_subset/"
-annotation_column_name_default = "url_blocklisting_refinedweb"
+""" The default value for the domain list URL"""
+annotation_column_name_default = "blocklisted"
+""" """
 source_column_name_default = "title"
+""" """
 domain_refs_key = "__domain_refs"
 """ A hidden key used by the runtime to pass a ray object reference to the transform"""
 
@@ -78,6 +80,7 @@ class BlockListTransform(AbstractTableTransform):
         """
 
         super().__init__(config)
+        logger.info(f"Blocklist config:{config}")
         self.blocklist_annotation_column_name = config.get(annotation_column_name_key, annotation_column_name_default)
         self.source_url_column_name = config.get(source_url_column_name_key, source_column_name_default)
         runtime_provided_domain_refs = config.get(domain_refs_key, None)
@@ -91,7 +94,7 @@ class BlockListTransform(AbstractTableTransform):
                 msg2 = f"Exception loading list of block listed domains from ray runtime: {e}"
                 logger.error(msg2)
         if domain_list is None:
-            url = config.get(blocked_domain_list_url_key, blocked_domain_list_url_default)
+            url = config.get(blocked_domain_list_path_key, blocked_domain_list_url_default)
             if url is None:
                 raise RuntimeError(f"Missing configuration value for key {annotation_column_name_key}")
             domain_list = get_domain_list(url)
@@ -163,7 +166,7 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            f"--{blocked_domain_list_url_key}",
+            f"--{blocked_domain_list_path_key}",
             type=str,
             required=False,
             default=blocked_domain_list_url_default,
@@ -193,7 +196,7 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         dargs = vars(args)
-        self.params[blocked_domain_list_url_key] = dargs.get(blocked_domain_list_url_key)
+        self.params[blocked_domain_list_path_key] = dargs.get(blocked_domain_list_path_key)
         self.params[annotation_column_name_key] = dargs.get(annotation_column_name_key)
         self.params[source_url_column_name_key] = dargs.get(source_url_column_name_key)
         return True
@@ -226,9 +229,9 @@ class BlockListRuntime(DefaultTableTransformRuntime):
         """
         # create the list of blocked domains by reading the files at the conf_url location
         data_access = data_access_factory.create_data_access()
-        url = self.params.get(blocked_domain_list_url_key, None)
+        url = self.params.get(blocked_domain_list_path_key, None)
         if url is None:
-            raise RuntimeError(f"Missing configuration key {blocked_domain_list_url_key}")
+            raise RuntimeError(f"Missing configuration key {blocked_domain_list_path_key}")
         domain_list = get_domain_list(url, data_access)
         domain_refs = ray.put(list(domain_list))
         logger.info(f"{domain_refs_key} = {domain_refs}")

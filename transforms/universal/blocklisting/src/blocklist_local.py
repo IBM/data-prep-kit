@@ -9,7 +9,7 @@ from blocklist_transform import (
     BlockListTransform,
     BlockListTransformConfiguration,
     annotation_column_name_key,
-    blocked_domain_list_url_key,
+    blocked_domain_list_path_key,
     source_url_column_name_key,
 )
 from data_processing.ray import TransformLauncher
@@ -44,7 +44,7 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    blocked_domain_list_url_key: blocklist_conf_url,
+    blocked_domain_list_path_key: blocklist_conf_url,
     annotation_column_name_key: blocklist_annotation_column_name,
     source_url_column_name_key: blocklist_doc_source_url_column,
 }
