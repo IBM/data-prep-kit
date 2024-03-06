@@ -5,16 +5,11 @@ op=$1
 source ${ROOT_DIR}/hack/common.sh
 
 SLEEP_TIME="${SLEEP_TIME:-50}"
-MAX_RETRIES="${MAX_RETRIES:-10}"
-DEPLOYMENT_TIMEOUT="${DEPLOYMENT_TIMEOUT:-200}"
+MAX_RETRIES="${MAX_RETRIES:-20}"
 EXIT_CODE=0
-TEKTON_KFP_SERVER_VERSION=1.8.1
 
-wget https://raw.githubusercontent.com/kubeflow/kfp-tekton/v${TEKTON_KFP_SERVER_VERSION}/scripts/deploy/iks/helper-functions.sh -O /tmp/helper-functions.sh
-source /tmp/helper-functions.sh
-rm /tmp/helper-functions.sh
-
-deploy_kubeflow() {
+deploy() {
+	rm -rf /tmp/pipelines
 	cd /tmp
 	git clone https://github.com/kubeflow/pipelines.git
 	cd pipelines
@@ -31,13 +26,13 @@ deploy_kubeflow() {
 		exit 1
 	fi
 
-    # FIXME: avoid using cluster-admin role
+       # FIXME: avoid using cluster-admin role
 	kubectl create clusterrolebinding pipeline-runner-extend --clusterrole cluster-admin --serviceaccount=kubeflow:pipeline-runner
 	echo "Finished Kubeflow deployment."
 	rm -rf /tmp/pipelines
 }
 
-wait_kubeflow(){
+wait(){
 	echo "Wait for kubeflow deployment."
 	wait_for_pods "kubeflow" "$MAX_RETRIES" "$SLEEP_TIME" || EXIT_CODE=$?
 
@@ -48,23 +43,32 @@ wait_kubeflow(){
 	fi
 }
 
-delete_kubeflow(){
+delete(){
 	kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/cluster-scoped-resources?ref=$PIPELINE_VERSION"
 	kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/env/dev?ref=$PIPELINE_VERSION"
+}
+
+usage(){
+        cat <<EOF
+"Usage: ./install_kubeflow.sh [cleanup|deploy-wait|deploy]"
+EOF
 }
 
 case "$op" in
 	cleanup)
 		header_text "Uninstalling Kubeflow"
-		delete_kubeflow
+		delete
 		;;
 	deploy-wait)
 		header_text "wait for Kubeflow deployment"
-		wait_kubeflow
+		wait
+		;;
+	deploy)
+		header_text "Installing Kubeflow"
+		deploy
 		;;
 	*)
-		header_text "Installing Kubeflow"
-		deploy_kubeflow
-		;;
+		usage
+  	;;
 esac
 

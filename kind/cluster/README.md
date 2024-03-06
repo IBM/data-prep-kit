@@ -28,20 +28,20 @@ kind create cluster --name goofy --config ${ROOT_DIR}/hack/kind-cluster-config.y
 Install [Kubeflow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/installation/standalone-deployment/#deploying-kubeflow-pipelines) and wait for it to be ready:
 
 ```shell
-    PIPELINE_VERSION=1.8.5
-    cd /tmp
-	git clone https://github.com/kubeflow/pipelines.git
-	cd pipelines
-	git checkout tags/${PIPELINE_VERSION}
-	kubectl apply -k manifests/kustomize/cluster-scoped-resources
-	kubectl wait --for condition=established --timeout=60s crd/applications.app.k8s.io
-	sed -i '/inverse-proxy$/d' manifests/kustomize/env/dev/kustomization.yaml
-    kubectl apply -k manifests/kustomize/env/dev
-    kubectl wait --for=condition=ready --all pod -n kubeflow --timeout=240s
+PIPELINE_VERSION=1.8.5
+cd /tmp
+git clone https://github.com/kubeflow/pipelines.git
+cd pipelines
+git checkout tags/${PIPELINE_VERSION}
+kubectl apply -k manifests/kustomize/cluster-scoped-resources
+kubectl wait --for condition=established --timeout=60s crd/applications.app.k8s.io
+sed -i.back '/inverse-proxy$/d' manifests/kustomize/env/dev/kustomization.yaml
+kubectl apply -k manifests/kustomize/env/dev
+kubectl wait --for=condition=ready --all pod -n kubeflow --timeout=300s
 ```
 Add permissions with RBAC role:
 ```shell
-    kubectl create clusterrolebinding pipeline-runner-extend --clusterrole cluster-admin --serviceaccount=kubeflow:pipeline-runner
+kubectl create clusterrolebinding pipeline-runner-extend --clusterrole cluster-admin --serviceaccount=kubeflow:pipeline-runner
 ```
 
 ## Install KubeRay
@@ -76,29 +76,13 @@ kubectl wait --namespace ingress-nginx \
           --timeout=90s
 ```
 
-The endpoints for KFP and API server ingress use the same endpoint, hence only one of them should be employed concurrently.
-
-To deploy the ingress for apiserver:
+To deploy the ingress for ray apiserver and kfp execute the following:
 ```shell
 kubectl apply -f $ROOT_DIR/hack/ray_api_server_ingress.yaml
-```
-
-To deploy the ingress for kubeflow pipelines:
-```shell
 kubectl apply -f $ROOT_DIR/hack/kfp_ingress.yaml
 ```
 
-Open the Kubeflow Pipelines UI at  http://localhost:8080/#/pipelines
-
-Alternatively, port forwarding to localhost can be used to access the services externally:
-
-```shell
-kubectl port-forward service/ml-pipeline-ui -n kubeflow 8080:80 &
-
-kubectl port-forward service/kuberay-apiserver-service -n kuberay 8081:8888 &
-```
-
-Open the Kubeflow Pipelines UI at http://localhost:8080/
+Open the Kubeflow Pipelines UI at  http://localhost:8080/kfp/#/pipelines
 
 ## Cleanup
 
@@ -114,5 +98,5 @@ rm -rf /tmp/pipelines
 delete the cluster:
 
 ```shell
-kind delete cluster
+kind delete cluster --name goofy
 ```

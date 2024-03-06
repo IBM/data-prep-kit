@@ -6,15 +6,9 @@ source ${ROOT_DIR}/hack/common.sh
 
 SLEEP_TIME="${SLEEP_TIME:-30}"
 MAX_RETRIES="${MAX_RETRIES:-5}"
-DEPLOYMENT_TIMEOUT="${DEPLOYMENT_TIMEOUT:-200}"
 EXIT_CODE=0
-TEKTON_KFP_SERVER_VERSION=1.8.1
 
-wget https://raw.githubusercontent.com/kubeflow/kfp-tekton/v${TEKTON_KFP_SERVER_VERSION}/scripts/deploy/iks/helper-functions.sh -O /tmp/helper-functions.sh
-source /tmp/helper-functions.sh
-rm /tmp/helper-functions.sh
-
-deploy_kuberay() {
+deploy() {
 	helm repo add kuberay https://ray-project.github.io/kuberay-helm/
 	helm repo update
 	helm install kuberay-operator kuberay/kuberay-operator -n kuberay --version ${KUBERAY} --set image.pullPolicy=IfNotPresent --create-namespace
@@ -22,7 +16,7 @@ deploy_kuberay() {
 	echo "Finished KubeRay deployment."
 }
 
-wait_kuberay(){
+wait(){
 	echo "Wait for kuberay deployment."
 	wait_for_pods "kuberay" "$MAX_RETRIES" "$SLEEP_TIME" || EXIT_CODE=$?
 
@@ -33,22 +27,32 @@ wait_kuberay(){
 	fi
 }
 
-delete_kuberay(){
+delete(){
 	helm uninstall kuberay-operator -n kuberay
 }
+
+usage(){
+        cat <<EOF
+"Usage: ./install_kuberay.sh [cleanup|deploy-wait|deploy]"
+EOF
+}
+
 
 case "$op" in
 	cleanup)
 		header_text "Uninstalling KubeRay"
-		delete_kuberay
+		delete
 		;;
 	deploy-wait)
 		header_text "wait for KubeRay deployment"
-		wait_kuberay
+		wait
+		;;
+	deploy)
+		header_text "Installing KubeRay"
+		deploy
 		;;
 	*)
-		header_text "Installing KubeRay"
-		deploy_kuberay
+		usage
 		;;
 esac
 

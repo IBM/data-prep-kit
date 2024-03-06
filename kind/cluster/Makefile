@@ -8,6 +8,7 @@ setup-cluster:
 	$(MAKE) kind
 	$(MAKE) cluster-prepare
 	$(MAKE) cluster-prepare-wait
+	cd $(ROOT_DIR)/hack && ./ingress.sh deploy
 	@echo "setup-cluster completed"
 
 .PHONY: cluster-prepare
