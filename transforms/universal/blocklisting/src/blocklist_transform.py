@@ -21,6 +21,17 @@ from ray.actor import ActorHandle
 logger = get_logger(__name__)
 
 
+# Configuration keys
+
+annotation_column_name_key = "bl_annotation_column_name"
+source_url_column_name_key = "bl_source_url_column_name"
+blocked_domain_list_url_key = "bl_blocked_domain_list_url"
+blocked_domain_list_url_default = "cos-optimal-llm-pile/spark_test/remove-cma-1/blocklists_refinedweb_subset/"
+annotation_column_name_default = "url_blocklisting_refinedweb"
+source_column_name_default = "title"
+domain_refs_key = "__domain_refs"
+
+
 def reverse_url(url: str) -> str:
     url_list = re.sub("[a-zA-Z]+:/+", "", url).split(".")
     url_list.reverse()
@@ -43,18 +54,6 @@ def get_domain_list(domain_list_url: str, data_access: DataAccess = None):
     domain_list = set(domain_list)
     logger.info(f"Added {len(domain_list)} domains to domain list")
     return domain_list
-
-
-# Configuration keys
-
-annotation_column_name_key = "bl_annotation_column_name"
-source_url_column_name_key = "bl_source_url_column_name"
-blocked_domain_list_url_key = "bl_blocked_domain_list_url"
-blocked_domain_list_url_default = "cos-optimal-llm-pile/spark_test/remove-cma-1/blocklists_refinedweb_subset/"
-annotation_column_name_default = "url_blocklisting_refinedweb"
-source_column_name_default = "title"
-domain_refs_key = "__domain_refs"
-""" A hidden key used by the runtime to pass a ray object reference to the transform"""
 
 
 class BlockListTransform(AbstractTableTransform):
@@ -87,7 +86,7 @@ class BlockListTransform(AbstractTableTransform):
             try:
                 domain_list = ray.get(runtime_provided_domain_refs)
             except Exception as e:
-                print(f"Exception loading list of block listed domains from ray object storage {e}")
+                logger.info(f"Exception loading list of block listed domains from ray object storage {e}")
                 raise RuntimeError(f"exception loading from object storage for key {runtime_provided_domain_refs}")
         # build trie structure for block listing
         self.trie = pygtrie.StringTrie(separator=".")
