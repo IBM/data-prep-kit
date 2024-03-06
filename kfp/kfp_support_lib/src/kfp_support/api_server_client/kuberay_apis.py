@@ -19,7 +19,7 @@ class KubeRayAPIs:
                  token: str = None, http_retries: int = 5, wait_interval: int = 2):
         """
         Initializer
-        :param server_url: API server url
+        :param server_url: API server url - default assuming running it inside the cluster
         :param token: token, only used for API server with security enabled
         :param wait_interval: wait interval
         :param http_retries: http retries
