@@ -22,8 +22,8 @@ of a model, etc. These are set either explicitly in dictionaries
 (e.g. during testing) or from the command line when run from a Ray launcher.
 
 When specified on the command line, they are specified by prefixing with
-`--` (dash dash).  For example, `--mytransform_some_cfg` sets 
-the value for the `mytransform_some_cfg` configuration key. 
+`--` (dash dash).  For example, `--mytransform_some_cfg somevalue` sets 
+the value for the `mytransform_some_cfg` configuration key value to `somevalue`. 
 
 In general, a common prefix (i.e. `mytransform_`) is used to help distinguish these keys, primarily
 for ease-of-use/readability command line use, logging, etc.  This is not required, but
