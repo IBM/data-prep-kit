@@ -20,9 +20,6 @@
 
 # Rules with actual dependencies executed as commands
 
-# By default recurse into all sub-directories that do not begin with .
-SUB_MAKE_DIRS=$(shell echo */) 
-
 .PHONY: __build-recurse
 __build-recurse:
 	$(MAKE) RULE=build __recurse
@@ -37,19 +34,28 @@ __clean-recurse:
 
 .PHONY: __recurse
 __recurse: 
-	@if [ ! -z "$(SUB_MAKE_DIRS)" ]; then	\
-	    for i in $(SUB_MAKE_DIRS); do	\
+	@if [ -e .make_subdirs ]; then		\
+	    SUB_MAKE_DIRS=$$(cat .make_subdirs | sed -e 's/^#.*//') ;	\
+	else					\
+	    SUB_MAKE_DIRS=$$(echo */ | sort);	\
+	fi;					\
+	echo SUB_MAKE_DIRS=$$SUB_MAKE_DIRS;	\
+	if [ ! -z "$$SUB_MAKE_DIRS" ]; then	\
+	    for i in $$SUB_MAKE_DIRS; do	\
 		if [ -e $$i/Makefile ]; then	\
 		    echo Using recursive $(RULE) rule in $$i;	\
 		    (cd $$i; $(MAKE) $(RULE));	\
+		else				\
+		    echo No Makefile found in $$i. Skipping.;	\
 		fi;				\
 	    done;				\
 	fi
 
+PWD=$(shell pwd)
 # This rule allows sub-directories to override/define rule X for each X-recurse rule above.
 # See https://stackoverflow.com/questions/11958626/make-file-warning-overriding-commands-for-target
 %: __%-recurse
-	@echo 1 > /dev/null	
+	@echo Finished executing rule $@ recursively in $(PWD) > /dev/null	
 
 
 
