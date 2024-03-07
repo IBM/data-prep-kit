@@ -13,6 +13,9 @@ class TestBlockListTransform(AbstractTransformTest):
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         config = {
+            # When running outside the Ray orchestrator and its DataAccess/Factory, there is
+            # no Runtime class to load the domains and the Transform must do it itself using
+            # the bl_local_config for this test.
             "bl_local_config": {"input_folder": "/tmp", "output_folder": "/tmp"},
             blocklist_transform.blocked_domain_list_path_key: "../test-data/domains/arjel",
         }
