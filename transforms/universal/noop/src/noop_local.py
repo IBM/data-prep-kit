@@ -7,12 +7,9 @@ from data_processing.utils import ParamsUtils
 from noop_transform import NOOPTransformConfiguration
 
 
-# create launcher
-launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data"))
-output_folder = os.path.join(input_folder, "output")
-Path(output_folder).mkdir(parents=True, exist_ok=True)
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
@@ -32,7 +29,10 @@ params = {
     "code_location": ParamsUtils.convert_to_ast(code_location),
     "noop_sleep_sec": 5,
 }
-sys.argv = ParamsUtils.dict_to_req(d=params)
-
-# launch
-launcher.launch()
+if __name__ == "__main__":
+    sys.argv = ParamsUtils.dict_to_req(d=params)
+    # create launcher
+    Path(output_folder).mkdir(parents=True, exist_ok=True)
+    launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
+    # Launch the ray actor(s) to process the input
+    launcher.launch()

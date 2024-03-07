@@ -30,7 +30,7 @@ the regular expression `domains*`.
 You can run the [blocklist_local.py](src/blocklist_local.py) to
 transform the `test1.parquet` file in [test input data](test-data/input) 
 to an `output` directory.  The directory will contain both the new
-annotated `test.parquet` file and the `metadata.json` file.
+annotated `test1.parquet` file and the `metadata.json` file.
 <pre>
 % make venv
 % source venv/bin/activate

@@ -3,7 +3,12 @@
 The transform projects leverage the recursive `make` targets defined at the top of the repo (e.g. build, clean, test, etc).
  
 ## Project Organization
-1. `src` directory contain python source for the transform
+1. `src` directory contain python source for the transform.  `xyz_transform.py` 
+generally contains the following:
+    * `XYZTransform` class
+    * `XYXTransformConfiguration` class
+    * `XYZTransformRuntime` class, if needed.
+    * main() to start the `TransformLauncher` with the above.
 1. `test` directory contains test sources - usually a standalone test and ray launcher test.
 1. `requirements.txt` - used to create both the `venv` directory and docker image
 1. A virtual environment (created in `venv` directory) is used for development and testing
