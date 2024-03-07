@@ -15,7 +15,8 @@ the requirements for a data transform.
 This might include provisioning of shared memory objects or creation of additional actors.
 
 To learn more consider the following:
+* [Transform Tutorials](transform-tutorials.md)
+* [Library Configuration](library-config.md)
 * [Architecture Deep Dive](architecture.md)
 * [Transform Development Environment](transform-dev-env.md)
-* [Transform Tutorials](transform-tutorials.md)
 

@@ -2,13 +2,20 @@ import argparse
 import ast
 from typing import Any
 
+from data_processing import utils
 from data_processing.data_access import (
     DataAccess,
     DataAccessLakeHouse,
     DataAccessLocal,
     DataAccessS3,
 )
-from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger, str2bool
+from data_processing.utils import (
+    CLIArgumentProvider,
+    DPFConfig,
+    ParamsUtils,
+    get_logger,
+    str2bool,
+)
 
 
 logger = get_logger(__name__)
@@ -47,7 +54,7 @@ class DataAccessFactory(CLIArgumentProvider):
         help_example_dict = {
             "access_key": ["AFDSASDFASDFDSF ", "access key help text"],
             "secret_key": ["XSDFYZZZ", "secret key help text"],
-            "cos_url": ["s3:/cos-optimal-llm-pile/test/", "COS url"],
+            "url": ["s3:/cos-optimal-llm-pile/test/", "S3 url"],
         }
         parser.add_argument(
             "--s3_cred",
@@ -63,7 +70,7 @@ class DataAccessFactory(CLIArgumentProvider):
             ],
             "output_path": [
                 "/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed",
-                "Path to outpu folder of processed files",
+                "Path to output folder of processed files",
             ],
         }
         parser.add_argument(
@@ -146,19 +153,24 @@ class DataAccessFactory(CLIArgumentProvider):
 
         # further validate the specified configuration (S3, LakeHouse, or Local)
         if s3_config_specified == 1:
-            if not self.__validate_s3_cred(s3_credentials=args.s3_cred):
-                return False
             self.s3_cred = args.s3_cred
+            utils.add_if_missing(self.s3_cred, "access_key", DPFConfig.S3_ACCESS_KEY)
+            utils.add_if_missing(self.s3_cred, "secret_key", DPFConfig.S3_SECRET_KEY)
+            if not self.__validate_s3_cred(s3_credentials=self.s3_cred):
+                return False
             self.s3_config = args.s3_config
             logger.info(
                 f'Using s3 configuration: input path - {self.s3_config["input_folder"]}, '
                 f'output path - {self.s3_config["output_folder"]}'
             )
         elif lh_config_specified == 1:
-            if not self.__validate_s3_cred(s3_credentials=args.s3_cred):
-                return False
             self.s3_cred = args.s3_cred
+            utils.add_if_missing(self.s3_cred, "access_key", DPFConfig.S3_ACCESS_KEY)
+            utils.add_if_missing(self.s3_cred, "secret_key", DPFConfig.S3_SECRET_KEY)
+            if not self.__validate_s3_cred(s3_credentials=self.s3_cred):
+                return False
             self.lh_config = args.lh_config
+            utils.add_if_missing(self.lh_config, "token", DPFConfig.LAKEHOUSE_TOKEN)
             logger.info(
                 f'Using lake house configuration: input table - {self.lh_config["input_table"]}, '
                 f'input_dataset - {self.lh_config["input_dataset"]}, '
@@ -208,14 +220,14 @@ class DataAccessFactory(CLIArgumentProvider):
         :return:
         """
         if s3_credentials is None:
-            logger.error("Could not get cos credentials - exiting")
+            logger.error("Could not get cos credentials ")
             return False
         if (
-            s3_credentials.get("access_key", "") == ""
-            or s3_credentials.get("secret_key", "") == ""
-            or s3_credentials.get("cos_url", "") == ""
+            s3_credentials.get("access_key") == None
+            or s3_credentials.get("secret_key") == None
+            or s3_credentials.get("cos_url") == None
         ):
-            logger.error("Could not get cos credentials - exiting")
+            logger.error("Could not get cos credentials ")
             return False
         return True
 
@@ -227,7 +239,7 @@ class DataAccessFactory(CLIArgumentProvider):
         :return: True if local config is valid, False otherwise
         """
         if local_config is None:
-            logger.error("Could not get local config - exiting")
+            logger.error("Could not get local config")
             return False
         valid_config = True
         if local_config.get("input_folder", "") == "":
@@ -237,7 +249,7 @@ class DataAccessFactory(CLIArgumentProvider):
             valid_config = False
             logger.error(f"Could not find output folder in local config")
         if not valid_config:
-            logger.error("Invalid local configuration - exiting")
+            logger.error("Invalid local configuration")
         return valid_config
 
     def create_data_access(self) -> DataAccess:
