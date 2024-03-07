@@ -11,9 +11,12 @@ generally contains the following:
     * `XYXTransformConfiguration` class
     * `XYZTransformRuntime` class, if needed.
     * main() to start the `TransformLauncher` with the above.
-1. `test` directory contains test sources - usually a standalone test and ray launcher test.
-    * tests are run with pytest
-    * They are expected to be run **in** the `test` directory.
+1. `test` directory contains pytest test sources 
+    * `test_xyz.py` - a standalone (non-ray lauched) transform test.  This is best for initial debugging.
+        * Inherits from an abstract test class so that to test one needs only to provide test data.
+    * `test_xyz_launch.py` - runs ray via launcher. 
+        * Again, inherits from an abstract test class so that to test one needs only to provide test data.
+    * They are expected to be run from **within** the `test` directory.
         * From the command line, `make test` sets up the virtual environment and PYTHONPATH to include `src`
         * From the IDE, you **must** add the `src` directory to the project's Sources Root (see below).
         * Do **not** add `sys.path.append(...)` in the test python code.
