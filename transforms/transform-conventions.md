@@ -20,9 +20,9 @@ generally contains the following:
         * All test data should be referenced as `../test-data`.
 2. `test-data` contains any data file used by your tests.  Please don't put files over 5 MB here unless you really need to.
 3. `requirements.txt` - used to create both the `venv` directory and docker image
-4. A virtual environment (created in `venv` directory) is used for development and testing.
+4. A virtual environment (created in `venv` directory using `make venv`) is used for development and testing.
 5. A generic `Dockerfile` is available that should be sufficient for most transforms.  
-6. Makefile is used for most common operations
+6. `Makefile` is used for most common operations
     * venv - builds the python virtual environment for CLI and IDE use
     * test - runs the test in the `test` directory.
     * build - creates the docker image
