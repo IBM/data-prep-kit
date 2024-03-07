@@ -40,6 +40,7 @@ params = {
     blocked_domain_list_path_key: blocklist_conf_url,
     annotation_column_name_key: blocklist_annotation_column_name,
     source_url_column_name_key: blocklist_doc_source_url_column,
+    # 'bl_local_config' : local_conf
 }
 
 # launch

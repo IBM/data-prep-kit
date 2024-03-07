@@ -30,7 +30,13 @@ class DataAccessFactory(CLIArgumentProvider):
 
     def __init__(self, cli_arg_prefix: str = None):
         """
-        Initialization - set defaults
+        Create the factory to parse a set of args that will then define the type of DataAccess object
+        to be created by the create_data_access() method.
+        :param cli_arg_prefix:  if provided, this will be prepended to all the CLI arguments names.
+        This allows the creation of transform-specific (or other) DataAccess instances based on the
+        transform-specific prefix (e.g. bl_ for blocklist transform).  The resulting keys returned
+        in get_input_params() will include the prefix.  The underlying AST or other values of those
+        keys is not effected by the prefix.
         """
         self.s3_config = None
         self.lh_config = None

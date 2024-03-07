@@ -12,7 +12,6 @@ class TestBlockListTransform(AbstractTransformTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        config = {blocklist_transform.blocked_domain_list_path_key: "../test-data/domains/arjel"}
         config = {
             "bl_local_config": {"input_folder": "/tmp", "output_folder": "/tmp"},
             blocklist_transform.blocked_domain_list_path_key: "../test-data/domains/arjel",
