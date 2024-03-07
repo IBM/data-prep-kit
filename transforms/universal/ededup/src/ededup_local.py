@@ -11,7 +11,7 @@ from ededup_transform import EdedupTableTransformConfiguration
 launcher = TransformLauncher(transform_runtime_config=EdedupTableTransformConfiguration())
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
-output_folder = os.path.join(input_folder, "output")
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "output"))
 Path(output_folder).mkdir(parents=True, exist_ok=True)
 local_conf = {
     "input_folder": input_folder,

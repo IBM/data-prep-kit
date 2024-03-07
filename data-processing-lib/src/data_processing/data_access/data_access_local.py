@@ -51,11 +51,11 @@ class DataAccessLocal(DataAccess):
         parquet_files = []
         total_input_file_size = 0
         i = 0
-        for path in Path(path).rglob("*.parquet"):
+        for c_path in Path(path).rglob("*.parquet"):
             if i >= cm_files > 0:
                 break
-            size = path.stat().st_size
-            parquet_files.append(path.name)
+            size = c_path.stat().st_size
+            parquet_files.append(str(c_path.absolute()).removeprefix(f"{path}/"))
             total_input_file_size += size
             if min_file_size > size:
                 min_file_size = size
@@ -190,7 +190,7 @@ class DataAccessLocal(DataAccess):
             table = pq.read_table(file_path)
             return table
         except (FileNotFoundError, IOError, pa.ArrowException) as e:
-            logger.error(f"Error reading table from {path}: {e.with_traceback(None)}")
+            logger.error(f"Error reading table from {file_path}: {e}")
             return None
 
     def get_output_location(self, path: str) -> str:
