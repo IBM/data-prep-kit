@@ -14,7 +14,9 @@
 # using "$(MAKE) <rule>-recurse", for example "$(MAKE) test-recurse". 
 #
 # Each rule is called recursively on sub-directories and if a similar inclusion is done in the sub-Makefiles,
-# the rules will be applied/executed recursively in their sub-directories.
+# the rules will be applied/executed recursively in their sub-directories. By default, sub-directories
+# are traversed in lexigraphic order.  If you need to control the ordering, create a .make_subdirs
+# listing the sub-directories to process and their order.
 #
 #################################################################################################################
 
