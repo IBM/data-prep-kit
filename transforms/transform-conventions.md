@@ -1,6 +1,8 @@
 # Transform Conventions
 
 The transform projects leverage the recursive `make` targets defined at the top of the repo (e.g. build, clean, test, etc).
+Transform projects are standalone entities.  Each transform is expected to be built into a separate docker image.  As such
+they each have their own virtual environments.
  
 ## Project Organization
 1. `src` directory contain python source for the transform.  `xyz_transform.py` 
@@ -11,7 +13,7 @@ generally contains the following:
     * main() to start the `TransformLauncher` with the above.
 1. `test` directory contains test sources - usually a standalone test and ray launcher test.
 1. `requirements.txt` - used to create both the `venv` directory and docker image
-1. A virtual environment (created in `venv` directory) is used for development and testing
+1. A virtual environment (created in `venv` directory) is used for development and testing.
 1. A generic `Dockerfile` is available that should be sufficient for most transforms.  
 1. Makefile is used for most common operations
     * venv - builds the python virtual environment for CLI and IDE use
@@ -41,9 +43,11 @@ Note that the `Makefile` defines the DOCKER_IMAGE_NAME and DOCKER_IMAGE_VERSION.
 
 ## IDE Setup
 When running in an IDE, such as PyCharm, the following are generally assumed:
-* Build the venv using `make venv` and add this as a virtual environment to the IDE's project.
-* Mark the `src` as a _source root_ so that it is included in your PYTHONPATH when running .py files in the IDE
-  * In Pycharm this can be done by selecting the `src` directory, and then
-  selecting `Mark Directory as` -> `Sources Root`
+* From the command line, build the venv using `make venv`.
+* In the IDE
+    * Set your project/run configuration to use the venv/bin/python as your runtime virtual environment.
+        * In Pycharm this can be done through the PyCharm->Settings->Project...->Python Interpreter page
+    * Mark the `src` as a _source root_ so that it is included in your PYTHONPATH when running .py files in the IDE
+        * In Pycharm this can be done by selecting the `src` directory, and then selecting `Mark Directory as` -> `Sources Root`
 
 
