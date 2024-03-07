@@ -20,4 +20,17 @@
 include makefile.recurse
 
 # Add local or overriding rules here
+include Makefile.env
+
+include cluster.mk
+
+.PHONY: setup-kind-cluster
+setup-kind-cluster:
+	$(MAKE) delete-kind-cluster
+	$(MAKE) create-kind-cluster
+	$(MAKE) cluster-prepare
+	$(MAKE) cluster-prepare-wait
+	cd $(KIND_DIR)/hack && ./ingress.sh deploy
+	@echo "setup-cluster completed"
+
 

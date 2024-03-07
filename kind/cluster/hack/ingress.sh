@@ -2,16 +2,16 @@
 
 op=$1
 
-source ${ROOT_DIR}/hack/common.sh
+source ${KIND_DIR}/hack/common.sh
 
 deploy() {
-	kubectl apply -f ${ROOT_DIR}/hack/ray_api_server_ingress.yaml
-	kubectl apply -f ${ROOT_DIR}/hack/kfp_ingress.yaml
+	kubectl apply -f ${KIND_DIR}/hack/ray_api_server_ingress.yaml
+	kubectl apply -f ${KIND_DIR}/hack/kfp_ingress.yaml
 }
 
 delete(){
-	kubectl delete -f ${ROOT_DIR}/hack/ray_api_server_ingress.yaml
-	kubectl delete -f ${ROOT_DIR}/hack/kfp_ingress.yaml
+	kubectl delete -f ${KIND_DIR}/hack/ray_api_server_ingress.yaml
+	kubectl delete -f ${KIND_DIR}/hack/kfp_ingress.yaml
 }
 
 usage(){

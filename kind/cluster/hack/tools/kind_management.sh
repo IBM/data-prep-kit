@@ -3,14 +3,14 @@
 op=$1; shift
 cluster_name="${1:-goofy}"
 
-source ${ROOT_DIR}/hack/common.sh
+source ../common.sh
 
 kind_delete() {
   kind delete cluster --name $cluster_name
 }
 
 kind_create() {
-  kind create cluster --name $cluster_name --config ${ROOT_DIR}/hack/kind-cluster-config.yaml
+  kind create cluster --name $cluster_name --config ${KIND_DIR}/hack/kind-cluster-config.yaml
 }
 
 usage(){
@@ -22,11 +22,11 @@ EOF
 case "$op" in
 delete_cluster)
   header_text "Uninstalling kind cluster"
-  kind_delete kind || true
+  kind_delete || true
   ;;
 create_cluster)
   header_text "Installing kind cluster"
-  kind_create kind
+  kind_create
   ;;
  *)
   usage

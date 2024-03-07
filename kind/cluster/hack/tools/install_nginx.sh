@@ -6,7 +6,7 @@ SLEEP_TIME="${SLEEP_TIME:-50}"
 MAX_RETRIES="${MAX_RETRIES:-10}"
 EXIT_CODE=0
 
-source ${ROOT_DIR}/hack/common.sh
+source ../common.sh
 
 deploy() {
 	kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml

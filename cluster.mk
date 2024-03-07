@@ -1,15 +1,10 @@
+.PHONY: create-kind-cluster
+create-kind-cluster:
+	cd $(TOOLS_DIR); ./kind_management.sh create_cluster
 
-include Makefile.env
-
-include hack/make-rules/cluster.mk
-
-.PHONY: setup-cluster
-setup-cluster:
-	$(MAKE) kind
-	$(MAKE) cluster-prepare
-	$(MAKE) cluster-prepare-wait
-	cd $(ROOT_DIR)/hack && ./ingress.sh deploy
-	@echo "setup-cluster completed"
+.PHONY: delete-kind-cluster
+delete-kind-cluster:
+	cd $(TOOLS_DIR); ./kind_management.sh delete_cluster
 
 .PHONY: cluster-prepare
 cluster-prepare:
@@ -22,3 +17,4 @@ cluster-prepare-wait:
 	cd $(TOOLS_DIR) && ./install_nginx.sh deploy-wait
 	cd $(TOOLS_DIR) && ./install_kubeflow.sh deploy-wait
 	cd $(TOOLS_DIR) && ./install_kuberay.sh deploy-wait
+

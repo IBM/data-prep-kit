@@ -2,7 +2,7 @@
 
 op=$1
 
-source ${ROOT_DIR}/hack/common.sh
+source ../common.sh
 
 SLEEP_TIME="${SLEEP_TIME:-50}"
 MAX_RETRIES="${MAX_RETRIES:-20}"
