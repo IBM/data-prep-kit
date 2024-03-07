@@ -44,6 +44,7 @@ def get_domain_list(domain_list_url: str, data_access: DataAccess = None):
     return domain_list
 
 
+arg_prefix = "bl_"
 annotation_column_name_key = "bl_annotation_column_name"
 """ Key holds the name of the column to create in the output table"""
 source_url_column_name_key = "bl_source_url_column_name"
@@ -84,7 +85,10 @@ class BlockListTransform(AbstractTableTransform):
             url = config.get(blocked_domain_list_path_key, blocked_domain_list_path_default)
             if url is None:
                 raise RuntimeError(f"Missing configuration value for key {annotation_column_name_key}")
-            domain_list = get_domain_list(url)
+            daf = DataAccessFactory(arg_prefix)
+            daf.apply_input_params(config)
+            data_access = daf.create_data_access()
+            domain_list = get_domain_list(url, data_access)
         else:
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
@@ -181,6 +185,9 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
             default=source_column_name_default,
             help="Name of the table column that has the document download URL",
         )
+        # Add bl-specific arguments to create the DataAccess instance to load the domains.
+        daf = DataAccessFactory(arg_prefix)
+        daf.add_input_params(parser)
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
@@ -189,9 +196,12 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         dargs = vars(args)
-        self.params[blocked_domain_list_path_key] = dargs.get(blocked_domain_list_path_key)
-        self.params[annotation_column_name_key] = dargs.get(annotation_column_name_key)
-        self.params[source_url_column_name_key] = dargs.get(source_url_column_name_key)
+        for key, value in dargs.items():
+            if key.startswith(arg_prefix):
+                self.params[key] = value
+        # self.params[blocked_domain_list_path_key] = dargs.get(blocked_domain_list_path_key)
+        # self.params[annotation_column_name_key] = dargs.get(annotation_column_name_key)
+        # self.params[source_url_column_name_key] = dargs.get(source_url_column_name_key)
         return True
 
 
