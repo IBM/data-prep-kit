@@ -30,7 +30,7 @@ The `Makefile` also defines a number of macros/variables that can be set, includ
 python executable and more.
 
 ## Configuration and command line options
-Transforms generally accept a dictionary of configuration to
+A transform generally accept a dictionary of configuration to
 control its operation.  For example, the size of a table, the location
 of a model, etc. These are set either explicitly in dictionaries
 (e.g. during testing) or from the command line when run from a Ray launcher.
