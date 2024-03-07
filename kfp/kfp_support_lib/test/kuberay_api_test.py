@@ -13,7 +13,7 @@ def test_templates():
     Test template
     """
     # create API server
-    apis = KubeRayAPIs(server_url="http://localhost:8080/ray")
+    apis = KubeRayAPIs(server_url="http://localhost:8080")
     # cleanup
     _, _ = apis.delete_compute_template(ns="default", name="default-template")
     # create
