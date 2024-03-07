@@ -44,8 +44,10 @@ Note that the `Makefile` defines the DOCKER_IMAGE_NAME and DOCKER_IMAGE_VERSION.
 ## IDE Setup
 When running in an IDE, such as PyCharm, the following are generally assumed:
 * Build the venv using `make venv` and add this as a virtual environment to the IDE's project.
-* Mark the `src` as a _source root_ so that it is included in your PYTHONPATH when running .py files in the IDE
-  * In Pycharm this can be done by selecting the `src` directory, and then
-  selecting `Mark Directory as` -> `Sources Root`
+* In the IDE
+    * Set your project/run configuration to use the venv/bin/python as your runtime virtual environment.
+        * In Pycharm this can be done through the PyCharm->Settings->Project...->Python Interpreter page
+    * Mark the `src` as a _source root_ so that it is included in your PYTHONPATH when running .py files in the IDE
+        * In Pycharm this can be done by selecting the `src` directory, and then selecting `Mark Directory as` -> `Sources Root`
 
 
