@@ -1,6 +1,6 @@
 # Transform Conventions
 
-The transform projects leverage the recursive `make` targets defined at the top of the repo (e.g. build, clean, test, etc).
+The transform projects leverage the recursive `make` targets defined at the top of the repo (e.g. help, build, clean, test, etc).
 Transform projects are standalone entities.  Each transform is expected to be built into a separate docker image.  As such
 they each have their own virtual environments.
  
