@@ -164,6 +164,9 @@ class KubeRayAPIs:
                 response = requests.delete(url, headers=_headers, timeout=(10, 10))
                 if response.status_code // 100 == 2:
                     return response.status_code, None
+                elif response.status_code == 404:
+                    # not found - no need to retry
+                    return response.status_code, response.json()["message"]
                 else:
                     print(f"Failed to delete compute template, status : {response.status_code}")
                     status = response.status_code
@@ -373,6 +376,9 @@ class KubeRayAPIs:
                 response = requests.delete(url, headers=_headers)
                 if response.status_code // 100 == 2:
                     return response.status_code, None
+                elif response.status_code == 404:
+                    # not found - no need to retry
+                    return response.status_code, response.json()["message"]
                 else:
                     print(f"Failed to delete cluster , status : {response.status_code}")
                     status = response.status_code

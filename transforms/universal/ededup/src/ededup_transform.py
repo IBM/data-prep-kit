@@ -172,7 +172,6 @@ class EdedupRuntime(DefaultTableTransformRuntime):
         :return: dictionary of filter init params
         """
         # create hashes
-        print(f"xyzzy: params={self.params}")
         self.filters = RayUtils.create_actors(
             clazz=HashFilter,
             params={},
@@ -199,7 +198,7 @@ class EdedupRuntime(DefaultTableTransformRuntime):
                 sum_hash = sum_hash + h_size
                 sum_hash_mem = sum_hash_mem + h_memory
             remote_replies = not_ready
-        dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 0))
+        dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 1))
         return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
 
 
