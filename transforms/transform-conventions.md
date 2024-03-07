@@ -12,10 +12,15 @@ generally contains the following:
     * `XYZTransformRuntime` class, if needed.
     * main() to start the `TransformLauncher` with the above.
 1. `test` directory contains test sources - usually a standalone test and ray launcher test.
-1. `requirements.txt` - used to create both the `venv` directory and docker image
-1. A virtual environment (created in `venv` directory) is used for development and testing.
-1. A generic `Dockerfile` is available that should be sufficient for most transforms.  
-1. Makefile is used for most common operations
+    * tests are run with pytest
+    * They are expected to be run **in** the `test` directory.
+        * From the command line, `make test` sets up the virtual environment and PYTHONPATH to include `src`
+        * From the IDE, you **must** add the `src` directory to the project's Sources Root (see below).
+        * Do **not** add `sys.path.append(...)` in the test python code.
+3. `requirements.txt` - used to create both the `venv` directory and docker image
+4. A virtual environment (created in `venv` directory) is used for development and testing.
+5. A generic `Dockerfile` is available that should be sufficient for most transforms.  
+6. Makefile is used for most common operations
     * venv - builds the python virtual environment for CLI and IDE use
     * test - runs the test in the `test` directory.
     * build - creates the docker image
