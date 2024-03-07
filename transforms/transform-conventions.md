@@ -17,6 +17,8 @@ generally contains the following:
         * From the command line, `make test` sets up the virtual environment and PYTHONPATH to include `src`
         * From the IDE, you **must** add the `src` directory to the project's Sources Root (see below).
         * Do **not** add `sys.path.append(...)` in the test python code.
+        * All test data should be referenced as `../test-data`.
+2. `test-data` contains any data file used by your tests.  Please don't put files over 5 MB here unless you really need to.
 3. `requirements.txt` - used to create both the `venv` directory and docker image
 4. A virtual environment (created in `venv` directory) is used for development and testing.
 5. A generic `Dockerfile` is available that should be sufficient for most transforms.  
