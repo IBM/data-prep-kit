@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
@@ -9,24 +10,19 @@ from fdedup_transform import FdedupTableTransformConfiguration
 # create launcher
 launcher = TransformLauncher(transform_runtime_config=FdedupTableTransformConfiguration())
 # create parameters
-s3_cred = {
-    "access_key": os.environ.get("COS_ACCESS_KEY", "access"),
-    "secret_key": os.environ.get("COS_SECRET_KEY", "secret"),
-    "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
-}
-s3_conf = {
-    "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=fuzzy_dedup/",
-    "output_folder": "cos-optimal-llm-pile/boris-da-test/",
-    # "input_folder": "cos-optimal-llm-pile/test/david/input/",
-    # "output_folder": "cos-optimal-llm-pile/test/david/output/",
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
+output_folder = os.path.join(input_folder, "output")
+Path(output_folder).mkdir(parents=True, exist_ok=True)
+local_conf = {
+    "input_folder": input_folder,
+    "output_folder": output_folder,
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
     "run_locally": True,
     "max_files": -1,
-    "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    "local_config": ParamsUtils.convert_to_ast(local_conf),
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "num_workers": 3,
     "checkpointing": False,

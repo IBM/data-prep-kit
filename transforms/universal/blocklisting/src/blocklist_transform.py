@@ -141,7 +141,6 @@ class BlockListTransform(AbstractTableTransform):
 
 
 class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
-
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
