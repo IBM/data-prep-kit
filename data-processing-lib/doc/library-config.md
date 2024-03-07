@@ -1,12 +1,7 @@
 # Library Configuration
 The library has a number of configurables that can help provide or
 override default values.  All are set using environment variables
-in [DPFConfig](../src/data_processing/utils/config.py),
-as follows:
-
-#### S3 Credentials 
-The default S3 access key and secret can be set for use by elements
-such as the DataAccessS3 class and associated command line arguments.
+in [DPFConfig](../src/data_processing/utils/config.py).
 
 | Environment Variable  | Function                                                                                                         |
 |-----------------------|------------------------------------------------------------------------------------------------------------------|
