@@ -7,12 +7,11 @@ This is the root director of all transforms.  It is organized as follows
 
 Each of these directories contains a number of directories, each directory implementing a specific transform.
 Each transform is expected to be a standalone entity that generally runs at scale from within a docker image.
+As such they each have their own virtual environments for development.
 
 ## Transform Project Conventions
 
-The transform projects leverage the recursive `make` targets defined at the top of the repo (e.g. help, build, clean, test, etc).
-Transform projects are standalone entities.  Each transform is expected to be built into a separate docker image.  As such
-they each have their own virtual environments for development.
+The transform projects all try to use a common set of conventions include code layout, build, documentation and IDE recommendations.
  
 ### Project Organization
 1. `src` directory contain python source for the transform.  `xyz_transform.py` 
