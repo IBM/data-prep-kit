@@ -1,8 +1,8 @@
 # Transform Conventions
 
-The transform projects leverage the recursive `make` targets defined at the top of the repo (e.g. build, clean, test, etc).
+The transform projects leverage the recursive `make` targets defined at the top of the repo (e.g. help, build, clean, test, etc).
 Transform projects are standalone entities.  Each transform is expected to be built into a separate docker image.  As such
-they each have their own virtual environments.
+they each have their own virtual environments for development.
  
 ## Project Organization
 1. `src` directory contain python source for the transform.  `xyz_transform.py` 
@@ -11,9 +11,12 @@ generally contains the following:
     * `XYXTransformConfiguration` class
     * `XYZTransformRuntime` class, if needed.
     * main() to start the `TransformLauncher` with the above.
-1. `test` directory contains test sources - usually a standalone test and ray launcher test.
-    * tests are run with pytest
-    * They are expected to be run **in** the `test` directory.
+1. `test` directory contains pytest test sources 
+    * `test_xyz.py` - a standalone (non-ray lauched) transform test.  This is best for initial debugging.
+        * Inherits from an abstract test class so that to test one needs only to provide test data.
+    * `test_xyz_launch.py` - runs ray via launcher. 
+        * Again, inherits from an abstract test class so that to test one needs only to provide test data.
+    * They are expected to be run from **within** the `test` directory.
         * From the command line, `make test` sets up the virtual environment and PYTHONPATH to include `src`
         * From the IDE, you **must** add the `src` directory to the project's Sources Root (see below).
         * Do **not** add `sys.path.append(...)` in the test python code.
@@ -30,7 +33,7 @@ The `Makefile` also defines a number of macros/variables that can be set, includ
 python executable and more.
 
 ## Configuration and command line options
-Transforms generally accept a dictionary of configuration to
+A transform generally accept a dictionary of configuration to
 control its operation.  For example, the size of a table, the location
 of a model, etc. These are set either explicitly in dictionaries
 (e.g. during testing) or from the command line when run from a Ray launcher.
@@ -46,7 +49,8 @@ strongly recommended.
 ## Building the docker image
 Generally to build a docker image, one uses the `make build` command, which uses
 the `Dockerfile`, which in turn uses the `src` and `requirements.txt` to build the image. 
-Note that the `Makefile` defines the DOCKER_IMAGE_NAME and DOCKER_IMAGE_VERSION.
+Note that the `Makefile` defines the DOCKER_IMAGE_NAME and DOCKER_IMAGE_VERSION
+and should be redefined if copying from another transform project.
 
 ## IDE Setup
 When running in an IDE, such as PyCharm, the following are generally assumed:
