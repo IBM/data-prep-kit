@@ -93,3 +93,6 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
 
     def get_name(self):
         return self.name
+
+    def get_transform_metadata(self) -> dict[str, Any]:
+        return self.get_input_params()

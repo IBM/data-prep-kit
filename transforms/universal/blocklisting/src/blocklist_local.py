@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 
-from blocklist_transform import (
+from blocklist_transform_boris import (
     BlockListTransformConfiguration,
     annotation_column_name_key,
     blocked_domain_list_path_key,
@@ -20,6 +20,7 @@ blocklist_doc_source_url_column = "title"
 
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "output"))
+Path(output_folder).mkdir(parents=True, exist_ok=True)
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
@@ -40,10 +41,7 @@ params = {
     blocked_domain_list_path_key: blocklist_conf_url,
     annotation_column_name_key: blocklist_annotation_column_name,
     source_url_column_name_key: blocklist_doc_source_url_column,
-    # Turn this one on or off to control which DataAccess is used to read the domains
-    # On - use the blocklist (bl_*) parameter to define the DataAccess
-    # Off - use the local_config parameter above to define the DataAccess
-    # 'bl_local_config' : local_conf
+    "blocklist_local_config": local_conf
 }
 
 # launch
