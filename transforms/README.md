@@ -13,12 +13,11 @@ This is the root director of all transforms.  It is organized as follows
 
 Each of the `universal`, `language` and `code`  directories contains a directory for a specific transform.
 Each transform is expected to be a standalone entity that generally runs at scale from within a docker image.
+As such they each have their own virtual environments for development.
 
 ## Transform Project Conventions
 
-The transform projects leverage the recursive `make` targets defined at the top of the repo (e.g. help, build, clean, test, etc).
-Transform projects are standalone entities.  Each transform is expected to be built into a separate docker image.  As such
-they each have their own virtual environments for development.
+The transform projects all try to use a common set of conventions include code layout, build, documentation and IDE recommendations.
  
 ### Project Organization
 1. `src` directory contain python source for the transform.  `xyz_transform.py` 
@@ -44,7 +43,8 @@ generally contains the following:
 6. `Makefile` is used for most common operations
     * venv - builds the python virtual environment for CLI and IDE use
     * test - runs the test in the `test` directory.
-    * build - creates the docker image
+    * image - creates the docker image
+    * help - shows all targets and help text
 The `Makefile` also defines a number of macros/variables that can be set, including the name and version of the docker image, 
 python executable and more.
 
@@ -63,13 +63,13 @@ for ease-of-use/readability command line use, logging, etc.  This is not require
 strongly recommended.
 
 ### Building the docker image
-Generally to build a docker image, one uses the `make build` command, which uses
+Generally to build a docker image, one uses the `make image` command, which uses
 the `Dockerfile`, which in turn uses the `src` and `requirements.txt` to build the image. 
 Note that the `Makefile` defines the DOCKER_IMAGE_NAME and DOCKER_IMAGE_VERSION
 and should be redefined if copying from another transform project.
 
 ### IDE Setup
-When running in an IDE, such as PyCharm, the following are generally assumed:
+When running in an IDE, such as PyCharm, the following are generally required:
 * From the command line, build the venv using `make venv`.
 * In the IDE
     * Set your project/run configuration to use the venv/bin/python as your runtime virtual environment.
