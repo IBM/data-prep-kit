@@ -56,7 +56,7 @@ for ease-of-use/readability command line use, logging, etc.  This is not require
 strongly recommended.
 
 ### Building the docker image
-Generally to build a docker image, one uses the `make build` command, which uses
+Generally to build a docker image, one uses the `make image` command, which uses
 the `Dockerfile`, which in turn uses the `src` and `requirements.txt` to build the image. 
 Note that the `Makefile` defines the DOCKER_IMAGE_NAME and DOCKER_IMAGE_VERSION
 and should be redefined if copying from another transform project.
