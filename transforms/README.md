@@ -63,7 +63,7 @@ Note that the `Makefile` defines the DOCKER_IMAGE_NAME and DOCKER_IMAGE_VERSION
 and should be redefined if copying from another transform project.
 
 ### IDE Setup
-When running in an IDE, such as PyCharm, the following are generally assumed:
+When running in an IDE, such as PyCharm, the following are generally required:
 * From the command line, build the venv using `make venv`.
 * In the IDE
     * Set your project/run configuration to use the venv/bin/python as your runtime virtual environment.
