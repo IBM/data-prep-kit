@@ -248,11 +248,12 @@ class TestGetFilesToProcess(TestInit):
         in_file_1 = in_path_1 / "file1.parquet"
         in_file_1.touch()
         result = self.dal.get_files_to_process()
+        print(f"result {result}")
         self.cleanup(
             directories_to_remove=[in_path_1, out_path_1, in_path_2, out_path_2],
             files_to_remove=[in_file_1],
         )
-        assert result == ([str(in_file_1.resolve())], self.size_stat_dict)
+        assert result == ([str(in_file_1.absolute())], self.size_stat_dict)
 
     def multiple_missing_files_setup(self):
         # create the data set sub-directories
@@ -296,8 +297,8 @@ class TestGetFilesToProcess(TestInit):
         ) = self.multiple_missing_files_setup()
         expected_result = (
             sorted(
-                [str(file.resolve()) for file in in_files_1 if file.resolve() != out_file_2.resolve()]
-                + [str(file.resolve()) for file in in_files_2 if file.name != out_file_2.name]
+                [str(file.absolute()) for file in in_files_1 if file.absolute() != out_file_2.absolute()]
+                + [str(file.absolute()) for file in in_files_2 if file.name != out_file_2.name]
             ),
             self.size_stat_dict_1,
         )
@@ -318,7 +319,7 @@ class TestGetFilesToProcess(TestInit):
             out_path_2,
         ) = self.multiple_missing_files_setup()
         expected_result = (
-            sorted([str(file.resolve()) for file in in_files_1] + [str(file.resolve()) for file in in_files_2]),
+            sorted([str(file.absolute()) for file in in_files_1] + [str(file.absolute()) for file in in_files_2]),
             self.size_stat_dict_1,
         )
         self.multiple_missing_files_cleanup(
@@ -337,7 +338,7 @@ class TestGetFilesToProcess(TestInit):
             in_path_2,
             out_path_2,
         ) = self.multiple_missing_files_setup()
-        expected_result = ([str(in_files_1[-1].resolve())], self.size_stat_dict)
+        expected_result = ([str(in_files_1[-1].absolute())], self.size_stat_dict)
         self.multiple_missing_files_cleanup(
             in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
         )
