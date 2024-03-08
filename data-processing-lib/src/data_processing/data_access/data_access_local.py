@@ -32,6 +32,7 @@ class DataAccessLocal(DataAccess):
         """
         self.input_folder = path_config["input_folder"]
         self.output_folder = path_config["output_folder"]
+        logger.debug(f"Creating DataAccessLocal: input_folder={self.input_folder}, output_folder={self.output_folder}")
         self.d_sets = d_sets
         self.checkpoint = checkpoint
         self.m_files = m_files
@@ -199,7 +200,10 @@ class DataAccessLocal(DataAccess):
         :param path: input file location
         :return: output file location
         """
-        return path.replace(self.input_folder, self.output_folder)
+        location = path.replace(self.input_folder, self.output_folder)
+        # logger.debug(f"get_output_location(): input_folder={self.input_folder}, output_folder={self.output_folder}")
+        logger.debug(f"get_output_location(): Location of {path} is {location}")
+        return location
 
     def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
         """
@@ -221,11 +225,15 @@ class DataAccessLocal(DataAccess):
         size_in_memory = table.nbytes
         try:
             output_path = os.path.join(self.output_folder, path)
+            logger.debug(
+                f"Writing table of size {size_in_memory} to named {path} to output folder {self.output_folder}"
+            )
             # Write the table to parquet format
             pq.write_table(table, output_path)
 
             # Get file size and create file_info
             file_info = {"name": os.path.basename(output_path), "size": os.path.getsize(output_path)}
+            logger.debug(f"Done writing table of {output_path}: file_info={file_info}")
             return size_in_memory, file_info
 
         except Exception as e:

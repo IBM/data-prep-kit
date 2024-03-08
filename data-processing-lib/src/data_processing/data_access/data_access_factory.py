@@ -133,14 +133,17 @@ class DataAccessFactory(CLIArgumentProvider):
         )
         parser.add_argument(f"--{self.cli_arg_prefix}data_sets", type=str, default=None, help="List of data sets")
 
-    def apply_input_params(self, args: argparse.Namespace) -> bool:
+    def apply_input_params(self, args: Union[dict, argparse.Namespace]) -> bool:
         """
         Validate data access specific parameters
         This might need to be extended if new data access implementation is added
         :param args: user defined arguments
         :return: None
         """
-        arg_dict = vars(args)
+        if isinstance(args, argparse.Namespace):
+            arg_dict = vars(args)
+        else:
+            arg_dict = args
         s3_cred = arg_dict.get(f"{self.cli_arg_prefix}s3_cred")
         s3_config = arg_dict.get(f"{self.cli_arg_prefix}s3_config")
         lh_config = arg_dict.get(f"{self.cli_arg_prefix}lh_config")

@@ -49,5 +49,5 @@ venv:	pyproject.toml check-env
 test:  
 	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
 	source venv/bin/activate;		\
-	export PYTHONPATH=src:test:$$PYTHONPATH; \
-	pytest test
+	export PYTHONPATH=../src:.:$$PYTHONPATH; \
+	cd test; pytest . 

@@ -1,11 +1,17 @@
 # Transforms
 This is the root director of all transforms.  It is organized as follows
 
-* universal - holds transforms that may be useful across many domains
-* language - holds transforms that are specific to language-based modeling 
-* code - holds transforms that are specific to code-based modeling 
+* `universal` - transforms applicable across code and language model data include
+    * Schema modification 
+    * Deduplicatifation - both exact and fuzzy
+    * Coalesce/split
+    * Blocklisting
+* `language` - spoken language model specific transforms
+    * Document quality
+    * Language Identification
+* `code` - programming language specific transforms.
 
-Each of these directories contains a number of directories, each directory implementing a specific transform.
+Each of the `universal`, `language` and `code`  directories contains a directory for a specific transform.
 Each transform is expected to be a standalone entity that generally runs at scale from within a docker image.
 
 ## Transform Project Conventions
