@@ -110,7 +110,7 @@ def orchestrate(
             "job details": preprocessing_params.job_details
             | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "status": "success"},
             "code": preprocessing_params.code_location,
-            "job_input_params": transform_runtime_config.get_input_params()
+            "job_input_params": transform_runtime_config.get_transform_metadata()
             | data_access_factory.get_input_params()
             | preprocessing_params.get_input_params(),
             "execution_stats": resources,
