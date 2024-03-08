@@ -37,7 +37,8 @@ generally contains the following:
 6. `Makefile` is used for most common operations
     * venv - builds the python virtual environment for CLI and IDE use
     * test - runs the test in the `test` directory.
-    * build - creates the docker image
+    * image - creates the docker image
+    * help - shows all targets and help text
 The `Makefile` also defines a number of macros/variables that can be set, including the name and version of the docker image, 
 python executable and more.
 
