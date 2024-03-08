@@ -25,7 +25,7 @@ class TestInit:
     size_stat_dict_1 = {"max_file_size": 1.0, "min_file_size": 0.0, "total_file_size": 1.0}
 
 
-class Test_GetFilesFolder(TestInit):
+class TestGetFilesFolder(TestInit):
     def test_empty_directory(self):
         """
         Tests the function with an empty directory.
@@ -44,7 +44,7 @@ class Test_GetFilesFolder(TestInit):
         file_path = directory / "file.parquet"
         os.makedirs(directory, exist_ok=True)
         file_path.touch()
-        result = self.dal._get_files_folder(directory, cm_files=0)
+        result = self.dal._get_files_folder(str(directory), cm_files=0)
         os.remove(file_path)
         os.rmdir(directory)
         assert result == (["file.parquet"], self.size_stat_dict)
@@ -61,7 +61,7 @@ class Test_GetFilesFolder(TestInit):
         with open(files[0], "w") as fp:
             fp.write(" " * MB)
 
-        file_list, size_dict = self.dal._get_files_folder(directory, cm_files=0)
+        file_list, size_dict = self.dal._get_files_folder(str(directory), cm_files=0)
         results = (sorted(file_list), size_dict)
         expected_results = (sorted([file.name for file in files]), self.size_stat_dict_1)
         for file in files:
@@ -77,7 +77,7 @@ class Test_GetFilesFolder(TestInit):
         file_path = directory / "file.txt"
         os.makedirs(directory, exist_ok=True)
         file_path.touch()
-        result = self.dal._get_files_folder(directory, cm_files=0)
+        result = self.dal._get_files_folder(str(directory), cm_files=0)
         os.remove(file_path)
         os.rmdir(directory)
         assert result == ([], self.size_stat_dict_empty)
@@ -89,11 +89,11 @@ class Test_GetFilesFolder(TestInit):
         directory = Path("non_existent_dir")
         with patch("pathlib.Path.rglob") as mock_rglob:
             mock_rglob.return_value = []
-            result = self.dal._get_files_folder(directory, cm_files=0)
+            result = self.dal._get_files_folder(str(directory), cm_files=0)
         assert result == ([], self.size_stat_dict_empty)
 
 
-class Test_GetInputFiles(TestInit):
+class TestGetInputFiles(TestInit):
     def setup_directories(self, prefix=""):
         """
         Utility function that sets up input and output directories
@@ -104,7 +104,8 @@ class Test_GetInputFiles(TestInit):
         os.makedirs(output_path, exist_ok=True)
         return input_path, output_path
 
-    def cleanup(self, directories_to_remove=[], files_to_remove=[]):
+    @staticmethod
+    def cleanup(directories_to_remove=[], files_to_remove=[]):
         """
         Utility function that removes all the files and all the directories
         passed as arguments
@@ -125,7 +126,7 @@ class Test_GetInputFiles(TestInit):
         Test the function with empty input and output directories.
         """
         input_path, output_path = self.setup_directories("empty_")
-        result = self.dal._get_input_files(input_path, output_path, cm_files=0)
+        result = self.dal._get_input_files(str(input_path), str(output_path), cm_files=0)
         self.cleanup(directories_to_remove=[input_path, output_path])
         assert result == ([], self.size_stat_dict_empty)
 
@@ -138,10 +139,10 @@ class Test_GetInputFiles(TestInit):
         output_file = output_path / "file2.parquet"
         input_file.touch()
         output_file.touch()
-        result = self.dal._get_input_files(input_path, output_path, cm_files=0)
+        result = self.dal._get_input_files(str(input_path), str(output_path), cm_files=0)
         self.cleanup(
             directories_to_remove=[input_path, output_path],
-            files_to_remove=(input_file, output_file),
+            files_to_remove=[input_file, output_file],
         )
         assert result == ([input_file.name], self.size_stat_dict)
 
@@ -156,7 +157,7 @@ class Test_GetInputFiles(TestInit):
             file.touch()
         output_file.touch()
 
-        file_list, size_dict = self.dal._get_input_files(input_path, output_path, cm_files=0)
+        file_list, size_dict = self.dal._get_input_files(str(input_path), str(output_path), cm_files=0)
         result = (sorted(file_list), size_dict)
         expected_result = (
             sorted([file.name for file in input_files if file.name != output_file.name]),
@@ -177,7 +178,7 @@ class Test_GetInputFiles(TestInit):
         input_path, output_path = self.setup_directories()
         with patch("pathlib.Path.rglob") as mock_rglob:
             mock_rglob.return_value = []
-            result = self.dal._get_input_files(nonexistent_input_path, output_path, cm_files=0)
+            result = self.dal._get_input_files(str(nonexistent_input_path), str(output_path), cm_files=0)
             self.cleanup(directories_to_remove=[input_path, output_path])
             assert result == ([], self.size_stat_dict_empty)
 
@@ -188,7 +189,7 @@ class Test_GetInputFiles(TestInit):
         input_path, output_path = self.setup_directories()
         input_file = input_path / "file.txt"
         input_file.touch()
-        result = self.dal._get_input_files(input_path, output_path, cm_files=0)
+        result = self.dal._get_input_files(str(input_path), str(output_path), cm_files=0)
         self.cleanup(
             directories_to_remove=[input_path, output_path],
             files_to_remove=[input_file],
@@ -207,7 +208,8 @@ class TestGetFilesToProcess(TestInit):
         os.makedirs(output_path, exist_ok=True)
         return input_path, output_path
 
-    def cleanup(self, directories_to_remove=[], files_to_remove=[]):
+    @staticmethod
+    def cleanup(directories_to_remove=[], files_to_remove=[]):
         """
         Utility function that removes all the files and all the directories
         passed as arguments
@@ -278,7 +280,7 @@ class TestGetFilesToProcess(TestInit):
         self, in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
     ):
         files_to_remove = in_files_1 + in_files_2 + [out_file_2]
-        directories_to_remove = ([in_path_1, out_path_1, in_path_2, out_path_2],)
+        directories_to_remove = [in_path_1, out_path_1, in_path_2, out_path_2]
         self.cleanup(directories_to_remove=directories_to_remove, files_to_remove=files_to_remove)
 
     def test_multiple_missing_files(self):
@@ -463,7 +465,8 @@ class TestSaveJobMetadata(TestInit):
         "job_output_stats": "job_output_stats",
     }
 
-    def cleanup(self, directories_to_remove=[], files_to_remove=[]):
+    @staticmethod
+    def cleanup(directories_to_remove=[], files_to_remove=[]):
         """
         Utility function that removes all the files and all the directories
         passed as arguments
