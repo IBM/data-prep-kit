@@ -165,11 +165,11 @@ class EdedupRuntime(DefaultTableTransformRuntime):
         self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
     ) -> dict[str, Any]:
         """
-        Set environment for filter execution
+        Set environment for transform execution
         :param data_access_factory - data access factory
         :param statistics - reference to the statistics object
         :param files - list of files to process
-        :return: dictionary of filter init params
+        :return: dictionary of transform init params
         """
         # create hashes
         self.filters = RayUtils.create_actors(
