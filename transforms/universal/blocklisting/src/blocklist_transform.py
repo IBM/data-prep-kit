@@ -44,21 +44,23 @@ def get_domain_list(domain_list_url: str, data_access: DataAccess = None):
     return domain_list
 
 
-arg_prefix = "bl_"
 annotation_column_name_key = "bl_annotation_column_name"
 """ Key holds the name of the column to create in the output table"""
 source_url_column_name_key = "bl_source_url_column_name"
 """ Key holds the name of the column holding the URL from which the document was retrieved"""
 blocked_domain_list_path_key = "bl_blocked_domain_list_path"
 """ Key holds the directory holding 1 or more domain* files listing the urls to identify """
+block_data_factory_key = "block_list_data_factory"
+""" Key holds the data access factory for domain files """
+domain_refs_key = "__domain_refs"
+""" A hidden key used by the runtime to pass a ray object reference to the transform"""
+# defaults
 blocked_domain_list_path_default = "cos-optimal-llm-pile/spark_test/remove-cma-1/blocklists_refinedweb_subset/"
 """ The default value for the domain list URL"""
 annotation_column_name_default = "blocklisted"
 """ The default name of the annotation column """
 source_column_name_default = "title"
 """ The default name of the column containing the source url"""
-domain_refs_key = "__domain_refs"
-""" A hidden key used by the runtime to pass a ray object reference to the transform"""
 
 
 class BlockListTransform(AbstractTableTransform):
@@ -76,17 +78,17 @@ class BlockListTransform(AbstractTableTransform):
         """
 
         super().__init__(config)
-        logger.info(f"Blocklist config:{config}")
-        self.blocklist_annotation_column_name = config.get(annotation_column_name_key, annotation_column_name_default)
-        self.source_url_column_name = config.get(source_url_column_name_key, source_column_name_default)
+        self.blocklist_annotation_column_name = config.get(annotation_column_name_key, "")
+        self.source_url_column_name = config.get(source_url_column_name_key, "")
         runtime_provided_domain_refs = config.get(domain_refs_key, None)
         if runtime_provided_domain_refs is None:
             # this is only useful during local debugging without Ray
-            url = config.get(blocked_domain_list_path_key, blocked_domain_list_path_default)
+            url = config.get(blocked_domain_list_path_key, None)
             if url is None:
                 raise RuntimeError(f"Missing configuration value for key {annotation_column_name_key}")
-            daf = DataAccessFactory(arg_prefix)
-            daf.apply_input_params(config)
+            daf = config.get(block_data_factory_key, None)
+            if url is None:
+                raise RuntimeError(f"Missing configuration value for key {block_data_factory_key}")
             data_access = daf.create_data_access()
             domain_list = get_domain_list(url, data_access)
         else:
@@ -153,6 +155,7 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
     def __init__(self):
         super().__init__(name="blocklist", transform_class=BlockListTransform, runtime_class=BlockListRuntime)
         self.params = {}
+        self.daf = None
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
@@ -184,9 +187,9 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
             default=source_column_name_default,
             help="Name of the table column that has the document download URL",
         )
-        # Add bl-specific arguments to create the DataAccess instance to load the domains.
-        daf = DataAccessFactory(arg_prefix)
-        daf.add_input_params(parser)
+        # Add block-list-specific arguments to create the DataAccess instance to load the domains.
+        self.daf = DataAccessFactory(f"{self.name}_")
+        self.daf.add_input_params(parser)
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
@@ -194,16 +197,26 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        # Validate the data access args, if any
-        daf = DataAccessFactory(arg_prefix)
-        daf.apply_input_params(args)
-
+        arg_keys = [blocked_domain_list_path_key, annotation_column_name_key, source_url_column_name_key]
         dargs = vars(args)
-        for key, value in dargs.items():
-            if key.startswith(arg_prefix):
-                self.params[key] = value
-        return True
+        for arg_key in arg_keys:
+            # Make sure parameters are defined
+            if dargs.get(arg_key) is None or len(dargs.get(arg_key)) < 1:
+                logger.info(f"parameter {arg_key} is not defined, exiting")
+                return False
+            self.params[arg_key] = dargs.get(arg_key)
+        self.params[block_data_factory_key] = self.daf
+        # populate data access factory
+        return self.daf.apply_input_params(args)
 
+    def get_transform_metadata(self) -> dict[str, Any]:
+        """
+        Provides a default implementation if the user has provided a set of keys to the initializer.
+        These keys are used in apply_input_params() to extract our key/values from the global Namespace of args.
+        :return:
+        """
+        del self.params[block_data_factory_key]
+        return self.params
 
 class BlockListRuntime(DefaultTableTransformRuntime):
     """
@@ -220,18 +233,6 @@ class BlockListRuntime(DefaultTableTransformRuntime):
         """
         super().__init__(params)
 
-    def _get_data_access(self, data_access_factory: DataAccessFactory):
-        logger.info(f"getting blocklist DataAccessFactory with {self.params}")
-        daf = DataAccessFactory(arg_prefix)
-        valid = daf.apply_input_params(self.params)
-        if not valid:
-            logger.info("Using ray runtime data access factory")
-            daf = data_access_factory
-        else:
-            logger.info("Using blocklist-specific data access factory")
-        data_access = daf.create_data_access()
-        return data_access
-
     def get_transform_config(
         self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
     ) -> dict[str, Any]:
@@ -246,10 +247,12 @@ class BlockListRuntime(DefaultTableTransformRuntime):
         url = self.params.get(blocked_domain_list_path_key, None)
         if url is None:
             raise RuntimeError(f"Missing configuration key {blocked_domain_list_path_key}")
-        data_access = self._get_data_access(data_access_factory)
-        domain_list = get_domain_list(url, data_access)
+        data_access_factory = self.params.get(block_data_factory_key, None)
+        if data_access_factory is None:
+            raise RuntimeError(f"Missing configuration key {block_data_factory_key}")
+
+        domain_list = get_domain_list(url, data_access_factory.create_data_access())
         domain_refs = ray.put(list(domain_list))
-        logger.info(f"{domain_refs_key} = {domain_refs}")
         return {domain_refs_key: domain_refs} | self.params
 
 

@@ -55,7 +55,7 @@ class DataAccessLocal(DataAccess):
             if i >= cm_files > 0:
                 break
             size = c_path.stat().st_size
-            parquet_files.append(str(c_path.absolute()).removeprefix(f"{path}/"))
+            parquet_files.append(str(c_path.absolute()))
             total_input_file_size += size
             if min_file_size > size:
                 min_file_size = size
@@ -200,6 +200,7 @@ class DataAccessLocal(DataAccess):
         :return: output file location
         """
         return path.replace(self.input_folder, self.output_folder)
+        return output_path
 
     def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
         """
