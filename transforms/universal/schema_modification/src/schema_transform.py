@@ -129,7 +129,7 @@ class SchemaTransformConfiguration(DefaultTableTransformConfiguration):
         By convention a common prefix should be used for all transform-specific CLI args
         (e.g, noop_, pii_, etc.)
         """
-        parser.add_argument("--doc_column", type=str, default="contents", help="doc column name")
+        parser.add_argument("--doc_column", type=str, default=None, help="doc column name")
         parser.add_argument("--id_column", type=str, default=None, help="doc data id column name")
         parser.add_argument("--int_id_column", type=str, default=None, help="int doc data id column name")
         # When using this specify columns as follows --columns_to_remove foo bar foobar
@@ -141,7 +141,7 @@ class SchemaTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        if args.id_column is not None and len(args.doc_column) <= 1:
+        if args.id_column is not None and args.doc_column is None:
             print("doc column name has to be defined for doc id generation")
             return False
         self.params["doc_column"] = args.doc_column

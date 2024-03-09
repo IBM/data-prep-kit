@@ -2,16 +2,16 @@ import os
 import sys
 
 from data_processing.ray import TransformLauncher
-from data_processing.utils import ParamsUtils
-from schema_modification_implementation import SchemaTransformConfiguration
+from data_processing.utils import DPFConfig, ParamsUtils
+from schema_transform import SchemaTransformConfiguration
 
 
 # create launcher
 launcher = TransformLauncher(transform_runtime_config=SchemaTransformConfiguration())
 # create parameters
 s3_cred = {
-    "access_key": "YOUR Lakehouse COS ACCESS KEY",
-    "secret_key": "YOUR Lakehouse COS PRIVATE KEY",
+    "access_key": DPFConfig.S3_ACCESS_KEY,
+    "secret_key": DPFConfig.S3_SECRET_KEY,
     "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
@@ -23,7 +23,7 @@ lakehouse_config = {
     "input_version": "main",
     "output_table": "academic.ieee_schema_test",
     "output_path": "lh-test/tables/academic/ieee_schema_test",
-    "token": "YOUR Lakehouse TOKEN",
+    "token": DPFConfig.LAKEHOUSE_TOKEN,
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}

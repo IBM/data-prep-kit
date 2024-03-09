@@ -1,3 +1,4 @@
+import os
 from typing import Tuple
 
 import pyarrow as pa
@@ -17,6 +18,7 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
     """
 
     def get_test_transform_fixtures(self) -> list[Tuple]:
-        basedir = "test-data/data_processing/ray/noop/"
-        fixtures = [(NOOPTransformConfiguration(), {"noop_sleep_sec": 0}, basedir + "input", basedir + "expected")]
+        basedir = "../../../test-data/data_processing/ray/noop/"
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        fixtures = [(NOOPTransformConfiguration(), {"noop_sleep_sec": 0}, basedir + "/input", basedir + "/expected")]
         return fixtures

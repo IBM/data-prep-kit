@@ -50,6 +50,7 @@ class AbstractTest:
         for i in range(l1):
             t1 = table_list[i]
             t2 = expected_table_list[i]
+            assert t1.schema == t2.schema, f"Schema of the two tables is not the same"
             l1 = t1.num_rows
             l2 = t2.num_rows
             assert l1 == l2, f"Number of rows in table #{i} ({l1}) does not match expected number ({l2})"
@@ -92,7 +93,7 @@ class AbstractTest:
         """
         dir_cmp = dircmp(directory, expected_dir)
         assert len(dir_cmp.funny_files) == 0, f"Funny files found: {dir_cmp.funny_files}"
-        assert len(dir_cmp.right_only) == 0, f"Funny found only in test output directory: {dir_cmp.right_only}"
+        assert len(dir_cmp.right_only) == 0, f"Funny found only in expected output directory: {dir_cmp.right_only}"
         assert len(dir_cmp.left_only) == 0, f"Funny files missing in test output directory: {dir_cmp.left_only}"
         if "metadata.json" in dir_cmp.diff_files:
             # metadata.json has things like dates and times and output foldres.

@@ -51,11 +51,11 @@ class DataAccessLocal(DataAccess):
         parquet_files = []
         total_input_file_size = 0
         i = 0
-        for path in Path(path).rglob("*.parquet"):
+        for c_path in Path(path).rglob("*.parquet"):
             if i >= cm_files > 0:
                 break
-            size = path.stat().st_size
-            parquet_files.append(path.name)
+            size = c_path.stat().st_size
+            parquet_files.append(str(c_path.absolute()))
             total_input_file_size += size
             if min_file_size > size:
                 min_file_size = size
@@ -186,11 +186,10 @@ class DataAccessLocal(DataAccess):
         """
 
         try:
-            file_path = os.path.join(self.input_folder, path)
-            table = pq.read_table(file_path)
+            table = pq.read_table(path)
             return table
         except (FileNotFoundError, IOError, pa.ArrowException) as e:
-            logger.error(f"Error reading table from {path}: {e.with_traceback(None)}")
+            logger.error(f"Error reading table from {path}: {e}")
             return None
 
     def get_output_location(self, path: str) -> str:
@@ -200,6 +199,7 @@ class DataAccessLocal(DataAccess):
         :return: output file location
         """
         return path.replace(self.input_folder, self.output_folder)
+        return output_path
 
     def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
         """
@@ -220,16 +220,15 @@ class DataAccessLocal(DataAccess):
         # Get table size in memory
         size_in_memory = table.nbytes
         try:
-            output_path = os.path.join(self.output_folder, path)
             # Write the table to parquet format
-            pq.write_table(table, output_path)
+            pq.write_table(table, path)
 
             # Get file size and create file_info
-            file_info = {"name": os.path.basename(output_path), "size": os.path.getsize(output_path)}
+            file_info = {"name": os.path.basename(path), "size": os.path.getsize(path)}
             return size_in_memory, file_info
 
         except Exception as e:
-            logger.error(f"Error saving table to {output_path}: {e}")
+            logger.error(f"Error saving table to {path}: {e}")
             return size_in_memory, None
 
     def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:

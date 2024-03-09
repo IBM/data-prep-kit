@@ -77,4 +77,23 @@ test/test_noop.py ..                                                            
 ================================================================================= 2 passed in 0.83s =================================================================================
 (venv) % 
 ```
+Finally, the tests should be runnable with the `Makefile`  as follows:
+```shell
+$ make test
+source venv/bin/activate;			\
+	export PYTHONPATH=../src:.:$PYTHONPATH;	\
+	cd test; pytest . 
+========================================================================================== test session starts ==========================================================================================
+platform darwin -- Python 3.10.11, pytest-8.0.2, pluggy-1.4.0
+rootdir: /Users/dawood/git/fm-data-engineering/transforms/universal/noop/test
+collected 3 items                                                                                                                                                                                       
+
+test_noop.py ..                                                                                                                                                                                   [ 66%]
+test_noop_launch.py .                                                                                                                                                                             [100%]
+
+========================================================================================== 3 passed in 17.15s ===========================================================================================
+$
+```
+Note that the venv was activated for you as part of running the test.
+
 
