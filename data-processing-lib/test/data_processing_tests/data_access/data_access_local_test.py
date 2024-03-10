@@ -47,7 +47,7 @@ class TestGetFilesFolder(TestInit):
         result = self.dal._get_files_folder(str(directory), cm_files=0)
         os.remove(file_path)
         os.rmdir(directory)
-        assert result == (["file.parquet"], self.size_stat_dict)
+        assert result == (["/tmp/input/empty_dir/file.parquet"], self.size_stat_dict)
 
     def test_multiple_files(self):
         """
@@ -63,7 +63,7 @@ class TestGetFilesFolder(TestInit):
 
         file_list, size_dict = self.dal._get_files_folder(str(directory), cm_files=0)
         results = (sorted(file_list), size_dict)
-        expected_results = (sorted([file.name for file in files]), self.size_stat_dict_1)
+        expected_results = (sorted([str(file.absolute()) for file in files]), self.size_stat_dict_1)
         for file in files:
             os.remove(file)
         os.rmdir(directory)

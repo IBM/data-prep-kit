@@ -32,7 +32,6 @@ class DataAccessLocal(DataAccess):
         """
         self.input_folder = path_config["input_folder"]
         self.output_folder = path_config["output_folder"]
-        logger.debug(f"Creating DataAccessLocal: input_folder={self.input_folder}, output_folder={self.output_folder}")
         self.d_sets = d_sets
         self.checkpoint = checkpoint
         self.m_files = m_files
@@ -56,7 +55,7 @@ class DataAccessLocal(DataAccess):
             if i >= cm_files > 0:
                 break
             size = c_path.stat().st_size
-            parquet_files.append(str(c_path.absolute()).removeprefix(f"{path}/"))
+            parquet_files.append(str(c_path.absolute()))
             total_input_file_size += size
             if min_file_size > size:
                 min_file_size = size
@@ -187,11 +186,10 @@ class DataAccessLocal(DataAccess):
         """
 
         try:
-            file_path = os.path.join(self.input_folder, path)
-            table = pq.read_table(file_path)
+            table = pq.read_table(path)
             return table
         except (FileNotFoundError, IOError, pa.ArrowException) as e:
-            logger.error(f"Error reading table from {file_path}: {e}")
+            logger.error(f"Error reading table from {path}: {e}")
             return None
 
     def get_output_location(self, path: str) -> str:
@@ -200,10 +198,8 @@ class DataAccessLocal(DataAccess):
         :param path: input file location
         :return: output file location
         """
-        location = path.replace(self.input_folder, self.output_folder)
-        # logger.debug(f"get_output_location(): input_folder={self.input_folder}, output_folder={self.output_folder}")
-        logger.debug(f"get_output_location(): Location of {path} is {location}")
-        return location
+        return path.replace(self.input_folder, self.output_folder)
+        return output_path
 
     def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
         """
@@ -224,20 +220,15 @@ class DataAccessLocal(DataAccess):
         # Get table size in memory
         size_in_memory = table.nbytes
         try:
-            output_path = os.path.join(self.output_folder, path)
-            logger.debug(
-                f"Writing table of size {size_in_memory} to named {path} to output folder {self.output_folder}"
-            )
             # Write the table to parquet format
-            pq.write_table(table, output_path)
+            pq.write_table(table, path)
 
             # Get file size and create file_info
-            file_info = {"name": os.path.basename(output_path), "size": os.path.getsize(output_path)}
-            logger.debug(f"Done writing table of {output_path}: file_info={file_info}")
+            file_info = {"name": os.path.basename(path), "size": os.path.getsize(path)}
             return size_in_memory, file_info
 
         except Exception as e:
-            logger.error(f"Error saving table to {output_path}: {e}")
+            logger.error(f"Error saving table to {path}: {e}")
             return size_in_memory, None
 
     def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:

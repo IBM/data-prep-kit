@@ -1,5 +1,12 @@
 # Fuzzy Dedup
 
+Please see the set of
+[transform project conventions](../../transform-conventions.md)
+for details on general project conventions, transform configuration,
+testing and IDE set up.
+
+## Summary
+
 The basic implementation of the fuzzy de dup is based on [MinHash](https://en.wikipedia.org/wiki/MinHash). Also see
 [here](http://infolab.stanford.edu/~ullman/mmds/ch3n.pdf) for more details. The architecture of the implementation is presented here:
 
@@ -68,26 +75,24 @@ A [docker file](Dockerfile) that can be used for building docker image. You can 
 make build to build it
 ```
 
-## Driver options
+### Configuration and command line Options
 
-In addition to the "standard" options described 
-[here](../../../data-processing-lib/doc/launcher-options.md) transformer defines the following additional parameters:
+The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py)
+configuration for values are as follows:
 
-```shell
-    "bucket_cpu": 0.5,
-    "doc_cpu": 0.5,
-    "mhash_cpu": 0.5,
-    "num_doc_actors": 1,
-    "num_bucket_actors": 1,
-    "num_minhash_actors": 1,
-    "num_preprocessors": 2,
-    # fuzzy parameters
-    "num_permutations": 64,
-    "threshold": 0.8,
-    "shingles_size": 5,
-    "japanese_data": False,
-    "delimiters": " ",
-```
+* _bucket_cpu_ - specifies number of CPUs for bucket actor
+* _doc_cpu_ - specifies number of CPUs for doc actor
+* _mhash_cpu_ - specifies number of CPUs for minhash actor
+* _num_doc_actors_ - specifies number of doc actors
+* _num_bucket_actors_ - specifies number of bucket actors
+* _num_minhash_actors_ - specifies number of minhash actors
+* _num_preprocessors_ - specifies number of preprocessors
+* _num_permutations_ - specifies number of permutations
+* _threshold_ - specifies threshold
+* _shingles_size_ - specifies shingles size
+* _japanese_data_ - specifies whether to use japanese specific document splitting
+* _delimiters_ - specifies delimiter for non japanese document splitting
+
 Above you see both parameters and their values for small runs (tens of files). We also provide an 
 [estimate](src/cluster_estimator.py) to roughly determine cluster size for running transformer.
 

@@ -1,5 +1,12 @@
 # Exact Dedup
 
+Please see the set of
+[transform project conventions](../../transform-conventions.md)
+for details on general project conventions, transform configuration,
+testing and IDE set up.
+
+## Summary
+
 Exact data deduplication is used to identify (and remove) records determined by native documents.
 * It’s O(N2) complexity
 * shuffling with lots of data movement
@@ -38,18 +45,16 @@ A [docker file](Dockerfile) that can be used for building docker image. You can 
 make build to build it
 ```
 
-## Driver options
+## Configuration and command line Options
 
-In addition to the "standard" options described
-[here](../../../data-processing-lib/doc/launcher-options.md) transformer defines the following additional parameters:
+The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py)
+configuration for values are as follows:
 
-```shell
-    "hash_cpu": 0.5,
-    "num_hashes": 2,
-    "doc_column": "contents",
-```
-Above you see both parameters and their values for small runs (tens of files). We also provide an
-[estimate](src/cluster_estimator.py) to roughly determine cluster size for running transformer.
+* _hash_cpu_ - specifies an amount of CPUs per hash actor
+* _num_hashes_ - specifies number of hash actors
+* _doc_column_ - specifies name of the column containing documents
+
+We also provide an [estimate](src/cluster_estimator.py) to roughly determine cluster size for running transformer.
 
 ## Running
 

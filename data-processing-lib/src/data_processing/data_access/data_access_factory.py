@@ -46,6 +46,7 @@ class DataAccessFactory(CLIArgumentProvider):
         self.dsets = None
         self.max_files = -1
         self.cli_arg_prefix = "" if cli_arg_prefix is None else cli_arg_prefix
+        self.params = {}
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
@@ -142,8 +143,10 @@ class DataAccessFactory(CLIArgumentProvider):
         """
         if isinstance(args, argparse.Namespace):
             arg_dict = vars(args)
-        else:
+        elif isinstance(args, dict):
             arg_dict = args
+        else:
+            raise ValueError("args must be Namespace or dictionary")
         s3_cred = arg_dict.get(f"{self.cli_arg_prefix}s3_cred")
         s3_config = arg_dict.get(f"{self.cli_arg_prefix}s3_config")
         lh_config = arg_dict.get(f"{self.cli_arg_prefix}lh_config")
@@ -160,6 +163,7 @@ class DataAccessFactory(CLIArgumentProvider):
         # check that only one (S3, LakeHouse, or Local) configuration is specified
         if s3_config_specified + lh_config_specified + local_config_specified > 1:
             logger.error(
+                f"prefix {self.cli_arg_prefix} "
                 f"{'S3, ' if s3_config_specified == 1 else ''}"
                 f"{'Lakehouse, ' if lh_config_specified == 1 else ''}"
                 f"{'Local ' if local_config_specified == 1 else ''}"
@@ -170,6 +174,7 @@ class DataAccessFactory(CLIArgumentProvider):
         # check that at least one (S3, LakeHouse, or Local) configuration is specified
         if s3_config_specified + lh_config_specified + local_config_specified == 0:
             logger.error(
+                f"prefix {self.cli_arg_prefix} "
                 "No S3, lakehouse, or local configuration parameters defined," " at least one of them is required! "
             )
             return False
@@ -235,44 +240,60 @@ class DataAccessFactory(CLIArgumentProvider):
             params["data sets"] = self.dsets
         return params
 
-    @staticmethod
-    def __validate_s3_cred(s3_credentials: dict[str, str]) -> bool:
+    def __validate_s3_cred(self, s3_credentials: dict[str, str]) -> bool:
         """
         Validate that
         :param s3_credentials: dictionary of S3 credentials
         :return:
         """
         if s3_credentials is None:
-            logger.error("Could not get cos credentials ")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                "Could not get cos credentials "
+            )
             return False
         if (
-            s3_credentials.get("access_key") == None
-            or s3_credentials.get("secret_key") == None
-            or s3_credentials.get("cos_url") == None
+            s3_credentials.get("access_key") is None
+            or s3_credentials.get("secret_key") is None
+            or s3_credentials.get("cos_url") is None
         ):
-            logger.error("Could not get cos credentials ")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                "Could not get cos credentials "
+            )
             return False
         return True
 
-    @staticmethod
-    def _validate_local(local_config: dict[str, str]) -> bool:
+    def _validate_local(self, local_config: dict[str, str]) -> bool:
         """
         Validate that
         :param local_config: dictionary of local config
         :return: True if local config is valid, False otherwise
         """
         if local_config is None:
-            logger.error("Could not get local config")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                "Could not get local config"
+            )
             return False
         valid_config = True
         if local_config.get("input_folder", "") == "":
             valid_config = False
-            logger.error(f"Could not find input folder in local config")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                f"Could not find input folder in local config"
+            )
         if local_config.get("output_folder", "") == "":
             valid_config = False
-            logger.error(f"Could not find output folder in local config")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                f"Could not find output folder in local config"
+            )
         if not valid_config:
-            logger.error("Invalid local configuration")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                "Invalid local configuration"
+            )
         return valid_config
 
     def create_data_access(self) -> DataAccess:

@@ -11,9 +11,8 @@ print(os.environ)
 # create launcher
 launcher = TransformLauncher(transform_runtime_config=CoalesceTransformConfiguration())
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "output"))
-Path(output_folder).mkdir(parents=True, exist_ok=True)
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/output"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
@@ -34,6 +33,7 @@ params = {
     "coalesce_target": 100,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
+Path(output_folder).mkdir(parents=True, exist_ok=True)
 
 # launch
 launcher.launch()

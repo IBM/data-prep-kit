@@ -1,5 +1,12 @@
 # Split  files
 
+Please see the set of
+[transform project conventions](../../transform-conventions.md)
+for details on general project conventions, transform configuration,
+testing and IDE set up.
+
+## Summary
+
 This is a fairly simple transformer that is converting large files into smaller ones ones by splitting original
 tables into smaller ones we currently support two tipes of splitting:
 * splitting based on memory
@@ -13,17 +20,13 @@ A [docker file](Dockerfile) that can be used for building docker image. You can 
 make build to build it
 ```
 
-## Driver options
+## Configuration and command line Options
 
-In addition to the "standard" options described
-[here](../../../data-processing-lib/doc/launcher-options.md) transformer defines the following additional parameters:
+The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py)
+configuration for values are as follows:
 
-```shell
-    "max_table_size": 1,
-    "max_documents_table": 150
-```
-Here max table size is required size of coalesced table on disk (S3) and max document table is maximum documents
-per table
+* _max_table_size_ - specifies max size of table on disk/S3
+* _max_documents_table_ - specifies max documents per table
 
 ## Running
 

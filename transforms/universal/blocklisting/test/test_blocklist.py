@@ -1,8 +1,12 @@
 import blocklist_transform
 import pyarrow as pa
-from blocklist_transform import BlockListTransform
+from blocklist_transform import (BlockListTransform, blocked_domain_list_path_key,
+                                 block_data_factory_key, annotation_column_name_key,
+                                 source_url_column_name_key, source_column_name_default,
+                                 annotation_column_name_default)
 from data_processing.data_access import DataAccessLocal
 from data_processing.test_support.transform import AbstractTransformTest
+from data_processing.data_access import DataAccessFactory
 
 
 class TestBlockListTransform(AbstractTransformTest):
@@ -12,12 +16,17 @@ class TestBlockListTransform(AbstractTransformTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
+        daf = DataAccessFactory()
+        daf.apply_input_params({"local_config": {"input_folder": "/tmp", "output_folder": "/tmp"}})
         config = {
             # When running outside the Ray orchestrator and its DataAccess/Factory, there is
             # no Runtime class to load the domains and the Transform must do it itself using
             # the bl_local_config for this test.
-            "bl_local_config": {"input_folder": "/tmp", "output_folder": "/tmp"},
-            blocklist_transform.blocked_domain_list_path_key: "../test-data/domains/arjel",
+            block_data_factory_key: daf,
+            blocked_domain_list_path_key: "../test-data/domains/arjel",
+            annotation_column_name_key: annotation_column_name_default,
+            source_url_column_name_key: source_column_name_default,
+
         }
         fixtures = [
             (
@@ -67,7 +76,6 @@ class TestBlockListTransform(AbstractTransformTest):
         },  # transform() metadata
         {},  # Empty flush() metadata
     ]
-
 
 if __name__ == "__main__":
     t = TestBlockListTransform()

@@ -1,5 +1,12 @@
 # Coalesce files
 
+Please see the set of
+[transform project conventions](../../transform-conventions.md)
+for details on general project conventions, transform configuration,
+testing and IDE set up.
+
+## Summary
+
 This is a fairly simple transformer that is converting small files into larger ones by buffering them in memory
 until the size of the buffer is not smaller then the required size and then writes the aggregated table out. This
 transformer is leveraging flush support in the framework to ensure that no data is left in memory (buffer) once 
@@ -13,15 +20,12 @@ A [docker file](Dockerfile) that can be used for building docker image. You can 
 make build to build it
 ```
 
-## Driver options
+## Configuration and command line Options
 
-In addition to the "standard" options described
-[here](../../../data-processing-lib/doc/launcher-options.md) transformer defines the following additional parameters:
+The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py)
+configuration for values are as follows:
 
-```shell
-  "coalesce_target": 100,
-```
-Here coalesce target is required size of coalesced table on disk (S3)
+* _coalesce_target_ - specifies coalesce target in MB
 
 ## Running
 
