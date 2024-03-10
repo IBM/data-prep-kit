@@ -304,7 +304,7 @@ class RayRemoteJobs:
             gpus = worker_node.get("gpu", 0)
             accelerator = worker_node.get("gpu_accelerator", None)
             worker_node_template_name = f"{name}-worker-template-{index}"
-            _, _ = self.api_server_client.delete_compute_template(ns="default", name=worker_node_template_name)
+            _, _ = self.api_server_client.delete_compute_template(ns=namespace, name=worker_node_template_name)
             worker_template = Template(name=worker_node_template_name, namespace=namespace, cpu=cpus, memory=memory,
                                        gpu=gpus, gpu_accelerator=accelerator)
             status, error = self.api_server_client.create_compute_template(worker_template)
