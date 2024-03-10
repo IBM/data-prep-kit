@@ -8,6 +8,7 @@ actor_options = {"num_cpus": 1, "memory": GB, "max_task_retries": 10}
 
 
 def test_actor_creation():
+    print("Starting Ray cluster")
     ray.init()
     support = RayUtils()
 
@@ -32,3 +33,6 @@ def test_actor_creation():
 
     assert 1 == res["cpus"] - res1["cpus"]
     assert 1 == res["memory"] - res1["memory"]
+
+    print("shutting down Ray cluster")
+    ray.shutdown()
