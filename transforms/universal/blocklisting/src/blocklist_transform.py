@@ -28,16 +28,11 @@ def reverse_url(url: str) -> str:
 
 def get_domain_list(domain_list_url: str, data_access: DataAccess = None):
     domain_list = []
-    if data_access is None:
-        logger.info(f"Reading domain list in from {domain_list_url} as ")
-        config = {"input_folder": "/tmp", "output_folder": "/tmp"}
-        data_access = DataAccessLocal(config, [], False, -1)
     logger.info(f"Reading domain list from {domain_list_url} ")
     blocklist_file_dict = data_access.get_folder_files(domain_list_url)
     for file_name, file_contents in blocklist_file_dict.items():
         domains = file_contents.decode("utf-8").split("\n")
         domain_list_from_file = [domain.strip() for domain in domains if not domain.startswith("#")]
-        logger.info(f"Adding {len(domain_list_from_file)} domains from {file_name}")
         domain_list += domain_list_from_file
     domain_list = set(domain_list)
     logger.info(f"Added {len(domain_list)} domains to domain list")
@@ -238,7 +233,7 @@ class BlockListRuntime(DefaultTableTransformRuntime):
     ) -> dict[str, Any]:
         """
         Set environment for filter execution
-        :param data_access_factory - data access factory
+        :param blocklist_data_access_factory - data access factory
         :param statistics - reference to the statistics object
         :param files - list of files to process
         :return: dictionary of filter init params
@@ -247,11 +242,11 @@ class BlockListRuntime(DefaultTableTransformRuntime):
         url = self.params.get(blocked_domain_list_path_key, None)
         if url is None:
             raise RuntimeError(f"Missing configuration key {blocked_domain_list_path_key}")
-        data_access_factory = self.params.get(block_data_factory_key, None)
-        if data_access_factory is None:
+        blocklist_data_access_factory = self.params.get(block_data_factory_key, None)
+        if blocklist_data_access_factory is None:
             raise RuntimeError(f"Missing configuration key {block_data_factory_key}")
 
-        domain_list = get_domain_list(url, data_access_factory.create_data_access())
+        domain_list = get_domain_list(url, blocklist_data_access_factory.create_data_access())
         domain_refs = ray.put(list(domain_list))
         return {domain_refs_key: domain_refs} | self.params
 

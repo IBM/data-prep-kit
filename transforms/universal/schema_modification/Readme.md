@@ -1,5 +1,12 @@
 # Schema modification
 
+Please see the set of
+[transform project conventions](../../transform-conventions.md)
+for details on general project conventions, transform configuration,
+testing and IDE set up.
+
+## Summary
+
 This is a fairly simple transformer that supports tables' schema modification. It
 supports the following transformations of the original data:
 * Adding document id: this allows to add string document id to the data, calculated as
@@ -27,15 +34,16 @@ make build to build it
 
 ## Driver options
 
-In addition to the "standard" options described
-[here](../../../data-processing-lib/doc/launcher-options.md) transformer defines the following additional parameters:
+## Configuration and command line Options
 
-```shell
-    "doc_column": "contents",
-    "id_column": "id_column",
-    "int_id_column": "int_id_column",
-    "columns_to_remove": <list of space separated columns_to_remove>
-```
+The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py)
+configuration for values are as follows:
+
+* _doc_column_ - specifies name of column containing document (required for ID generation)
+* _id_column_ - specifies name of column containing string document id, if None, id is not generated
+* _int_id_column_ - specifies name of column containing integer document id, if None, id is not generated
+* _columns_to_remove_ - specifies list of space separated columns to remove
+
 
 ## Running
 
