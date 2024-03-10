@@ -134,3 +134,6 @@ dmypy.json
 **/*.swp
 **/.pydevproject
 .DS_Store
+
+
+kind/cluster/hack/.helper-functions.sh
