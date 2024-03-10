@@ -93,7 +93,7 @@ class AbstractTest:
         """
         dir_cmp = dircmp(directory, expected_dir)
         assert len(dir_cmp.funny_files) == 0, f"Funny files found: {dir_cmp.funny_files}"
-        assert len(dir_cmp.right_only) == 0, f"Funny found only in test output directory: {dir_cmp.right_only}"
+        assert len(dir_cmp.right_only) == 0, f"Funny found only in expected output directory: {dir_cmp.right_only}"
         assert len(dir_cmp.left_only) == 0, f"Funny files missing in test output directory: {dir_cmp.left_only}"
         if "metadata.json" in dir_cmp.diff_files:
             # metadata.json has things like dates and times and output foldres.
