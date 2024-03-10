@@ -1,4 +1,5 @@
-include ../makefile.recurse
+# Use make help, to see the available rules
+include ../.make.defaults
 
 VERSION=0.2.0
 TAG := "v${VERSION}"
@@ -8,24 +9,28 @@ PYTHON=python3
 #ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/wcp-ai-foundation-team-fms-pypi-local
 ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local
 
-clean:
-	rm -r dist
+clean::
+	@# Help: Clean up the distribution build and the venv 
+	rm -r dist venv
 	rm -rf src/*egg-info
 
-check-env:
+.check-env::
 	@if [ -z "$(VERSION)" ]; then echo "You must provide VERSION"; false; fi
 	@if [ -z "$(ARTIFACTORY_USER)" ] || [ -z "$(ARTIFACTORY_API_KEY)" ]; then echo "You must set ARTIFACTORY_USER and ARTIFACTORY_API_KEY env vars"; false ; fi
 	@echo "Checks passed"
 
-update-toml: check-env
+update-toml:: .check-env
+	@# Help: Copy the Makefile distribution version into the pyproject.toml 
 	sed -e 's/^version[ ]*=.*/version = "'${VERSION}'"/' pyproject.toml > tt.toml
 	mv tt.toml pyproject.toml
 
-build: update-toml venv
+build:: update-toml venv
+	@# Help: Build the distribution for publishing to a pypi 
 	${PYTHON} -m pip install --upgrade build
 	${PYTHON} -m build
 
-publish: check-env
+publish:: .check-env
+	@# Help: Publish the wheel to and pypi 
 	@twine upload --verbose --non-interactive --skip-existing \
 		--repository-url ${ARTIFACTORY_DESTINATION}	\
 		-u ${ARTIFACTORY_USER} \
@@ -35,7 +40,8 @@ publish: check-env
 	#@git tag ${TAG}
 	#@git push origin ${TAG}
 
-venv:	pyproject.toml check-env
+venv::	pyproject.toml .check-env
+	@# Help: Create the virtual environment using pyproject.toml 
 	rm -rf venv	
 	$(PYTHON) -m venv venv
 	echo '[global]' > venv/pip.conf
@@ -45,8 +51,7 @@ venv:	pyproject.toml check-env
 	pip install -e .;		\
 	pip install pytest pytest-cov
 
-.PHONY: test
-test:  
+test::  
 	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
 	source venv/bin/activate;		\
 	export PYTHONPATH=../src:.:$$PYTHONPATH; \

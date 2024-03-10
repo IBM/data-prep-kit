@@ -1,4 +1,33 @@
-# Provide some common rules and functions for our tree of Makefiles
+#######################################################################################
+# Lists all targets and optional help text found in the target.
+# Adapted from https://stackoverflow.com/a/65243296/45375
+# and modified to support help at the top or middle of the recursive tree and at 
+# the leaves (the head and tail piece).
+.PHONY: help
+.newhelp::
+	# Expects a line of the following in the rule
+	@printf "%-15s %s\n" "Target" "Description"
+	@printf "%-15s %s\n" "--------------" "------------------------"
+	@make -pqR : 2>/dev/null  | grep '@# Help:' | grep -v make | grep -v IGNORE | sed -e 's/.*Help://' -e 's/[ 	]*//' | \
+		awk -F, '{printf("%-15s%s\n",$$1,$$2)}'
+
+help::
+	@printf "%-20s %s\n" "Target" "Description"
+	@printf "%-20s %s\n" "------" "-----------"
+	@export submakes=$$(find ./* -name Makefile -d 1);	\
+	make -pqR : 2>/dev/null \
+		| awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' \
+		| sort \
+		| egrep -v -e '^[^[:alnum:]]' -e '^$@$$' \
+		| xargs -I _ sh -c 'printf "%-20s " _; make _ -nB 2>/dev/null | (grep -i "^# Help:" || echo "") \
+		| if [ -z "$$submakes" ]; then	\
+			tail -1;		\
+		else				\
+			 head -1;		\
+		fi				\
+		| sed "s/^# Help: //g"' | uniq
+
+
 #################################################################################################################
 #
 # This provides common support for all Makefiles in the project. 
@@ -15,29 +44,17 @@
 #
 # Each rule is called recursively on sub-directories and if a similar inclusion is done in the sub-Makefiles,
 # the rules will be applied/executed recursively in their sub-directories. By default, sub-directories
-# are traversed in lexigraphic order.  If you need to control the ordering, create a .make_subdirs
+# are traversed in lexigraphic order.  If you need to control the ordering, create a .make.subdirs
 # listing the sub-directories to process and their order.
 #
 #################################################################################################################
 
-# Rules with actual dependencies executed as commands
-
-.PHONY: __build-recurse
-__build-recurse:
-	$(MAKE) RULE=build __recurse
-
-.PHONY: __test-recurse
-__test-recurse:
-	$(MAKE) RULE=test __recurse
-
-.PHONY: __clean-recurse
-__clean-recurse:
-	$(MAKE) RULE=clean __recurse
-
-.PHONY: __recurse
-__recurse: 
-	@if [ -e .make_subdirs ]; then		\
-	    SUB_MAKE_DIRS=$$(cat .make_subdirs | sed -e 's/^#.*//') ;	\
+# Rule to recurse into subdirectories.  
+# Usage: $(MAKE) RULE=yourrule .recurse
+.PHONY: .recurse
+.recurse:: 
+	@if [ -e .make.subdirs ]; then		\
+	    SUB_MAKE_DIRS=$$(cat .make.subdirs | sed -e 's/^#.*//') ;	\
 	else					\
 	    SUB_MAKE_DIRS=$$(echo */ | sort);	\
 	fi;					\
@@ -47,6 +64,10 @@ __recurse:
 		if [ -e $$i/Makefile ]; then	\
 		    echo Using recursive $(RULE) rule in $$i;	\
 		    (cd $$i; $(MAKE) $(RULE));	\
+		    status=$$?;			\
+		    if [ $$status -ne 0 ]; then	\
+			exit $$status;		\
+		    fi;				\
 		else				\
 		    echo No Makefile found in $$i. Skipping.;	\
 		fi;				\
@@ -56,8 +77,6 @@ __recurse:
 PWD=$(shell pwd)
 # This rule allows sub-directories to override/define rule X for each X-recurse rule above.
 # See https://stackoverflow.com/questions/11958626/make-file-warning-overriding-commands-for-target
-%: __%-recurse
+%:: .%-recurse
 	@echo Finished executing rule $@ recursively in $(PWD) > /dev/null	
-
-
 
