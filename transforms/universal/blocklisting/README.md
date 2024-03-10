@@ -1,6 +1,6 @@
 # URL Block List Annotator 
 Please see the set of
-[transform project conventions](../../transform-conventions.md)
+[transform project conventions](../../README.md)
 for details on general project conventions, transform configuration,
 testing and IDE set up.
 
@@ -82,16 +82,22 @@ metadata.json	test1.parquet
 %
 </pre>
 
+### Building the Docker Image
+```shell
+% make image 
+...
+% podman images
+REPOSITORY                            TAG                    IMAGE ID      CREATED         SIZE
+localhost/blocklisting                0.1.0                  f6d4fbad1ab3  9 minutes ago   1.14 GB
+%
 
-In addition, there are some useful `make` targets (see conventions above):
-* `make venv` - creates the virtual environment.
-* `make test` - runs the tests in [test](test) directory
-* `make build` - to build the docker image
-* `make help` - displays the available `make` targets and help text.
+````
+In addition, there are some useful `make` targets (see conventions above)
+or use `make help` to see a list of available targets.
 
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
-the following additional command line arguments are available in addition to 
+the following command line arguments are available in addition to 
 [the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
 ```
 --bl_blocked_domain_list_path BL_BLOCKED_DOMAIN_LIST_PATH

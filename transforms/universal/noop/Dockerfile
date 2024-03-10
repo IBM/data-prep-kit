@@ -11,8 +11,6 @@ RUN apt -y update && apt install -y vim sudo bash curl unzip procps gcc
 ENV PYTHONPATH "$PYTHONPATH:/T5"
 ENV OPENBLAS_NUM_THREADS "1"
 ENV PATH "/T5:$PATH"
-#ENV JAVA_HOME "/usr/lib/jvm/java-11-openjdk-amd64"
-#ENV JVM_PATH "/usr/lib/jvm/java-11-openjdk-amd64/lib/server/libjvm.so"
 ENV HOME "/T5"
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
@@ -34,7 +32,7 @@ RUN rm /T5/requirements.txt
 RUN rm -rf /T5/.cache/pip
 
 # GCC only needed while installing some python modules
-RUN apt remove -y gcc
+RUN apt remove -y gcc && apt clean -y && apt autoremove -y
 
 # Expect the models to be avavilable in the host via "python preload.py" so that we don't trigger
 # watson_nlp's use of ARTIFACTORY env vars.

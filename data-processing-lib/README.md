@@ -2,13 +2,11 @@
 This provides a python framework for developing _transforms_ 
 on data stored in files - currently parquet files are supported -
 and running them in a [ray](https://ray.com) cluster.
-Data files may be stored in the local file system, COS/S3 or Lakehouse.
+Data files may be stored in the local file system or  COS/S3.
 For more details see the [documentation](doc/overview.md).
 
-## Development
-
 ### Requirements
-1. python 3.10 or later
+1. python 3.10 or 3.11 
 2. git command line tools
 3. [pre-commit](https://pre-commit.com/)
 4. twine (pip install twine)
@@ -37,8 +35,9 @@ or set up your IDE to use the venv directory when developing in this project
 
 
 ## Library Artifact Build and Publish
-To build and publish the library to artifactory
+To test, build and publish the library to artifactory
 ```shell
+make test
 make build
 make publish
 ```
@@ -46,19 +45,4 @@ To up the version number, edit the Makefile to change VERSION and rerun
 the above.  This will require committing both the Makefile and the 
 autotmatically updated pyproject.toml file.
 
-## Development (OLD?)
-
-Start by installing `setup-tools`
-
-```shell
-pip3 install -U setuptools
-```
-
-Now install our library locally. From the directory `path/to/kuberay/clients/python_apiserver_client` execute
-
-```shell
-pip3 install -e .
-```
-
-## Testing
 

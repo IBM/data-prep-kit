@@ -9,24 +9,27 @@ include ../../makefile.transforms
 DOCKER_IMAGE_NAME=blocklisting
 DOCKER_IMAGE_VERSION=0.1.0
 
-# Use default rule inherited from makefile.common
+# Use default rule inherited from ../../makefile.transforms
+.PHONY: clean
 clean: .clean
 
-	#export PYTHONPATH=../src:.:$$PYTHONPATH; \
-# Use default rule inherited from makefile.common
-
+# Use default rule inherited from ../../makefile.transforms
+.PHONY: test 
 test: .test
 
-# Use default rule inherited from makefile.common
+# Use default rule inherited from ../../makefile.transforms
+.PHONY: image 
 image: .image
 
-# Use default rule inherited from makefile.common
+# Use default rule inherited from ../../makefile.transforms
+.PHONY: build 
 build: .build
 
-# Use default rule inherited from makefile.common
+# Use default rule inherited from ../../makefile.transforms
 venv: .venv
 
-# Use default rule inherited from makefile.common
+# Use default rule inherited from ../../makefile.transforms
+.PHONY:  install_lib_source
 install_lib_source: .install_lib_source
 
 
