@@ -20,7 +20,7 @@ class RayJobRequest:
     """
     def __init__(self, entrypoint: str, submission_id: str = None, runtime_env: str = None,
                  metadata: dict[str, str] = None, num_cpu: float = -1., num_gpu: float = -1.,
-                 resources: dict[str, str] = None) -> None:
+                 resources: dict[str, str] = None):
         """
         Initialization see https://docs.ray.io/en/latest/cluster/running-applications/job-submission/api.html
         :param entrypoint: entrypoint
@@ -98,7 +98,7 @@ class RayJobInfo:
         error_type - type of error
         metadata - optional, dictionary of the submission metadata
     """
-    def __init__(self, dct: dict[str, Any]) -> None:
+    def __init__(self, dct: dict[str, Any]):
         """
         Initialize from dictionary
         :param dct: dictionary representation of Ray job info

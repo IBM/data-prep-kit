@@ -1,9 +1,12 @@
-from data_access import DataAccessLakeHouse
+import pytest
+from data_processing.data_access import DataAccessLakeHouse
+from data_processing.utils import DPFConfig
 
 
 s3_cred = {
-    "access_key": "YOUR KEY",
-    "secret_key": "YOUR SECRET KEY",
+    # Running these tests requires the credentials to be provided in the env vars.
+    "access_key": DPFConfig.S3_ACCESS_KEY,
+    "secret_key": DPFConfig.S3_SECRET_KEY,
     "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
@@ -15,10 +18,14 @@ lakehouse_config = {
     "input_version": "main",
     "output_table": "academic.ieee.lh_unittest",
     "output_path": "lh-test/tables/academic/ieee/lh_unittest",
-    "token": "YOUR TOKEN",
+    # Running these tests requires the credentials to be provided in the env vars.
+    "token": DPFConfig.LAKEHOUSE_TOKEN,
 }
 
 
+@pytest.mark.skipif(
+    DPFConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
+)
 def test_table_read_write():
     """
     Testing table read/write
@@ -55,6 +62,9 @@ def test_table_read_write():
     assert r_columns == s_columns
 
 
+@pytest.mark.skipif(
+    DPFConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
+)
 def test_get_folder():
     """
     Testing get folder
@@ -70,6 +80,9 @@ def test_get_folder():
     assert 14 == len(files[0])
 
 
+@pytest.mark.skipif(
+    DPFConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
+)
 def test_get_todo_list():
     """
     Testing get todo list by setting checkpoint to True
@@ -84,6 +97,9 @@ def test_get_todo_list():
     assert 12 == len(d_a.get_files_to_process()[0])
 
 
+@pytest.mark.skipif(
+    DPFConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
+)
 def test_files_to_process():
     """
     Testing get files to process

@@ -2,9 +2,9 @@ from typing import Any
 import enum
 
 from kfp_support.api_server_client.params import (BaseVolume, EnvironmentVariables,
-                                                  volume_decoder, environmentvariables_decoder)
+                                                  volume_decoder, environment_variables_decoder)
 
-DEFAULT_HEAD_START_PARAMS = {"dashboard-host": "0.0.0.0", "metrics-export-port": "8080"}
+DEFAULT_HEAD_START_PARAMS = {"dashboard-host": "0.0.0.0", "metrics-export-port": "8080", "num-cpus": "0"}
 
 
 class ServiceType(enum.Enum):
@@ -35,11 +35,11 @@ class HeadNodeSpec:
         annotations - optional, annotations for head node
         labels - optional, labels for head node
     """
-    def __init__(self, compute_template: str, ray_start_params: dict[str, str], image: str = None,
-                 service_type: ServiceType = None, enable_ingress: bool = False,
+    def __init__(self, compute_template: str, image: str, ray_start_params: dict[str, str] = DEFAULT_HEAD_START_PARAMS,
+                 service_type: ServiceType = ServiceType.ClusterIP, enable_ingress: bool = False,
                  volumes: list[BaseVolume] = None, service_account: str = None, image_pull_secret: str = None,
                  environment: EnvironmentVariables = None, annotations: dict[str, str] = None,
-                 labels: dict[str, str] = None) -> None:
+                 labels: dict[str, str] = None):
         """
         Initialization
         :param compute_template: compute template
@@ -149,7 +149,7 @@ def head_node_spec_decoder(dct: dict[str, Any]) -> HeadNodeSpec:
         volumes = [volume_decoder(v) for v in dct["volumes"]]
     environments = None
     if "environment" in dct and len(dct.get("environment")) > 0:
-        environments = environmentvariables_decoder(dct.get("environment"))
+        environments = environment_variables_decoder(dct.get("environment"))
     return HeadNodeSpec(compute_template=dct.get("computeTemplate"), ray_start_params=dct.get("rayStartParams"),
                         image=dct.get("image"), service_type=service_type,
                         enable_ingress=dct.get("enableIngress", False),

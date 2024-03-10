@@ -4,7 +4,7 @@ from kfp_support.api_server_client.params.volumes import (HostPath, MountPropaga
                                                           HostPathVolume, PVCVolume, EphemeralVolume, EmptyDirVolume,
                                                           ConfigMapVolume, SecretVolume, volume_decoder)
 from kfp_support.api_server_client.params.environmentvariables import (EnvVarSource, EnvVarFrom, EnvironmentVariables,
-                                                                       envvarfrom_decoder, environmentvariables_decoder)
+                                                                       env_var_from_decoder, environment_variables_decoder)
 from kfp_support.api_server_client.params.headnode import (ServiceType, HeadNodeSpec, DEFAULT_HEAD_START_PARAMS,
                                                            head_node_spec_decoder)
 from kfp_support.api_server_client.params.workernode import (WorkerNodeSpec, DEFAULT_WORKER_START_PARAMS,

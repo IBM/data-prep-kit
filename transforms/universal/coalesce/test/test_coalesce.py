@@ -2,7 +2,7 @@ from typing import Tuple
 
 import pyarrow as pa
 from coalesce_transform import CoalesceTransform
-from data_processing_test.transform.transform_test import AbstractTransformTest
+from data_processing.test_support.transform.transform_test import AbstractTransformTest
 
 
 # # Every class sub-classing AbstractTransformTest must define this function this way.

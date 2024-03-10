@@ -1,8 +1,13 @@
 import time
+import traceback
 from typing import Any
 
 import pyarrow as pa
 import ray
+from data_processing.utils import get_logger
+
+
+logger = get_logger(__name__)
 
 
 @ray.remote(scheduling_strategy="SPREAD")
@@ -54,13 +59,13 @@ class TransformTableProcessor:
                 # execute local processing
                 out_tables, stats = self.transform.transform(table=table)
             else:
-                print(f"table: {f_name} is empty, skipping processing")
+                logger.info(f"table: {f_name} is empty, skipping processing")
                 out_tables = [table]
                 stats = {}
             # save results
             self._submit_table(f_name=f_name, t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
-            print(f"Exception {e} processing file {f_name}")
+            logger.warning(f"Exception {e} processing file {f_name}: {traceback.format_exc()}")
 
     def flush(self) -> None:
         """
@@ -76,7 +81,7 @@ class TransformTableProcessor:
             # Here we are using the name of the last table, that did not return anything
             self._submit_table(f_name=self.last_empty, t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
-            print(f"Exception {e} flushing")
+            logger.warning(f"Exception {e} flushing: {traceback.format_exc()}")
 
     def _submit_table(self, f_name: str, t_start: float, out_tables: list[pa.Table], stats: dict[str, Any]) -> None:
         """
@@ -95,6 +100,7 @@ class TransformTableProcessor:
             case 1:
                 # we have exactly 1 table
                 output_name = self.data_access.get_output_location(path=f_name)
+                logger.debug(f"Writing transformed file {f_name} to {output_name}")
                 output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
                 if save_res is not None:
                     # Store execution statistics. Doing this async
@@ -111,8 +117,13 @@ class TransformTableProcessor:
                 table_sizes = 0
                 output_name = self.data_access.get_output_location(path=f_name)
                 output_file_name = output_name.removesuffix(".parquet")
-                for index in range(len(out_tables)):
+                count = len(out_tables)
+                for index in range(count):
                     table_sizes += out_tables[index].nbytes
+                    output_name_indexed = f"{output_file_name}_{index}.parquet"
+                    logger.debug(
+                        f"Writing transformed file {f_name}, {index + 1} of {count}  to {output_name_indexed}"
+                    )
                     output_file_size, save_res = self.data_access.save_table(
                         path=f"{output_file_name}_{index}.parquet", table=out_tables[index]
                     )

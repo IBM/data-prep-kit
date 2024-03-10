@@ -35,8 +35,6 @@ class TransformStatistics(object):
                 self.data_read_counter.inc(val)
             if key == "result_files":
                 self.result_document_counter.inc(val)
-            if key == "result_size":
-                self.data_write_counter.inc(val)
 
     def get_execution_stats(self) -> dict[str, Any]:
         """

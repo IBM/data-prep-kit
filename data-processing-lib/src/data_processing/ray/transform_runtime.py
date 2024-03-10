@@ -8,7 +8,7 @@ from ray.actor import ActorHandle
 
 class DefaultTableTransformRuntime:
     """
-    Transformer runtime used by processor to to create Mutator specific environment
+    Transformer runtime used by processor to to create Transform specific environment
     """
 
     def __init__(self, params: dict[str, Any]):
@@ -93,3 +93,6 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
 
     def get_name(self):
         return self.name
+
+    def get_transform_metadata(self) -> dict[str, Any]:
+        return self.get_input_params()

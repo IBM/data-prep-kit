@@ -37,7 +37,7 @@ class CoalesceTransform(AbstractTableTransform):
         for (_, table_size) in self.output_buffer:
             total_size += table_size
         # Not enough data to output
-        if total_size < self.coalesce_target:
+        if total_size <= self.coalesce_target:
             return [], {}
         # Build table to return and return it
         return self._build_return_table()
