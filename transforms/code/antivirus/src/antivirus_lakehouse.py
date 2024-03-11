@@ -1,10 +1,8 @@
-import os
 import sys
-from pathlib import Path
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from transforms.code.antivirus.src.antivirus_transform import AntivirusTransformConfiguration
+from antivirus_transform import AntivirusTransformConfiguration
 
 
 # create launcher
@@ -19,11 +17,11 @@ s3_cred = {
 # Configure lakehouse unit test tables
 lakehouse_config = {
     "lh_environment": "STAGING",
-    "input_table": "code.ieee",
+    "input_table": "code.cobol",
     "input_dataset": "",
     "input_version": "main",
-    "output_table": "code.adap_antivirus_test",
-    "output_path": "lh-test/tables/code/adap_antivirus_test",
+    "output_table": "code.cobol_antivirus_test",
+    "output_path": "lh-test/tables/code/cobol_antivirus_test",
     "token": "YOUR LAKEHOUSE TOKEN",
 }
 
@@ -41,8 +39,9 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    "input_column": "content",
-    "output_column": "virus_detection"
+    "input_column": "contents",
+    "output_column": "virus_detection",
+    "use_network_socket": True,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

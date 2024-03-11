@@ -1,5 +1,4 @@
 from io import BytesIO
-import time
 from argparse import ArgumentParser, Namespace
 import traceback
 from typing import Any
@@ -7,7 +6,6 @@ from typing import Any
 import pyarrow as pa
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
@@ -21,7 +19,6 @@ class AntivirusTransform(AbstractTableTransform):
     """
     Implements a simple copy of a pyarrow Table.
     """
-    import clamd
 
     def __init__(self, config: dict[str, Any]):
         """
@@ -36,6 +33,11 @@ class AntivirusTransform(AbstractTableTransform):
         self.input_column = config.get("input_column", "contents")
         self.output_column = config.get("output_column", "virus_detection")
         self.drop_column_if_existed = config.get("drop_column_if_existed", True)
+        self.use_network_socket = config.get("use_network_socket", False)
+        if self.use_network_socket:
+            logger.info("using network scoket")
+        else:
+            logger.info("using unix socket")
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -60,16 +62,22 @@ class AntivirusTransform(AbstractTableTransform):
                 )
                 exit(-1)
 
-        cd = clamd.ClamdUnixSocket()
+        if self.use_network_socket:
+            cd = clamd.ClamdNetworkSocket()
+        else:
+            cd = clamd.ClamdUnixSocket()
         
         def _scan(content: str) -> str | None:
+            if content is None:
+                return None
             (status, description) = cd.instream(BytesIO(content.encode()))['stream']
             if status == 'FOUND':
+                logger.debug(f"detected: {description}")
                 return description or 'UNKNOWN'
             return None
 
         try:
-            virus_detection = pa.array(list(map(_scan, table[self.input_column].to_pylist())))
+            virus_detection = pa.array(list(map(_scan, table[self.input_column].to_pylist())), type=pa.string())
         except Exception as e:
             logger.error(f"Exception during the scan {e}: {traceback.print_exc()}")
             return None, None
@@ -102,24 +110,28 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            "-ic"
             "--input_column",
             type=str,
             default="contents",
             help="input column name",
         )
         parser.add_argument(
-            "-oc"
             "--output_column",
             type=str,
             default="virus_detection",
             help="output column name",
         )
         parser.add_argument(
-            "-dr",
             "--drop_column_if_existed",
             default=True,
             help="drop columns if existed"
+        )
+        parser.add_argument(
+            "-n",
+            "--use_network_socket",
+            type=bool,
+            default=False,
+            help="use network socket (port: 3310) or not (default: use unix socket (/var/run/clamav/clamd.ctl))."
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
@@ -137,7 +149,8 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["input_column"] = args.input_column
         self.params["output_column"] = args.output_column
         self.params["drop_column_if_existed"] = args.drop_column_if_existed
-        print(f"antivirus parameters are : {self.params}")
+        self.params["use_network_socket"] = args.use_network_socket
+        logger.info(f"antivirus parameters are : {self.params}")
         return True
 
 
