@@ -8,12 +8,12 @@ defines the location of the domain list.
 
 In the next sections we cover the following:
    1. How to define the transform-specific resource location(s)
-   2. How to load the transform-specific data from storage:
+   2. How to load the transform-specific resources from storage:
       1. During transform initialization - this is useful for testing outside of ray, and optionally
-      2. During transform configuration - used when running in ray.  This may not be feasible if the data
+      2. During transform configuration - used when running in ray.  This may not be feasible if a resource 
          is not picklable.
 
-## Defining Transform-specific Storage Locations 
+## Defining Transform-specific Resource Locations 
 
 Each transform has a _configuration_ class that defines the command line options with which the
 transform can be configured.  The [DataAccessFactory](../src/data_processing/data_access/data_access_factory.py)
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     ...
 ```
 
-## Placing of loading of the additional data/models
+## When and Where to Load the Additional Resources 
 
 With a DataAccessFactory established, it can be used in either the transform's Runtime class
 when running in Ray, or in the transform's initializer to load the resource(s).
