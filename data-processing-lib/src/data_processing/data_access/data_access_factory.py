@@ -175,7 +175,8 @@ class DataAccessFactory(CLIArgumentProvider):
         if s3_config_specified + lh_config_specified + local_config_specified == 0:
             logger.error(
                 f"prefix {self.cli_arg_prefix} "
-                "No S3, lakehouse, or local configuration parameters defined," " at least one of them is required! "
+                "No S3, lakehouse, or local configuration parameters defined,"
+                " at least one of them is required! "
             )
             return False
 
@@ -247,20 +248,14 @@ class DataAccessFactory(CLIArgumentProvider):
         :return:
         """
         if s3_credentials is None:
-            logger.error(
-                f"prefix {self.cli_arg_prefix} "
-                "Could not get cos credentials "
-            )
+            logger.error(f"prefix {self.cli_arg_prefix} " "Could not get cos credentials ")
             return False
         if (
             s3_credentials.get("access_key") is None
             or s3_credentials.get("secret_key") is None
-            or s3_credentials.get("cos_url") is None
+            or s3_credentials.get("url") is None
         ):
-            logger.error(
-                f"prefix {self.cli_arg_prefix} "
-                "Could not get cos credentials "
-            )
+            logger.error(f"prefix {self.cli_arg_prefix} " "Could not get cos credentials ")
             return False
         return True
 
@@ -271,29 +266,17 @@ class DataAccessFactory(CLIArgumentProvider):
         :return: True if local config is valid, False otherwise
         """
         if local_config is None:
-            logger.error(
-                f"prefix {self.cli_arg_prefix} "
-                "Could not get local config"
-            )
+            logger.error(f"prefix {self.cli_arg_prefix} " "Could not get local config")
             return False
         valid_config = True
         if local_config.get("input_folder", "") == "":
             valid_config = False
-            logger.error(
-                f"prefix {self.cli_arg_prefix} "
-                f"Could not find input folder in local config"
-            )
+            logger.error(f"prefix {self.cli_arg_prefix} " f"Could not find input folder in local config")
         if local_config.get("output_folder", "") == "":
             valid_config = False
-            logger.error(
-                f"prefix {self.cli_arg_prefix} "
-                f"Could not find output folder in local config"
-            )
+            logger.error(f"prefix {self.cli_arg_prefix} " f"Could not find output folder in local config")
         if not valid_config:
-            logger.error(
-                f"prefix {self.cli_arg_prefix} "
-                "Invalid local configuration"
-            )
+            logger.error(f"prefix {self.cli_arg_prefix} " "Invalid local configuration")
         return valid_config
 
     def create_data_access(self) -> DataAccess:

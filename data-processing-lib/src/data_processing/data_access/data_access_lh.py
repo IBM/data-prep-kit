@@ -37,7 +37,7 @@ class DataAccessLakeHouse(DataAccess):
             key=s3_credentials["access_key"],
             secret=s3_credentials["secret_key"],
             region="us-east",
-            endpoint=s3_credentials["cos_url"],
+            endpoint=s3_credentials["url"],
         )
         self.lh = LakehouseForProcessingTask(
             input_table_name=lakehouse_config["input_table"],

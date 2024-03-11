@@ -13,13 +13,13 @@ launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration
 s3_cred = {
     "access_key": DPFConfig.S3_ACCESS_KEY,
     "secret_key": DPFConfig.S3_SECRET_KEY,
-    "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
+    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 s3_conf = {
     "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=text/",
     "output_folder": "cos-optimal-llm-pile/boris-da-test/",
-    # "input_folder": "cos-optimal-llm-pile/test/david/input/",
-    # "output_folder": "cos-optimal-llm-pile/test/david/output/",
+    "input_folder": "cos-optimal-llm-pile/test/david/input/",
+    "output_folder": "cos-optimal-llm-pile/test/david/output/",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}

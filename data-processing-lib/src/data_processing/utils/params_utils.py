@@ -107,7 +107,7 @@ class ParamsUtils:
             help_example_dict = {
                 'access_key': ["AFDSASDFASDFDSF ", 'access key help text'],
                 'secret_key': ["XSDFYZZZ", 'secret key help text'],
-                'cos_url': ['s3:/cos-optimal-llm-pile/test/', "COS url"]
+                'url': ['s3:/cos-optimal-llm-pile/test/', "COS url"]
             }
             parser.add_argument(
                 "--s3_cred",
