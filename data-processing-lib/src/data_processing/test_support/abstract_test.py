@@ -53,8 +53,8 @@ class AbstractTest:
             l2 = t2.num_rows
             assert l1 == l2, f"Number of rows in table #{i} ({l1}) does not match expected number ({l2})"
             for j in range(l1):
-                r1 = t1.take([j])[0]
-                r2 = t2.take([j])[0]
+                r1 = t1.take([j])
+                r2 = t2.take([j])
                 assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {2}"
 
     @staticmethod
@@ -89,8 +89,9 @@ class AbstractTest:
         :return:
         """
         dir_cmp = dircmp(directory, expected_dir)
-        assert len(dir_cmp.funny_files) == 0, \
-            f"Files that could compare, but couldn't be read for some reason: {dir_cmp.funny_files}"
+        assert (
+            len(dir_cmp.funny_files) == 0
+        ), f"Files that could compare, but couldn't be read for some reason: {dir_cmp.funny_files}"
         assert len(dir_cmp.common_funny) == 0, f"Types of the following files don't match: {dir_cmp.common_funny}"
         assert len(dir_cmp.right_only) == 0, f"Files found only in expected output directory: {dir_cmp.right_only}"
         assert len(dir_cmp.left_only) == 0, f"Files files missing in test output directory: {dir_cmp.left_only}"
