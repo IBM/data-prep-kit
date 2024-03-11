@@ -2,7 +2,7 @@ import os
 import sys
 
 from data_processing.ray import TransformLauncher
-from data_processing.utils import ParamsUtils
+from data_processing.utils import DPFConfig, ParamsUtils
 from noop_transform import NOOPTransformConfiguration
 
 
@@ -11,8 +11,8 @@ print(os.environ)
 launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
 # create parameters
 s3_cred = {
-    "access_key": os.environ.get("COS_ACCESS_KEY", "access"),
-    "secret_key": os.environ.get("COS_SECRET_KEY", "secret"),
+    "access_key": DPFConfig.S3_ACCESS_KEY,
+    "secret_key": DPFConfig.S3_SECRET_KEY,
     "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 s3_conf = {
