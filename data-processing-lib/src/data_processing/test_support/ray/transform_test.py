@@ -1,6 +1,6 @@
 import sys
 import tempfile
-from typing import Any, Tuple
+from typing import Any
 
 from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
 from data_processing.test_support.abstract_test import AbstractTest
@@ -16,7 +16,8 @@ class AbstractTransformLauncherTest(AbstractTest):
 
     """
 
-    def _get_argv(self, cli_params: dict[str, Any], in_table_path: str, out_table_path: str):
+    @staticmethod
+    def _get_argv(cli_params: dict[str, Any], in_table_path: str, out_table_path: str):
         args = {} | cli_params
         local_ast = {"input_folder": in_table_path, "output_folder": out_table_path}
         args["local_config"] = local_ast
@@ -62,7 +63,7 @@ class AbstractTransformLauncherTest(AbstractTest):
             # Install the fixture, matching the parameter names used by test_transform() method.
             metafunc.parametrize("transform_config,cli_params,in_table_path,expected_out_table_path", f)
 
-    def get_test_transform_fixtures(self) -> list[Tuple]:
+    def get_test_transform_fixtures(self) -> list[tuple]:
         """
         Get the test data for the test_transform() test.  The returned list contains 0 or more tuples
         containing the following:

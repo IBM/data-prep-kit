@@ -131,11 +131,13 @@ def test_launcher():
         ),
     ).launch()
     assert 0 == res
+    sys.argv = []
 
 
 def test_local_config():
     # test that the driver works with local configuration
     params = {
+        "local_config": ParamsUtils.convert_to_ast(local_conf),
         "run_locally": True,
         "max_files": -1,
         "worker_options": ParamsUtils.convert_to_ast(worker_options),
@@ -146,7 +148,6 @@ def test_local_config():
         "creation_delay": 0,
         "code_location": ParamsUtils.convert_to_ast(code_location),
     }
-    params["local_config"] = ParamsUtils.convert_to_ast(local_conf)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
@@ -209,3 +210,4 @@ def test_local_config_validate():
         ),
     ).launch()
     assert 0 == res
+    sys.argv = []
