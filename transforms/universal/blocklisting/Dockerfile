@@ -34,16 +34,10 @@ RUN apt remove -y gcc && apt clean -y && apt autoremove -y
 # Do this before the chmod/chgrp stuff below
 RUN rm -rf /T5/.cache/pip
 
-
-# Expect the models to be avavilable in the host via "python preload.py" so that we don't trigger
-# watson_nlp's use of ARTIFACTORY env vars.
-
 # Copy test source , but avoid copying any models (entity_*), we already did that above
 COPY ./src/ /T5/
 
 # Do this because when running in the cluster, we may not be running as root.
-#RUN chgrp -R 0 /T5 && chmod -R g=u /T5
-#RUN chmod +x /T5/*.sh
 RUN chmod a+r+w+x -R /T5
 
 WORKDIR /T5
