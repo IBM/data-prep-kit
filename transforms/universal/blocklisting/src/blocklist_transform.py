@@ -166,13 +166,13 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
         By convention a common prefix should be used for all mutator-specific CLI args
         (e.g, noop_, pii_, etc.)
         """
+        # The DataAccess created by the DataAccessFactory below will use this url
         parser.add_argument(
             f"--{blocked_domain_list_path_key}",
             type=str,
             required=False,
             default=blocked_domain_list_path_default,
-            help="COS URL or local folder (file or directory) that points to the list of block listed domains.  "
-            "If not running in Ray, this must be a local folder.",
+            help="S3/COS URL or local folder (file or directory) that points to the list of block listed domains.",
         )
         parser.add_argument(
             f"--{annotation_column_name_key}",
@@ -189,8 +189,9 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
             default=source_column_name_default,
             help="Name of the table column that has the document download URL",
         )
-        # Add block-list-specific arguments to create the DataAccess instance to load the domains.
-        self.daf = DataAccessFactory(f"{self.name}_")
+        # Create the DataAccessFactor to use CLI args with the given blocklist prefix.
+        self.daf = DataAccessFactory(f"{arg_prefix}_")
+        # Add the DataAccessFactory parameters to the transform's configuration parameters.
         self.daf.add_input_params(parser)
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:

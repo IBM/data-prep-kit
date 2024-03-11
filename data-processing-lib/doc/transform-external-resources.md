@@ -30,12 +30,18 @@ The implementation of such approach looks as follows (the code here is from [blo
         By convention a common prefix should be used for all mutator-specific CLI args
         (e.g, noop_, pii_, etc.)
         """
-        
         ...
-        
-        # Add block-list-specific arguments to create the DataAccess instance to load the domains.
-        global arg_prefix
+       # The DataAccess created by the DataAccessFactory below will use this url
+       parser.add_argument(
+            f"--{blocked_domain_list_path_key}",
+            type=str,
+            required=False,
+            default=blocked_domain_list_path_default,
+            help="S3/COS URL or local folder (file or directory) that points to the list of block listed domains."
+        )  
+        # Create the DataAccessFactor to use CLI args with the given blocklist prefix.
         self.daf = DataAccessFactory(f"{arg_prefix}_")
+        # Add the DataAccessFactory parameters to the transform's configuration parameters.
         self.daf.add_input_params(parser)
 ```
 We are creating an additional `DataAccessFactory` using
