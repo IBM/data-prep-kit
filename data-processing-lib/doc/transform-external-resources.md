@@ -2,16 +2,17 @@
 
 Often when implementing a transform, the transform will require loading its own resources 
 (e.g. models, configuration, etc.) to complete its job.  For example, the Blocklist transform
-loads a list of domains to block.  These can be located from either S3 or local storage.
-In addition to actually loading the resource(s), the transform also needs to define the configuration that 
+loads a list of domains to block.  These can be loaded from either S3 or local storage.
+In addition to actually loading the resource(s), the transform needs to define the configuration that 
 defines the location of the domain list. 
 
 In the next sections we cover the following:
-   1. How to define the transform-specific resource location(s)
-   2. How to load the transform-specific resources from storage:
+   1. How to define the transform-specific resource location(s) as command line arguments
+   2. How to load the transform-specific resources, either or both of:
       1. During transform initialization - this is useful for testing outside of ray, and optionally
-      2. During transform configuration - used when running in ray.  This may not be feasible if a resource 
+      2. During transform configuration in the Ray orchestrator.  This may not be feasible if a resource 
          is not picklable.
+
 
 ## Defining Transform-specific Resource Locations 
 
@@ -19,10 +20,13 @@ Each transform has a _configuration_ class that defines the command line options
 transform can be configured.  The [DataAccessFactory](../src/data_processing/data_access/data_access_factory.py)
 can be used in the _configuration_ to add transform-specific arguments that allow a `DataAccessFactory` to be
 initialized specifically for the transform.  The initialized `DataAcessFactory` is then made available to
-the transform's initializer to enable it to read from transform-specific storage.
-The implementation of such approach looks as follows (the code here is from [block listing](../../transforms/universal/blocklisting/src/blocklist_transform.py)):
+the transform's initializer to enable it to read from transform-specific location.
+The implementation of such approach looks as follows (the code here is 
+from [block listing](../../transforms/universal/blocklisting/src/blocklist_transform.py)):
 
 ```python
+class BlockListTransformConfiguration(DefaultTransformConfiguration):
+    ...
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given parser.
