@@ -75,7 +75,7 @@ when running in Ray.
         del self.params[block_data_factory_key]
         return self.params
 ```
-j
+
 The above code can be run in a non-ray main() as follows: 
 ```python
 if __name__ == "__main__":
@@ -114,7 +114,7 @@ This will ease debugging.  If load is an issue and the resource is picklable, th
 loading in the transform's Runtime.
 Next we show how to load resources using both approaches.
 
-### Loading in Transform Initializer 
+### Loading in the Transform Initializer 
 
 If you decide to implement resource loading in the transform itself,
 you can do this in the init method of the transform class. 
@@ -122,10 +122,13 @@ Let's look at the implementation, based on
 [block listing](../../transforms/universal/blocklisting/src/blocklist_transform.py)) example. The code below demonstrates loading of data.
 
 ```python
-    daf = config.get(block_data_factory_key, None)
+    daf = config.get(block_data_factory_key)
     if daf is None:
         raise RuntimeError(f"Missing configuration value for key {block_data_factory_key}")
     data_access = daf.create_data_access()
+    url = config.get(blocked_domain_list_path_key)
+    if url is None:
+        raise RuntimeError(f"Missing configuration value for key {blocked_domain_list_path_key}")
     domain_list = get_domain_list(url, data_access)
 ```
 Note that here, similar to the example above we are using an additional data access 

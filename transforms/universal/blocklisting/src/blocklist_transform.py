@@ -79,14 +79,18 @@ class BlockListTransform(AbstractTableTransform):
         """
 
         super().__init__(config)
-        self.blocklist_annotation_column_name = config.get(annotation_column_name_key, "")
-        self.source_url_column_name = config.get(source_url_column_name_key, "")
+        self.blocklist_annotation_column_name = config.get(annotation_column_name_key)
+        if self.blocklist_annotation_column_name is None:
+            raise RuntimeError(f"Missing configuration value for key {annotation_column_name_key}")
+        self.source_url_column_name = config.get(source_url_column_name_key)
+        if self.source_url_column_name is None:
+            raise RuntimeError(f"Missing configuration value for key {source_url_column_name_key}")
         runtime_provided_domain_refs = config.get(domain_refs_key, None)
         if runtime_provided_domain_refs is None:
             # this is only useful during local debugging without Ray
             url = config.get(blocked_domain_list_path_key, None)
             if url is None:
-                raise RuntimeError(f"Missing configuration value for key {annotation_column_name_key}")
+                raise RuntimeError(f"Missing configuration value for key {blocked_domain_list_path_key}")
             daf = config.get(block_data_factory_key, None)
             if url is None:
                 raise RuntimeError(f"Missing configuration value for key {block_data_factory_key}")
