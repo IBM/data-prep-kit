@@ -17,7 +17,7 @@ print(os.environ)
 # create launcher
 launcher = TransformLauncher(transform_runtime_config=LangIdentificationTableTransformConfiguration())
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data"))
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 output_folder = os.path.abspath(os.path.join(input_folder, "output"))
 
 # Configure local folders
