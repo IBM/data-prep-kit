@@ -11,7 +11,7 @@ from data_processing.ray import (
     TransformStatistics,
     TransformTableProcessor,
 )
-from data_processing.utils import get_logger
+from data_processing.utils import ParamsUtils, get_logger
 from ray.util import ActorPool
 from ray.util.metrics import Gauge
 
@@ -111,17 +111,21 @@ def orchestrate(
 
         # build and save metadata
         logger.info("Building job metadata")
+        cleaned_tranform_metadata = transform_runtime_config.get_transform_metadata()
+        cleaned_tranform_metadata = ParamsUtils.hide_secrets(cleaned_tranform_metadata)
+        # logger.info(f"daf input params: {data_access_factory.get_input_params()}")
         metadata = {
             "pipeline": preprocessing_params.pipeline_id,
             "job details": preprocessing_params.job_details
             | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "status": "success"},
             "code": preprocessing_params.code_location,
-            "job_input_params": transform_runtime_config.get_transform_metadata()
+            "job_input_params": cleaned_tranform_metadata
             | data_access_factory.get_input_params()
             | preprocessing_params.get_input_params(),
             "execution_stats": resources,
             "job_output_stats": stats,
         }
+        logger.debug(f"Saved job metadata: {metadata}.")
         data_access.save_job_metadata(metadata)
         logger.info("Saved job metadata.")
         return 0
