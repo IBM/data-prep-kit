@@ -44,12 +44,15 @@ class TransformTableProcessor:
         :param f_name: file name
         :return: None
         """
+        logger.info(f"Begin processing file {f_name}")
         if self.data_access is None:
+            logger.warning("No data_access found. Returning.")
             return
         t_start = time.time()
         # Read source table
         table = self.data_access.get_table(path=f_name)
         if table is None:
+            logger.warning("File read resulted in None. Returning.")
             return
         if self.base_table_stats:
             self.stats.add_stats.remote({"source_files": 1, "source_size": table.nbytes})
@@ -57,7 +60,9 @@ class TransformTableProcessor:
         try:
             if table.num_rows > 0:
                 # execute local processing
+                logger.info(f"Begin transforming table from {f_name}")
                 out_tables, stats = self.transform.transform(table=table)
+                logger.info(f"Done transforming table from {f_name}")
             else:
                 logger.info(f"table: {f_name} is empty, skipping processing")
                 out_tables = [table]
@@ -77,7 +82,9 @@ class TransformTableProcessor:
         t_start = time.time()
         try:
             # get flush results
+            logger.info(f"Begin flushing transform")
             out_tables, stats = self.transform.flush()
+            logger.info(f"Done flushing transform")
             # Here we are using the name of the last table, that did not return anything
             self._submit_table(f_name=self.last_empty, t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
@@ -96,11 +103,12 @@ class TransformTableProcessor:
         match len(out_tables):
             case 0:
                 # no tables - save input file name for flushing
+                logger.info(f"Transform did not produce a transformed table for file {f_name}")
                 self.last_empty = f_name
             case 1:
                 # we have exactly 1 table
                 output_name = self.data_access.get_output_location(path=f_name)
-                logger.debug(f"Writing transformed file {f_name} to {output_name}")
+                logger.info(f"Writing transformed file {f_name} to {output_name}")
                 output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
                 if save_res is not None:
                     # Store execution statistics. Doing this async
@@ -121,9 +129,7 @@ class TransformTableProcessor:
                 for index in range(count):
                     table_sizes += out_tables[index].nbytes
                     output_name_indexed = f"{output_file_name}_{index}.parquet"
-                    logger.debug(
-                        f"Writing transformed file {f_name}, {index + 1} of {count}  to {output_name_indexed}"
-                    )
+                    logger.info(f"Writing transformed file {f_name}, {index + 1} of {count}  to {output_name_indexed}")
                     output_file_size, save_res = self.data_access.save_table(
                         path=f"{output_file_name}_{index}.parquet", table=out_tables[index]
                     )

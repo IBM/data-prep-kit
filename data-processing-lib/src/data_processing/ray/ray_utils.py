@@ -2,11 +2,14 @@ import time
 from typing import Any
 
 import ray
-from data_processing.utils import GB
-from ray.types import ObjectRef
+from data_processing.utils import GB, get_logger
 from ray.actor import ActorHandle
+from ray.types import ObjectRef
 from ray.util.actor_pool import ActorPool
 from ray.util.metrics import Gauge
+
+
+logger = get_logger(__name__)
 
 
 class RayUtils:
@@ -105,6 +108,7 @@ class RayUtils:
         :param object_memory_gauge: ray Gauge to report available object memory
         :return:
         """
+        logger.debug("Begin processing files")
         RayUtils.get_available_resources(
             available_cpus_gauge=available_cpus_gauge,
             available_gpus_gauge=available_gpus_gauge,
@@ -131,11 +135,11 @@ class RayUtils:
                     object_memory_gauge=object_memory_gauge,
                 )
                 if completed % print_interval == 0:
-                    print(f"Completed {completed} files in {(time.time() - t_start)/60} min")
+                    logger.info(f"Completed {completed} files in {(time.time() - t_start)/60} min")
         # Wait for completion
         files_completed_gauge.set(completed)
         # Wait for completion
-        print(f"Completed {completed} files in {(time.time() - t_start)/60} min. Waiting for completion")
+        logger.info(f"Completed {completed} files in {(time.time() - t_start)/60} min. Waiting for completion")
         while executors.has_next():
             executors.get_next_unordered()
             running -= 1
@@ -149,7 +153,7 @@ class RayUtils:
                 object_memory_gauge=object_memory_gauge,
             )
 
-        print(f"Completed processing in {(time.time() - t_start)/60.} min")
+        logger.info(f"Completed processing in {(time.time() - t_start)/60.} min")
 
     @staticmethod
     def wait_for_execution_completion(replies: list[ray.ObjectRef]) -> None:
