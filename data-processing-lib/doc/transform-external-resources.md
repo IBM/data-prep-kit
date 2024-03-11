@@ -1,13 +1,13 @@
-# Support for external models
+# Support for external resources
 
-Often when implementing a transform, the transform will require loading its own artifacts 
+Often when implementing a transform, the transform will require loading its own resources 
 (e.g. models, configuration, etc.) to complete its job.  For example, the Blocklist transform
-loads a list of domains to block.  These can be located in either S3 or local storage.
-In addition to actually loading the data, it also needs to define the configuration that 
+loads a list of domains to block.  These can be located from either S3 or local storage.
+In addition to actually loading the resource(s), the transform also needs to define the configuration that 
 defines the location of the domain list. 
 
 In the next sections we cover the following:
-   1. How to define the transform-specific storage location(s)
+   1. How to define the transform-specific resource location(s)
    2. How to load the transform-specific data from storage:
       1. During transform initialization - this is useful for testing outside of ray, and optionally
       2. During transform configuration - used when running in ray.  This may not be feasible if the data
