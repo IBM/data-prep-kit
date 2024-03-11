@@ -39,16 +39,22 @@ def get_domain_list(domain_list_url: str, data_access: DataAccess = None):
     return domain_list
 
 
-annotation_column_name_key = "bl_annotation_column_name"
+short_name = "blocklist"
+arg_prefix = short_name
+
+annotation_column_name_key = f"{arg_prefix}_annotation_column_name"
 """ Key holds the name of the column to create in the output table"""
-source_url_column_name_key = "bl_source_url_column_name"
+source_url_column_name_key = f"{arg_prefix}_source_url_column_name"
 """ Key holds the name of the column holding the URL from which the document was retrieved"""
-blocked_domain_list_path_key = "bl_blocked_domain_list_path"
+blocked_domain_list_path_key = f"{arg_prefix}_blocked_domain_list_path"
 """ Key holds the directory holding 1 or more domain* files listing the urls to identify """
-block_data_factory_key = "block_list_data_factory"
+block_data_factory_key = f"{arg_prefix}_data_factory"
 """ Key holds the data access factory for domain files """
 domain_refs_key = "__domain_refs"
 """ A hidden key used by the runtime to pass a ray object reference to the transform"""
+captured_arg_keys = [blocked_domain_list_path_key, annotation_column_name_key, source_url_column_name_key]
+""" The set of keys captured from the command line """
+
 # defaults
 blocked_domain_list_path_default = "cos-optimal-llm-pile/spark_test/remove-cma-1/blocklists_refinedweb_subset/"
 """ The default value for the domain list URL"""
@@ -148,7 +154,8 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name="blocklist", transform_class=BlockListTransform, runtime_class=BlockListRuntime)
+        global short_name
+        super().__init__(name=short_name, transform_class=BlockListTransform, runtime_class=BlockListRuntime)
         self.params = {}
         self.daf = None
 
@@ -192,16 +199,19 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        arg_keys = [blocked_domain_list_path_key, annotation_column_name_key, source_url_column_name_key]
+        # Capture the args that are specific to this transform
         dargs = vars(args)
-        for arg_key in arg_keys:
+        global captured_arg_keys
+        for arg_key in captured_arg_keys:
             # Make sure parameters are defined
             if dargs.get(arg_key) is None or len(dargs.get(arg_key)) < 1:
                 logger.info(f"parameter {arg_key} is not defined, exiting")
                 return False
             self.params[arg_key] = dargs.get(arg_key)
+
+        # Add the DataAccessFactory to the transform's configuration parameters.
         self.params[block_data_factory_key] = self.daf
-        # populate data access factory
+        # Validate and populate the transform's DataAccessFactory
         return self.daf.apply_input_params(args)
 
     def get_transform_metadata(self) -> dict[str, Any]:
@@ -212,6 +222,7 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
         """
         del self.params[block_data_factory_key]
         return self.params
+
 
 class BlockListRuntime(DefaultTableTransformRuntime):
     """

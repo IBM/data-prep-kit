@@ -1,0 +1,204 @@
+# Support for external models
+
+Often when implementing a transform, the transform will require loading its own artifacts 
+(e.g. models, configuration, etc.) to complete its job.  For example, the Blocklist transform
+loads a list of domains to block.  These can be located in either S3 or local storage.
+In addition to actually loading the data, it also needs to define the configuration that 
+defines the location of the domain list. 
+
+In the next sections we cover the following:
+   1. How to define the transform-specific storage location(s)
+   2. How to load the transform-specific data from storage:
+      1. During transform initialization - this is useful for testing outside of ray, and optionally
+      2. During transform configuration - used when running in ray.  This may not be feasible if the data
+         is not picklable.
+
+## Defining Transform-specific Storage Locations 
+
+Each transform has a _configuration_ class that defines the command line options with which the
+transform can be configured.  The [DataAccessFactory](../src/data_processing/data_access/data_access_factory.py)
+can be used in the _configuration_ to add transform-specific arguments that allow a `DataAccessFactory` to be
+initialized specifically for the transform.  The initialized `DataAcessFactory` is then made available to
+the transform's initializer to enable it to read from transform-specific storage.
+The implementation of such approach looks as follows (the code here is from [block listing](../../transforms/universal/blocklisting/src/blocklist_transform.py)):
+
+```python
+    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+        """
+        Add Transform-specific arguments to the given parser.
+        This will be included in a dictionary used to initialize the BlockListTransform.
+        By convention a common prefix should be used for all mutator-specific CLI args
+        (e.g, noop_, pii_, etc.)
+        """
+        
+        ...
+        
+        # Add block-list-specific arguments to create the DataAccess instance to load the domains.
+        global arg_prefix
+        self.daf = DataAccessFactory(f"{arg_prefix}_")
+        self.daf.add_input_params(parser)
+```
+We are creating an additional `DataAccessFactory` using
+a transform-specific prefix to define the transform-specific command line option to configure the 
+transform's factory instance.
+In this case, all the transform's DataAccessFactory parameters are prepended with `blocklist_`, (`arg_prefix`).
+
+After configuring the command line argument parser above, 
+The BlocklistConfiguration `apply_input_params()` is implemented to capture all 
+`blocklist_` prefixed parameters and apply the arguments  to the DataAccessFactory.
+In addition, it adds the factory to the parameters that will be made available
+to the transform. In this way, the transform initializer will receive the DataAccessFactory
+created and initialized by the configuration instance.
+
+```python
+    def apply_input_params(self, args: argparse.Namespace) -> bool:
+        # Capture the args that are specific to this transform
+        ...
+        
+        # Add the DataAccessFactory to the transform's configuration parameters.
+        self.params[block_data_factory_key] = self.daf
+        # Validate and populate the transform's DataAccessFactory 
+        return self.daf.apply_input_params(args)
+```
+Finally, we implement the `get_transform_metadata()` configuration interface method to remove
+the DataAccessFactory so that it (especially any credentials) are not logged in the job's metadata
+when running in Ray.
+
+```python
+    def get_transform_metadata(self) -> dict[str, Any]:
+        del self.params[block_data_factory_key]
+        return self.params
+```
+j
+The above code can be run in a non-ray main() as follows: 
+```python
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    bltc = BlockListTransformConfiguration()
+    bltc.add_input_params(parser)
+    args = parser.parse()
+    config = bltc.apply_input_params(args) 
+    transform = BlockListTransform(config)
+    ...
+```
+
+## Placing of loading of the additional data/models
+
+With a DataAccessFactory established, it can be used in either the transform's Runtime class
+when running in Ray, or in the transform's initializer to load the resource(s).
+These two approaches have the following considerations:
+
+* Loading in transform itself has the following: 
+    * Advantages
+        * enables debugging without the need for a remote debugger to attach to the Ray worker.
+        * simplifies local testing, especially if a transform itself can be tested locally.
+        * can load any resource regardless of its picklability (irrelevant for data, but relevant for models).
+    * Disadvantages
+        * can create additional load on external resources, for example S3 or external web site.
+* Loading in runtime and then storing it plasma (Ray object storage) and delivering it to the 
+transform via pointer has the following: 
+    * Advantages
+        * minimises load on external resources, for example S3 or external web site
+    * Disadvantages
+        * can be problematic if the resource/model is not picklable
+        * makes it slightly more complex for local testing, which can be easily overcome - see below
+
+With the above in mind, we recommend at least loading the resource(s) in the transform's initializer.
+This will ease debugging.  If load is an issue and the resource is picklable, then ALSO implement
+loading in the transform's Runtime.
+Next we show how to load resources using both approaches.
+
+### Loading in Transform Initializer 
+
+If you decide to implement resource loading in the transform itself,
+you can do this in the init method of the transform class. 
+Let's look at the implementation, based on
+[block listing](../../transforms/universal/blocklisting/src/blocklist_transform.py)) example. The code below demonstrates loading of data.
+
+```python
+    daf = config.get(block_data_factory_key, None)
+    if daf is None:
+        raise RuntimeError(f"Missing configuration value for key {block_data_factory_key}")
+    data_access = daf.create_data_access()
+    domain_list = get_domain_list(url, data_access)
+```
+Note that here, similar to the example above we are using an additional data access 
+factory `blocklist_data_access_factory`, that we described above. Alternatively, 
+if you are downloading data/models from the same source as the data itself,
+you can use global `data_access` (it is also in the config with the key "data_access") 
+to download everything that you need using it.
+
+### Loading in the Transform Runtime
+
+If you decide to implement resource loading in the transform runtime, 
+you have to implement custom transform runtime class. 
+Let's look at the implementation, based on [block listing](../../transforms/universal/blocklisting/src/blocklist_transform.py)) example. 
+The code below demonstrates definition and implementation of the class.
+
+```python
+class BlockListRuntime(DefaultTableTransformRuntime):
+
+    def __init__(self, params: dict[str, Any]):
+        super().__init__(params)
+
+```
+Once this is done, you need to at least implement `get_transform_config` method,
+which is called by the Ray orchestrator to establish the transform configuration parameters
+passed to the Ray Worker that then creates the transform instance using the provided 
+configuation parameters.  In short, these are the parameters that will be used to configure
+your transform in the Ray worker.
+
+```python
+    def get_transform_config(
+        self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
+    ) -> dict[str, Any]:
+        # create the list of blocked domains by reading the files at the conf_url location
+        url = self.params.get(blocked_domain_list_path_key, None)
+        if url is None:
+            raise RuntimeError(f"Missing configuration key {blocked_domain_list_path_key}")
+        blocklist_data_access_factory = self.params.get(block_data_factory_key, None)
+        if blocklist_data_access_factory is None:
+            raise RuntimeError(f"Missing configuration key {block_data_factory_key}")
+
+        domain_list = get_domain_list(url, blocklist_data_access_factory.create_data_access())
+        domain_refs = ray.put(list(domain_list))
+        return {domain_refs_key: domain_refs} | self.params
+```
+In the implementation above, we do something very similiar as was done in the transform
+initializer, except that here we store the loaded resource (i.e. the domain list) in Ray global memory
+and place the key for the stored object in the configuration.  This way the transform initializer
+can first look for this key and if found, avoid loading the domain list itself.
+
+Alternatively, if you are downloading resources from the **same** source as 
+the data itself, you can use input parameter `data_access_factory` to create data access 
+and download everything that you need using it.
+
+Finally, and as mentioned above, the transform's initializer looks to see if the key
+to the domain list is present and uses it instead of loading the domain list itself.
+
+```python
+        runtime_provided_domain_refs = config.get(domain_refs_key, None)
+        if runtime_provided_domain_refs is None:
+            # this is useful during local debugging and testing without Ray
+            url = config.get(blocked_domain_list_path_key, None)
+            if url is None:
+                raise RuntimeError(f"Missing configuration value for key {annotation_column_name_key}")
+            daf = config.get(block_data_factory_key, None)
+            if url is None:
+                raise RuntimeError(f"Missing configuration value for key {block_data_factory_key}")
+            data_access = daf.create_data_access()
+            domain_list = get_domain_list(url, data_access)
+        else:
+            # This is recommended for production approach. In this case domain list is build by the
+            # runtime once, loaded to the object store and can be accessed by actors without additional reads
+            try:
+                domain_list = ray.get(runtime_provided_domain_refs)
+            except Exception as e:
+                logger.info(f"Exception loading list of block listed domains from ray object storage {e}")
+                raise RuntimeError(f"exception loading from object storage for key {runtime_provided_domain_refs}")
+```
+### Conclusion
+
+Generally, although both resource loading approaches can be used, we recommend 
+always implementing loading in the transform initializer, and if desired, loading in the transform 
+runtime if feasible (picklable, etc) or desirable for other reasons such as network bandwidth.
