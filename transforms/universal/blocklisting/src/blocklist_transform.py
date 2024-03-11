@@ -100,11 +100,13 @@ class BlockListTransform(AbstractTableTransform):
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
             try:
+                logger.info(f"Loading domain list from Ray storage under reference {runtime_provided_domain_refs}")
                 domain_list = ray.get(runtime_provided_domain_refs)
             except Exception as e:
                 logger.info(f"Exception loading list of block listed domains from ray object storage {e}")
                 raise RuntimeError(f"exception loading from object storage for key {runtime_provided_domain_refs}")
         # build trie structure for block listing
+        logger.info(f"Loading trie with {len(domain_list)} items.")
         self.trie = pygtrie.StringTrie(separator=".")
         for url in domain_list:
             self.trie[reverse_url(url)] = ""
@@ -264,6 +266,7 @@ class BlockListRuntime(DefaultTableTransformRuntime):
 
         domain_list = get_domain_list(url, blocklist_data_access_factory.create_data_access())
         domain_refs = ray.put(list(domain_list))
+        logger.info(f"Placed domain list into Ray object storage under reference{domain_refs}")
         return {domain_refs_key: domain_refs} | self.params
 
 
