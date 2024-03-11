@@ -5,9 +5,7 @@ ARG ARTIFACTORY_API_KEY
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
-# remove credentials-containing file
-RUN rm requirements.txt
 
-COPY ./src/split_file_implementation.py transformer_launcher.py
+COPY ./src/*_transform.py ./ 
 ENV PYTHONPATH /home/ray
 
