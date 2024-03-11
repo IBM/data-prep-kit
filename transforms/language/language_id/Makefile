@@ -7,24 +7,26 @@ DOCKER_IMAGE_VERSION=0.6
 REPOROOT=../../..
 # Include the common rules.
 # Use "make help" to see them. 
-include ../../makefile.transforms
+include ../../../.make.defaults
 
-# Use default rule inherited from makefile.common
-clean: .clean
+# Include a library of common .transform.* targets which most
+# transforms should be able to reuse.  However, feel free
+# to override/redefine the rules below. 
+include ../../.make.transforms
 
-# Use default rule inherited from makefile.common
-test: .test
+DOCKER_IMAGE_NAME=language_identification
+DOCKER_IMAGE_VERSION=0.6
 
-# Use default rule inherited from makefile.common
-image: .image
+venv::	.transforms.venv
 
-# Use default rule inherited from makefile.common
-build: .build
+build::	.transforms.build
 
-# Use default rule inherited from makefile.common
-venv: .venv
+test::	.transforms.test
 
-# Use default rule inherited from makefile.common
-install_lib_source: .install_lib_source
+clean:: .transforms.clean
 
+image:: .transforms.image
 
+test-lib-src:: .transforms.test-lib-src
+
+install-lib-src:: .transforms.install-lib-src
