@@ -17,8 +17,9 @@ Reference https://github.ibm.com/ai-foundation/foundation-model-stack/tree/main/
 """
 
 PARAM_DROP_COLUMN_IF_EXISTED = "drop_column_if_existed"
+PARAM_MODEL_CREDENTIAL = "model_credential"
 PARAM_MODEL_KIND = "model_kind"
-PARAM_MODEL_PATH = "model_path"
+PARAM_MODEL_URL = "model_url"
 PARAM_CONTENT_COLUMN_NAME = "content_column_name"
 
 
@@ -36,7 +37,9 @@ class LangIdentificationTransform(AbstractTableTransform):
         # super().__init__(config)
         from lang_models import LangModelFactory
 
-        self.nlp_langid = LangModelFactory.create_model(config[PARAM_MODEL_KIND], config.get(PARAM_MODEL_PATH))
+        self.nlp_langid = LangModelFactory.create_model(
+            config[PARAM_MODEL_KIND], config.get(PARAM_MODEL_URL), config.get(PARAM_MODEL_CREDENTIAL)
+        )
         self.column_name = config.get(PARAM_CONTENT_COLUMN_NAME)
 
         if PARAM_DROP_COLUMN_IF_EXISTED in config:
@@ -84,8 +87,13 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument("-dr", f"--{PARAM_DROP_COLUMN_IF_EXISTED}", default=True, help="drop columns if existed")
+        parser.add_argument(
+            f"--{PARAM_MODEL_CREDENTIAL}",
+            default=None,
+            help="Credential to access model for language detection placed in url",
+        )
         parser.add_argument(f"--{PARAM_MODEL_KIND}", default="", help="Kind of model for language detection")
-        parser.add_argument(f"--{PARAM_MODEL_PATH}", default=None, help="Path to model for language detection")
+        parser.add_argument(f"--{PARAM_MODEL_URL}", default=None, help="Url to model for language detection")
         parser.add_argument(f"--{PARAM_CONTENT_COLUMN_NAME}", default="contents", help="Column name to get content")
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
@@ -96,8 +104,9 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
         :return: True, if validate pass or False otherwise
         """
         self.params[PARAM_DROP_COLUMN_IF_EXISTED] = args.drop_column_if_existed
+        self.params[PARAM_MODEL_CREDENTIAL] = args.model_credential
         self.params[PARAM_MODEL_KIND] = args.model_kind
-        self.params[PARAM_MODEL_PATH] = args.model_path
+        self.params[PARAM_MODEL_URL] = args.model_url
         self.params[PARAM_CONTENT_COLUMN_NAME] = args.content_column_name
         return True
 

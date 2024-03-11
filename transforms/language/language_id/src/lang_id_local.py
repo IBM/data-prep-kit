@@ -5,8 +5,9 @@ from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
 from lang_id_implementation import (
     PARAM_CONTENT_COLUMN_NAME,
+    PARAM_MODEL_CREDENTIAL,
     PARAM_MODEL_KIND,
-    PARAM_MODEL_PATH,
+    PARAM_MODEL_URL,
     LangIdentificationTableTransformConfiguration,
 )
 from lang_models import KIND_FASTTEXT
@@ -36,8 +37,8 @@ params = {
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
     PARAM_MODEL_KIND: KIND_FASTTEXT,
-    # PARAM_MODEL_PATH: "PATH TO YOUR MODEL",
-    PARAM_MODEL_PATH: "/root/lid.176.ftz",
+    PARAM_MODEL_URL: "facebook/fasttext-language-identification",
+    PARAM_MODEL_CREDENTIAL: "YOUR HUGGING FACE ACCOUNT TOKEN",
     PARAM_CONTENT_COLUMN_NAME: "text",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)

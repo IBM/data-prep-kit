@@ -4,8 +4,9 @@ import pyarrow as pa
 from data_processing.test_support.transform.transform_test import AbstractTransformTest
 from lang_id_implementation import (
     PARAM_CONTENT_COLUMN_NAME,
+    PARAM_MODEL_CREDENTIAL,
     PARAM_MODEL_KIND,
-    PARAM_MODEL_PATH,
+    PARAM_MODEL_URL,
     LangIdentificationTransform,
 )
 from lang_models import KIND_FASTTEXT
@@ -15,7 +16,8 @@ class TestLangIdentificationTransform(AbstractTransformTest):
     def get_test_transform_fixtures(self) -> list[Tuple]:
         config = {
             PARAM_MODEL_KIND: KIND_FASTTEXT,
-            PARAM_MODEL_PATH: "/root/lid.176.ftz",
+            PARAM_MODEL_CREDENTIAL: "PARAM_MODEL_CREDENTIAL",
+            PARAM_MODEL_URL: "facebook/fasttext-language-identification",
             PARAM_CONTENT_COLUMN_NAME: "contents",
         }
         table = pa.Table.from_arrays(
