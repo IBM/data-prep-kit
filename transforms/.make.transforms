@@ -1,0 +1,118 @@
+#
+# Include this to get access to a common set of rules for reuse in transform projects.
+# Before including,  REPOROOT must be defined.  For example,
+# REPOROOT=../../..
+# include ../../.make.transforms
+#
+# Targets defined here use double colon so can be overriden
+#
+# Reusable rules begin with '.'. To reuse without modification, for example,
+# define your local Makefile rule as follows:
+# clean: .clean
+# To augment the the clean rule
+# clean: .clean
+# 	rm -rf other-stuff
+#
+#######################################################################################
+DOCKER=podman
+DOCKER_FILE=Dockerfile
+DOCKER_REGISTRY=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
+EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
+
+PYTHON=python
+PIP=$(PYTHON) -m pip
+
+# The following taken from https://stackoverflow.com/a/65243296/45375
+# Lists all targets and optional help text found in the target.
+# :: rule means we first run the help from the main make.defaults.
+help::	
+	@echo ""
+	@echo Overridable macro values include the following:
+	@echo DOCKER - the name of the docker executable to use.  DOCKER=$(DOCKER)
+	@echo DOCKER_FILE - the name of the docker file to use.  DOCKER_FILE=$(DOCKER_FILE)
+	@echo DOCKER_REGISTRY - the name of the docker registry to use.  DOCKER_REGISTRY=$(DOCKER_REGISTRY)
+	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
+	@echo EXTRA_ARTIFACTORY_URL - the url of an additional artifactory to satisfy dependencies.  EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL)
+	@echo ""
+	@echo Macros that require definition in the including Makefile
+	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
+	@echo DOCKER_IMAGE_VERSION - the version of the docker image to produce.  DOCKER_IMAGE_VERSION=$(DOCKER_IMAGE_VERSION)
+	@$(MAKE) .transforms.check_required_macros
+
+.PHONY: .transforms.check_required_macros
+.transforms.check_required_macros::
+	@if [ -z "$(DOCKER_IMAGE_NAME)" ]; then		\
+	    echo ERROR: DOCKER_IMAGE_NAME is must be defined.;	\
+	fi
+	@if [ -z "$(DOCKER_IMAGE_VERSION)" ]; then	\
+	    echo ERROR: DOCKER_IMAGE_VERSION is must be defined.;	\
+	fi			
+
+.PHONY: .transforms.clean
+.transforms.clean:: 
+	@# Help: Clean up the virtual environment.
+	rm -rf venv
+
+# Create the local virtual environment, assuming python is already installed and available
+# We upgrade pip as that seems to be required by watson_nlp
+.PHONY: .transforms.venv
+.transforms.venv::	requirements.txt
+	@$(MAKE) .transforms.check_env	# Put this first so we don't get its help
+	@# Help: Create the virtual environment using requirements.txt
+	$(PYTHON) -m venv venv
+	@if [ ! -z "$(EXTRA_ARTIFACTORY_URL)" ]; then				\
+	    echo '[global]' > venv/pip.conf;					\
+	    echo "extra-index-url = $(EXTRA_ARTIFACTORY_URL)" >> venv/pip.conf;	\
+	fi
+	. venv/bin/activate;			\
+	$(PIP) install --upgrade pip;		\
+	$(PIP) install -r requirements.txt;	\
+	$(PIP) install pytest;			\
+
+.transforms.check_env::
+	@# Help: Make sure Artifactory credentials are in the environment variables. 
+	@if [ -z "$(ARTIFACTORY_USER)" -o -z "$(ARTIFACTORY_API_KEY)" ]; then \
+		echo "You must set ARTIFACTORY_USER and ARTIFACTORY_API_KEY env vars";\
+		exit;									\
+	fi
+
+# Create the docker image making sure the preloaded models are available to copy into the image
+.transforms.image:: Dockerfile requirements.txt
+	$(MAKE) .transforms.check_env	# Put this first so we don't get its help
+	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
+	$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
+	$(DOCKER) build --build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) --build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
+		-f $(DOCKER_FILE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) .
+
+.PHONY: .transforms.install-lib-src
+.transforms.install-lib-src::
+	@# Help: Install the source from the data processing library for $(PYTHON) 
+	@echo Installing source from data processing library for venv 
+	@source venv/bin/activate;					\
+	$(PIP) uninstall -y fm-data-processing;			\
+	$(PIP) install 						\
+		--extra-index-url $(EXTRA_ARTIFACTORY_URL)		\
+		-e $(REPOROOT)/data-processing-lib/;			\
+	if [ $$? -eq 0 ]; then	\
+		echo Installed source from data processing library for `which $(PYTHON)`;	\
+	else \
+		echo ERROR installing source into `which $(PYTHON)`;	\
+	fi
+
+.transforms.build:: .transforms.venv .transforms.image	
+
+.PHONY: .transforms.test-lib-src
+.transforms.test-lib-src::
+	$(MAKE) .transforms.install-lib-src 
+	@# Help: Run pytest on the test directory after installing data-process-lib source into the current venv
+	source venv/bin/activate;			\
+	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
+	cd test; pytest . 
+
+.PHONY: test	# because there is a directory called tests in the projects
+.transforms.test::  
+	@# Help: Run pytest on the test directory using the current venv
+	source venv/bin/activate;			\
+	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
+	cd test; pytest . 
+

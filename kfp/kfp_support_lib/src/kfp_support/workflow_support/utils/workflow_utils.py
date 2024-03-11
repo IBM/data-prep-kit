@@ -229,10 +229,11 @@ class RayRemoteJobs:
     """
     ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 
-    def __init__(self, server_url: str = "http://localhost:8080", wait_interval: int = 2):
+    def __init__(self, server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
+                 wait_interval: int = 2):
         """
         Initialization
-        :param server_url: API server URL
+        :param server_url: API server URL. Default value is assuming running inside the cluster
         :param wait_interval: wai interval
         """
         self.api_server_client = KubeRayAPIs(server_url=server_url, wait_interval=wait_interval)
@@ -248,10 +249,10 @@ class RayRemoteJobs:
                 cpu - number of cpus
                 memory memory size (GB)
                 image - image to use
-                image_pull_secret - image pull secret
             optional fields:
                 gpu - number of gpus
                 gpu_accelerator - gpu accelerator to use
+                image_pull_secret - image pull secret
                 ray_start_params - dictionary of ray start parameters
                 volumes - list of volumes for head node
                 service_account - service account to use (has to be created)
@@ -264,13 +265,13 @@ class RayRemoteJobs:
                 cpu - number of cpus
                 memory memory size (GB)
                 image - image to use
-                image_pull_secret - image pull secret
                 max_replicas - max replicas for this worker group
             optional fields:
                 gpu - number of gpus
                 gpu_accelerator - gpu accelerator to use
                 replicas - number of replicas to create for this group (default 1)
                 min_replicas - min number of replicas for this group (default 0)
+                image_pull_secret - image pull secret
                 ray_start_params - dictionary of ray start parameters
                 volumes - list of volumes for this group
                 service_account - service account to use (has to be created)
@@ -303,7 +304,7 @@ class RayRemoteJobs:
             gpus = worker_node.get("gpu", 0)
             accelerator = worker_node.get("gpu_accelerator", None)
             worker_node_template_name = f"{name}-worker-template-{index}"
-            _, _ = self.api_server_client.delete_compute_template(ns="default", name=worker_node_template_name)
+            _, _ = self.api_server_client.delete_compute_template(ns=namespace, name=worker_node_template_name)
             worker_template = Template(name=worker_node_template_name, namespace=namespace, cpu=cpus, memory=memory,
                                        gpu=gpus, gpu_accelerator=accelerator)
             status, error = self.api_server_client.create_compute_template(worker_template)
@@ -430,7 +431,7 @@ class RayRemoteJobs:
         """
         # get job invo
         status, error, info = self.api_server_client.get_job_info(ns=namespace, name=name, sid=submission_id)
-        if status != 200:
+        if status // 100 != 2:
             return status, error, ""
         return status, error, info.status
 
@@ -462,7 +463,7 @@ class RayRemoteJobs:
         while job_status != JobStatus.RUNNING:
             status, error, job_status = self._get_job_status(name=name, namespace=namespace,
                                                              submission_id=submission_id)
-            if status != 200:
+            if status // 100 != 2:
                 sys.exit(1)
             if job_status in {JobStatus.STOPPED, JobStatus.SUCCEEDED, JobStatus.FAILED, JobStatus.RUNNING}:
                 break
@@ -471,7 +472,7 @@ class RayRemoteJobs:
         previous_log_len = 0
         # At this point job could succeeded, failed, stop or running. So print log regardless
         status, error, log = self.api_server_client.get_job_log(ns=namespace, name=name, sid=submission_id)
-        if status != 200:
+        if status // 100 != 2:
             sys.exit(1)
         self._print_log(log=log, previous_log_len=previous_log_len)
         previous_log_len = len(log)
@@ -479,19 +480,19 @@ class RayRemoteJobs:
         while job_status == JobStatus.RUNNING:
             time.sleep(print_timeout)
             status, error, log = self.api_server_client.get_job_log(ns=namespace, name=name, sid=submission_id)
-            if status != 200:
+            if status // 100 != 2:
                 sys.exit(1)
             self._print_log(log=log, previous_log_len=previous_log_len)
             previous_log_len = len(log)
             status, error, job_status = self._get_job_status(name=name, namespace=namespace,
                                                              submission_id=submission_id)
-            if status != 200:
+            if status // 100 != 2:
                 sys.exit(1)
         # Print the final log and execution status
         # Sleep here to avoid racing conditions
         time.sleep(2)
         status, error, log = self.api_server_client.get_job_log(ns=namespace, name=name, sid=submission_id)
-        if status != 200:
+        if status // 100 != 2:
             sys.exit(1)
         self._print_log(log=log, previous_log_len=previous_log_len)
         print(f"Job completed with execution status {status}")

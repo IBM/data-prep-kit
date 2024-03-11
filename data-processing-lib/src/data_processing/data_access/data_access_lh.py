@@ -86,6 +86,7 @@ class DataAccessLakeHouse(DataAccess):
         :return: output file location
         """
         return self.lh.get_output_file_path_from(file_path=path)
+
     def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
         """
         Save table to a given location

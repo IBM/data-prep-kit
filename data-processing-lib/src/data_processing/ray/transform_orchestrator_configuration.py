@@ -83,7 +83,7 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
             "job type": "ray",
             "job id": args.job_id,
         }
-        self.code_location = (args.code_location,)
+        self.code_location = args.code_location
 
         # print them
         print(f"number of workers {self.n_workers} worker options {self.worker_options}")

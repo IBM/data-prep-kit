@@ -31,6 +31,15 @@ class AbstractTransformLauncherTest(AbstractTest):
         in_table_path: str,
         expected_out_table_path: str,
     ):
+        """
+        Test the given transform and its runtime using the given CLI arguments, input directory of data files and expected output directory.
+        Data is processed into a temporary output directory which is then compared with the directory of expected output.
+        :param transform_config:
+        :param cli_params: a map of the simulated CLI arguments (w/o --).  This includes both the transform-specific CLI parameters and  the Ray launching args.
+        :param in_table_path: a directory containing the input parquet files to be processed and results compared against the expected output table path.
+        :param expected_out_table_path: directory contain parquet and metadata.json that is expected to match the processed input directory.
+        :return:
+        """
 
         launcher = TransformLauncher(transform_config)
         prefix = transform_config.get_name()
@@ -55,11 +64,12 @@ class AbstractTransformLauncherTest(AbstractTest):
 
     def get_test_transform_fixtures(self) -> list[Tuple]:
         """
-        Get the test data for the test_transform() test.
+        Get the test data for the test_transform() test.  The returned list contains 0 or more tuples
+        containing the following:
+            |  Item 0: The DefaultTableTransformConfiguration to be tested. This defines the Transform being tested and the Runtime required to run it.
+            |  Item 1: The dictionary of command line args to simulate when running the transform.
+            |  Item 2: The input path to the parquet files to process.
+            |  Item 3: the output path holding the expected results of the transform including parquet and metadata.json
         :return:  a list of Tuples, to test. Each tuple contains the test inputs for test_transform() method.
-            Item 0: The DefaultTableTransformConfiguration to be tested
-            Item 1: The dictionary of command line args to simulate when running the transform.
-            Item 2: The input path to the parquet files to process.
-            Item 3: the output path holding the expected results of the transform including parquet and metadata.json
         """
         raise NotImplemented()

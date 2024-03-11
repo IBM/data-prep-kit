@@ -12,7 +12,7 @@
     "code": [null],
     "job_input_params": {
         "bl_blocked_domain_list_url": "test-data/domains/arjel",
-        "bl_annotation_column_name": "url_blocklisting_refinedweb",
+        "bl_annotation_column_name": "blocklisted",
         "bl_source_url_column_name": "title",
         "checkpointing": false,
         "max_files": -1,

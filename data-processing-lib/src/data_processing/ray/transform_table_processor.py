@@ -100,6 +100,7 @@ class TransformTableProcessor:
             case 1:
                 # we have exactly 1 table
                 output_name = self.data_access.get_output_location(path=f_name)
+                logger.debug(f"Writing transformed file {f_name} to {output_name}")
                 output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
                 if save_res is not None:
                     # Store execution statistics. Doing this async
@@ -116,8 +117,13 @@ class TransformTableProcessor:
                 table_sizes = 0
                 output_name = self.data_access.get_output_location(path=f_name)
                 output_file_name = output_name.removesuffix(".parquet")
-                for index in range(len(out_tables)):
+                count = len(out_tables)
+                for index in range(count):
                     table_sizes += out_tables[index].nbytes
+                    output_name_indexed = f"{output_file_name}_{index}.parquet"
+                    logger.debug(
+                        f"Writing transformed file {f_name}, {index + 1} of {count}  to {output_name_indexed}"
+                    )
                     output_file_size, save_res = self.data_access.save_table(
                         path=f"{output_file_name}_{index}.parquet", table=out_tables[index]
                     )

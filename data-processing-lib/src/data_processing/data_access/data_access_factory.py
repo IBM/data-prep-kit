@@ -1,14 +1,21 @@
 import argparse
 import ast
-from typing import Any
+from typing import Any, Union
 
+from data_processing import utils
 from data_processing.data_access import (
     DataAccess,
     DataAccessLakeHouse,
     DataAccessLocal,
     DataAccessS3,
 )
-from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger, str2bool
+from data_processing.utils import (
+    CLIArgumentProvider,
+    DPFConfig,
+    ParamsUtils,
+    get_logger,
+    str2bool,
+)
 
 
 logger = get_logger(__name__)
@@ -21,9 +28,15 @@ class DataAccessFactory(CLIArgumentProvider):
     This class has to be serializable, so that we can pass it to the actors
     """
 
-    def __init__(self):
+    def __init__(self, cli_arg_prefix: str = None):
         """
-        Initialization - set defaults
+        Create the factory to parse a set of args that will then define the type of DataAccess object
+        to be created by the create_data_access() method.
+        :param cli_arg_prefix:  if provided, this will be prepended to all the CLI arguments names.
+        This allows the creation of transform-specific (or other) DataAccess instances based on the
+        transform-specific prefix (e.g. bl_ for blocklist transform).  The resulting keys returned
+        in get_input_params() will include the prefix.  The underlying AST or other values of those
+        keys is not effected by the prefix.
         """
         self.s3_config = None
         self.lh_config = None
@@ -32,6 +45,8 @@ class DataAccessFactory(CLIArgumentProvider):
         self.checkpointing = False
         self.dsets = None
         self.max_files = -1
+        self.cli_arg_prefix = "" if cli_arg_prefix is None else cli_arg_prefix
+        self.params = {}
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
@@ -47,10 +62,10 @@ class DataAccessFactory(CLIArgumentProvider):
         help_example_dict = {
             "access_key": ["AFDSASDFASDFDSF ", "access key help text"],
             "secret_key": ["XSDFYZZZ", "secret key help text"],
-            "cos_url": ["s3:/cos-optimal-llm-pile/test/", "COS url"],
+            "url": ["s3:/cos-optimal-llm-pile/test/", "S3 url"],
         }
         parser.add_argument(
-            "--s3_cred",
+            f"--{self.cli_arg_prefix}s3_cred",
             type=ast.literal_eval,
             default=None,
             help="AST string of options for cos credentials. Only required for COS or Lakehouse.\n"
@@ -63,11 +78,11 @@ class DataAccessFactory(CLIArgumentProvider):
             ],
             "output_path": [
                 "/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed",
-                "Path to outpu folder of processed files",
+                "Path to output folder of processed files",
             ],
         }
         parser.add_argument(
-            "--s3_config",
+            f"--{self.cli_arg_prefix}s3_config",
             type=ast.literal_eval,
             default=None,
             help="AST string containing input/output paths.\n" + ParamsUtils.get_ast_help_text(help_example_dict),
@@ -91,7 +106,7 @@ class DataAccessFactory(CLIArgumentProvider):
             "lh_environment": ["STAGING", "Operational environment. One of STAGING or PROD"],
         }
         parser.add_argument(
-            "--lh_config",
+            f"--{self.cli_arg_prefix}lh_config",
             type=ast.literal_eval,
             default=None,
             help="AST string containing input/output using lakehouse.\n"
@@ -102,34 +117,53 @@ class DataAccessFactory(CLIArgumentProvider):
             "output_folder": ["/tmp/output", "Path to output folder of processed files"],
         }
         parser.add_argument(
-            "--local_config",
+            f"--{self.cli_arg_prefix}local_config",
             type=ast.literal_eval,
             default=None,
             help="ast string containing input/output folders using local fs.\n"
             + ParamsUtils.get_ast_help_text(help_example_dict),
         )
-        parser.add_argument("--max_files", type=int, default=-1, help="Max amount of files to process")
         parser.add_argument(
-            "--checkpointing", type=lambda x: bool(str2bool(x)), default=False, help="checkpointing flag"
+            f"--{self.cli_arg_prefix}max_files", type=int, default=-1, help="Max amount of files to process"
         )
-        parser.add_argument("--data_sets", type=str, default=None, help="List of data sets")
+        parser.add_argument(
+            f"--{self.cli_arg_prefix}checkpointing",
+            type=lambda x: bool(str2bool(x)),
+            default=False,
+            help="checkpointing flag",
+        )
+        parser.add_argument(f"--{self.cli_arg_prefix}data_sets", type=str, default=None, help="List of data sets")
 
-    def apply_input_params(self, args: argparse.Namespace) -> bool:
+    def apply_input_params(self, args: Union[dict, argparse.Namespace]) -> bool:
         """
         Validate data access specific parameters
         This might need to be extended if new data access implementation is added
         :param args: user defined arguments
         :return: None
         """
+        if isinstance(args, argparse.Namespace):
+            arg_dict = vars(args)
+        elif isinstance(args, dict):
+            arg_dict = args
+        else:
+            raise ValueError("args must be Namespace or dictionary")
+        s3_cred = arg_dict.get(f"{self.cli_arg_prefix}s3_cred")
+        s3_config = arg_dict.get(f"{self.cli_arg_prefix}s3_config")
+        lh_config = arg_dict.get(f"{self.cli_arg_prefix}lh_config")
+        local_config = arg_dict.get(f"{self.cli_arg_prefix}local_config")
+        checkpointing = arg_dict.get(f"{self.cli_arg_prefix}checkpointing")
+        max_files = arg_dict.get(f"{self.cli_arg_prefix}max_files")
+        data_sets = arg_dict.get(f"{self.cli_arg_prefix}data_sets")
 
         # check which configuration (S3, LakeHouse, or Local) is specified
-        s3_config_specified = 1 if args.s3_config is not None and len(args.s3_config) > 1 else 0
-        lh_config_specified = 1 if args.lh_config is not None and len(args.lh_config) > 1 else 0
-        local_config_specified = 1 if args.local_config is not None and len(args.local_config) > 1 else 0
+        s3_config_specified = 1 if s3_config is not None and len(s3_config) > 1 else 0
+        lh_config_specified = 1 if lh_config is not None and len(lh_config) > 1 else 0
+        local_config_specified = 1 if local_config is not None and len(local_config) > 1 else 0
 
         # check that only one (S3, LakeHouse, or Local) configuration is specified
         if s3_config_specified + lh_config_specified + local_config_specified > 1:
             logger.error(
+                f"prefix {self.cli_arg_prefix} "
                 f"{'S3, ' if s3_config_specified == 1 else ''}"
                 f"{'Lakehouse, ' if lh_config_specified == 1 else ''}"
                 f"{'Local ' if local_config_specified == 1 else ''}"
@@ -140,25 +174,31 @@ class DataAccessFactory(CLIArgumentProvider):
         # check that at least one (S3, LakeHouse, or Local) configuration is specified
         if s3_config_specified + lh_config_specified + local_config_specified == 0:
             logger.error(
+                f"prefix {self.cli_arg_prefix} "
                 "No S3, lakehouse, or local configuration parameters defined," " at least one of them is required! "
             )
             return False
 
         # further validate the specified configuration (S3, LakeHouse, or Local)
         if s3_config_specified == 1:
-            if not self.__validate_s3_cred(s3_credentials=args.s3_cred):
+            self.s3_cred = s3_cred
+            utils.add_if_missing(self.s3_cred, "access_key", DPFConfig.S3_ACCESS_KEY)
+            utils.add_if_missing(self.s3_cred, "secret_key", DPFConfig.S3_SECRET_KEY)
+            if not self.__validate_s3_cred(s3_credentials=self.s3_cred):
                 return False
-            self.s3_cred = args.s3_cred
-            self.s3_config = args.s3_config
+            self.s3_config = s3_config
             logger.info(
                 f'Using s3 configuration: input path - {self.s3_config["input_folder"]}, '
                 f'output path - {self.s3_config["output_folder"]}'
             )
         elif lh_config_specified == 1:
-            if not self.__validate_s3_cred(s3_credentials=args.s3_cred):
+            self.s3_cred = s3_cred
+            utils.add_if_missing(self.s3_cred, "access_key", DPFConfig.S3_ACCESS_KEY)
+            utils.add_if_missing(self.s3_cred, "secret_key", DPFConfig.S3_SECRET_KEY)
+            if not self.__validate_s3_cred(s3_credentials=self.s3_cred):
                 return False
-            self.s3_cred = args.s3_cred
-            self.lh_config = args.lh_config
+            self.lh_config = lh_config
+            utils.add_if_missing(self.lh_config, "token", DPFConfig.LAKEHOUSE_TOKEN)
             logger.info(
                 f'Using lake house configuration: input table - {self.lh_config["input_table"]}, '
                 f'input_dataset - {self.lh_config["input_dataset"]}, '
@@ -168,20 +208,20 @@ class DataAccessFactory(CLIArgumentProvider):
                 f'lh_environment - {self.lh_config["lh_environment"]} '
             )
         elif local_config_specified == 1:
-            if not self._validate_local(local_config=args.local_config):
+            if not self._validate_local(local_config=local_config):
                 return False
-            self.local_config = args.local_config
+            self.local_config = local_config
             logger.info(
                 f"Using local configuration with: "
                 f"input_folder - {self.local_config['input_folder']} "
                 f"output_folder - {self.local_config['output_folder']}"
             )
-        self.checkpointing = args.checkpointing
-        self.max_files = args.max_files
-        if args.data_sets is None or len(args.data_sets) < 1:
+        self.checkpointing = checkpointing
+        self.max_files = max_files
+        if data_sets is None or len(data_sets) < 1:
             logger.info(f"Not using data sets, checkpointing {self.checkpointing}, max files {self.max_files}")
         else:
-            self.dsets = args.data_sets.split(",")
+            self.dsets = data_sets.split(",")
             logger.info(
                 f"Using data sets {self.dsets}, checkpointing {self.checkpointing}, max files {self.max_files}"
             )
@@ -200,44 +240,60 @@ class DataAccessFactory(CLIArgumentProvider):
             params["data sets"] = self.dsets
         return params
 
-    @staticmethod
-    def __validate_s3_cred(s3_credentials: dict[str, str]) -> bool:
+    def __validate_s3_cred(self, s3_credentials: dict[str, str]) -> bool:
         """
         Validate that
         :param s3_credentials: dictionary of S3 credentials
         :return:
         """
         if s3_credentials is None:
-            logger.error("Could not get cos credentials - exiting")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                "Could not get cos credentials "
+            )
             return False
         if (
-            s3_credentials.get("access_key", "") == ""
-            or s3_credentials.get("secret_key", "") == ""
-            or s3_credentials.get("cos_url", "") == ""
+            s3_credentials.get("access_key") is None
+            or s3_credentials.get("secret_key") is None
+            or s3_credentials.get("cos_url") is None
         ):
-            logger.error("Could not get cos credentials - exiting")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                "Could not get cos credentials "
+            )
             return False
         return True
 
-    @staticmethod
-    def _validate_local(local_config: dict[str, str]) -> bool:
+    def _validate_local(self, local_config: dict[str, str]) -> bool:
         """
         Validate that
         :param local_config: dictionary of local config
         :return: True if local config is valid, False otherwise
         """
         if local_config is None:
-            logger.error("Could not get local config - exiting")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                "Could not get local config"
+            )
             return False
         valid_config = True
         if local_config.get("input_folder", "") == "":
             valid_config = False
-            logger.error(f"Could not find input folder in local config")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                f"Could not find input folder in local config"
+            )
         if local_config.get("output_folder", "") == "":
             valid_config = False
-            logger.error(f"Could not find output folder in local config")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                f"Could not find output folder in local config"
+            )
         if not valid_config:
-            logger.error("Invalid local configuration - exiting")
+            logger.error(
+                f"prefix {self.cli_arg_prefix} "
+                "Invalid local configuration"
+            )
         return valid_config
 
     def create_data_access(self) -> DataAccess:

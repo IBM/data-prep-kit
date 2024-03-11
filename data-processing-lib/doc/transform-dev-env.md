@@ -23,7 +23,7 @@ Target               Description
 build                Create the virtual environment using requirements.txt
 clean                Clean up the virtual environment.
 image                Build the docker image using the Dockerfile and requirements.txt 
-install_lib_source   Install the source from the data processing library for python 
+install-lib-src      Install the source from the data processing library for python 
 test                 Use the already-built virtual environment to run pytest on the test directory. 
 venv                 Create the virtual environment using requirements.txt
 

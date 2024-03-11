@@ -12,7 +12,6 @@ class AbstractTransformTest(AbstractTest):
     to provide the test data for a given test method.  For example,  get_test_transform_fixtures()
     provides the test data for the test_transform() test method.
     """
-
     def _install_test_fixtures(self, metafunc):
         # Apply the fixtures for the method with these input names (i.e. test_transform()).
         if (
