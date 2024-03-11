@@ -5,6 +5,7 @@ os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
 from typing import Any, List, Tuple
 
+import pandas as pd
 import pyarrow
 import pyarrow as pa
 
@@ -21,30 +22,24 @@ runtime_env = {
 }
 
 
-def get_score(lang: str) -> float:
-    # Note: pyizumo does not return confidence score. Set to 1.0 as default.
-    # Other libraries may return confidence score.
-    return 1.0
-
-
 def get_lang_ds_pa(
     table: pyarrow.table, nlp: LangModel, col_name: str = "contents"
 ) -> tuple[pyarrow.table, dict[str, Any]]:
     try:
-        detected_language = pa.array(list(map(lambda x: nlp.detect_lang(x), table[col_name].to_pylist())))
+        detected_language = pa.table(
+            pd.DataFrame(map(lambda x: nlp.detect_lang(x), table[col_name].to_pylist()), columns=["lang", "score"])
+        )
     except Exception as e:
         print("ERROR:", e, "skipping the file")
         return None, None
-    stats = pa.table([detected_language], names=["lang"]).group_by("lang").aggregate([("lang", "count")])
+    stats = pa.table([detected_language["lang"]], names=["lang"]).group_by("lang").aggregate([("lang", "count")])
     stats_dict = {}
     for batch in stats.to_batches():
         d = batch.to_pydict()
         for lang, count in zip(d["lang"], d["lang_count"]):
             stats_dict[lang] = count
-    result = pa.table([detected_language], names=["ft_lang"])
-    result = result.append_column(
-        "ft_score", pa.array(list(map(lambda x: get_score(x), result["ft_lang"].to_pylist())))
-    )
+    result = pa.table([detected_language["lang"]], names=["ft_lang"])
+    result = result.append_column("ft_score", detected_language["score"])
     return result, stats_dict
 
 

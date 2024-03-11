@@ -41,14 +41,12 @@ class LangIdentificationTransform(AbstractTableTransform):
             config[PARAM_MODEL_KIND], config.get(PARAM_MODEL_URL), config.get(PARAM_MODEL_CREDENTIAL)
         )
         self.column_name = config.get(PARAM_CONTENT_COLUMN_NAME)
-
         if PARAM_DROP_COLUMN_IF_EXISTED in config:
             self.drop_column_if_existed = config[PARAM_DROP_COLUMN_IF_EXISTED]
         else:
             self.drop_column_if_existed = True
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
-
         if not TransformUtils.validate_columns(table, [self.column_name]):
             exit(1)
 

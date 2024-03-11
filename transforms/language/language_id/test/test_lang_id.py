@@ -16,7 +16,7 @@ class TestLangIdentificationTransform(AbstractTransformTest):
     def get_test_transform_fixtures(self) -> list[Tuple]:
         config = {
             PARAM_MODEL_KIND: KIND_FASTTEXT,
-            PARAM_MODEL_CREDENTIAL: "PARAM_MODEL_CREDENTIAL",
+            PARAM_MODEL_CREDENTIAL: "YOUR HUGGING FACE ACCOUNT TOKEN",
             PARAM_MODEL_URL: "facebook/fasttext-language-identification",
             PARAM_CONTENT_COLUMN_NAME: "contents",
         }
@@ -44,11 +44,11 @@ class TestLangIdentificationTransform(AbstractTransformTest):
                 pa.array(["de", "pt", "ja", "fr", "es"]),
                 pa.array(
                     [
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0,
-                        1.0,
+                        0.9980756640434265,
+                        1.0000087022781372,
+                        0.9301454424858093,
+                        0.9982814788818359,
+                        0.9987021088600159,
                     ]
                 ),
             ],
