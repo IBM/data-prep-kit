@@ -52,7 +52,7 @@ actor creation delay 0
 (TransformTableProcessor pid=40843) 18:36:27 INFO - Sleep for 5 seconds
 (venv) % deactivate
 % ls ../output
-metadata.json	test1.parquet
+metadata.json	sample1.parquet
 %
 </pre>
 
