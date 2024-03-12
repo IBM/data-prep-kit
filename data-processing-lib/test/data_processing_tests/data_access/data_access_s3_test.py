@@ -7,7 +7,7 @@ s3_cred = {
     # Running these tests requires the credentials to be provided in the env vars.
     "access_key": DPFConfig.S3_ACCESS_KEY,
     "secret_key": DPFConfig.S3_SECRET_KEY,
-    "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
+    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
 s3_conf = {

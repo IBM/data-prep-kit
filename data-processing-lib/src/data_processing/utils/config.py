@@ -17,6 +17,8 @@ class DPFConfig:
     """ Set from DPF_S3_SECRET_KEY, AWS_SECRET_ACCESS_KEY or COS_SECRET_KEY env vars """
     LAKEHOUSE_TOKEN = _get_config(["DPF_LAKEHOUSE_TOKEN", "LAKEHOUSE_TOKEN"])
     """ Set from DPF_LAKEHOUSE_TOKEN or LAKEHOUSE_TOKEN env vars """
+    HUGGING_FACE_TOKEN = _get_config(["DPF_HUGGING_FACE_TOKEN"])
+    """ Set from DPF_HUGGING_FACE_TOKEN env var(s) """
 
     DEFAULT_LOG_LEVEL = os.environ.get("DPF_LOG_LEVEL", "INFO")
 
