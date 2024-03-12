@@ -202,17 +202,10 @@ class LangSelectorTransformConfiguration(DefaultTableTransformConfiguration):
                        lang_known_selector: dargs.get(lang_known_selector, True),
                        lang_data_factory_key: self.daf,
                        }
+        # remove data access factory from metadata
+        self.remove_from_metadata.append(lang_data_factory_key)
         # Validate and populate the transform's DataAccessFactory
         return self.daf.apply_input_params(args)
-
-    def get_transform_metadata(self) -> dict[str, Any]:
-        """
-        Provides a default implementation if the user has provided a set of keys to the initializer.
-        These keys are used in apply_input_params() to extract our key/values from the global Namespace of args.
-        :return:
-        """
-        del self.params[lang_data_factory_key]
-        return self.params
 
 
 if __name__ == "__main__":

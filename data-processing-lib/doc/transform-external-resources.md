@@ -74,18 +74,14 @@ created and initialized by the configuration instance.
         
         # Add the DataAccessFactory to the transform's configuration parameters.
         self.params[block_data_factory_key] = self.daf
+        # mark this parameter to be removed
+        self.remove_from_metadata.append(block_data_factory_key)
         # Validate and populate the transform's DataAccessFactory 
         return self.daf.apply_input_params(args)
 ```
-Finally, we implement the `get_transform_metadata()` configuration interface method to remove
-the DataAccessFactory so that it (especially any credentials) are not logged in the job's metadata
-when running in Ray.
-
-```python
-    def get_transform_metadata(self) -> dict[str, Any]:
-        del self.params[block_data_factory_key]
-        return self.params
-```
+Note here, that as daf can contain secrets we do not want him to show up in the execution metadata, we add its key
+to the `self.remove_from_metadata` array. All the keys contained in this array will be removed from metadata. This 
+can also be very usefull for any keys cantaining sensitive information, for example, secrets, passwords, etc.
 
 The above code can be run in a non-ray main() as follows: 
 ```python

@@ -4,6 +4,9 @@ import boto3
 import pyarrow as pa
 import pyarrow.parquet as pq
 from botocore.config import Config
+from data_processing.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 class ArrowS3:
@@ -101,8 +104,8 @@ class ArrowS3:
                 obj = self.s3_client.get_object(Bucket=bucket, Key=prefix)
                 return obj["Body"].read()
             except Exception as e:
-                print(f"failed to read file {key}, exception {e}, attempt {n}")
-        print(f"failed to read file {key} in {self.retries} attempts. Skipping it")
+                logger.error(f"failed to read file {key}, exception {e}, attempt {n}")
+        logger.error(f"failed to read file {key} in {self.retries} attempts. Skipping it")
         return None
 
     def save_file(self, key: str, data: bytes) -> dict[str, Any]:
@@ -119,8 +122,8 @@ class ArrowS3:
             try:
                 return self.s3_client.put_object(Bucket=bucket, Key=prefix, Body=data)
             except Exception as e:
-                print(f"Failed to upload file to to key {key}, exception {e}")
-        print(f"Failed to upload file {key}, skipping it")
+                logger.error(f"Failed to upload file to to key {key}, exception {e}")
+        logger.error(f"Failed to upload file {key}, skipping it")
         return None
 
     def read_table(self, key: str, schema: pa.schema = None) -> pa.Table:
@@ -140,7 +143,7 @@ class ArrowS3:
             table = pq.read_table(reader, schema=schema)
             return table
         except Exception as e:
-            print(f"Failed to convert file {key} to arrow table, exception {e}. Skipping it")
+            logger.error(f"Failed to convert file {key} to arrow table, exception {e}. Skipping it")
             return None
 
     def save_table(self, key: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
@@ -158,7 +161,7 @@ class ArrowS3:
             pq.write_table(table=table, where=writer)
             data = bytes(writer.getvalue())
         except Exception as e:
-            print(f"Failed to convert arrow table to byte array for key {key}, exception {e}. Skipping it")
+            logger.error(f"Failed to convert arrow table to byte array for key {key}, exception {e}. Skipping it")
             return -1, None
         # save bytes
         return len(data), self.save_file(key, data)
@@ -175,7 +178,7 @@ class ArrowS3:
                 self.s3_client.delete_object(Bucket=bucket, Key=prefix)
                 return None
             except Exception as e:
-                print(f"failed to delete file {key}, exception {e}")
+                logger.error(f"failed to delete file {key}, exception {e}")
         return None
 
     def move_file(self, source: str, dest: str) -> None:
@@ -195,5 +198,5 @@ class ArrowS3:
                 self.delete_file(source)
                 return None
             except Exception as e:
-                print(f"failed to copy file {source} to {dest}, exception {e}")
+                logger.error(f"failed to copy file {source} to {dest}, exception {e}")
         return None
