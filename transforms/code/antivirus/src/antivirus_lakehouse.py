@@ -11,7 +11,7 @@ launcher = TransformLauncher(transform_runtime_config=AntivirusTransformConfigur
 s3_cred = {
     "access_key": "YOUR KEY",
     "secret_key": "YOUR SECRET KEY",
-    "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
+    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
 # Configure lakehouse unit test tables
@@ -41,7 +41,7 @@ params = {
     "code_location": ParamsUtils.convert_to_ast(code_location),
     "input_column": "contents",
     "output_column": "virus_detection",
-    "use_network_socket": True,
+    "network_socket": "localhost:3310",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

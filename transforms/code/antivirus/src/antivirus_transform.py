@@ -30,14 +30,16 @@ class AntivirusTransform(AbstractTableTransform):
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of AntivirusTransformConfiguration class
         super().__init__(config)
+        self.warning_issued = False
         self.input_column = config.get("input_column", "contents")
         self.output_column = config.get("output_column", "virus_detection")
-        self.drop_column_if_existed = config.get("drop_column_if_existed", True)
         self.use_network_socket = config.get("use_network_socket", False)
         if self.use_network_socket:
-            logger.info("using network scoket")
+            self.network_socket_host = config.get("network_socket_host", "localhost")
+            self.network_socket_port = config.get("network_socket_port", 3310)
+            logger.info(f"Using network scoket: {self.network_socket_host}:{self.network_socket_port}")
         else:
-            logger.info("using unix socket")
+            logger.info("Using unix socket")
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -50,20 +52,13 @@ class AntivirusTransform(AbstractTableTransform):
         
         logger.debug(f"Transforming one table with {len(table)} rows")
         if self.output_column in table.column_names:
-            if self.drop_column_if_existed:
-                if not self.warning_issued:
-                    logger.warn(f"drop existing column {self.output_column}")
-                    self.warning_issued = True
-                table = table.drop(self.output_column)
-            else:
-                logger.error(
-                    f"Existing column {self.output_column} found and drop_column_if_existed is false. "
-                    f"Terminating..."
-                )
-                exit(-1)
+            if not self.warning_issued:
+                logger.warn(f"Drop existing column {self.output_column}")
+                self.warning_issued = True
+            table = table.drop(self.output_column)
 
         if self.use_network_socket:
-            cd = clamd.ClamdNetworkSocket()
+            cd = clamd.ClamdNetworkSocket(host=self.network_socket_host, port=self.network_socket_port)
         else:
             cd = clamd.ClamdUnixSocket()
         
@@ -72,7 +67,7 @@ class AntivirusTransform(AbstractTableTransform):
                 return None
             (status, description) = cd.instream(BytesIO(content.encode()))['stream']
             if status == 'FOUND':
-                logger.debug(f"detected: {description}")
+                logger.debug(f"Detected: {description}")
                 return description or 'UNKNOWN'
             return None
 
@@ -122,16 +117,11 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
             help="output column name",
         )
         parser.add_argument(
-            "--drop_column_if_existed",
-            default=True,
-            help="drop columns if existed"
-        )
-        parser.add_argument(
             "-n",
-            "--use_network_socket",
-            type=bool,
-            default=False,
-            help="use network socket (port: 3310) or not (default: use unix socket (/var/run/clamav/clamd.ctl))."
+            "--network_socket",
+            type=str,
+            default="",
+            help="If provided, use local network socket (default: use unix socket (/var/run/clamav/clamd.ctl))."
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
@@ -148,8 +138,15 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
             return False
         self.params["input_column"] = args.input_column
         self.params["output_column"] = args.output_column
-        self.params["drop_column_if_existed"] = args.drop_column_if_existed
-        self.params["use_network_socket"] = args.use_network_socket
+        use_network_socket = bool(args.network_socket)
+        if use_network_socket:
+            host_port = args.network_socket.split(":")
+            if len(host_port) < 2 or not host_port[-1].isnumeric():
+                logger.error(f"invalid netowrk socket: {args.network_socket}")
+                return False
+            self.params["use_network_socket"] = True
+            self.params["network_socket_host"] = ":".join(host_port[:-1])
+            self.params["network_socket_port"] = int(host_port[-1])
         logger.info(f"antivirus parameters are : {self.params}")
         return True
 

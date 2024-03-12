@@ -8,14 +8,13 @@ COPY --link --chown=clamav:0 --chmod=774 --from=clamav /var/lib/clamav/ /var/lib
 COPY --chown=clamav:0 --chmod=774 ./docker/clamd.conf /etc/clamav/clamd.conf
 RUN mkdir -p /var/run/clamav \
     && chown clamav:0 /var/run/clamav /var/log/clamav \
-    && chmod -R 774 /var/run/clamav /var/log/clamav
+    && chmod -R 774 /var/run/clamav /var/log/clamav \
+    && echo "TCPSocket 3310" >> /etc/clamav/clamd.conf
 
 FROM base AS clamav-local
-RUN echo "TCPSocket 3310" >> /etc/clamav/clamd.conf
+
 CMD ["/bin/bash", "-c", "freshclam && clamd --debug --foreground"]
 EXPOSE 3310/tcp
-
-#CMD ["/bin/bash"]
 
 FROM base AS antivirus
 
@@ -59,12 +58,9 @@ RUN apt remove -y gcc
 # Copy test source , but avoid copying any models (entity_*), we already did that above
 COPY ./src/ /T5/
 
-#COPY scripts/*.sh /T5/
-
 # Do this because when running in the cluster, we may not be running as root.
-#RUN chgrp -R 0 /T5 && chmod -R g=u /T5
-#RUN chmod +x /T5/*.sh
 RUN chmod a+r+w+x -R /T5
 
 WORKDIR /T5
-CMD ["/bin/bash"]
+RUN freshclam
+CMD ["/bin/bash", "-c", "clamd --foreground"]
