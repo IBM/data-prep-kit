@@ -53,6 +53,10 @@ help::
 # Usage: $(MAKE) RULE=yourrule .recurse
 .PHONY: .recurse
 .recurse:: 
+	@if [ -z "$(RULE)" ]; then		\
+		echo RULE must be specified to use the .recurse target;	\
+		exit 1;				\
+	fi
 	@if [ -e .make.subdirs ]; then		\
 	    SUB_MAKE_DIRS=$$(cat .make.subdirs | sed -e 's/^#.*//') ;	\
 	else					\

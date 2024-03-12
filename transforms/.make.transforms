@@ -110,7 +110,7 @@ help::
 	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
 	cd test; pytest . 
 
-.PHONY: test	# because there is a directory called tests in the projects
+.PHONY: .transforms.test # because there is a directory called tests in the projects
 .transforms.test::  
 	@# Help: Run pytest on the test directory using the current venv
 	source venv/bin/activate;			\

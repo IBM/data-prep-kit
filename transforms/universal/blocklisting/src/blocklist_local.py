@@ -1,8 +1,10 @@
 import os
 import sys
+from argparse import ArgumentParser
 from pathlib import Path
 
 from blocklist_transform import (
+    BlockListTransform,
     BlockListTransformConfiguration,
     annotation_column_name_key,
     blocked_domain_list_path_key,
@@ -44,10 +46,22 @@ params = {
 }
 
 # launch
+run_in_ray = True
+run_in_ray = False
 if __name__ == "__main__":
     Path(output_folder).mkdir(parents=True, exist_ok=True)
     sys.argv = ParamsUtils.dict_to_req(d=params)
-    # create launcher
-    launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
-    # Launch the ray actor(s) to process the input
-    launcher.launch()
+    if not run_in_ray:
+        config = BlockListTransformConfiguration()
+        parser = ArgumentParser()
+        args = parser.parse_args()
+        config.apply_input_params(args)
+        config = config.get_input_params()
+        transform = BlockListTransform(config)
+        print(f"config: {config}")
+        print(f"transform: {transform}")
+    else:
+        # create launcher
+        launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
+        # Launch the ray actor(s) to process the input
+        launcher.launch()

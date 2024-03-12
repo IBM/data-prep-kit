@@ -1,5 +1,4 @@
 import os
-from typing import Tuple
 
 import pyarrow as pa
 from data_processing.test_support.ray import AbstractTransformLauncherTest
@@ -17,7 +16,7 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
 
-    def get_test_transform_fixtures(self) -> list[Tuple]:
+    def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = "../../../test-data/data_processing/ray/noop/"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         fixtures = [(NOOPTransformConfiguration(), {"noop_sleep_sec": 0}, basedir + "/input", basedir + "/expected")]

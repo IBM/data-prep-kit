@@ -5,7 +5,6 @@ from typing import Any
 import pyarrow as pa
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform

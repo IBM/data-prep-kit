@@ -1,9 +1,9 @@
 from abc import abstractmethod
+from argparse import ArgumentParser
 from filecmp import dircmp
-from typing import Tuple, Union
 
 import pyarrow as pa
-from data_processing.transform import AbstractTableTransform
+from data_processing.ray import DefaultTableTransformConfiguration
 from data_processing.utils import get_logger
 
 
@@ -55,10 +55,11 @@ class AbstractTest:
             l2 = t2.num_rows
             assert l1 == l2, f"Number of rows in table #{i} ({l1}) does not match expected number ({l2})"
             for j in range(l1):
-                r1 = t1.take([j])[0]
-                r2 = t2.take([j])[0]
+                r1 = t1.take([j])
+                r2 = t2.take([j])
                 assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {2}"
 
+    @staticmethod
     def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
         elen = len(expected_metadata)
         assert len(metadata) == elen, f"Number of metadata dictionaries not the expected of {elen}"
@@ -77,8 +78,6 @@ class AbstractTest:
         assert expected_metadata is not None, "Test misconfigured: expected metadata is None"
         assert isinstance(metadata, dict), f"Did not generate metadata of type dict"
         assert isinstance(expected_metadata, dict), f"Test misconfigured, expected metadata is not a dictionary"
-        l1 = len(metadata)
-        l2 = len(expected_metadata)
         assert metadata == expected_metadata, (
             f"Metadata not equal\n" "\tTransformed: {metadata}  Expected   : {expected_metadata}"
         )
@@ -92,11 +91,14 @@ class AbstractTest:
         :return:
         """
         dir_cmp = dircmp(directory, expected_dir)
-        assert len(dir_cmp.funny_files) == 0, f"Funny files found: {dir_cmp.funny_files}"
-        assert len(dir_cmp.right_only) == 0, f"Funny found only in expected output directory: {dir_cmp.right_only}"
-        assert len(dir_cmp.left_only) == 0, f"Funny files missing in test output directory: {dir_cmp.left_only}"
+        assert (
+            len(dir_cmp.funny_files) == 0
+        ), f"Files that could compare, but couldn't be read for some reason: {dir_cmp.funny_files}"
+        assert len(dir_cmp.common_funny) == 0, f"Types of the following files don't match: {dir_cmp.common_funny}"
+        assert len(dir_cmp.right_only) == 0, f"Files found only in expected output directory: {dir_cmp.right_only}"
+        assert len(dir_cmp.left_only) == 0, f"Files files missing in test output directory: {dir_cmp.left_only}"
         if "metadata.json" in dir_cmp.diff_files:
-            # metadata.json has things like dates and times and output foldres.
+            # metadata.json has things like dates and times and output folders.
             logger.warning("Differences in metadata.json being ignored for now.")
             assert len(dir_cmp.diff_files) == 1, f"Files that did not match the expected {dir_cmp.diff_files}"
         else:
