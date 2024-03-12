@@ -8,7 +8,9 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import LOCAL_TO_DISK, MB
+from data_processing.utils import LOCAL_TO_DISK, MB, get_logger
+
+logger = get_logger(__name__)
 
 
 class SplitFileTransform(AbstractTableTransform):
@@ -98,14 +100,14 @@ class SplitFileTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         if args.max_documents_table <= 0 and args.max_table_size <= 0:
-            print("Neither max documents per table nor max table size are defined")
+            logger.info("Neither max documents per table nor max table size are defined")
             return False
         if args.max_documents_table > 0 and args.max_table_size > 0:
-            print("Both max documents per table and max table size are defined. Only one should be present")
+            logger.info("Both max documents per table and max table size are defined. Only one should be present")
             return False
         self.params["max_documents_table"] = args.max_documents_table
         self.params["max_table_size"] = args.max_table_size
-        print(f"Split file parameters are : {self.params}")
+        logger.info(f"Split file parameters are : {self.params}")
         return True
 
 

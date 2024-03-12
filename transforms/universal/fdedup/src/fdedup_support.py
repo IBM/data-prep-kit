@@ -1,5 +1,5 @@
 from scipy.integrate import quad as integrate
-from data_processing.utils import TransformUtils, RANDOM_SEED, GB
+from data_processing.utils import TransformUtils, RANDOM_SEED, GB, get_logger
 import numpy as np
 from typing import Any, Iterator, Union
 import ray
@@ -11,6 +11,7 @@ from data_processing.ray import RayUtils
 
 NO_SIMILARITY = -1
 REQUEST_LEN = 4096
+logger = get_logger(__name__)
 
 
 def find(s: str, ch: str) -> list[int]:
@@ -429,7 +430,7 @@ class BucketsHashProcessor:
                 if d not in docs:
                     docs[d] = NO_SIMILARITY
             if very_long:
-                print(
+                logger.info(
                     f"Processed long ({bucket_len}) bucket in {(time.time() - start) / 60} "
                     f"min; "
                     f"docs chains {len(set_list)}"
