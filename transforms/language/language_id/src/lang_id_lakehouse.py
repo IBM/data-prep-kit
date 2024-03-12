@@ -2,7 +2,7 @@ import os
 import sys
 
 from data_processing.ray import TransformLauncher
-from data_processing.utils import ParamsUtils
+from data_processing.utils import DPFConfig, ParamsUtils
 from lang_id_implementation import (
     PARAM_MODEL_CREDENTIAL,
     PARAM_MODEL_KIND,
@@ -18,8 +18,8 @@ launcher = TransformLauncher(transform_runtime_config=LangIdentificationTableTra
 # create parameters
 
 s3_cred = {
-    "access_key": os.environ.get("COS_ACCESS_KEY", "access"),
-    "secret_key": os.environ.get("COS_SECRET_KEY", "secret"),
+    "access_key": DPFConfig.S3_ACCESS_KEY,
+    "secret_key": DPFConfig.S3_SECRET_KEY,
     "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
@@ -31,7 +31,7 @@ lakehouse_config = {
     "input_version": "main",
     "output_table": "academic.ieee_lang_id_0304_02",
     "output_path": "lh-test/tables/academic/ieee_lang_id_0304_02",
-    "token": "YOUR LAKEHOUSE TOKEN",
+    "token": DPFConfig.LAKEHOUSE_TOKEN,
 }
 
 worker_options = {"num_cpus": 1}
@@ -50,7 +50,7 @@ params = {
     "code_location": ParamsUtils.convert_to_ast(code_location),
     PARAM_MODEL_KIND: KIND_FASTTEXT,
     PARAM_MODEL_URL: "facebook/fasttext-language-identification",
-    PARAM_MODEL_CREDENTIAL: "YOUR HUGGING FACE ACCOUNT TOKEN",
+    PARAM_MODEL_CREDENTIAL: DPFConfig.HUGGING_FACE_TOKEN,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 
