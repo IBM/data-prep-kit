@@ -150,6 +150,8 @@ class ParamsUtils:
             for key, value in item.items():
                 if "secret" in key or "pwd" in key or "password" in key or "credential" in key:
                     value = ParamsUtils.hide_secrets(value, True)
+                else:
+                    value = ParamsUtils.hide_secrets(value, False)
                 newitem[key] = value
         else:
             if hide:
