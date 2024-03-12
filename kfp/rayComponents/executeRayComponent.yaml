@@ -7,6 +7,7 @@ inputs:
     - { name: additional_params, type: String, description: "additional parameters" }
     # The component converts the dictionary to json string
     - { name: exec_params, type: dict, description: "job parameters" }
+    - { name: exec_script_name, type: String, description: "transform script name" }
     - { name: server_url, type: String, default: "", description: "url of api server" }
 
 implementation:
@@ -29,6 +30,8 @@ implementation:
                 { inputValue: exec_params },
                 --additional_params,
                 { inputValue: additional_params },
+                --exec_script_name,
+                { inputValue: exec_script_name },
                 --server_url,
                 { inputValue: server_url },
             ]

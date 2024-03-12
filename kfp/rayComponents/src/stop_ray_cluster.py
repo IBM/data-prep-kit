@@ -1,19 +1,19 @@
+import sys
+
+from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
+
+
 # Cleans and shutdowns the Ray cluster
 def cleanup_ray_cluster(
     name: str,  # name of Ray cluster
-    server_url: str, # url of api server
+    server_url: str,  # url of api server
 ):
-    import sys
-
-    from kfp_support.workflow_support.utils import RayRemoteJobs, KFPUtils
-
-
     # get current namespace
     ns = KFPUtils.get_namespace()
     if ns == "":
         print(f"Failed to get namespace")
         sys.exit(1)
-    
+
     # create cluster
     remote_jobs = RayRemoteJobs(server_url=server_url)
 
@@ -24,8 +24,6 @@ def cleanup_ray_cluster(
 
 if __name__ == "__main__":
     import argparse
-
-    from kfp_support.workflow_support.utils import KFPUtils
 
     parser = argparse.ArgumentParser(description="Stop Ray cluster operation")
     parser.add_argument("-rn", "--ray_name", type=str, default="")

@@ -1,3 +1,8 @@
+import sys
+
+from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
+
+
 def start_ray_cluster(
     name: str,  # name of Ray cluster
     num_workers: int,  # number of workers
@@ -5,20 +10,10 @@ def start_ray_cluster(
     memory: int,  # memory per worker
     num_gpus: int,  # number of gpus per worker
     image: str,  # image for Ray cluster
-    server_url: str, # url of api server
-    additional_params: str, # additional parameters for 
+    server_url: str,  # url of api server
+    additional_params: str,  # additional parameters for
 ):
-    import json
-    import sys
-
-    from kfp_support.workflow_support.utils import RayRemoteJobs, KFPUtils
-
-    try:
-        dict_params = json.loads(additional_params)
-    except Exception as e:
-        print(f"Failed to load additional parameters {additional_params} with error {e}")
-        sys.exit(1)
-
+    dict_params = KFPUtils.load_from_json(additional_params)
     # get current namespace
     ns = KFPUtils.get_namespace()
     if ns == "":
@@ -31,11 +26,7 @@ def start_ray_cluster(
         "image": image,
         "image_pull_secret": dict_params.get("image_pull_secret", "prod-all-icr-io"),
         # Ray start params, just to show
-        "ray_start_params": {
-            "metrics-export-port": "8080",
-            "num-cpus": "0",
-            "dashboard-host": "0.0.0.0"
-        },
+        "ray_start_params": {"metrics-export-port": "8080", "num-cpus": "0", "dashboard-host": "0.0.0.0"},
     }
 
     worker_node = {
@@ -49,16 +40,24 @@ def start_ray_cluster(
     }
 
     # create cluster
-    remote_jobs = RayRemoteJobs(server_url=server_url)
-    status, error = remote_jobs.create_ray_cluster(name=name, namespace=ns, head_node=head_node,
-                                                   worker_nodes=[worker_node])
-    
+    remote_jobs = RayRemoteJobs(
+        server_url=server_url,
+        http_retries=dict_params.get("http_retries", 5),
+        wait_interval=dict_params.get("wait_interval", 2),
+    )
+    status, error = remote_jobs.create_ray_cluster(
+        name=name,
+        namespace=ns,
+        head_node=head_node,
+        worker_nodes=[worker_node],
+        wait_cluster_ready=dict_params.get("wait_cluster_ready_tmout", -1),
+    )
+
     print(f"Created cluster - status: {status}, error: {error}")
+
 
 if __name__ == "__main__":
     import argparse
-
-    from kfp_support.workflow_support.utils import KFPUtils
 
     parser = argparse.ArgumentParser(description="Start Ray cluster operation")
     parser.add_argument("-rn", "--ray_name", type=str, default="")

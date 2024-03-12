@@ -2,19 +2,31 @@
 
 from typing import Any
 
+import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-import workflow_utils
-# from kfp_tekton.compiler import TektonCompiler
-import kfp.compiler as compiler
+from kfp_support.workflow_support.utils import (
+    ONE_HOUR_SEC,
+    ONE_WEEK_SEC,
+    ComponentUtils,
+    RayRemoteJobs,
+)
 from kubernetes import client as k8s_client
 
-run_id = "00"
+
+# the name of the job script
+EXEC_SCRIPT_NAME: str = "transformer_launcher.py"
+RUN_ID = "00"
 
 # components
-execute_ray_jobs_op = comp.load_component_from_file("../shared/rayComponents/executeRayComponent.yaml")
-start_ray_op = comp.load_component_from_file("../shared/rayComponents/startRayComponent.yaml")
-shutdown_ray_op = comp.load_component_from_file("../shared/rayComponents/stopRayComponent.yaml")
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-oc:0.0.17-guftest1"
+
+compute_exec_params_op = comp.func_to_container_op(
+    func=RayRemoteJobs.default_compute_execution_params2, base_image=base_kfp_image
+)
+execute_ray_jobs_op = comp.load_component_from_file("../../../rayComponents/executeRayComponent.yaml")
+start_ray_op = comp.load_component_from_file("../../../rayComponents/startRayComponent.yaml")
+shutdown_ray_op = comp.load_component_from_file("../../../rayComponents/stopRayComponent.yaml")
 
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
 TASK_NAME: str = "noop"
@@ -32,8 +44,7 @@ def noop(
     ray_worker_gpus: int = 0,  # number of gpus per worker
     image: str = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop:guftest",
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-    template_cm: str = "ray-template-cm",  # config map name, which contains the Ray cluster template
-    additional_params: str = '{"wait_cluster_ready_tmout": 8, "wait_cluster_up_tmout": 5, "wait_cluster_nodes_ready_tmout": 1, "wait_job_ready_tmout": 1, "wait_job_ready_retries": 100, "wait_print_tmout": 1, "http_retries": 5, "notify_level": 2, "notify_channel": "kfp-notifications", "image_pull_secret": "prod-all-icr-io", "script_name": "transformer_launcher.py"}',
+    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 8, "wait_cluster_up_tmout": 5, "wait_cluster_nodes_ready_tmout": 1, "wait_job_ready_tmout": 100, "wait_job_ready_retries": 100, "wait_print_tmout": 120, "http_retries": 5, "image_pull_secret": "prod-all-icr-io", "script_name": "transformer_launcher.py"}',
     noop_sleep_sec: int = 50,
     lh_config: str = "None",
     max_files: int = -1,
@@ -45,14 +56,21 @@ def noop(
     s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/doc_annotation_test/input/noop_small/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_noop_guf/'}",
     s3_cred: str = "{'access_key': 'KEY', 'secret_key': 'SECRET', 'cos_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}",
 ):
-    clean_up_task = shutdown_ray_op(ray_name=ray_name, run_id=run_id, server_url=server_url)
-    workflow_utils.add_settings_to_component(clean_up_task, 60)
+    clean_up_task = shutdown_ray_op(ray_name=ray_name, run_id=RUN_ID, server_url=server_url)
+    ComponentUtils.add_settings_to_component(clean_up_task, 60)
 
     with dsl.ExitHandler(clean_up_task):
         # invoke pipeline
+        compute_exec_params = compute_exec_params_op(
+            num_workers=ray_num_workers,
+            worker_cpu=ray_worker_cpus,
+            worker_memory=ray_worker_memory,
+            worker_options=worker_options,
+        )
+
         ray_cluster = start_ray_op(
             ray_name=ray_name,
-            run_id=run_id,
+            run_id=RUN_ID,
             num_workers=ray_num_workers,
             cpus=ray_worker_cpus,
             memory=ray_worker_memory,
@@ -63,12 +81,12 @@ def noop(
         )
 
         # workflow_utils.add_cm_volume_to_com_function(ray_cluster, template_cm, "/templates")
-        workflow_utils.add_settings_to_component(ray_cluster, workflow_utils.ONE_HOUR_SEC * 2)
+        ComponentUtils.add_settings_to_component(ray_cluster, ONE_HOUR_SEC * 2)
         ray_cluster.set_image_pull_policy("IfNotPresent")
 
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
-            run_id=run_id,
+            run_id=RUN_ID,
             additional_params=additional_params,
             exec_params={
                 "s3_config": s3_config,
@@ -81,20 +99,20 @@ def noop(
                 "pipeline_id": pipeline_id,
                 "job_id": job_id,
             },
+            exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
         )
-        workflow_utils.add_settings_to_component(execute_job, workflow_utils.ONE_WEEK_SEC)
-        workflow_utils.set_cos_env_vars_to_component(execute_job, cos_access_secret)
+        ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
+        ComponentUtils.set_cos_env_vars_to_component(execute_job, cos_access_secret)
 
         execute_job.after(ray_cluster)
 
     # set image pull secrets
     dsl.get_pipeline_conf().set_image_pull_secrets([k8s_client.V1ObjectReference(name="prod-all-icr-io")])
     # Configure the pipeline level to one week (in seconds)
-    dsl.get_pipeline_conf().set_timeout(workflow_utils.ONE_WEEK_SEC)
+    dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    # TektonCompiler().compile(noop, __file__.replace(".py", ".yaml"))
     compiler.Compiler().compile(noop, __file__.replace(".py", ".yaml"))

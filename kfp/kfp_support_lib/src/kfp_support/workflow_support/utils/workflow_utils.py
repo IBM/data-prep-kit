@@ -1,14 +1,17 @@
+import json
 import os
 import re
 import sys
 
 import datetime
+import kfp.dsl as dsl
 import time
 from typing import Optional, Any
 from ray.job_submission import JobStatus
 
 from kfp_server_api import models
 from kfp import Client
+from kubernetes import client as k8s_client
 
 from kfp_support.api_server_client import KubeRayAPIs
 from kfp_support.api_server_client.params import (Template, DEFAULT_HEAD_START_PARAMS, DEFAULT_WORKER_START_PARAMS,
@@ -120,8 +123,19 @@ class KFPUtils:
     def dict_to_req(d: dict[str, Any], executor: str = "transformer_launcher.py") -> str:
         res = f"python {executor} "
         for key, value in d.items():
-            res += f"--{key}={value} "
+            if isinstance(value, str):
+                res += f'--{key}="{value}" '
+            else:
+                res += f"--{key}={value} "
         return res
+
+    # Load a string that represents a json to python dictionary
+    def load_from_json(js: str) -> dict[str, Any]:
+        try:
+            return json.loads(js)
+        except Exception as e:
+            print(f"Failed to load parameters {js} with error {e}")
+            sys.exit(1)
 
 
 class PipelinesUtils:
@@ -451,7 +465,7 @@ class RayRemoteJobs:
             l_to_print = RayRemoteJobs.ansi_escape.sub("", l_to_print)
             print(l_to_print)
 
-    def follow_execution(self, name: str, namespace: str, submission_id: str, job_ready_timeout: int=600,
+    def follow_execution(self, name: str, namespace: str, submission_id: str, job_ready_timeout: int = 600,
                          print_timeout: int = 120) -> None:
         """
         Follow remote job execution
@@ -524,3 +538,52 @@ class RayRemoteJobs:
             sys.exit(1)
         # return the minimum of two
         return n_workers
+
+    @staticmethod
+    def default_compute_execution_params2(
+        num_workers: int,  # number of workers
+        worker_cpu: int,  # number cpus per worker
+        worker_memory: int,  # memory per worker (GB)
+        worker_options: str,  # cpus per actor
+    ) -> str:
+        import sys
+
+        w_options = KFPUtils.load_from_json(worker_options)
+        cluster_cpu = num_workers * worker_cpu * 0.85
+        cluster_mem = num_workers * worker_memory * 0.85
+        print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}")
+        # compute number of actors
+        n_actors = int(cluster_cpu / w_options["num_cpus"])
+        print(f"Number of actors - {n_actors}")
+        if n_actors < 1:
+            print(f"Not enough cpu/memory to run transform, required cpu {w_options["num_cpus"]}, available {cluster_cpu}, "
+                  f"required memory {worker_memory}, available {cluster_mem}")
+            sys.exit(1)
+        
+        return json.dumps({"actors": n_actors})
+
+
+class ComponentUtils:
+    # Add properties to kfp component
+    def add_settings_to_component(component: dsl.ContainerOp, tmout: int) -> None:
+        # No cashing
+        component.execution_options.caching_strategy.max_cache_staleness = "P0D"
+        # image pull policy
+        component.set_image_pull_policy("Always")
+        # Set the timeout for the task to one day (in seconds)
+        component.set_timeout(tmout)
+
+    env_to_key = {"COS_KEY": "cos-key", "COS_SECRET": "cos-secret", "COS_ENDPOINT": "cos-endpoint"}
+    # Set COS env variables to KFP component
+    def set_cos_env_vars_to_component(
+        component: dsl.ContainerOp, secret: str, env2key: dict[str, str] = env_to_key
+    ) -> None:
+        for env_name, secret_key in env2key.items():
+            component = component.add_env_variable(
+                k8s_client.V1EnvVar(
+                    name=env_name,
+                    value_from=k8s_client.V1EnvVarSource(
+                        secret_key_ref=k8s_client.V1SecretKeySelector(name=secret, key=secret_key)
+                    ),
+                )
+            )
