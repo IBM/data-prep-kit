@@ -17,7 +17,7 @@ from data_processing.utils import ParamsUtils
 s3_cred = {
     "access_key": "key",
     "secret_key": "secret",
-    "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
+    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 s3_conf = {
     "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=text/",

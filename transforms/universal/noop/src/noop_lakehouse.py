@@ -14,7 +14,7 @@ launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration
 s3_cred = {
     "access_key": "YOUR Lakehouse COS ACCESS KEY",
     "secret_key": "YOUR Lakehouse COS PRIVATE KEY",
-    "cos_url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
+    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
 # Configure lakehouse unit test tables

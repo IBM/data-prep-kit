@@ -49,10 +49,10 @@ venv::	pyproject.toml .check-env
 	source venv/bin/activate; 	\
 	pip install --upgrade pip;	\
 	pip install -e .;		\
-	pip install pytest pytest-cov
+	pip install pytest pytest-cov pytest-forked
 
 test::  
 	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
 	source venv/bin/activate;		\
 	export PYTHONPATH=../src:.:$$PYTHONPATH; \
-	cd test; pytest . 
+	cd test; pytest --forked  . 

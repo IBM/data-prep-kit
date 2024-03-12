@@ -5,7 +5,9 @@ ARG ARTIFACTORY_API_KEY
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
+# remove credentials-containing file
+RUN rm requirements.txt
 
-COPY src/*_transform.py  ./
+COPY  --chown=ray ./src /home/ray/transform
+COPY  --chown=ray ./test-data /home/ray/test-data
 ENV PYTHONPATH /home/ray
-

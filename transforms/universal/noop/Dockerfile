@@ -24,8 +24,6 @@ ARG ARTIFACTORY_API_KEY
 # Setup our python requirements w/o watson_nlp since that is in the base image
 COPY requirements.txt /T5/requirements.txt
 RUN pip install --no-cache-dir -r  /T5/requirements.txt
-# remove credentials-containing file
-RUN rm /T5/requirements.txt 
 
 # After all pip installs are done, we can remove pip's cache which can be considerable for large depenences.
 # Do this before the chmod/chgrp stuff below

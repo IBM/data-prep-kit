@@ -1,3 +1,5 @@
+import argparse
+from argparse import ArgumentParser
 from typing import Any
 
 from data_processing.data_access import DataAccessFactory
@@ -96,3 +98,38 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
 
     def get_transform_metadata(self) -> dict[str, Any]:
         return self.get_input_params()
+
+
+def get_transform_config(
+    transform_configuration: DefaultTableTransformConfiguration, argv: str, parser: argparse.ArgumentParser = None
+):
+    """
+    Create a transform configuration dictionary  using the given Configuration class and dictionary of
+    values that should be treated as command line options.
+    Example:
+
+        config = self._get_transform_config(YourTransformConfiguration(), ...)\n
+        transform = YourTransform(config)   \n
+
+    :param transform_configuration: The configuration class used to define and apply input parameters.
+    :param command_line: dictionary of key/value pairs where the keys are the option names (.e.g. --block_list_foo)
+        and the values are the command line values.
+    :param parser: optional parser to use.  If not provided one is created internally.  if provided and argv
+        contains args that will be parsed by the parser, then they will be in the returned dictionary.
+    :return:  the configuration dictionary as produced by the given transform configuration after all args
+        have been defined and applied.
+    """
+    # Create and add our arguments to the parser
+    if parser is None:
+        parser = argparse.ArgumentParser()
+    transform_configuration.add_input_params(parser)
+
+    # Create the command line and parse it.
+    if "python" in argv[0]:
+        argv = argv[1:0]
+    args = parser.parse_args(argv)
+    dargs = vars(args)
+
+    transform_configuration.apply_input_params(args)
+    config = transform_configuration.get_input_params()  # This is the transform configuration, for this test.
+    return dargs | config
