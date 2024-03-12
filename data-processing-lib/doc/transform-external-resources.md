@@ -2,7 +2,8 @@
 
 Often when implementing a transform, the transform will require loading its own resources 
 (e.g. models, configuration, etc.) to complete its job.  For example, the Blocklist transform
-loads a list of domains to block.  These can be loaded from either S3 or local storage.
+loads a list of domains to block.  Resources can be loaded from either S3 or local storage or a 
+custom location defined by the transform (i.e. hugging face, etc).
 In addition to actually loading the resource(s), the transform needs to define the configuration that 
 defines the location of the domain list. 
 
