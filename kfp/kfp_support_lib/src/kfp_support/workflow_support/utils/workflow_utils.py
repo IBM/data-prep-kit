@@ -230,16 +230,18 @@ class RayRemoteJobs:
     ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 
     def __init__(self, server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-                 wait_interval: int = 2):
+                 http_retries: int = 5, wait_interval: int = 2):
         """
         Initialization
         :param server_url: API server URL. Default value is assuming running inside the cluster
-        :param wait_interval: wai interval
+        :param wait_interval: wait interval
+        :param http_retries: http retries
         """
-        self.api_server_client = KubeRayAPIs(server_url=server_url, wait_interval=wait_interval)
+        self.api_server_client = KubeRayAPIs(server_url=server_url, http_retries=http_retries,
+                                             wait_interval=wait_interval)
 
     def create_ray_cluster(self, name: str, namespace: str, head_node: dict[str, Any],
-                           worker_nodes: list[dict[str, Any]]) -> tuple[int, str]:
+                           worker_nodes: list[dict[str, Any]], wait_cluster_ready: int = -1) -> tuple[int, str]:
         """
         Create Ray cluster
         :param name: name, _ are not allowed in the name
@@ -278,6 +280,7 @@ class RayRemoteJobs:
                 environment - dictionary of node of this group environment
                 annotations: dictionary of node of this group annotation
                 labels: dictionary of node of this group labels
+        :param wait_cluster_ready - time to wait for cluster ready sec (-1 forever)
         :return:tuple containing
             http return code
             message - only returned if http return code is not equal to 200
@@ -372,7 +375,7 @@ class RayRemoteJobs:
         if status != 200:
             return status, error
         # Wait for cluster ready
-        return self.api_server_client.wait_cluster_ready(name=name, ns=namespace)
+        return self.api_server_client.wait_cluster_ready(name=name, ns=namespace, wait=wait_cluster_ready)
 
     def delete_ray_cluster(self, name: str, namespace: str) -> tuple[int, str]:
         """
@@ -429,7 +432,7 @@ class RayRemoteJobs:
             message - only returned if http return code is not equal to 200
             status - job status
         """
-        # get job invo
+        # get job info
         status, error, info = self.api_server_client.get_job_info(ns=namespace, name=name, sid=submission_id)
         if status // 100 != 2:
             return status, error, ""
@@ -448,26 +451,32 @@ class RayRemoteJobs:
             l_to_print = RayRemoteJobs.ansi_escape.sub("", l_to_print)
             print(l_to_print)
 
-    def follow_execution(self, name: str, namespace: str, submission_id: str, print_timeout: int = 120) \
-            -> None:
+    def follow_execution(self, name: str, namespace: str, submission_id: str, job_ready_timeout: int=600,
+                         print_timeout: int = 120) -> None:
         """
         Follow remote job execution
         :param name: cluster name
         :param namespace: cluster namespace
         :param submission_id: job submission ID
+        :param job_ready_timeout: timeout to wait for fob to become ready
         :param print_timeout: print interval
         :return: None
         """
         # Wait for job to start running
         job_status = JobStatus.PENDING
-        while job_status != JobStatus.RUNNING:
+        while job_status != JobStatus.RUNNING and job_ready_timeout > 0:
             status, error, job_status = self._get_job_status(name=name, namespace=namespace,
                                                              submission_id=submission_id)
             if status // 100 != 2:
                 sys.exit(1)
             if job_status in {JobStatus.STOPPED, JobStatus.SUCCEEDED, JobStatus.FAILED, JobStatus.RUNNING}:
                 break
+            time.sleep(self.api_server_client.wait_interval)
+            job_ready_timeout -= self.api_server_client.wait_interval
         print(f"job status is {job_status}")
+        if job_ready_timeout < 0:
+            print("timed out waiting for job become ready, exiting")
+            sys.exit(1)
         #  While job is running print log
         previous_log_len = 0
         # At this point job could succeeded, failed, stop or running. So print log regardless
