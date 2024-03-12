@@ -14,9 +14,9 @@ DOCKER_IMAGE_NAME=antivirus
 DOCKER_IMAGE_VERSION=0.1
 
 venv::	.transforms.venv
-	@docker build --target clamav-local -f Dockerfile -t clamav-local:latest .
-	@echo "docker run -d --name clamav -p 3310:3310 clamav-local:latest" >> ./venv/bin/activate
-	@sed -i -e "s/deactivate () {/deactivate () {\nfor c in \`docker ps -a | grep clamav | cut -f1 -d ' '\`; do docker rm -f -v \$$c; done/" ./venv/bin/activate
+	@$(DOCKER) build --target clamav-local -f Dockerfile -t clamav-local:latest .
+	@echo "$(DOCKER) run -d --name clamav -p 3310:3310 clamav-local:latest" >> ./venv/bin/activate
+	@sed -i -e "s/deactivate () {/deactivate () {\nfor c in \`docker ps -a | grep clamav | cut -f1 -d ' '\`; do $(DOCKER) rm -f -v \$$c; done/" ./venv/bin/activate
 
 build::	.transforms.build
 
