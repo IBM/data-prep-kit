@@ -496,3 +496,22 @@ class RayRemoteJobs:
             sys.exit(1)
         self._print_log(log=log, previous_log_len=previous_log_len)
         print(f"Job completed with execution status {status}")
+
+    @staticmethod
+    def default_compute_execution_params(
+            cluster_cpu: float,         # number cpus for cluster
+            cluster_memory: float,      # memory for cluster (GB)
+            worker_cpu: float,          # cpu requirement per actor
+            worker_memory: float = 1,   # memory requirement per actor (GB)
+    ) -> int:
+        import sys
+        # compute number of worker
+        n_workers_cpu = int(0.85 * cluster_cpu / worker_cpu)
+        n_workers_memory = int(0.85 * cluster_memory / worker_memory)
+        n_workers = min(n_workers_cpu, n_workers_memory)
+        if n_workers < 1:
+            print(f"Not enough cpu/memory to run transform, required cpu {worker_cpu}, available {cluster_cpu}, "
+                  f"required memory {worker_memory}, available {cluster_memory}")
+            sys.exit(1)
+        # return the minimum of two
+        return n_workers
