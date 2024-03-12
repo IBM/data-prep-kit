@@ -74,6 +74,12 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
             default=1,
             help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
         )
+        parser.add_argument(
+            "--noop_pwd",  # pwd, secret, password, creential are all things that will be hidden in the metadata.
+            type=str,
+            default="nothing",
+            help="A dummy password which should be filtered out of the metadata",
+        )
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -85,6 +91,7 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
             print(f"Parameter noop_sleep_sec should be greater then 0, you specified {args.noop_sleep_sec}")
             return False
         self.params["sleep"] = args.noop_sleep_sec
+        self.params["pwd"] = args.noop_pwd
         print(f"noop parameters are : {self.params}")
         return True
 

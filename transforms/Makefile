@@ -14,5 +14,5 @@ test::
 
 test-lib-src::
 	@# Help: test-lib-src, Install the library source into the venv and test 
-	$(MAKE) rule=test-lib-src .recurse
+	$(MAKE) RULE=test-lib-src .recurse
 

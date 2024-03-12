@@ -12,6 +12,7 @@ class AbstractTransformTest(AbstractTest):
     to provide the test data for a given test method.  For example,  get_test_transform_fixtures()
     provides the test data for the test_transform() test method.
     """
+
     def _install_test_fixtures(self, metafunc):
         # Apply the fixtures for the method with these input names (i.e. test_transform()).
         if (
@@ -51,8 +52,8 @@ class AbstractTransformTest(AbstractTest):
         all_metadata_list = []
         for in_table in in_table_list:
             table_list, metadata = transform.transform(in_table)
-        all_table_list.extend(table_list)
-        all_metadata_list.append(metadata)
+            all_table_list.extend(table_list)
+            all_metadata_list.append(metadata)
 
         table_list, metadata = transform.flush()
         all_table_list.extend(table_list)

@@ -14,5 +14,5 @@ test::
 
 test-lib-src::
 	@# Help: Recursively test in all subdirs using source from data-processing-lib
-	$(MAKE) rule=test-lib-src .recurse
+	$(MAKE) RULE=test-lib-src .recurse
 

@@ -31,7 +31,7 @@ class DataAccessS3(DataAccess):
         self.arrS3 = ArrowS3(
             access_key=s3_credentials["access_key"],
             secret_key=s3_credentials["secret_key"],
-            endpoint=s3_credentials["cos_url"],
+            endpoint=s3_credentials["url"],
         )
         self.input_folder = s3_config["input_folder"]
         self.output_folder = s3_config["output_folder"]
