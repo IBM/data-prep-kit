@@ -8,8 +8,7 @@ COPY --link --chown=clamav:0 --chmod=774 --from=clamav /var/lib/clamav/ /var/lib
 COPY --chown=clamav:0 --chmod=774 ./docker/clamd.conf /etc/clamav/clamd.conf
 RUN mkdir -p /var/run/clamav \
     && chown clamav:0 /var/run/clamav /var/log/clamav \
-    && chmod -R 774 /var/run/clamav /var/log/clamav \
-    && echo "TCPSocket 3310" >> /etc/clamav/clamd.conf
+    && chmod -R 774 /var/run/clamav /var/log/clamav
 
 FROM base AS clamav-local
 
