@@ -91,7 +91,7 @@ class BlockListTransform(AbstractTableTransform):
             if url is None:
                 raise RuntimeError(f"Missing configuration value for key {blocked_domain_list_path_key}")
             daf = config.get(block_data_factory_key, None)
-            if url is None:
+            if daf is None:
                 raise RuntimeError(f"Missing configuration value for key {block_data_factory_key}")
             data_access = daf.create_data_access()
             domain_list = _get_domain_list(url, data_access)

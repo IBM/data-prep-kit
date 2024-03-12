@@ -1,10 +1,7 @@
-import sys
-from argparse import ArgumentParser
-
-import blocklist_transform
 import pyarrow as pa
 from blocklist_transform import (
     BlockListTransform,
+    BlockListTransformConfiguration,
     annotation_column_name_default,
     annotation_column_name_key,
     block_data_factory_key,
@@ -12,8 +9,7 @@ from blocklist_transform import (
     source_column_name_default,
     source_url_column_name_key,
 )
-from data_processing.data_access import DataAccessFactory, DataAccessLocal
-from data_processing.ray import DefaultTableTransformConfiguration
+from data_processing.data_access import DataAccessLocal
 from data_processing.ray.transform_runtime import get_transform_config
 from data_processing.test_support.transform import AbstractTransformTest
 from data_processing.utils import ParamsUtils
@@ -41,7 +37,7 @@ class TestBlockListTransform(AbstractTransformTest):
         ]
 
         # Use the BlockListTransformConfiguration to compute the config parameters
-        bltc = blocklist_transform.BlockListTransformConfiguration()
+        bltc = BlockListTransformConfiguration()
         config = get_transform_config(bltc, cli)
 
         fixtures = [
@@ -96,9 +92,3 @@ class TestBlockListTransform(AbstractTransformTest):
 
 if __name__ == "__main__":
     t = TestBlockListTransform()
-    inp = t.input_df.to_arrow()
-    out = t.expected_output_df.to_arrow()
-    config = {"input_folder": "/tmp", "output_folder": "./test-data"}
-    data_access = DataAccessLocal(config, [], False, -1)
-    data_access.save_table("../test-data/input/", inp)
-    data_access.save_table("../test-data/expected/", out)

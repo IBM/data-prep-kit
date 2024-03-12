@@ -17,10 +17,11 @@ from ray.actor import ActorHandle
 
 logger = get_logger(__name__)
 
-ls_allowed_langs_file_key = "ls_allowed_langs_file"
-ls_lang_column_key = "ls_language_column"
-ls_known_selector = "ls_return_known"
-ls_allowed_languages = "ls_allowed_languages"
+lang_allowed_langs_file_key = "lang_select_allowed_langs_file"
+lang_lang_column_key = "lang_select_language_column"
+lang_known_selector = "lang_select_return_known"
+lang_allowed_languages = "lang_select_allowed_languages"
+lang_data_factory_key = "lang_select_data_factory"
 
 
 def _get_supported_languages(lang_file: str, data_access: DataAccess) -> list[str]:
@@ -42,12 +43,26 @@ class LangSelectorTransform(AbstractTableTransform):
         """
 
         super().__init__(config)
-        languages_include_ref = config.get(ls_allowed_languages, None)
+        self.lang_column = config.get(lang_lang_column_key, "")
+        self.known = config.get(lang_known_selector, True)
+        languages_include_ref = config.get(lang_allowed_languages, None)
         if languages_include_ref is None:
-            raise RuntimeError(f"Missing configuration value for key {ls_allowed_languages}")
-        self.languages_include = ray.get(languages_include_ref)
-        self.lang_column = config.get(ls_lang_column_key, "")
-        self.known = config.get(ls_known_selector, True)
+            path = config.get(lang_allowed_langs_file_key, None)
+            if path is None:
+                raise RuntimeError(f"Missing configuration value for key {lang_allowed_langs_file_key}")
+            daf = config.get(lang_data_factory_key, None)
+            if daf is None:
+                raise RuntimeError(f"Missing configuration value for key {lang_data_factory_key}")
+            self.languages_include = _get_supported_languages(lang_file=path, data_access=daf.create_data_access())
+        else:
+            # This is recommended for production approach. In this case domain list is build by the
+            # runtime once, loaded to the object store and can be accessed by actors without additional reads
+            try:
+                logger.info(f"Loading languages to include from Ray storage under reference {languages_include_ref}")
+                self.languages_include = ray.get(languages_include_ref)
+            except Exception as e:
+                logger.info(f"Exception loading languages list from ray object storage {e}")
+                raise RuntimeError(f"exception loading from object storage for key {languages_include_ref}")
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
         """
@@ -108,13 +123,17 @@ class LangSelectorRuntime(DefaultTableTransformRuntime):
         :return: dictionary of filter init params
         """
         # create the list of blocked domains by reading the files at the conf_url location
-        lang_file = self.params.get(ls_allowed_langs_file_key, None)
+        lang_file = self.params.get(lang_allowed_langs_file_key, None)
         if lang_file is None:
-            raise RuntimeError(f"Missing configuration key {ls_allowed_langs_file_key}")
-        data_access = data_access_factory.create_data_access()
-        lang_list = _get_supported_languages(lang_file, data_access)
+            raise RuntimeError(f"Missing configuration key {lang_allowed_langs_file_key}")
+        lang_data_access_factory = self.params.get(lang_data_factory_key, None)
+        if lang_data_access_factory is None:
+            raise RuntimeError(f"Missing configuration key {lang_data_factory_key}")
+        lang_list = _get_supported_languages(lang_file=lang_file,
+                                             data_access=lang_data_access_factory.create_data_access())
         lang_refs = ray.put(list(lang_list))
-        return {ls_allowed_languages: lang_refs} | self.params
+        logger.info(f"Placed language list into Ray object storage under reference{lang_refs}")
+        return {lang_allowed_languages: lang_refs} | self.params
 
 
 class LangSelectorTransformConfiguration(DefaultTableTransformConfiguration):
@@ -130,6 +149,7 @@ class LangSelectorTransformConfiguration(DefaultTableTransformConfiguration):
             runtime_class=LangSelectorRuntime,
         )
         self.params = {}
+        self.daf = None
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
@@ -139,26 +159,30 @@ class LangSelectorTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            f"--{ls_allowed_langs_file_key}",
+            f"--{lang_allowed_langs_file_key}",
             type=str,
             required=False,
             default=None,
             help="Directory to store unknown language files.",
         )
         parser.add_argument(
-            f"--{ls_lang_column_key}",
+            f"--{lang_lang_column_key}",
             type=str,
             required=False,
             default="language_column",
             help="Directory to store unknown language files.",
         )
         parser.add_argument(
-            f"--{ls_known_selector}",
+            f"--{lang_known_selector}",
             type=lambda x: bool(str2bool(x)),
             required=False,
             default=True,
             help="Flag to return docs with known languages (True) or unknown {False}.",
         )
+        # Create the DataAccessFactor to use CLI args with the given blocklist prefix.
+        self.daf = DataAccessFactory(f"{self.name}_")
+        # Add the DataAccessFactory parameters to the transform's configuration parameters.
+        self.daf.add_input_params(parser)
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
@@ -167,16 +191,28 @@ class LangSelectorTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         dargs = vars(args)
-        if dargs.get(ls_allowed_langs_file_key, None) is None:
-            logger.info(f"{ls_allowed_langs_file_key} is required, but got None")
+        if dargs.get(lang_allowed_langs_file_key, None) is None:
+            logger.info(f"{lang_allowed_langs_file_key} is required, but got None")
             return False
-        if dargs.get(ls_lang_column_key, None) is None:
-            logger.info(f"{ls_lang_column_key} is required, but got None")
+        if dargs.get(lang_lang_column_key, None) is None:
+            logger.info(f"{lang_lang_column_key} is required, but got None")
             return False
-        self.params = {ls_lang_column_key: dargs.get(ls_lang_column_key, None),
-                       ls_allowed_langs_file_key: dargs.get(ls_allowed_langs_file_key, None),
-                       ls_known_selector: dargs.get(ls_known_selector, True)}
-        return True
+        self.params = {lang_lang_column_key: dargs.get(lang_lang_column_key, None),
+                       lang_allowed_langs_file_key: dargs.get(lang_allowed_langs_file_key, None),
+                       lang_known_selector: dargs.get(lang_known_selector, True),
+                       lang_data_factory_key: self.daf,
+                       }
+        # Validate and populate the transform's DataAccessFactory
+        return self.daf.apply_input_params(args)
+
+    def get_transform_metadata(self) -> dict[str, Any]:
+        """
+        Provides a default implementation if the user has provided a set of keys to the initializer.
+        These keys are used in apply_input_params() to extract our key/values from the global Namespace of args.
+        :return:
+        """
+        del self.params[lang_data_factory_key]
+        return self.params
 
 
 if __name__ == "__main__":
