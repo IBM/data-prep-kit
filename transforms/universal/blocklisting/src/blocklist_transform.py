@@ -49,6 +49,8 @@ blocked_domain_list_path_key = f"{arg_prefix}_blocked_domain_list_path"
 """ Key holds the directory holding 1 or more domain* files listing the urls to identify """
 block_data_factory_key = f"{arg_prefix}_data_factory"
 """ Key holds the data access factory for domain files """
+block_data_access_key = "data_access"
+""" Key holds the data access for reading domain files.  If not present, then block_data_factory_key is expected"""
 domain_refs_key = "__domain_refs"
 """ A hidden key used by the runtime to pass a ray object reference to the transform"""
 captured_arg_keys = [blocked_domain_list_path_key, annotation_column_name_key, source_url_column_name_key]
@@ -90,10 +92,12 @@ class BlockListTransform(AbstractTableTransform):
             url = config.get(blocked_domain_list_path_key, None)
             if url is None:
                 raise RuntimeError(f"Missing configuration value for key {blocked_domain_list_path_key}")
-            daf = config.get(block_data_factory_key, None)
-            if daf is None:
-                raise RuntimeError(f"Missing configuration value for key {block_data_factory_key}")
-            data_access = daf.create_data_access()
+            data_access = config.get(block_data_access_key, None)
+            if data_access is None:
+                daf = config.get(block_data_factory_key, None)
+                if daf is None:
+                    raise RuntimeError(f"Missing configuration value for key {block_data_factory_key}")
+                data_access = daf.create_data_access()
             domain_list = _get_domain_list(url, data_access)
         else:
             # This is recommended for production approach. In this case domain list is build by the
