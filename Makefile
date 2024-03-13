@@ -18,22 +18,13 @@
 #################################################################################################################
 
 # Add local or overriding rules here
-include Makefile.env
+setup-kind-cluster::
+	@# Help: Building kind cluster with everything installed
+	cd kind && $(MAKE) setup-kind-cluster
 
-include cluster.mk
-
-.PHONY: setup-kind-cluster
-setup-kind-cluster:
-	$(MAKE) delete-kind-cluster
-	$(MAKE) create-kind-cluster
-	$(MAKE) cluster-prepare
-	$(MAKE) cluster-prepare-wait
-	cd $(KIND_DIR)/hack && ./ingress.sh deploy
-	@echo "setup-cluster completed"
-
-.PHONY: cleanup-kind-cluster
-cleanup-kind-cluster:
-	$(MAKE) delete-kind-cluster
+cleanup-kind-cluster::
+	@# Help: Deleting the kind cluster
+	cd kind && $(MAKE) delete-kind-cluster
 
 # Get some common rules for the whole repo
 include .make.defaults
