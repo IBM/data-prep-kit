@@ -12,6 +12,6 @@ RUN pip install --no-cache-dir "cython<3.0.0" wheel && pip install --no-cache-di
 # Adding kfp_tekton install, required by sub workflow
 RUN pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple fm-data-processing-kfp==0.0.3.dev11
 
-RUN pip install --no-cache-dir "ray[default]"==2.9.1
+RUN pip install --no-cache-dir "ray[default]"==2.9.3
 RUN pip install pydantic==2.5.3
 COPY ./src /pipelines/component/src
