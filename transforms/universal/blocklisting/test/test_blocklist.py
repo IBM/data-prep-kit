@@ -4,12 +4,10 @@ from blocklist_transform import (
     BlockListTransformConfiguration,
     annotation_column_name_default,
     annotation_column_name_key,
-    block_data_factory_key,
     blocked_domain_list_path_key,
     source_column_name_default,
     source_url_column_name_key,
 )
-from data_processing.data_access import DataAccessLocal
 from data_processing.ray.transform_runtime import get_transform_config
 from data_processing.test_support.transform import AbstractTransformTest
 from data_processing.utils import ParamsUtils
