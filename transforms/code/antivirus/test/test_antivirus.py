@@ -16,7 +16,7 @@ expected_table = pa.Table.from_pydict({
             'contents': ['INNOCENT', 'VIRUS'],
             'virus_detection': [None, 'VIRUS_DETECTION'],
         })
-expected_metadata_list = [{"nfiles": 1, "nrows": 2, "detected": 1}, {}]  # transform() result  # flush() result
+expected_metadata_list = [{"clean": 1, "infected": 1}, {}]  # transform() result  # flush() result
 
 def side_effect(arg: BytesIO) -> dict:
     if arg.getvalue().decode() == 'VIRUS':
