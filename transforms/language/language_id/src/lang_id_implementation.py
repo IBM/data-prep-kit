@@ -106,6 +106,7 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
         self.params[PARAM_MODEL_KIND] = args.model_kind
         self.params[PARAM_MODEL_URL] = args.model_url
         self.params[PARAM_CONTENT_COLUMN_NAME] = args.content_column_name
+        self.remove_from_metadata.append(PARAM_MODEL_CREDENTIAL)
         return True
 
     def get_input_params(self) -> dict[str, Any]:

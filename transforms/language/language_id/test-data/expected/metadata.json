@@ -16,7 +16,6 @@
     },
     "job_input_params": {
         "drop_column_if_existed": true,
-        "model_credential": "<secret>",
         "model_kind": "fasttext",
         "model_url": "facebook/fasttext-language-identification",
         "content_column_name": "text",
