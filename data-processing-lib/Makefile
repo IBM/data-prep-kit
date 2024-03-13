@@ -5,8 +5,6 @@ VERSION=0.2.0
 TAG := "v${VERSION}"
 LIBNAME=fm_data_processing
 PYTHON=python3
-#ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-edge-ai-team-sdk-pypi-local
-#ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/wcp-ai-foundation-team-fms-pypi-local
 ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local
 
 clean::

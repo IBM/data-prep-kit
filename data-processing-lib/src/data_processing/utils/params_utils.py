@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 
 class ParamsUtils:
@@ -132,28 +132,3 @@ class ParamsUtils:
             help_dict[key] = help_text
             example_dict[key] = example_value
         return ParamsUtils.get_ast_help_and_example_text(help_dict, [example_dict])
-        # return ParamsUtils.get_ast_help_and_example_text(help_dict, [example_dict,example_dict])
-
-    @staticmethod
-    def hide_secrets(item: Union[str, list[Any], dict[str, Any]], hide=False):
-        if isinstance(item, str):
-            if hide:
-                newitem = "<secret>"
-            else:
-                newitem = item
-        elif isinstance(item, list):
-            newitem = []
-            for i in range(len(item)):
-                newitem.append(ParamsUtils.hide_secrets(item[i]), hide)
-        elif isinstance(item, dict):
-            newitem = {}
-            for key, value in item.items():
-                if "secret" in key or "pwd" in key or "password" in key or "credential" in key:
-                    value = ParamsUtils.hide_secrets(value, True)
-                newitem[key] = value
-        else:
-            if hide:
-                newitem = 0  # other primitives int, bool, float
-            else:
-                newitem = item  # other primitives int, bool, float
-        return newitem
