@@ -74,8 +74,10 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
             default=1,
             help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
         )
+        # An example of a command line option that we don't want included in the metadata collected by the Ray orchestrator
+        # See below for remove_from_metadata addition so that it is not reported.
         parser.add_argument(
-            "--noop_pwd",  # pwd, secret, password, creential are all things that will be hidden in the metadata.
+            "--noop_pwd",
             type=str,
             default="nothing",
             help="A dummy password which should be filtered out of the metadata",
@@ -93,6 +95,8 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["sleep"] = args.noop_sleep_sec
         self.params["pwd"] = args.noop_pwd
         print(f"noop parameters are : {self.params}")
+        # Don't publish this in the metadata produced by the ray orchestrator.
+        self.remove_from_metadata["pwd"]
         return True
 
 
