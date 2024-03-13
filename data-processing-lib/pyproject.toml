@@ -42,7 +42,8 @@ package_dir = ["src","test"]
 where = ["src/data_processing"]
 
 [tool.pytest.ini_options]
-addopts = "--cov --cov-report term-missing --cov-fail-under 70"
+# Currently we use low coverage since we have to run tests separately (see makefile)
+addopts = "--cov --cov-report term-missing --cov-fail-under 30"
 markers = ["unit: unit tests", "integration: integration tests"]
 
 [tool.coverage.run]
