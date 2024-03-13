@@ -4,4 +4,3 @@
 fm-data-processing==0.2.0
 ### For blocklist
 pygtrie>=2.5.0
-polars==0.20.6

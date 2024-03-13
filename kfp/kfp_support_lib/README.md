@@ -8,7 +8,7 @@ For more details see the [documentation](doc).
 ## Development
 
 ### Requirements
-1. python 3.9 or later
+1. python 3.10 or later
 2. git command line tools
 3. [pre-commit](https://pre-commit.com/)
 4. twine (pip install twine)
