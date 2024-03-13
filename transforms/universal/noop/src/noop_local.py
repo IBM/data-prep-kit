@@ -35,7 +35,6 @@ run_in_ray = True
 if __name__ == "__main__":
     if not run_in_ray:
         # Here we show how to run outside of ray
-        # Blocklist transform needs a DataAccess to ready the domain list.
         # Create and configure the transform.
         transform = NOOPTransform(noop_params)
         # Use the local data access to read a parquet table.
@@ -47,9 +46,9 @@ if __name__ == "__main__":
         print(f"\noutput table: {table_list}")
         print(f"output metadata : {metadata}")
     else:
-        # Here we show to to run the transform in the ray launcher
+        # Here we show to run the transform in the ray launcher
         Path(output_folder).mkdir(parents=True, exist_ok=True)
-        # Set the the simulated command line args
+        # Set the simulated command line args
         sys.argv = ParamsUtils.dict_to_req(d=params | noop_params)
         # create launcher
         launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
