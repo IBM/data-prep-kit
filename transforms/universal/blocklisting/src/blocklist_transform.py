@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 import pyarrow as pa
 import pygtrie
 import ray
-from data_processing.data_access import DataAccess, DataAccessFactory, DataAccessLocal
+from data_processing.data_access import DataAccess, DataAccessFactory
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
@@ -26,15 +26,14 @@ def reverse_url(url: str) -> str:
     return ".".join(url_list)
 
 
-def get_domain_list(domain_list_url: str, data_access: DataAccess = None):
-    domain_list = []
+def _get_domain_list(domain_list_url: str, data_access: DataAccess) -> set[str]:
+    domain_list = set()
     logger.info(f"Reading domain list from {domain_list_url} ")
     blocklist_file_dict = data_access.get_folder_files(domain_list_url)
     for file_name, file_contents in blocklist_file_dict.items():
         domains = file_contents.decode("utf-8").split("\n")
         domain_list_from_file = [domain.strip() for domain in domains if not domain.startswith("#")]
-        domain_list += domain_list_from_file
-    domain_list = set(domain_list)
+        domain_list.update(domain_list_from_file)
     logger.info(f"Added {len(domain_list)} domains to domain list")
     return domain_list
 
@@ -92,10 +91,10 @@ class BlockListTransform(AbstractTableTransform):
             if url is None:
                 raise RuntimeError(f"Missing configuration value for key {blocked_domain_list_path_key}")
             daf = config.get(block_data_factory_key, None)
-            if url is None:
+            if daf is None:
                 raise RuntimeError(f"Missing configuration value for key {block_data_factory_key}")
             data_access = daf.create_data_access()
-            domain_list = get_domain_list(url, data_access)
+            domain_list = _get_domain_list(url, data_access)
         else:
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
@@ -218,17 +217,10 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
 
         # Add the DataAccessFactory to the transform's configuration parameters.
         self.params[block_data_factory_key] = self.daf
+        # mark this parameter to be removed
+        self.remove_from_metadata.append(block_data_factory_key)
         # Validate and populate the transform's DataAccessFactory
         return self.daf.apply_input_params(args)
-
-    def get_transform_metadata(self) -> dict[str, Any]:
-        """
-        Provides a default implementation if the user has provided a set of keys to the initializer.
-        These keys are used in apply_input_params() to extract our key/values from the global Namespace of args.
-        :return:
-        """
-        del self.params[block_data_factory_key]
-        return self.params
 
 
 class BlockListRuntime(DefaultTableTransformRuntime):
@@ -251,7 +243,7 @@ class BlockListRuntime(DefaultTableTransformRuntime):
     ) -> dict[str, Any]:
         """
         Set environment for filter execution
-        :param blocklist_data_access_factory - data access factory
+        :param data_access_factory - data access factory
         :param statistics - reference to the statistics object
         :param files - list of files to process
         :return: dictionary of filter init params
@@ -264,7 +256,7 @@ class BlockListRuntime(DefaultTableTransformRuntime):
         if blocklist_data_access_factory is None:
             raise RuntimeError(f"Missing configuration key {block_data_factory_key}")
 
-        domain_list = get_domain_list(url, blocklist_data_access_factory.create_data_access())
+        domain_list = _get_domain_list(url, blocklist_data_access_factory.create_data_access())
         domain_refs = ray.put(list(domain_list))
         logger.info(f"Placed domain list into Ray object storage under reference{domain_refs}")
         return {domain_refs_key: domain_refs} | self.params

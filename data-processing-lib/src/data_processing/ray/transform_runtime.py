@@ -1,5 +1,4 @@
 import argparse
-from argparse import ArgumentParser
 from typing import Any
 
 from data_processing.data_access import DataAccessFactory
@@ -76,6 +75,7 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
         self.transform_class = transform_class
         # These are expected to be updated later by the sub-class in apply_input_params().
         self.params = {}
+        self.remove_from_metadata = []
 
     def create_transform_runtime(self) -> DefaultTableTransformRuntime:
         """
@@ -97,7 +97,19 @@ class DefaultTableTransformConfiguration(CLIArgumentProvider):
         return self.name
 
     def get_transform_metadata(self) -> dict[str, Any]:
-        return self.get_input_params()
+        """
+        Get transform metadata. Before returning remove all parameters key accumulated in
+        self.remove_from metadata. This allows transform developer to mark any input parameters
+        that should not make it to the metadata. This can be parameters containing sensitive
+        information, access keys, secrets, passwords, etc
+        :return:
+        """
+        # get input parameters
+        parameters = self.get_input_params()
+        # remove everything that user marked as to be removed
+        for key in self.remove_from_metadata:
+            del self.params[key]
+        return parameters
 
 
 def get_transform_config(

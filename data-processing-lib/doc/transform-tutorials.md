@@ -158,3 +158,7 @@ Once a transform has been built, testing can be enabled with the testing framewo
 independent of the Ray framework.
 * [End-to-End Testing](testing-e2e-transform.md) - shows how to test the
 transform running in the Ray environment.
+
+### Additional transform support
+
+We also strted a library of [transform utilities](transformer-utilities.md)

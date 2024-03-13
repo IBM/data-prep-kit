@@ -16,7 +16,7 @@ from data_processing.ray import (
     TransformTableProcessor,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import RANDOM_SEED, TransformUtils, str2bool
+from data_processing.utils import RANDOM_SEED, TransformUtils, str2bool, get_logger
 from fdedup_support import (
     REQUEST_LEN,
     BucketsHash,
@@ -32,6 +32,9 @@ from ray.actor import ActorHandle
 from ray.util import ActorPool
 from ray.util.metrics import Gauge
 from text_normalizer import normalize as text_normalize
+
+
+logger = get_logger(__name__)
 
 
 class FdedupTransform(AbstractTableTransform):
@@ -84,7 +87,7 @@ class FdedupTransform(AbstractTableTransform):
                 for i in range(0, max(1, word_count - self.word_shingle_size + 1)):
                     shingles.append(self.delimiter.join(words[i : i + self.word_shingle_size]))
             except Exception as e:
-                print(f"Exception during japanese shingle building {e}")
+                logger.info(f"Exception during japanese shingle building {e}")
                 self.is_japanese = False
             return shingles
         else:
@@ -333,7 +336,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             false_positive_weight=0.5,
             false_negative_weight=0.5,
         )
-        print(f"Fuzzy: num buckets {num_buckets}, bucket length {length_bucket}")
+        logger.info(f"Fuzzy: num buckets {num_buckets}, bucket length {length_bucket}")
         mn_min_hash = MurmurMH(num_perm=self.params.get("num_permutations", 64), seed=RANDOM_SEED)
         # Build bucket and minhash collectors
         bucket_collectors = RayUtils.create_actors(
@@ -342,14 +345,14 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             actor_options={"num_cpus": self.params.get("bucket_cpu", 0.5)},
             n_actors=self.params.get("b_actors", 1),
         )
-        print(f"created {len(bucket_collectors)} bucket actors")
+        logger.info(f"created {len(bucket_collectors)} bucket actors")
         minhash_collectors = RayUtils.create_actors(
             clazz=DocsMinHash,
             params={},
             actor_options={"num_cpus": self.params.get("mhash_cpu", 0.5)},
             n_actors=self.params.get("m_actors", 1),
         )
-        print(f"created {len(minhash_collectors)} minhash actors")
+        logger.info(f"created {len(minhash_collectors)} minhash actors")
         self._preprocess_tables(
             data_access_factory=data_access_factory,
             statistics=statistics,
@@ -367,7 +370,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             actor_options={"num_cpus": self.params.get("doc_cpu", 0.5)},
             n_actors=self.params.get("d_actors", 1),
         )
-        print(f"created {len(self.document_collectors)} document actors")
+        logger.info(f"created {len(self.document_collectors)} document actors")
         # create bucket processors
         bucket_processors_list = RayUtils.create_actors(
             clazz=BucketsHashProcessor,
@@ -381,7 +384,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             actor_options=self.params.get("worker_options", None),
             n_actors=self.params.get("n_preprocessors", 1),
         )
-        print(f"created {len(bucket_processors_list)} bucket processor actors")
+        logger.info(f"created {len(bucket_processors_list)} bucket processor actors")
         # create bucket processors invoker
         bucket_processor_invoker = BucketsHashProcessorInvoker.options(
             num_cpus=self.params.get("bucket_cpu", 0.5)
@@ -398,7 +401,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         RayUtils.wait_for_execution_completion(replies=bucket_replies)
         # Wait for pool to complete
         ray.get(bucket_processor_invoker.wait_for_completion.remote())
-        print(f"Done processing buckets in {(time.time() - start) / 60} min")
+        logger.info(f"Done processing buckets in {(time.time() - start) / 60} min")
         # At this point we do not need bucket and minhash actors, remove them
         # but first get usage information
         # Bucket collector
@@ -462,7 +465,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         n_readers = self.params.get("n_preprocessors", 1) + int(
             self.params.get("d_actors", 1) * self.params.get("doc_cpu", 1) / worker_options["num_cpus"]
         )
-        print(f"Table preprocessing uses {n_readers} readers")
+        logger.info(f"Table preprocessing uses {n_readers} readers")
         # Create preprocessing actors
         processor_params = {
             "data_access_factory": data_access_factory,
@@ -488,7 +491,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             actor_options=worker_options,
             n_actors=n_readers,
         )
-        print(f"created {len(processors_list)} table processor actors")
+        logger.info(f"created {len(processors_list)} table processor actors")
         # Execute preprocessing
         # create gauges
         files_in_progress_gauge = Gauge(
@@ -538,7 +541,6 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         replies = [collector.get_size.remote() for collector in self.document_collectors]
         while replies:
             ready, not_ready = ray.wait(replies)
-            #            print(f"Getting document collector stats {ray.get(ready)}")
             d_amount, d_memory, r_amount, r_memory = ray.get(ready)[0]
             sum_docs += d_amount
             sum_docs_mem += d_memory
@@ -615,7 +617,7 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["is_japanese"] = args.japanese_data
         self.params["delimiters"] = args.delimiters
 
-        print(f"fuzzy dedup params are {self.params}")
+        logger.info(f"fuzzy dedup params are {self.params}")
         return True
 
 

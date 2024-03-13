@@ -11,10 +11,10 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import GB, TransformUtils
+from data_processing.utils import GB, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
-
+logger = get_logger(__name__)
 REQUEST_LEN = 8192
 
 
@@ -227,12 +227,12 @@ class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         if args.num_hashes <= 0:
-            print(f"Number of hashes should be greater then zero, provided {args.num_hashes}")
+            logger.info(f"Number of hashes should be greater then zero, provided {args.num_hashes}")
             return False
         self.params["doc_column"] = args.doc_column
         self.params["hash_cpu"] = args.hash_cpu
         self.params["num_hashes"] = args.num_hashes
-        print(f"exact dedup params are {self.params}")
+        logger.info(f"exact dedup params are {self.params}")
         return True
 
 
