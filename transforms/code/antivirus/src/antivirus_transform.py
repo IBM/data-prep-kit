@@ -60,13 +60,13 @@ class AntivirusTransform(AbstractTableTransform):
             return None
 
         try:
-            virus_detection = list(map(_scan, table[self.input_column].to_pylist()))
+            virus_detection = pa.array(list(map(_scan, table[self.input_column].to_pylist())), type=pa.string())
         except Exception as e:
             logger.error(f"Exception during the scan {e}: {traceback.print_exc()}")
             return None, None
         
-        nrows = len(virus_detection)
-        clean = virus_detection.count(None)
+        nrows = table.num_rows
+        clean = virus_detection.null_count
         infected = nrows - clean
         table = TransformUtils.add_column(table, self.output_column, virus_detection)
         # Add some sample metadata.
