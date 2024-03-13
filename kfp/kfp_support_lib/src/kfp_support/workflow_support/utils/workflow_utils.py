@@ -510,25 +510,25 @@ class RayRemoteJobs:
     def default_compute_execution_params(
             cluster_cpu: float,         # number cpus for cluster
             cluster_memory: float,      # memory for cluster (GB)
-            worker_cpu: float,          # cpu requirement per actor
-            worker_memory: float = 1,   # memory requirement per actor (GB)
-    ) -> int:
+            actor_cpu: float,           # cpu requirement per actor
+            actor_memory: float = 1,    # memory requirement per actor (GB)
+    ) -> str:
         """
         This is the most simplistic transform execution parameters computation
         :param cluster_cpu: overall cluster cpu
         :param cluster_memory: overall cluster memory
-        :param worker_cpu: worker cpu requirement
-        :param worker_memory: worker memory requirement
-        :return: number of workers
+        :param actor_cpu: worker cpu requirement
+        :param actor_memory: worker memory requirement
+        :return: number of actors
         """
         import sys
-        # compute number of worker
-        n_workers_cpu = int(0.85 * cluster_cpu / worker_cpu)
-        n_workers_memory = int(0.85 * cluster_memory / worker_memory)
-        n_workers = min(n_workers_cpu, n_workers_memory)
-        if n_workers < 1:
-            print(f"Not enough cpu/memory to run transform, required cpu {worker_cpu}, available {cluster_cpu}, "
-                  f"required memory {worker_memory}, available {cluster_memory}")
+        # compute number of actors
+        n_actors_cpu = int(0.85 * cluster_cpu / actor_cpu)
+        n_actors_memory = int(0.85 * cluster_memory / actor_memory)
+        n_actors = min(n_actors_cpu, n_actors_memory)
+        if n_actors < 1:
+            print(f"Not enough cpu/memory to run transform, required cpu {actor_cpu}, available {cluster_cpu}, "
+                  f"required memory {actor_memory}, available {cluster_memory}")
             sys.exit(1)
         # return the minimum of two
-        return n_workers
+        return str(n_actors)
