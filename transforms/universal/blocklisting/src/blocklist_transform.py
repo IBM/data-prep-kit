@@ -51,7 +51,7 @@ block_data_factory_key = f"{arg_prefix}_data_factory"
 """ Key holds the data access factory for domain files """
 block_data_access_key = "data_access"
 """ Key holds the data access for reading domain files.  If not present, then block_data_factory_key is expected"""
-domain_refs_key = "__domain_refs"
+_domain_ref_key = "__domain_refs"
 """ A hidden key used by the runtime to pass a ray object reference to the transform"""
 captured_arg_keys = [blocked_domain_list_path_key, annotation_column_name_key, source_url_column_name_key]
 """ The set of keys captured from the command line """
@@ -86,8 +86,8 @@ class BlockListTransform(AbstractTableTransform):
         self.source_url_column_name = config.get(source_url_column_name_key)
         if self.source_url_column_name is None:
             raise RuntimeError(f"Missing configuration value for key {source_url_column_name_key}")
-        runtime_provided_domain_refs = config.get(domain_refs_key, None)
-        if runtime_provided_domain_refs is None:
+        runtime_provided_domain_ref = config.get(_domain_ref_key, None)
+        if runtime_provided_domain_ref is None:
             # this is only useful during local debugging without Ray
             url = config.get(blocked_domain_list_path_key, None)
             if url is None:
@@ -103,13 +103,14 @@ class BlockListTransform(AbstractTableTransform):
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
             try:
-                logger.info(f"Loading domain list from Ray storage under reference {runtime_provided_domain_refs}")
-                domain_list = ray.get(runtime_provided_domain_refs)
+                logger.info(f"Loading domain list from Ray storage under reference {runtime_provided_domain_ref}")
+                domain_list = ray.get(runtime_provided_domain_ref)
             except Exception as e:
                 logger.info(f"Exception loading list of block listed domains from ray object storage {e}")
-                raise RuntimeError(f"exception loading from object storage for key {runtime_provided_domain_refs}")
+                raise RuntimeError(f"exception loading from object storage for key {runtime_provided_domain_ref}")
         # build trie structure for block listing
         logger.info(f"Loading trie with {len(domain_list)} items.")
+        # logger.info(f"Loading trie with {domain_list}.")
         self.trie = pygtrie.StringTrie(separator=".")
         for url in domain_list:
             self.trie[reverse_url(url)] = ""
@@ -261,9 +262,9 @@ class BlockListRuntime(DefaultTableTransformRuntime):
             raise RuntimeError(f"Missing configuration key {block_data_factory_key}")
 
         domain_list = _get_domain_list(url, blocklist_data_access_factory.create_data_access())
-        domain_refs = ray.put(list(domain_list))
-        logger.info(f"Placed domain list into Ray object storage under reference{domain_refs}")
-        return {domain_refs_key: domain_refs} | self.params
+        domain_ref = ray.put(domain_list)
+        logger.info(f"Placed domain list into Ray object storage under reference{domain_ref}")
+        return {_domain_ref_key: domain_ref} | self.params
 
 
 if __name__ == "__main__":
