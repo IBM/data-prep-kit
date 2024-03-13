@@ -10,6 +10,7 @@ from data_processing.ray import (
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import get_logger
+from data_processing.utils.transform_utils import TransformUtils
 
 
 logger = get_logger(__name__)
@@ -33,13 +34,8 @@ class AntivirusTransform(AbstractTableTransform):
         self.warning_issued = False
         self.input_column = config.get("input_column", "contents")
         self.output_column = config.get("output_column", "virus_detection")
-        self.use_network_socket = config.get("use_network_socket", False)
-        if self.use_network_socket:
-            self.network_socket_host = config.get("network_socket_host", "localhost")
-            self.network_socket_port = config.get("network_socket_port", 3310)
-            logger.info(f"Using network scoket: {self.network_socket_host}:{self.network_socket_port}")
-        else:
-            logger.info("Using unix socket")
+        self.clamd_socket = config.get("clamd_socket", "/var/run/clamav/clamd.ctl")
+        logger.info(f"Using unix socket: {self.clamd_socket}")
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -51,16 +47,8 @@ class AntivirusTransform(AbstractTableTransform):
         import clamd
         
         logger.debug(f"Transforming one table with {len(table)} rows")
-        if self.output_column in table.column_names:
-            if not self.warning_issued:
-                logger.warn(f"Drop existing column {self.output_column}")
-                self.warning_issued = True
-            table = table.drop(self.output_column)
 
-        if self.use_network_socket:
-            cd = clamd.ClamdNetworkSocket(host=self.network_socket_host, port=self.network_socket_port)
-        else:
-            cd = clamd.ClamdUnixSocket()
+        cd = clamd.ClamdUnixSocket(path=self.clamd_socket)
         
         def _scan(content: str) -> str | None:
             if content is None:
@@ -72,17 +60,18 @@ class AntivirusTransform(AbstractTableTransform):
             return None
 
         try:
-            virus_detection = pa.array(list(map(_scan, table[self.input_column].to_pylist())), type=pa.string())
+            virus_detection = list(map(_scan, table[self.input_column].to_pylist()))
         except Exception as e:
             logger.error(f"Exception during the scan {e}: {traceback.print_exc()}")
             return None, None
         
         nrows = len(virus_detection)
-        detected = nrows - virus_detection.null_count
-        table = table.append_column(self.output_column, virus_detection)
+        clean = virus_detection.count(None)
+        infected = nrows - clean
+        table = TransformUtils.add_column(table, self.output_column, virus_detection)
         # Add some sample metadata.
-        logger.debug(f"Virus detection {detected} / {nrows} rows")
-        metadata = {"nfiles": 1, "nrows": len(table), "detected": detected}
+        logger.debug(f"Virus detection {infected} / {nrows} rows")
+        metadata = {"clean": clean, "infected": infected}
         return [table], metadata
 
 
@@ -117,11 +106,11 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
             help="output column name",
         )
         parser.add_argument(
-            "-n",
-            "--network_socket",
+            "-s",
+            "--clamd_socket",
             type=str,
-            default="",
-            help="If provided, use local network socket (default: use unix socket (/var/run/clamav/clamd.ctl))."
+            default="/var/run/clamav/clamd.ctl",
+            help="local socket path for clamd"
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
@@ -138,15 +127,7 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
             return False
         self.params["input_column"] = args.input_column
         self.params["output_column"] = args.output_column
-        use_network_socket = bool(args.network_socket)
-        if use_network_socket:
-            host_port = args.network_socket.split(":")
-            if len(host_port) < 2 or not host_port[-1].isnumeric():
-                logger.error(f"invalid netowrk socket: {args.network_socket}")
-                return False
-            self.params["use_network_socket"] = True
-            self.params["network_socket_host"] = ":".join(host_port[:-1])
-            self.params["network_socket_port"] = int(host_port[-1])
+        self.params["clamd_socket"] = args.clamd_socket
         logger.info(f"antivirus parameters are : {self.params}")
         return True
 

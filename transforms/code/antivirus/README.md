@@ -16,7 +16,7 @@ configuration for values are as follows:
 
 * _input_column_ - specifies the input column's name to scan. (default: `contents`)
 * _output_column_ - specifies the output column's name of the detected virus signature name. (default: `virus_detection`)
-* _network_socket_ - specifies the network socket value. e.g. `localhost:3310` As a default, the unix socket will be used. If you want to run this filter with a ClamAV server like a docker container, you need to specifies this option.
+* _clamd_socket_ - specifies the socket path for ClamAV. (default: `/var/run/clamav/clamd.ctl`)
 
 ## Running
 You can run the [antivirus_local.py](src/antivirus_local.py) to
@@ -33,45 +33,65 @@ CONTAINER ID   IMAGE                 COMMAND                  CREATED         ST
 7bb01ab8a5af   clamav-local:latest   "/bin/bash -c 'fresh…"   3 seconds ago   Up 2 seconds   0.0.0.0:3310->3310/tcp   clamav
 (venv) % cd src
 (venv) % python antivirus_local.py
-03:01:05 INFO - Running locally
-03:01:05 INFO - antivirus parameters are : {'input_column': 'contents', 'output_column': 'virus_detection', 'use_network_socket': True, 'network_socket_host': 'localhost', 'network_socket_port': 3310}
-03:01:05 INFO - Using local configuration with: input_folder - /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/input output_folder - /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/output
-03:01:05 INFO - Not using data sets, checkpointing False, max files -1
+00:51:25 INFO - Running locally
+00:51:25 INFO - antivirus parameters are : {'input_column': 'contents', 'output_column': 'virus_detection', 'clamd_socket': '../.tmp/clamd.ctl'}
+00:51:25 INFO - Using local configuration with: input_folder - /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/input output_folder - /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/output
+00:51:25 INFO - Not using data sets, checkpointing False, max files -1
 number of workers 5 worker options {'num_cpus': 0.8}
 pipeline id pipeline_id; number workers 5
 job details {'job category': 'preprocessing', 'job name': 'Antivirus', 'job type': 'ray', 'job id': 'job_id'}
 code location {'github': 'github', 'commit_hash': '12345', 'path': 'path'}
 actor creation delay 0
-03:01:05 INFO - running locally creating Ray cluster
-2024-03-12 03:01:10,703 INFO worker.py:1715 -- Started a local Ray instance. View the dashboard at 127.0.0.1:8265
-03:01:12 INFO - Starting orchestrator
-(orchestrate pid=131278) 03:01:15 INFO - orchestrator started at 2024-03-12 03:01:15
-(orchestrate pid=131278) 03:01:15 INFO - Number of files is 1, source profile {'max_file_size': 0.00240325927734375, 'min_file_size': 0.00240325927734375, 'total_file_size': 0.00240325927734375}
-(orchestrate pid=131278) 03:01:15 INFO - Cluster resources: {'cpus': 8, 'gpus': 0, 'memory': 6.625856782309711, 'object_store': 3.3129283897578716}
-(orchestrate pid=131278) 03:01:15 INFO - Number of workers - 5 with {'num_cpus': 0.8} each
-(orchestrate pid=131278) 03:01:15 INFO - Creating actors
-(orchestrate pid=131278) 03:01:15 INFO - Begin processing files
-(orchestrate pid=131278) 03:01:15 INFO - Completed 0 files in 2.0261605580647787e-05 min. Waiting for completion
-(TransformTableProcessor pid=131602) 03:01:19 INFO - Using network scoket: localhost:3310
-(orchestrate pid=131278) 03:01:20 INFO - Completed processing in 0.0731032133102417 min
-(orchestrate pid=131278) 03:01:20 INFO - Done processing files, waiting for flush() completion.
-(orchestrate pid=131278) 03:01:20 INFO - done flushing in 0.010388851165771484 sec
-(orchestrate pid=131278) 03:01:20 INFO - Computing execution stats
-(TransformTableProcessor pid=131600) 03:01:20 INFO - Begin flushing transform
-(TransformTableProcessor pid=131600) 03:01:20 INFO - Done flushing transform
-(TransformTableProcessor pid=131600) 03:01:20 INFO - Transform did not produce a transformed table for file
-(TransformTableProcessor pid=131603) 03:01:20 INFO - Begin processing file /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/input/sample.parquet
-(TransformTableProcessor pid=131603) 03:01:20 INFO - Begin transforming table from /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/input/sample.parquet
-(TransformTableProcessor pid=131603) 03:01:20 INFO - Done transforming table from /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/input/sample.parquet
-(TransformTableProcessor pid=131603) 03:01:20 INFO - Writing transformed file /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/input/sample.parquet to /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/output/sample.parquet
-03:01:20 INFO - Completed orchestrator
-(orchestrate pid=131278) 03:01:20 INFO - Building job metadata
-(orchestrate pid=131278) 03:01:20 INFO - Saved job metadata.
-03:01:30 INFO - Completed execution in 0.41824158032735187 min, execution result 0
-(TransformTableProcessor pid=131601) 03:01:20 INFO - Using network scoket: localhost:3310 [repeated 4x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/ray-logging.html#log-deduplication for more options.)
-(TransformTableProcessor pid=131601) 03:01:20 INFO - Begin flushing transform [repeated 4x across cluster]
-(TransformTableProcessor pid=131601) 03:01:20 INFO - Done flushing transform [repeated 4x across cluster]
-(TransformTableProcessor pid=131601) 03:01:20 INFO - Transform did not produce a transformed table for file   [repeated 4x across cluster]
+00:51:25 INFO - running locally creating Ray cluster
+2024-03-13 00:51:30,906 INFO worker.py:1715 -- Started a local Ray instance. View the dashboard at 127.0.0.1:8265
+00:51:32 INFO - Starting orchestrator
+(orchestrate pid=180576) 00:51:35 INFO - orchestrator started at 2024-03-13 00:51:35
+(orchestrate pid=180576) 00:51:35 INFO - Number of files is 1, source profile {'max_file_size': 0.00240325927734375, 'min_file_size': 0.00240325927734375, 'total_file_size': 0.00240325927734375}
+(orchestrate pid=180576) 00:51:35 INFO - Cluster resources: {'cpus': 8, 'gpus': 0, 'memory': 6.961594391614199, 'object_store': 3.4807971948757768}
+(orchestrate pid=180576) 00:51:35 INFO - Number of workers - 5 with {'num_cpus': 0.8} each
+(orchestrate pid=180576) 00:51:36 INFO - Completed 0 files in 0.000544595718383789 min. Waiting for completion
+(TransformTableProcessor pid=180905) 00:51:39 INFO - Using unix socket: ../.tmp/clamd.ctl
+(orchestrate pid=180576) 00:51:40 INFO - Completed processing in 0.06612720489501953 min
+(TransformTableProcessor pid=180905) 00:51:40 WARNING - Exception 'NoneType' object is not iterable processing file /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/input/sample.parquet: Traceback (most recent call last):
+(TransformTableProcessor pid=180905)   File "/home/tkyg/fm-data-engineering/data-processing-lib/src/data_processing/ray/transform_table_processor.py", line 64, in process_table
+(TransformTableProcessor pid=180905)     out_tables, stats = self.transform.transform(table=table)
+(TransformTableProcessor pid=180905)   File "/home/tkyg/fm-data-engineering/transforms/code/antivirus/src/antivirus_transform.py", line 72, in transform
+(TransformTableProcessor pid=180905)     table.append_column(self.output_column, virus_detection)
+(TransformTableProcessor pid=180905)   File "pyarrow/table.pxi", line 4483, in pyarrow.lib.Table.append_column
+(TransformTableProcessor pid=180905)   File "pyarrow/table.pxi", line 4432, in pyarrow.lib.Table.add_column
+(TransformTableProcessor pid=180905)   File "pyarrow/table.pxi", line 1380, in pyarrow.lib.chunked_array
+(TransformTableProcessor pid=180905)   File "pyarrow/array.pxi", line 344, in pyarrow.lib.array
+(TransformTableProcessor pid=180905)   File "pyarrow/array.pxi", line 42, in pyarrow.lib._sequence_to_array
+(TransformTableProcessor pid=180905)   File "pyarrow/error.pxi", line 154, in pyarrow.lib.pyarrow_internal_check_status
+(TransformTableProcessor pid=180905)   File "pyarrow/types.pxi", line 88, in pyarrow.lib._datatype_to_pep3118
+(TransformTableProcessor pid=180905) TypeError: 'NoneType' object is not iterable
+(TransformTableProcessor pid=180905)
+00:51:40 INFO - Completed orchestrator
+00:51:50 INFO - Completed execution in 0.4105185270309448 min, execution result 0
+(TransformTableProcessor pid=180903) 00:51:40 INFO - Using unix socket: ../.tmp/clamd.ctl [repeated 4x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/ray-logging.html#log-deduplication for more options.)
+(antivirus) tkyg@tkyg21:~/granite/fm-data-engineering/transforms/code/antivirus/src$ python antivirus_local.py
+00:53:27 INFO - Running locally
+00:53:27 INFO - antivirus parameters are : {'input_column': 'contents', 'output_column': 'virus_detection', 'clamd_socket': '../.tmp/clamd.ctl'}
+00:53:27 INFO - Using local configuration with: input_folder - /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/input output_folder - /home/tkyg/fm-data-engineering/transforms/code/antivirus/test-data/output
+00:53:27 INFO - Not using data sets, checkpointing False, max files -1
+number of workers 5 worker options {'num_cpus': 0.8}
+pipeline id pipeline_id; number workers 5
+job details {'job category': 'preprocessing', 'job name': 'Antivirus', 'job type': 'ray', 'job id': 'job_id'}
+code location {'github': 'github', 'commit_hash': '12345', 'path': 'path'}
+actor creation delay 0
+00:53:27 INFO - running locally creating Ray cluster
+2024-03-13 00:53:33,295 INFO worker.py:1715 -- Started a local Ray instance. View the dashboard at 127.0.0.1:8265
+00:53:35 INFO - Starting orchestrator
+(orchestrate pid=181325) 00:53:38 INFO - orchestrator started at 2024-03-13 00:53:38
+(orchestrate pid=181325) 00:53:38 INFO - Number of files is 1, source profile {'max_file_size': 0.00240325927734375, 'min_file_size': 0.00240325927734375, 'total_file_size': 0.00240325927734375}
+(orchestrate pid=181325) 00:53:38 INFO - Cluster resources: {'cpus': 8, 'gpus': 0, 'memory': 6.959992218762636, 'object_store': 3.4799961084499955}
+(orchestrate pid=181325) 00:53:38 INFO - Number of workers - 5 with {'num_cpus': 0.8} each
+(orchestrate pid=181325) 00:53:38 INFO - Completed 0 files in 4.4290224711100264e-05 min. Waiting for completion
+(TransformTableProcessor pid=181646) 00:53:42 INFO - Using unix socket: ../.tmp/clamd.ctl
+(orchestrate pid=181325) 00:53:43 INFO - Completed processing in 0.06886642773946126 min
+00:53:43 INFO - Completed orchestrator
+00:53:53 INFO - Completed execution in 0.43177722295125326 min, execution result 0
+(TransformTableProcessor pid=181649) 00:53:43 INFO - Using unix socket: ../.tmp/clamd.ctl [repeated 4x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/ray-logging.html#log-deduplication for more options.)
 (venv) % deactivate
 7bb01ab8a5af
 % docker ps

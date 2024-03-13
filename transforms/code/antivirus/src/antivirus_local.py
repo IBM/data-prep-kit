@@ -29,7 +29,7 @@ params = {
     "code_location": ParamsUtils.convert_to_ast(code_location),
     "input_column": "contents",
     "output_column": "virus_detection",
-    "network_socket": "localhost:3310",
+    "clamd_socket": "../.tmp/clamd.ctl",
 }
 if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=params)

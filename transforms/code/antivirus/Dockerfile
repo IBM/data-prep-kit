@@ -11,8 +11,9 @@ FROM base AS clamav-local
 USER root
 COPY --link --chown=1000:100 --chmod=774 --from=clamav /var/lib/clamav/ /var/lib/clamav/
 COPY --chown=1000:100 --chmod=774 ./docker/clamd.conf /etc/clamav/clamd.conf
-RUN freshclam && chown -R 1000:100 /var/log/clamav /var/lib/clamav
-
+RUN freshclam \
+    && mkdir -p /var/run/clamav \
+    && chown -R 1000:100 /var/run/clamav /var/log/clamav /var/lib/clamav
 USER 1000
 CMD ["/bin/bash", "-c", "freshclam && clamd --debug --foreground"]
 
@@ -21,8 +22,10 @@ FROM base AS antivirus
 ARG ARTIFACTORY_USER
 ARG ARTIFACTORY_API_KEY
 
-COPY --from=clamav-local /var/lib/clamav/ /var/lib/clamav/
-COPY --from=clamav-local /etc/clamav/clamd.conf /etc/clamav/clamd.conf
+COPY --from=clamav-local --chown=1000:100 /var/lib/clamav/ /var/lib/clamav/
+COPY --from=clamav-local --chown=1000:100 /etc/clamav/clamd.conf /etc/clamav/clamd.conf
+COPY --from=clamav-local --chown=1000:100 /var/log/clamav/clamav.log /var/log/clamav/clamav.log
+COPY --from=clamav-local --chown=1000:100 /var/run/clamav /var/run/clamav
 COPY requirements.txt requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt \
