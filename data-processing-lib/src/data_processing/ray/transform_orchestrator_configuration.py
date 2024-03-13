@@ -2,7 +2,10 @@ import argparse
 import ast
 from typing import Any
 
-from data_processing.utils import CLIArgumentProvider, ParamsUtils
+from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger
+
+
+logger = get_logger(__name__)
 
 
 class TransformOrchestratorConfiguration(CLIArgumentProvider):
@@ -86,11 +89,11 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
         self.code_location = args.code_location
 
         # print them
-        print(f"number of workers {self.n_workers} worker options {self.worker_options}")
-        print(f"pipeline id {self.pipeline_id}; number workers {self.n_workers}")
-        print(f"job details {self.job_details}")
-        print(f"code location {self.code_location}")
-        print(f"actor creation delay {self.creation_delay}")
+        logger.info(f"number of workers {self.n_workers} worker options {self.worker_options}")
+        logger.info(f"pipeline id {self.pipeline_id}; number workers {self.n_workers}")
+        logger.info(f"job details {self.job_details}")
+        logger.info(f"code location {self.code_location}")
+        logger.info(f"actor creation delay {self.creation_delay}")
         return True
 
     def get_input_params(self) -> dict[str, Any]:

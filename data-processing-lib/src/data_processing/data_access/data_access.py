@@ -2,7 +2,9 @@ from typing import Any
 import random
 
 import pyarrow as pa
-from data_processing.utils import MB, KB
+from data_processing.utils import MB, KB, get_logger
+
+logger = get_logger(__name__)
 
 
 class DataAccess:
@@ -122,7 +124,7 @@ class DataAccess:
         else:
             # use all existing files
             files = range(len(path_list))
-        print(f"Using files {files} to sample data")
+        logger.info(f"Using files {files} to sample data")
 
         # Read table and compute number of docs and sizes
         number_of_docs = []
@@ -148,14 +150,14 @@ class DataAccess:
                 av_doc_size = 0
             else:
                 av_doc_size = av_table_size * MB / av_number_docs / KB
-        print(
+        logger.info(
             f"average number of docs {av_number_docs}, average table size {av_table_size} MB, "
             f"average doc size {av_doc_size} kB"
         )
 
         # compute number of docs
         number_of_docs = av_number_docs * len(path_list)
-        print(f"Estimated number of docs {number_of_docs}")
+        logger.info(f"Estimated number of docs {number_of_docs}")
         return path_profile | {
             "average table size MB": av_table_size,
             "average doc size KB": av_doc_size,

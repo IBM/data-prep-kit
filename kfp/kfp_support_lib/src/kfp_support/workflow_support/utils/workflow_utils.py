@@ -513,6 +513,14 @@ class RayRemoteJobs:
             worker_cpu: float,          # cpu requirement per actor
             worker_memory: float = 1,   # memory requirement per actor (GB)
     ) -> int:
+        """
+        This is the most simplistic transform execution parameters computation
+        :param cluster_cpu: overall cluster cpu
+        :param cluster_memory: overall cluster memory
+        :param worker_cpu: worker cpu requirement
+        :param worker_memory: worker memory requirement
+        :return: number of workers
+        """
         import sys
         # compute number of worker
         n_workers_cpu = int(0.85 * cluster_cpu / worker_cpu)
