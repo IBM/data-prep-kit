@@ -54,7 +54,7 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
+    configuration with CLI args.
     """
 
     def __init__(self):
