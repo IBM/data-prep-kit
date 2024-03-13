@@ -96,7 +96,7 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["pwd"] = args.noop_pwd
         print(f"noop parameters are : {self.params}")
         # Don't publish this in the metadata produced by the ray orchestrator.
-        self.remove_from_metadata["pwd"]
+        self.remove_from_metadata.append("pwd")
         return True
 
 
