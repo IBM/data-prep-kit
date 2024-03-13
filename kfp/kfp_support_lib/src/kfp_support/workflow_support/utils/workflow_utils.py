@@ -549,11 +549,15 @@ class RayRemoteJobs:
 
     @staticmethod
     def default_compute_execution_params2(
-        num_workers: int,  # number of workers
-        worker_cpu: int,  # number cpus per worker
-        worker_memory: int,  # memory per worker (GB)
-        worker_options: str,  # cpus per actor
+        worker_options: str,  # ray worker configuration
+        actor_options: str,  # cpus per actor
     ) -> str:
+        """
+        This is the most simplistic transform execution parameters computation
+        :param worker_options: configuration of ray workers
+        :param cluster_memory: configuration of ray actor
+        :return: number of actors
+        """
         import json
         import sys
 
@@ -563,18 +567,24 @@ class RayRemoteJobs:
         except Exception as e:
             print(f"Failed to load parameters {worker_options} with error {e}")
             sys.exit(1)
-        cluster_cpu = num_workers * worker_cpu * 0.85
-        cluster_mem = num_workers * worker_memory * 0.85
+        try:
+            actor_options = actor_options.replace("'", '"')
+            a_options = json.loads(actor_options)
+        except Exception as e:
+            print(f"Failed to load parameters {actor_options} with error {e}")
+            sys.exit(1)
+
+        cluster_cpu = w_options["replicas"] * w_options["cpu"] * 0.85
+        cluster_mem = w_options["replicas"] * w_options["memory"] * 0.85
         print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}")
         # compute number of actors
-        n_actors = int(cluster_cpu / w_options["num_cpus"])
+        n_actors = int(cluster_cpu / a_options["num_cpus"])
         print(f"Number of actors - {n_actors}")
         if n_actors < 1:
-            print(f"Not enough cpu/memory to run transform, required cpu {w_options['num_cpus']}, available {cluster_cpu}, "
-                  f"required memory {worker_memory}, available {cluster_mem}")
+            print(f"Not enough cpu/memory to run transform, required cpu {a_options['num_cpus']}, available {cluster_cpu}")
             sys.exit(1)
-        
-        return json.dumps({"actors": n_actors})
+
+        return str(n_actors)
 
 
 class ComponentUtils:

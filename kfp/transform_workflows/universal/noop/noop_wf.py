@@ -19,15 +19,52 @@ EXEC_SCRIPT_NAME: str = "transformer_launcher.py"
 RUN_ID = "00"
 
 
-# components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-guf:0.0.1-test"
+def default_compute_execution_params2(
+    worker_options: str,  # ray worker configuration
+    actor_options: str,  # cpus per actor
+) -> str:
+    """
+    This is the most simplistic transform execution parameters computation
+    :param worker_options: configuration of ray workers
+    :param cluster_memory: configuration of ray actor
+    :return: number of actors
+    """
+    import json
+    import sys
 
-compute_exec_params_op = comp.func_to_container_op(
-    func=RayRemoteJobs.default_compute_execution_params2, base_image=base_kfp_image
-)
-execute_ray_jobs_op = comp.load_component_from_file("../../../rayComponents/executeRayComponent.yaml")
-start_ray_op = comp.load_component_from_file("../../../rayComponents/startRayComponent.yaml")
-shutdown_ray_op = comp.load_component_from_file("../../../rayComponents/stopRayComponent.yaml")
+    try:
+        worker_options = worker_options.replace("'", '"')
+        w_options = json.loads(worker_options)
+    except Exception as e:
+        print(f"Failed to load parameters {worker_options} with error {e}")
+        sys.exit(1)
+    try:
+        actor_options = actor_options.replace("'", '"')
+        a_options = json.loads(actor_options)
+    except Exception as e:
+        print(f"Failed to load parameters {actor_options} with error {e}")
+        sys.exit(1)
+
+    cluster_cpu = w_options["replicas"] * w_options["cpu"] * 0.85
+    cluster_mem = w_options["replicas"] * w_options["memory"] * 0.85
+    print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}")
+    # compute number of actors
+    n_actors = int(cluster_cpu / a_options["num_cpus"])
+    print(f"Number of actors - {n_actors}")
+    if n_actors < 1:
+        print(f"Not enough cpu/memory to run transform, required cpu {a_options['num_cpus']}, available {cluster_cpu}")
+        sys.exit(1)
+
+    return str(n_actors)
+
+
+# components
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-guf:0.0.1-test1"
+
+compute_exec_params_op = comp.func_to_container_op(func=default_compute_execution_params2, base_image=base_kfp_image)
+execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayComponent.yaml")
+start_ray_op = comp.load_component_from_file("../../../kfp_ray_components/startRayComponent.yaml")
+shutdown_ray_op = comp.load_component_from_file("../../../kfp_ray_components/stopRayComponent.yaml")
 
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
 TASK_NAME: str = "noop"
@@ -39,18 +76,17 @@ TASK_NAME: str = "noop"
 )
 def noop(
     ray_name: str = "noop-kfp-ray",  # name of Ray cluster
-    ray_num_workers: int = 1,  # number of workers
-    ray_worker_cpus: int = 4,  # cpus per worker
-    ray_worker_memory: int = 16,  # memory per worker
-    ray_worker_gpus: int = 0,  # number of gpus per worker
-    image: str = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop:guftest",
+    ray_head_options: str = '{"cpu": 1, "memory": 16, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop:guftest",\
+             "image_pull_secret": "prod-all-icr-io"}',
+    ray_worker_options: str = '{"replicas": 1, "max_replicas": 1, "cpu": 4, "memory": 16, "image_pull_secret": "prod-all-icr-io",\
+            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop:guftest"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_cluster_nodes_ready_tmout": 100, "wait_job_ready_tmout": 400, "wait_job_ready_retries": 100, "wait_print_tmout": 120, "http_retries": 5, "image_pull_secret": "prod-all-icr-io"}',
     noop_sleep_sec: int = 50,
     lh_config: str = "None",
     max_files: int = -1,
     num_workers: int = 1,
-    worker_options: str = "{'num_cpus': 0.8}",
+    actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     job_id: str = "job_id",
     cos_access_secret: str = "cos-access",
@@ -63,28 +99,20 @@ def noop(
     with dsl.ExitHandler(clean_up_task):
         # invoke pipeline
         compute_exec_params = compute_exec_params_op(
-            num_workers=ray_num_workers,
-            worker_cpu=ray_worker_cpus,
-            worker_memory=ray_worker_memory,
-            worker_options=worker_options,
+            worker_options=ray_worker_options,
+            actor_options=actor_options,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
 
         ray_cluster = start_ray_op(
             ray_name=ray_name,
             run_id=RUN_ID,
-            num_workers=ray_num_workers,
-            cpus=ray_worker_cpus,
-            memory=ray_worker_memory,
-            num_gpus=ray_worker_gpus,
-            image=image,
+            ray_head_options=ray_head_options,
+            ray_worker_options=ray_worker_options,
             server_url=server_url,
             additional_params=additional_params,
         )
-
-        # workflow_utils.add_cm_volume_to_com_function(ray_cluster, template_cm, "/templates")
         ComponentUtils.add_settings_to_component(ray_cluster, ONE_HOUR_SEC * 2)
-        ray_cluster.set_image_pull_policy("IfNotPresent")
 
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
@@ -96,8 +124,8 @@ def noop(
                 "noop_sleep_sec": noop_sleep_sec,
                 "lh_config": lh_config,
                 "max_files": max_files,
-                "num_workers": num_workers,
-                "worker_options": worker_options,
+                "num_workers": compute_exec_params.output,
+                "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
                 "job_id": job_id,
             },

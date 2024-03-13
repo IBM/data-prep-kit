@@ -4,18 +4,15 @@ description: Starts Ray cluster
 inputs:
     - { name: ray_name, type: String, description: "Ray cluster user name" }
     - { name: run_id, type: String, description: "The KFP Run ID" }
-    - { name: num_workers, type: Integer, description: "number of workers" }
-    - { name: cpus, type: Integer, description: "cpus per worker" }
-    - { name: memory, type: Integer, description: "Memory per worker" }
-    - { name: num_gpus, type: Integer, description: "Number of gpus per worker" }
-    - { name: image, type: String, default: "", description: "image for Ray cluster" }
+    - { name: ray_head_options, type: String, default: "", description: "ray head configuration" }
+    - { name: ray_worker_options, type: String, default: "", description: "ray worker configuration" }
     - { name: server_url, type: String, default: "", description: "url of api server" }
     - { name: additional_params, type: String, default: "{}", description: "additional parameters" }
 
 
 implementation:
     container:
-        image: us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-guf:0.0.1-test
+        image: us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-guf:0.0.1-test1
         # command is a list of strings (command-line arguments).
         # The YAML language has two syntaxes for lists and you can use either of them.
         # Here we use the "flow syntax" - comma-separated strings inside square brackets.
@@ -29,16 +26,10 @@ implementation:
                 { inputValue: ray_name },
                 --run_id,
                 { inputValue: run_id },
-                --num_workers,
-                { inputValue: num_workers },
-                --cpus,
-                { inputValue: cpus },
-                --memory,
-                { inputValue: memory },
-                --num_gpus,
-                { inputValue: num_gpus },
-                --image,
-                { inputValue: image },
+                --ray_head_options,
+                { inputValue: ray_head_options },
+                --ray_worker_options,
+                { inputValue: ray_worker_options },
                 --server_url,
                 { inputValue: server_url },
                 --additional_params,

@@ -5,11 +5,8 @@ from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
 
 def start_ray_cluster(
     name: str,  # name of Ray cluster
-    num_workers: int,  # number of workers
-    cpus: int,  # cpus per worker
-    memory: int,  # memory per worker
-    num_gpus: int,  # number of gpus per worker
-    image: str,  # image for Ray cluster
+    ray_head_options: str, # ray head configuration
+    ray_worker_options: str, # ray worker configuration
     server_url: str,  # url of api server
     additional_params: str,  # additional parameters for
 ):
@@ -20,24 +17,10 @@ def start_ray_cluster(
         print(f"Failed to get namespace")
         sys.exit(1)
 
-    head_node = {
-        "cpu": cpus,
-        "memory": memory,
-        "image": image,
-        "image_pull_secret": dict_params.get("image_pull_secret", "prod-all-icr-io"),
-        # Ray start params, just to show
-        "ray_start_params": {"metrics-export-port": "8080", "num-cpus": "0", "dashboard-host": "0.0.0.0"},
-    }
+    head_options = KFPUtils.load_from_json(ray_head_options)
+    worker_node = KFPUtils.load_from_json(ray_worker_options)
+    head_node = head_options | {"ray_start_params": {"metrics-export-port": "8080", "num-cpus": "0", "dashboard-host": "0.0.0.0"}}
 
-    worker_node = {
-        "cpu": cpus,
-        "memory": memory,
-        "image": image,
-        "replicas": num_workers,
-        "min_replicas": num_workers,
-        "max_replicas": num_workers,
-        "image_pull_secret": dict_params.get("image_pull_secret", "prod-all-icr-io"),
-    }
 
     # create cluster
     remote_jobs = RayRemoteJobs(
@@ -62,11 +45,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Start Ray cluster operation")
     parser.add_argument("-rn", "--ray_name", type=str, default="")
     parser.add_argument("-id", "--run_id", type=str, default="")
-    parser.add_argument("-w", "--num_workers", default=1, type=int)
-    parser.add_argument("--cpus", default=2, type=int)
-    parser.add_argument("-m", "--memory", default=16, type=int)
-    parser.add_argument("-g", "--num_gpus", default=0, type=int)
-    parser.add_argument("-img", "--image", default="", type=str)
+    parser.add_argument("-ho", "--ray_head_options", default="{}", type=str)
+    parser.add_argument("-wo", "--ray_worker_options", default="{}", type=str)
     parser.add_argument("-su", "--server_url", default="", type=str)
     parser.add_argument("-ap", "--additional_params", default="{}", type=str)
 
@@ -79,11 +59,8 @@ if __name__ == "__main__":
 
     start_ray_cluster(
         name=cluster_name,
-        num_workers=args.num_workers,
-        cpus=args.cpus,
-        memory=args.memory,
-        num_gpus=args.num_gpus,
-        image=args.image.strip(),
+        ray_head_options=args.ray_head_options,
+        ray_worker_options=args.ray_worker_options,
         server_url=args.server_url,
         additional_params=args.additional_params,
     )
