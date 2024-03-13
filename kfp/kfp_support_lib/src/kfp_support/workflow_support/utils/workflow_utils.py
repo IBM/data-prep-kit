@@ -546,9 +546,15 @@ class RayRemoteJobs:
         worker_memory: int,  # memory per worker (GB)
         worker_options: str,  # cpus per actor
     ) -> str:
+        import json
         import sys
 
-        w_options = KFPUtils.load_from_json(worker_options)
+        try:
+            worker_options = worker_options.replace("'", '"')
+            w_options = json.loads(worker_options)
+        except Exception as e:
+            print(f"Failed to load parameters {worker_options} with error {e}")
+            sys.exit(1)
         cluster_cpu = num_workers * worker_cpu * 0.85
         cluster_mem = num_workers * worker_memory * 0.85
         print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}")
@@ -556,7 +562,7 @@ class RayRemoteJobs:
         n_actors = int(cluster_cpu / w_options["num_cpus"])
         print(f"Number of actors - {n_actors}")
         if n_actors < 1:
-            print(f"Not enough cpu/memory to run transform, required cpu {w_options["num_cpus"]}, available {cluster_cpu}, "
+            print(f"Not enough cpu/memory to run transform, required cpu {w_options['num_cpus']}, available {cluster_cpu}, "
                   f"required memory {worker_memory}, available {cluster_mem}")
             sys.exit(1)
         

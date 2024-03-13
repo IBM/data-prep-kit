@@ -18,8 +18,9 @@ from kubernetes import client as k8s_client
 EXEC_SCRIPT_NAME: str = "transformer_launcher.py"
 RUN_ID = "00"
 
+
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-oc:0.0.17-guftest1"
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-guf:0.0.1-test"
 
 compute_exec_params_op = comp.func_to_container_op(
     func=RayRemoteJobs.default_compute_execution_params2, base_image=base_kfp_image
@@ -44,7 +45,7 @@ def noop(
     ray_worker_gpus: int = 0,  # number of gpus per worker
     image: str = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop:guftest",
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 8, "wait_cluster_up_tmout": 5, "wait_cluster_nodes_ready_tmout": 1, "wait_job_ready_tmout": 100, "wait_job_ready_retries": 100, "wait_print_tmout": 120, "http_retries": 5, "image_pull_secret": "prod-all-icr-io", "script_name": "transformer_launcher.py"}',
+    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_cluster_nodes_ready_tmout": 100, "wait_job_ready_tmout": 400, "wait_job_ready_retries": 100, "wait_print_tmout": 120, "http_retries": 5, "image_pull_secret": "prod-all-icr-io"}',
     noop_sleep_sec: int = 50,
     lh_config: str = "None",
     max_files: int = -1,
@@ -67,6 +68,7 @@ def noop(
             worker_memory=ray_worker_memory,
             worker_options=worker_options,
         )
+        ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
 
         ray_cluster = start_ray_op(
             ray_name=ray_name,
