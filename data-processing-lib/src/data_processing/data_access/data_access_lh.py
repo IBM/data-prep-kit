@@ -52,8 +52,8 @@ class DataAccessLakeHouse(DataAccess):
         self.S3 = DataAccessS3(
             s3_credentials=s3_credentials,
             s3_config={
-                "input_folder": self.lh.get_input_table_path(),
-                "output_folder": lakehouse_config["output_path"],
+                "input_folder": self.lh.get_input_data_path(),
+                "output_folder": self.lh.get_output_data_path(),
             },
             d_sets=d_sets,
             checkpoint=checkpoint,
