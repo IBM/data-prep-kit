@@ -8,7 +8,9 @@ from data_processing.ray import (
     TransformLauncher
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import LOCAL_TO_DISK, MB
+from data_processing.utils import LOCAL_TO_DISK, MB, get_logger
+
+logger = get_logger(__name__)
 
 
 class CoalesceTransform(AbstractTableTransform):
@@ -100,10 +102,10 @@ class CoalesceTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         if args.coalesce_target <= 0:
-            print(f"Parameter coalesce_target should be greater then 0, you specified {args.coalesce_target}")
+            logger.info(f"Parameter coalesce_target should be greater then 0, you specified {args.coalesce_target}")
             return False
         self.params["coalesce_target"] = args.coalesce_target
-        print(f"Coalesce parameters are : {self.params}")
+        logger.info(f"Coalesce parameters are : {self.params}")
         return True
 
 

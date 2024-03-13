@@ -5,14 +5,14 @@ from pathlib import Path
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
 from langselect_transform import (
-    LangSelectorTransformConfiguration,
+    LangSelectorTransformConfiguration, lang_known_selector, lang_lang_column_key, lang_allowed_langs_file_key
 )
 
 
 # create launcher
 launcher = TransformLauncher(transform_runtime_config=LangSelectorTransformConfiguration())
 # create parameters
-language_mutation_column_name = "language"
+language_column_name = "language"
 
 selected_languages_file = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                                        "../test-data/languages/allowed-code-languages.txt"))
@@ -35,9 +35,10 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    "ls_allowed_langs_file": selected_languages_file,
-    "ls_language_column": language_mutation_column_name,
-    "ls_return_known": True
+    lang_allowed_langs_file_key: selected_languages_file,
+    lang_lang_column_key: language_column_name,
+    lang_known_selector: True,
+    "lang_select_local_config": ParamsUtils.convert_to_ast(local_conf),
 }
 
 if __name__ == "__main__":

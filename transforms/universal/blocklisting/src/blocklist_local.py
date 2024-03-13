@@ -20,15 +20,22 @@ blocklist_conf_url = os.path.abspath(os.path.join(os.path.dirname(__file__), "..
 blocklist_annotation_column_name = "blocklisted"
 blocklist_doc_source_url_column = "title"
 
+
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/output"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
+block_list_params = {
+    blocked_domain_list_path_key: blocklist_conf_url,
+    annotation_column_name_key: blocklist_annotation_column_name,
+    source_url_column_name_key: blocklist_doc_source_url_column,
+    "blocklist_local_config": ParamsUtils.convert_to_ast(local_conf),
+}
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
-params = {
+launcher_params = {
     "run_locally": True,
     "max_files": -1,
     "local_config": ParamsUtils.convert_to_ast(local_conf),
@@ -39,21 +46,18 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    blocked_domain_list_path_key: blocklist_conf_url,
-    annotation_column_name_key: blocklist_annotation_column_name,
-    source_url_column_name_key: blocklist_doc_source_url_column,
-    "blocklist_local_config": ParamsUtils.convert_to_ast(local_conf),
 }
 
 # launch
-run_in_ray = True
 run_in_ray = False
+run_in_ray = True
 if __name__ == "__main__":
     Path(output_folder).mkdir(parents=True, exist_ok=True)
-    sys.argv = ParamsUtils.dict_to_req(d=params)
     if not run_in_ray:
+        sys.argv = ParamsUtils.dict_to_req(block_list_params)
         config = BlockListTransformConfiguration()
         parser = ArgumentParser()
+        config.add_input_params(parser)
         args = parser.parse_args()
         config.apply_input_params(args)
         config = config.get_input_params()
@@ -62,6 +66,7 @@ if __name__ == "__main__":
         print(f"transform: {transform}")
     else:
         # create launcher
+        sys.argv = ParamsUtils.dict_to_req(launcher_params | block_list_params)
         launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
         # Launch the ray actor(s) to process the input
         launcher.launch()

@@ -10,8 +10,10 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import TransformUtils
+from data_processing.utils import TransformUtils, get_logger
 from ray.actor import ActorHandle
+
+logger = get_logger(__name__)
 
 
 @ray.remote(num_cpus=0.25, scheduling_strategy="SPREAD")
@@ -77,7 +79,7 @@ class SchemaTransform(AbstractTableTransform):
             try:
                 table = table.drop(self.columns_to_remove)
             except Exception as e:
-                print(f"Failed to remove columns {self.columns_to_remove} from table; error {e}")
+                logger.info(f"Failed to remove columns {self.columns_to_remove} from table; error {e}")
         return [table], {}
 
 
@@ -142,13 +144,13 @@ class SchemaTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         if args.id_column is not None and args.doc_column is None:
-            print("doc column name has to be defined for doc id generation")
+            logger.info("doc column name has to be defined for doc id generation")
             return False
         self.params["doc_column"] = args.doc_column
         self.params["doc_id_column"] = args.id_column
         self.params["doc_id_int_column"] = args.int_id_column
         self.params["columns_to_remove"] = args.columns_to_remove
-        print(f"Schema modification parameters are : {self.params}")
+        logger.info(f"Schema modification parameters are : {self.params}")
         return True
 
 
