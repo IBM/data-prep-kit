@@ -160,7 +160,7 @@ and flag that the `pwd` parameter should not be reported in the metadata.
         self.params["sleep"] = args.noop_sleep_sec
         self.params["pwd"] = args.noop_pwd
         # Don't publish this in the metadata produced by the ray orchestrator.
-        self.remove_from_metadata["pwd"]
+        self.remove_from_metadata.append["pwd"]
         return True
 ```
 
