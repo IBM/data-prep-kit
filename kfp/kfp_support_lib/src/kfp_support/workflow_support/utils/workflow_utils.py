@@ -130,6 +130,7 @@ class KFPUtils:
         return res
 
     # Load a string that represents a json to python dictionary
+    @staticmethod
     def load_from_json(js: str) -> dict[str, Any]:
         try:
             return json.loads(js)
@@ -520,69 +521,38 @@ class RayRemoteJobs:
         self._print_log(log=log, previous_log_len=previous_log_len)
         print(f"Job completed with execution status {status}")
 
-    @staticmethod
-    def default_compute_execution_params(
-        worker_options: str,  # ray worker configuration
-        actor_options: str,  # cpus per actor
-    ) -> str:
-        """
-        This is the most simplistic transform execution parameters computation
-        :param worker_options: configuration of ray workers
-        :param cluster_memory: configuration of ray actor
-        :return: number of actors
-        """
-        import json
-        import sys
-
-        try:
-            worker_options = worker_options.replace("'", '"')
-            w_options = json.loads(worker_options)
-        except Exception as e:
-            print(f"Failed to load parameters {worker_options} with error {e}")
-            sys.exit(1)
-        try:
-            actor_options = actor_options.replace("'", '"')
-            a_options = json.loads(actor_options)
-        except Exception as e:
-            print(f"Failed to load parameters {actor_options} with error {e}")
-            sys.exit(1)
-
-        cluster_cpu = w_options["replicas"] * w_options["cpu"] * 0.85
-        cluster_mem = w_options["replicas"] * w_options["memory"] * 0.85
-        print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}")
-        # compute number of actors
-        n_actors = int(cluster_cpu / a_options["num_cpus"])
-        print(f"Number of actors - {n_actors}")
-        if n_actors < 1:
-            print(f"Not enough cpu/memory to run transform, required cpu {a_options['num_cpus']}, available {cluster_cpu}")
-            sys.exit(1)
-
-        return str(n_actors)
-
 
 class ComponentUtils:
+    """
+    Class containing methods supporting building pipelines
+    """
+
+    @staticmethod
     def add_settings_to_component(
         component: dsl.ContainerOp,
-        tmout: int,
+        timeout: int,
         image_pull_policy: str = "Always",
         cache_strategy: str = "P0D",
     ) -> None:
         """
-        Add properties to kfp component
+        Add settings to kfp component
         :param component: kfp component
-        :param tmout: timeout to set to the component in seconds
+        :param timeout: timeout to set to the component in seconds
         :param image_pull_policy: pull policy to set to the component
+        :param cache_strategy: cache strategy
         """
         # Set cashing
         component.execution_options.caching_strategy.max_cache_staleness = cache_strategy
         # image pull policy
         component.set_image_pull_policy(image_pull_policy)
         # Set the timeout for the task
-        component.set_timeout(tmout)
+        component.set_timeout(timeout)
 
-    env_to_key = {"COS_KEY": "cos-key", "COS_SECRET": "cos-secret", "COS_ENDPOINT": "cos-endpoint"}
-    def set_cos_env_vars_to_component(
-        component: dsl.ContainerOp, secret: str, env2key: dict[str, str] = env_to_key
+    @staticmethod
+    def set_s3_env_vars_to_component(
+            component: dsl.ContainerOp,
+            secret: str,
+            env2key: dict[str, str] = {"COS_KEY": "cos-key", "COS_SECRET": "cos-secret", "COS_ENDPOINT": "cos-endpoint"}
     ) -> None:
         """
         Set COS env variables to KFP component
@@ -599,3 +569,43 @@ class ComponentUtils:
                     ),
                 )
             )
+
+    @staticmethod
+    def default_compute_execution_params(
+            worker_options: str,  # ray worker configuration
+            actor_options: str,  # cpus per actor
+    ) -> str:
+        """
+        This is the most simplistic transform execution parameters computation
+        :param worker_options: configuration of ray workers
+        :param actor_options: actor request requirements
+        :return: number of actors
+        """
+        import sys
+        # convert input
+        w_options = KFPUtils.load_from_json(worker_options.replace("'", '"'))
+        a_options = KFPUtils.load_from_json(actor_options.replace("'", '"'))
+        # Compute available cluster resources
+        cluster_cpu = w_options["replicas"] * w_options["cpu"]
+        cluster_mem = w_options["replicas"] * w_options["memory"]
+        cluster_gpu = w_options["replicas"] * w_options.get("gpu", 0.)
+        print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}, GPUs {cluster_gpu}")
+        # compute number of actors
+        n_actors_cpu = int(cluster_cpu * 0.85 / a_options.get("num_cpus", .5))
+        n_actors_memory = int(cluster_mem * 0.85 / a_options.get("memory", 1))
+        n_actors = min(n_actors_cpu, n_actors_memory)
+        # Check if we need gpu calculations as well
+        actor_gpu = a_options.get("num_gpus", 0)
+        if actor_gpu > 0:
+            n_actors_gpu = int(cluster_gpu / actor_gpu)
+            n_actors = min(n_actors, n_actors_gpu)
+        print(f"Number of actors - {n_actors}")
+        if n_actors < 1:
+            print(f"Not enough cpu/gpu/memory to run transform, "
+                  f"required cpu {a_options.get('num_cpus', .5)}, available {cluster_cpu}, "
+                  f"required memory {a_options.get('memory', 1)}, available {cluster_mem}, "
+                  f"required cpu {actor_gpu}, available {cluster_gpu}"
+                  )
+            sys.exit(1)
+
+        return str(n_actors)

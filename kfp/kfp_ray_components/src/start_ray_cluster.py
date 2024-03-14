@@ -4,24 +4,33 @@ from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
 
 
 def start_ray_cluster(
-    name: str,  # name of Ray cluster
-    ray_head_options: str, # ray head configuration
-    ray_worker_options: str, # ray worker configuration
-    server_url: str,  # url of api server
-    additional_params: str,  # additional parameters for
-):
+    name: str,                  # name of Ray cluster
+    ray_head_options: str,      # ray head configuration
+    ray_worker_options: str,    # ray worker configuration
+    server_url: str,            # url of api server
+    additional_params: str,     # additional parameters for
+) -> None:
+    """
+    Create Ray cluster
+    :param name: cluster name
+    :param ray_head_options: head node options
+    :param ray_worker_options: worker node option (here we assume only 1 worker group)
+    :param server_url: API server URL
+    :param additional_params:  additional parameters
+    :return: None
+    """
     dict_params = KFPUtils.load_from_json(additional_params)
     # get current namespace
     ns = KFPUtils.get_namespace()
     if ns == "":
         print(f"Failed to get namespace")
         sys.exit(1)
-
+    # Convert input
     head_options = KFPUtils.load_from_json(ray_head_options)
     worker_node = KFPUtils.load_from_json(ray_worker_options)
-    head_node = head_options | {"ray_start_params": {"metrics-export-port": "8080", "num-cpus": "0", "dashboard-host": "0.0.0.0"}}
-
-
+    head_node = head_options | {
+        "ray_start_params": {"metrics-export-port": "8080", "num-cpus": "0", "dashboard-host": "0.0.0.0"}
+    }
     # create cluster
     remote_jobs = RayRemoteJobs(
         server_url=server_url,

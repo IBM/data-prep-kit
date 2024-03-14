@@ -13,6 +13,7 @@ This class contains a collection of functions useful for KFP pipelines implement
 * clean_path - clean up S3 path representation (remove spaces, etc)
 * runtime_name - generates unique runtime name
 * dict_to_req - convert dictionary of request parameters to a proper formatted JSON string
+* load_from_json - convert json string to dictionary and exit with error if conversion fails
 
 ## PipelinesUtils
 
@@ -36,3 +37,10 @@ implements 4 high-level methods, that allow to hide the specifics of the particu
 * submit_job - submits Ray job to the cluster
 * follow_execution - watching job execution to completion, periodically printing out the job log
 These basic methods can be used as a foundation of any KFP pipeline implementation
+
+## ComponentUtils
+
+This class provides some methods to simplify building pipelines:
+* add_settings_to_component - adds settings to component, including timeout, image_pull_policy and cache strategy
+* set_cos_env_vars_to_component - sets environment variables to support S3
+* default_compute_execution_params - default implementation of compute execution parameters (based on CPU, GPU and memory requirements)

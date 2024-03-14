@@ -1,7 +1,5 @@
 # execute Ray jobs
 import sys
-from typing import Any
-
 from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
 
 
@@ -11,35 +9,39 @@ def execute_ray_jobs(
     exec_params: str,
     exec_script_name: str,
     server_url: str,
-):
+) -> None:
+    """
+    Execute Ray job on a cluster periodically printing execution log
+    :param name: cluster name
+    :param additional_params: additional parameters for the job
+    :param exec_params: job execution parameters
+    :param exec_script_name: script to run (has to be present in the image)
+    :param server_url: API server url
+    :return: None
+    """
     # get current namespace
     ns = KFPUtils.get_namespace()
     if ns == "":
         print(f"Failed to get namespace")
         sys.exit(1)
-
     # Get parameters necessary for submitting
     additional_params_dict = KFPUtils.load_from_json(additional_params)
     exec_params = KFPUtils.load_from_json(exec_params)
-
+    # Get credentials
     access_key, secret_key, cos_url = KFPUtils.credentials()
     exec_params["s3_cred"] = (
         "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'cos_url': '" + cos_url + "'}"
     )
-
-    # KFPUtils.clean_standard_prefixes(exec_params)
-
     remote_jobs = RayRemoteJobs(
         server_url=server_url,
         http_retries=additional_params_dict.get("http_retries", 5),
         wait_interval=additional_params_dict.get("wait_interval", 2),
     )
-    # execute cluster
+    # submit job
     status, error, submission = remote_jobs.submit_job(
         name=name, namespace=ns, request=exec_params, executor=exec_script_name
     )
     print(f"submit job - status: {status}, error: {error}, submission id {submission}")
-
     # print execution log
     remote_jobs.follow_execution(
         name=name,
