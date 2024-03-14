@@ -6,14 +6,11 @@ os.environ["OPENBLAS_NUM_THREADS"] = "1"
 from typing import Any, List, Tuple
 
 import pandas as pd
-import pyarrow
 import pyarrow as pa
 from lang_models import LangModel
 
 
-def get_lang_ds_pa(
-    table: pyarrow.table, nlp: LangModel, col_name: str = "contents"
-) -> tuple[pyarrow.table, dict[str, Any]]:
+def get_lang_ds_pa(table: pa.table, nlp: LangModel, col_name: str = "contents") -> tuple[pa.table, dict[str, Any]]:
     try:
         detected_language = pa.table(
             pd.DataFrame(map(lambda x: nlp.detect_lang(x), table[col_name].to_pylist()), columns=["lang", "score"])
