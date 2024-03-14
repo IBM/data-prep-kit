@@ -48,14 +48,13 @@ class LangIdentificationTransform(AbstractTableTransform):
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         if not TransformUtils.validate_columns(table, [self.column_name]):
-            exit(1)
+            return [], {}
 
         """
         Put Transform-specific to convert one Table to another Table.
         This implementation makes no modifications so effectively implements a copy of the input parquet to the output folder, without modification.
         """
-        new_columns = ["ft_lang", "ft_score"]
-        if not TransformUtils.validate_columns(table, new_columns):
+        if not TransformUtils.validate_columns(table, ["ft_lang", "ft_score"]):
             return [], {}
 
         table, stats = get_lang_ds_pa(table, self.nlp_langid, self.column_name)
