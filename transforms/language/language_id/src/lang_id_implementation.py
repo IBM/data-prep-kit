@@ -100,10 +100,3 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
         self.params[PARAM_CONTENT_COLUMN_NAME] = args.content_column_name
         self.remove_from_metadata.append(PARAM_MODEL_CREDENTIAL)
         return True
-
-    def get_input_params(self) -> dict[str, Any]:
-        """
-        get input parameters for job_input_params in metadata
-        :return:
-        """
-        return self.params
