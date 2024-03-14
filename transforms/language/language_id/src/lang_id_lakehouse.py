@@ -3,7 +3,7 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import DPFConfig, ParamsUtils
-from lang_id_implementation import (
+from lang_id_transform import (
     PARAM_MODEL_CREDENTIAL,
     PARAM_MODEL_KIND,
     PARAM_MODEL_URL,
