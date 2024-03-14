@@ -16,7 +16,6 @@ from nlp import get_lang_ds_pa
 Reference https://github.ibm.com/ai-foundation/foundation-model-stack/tree/main/preprocessing/ray/language_identification_sentence_split
 """
 
-PARAM_DROP_COLUMN_IF_EXISTED = "drop_column_if_existed"
 PARAM_MODEL_CREDENTIAL = "model_credential"
 PARAM_MODEL_KIND = "model_kind"
 PARAM_MODEL_URL = "model_url"
@@ -41,10 +40,6 @@ class LangIdentificationTransform(AbstractTableTransform):
             config[PARAM_MODEL_KIND], config.get(PARAM_MODEL_URL), config.get(PARAM_MODEL_CREDENTIAL)
         )
         self.column_name = config.get(PARAM_CONTENT_COLUMN_NAME)
-        if PARAM_DROP_COLUMN_IF_EXISTED in config:
-            self.drop_column_if_existed = config[PARAM_DROP_COLUMN_IF_EXISTED]
-        else:
-            self.drop_column_if_existed = True
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         if not TransformUtils.validate_columns(table, [self.column_name]):
@@ -83,7 +78,6 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
         By convention a common prefix should be used for all transform-specific CLI args
         (e.g, noop_, pii_, etc.)
         """
-        parser.add_argument("-dr", f"--{PARAM_DROP_COLUMN_IF_EXISTED}", default=True, help="drop columns if existed")
         parser.add_argument(
             f"--{PARAM_MODEL_CREDENTIAL}",
             default=None,
@@ -100,7 +94,6 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
         arguments as defined by add_input_arguments().
         :return: True, if validate pass or False otherwise
         """
-        self.params[PARAM_DROP_COLUMN_IF_EXISTED] = args.drop_column_if_existed
         self.params[PARAM_MODEL_CREDENTIAL] = args.model_credential
         self.params[PARAM_MODEL_KIND] = args.model_kind
         self.params[PARAM_MODEL_URL] = args.model_url
