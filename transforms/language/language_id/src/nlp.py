@@ -7,7 +7,7 @@ from typing import Any
 
 import pandas as pd
 import pyarrow as pa
-from data_processing.utils import get_logger
+from data_processing.utils import TransformUtils, get_logger
 from lang_models import LangModel
 
 
@@ -29,5 +29,5 @@ def get_lang_ds_pa(table: pa.table, nlp: LangModel, col_name: str = "contents") 
         for lang, count in zip(d["lang"], d["lang_count"]):
             stats_dict[lang] = count
     result = pa.table([detected_language["lang"]], names=["ft_lang"])
-    result = result.append_column("ft_score", detected_language["score"])
+    result = TransformUtils.add_column(table=result, name="ft_score", content=detected_language["score"])
     return result, stats_dict
