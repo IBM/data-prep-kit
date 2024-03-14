@@ -1,10 +1,12 @@
 # Transform Tutorials
 
 All transforms operate on a [pyarrow Table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
-read for it by the RayWorker and produce zero or more transformed tables and transform specific metadata.
-The transformed tables are then written out by the [TransformTableProcessor](../src/data_processing/ray/transform_table_processor.py) 
-- the transform need not worry about I/O associated with the tables.
-This means the Transform itself need only be concerned with the conversion of one in memory table at a time.  
+and produce zero or more transformed tables and transform specific metadata.
+The Transform itself need only be concerned with the conversion of one in memory table at a time.  
+
+When running in the Ray worker (i.e. [TransformTableProcessor](../src/data_processing/ray/transform_table_processor.py) ), the input
+tables are read from parquet files and the transform table(s) is/are stored in destination parquet files.
+Metadata accumulated across calls to all transforms is stored in the destination.
 
 ### Transform Basics
 In support of this model the class 
@@ -36,8 +38,8 @@ not need this feature, a default implementation is provided to return an empty l
 ### Running in Ray
 When a transform is run using the Ray-based framework a number of other capabilities are involved:
 * [Transform Runtime](../src/data_processing/ray/transform_runtime.py) - this provides the ability for 
-transform implementor to create additional Ray object (see, for example, 
-[exact dedup](../../transforms/universal/ededup/src/ededup_transform.py)) and add them to the input parameters
+transform implementor to create additional Ray resources (see, for example, 
+[exact dedup](../../transforms/universal/ededup/src/ededup_transform.py)) and add them to the configuration used to create a transform.
 to transform implementation. This also provide the ability to supplement statics collected by
 [Statistics](../src/data_processing/ray/transform_statistics.py) (see below) with the information collected from
 the additional Ray objects, created by Transform runtime
@@ -50,13 +52,16 @@ the additional Ray objects, created by Transform runtime
 implement `main()` that makes use of a Transform Configuration to start the Ray runtime and execute the transforms.
 
 Roughly speaking the following steps are completed to establish transforms in the RayWorkers
-1. Launcher parses the CLI parameters using the Transform Configuration, 
+1. Launcher parses the CLI parameters using an ArgumentParser configured with its own CLI parameters 
+along with those of the Transform Configuration, 
 2. Launcher passes the Transform Configuration and CLI parameters to the [RayOrchestrator](../src/data_processing/ray/transform_orchestrator.py)
-3. RayOrchestrator create the Transform Runtime using the CLI parameters 
-4. Transform runtime generates transform initialization/configuration and optional Ray components
+3. RayOrchestrator creates the Transform Runtime using the Transform Configuration and its CLI parameter values
+4. Transform Runtime creates transform initialization/configuration including the CLI parameters,  
+and any Ray components need by the transform.
 5. [RayWorker](../src/data_processing/ray/transform_table_processor.py) is started with configuration from the Transform Runtime.
 6. RayWorker creates the Transform using the configuration provided by the Transform Runtime.
-7. Statistics is used to collect all of the statistics submitted by the individual transform, that is used for building execution metadata
+7. Statistics is used to collect the statistics submitted by the individual transform, that 
+is used for building execution metadata.
 
 ![Processing Architecture](processing-architecture.jpg)
 
