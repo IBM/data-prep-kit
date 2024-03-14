@@ -20,12 +20,34 @@ def _create_table() -> pa.Table:
     return pa.Table.from_arrays([languages], names=names)
 
 
+def create_duplicate_column() -> pa.Table:
+
+    languages = pa.array(
+        [
+            "Cobol",
+            "Java",
+            "C",
+        ]
+    )
+    names = ["language", "language"]
+    return pa.Table.from_arrays([languages, languages], names=names)
+
+
 def test_column_validation():
     table = _create_table()
     res = TransformUtils.validate_columns(table=table, required=["foo"])
     assert res == False
     res = TransformUtils.validate_columns(table=table, required=["language"])
     assert res == True
+
+
+def test_duplicates():
+    table = _create_table()
+    res = TransformUtils.verify_no_duplicate_columns(table=table,file="foo")
+    assert res == True
+    table = create_duplicate_column()
+    res = TransformUtils.verify_no_duplicate_columns(table=table,file="foo")
+    assert res == False
 
 
 def test_add_column():
@@ -68,5 +90,4 @@ def test_actor_creation():
     assert 1 == res["cpus"] - res1["cpus"]
     assert 1 == res["memory"] - res1["memory"]
 
-    print("shutting down Ray cluster")
     ray.shutdown()

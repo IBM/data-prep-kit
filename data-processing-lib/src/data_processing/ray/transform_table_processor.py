@@ -4,7 +4,7 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.utils import get_logger
+from data_processing.utils import get_logger, TransformUtils
 
 
 logger = get_logger(__name__)
@@ -109,17 +109,18 @@ class TransformTableProcessor:
                 # we have exactly 1 table
                 output_name = self.data_access.get_output_location(path=f_name)
                 logger.debug(f"Writing transformed file {f_name} to {output_name}")
-                output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
-                if save_res is not None:
-                    # Store execution statistics. Doing this async
-                    if self.base_table_stats:
-                        self.stats.add_stats.remote(
-                            {
-                                "result_files": 1,
-                                "result_size": out_tables[0].nbytes,
-                                "table_processing": time.time() - t_start,
-                            }
-                        )
+                if not TransformUtils.verify_no_duplicate_columns(table=out_tables[0], file=output_name):
+                    output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
+                    if save_res is not None:
+                        # Store execution statistics. Doing this async
+                        if self.base_table_stats:
+                            self.stats.add_stats.remote(
+                                {
+                                    "result_files": 1,
+                                    "result_size": out_tables[0].nbytes,
+                                    "table_processing": time.time() - t_start,
+                                }
+                            )
             case _:
                 # we have more then 1 table
                 table_sizes = 0
@@ -127,14 +128,15 @@ class TransformTableProcessor:
                 output_file_name = output_name.removesuffix(".parquet")
                 count = len(out_tables)
                 for index in range(count):
-                    table_sizes += out_tables[index].nbytes
-                    output_name_indexed = f"{output_file_name}_{index}.parquet"
-                    logger.debug(f"Writing transformed file {f_name}, {index + 1} of {count}  to {output_name_indexed}")
-                    output_file_size, save_res = self.data_access.save_table(
-                        path=f"{output_file_name}_{index}.parquet", table=out_tables[index]
-                    )
-                    if save_res is None:
-                        break
+                    if not TransformUtils.verify_no_duplicate_columns(table=out_tables[index], file=output_name):
+                        output_name_indexed = f"{output_file_name}_{index}.parquet"
+                        table_sizes += out_tables[index].nbytes
+                        logger.debug(f"Writing transformed file {f_name}, {index + 1} of {count}  to {output_name_indexed}")
+                        output_file_size, save_res = self.data_access.save_table(
+                            path=f"{output_file_name}_{index}.parquet", table=out_tables[index]
+                        )
+                        if save_res is None:
+                            break
                 if self.base_table_stats:
                     self.stats.add_stats.remote(
                         {
