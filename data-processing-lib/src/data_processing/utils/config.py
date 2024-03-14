@@ -8,9 +8,9 @@ class DPFConfig:
         for var in env_var_list:
             value = os.environ.get(var, None)
             if value is not None:
-                print(f"Found env var {var}={value}", flush=True)
+                # print(f"Found env var {var}", flush=True)
                 return value
-        print(f"Did not find any of the following env vars {env_var_list}")
+        # print(f"Did not find any of the following env vars {env_var_list}")
         return None
 
     S3_ACCESS_KEY = _get_first_env_var(["DPF_S3_ACCESS_KEY", "AWS_ACCESS_KEY_ID", "COS_ACCESS_KEY"])
