@@ -1,14 +1,17 @@
+import json
 import os
 import re
 import sys
 
 import datetime
+import kfp.dsl as dsl
 import time
 from typing import Optional, Any
 from ray.job_submission import JobStatus
 
 from kfp_server_api import models
 from kfp import Client
+from kubernetes import client as k8s_client
 
 from kfp_support.api_server_client import KubeRayAPIs
 from kfp_support.api_server_client.params import (Template, DEFAULT_HEAD_START_PARAMS, DEFAULT_WORKER_START_PARAMS,
@@ -120,8 +123,19 @@ class KFPUtils:
     def dict_to_req(d: dict[str, Any], executor: str = "transformer_launcher.py") -> str:
         res = f"python {executor} "
         for key, value in d.items():
-            res += f"--{key}={value} "
+            if isinstance(value, str):
+                res += f'--{key}="{value}" '
+            else:
+                res += f"--{key}={value} "
         return res
+
+    # Load a string that represents a json to python dictionary
+    def load_from_json(js: str) -> dict[str, Any]:
+        try:
+            return json.loads(js)
+        except Exception as e:
+            print(f"Failed to load parameters {js} with error {e}")
+            sys.exit(1)
 
 
 class PipelinesUtils:
@@ -451,7 +465,7 @@ class RayRemoteJobs:
             l_to_print = RayRemoteJobs.ansi_escape.sub("", l_to_print)
             print(l_to_print)
 
-    def follow_execution(self, name: str, namespace: str, submission_id: str, job_ready_timeout: int=600,
+    def follow_execution(self, name: str, namespace: str, submission_id: str, job_ready_timeout: int = 600,
                          print_timeout: int = 120) -> None:
         """
         Follow remote job execution
@@ -508,27 +522,80 @@ class RayRemoteJobs:
 
     @staticmethod
     def default_compute_execution_params(
-            cluster_cpu: float,         # number cpus for cluster
-            cluster_memory: float,      # memory for cluster (GB)
-            actor_cpu: float,           # cpu requirement per actor
-            actor_memory: float = 1,    # memory requirement per actor (GB)
+        worker_options: str,  # ray worker configuration
+        actor_options: str,  # cpus per actor
     ) -> str:
         """
         This is the most simplistic transform execution parameters computation
-        :param cluster_cpu: overall cluster cpu
-        :param cluster_memory: overall cluster memory
-        :param actor_cpu: worker cpu requirement
-        :param actor_memory: worker memory requirement
+        :param worker_options: configuration of ray workers
+        :param cluster_memory: configuration of ray actor
         :return: number of actors
         """
+        import json
         import sys
-        # compute number of actors
-        n_actors_cpu = int(0.85 * cluster_cpu / actor_cpu)
-        n_actors_memory = int(0.85 * cluster_memory / actor_memory)
-        n_actors = min(n_actors_cpu, n_actors_memory)
-        if n_actors < 1:
-            print(f"Not enough cpu/memory to run transform, required cpu {actor_cpu}, available {cluster_cpu}, "
-                  f"required memory {actor_memory}, available {cluster_memory}")
+
+        try:
+            worker_options = worker_options.replace("'", '"')
+            w_options = json.loads(worker_options)
+        except Exception as e:
+            print(f"Failed to load parameters {worker_options} with error {e}")
             sys.exit(1)
-        # return the minimum of two
+        try:
+            actor_options = actor_options.replace("'", '"')
+            a_options = json.loads(actor_options)
+        except Exception as e:
+            print(f"Failed to load parameters {actor_options} with error {e}")
+            sys.exit(1)
+
+        cluster_cpu = w_options["replicas"] * w_options["cpu"] * 0.85
+        cluster_mem = w_options["replicas"] * w_options["memory"] * 0.85
+        print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}")
+        # compute number of actors
+        n_actors = int(cluster_cpu / a_options["num_cpus"])
+        print(f"Number of actors - {n_actors}")
+        if n_actors < 1:
+            print(f"Not enough cpu/memory to run transform, required cpu {a_options['num_cpus']}, available {cluster_cpu}")
+            sys.exit(1)
+
         return str(n_actors)
+
+
+class ComponentUtils:
+    def add_settings_to_component(
+        component: dsl.ContainerOp,
+        tmout: int,
+        image_pull_policy: str = "Always",
+        cache_strategy: str = "P0D",
+    ) -> None:
+        """
+        Add properties to kfp component
+        :param component: kfp component
+        :param tmout: timeout to set to the component in seconds
+        :param image_pull_policy: pull policy to set to the component
+        """
+        # Set cashing
+        component.execution_options.caching_strategy.max_cache_staleness = cache_strategy
+        # image pull policy
+        component.set_image_pull_policy(image_pull_policy)
+        # Set the timeout for the task
+        component.set_timeout(tmout)
+
+    env_to_key = {"COS_KEY": "cos-key", "COS_SECRET": "cos-secret", "COS_ENDPOINT": "cos-endpoint"}
+    def set_cos_env_vars_to_component(
+        component: dsl.ContainerOp, secret: str, env2key: dict[str, str] = env_to_key
+    ) -> None:
+        """
+        Set COS env variables to KFP component
+        :param component: kfp component
+        :param secret: secret name with the COS credentials
+        :param env2key: dict with mapping each env variable to a key in the secret
+        """
+        for env_name, secret_key in env2key.items():
+            component = component.add_env_variable(
+                k8s_client.V1EnvVar(
+                    name=env_name,
+                    value_from=k8s_client.V1EnvVarSource(
+                        secret_key_ref=k8s_client.V1SecretKeySelector(name=secret, key=secret_key)
+                    ),
+                )
+            )
