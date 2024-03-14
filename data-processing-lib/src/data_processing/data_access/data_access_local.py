@@ -22,9 +22,9 @@ class DataAccessLocal(DataAccess):
     def __init__(
         self,
         path_config: dict[str, str],
-        d_sets: list[str],
-        checkpoint: bool,
-        m_files: int,
+        d_sets: list[str] = None,
+        checkpoint: bool = False,
+        m_files: int = 0,
     ):
         """
         Create data access class for folder based configuration

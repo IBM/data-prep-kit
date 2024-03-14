@@ -123,7 +123,9 @@ It also adds a `params` field that will be used below to hold the transform's
 configuration data (used in `NOOPTransform.init()` above).
 
 Next, we provide two methods that define and capture the command line configuration that 
-is specific to the `NOOPTransform`, in this case the number of seconds to sleep during transformation.
+is specific to the `NOOPTransform`, in this case the number of seconds to sleep during transformation
+and an example command line, `pwd`, option holding sensitive data that we don't want reported
+in the job metadata produced by the ray orchestrator.
 First we define the method establishes the command line arguments.
 This method is given a global argument parser to which the `NOOPTransform` arguments are added.
 It is good practice to include a common prefix to all transform-specific options (i.e. pii, lang, etc).
@@ -137,9 +139,18 @@ In our case we will use `noop_`.
             default=1,
             help="Sleep actor for a number of seconds while processing the data frame",
         )
+        # An example of a command line option that we don't want included in the metadata collected by the Ray orchestrator
+        # See below for remove_from_metadata addition so that it is not reported.
+        parser.add_argument(
+            "--noop_pwd",
+            type=str,
+            default="nothing",
+            help="A dummy password which should be filtered out of the metadata",
+        )
 ```
 Next we implement a method that is called after the framework has parsed the CLI args
-and which allows us to capture the `NOOPTransform`-specific arguments and optionally validate them.
+and which allows us to capture the `NOOPTransform`-specific arguments, optionally validate them
+and flag that the `pwd` parameter should not be reported in the metadata.
 
 ```python
     def apply_input_params(self, args: Namespace) -> bool:
@@ -147,7 +158,9 @@ and which allows us to capture the `NOOPTransform`-specific arguments and option
             print(f"Parameter noop_sleep_sec should be greater then 0, you specified {args.noop_sleep_sec}")
             return False
         self.params["sleep"] = args.noop_sleep_sec
-        print(f"noop parameters are : {self.params}")
+        self.params["pwd"] = args.noop_pwd
+        # Don't publish this in the metadata produced by the ray orchestrator.
+        self.remove_from_metadata.append["pwd"]
         return True
 ```
 
