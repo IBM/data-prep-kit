@@ -3,7 +3,7 @@ import os
 
 os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
-from typing import Any, List, Tuple
+from typing import Any
 
 import pandas as pd
 import pyarrow as pa
