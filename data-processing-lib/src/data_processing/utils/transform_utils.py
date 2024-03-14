@@ -110,5 +110,5 @@ class TransformUtils:
         if len(columns_set) != len(columns_list):
             logger.warning(f"Resulting table for file {file} contains duplicate columns {columns_list}. Skipping")
             return False
-        return  True
+        return True
 

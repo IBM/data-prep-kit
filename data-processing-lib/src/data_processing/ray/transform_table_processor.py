@@ -109,7 +109,7 @@ class TransformTableProcessor:
                 # we have exactly 1 table
                 output_name = self.data_access.get_output_location(path=f_name)
                 logger.debug(f"Writing transformed file {f_name} to {output_name}")
-                if not TransformUtils.verify_no_duplicate_columns(table=out_tables[0], file=output_name):
+                if TransformUtils.verify_no_duplicate_columns(table=out_tables[0], file=output_name):
                     output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
                     if save_res is not None:
                         # Store execution statistics. Doing this async
@@ -128,7 +128,7 @@ class TransformTableProcessor:
                 output_file_name = output_name.removesuffix(".parquet")
                 count = len(out_tables)
                 for index in range(count):
-                    if not TransformUtils.verify_no_duplicate_columns(table=out_tables[index], file=output_name):
+                    if TransformUtils.verify_no_duplicate_columns(table=out_tables[index], file=output_name):
                         output_name_indexed = f"{output_file_name}_{index}.parquet"
                         table_sizes += out_tables[index].nbytes
                         logger.debug(f"Writing transformed file {f_name}, {index + 1} of {count}  to {output_name_indexed}")
