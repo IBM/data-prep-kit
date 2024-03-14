@@ -52,7 +52,8 @@ the additional Ray objects, created by Transform runtime
 implement `main()` that makes use of a Transform Configuration to start the Ray runtime and execute the transforms.
 
 Roughly speaking the following steps are completed to establish transforms in the RayWorkers
-1. Launcher parses the CLI parameters using the Transform Configuration, 
+1. Launcher parses the CLI parameters using an ArgumentParser configured with its own CLI parameters 
+along with those of the Transform Configuration, 
 2. Launcher passes the Transform Configuration and CLI parameters to the [RayOrchestrator](../src/data_processing/ray/transform_orchestrator.py)
 3. RayOrchestrator creates the Transform Runtime using the Transform Configuration and its CLI parameter values
 4. Transform Runtime creates transform initialization/configuration including the CLI parameters,  
