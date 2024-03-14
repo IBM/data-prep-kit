@@ -7,7 +7,11 @@ from typing import Any
 
 import pandas as pd
 import pyarrow as pa
+from data_processing.utils import get_logger
 from lang_models import LangModel
+
+
+logger = get_logger(__name__)
 
 
 def get_lang_ds_pa(table: pa.table, nlp: LangModel, col_name: str = "contents") -> tuple[pa.table, dict[str, Any]]:
@@ -16,7 +20,7 @@ def get_lang_ds_pa(table: pa.table, nlp: LangModel, col_name: str = "contents") 
             pd.DataFrame(map(lambda x: nlp.detect_lang(x), table[col_name].to_pylist()), columns=["lang", "score"])
         )
     except Exception as e:
-        print("ERROR:", e, "skipping the file")
+        logger.warning("ERROR: %s, kipping the file", e)
         return None, None
     stats = pa.table([detected_language["lang"]], names=["lang"]).group_by("lang").aggregate([("lang", "count")])
     stats_dict = {}

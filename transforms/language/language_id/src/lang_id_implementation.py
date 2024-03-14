@@ -55,8 +55,8 @@ class LangIdentificationTransform(AbstractTableTransform):
         This implementation makes no modifications so effectively implements a copy of the input parquet to the output folder, without modification.
         """
         new_columns = ["ft_lang", "ft_score"]
-        if not self.drop_column_if_existed and TransformUtils.validate_columns(table, new_columns):
-            exit(1)
+        if not TransformUtils.validate_columns(table, new_columns):
+            return [], {}
 
         table, stats = get_lang_ds_pa(table, self.nlp_langid, self.column_name)
         return [table], stats
