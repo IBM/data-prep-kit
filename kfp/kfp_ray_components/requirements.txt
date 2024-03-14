@@ -2,7 +2,4 @@
 # The following url for fm-data-processing.  Contact David Wood, dawood@us.ibm.com, if you don't have pypi access
 --extra-index-url https://${ARTIFACTORY_USER}:${ARTIFACTORY_API_KEY}@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
 fm-data-processing==0.2.0
-pyarrow==14.0.2
 scipy==1.9.0
-ray[default]==2.9.3
-pydantic==2.5.3
