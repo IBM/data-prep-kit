@@ -5,7 +5,6 @@ os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
 from typing import Any
 
-import pandas as pd
 import pyarrow as pa
 from data_processing.utils import TransformUtils, get_logger
 from lang_models import LangModel
@@ -16,8 +15,13 @@ logger = get_logger(__name__)
 
 def get_lang_ds_pa(table: pa.table, nlp: LangModel, col_name: str = "contents") -> tuple[pa.table, dict[str, Any]]:
     try:
-        detected_language = pa.table(
-            pd.DataFrame(map(lambda x: nlp.detect_lang(x), table[col_name].to_pylist()), columns=["lang", "score"])
+        detected_language = pa.Table.from_pylist(
+            list(
+                map(
+                    lambda r: {"lang": r[0], "score": r[1]},
+                    map(lambda x: nlp.detect_lang(x), table[col_name].to_pylist()),
+                )
+            )
         )
     except Exception as e:
         logger.warning("ERROR: %s, kipping the file", e)
