@@ -95,10 +95,10 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
         arguments as defined by add_input_arguments().
         :return: True, if validate pass or False otherwise
         """
-        self.params[PARAM_MODEL_CREDENTIAL] = args.model_credential
-        self.params[PARAM_MODEL_KIND] = args.model_kind
-        self.params[PARAM_MODEL_URL] = args.model_url
-        self.params[PARAM_CONTENT_COLUMN_NAME] = args.content_column_name
+        self.params[PARAM_MODEL_CREDENTIAL] = args.lang_id_model_credential
+        self.params[PARAM_MODEL_KIND] = args.lang_id_model_kind
+        self.params[PARAM_MODEL_URL] = args.lang_id_model_url
+        self.params[PARAM_CONTENT_COLUMN_NAME] = args.lang_id_content_column_name
         self.remove_from_metadata.append(PARAM_MODEL_CREDENTIAL)
         return True
 
