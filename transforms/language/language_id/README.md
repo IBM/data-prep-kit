@@ -31,7 +31,7 @@ to build it
 The set of dictionary keys holding [LangIdentificationTransform](src/lang_id_transform.py)
 configuration for values are as follows:
 
-* lang_id_model_credential - specifies the credential you use to get model. This will be huggingface token.
+* lang_id_model_credential - specifies the credential you use to get model. This will be huggingface token. [Guide to get huggingface token](https://huggingface.co/docs/hub/security-tokens)
 * lang_id_model_kind - specifies what kind of model you want to use for language identification. Currently, only `fasttext` is available
 * lang_id_model_url - specifies url that model locates. For fasttext, this will be repo name of the model, like `facebook/fasttext-language-identification`
 * lang_id_content_column_name - specifies name of the column containing documents
