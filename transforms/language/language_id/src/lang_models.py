@@ -15,19 +15,10 @@ class LangModel(metaclass=ABCMeta):
         pass
 
 
-class WatsonNLPModel(LangModel):
-    def __init__(self):
-        pass
-
-    #        self.nlp = pyizumo.load(parsers=["langdetect"])
-
+class NoopModel(metaclass=ABCMeta):
+    @abstractmethod
     def detect_lang(self, text: str) -> tuple[str, float]:
-        # Note: pyizumo does not return confidence score. Set to 0.0 as default.
-        # Other libraries may return confidence score.
         return "en", 0.0
-
-
-#       return self.nlp(text).locale
 
 
 class FastTextModel(LangModel):
@@ -47,4 +38,4 @@ class LangModelFactory:
         if kind == KIND_FASTTEXT:
             return FastTextModel(url, credential)
         else:
-            return WatsonNLPModel()
+            return NoopModel()
