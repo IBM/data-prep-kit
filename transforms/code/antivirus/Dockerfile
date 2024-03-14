@@ -4,6 +4,7 @@ RUN apt -y update \
     && apt install -y clamav-daemon \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+#    && usermod -aG clam 1000
 USER 1000
 
 FROM clamav/clamav:latest AS clamav
@@ -12,8 +13,9 @@ USER root
 COPY --link --chown=1000:100 --chmod=774 --from=clamav /var/lib/clamav/ /var/lib/clamav/
 COPY --chown=1000:100 --chmod=774 ./docker/clamd.conf /etc/clamav/clamd.conf
 RUN freshclam \
-    && mkdir -p /var/run/clamav \
-    && chown -R 1000:100 /var/run/clamav /var/log/clamav /var/lib/clamav
+    #&& mkdir -p /var/run/clamav \
+    #&& chown -R 1000:100 /var/run/clamav /var/log/clamav /var/lib/clamav
+    && chown -R 1000:100 /var/log/clamav /var/lib/clamav
 USER 1000
 CMD ["/bin/bash", "-c", "freshclam && clamd --debug --foreground"]
 

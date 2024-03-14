@@ -39,9 +39,9 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    "input_column": "contents",
-    "output_column": "virus_detection",
-    "clamd_socket": "../.tmp/clamd.ctl",
+    "antivirus_input_column": "contents",
+    "antivirus_output_column": "virus_detection",
+    "antivirus_clamd_socket": "../.tmp/clamd.ctl",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

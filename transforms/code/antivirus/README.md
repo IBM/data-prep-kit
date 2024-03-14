@@ -14,9 +14,9 @@ If a virus is detected, the `virus_detection` column contains the detected virus
 The set of dictionary keys holding [AntivirusTransform](src/antivirus_transform.py) 
 configuration for values are as follows:
 
-* _input_column_ - specifies the input column's name to scan. (default: `contents`)
-* _output_column_ - specifies the output column's name of the detected virus signature name. (default: `virus_detection`)
-* _clamd_socket_ - specifies the socket path for ClamAV. (default: `/var/run/clamav/clamd.ctl`)
+* _antivirus_input_column_ - specifies the input column's name to scan. (default: `contents`)
+* _antivirus_output_column_ - specifies the output column's name of the detected virus signature name. (default: `virus_detection`)
+* _antivirus_clamd_socket_ - specifies the socket path for ClamAV. (default: `/var/run/clamav/clamd.ctl`)
 
 ## Running
 You can run the [antivirus_local.py](src/antivirus_local.py) to

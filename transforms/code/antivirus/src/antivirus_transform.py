@@ -15,6 +15,12 @@ from data_processing.utils.transform_utils import TransformUtils
 
 logger = get_logger(__name__)
 
+INPUT_COLUMN_KEY = "input_column"
+OUTPUT_COLUMN_KEY = "output_column"
+CLAMD_SOCKET_KEY = "clamd_socket"
+DEFAULT_INPUT_COLUMN = "contents"
+DEFAULT_OUTPUT_COLUMN = "virus_detection"
+DEFAULT_CLAMD_SOCKET = "/var/run/clamav/clamd.ctl"
 
 class AntivirusTransform(AbstractTableTransform):
     """
@@ -32,9 +38,9 @@ class AntivirusTransform(AbstractTableTransform):
         # of AntivirusTransformConfiguration class
         super().__init__(config)
         self.warning_issued = False
-        self.input_column = config.get("input_column", "contents")
-        self.output_column = config.get("output_column", "virus_detection")
-        self.clamd_socket = config.get("clamd_socket", "/var/run/clamav/clamd.ctl")
+        self.input_column = config.get(INPUT_COLUMN_KEY, DEFAULT_INPUT_COLUMN)
+        self.output_column = config.get(OUTPUT_COLUMN_KEY, DEFAULT_OUTPUT_COLUMN)
+        self.clamd_socket = config.get(CLAMD_SOCKET_KEY, DEFAULT_CLAMD_SOCKET)
         logger.info(f"Using unix socket: {self.clamd_socket}")
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
@@ -94,22 +100,21 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            "--input_column",
+            "--antivirus_input_column",
             type=str,
-            default="contents",
+            default=DEFAULT_INPUT_COLUMN,
             help="input column name",
         )
         parser.add_argument(
-            "--output_column",
+            "--antivirus_output_column",
             type=str,
-            default="virus_detection",
+            default=DEFAULT_OUTPUT_COLUMN,
             help="output column name",
         )
         parser.add_argument(
-            "-s",
-            "--clamd_socket",
+            "--antivirus_clamd_socket",
             type=str,
-            default="/var/run/clamav/clamd.ctl",
+            default=DEFAULT_CLAMD_SOCKET,
             help="local socket path for clamd"
         )
 
@@ -119,15 +124,15 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        if len(args.input_column) < 1:
+        if len(args.antivirus_input_column) < 1:
             logger.error("Empty value is not allowed for input_column")
             return False
-        if len(args.output_column) < 1:
+        if len(args.antivirus_output_column) < 1:
             logger.error("Empty value is not allowed for output_column")
             return False
-        self.params["input_column"] = args.input_column
-        self.params["output_column"] = args.output_column
-        self.params["clamd_socket"] = args.clamd_socket
+        self.params[INPUT_COLUMN_KEY] = args.antivirus_input_column
+        self.params[OUTPUT_COLUMN_KEY] = args.antivirus_output_column
+        self.params[CLAMD_SOCKET_KEY] = args.antivirus_clamd_socket
         logger.info(f"antivirus parameters are : {self.params}")
         return True
 
