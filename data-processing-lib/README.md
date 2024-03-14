@@ -6,10 +6,11 @@ Data files may be stored in the local file system or  COS/S3.
 For more details see the [documentation](doc/overview.md).
 
 ### Requirements
-1. python 3.10 or 3.11 
-2. git command line tools
-3. [pre-commit](https://pre-commit.com/)
-4. twine (pip install twine)
+1. python 3.10 or 3.11
+2. Ray 2.9.3
+3. git command line tools
+4. [pre-commit](https://pre-commit.com/)
+5. twine (pip install twine)
     * but on Mac you may have to include a dir in your PATH, such as `export PATH=$PATH:/Library/Frameworks/Python.framework/Versions/3.10/bin`
 
 ### Git

@@ -5,8 +5,6 @@ VERSION=0.2.0
 TAG := "v${VERSION}"
 LIBNAME=fm_data_processing
 PYTHON=python3
-#ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-edge-ai-team-sdk-pypi-local
-#ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/wcp-ai-foundation-team-fms-pypi-local
 ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local
 
 clean::
@@ -49,10 +47,15 @@ venv::	pyproject.toml .check-env
 	source venv/bin/activate; 	\
 	pip install --upgrade pip;	\
 	pip install -e .;		\
-	pip install pytest pytest-cov pytest-forked
+	pip install pytest pytest-cov 
 
+# Here we run each test directory of tests and each ray launched test separately, because
+# it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.
+# pytest-forked was tried, but then we get SIGABRT in pytest when running the s3 tests, some of which are skipped.. 
 test::  
 	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
-	source venv/bin/activate;		\
-	export PYTHONPATH=../src:.:$$PYTHONPATH; \
-	cd test; pytest --forked  . 
+	source venv/bin/activate; export PYTHONPATH=../src;  cd test; pytest data_processing_tests/transform;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; pytest data_processing_tests/data_access;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; pytest data_processing_tests/ray/ray_util_test.py;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; pytest data_processing_tests/ray/test_noop_launch.py;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; pytest data_processing_tests/ray/launcher_test.py;	

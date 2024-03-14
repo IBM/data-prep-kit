@@ -76,13 +76,13 @@ class TransformLauncher:
         try:
             if self.run_locally:
                 # Will create a local Ray cluster
-                logger.info("running locally creating Ray cluster")
+                logger.debug("running locally creating Ray cluster")
                 ray.init()
             else:
                 # connect to the existing cluster
                 logger.info("Connecting to the existing Ray cluster")
                 ray.init(f"ray://localhost:10001", ignore_reinit_error=True)
-            logger.info("Starting orchestrator")
+            logger.debug("Starting orchestrator")
             res = ray.get(
                 orchestrate.remote(
                     preprocessing_params=self.ray_orchestrator,

@@ -1,5 +1,5 @@
 # Library Configuration
-The library has a number of configurables that can help provide or
+The library has a number of configurable values that can help provide or
 override default values.  All are set using environment variables
 in [DPFConfig](../src/data_processing/utils/config.py).
 
