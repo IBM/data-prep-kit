@@ -1,7 +1,7 @@
 # Exact Dedup
 
 Please see the set of
-[transform project conventions](../../transform-conventions.md)
+[transform project conventions](../../README.md)
 for details on general project conventions, transform configuration,
 testing and IDE set up.
 
@@ -47,7 +47,7 @@ make build to build it
 
 ## Configuration and command line Options
 
-The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py)
+The set of dictionary keys holding [EdedupTransform](src/ededup_transform.py)
 configuration for values are as follows:
 
 * _hash_cpu_ - specifies an amount of CPUs per hash actor
