@@ -49,7 +49,7 @@ The `Makefile` also defines a number of macros/variables that can be set, includ
 python executable and more.
 
 ### Configuration and command line options
-A transform generally accept a dictionary of configuration to
+A transform generally accepts a dictionary of configuration to
 control its operation.  For example, the size of a table, the location
 of a model, etc. These are set either explicitly in dictionaries
 (e.g. during testing) or from the command line when run from a Ray launcher.
@@ -57,6 +57,8 @@ of a model, etc. These are set either explicitly in dictionaries
 When specified on the command line, they are specified by prefixing with
 `--` (dash dash).  For example, `--mytransform_some_cfg somevalue` sets 
 the value for the `mytransform_some_cfg` configuration key value to `somevalue`. 
+To avoid potential collisions with options for the Ray launcher, Data Access Factory and others, 
+it is strongly encouraged to not use single dash options with a single or small number of characters (e.g. -n).
 
 In general, a common prefix (i.e. `mytransform_`) is used to help distinguish these keys, primarily
 for ease-of-use/readability command line use, logging, etc.  This is not required, but

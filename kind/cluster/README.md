@@ -23,6 +23,9 @@ ROOT_DIR=$PWD/kind/cluster/
 kind create cluster --name goofy --config ${ROOT_DIR}/hack/kind-cluster-config.yaml
 ```
 
+Note that by default this will create a kind cluster with 2 worker nodes. If you would like a different
+amount of node, modify [cluster configuration](hack/kind-cluster-config.yaml)
+
 ## Install KFP
 
 Install [Kubeflow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/installation/standalone-deployment/#deploying-kubeflow-pipelines) and wait for it to be ready:
@@ -82,21 +85,18 @@ kubectl apply -f $ROOT_DIR/hack/ray_api_server_ingress.yaml
 kubectl apply -f $ROOT_DIR/hack/kfp_ingress.yaml
 ```
 
-Open the Kubeflow Pipelines UI at  http://localhost:8080/kfp/#/pipelines
+Open the Kubeflow Pipelines UI at  http://localhost:8080/kfp/
 
 ## Cleanup
-
-Stop kubectl port-forward processes (e.g., using pkill kubectl)
-
-Delete the temporary directories created for installation during the setup:
-
-```shell
-rm -rf /tmp/fm-data-engineering
-rm -rf /tmp/pipelines
-```
 
 delete the cluster:
 
 ```shell
 kind delete cluster --name goofy
+```
+
+alternatively you can execute
+
+```shell
+make cleanup-kind-cluster
 ```

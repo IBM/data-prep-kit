@@ -31,6 +31,10 @@ setup-kind-cluster:
 	cd $(KIND_DIR)/hack && ./ingress.sh deploy
 	@echo "setup-cluster completed"
 
+.PHONY: cleanup-kind-cluster
+cleanup-kind-cluster:
+	$(MAKE) delete-kind-cluster
+
 # Get some common rules for the whole repo
 include .make.defaults
 

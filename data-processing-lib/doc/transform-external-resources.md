@@ -180,7 +180,7 @@ your transform in the Ray worker.
         # Load domain list 
         domain_list = get_domain_list(url, blocklist_data_access_factory.create_data_access())
         # Store it in Ray object storage
-        domain_refs = ray.put(list(domain_list))
+        domain_refs = ray.put(domain_list)
         # Put the reference in the configuration that the transform initializer will use.
         return {domain_refs_key: domain_refs} | self.params
 ```

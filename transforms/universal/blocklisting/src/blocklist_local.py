@@ -7,9 +7,11 @@ from blocklist_transform import (
     BlockListTransform,
     BlockListTransformConfiguration,
     annotation_column_name_key,
+    block_data_factory_key,
     blocked_domain_list_path_key,
     source_url_column_name_key,
 )
+from data_processing.data_access import DataAccessLocal
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
 
@@ -49,24 +51,29 @@ launcher_params = {
 }
 
 # launch
-run_in_ray = False
 run_in_ray = True
+run_in_ray = False
 if __name__ == "__main__":
-    Path(output_folder).mkdir(parents=True, exist_ok=True)
     if not run_in_ray:
-        sys.argv = ParamsUtils.dict_to_req(block_list_params)
-        config = BlockListTransformConfiguration()
-        parser = ArgumentParser()
-        config.add_input_params(parser)
-        args = parser.parse_args()
-        config.apply_input_params(args)
-        config = config.get_input_params()
-        transform = BlockListTransform(config)
-        print(f"config: {config}")
-        print(f"transform: {transform}")
+        # Here we show how to run outside of ray
+        # Blocklist transform needs a DataAccess to ready the domain list.
+        data_access = DataAccessLocal(local_conf)
+        block_list_params["data_access"] = data_access
+        # Create and configure the transform.
+        transform = BlockListTransform(block_list_params)
+        # Use the local data access to read a parquet table.
+        table = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
+        print(f"input table: {table}")
+        # Transform the table
+        table_list, metadata = transform.transform(table)
+        print(f"\noutput table: {table_list}")
+        print(f"output metadata : {metadata}")
     else:
-        # create launcher
+        # Run the transform inside Ray
+        Path(output_folder).mkdir(parents=True, exist_ok=True)
+        # Create the CLI args as will be parsed by the launcher
         sys.argv = ParamsUtils.dict_to_req(launcher_params | block_list_params)
+        # Create the longer to launch with the blocklist transform.
         launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
         # Launch the ray actor(s) to process the input
         launcher.launch()
