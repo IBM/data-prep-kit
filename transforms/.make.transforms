@@ -80,7 +80,6 @@ help::
 	fi
 	. venv/bin/activate;			\
 	$(PIP) install --upgrade pip;		\
-	$(PIP) install setuptools wheel cmake;		\
 	$(PIP) install -r requirements.txt;	\
 	$(PIP) install pytest;			\
 
