@@ -522,33 +522,6 @@ class RayRemoteJobs:
 
     @staticmethod
     def default_compute_execution_params(
-            cluster_cpu: float,         # number cpus for cluster
-            cluster_memory: float,      # memory for cluster (GB)
-            actor_cpu: float,           # cpu requirement per actor
-            actor_memory: float = 1,    # memory requirement per actor (GB)
-    ) -> str:
-        """
-        This is the most simplistic transform execution parameters computation
-        :param cluster_cpu: overall cluster cpu
-        :param cluster_memory: overall cluster memory
-        :param actor_cpu: worker cpu requirement
-        :param actor_memory: worker memory requirement
-        :return: number of actors
-        """
-        import sys
-        # compute number of actors
-        n_actors_cpu = int(0.85 * cluster_cpu / actor_cpu)
-        n_actors_memory = int(0.85 * cluster_memory / actor_memory)
-        n_actors = min(n_actors_cpu, n_actors_memory)
-        if n_actors < 1:
-            print(f"Not enough cpu/memory to run transform, required cpu {actor_cpu}, available {cluster_cpu}, "
-                  f"required memory {actor_memory}, available {cluster_memory}")
-            sys.exit(1)
-        # return the minimum of two
-        return str(n_actors)
-
-    @staticmethod
-    def default_compute_execution_params2(
         worker_options: str,  # ray worker configuration
         actor_options: str,  # cpus per actor
     ) -> str:
@@ -588,20 +561,35 @@ class RayRemoteJobs:
 
 
 class ComponentUtils:
-    # Add properties to kfp component
-    def add_settings_to_component(component: dsl.ContainerOp, tmout: int) -> None:
-        # No cashing
-        component.execution_options.caching_strategy.max_cache_staleness = "P0D"
+    def add_settings_to_component(
+        component: dsl.ContainerOp,
+        tmout: int,
+        image_pull_policy: str = "Always",
+        cache_strategy: str = "P0D",
+    ) -> None:
+        """
+        Add properties to kfp component
+        :param component: kfp component
+        :param tmout: timeout to set to the component in seconds
+        :param image_pull_policy: pull policy to set to the component
+        """
+        # Set cashing
+        component.execution_options.caching_strategy.max_cache_staleness = cache_strategy
         # image pull policy
-        component.set_image_pull_policy("Always")
-        # Set the timeout for the task to one day (in seconds)
+        component.set_image_pull_policy(image_pull_policy)
+        # Set the timeout for the task
         component.set_timeout(tmout)
 
     env_to_key = {"COS_KEY": "cos-key", "COS_SECRET": "cos-secret", "COS_ENDPOINT": "cos-endpoint"}
-    # Set COS env variables to KFP component
     def set_cos_env_vars_to_component(
         component: dsl.ContainerOp, secret: str, env2key: dict[str, str] = env_to_key
     ) -> None:
+        """
+        Set COS env variables to KFP component
+        :param component: kfp component
+        :param secret: secret name with the COS credentials
+        :param env2key: dict with mapping each env variable to a key in the secret
+        """
         for env_name, secret_key in env2key.items():
             component = component.add_env_variable(
                 k8s_client.V1EnvVar(
@@ -611,4 +599,3 @@ class ComponentUtils:
                     ),
                 )
             )
-

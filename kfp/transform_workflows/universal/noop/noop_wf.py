@@ -19,49 +19,12 @@ EXEC_SCRIPT_NAME: str = "transformer_launcher.py"
 RUN_ID = "00"
 
 
-def default_compute_execution_params2(
-    worker_options: str,  # ray worker configuration
-    actor_options: str,  # cpus per actor
-) -> str:
-    """
-    This is the most simplistic transform execution parameters computation
-    :param worker_options: configuration of ray workers
-    :param cluster_memory: configuration of ray actor
-    :return: number of actors
-    """
-    import json
-    import sys
-
-    try:
-        worker_options = worker_options.replace("'", '"')
-        w_options = json.loads(worker_options)
-    except Exception as e:
-        print(f"Failed to load parameters {worker_options} with error {e}")
-        sys.exit(1)
-    try:
-        actor_options = actor_options.replace("'", '"')
-        a_options = json.loads(actor_options)
-    except Exception as e:
-        print(f"Failed to load parameters {actor_options} with error {e}")
-        sys.exit(1)
-
-    cluster_cpu = w_options["replicas"] * w_options["cpu"] * 0.85
-    cluster_mem = w_options["replicas"] * w_options["memory"] * 0.85
-    print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}")
-    # compute number of actors
-    n_actors = int(cluster_cpu / a_options["num_cpus"])
-    print(f"Number of actors - {n_actors}")
-    if n_actors < 1:
-        print(f"Not enough cpu/memory to run transform, required cpu {a_options['num_cpus']}, available {cluster_cpu}")
-        sys.exit(1)
-
-    return str(n_actors)
-
-
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-guf:0.0.1-test1"
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-guf:0.0.1-test2"
 
-compute_exec_params_op = comp.func_to_container_op(func=default_compute_execution_params2, base_image=base_kfp_image)
+compute_exec_params_op = comp.func_to_container_op(
+    func=RayRemoteJobs.default_compute_execution_params, base_image=base_kfp_image
+)
 execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayComponent.yaml")
 start_ray_op = comp.load_component_from_file("../../../kfp_ray_components/startRayComponent.yaml")
 shutdown_ray_op = comp.load_component_from_file("../../../kfp_ray_components/stopRayComponent.yaml")
@@ -91,7 +54,6 @@ def noop(
     job_id: str = "job_id",
     cos_access_secret: str = "cos-access",
     s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/doc_annotation_test/input/noop_small/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_noop_guf/'}",
-    s3_cred: str = "{'access_key': 'KEY', 'secret_key': 'SECRET', 'cos_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}",
 ):
     clean_up_task = shutdown_ray_op(ray_name=ray_name, run_id=RUN_ID, server_url=server_url)
     ComponentUtils.add_settings_to_component(clean_up_task, 60)
@@ -120,7 +82,6 @@ def noop(
             additional_params=additional_params,
             exec_params={
                 "s3_config": s3_config,
-                "s3_cred": s3_cred,
                 "noop_sleep_sec": noop_sleep_sec,
                 "lh_config": lh_config,
                 "max_files": max_files,
