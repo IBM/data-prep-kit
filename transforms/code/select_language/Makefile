@@ -4,25 +4,21 @@
 REPOROOT=../../..
 # Include the common rules.
 # Use "make help" to see them.
-include ../../makefile.transforms
+include ../../.make.transforms
 
 DOCKER_IMAGE_NAME=select-langauge
 DOCKER_IMAGE_VERSION=0.1.0
 
-# Use default rule inherited from makefile.common
-clean: .clean
+clean: .transforms.clean
 
-# Use default rule inherited from makefile.common
-test: .test
+test:  .transforms.test
 
-# Use default rule inherited from makefile.common
-image: .image
+image: .transforms.image
 
-# Use default rule inherited from makefile.common
-build: .build
+build: .transforms.build
 
-# Use default rule inherited from makefile.common
-venv: .venv
+venv:  .transforms.venv
 
-# Use default rule inherited from makefile.common
-install_lib_source: .install_lib_source
+test-lib-src:: .transforms.test-lib-src
+
+install-lib-src:: .transforms.install-lib-src
