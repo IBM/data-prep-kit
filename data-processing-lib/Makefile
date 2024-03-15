@@ -4,8 +4,10 @@ include ../.make.defaults
 VERSION=0.2.0
 TAG := "v${VERSION}"
 LIBNAME=fm_data_processing
-PYTHON=python3
+PYTHON=python
+PYTEST=pytest
 ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local
+
 
 clean::
 	@# Help: Clean up the distribution build and the venv 
@@ -54,8 +56,8 @@ venv::	pyproject.toml .check-env
 # pytest-forked was tried, but then we get SIGABRT in pytest when running the s3 tests, some of which are skipped.. 
 test::  
 	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
-	source venv/bin/activate; export PYTHONPATH=../src;  cd test; pytest data_processing_tests/transform;	
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; pytest data_processing_tests/data_access;	
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; pytest data_processing_tests/ray/ray_util_test.py;	
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; pytest data_processing_tests/ray/test_noop_launch.py;	
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; pytest data_processing_tests/ray/launcher_test.py;	
+	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/transform;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/data_access;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/ray/ray_util_test.py;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/ray/test_noop_launch.py;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/ray/launcher_test.py;	

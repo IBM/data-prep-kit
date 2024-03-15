@@ -28,22 +28,14 @@ def ededup_compute_execution_params(
     EXECUTION_OF_KB_DOC = 0.00025
 
     # Get cluster parameters
-    try:
-        worker_options = worker_options.replace("'", '"')
-        w_options = json.loads(worker_options)
-    except Exception as e:
-        print(f"Failed to load parameters {worker_options} with error {e}")
-        sys.exit(1)
-    cluster_cpu = w_options["replicas"] * w_options["cpu"] * 0.85
-    cluster_memory = w_options["replicas"] * w_options["memory"] * 0.85
+    w_options = KFPUtils.load_from_json(worker_options.replace("'", '"'))
+    cluster_cpu = w_options["replicas"] * w_options["cpu"]
+    cluster_memory = w_options["replicas"] * w_options["memory"]
     print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_memory}")
+    cluster_cpu *= 0.85
+    cluster_memory *= 0.85
     # get actor requirements
-    try:
-        actor_options = actor_options.replace("'", '"')
-        a_options = json.loads(actor_options)
-    except Exception as e:
-        print(f"Failed to load parameters {actor_options} with error {e}")
-        sys.exit(1)
+    a_options = KFPUtils.load_from_json(actor_options.replace("'", '"'))
     actor_cpu = a_options["num_cpus"]
     print(f"actor required cpu {actor_cpu}")
     # get credentials

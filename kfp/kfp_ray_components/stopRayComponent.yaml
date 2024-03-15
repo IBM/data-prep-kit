@@ -1,0 +1,27 @@
+name: Stop Ray Cluster
+description: Cleans and shutdowns the Ray cluster
+
+inputs:
+    - { name: ray_name, type: String, description: "Ray cluster user name" }
+    - { name: run_id, type: String, description: "The KFP Run ID" }
+    - { name: server_url, type: String, default: "", description: "url of api server" }
+
+implementation:
+    container:
+        image: us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-guf:0.0.1-test2
+        # command is a list of strings (command-line arguments).
+        # The YAML language has two syntaxes for lists and you can use either of them.
+        # Here we use the "flow syntax" - comma-separated strings inside square brackets.
+        command: [
+                python,
+                # Force the stdout and stderr streams to be unbuffered
+                -u,
+                # Path of the program inside the container
+                /pipelines/component/src/stop_ray_cluster.py,
+                --ray_name,
+                { inputValue: ray_name },
+                --run_id,
+                { inputValue: run_id },
+                --server_url,
+                { inputValue: server_url },
+            ]
