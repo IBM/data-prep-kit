@@ -1,5 +1,6 @@
 # execute Ray jobs
 import sys
+import os
 from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
 
 
@@ -19,6 +20,8 @@ def execute_ray_jobs(
     :param server_url: API server url
     :return: None
     """
+    # add run id
+    exec_params["job_id"] = os.getenv("ARGO_POD_UID"),
     # get current namespace
     ns = KFPUtils.get_namespace()
     if ns == "":

@@ -582,6 +582,7 @@ class ComponentUtils:
         :return: number of actors
         """
         import sys
+        from kfp_support.workflow_support.utils import KFPUtils
         # convert input
         w_options = KFPUtils.load_from_json(worker_options.replace("'", '"'))
         a_options = KFPUtils.load_from_json(actor_options.replace("'", '"'))
