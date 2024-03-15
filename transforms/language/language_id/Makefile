@@ -1,7 +1,3 @@
-SHELL=/bin/bash
-DOCKER_IMAGE_NAME=noop
-DOCKER_IMAGE_VERSION=0.6
-
 # Define the root of the local git clone for the common rules to be able 
 # know where they are running from.
 REPOROOT=../../..
@@ -14,12 +10,18 @@ include ../../../.make.defaults
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-DOCKER_IMAGE_NAME=language_identification
-DOCKER_IMAGE_VERSION=0.6
+.PHONY:	.pre-venv
+.pre-venv::	.transforms.check_python_version
+	@$(MAKE) .transforms.check_env	# Put this first so we don't get its help
+	@# Help: Install tools required to install fasttext
+	$(PYTHON) -m venv venv
+	@source venv/bin/activate;					\
+	$(PIP) install --upgrade pip;		\
+	$(PIP) install setuptools wheel cmake;		\
 
-venv::	.transforms.venv
+venv::	.pre-venv .transforms.venv
 
-build::	.transforms.build
+build::	venv image
 
 test::	.transforms.test
 
