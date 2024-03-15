@@ -19,9 +19,12 @@ DOCKER_FILE=Dockerfile
 DOCKER_REGISTRY=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
 EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
 
+# Command to run python 
 PYTHON=python
 PIP=$(PYTHON) -m pip
 PYTHON_VERSION=$(shell python --version)
+# Command to run pytest
+PYTEST=pytest
 
 # The following taken from https://stackoverflow.com/a/65243296/45375
 # Lists all targets and optional help text found in the target.
@@ -122,12 +125,12 @@ help::
 	@# Help: Run pytest on the test directory after installing data-process-lib source into the current venv
 	source venv/bin/activate;			\
 	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
-	cd test; pytest . 
+	cd test; $(PYTEST) . 
 
 .PHONY: .transforms.test # because there is a directory called tests in the projects
 .transforms.test::  
 	@# Help: Run pytest on the test directory using the current venv
 	source venv/bin/activate;			\
 	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
-	cd test; pytest . 
+	cd test; $(PYTEST) . 
 
