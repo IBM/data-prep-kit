@@ -15,9 +15,9 @@ from data_processing.utils.transform_utils import TransformUtils
 
 logger = get_logger(__name__)
 
-INPUT_COLUMN_KEY = "input_column"
-OUTPUT_COLUMN_KEY = "output_column"
-CLAMD_SOCKET_KEY = "clamd_socket"
+INPUT_COLUMN_KEY = "antivirus_input_column"
+OUTPUT_COLUMN_KEY = "antivirus_output_column"
+CLAMD_SOCKET_KEY = "antivirus_clamd_socket"
 DEFAULT_INPUT_COLUMN = "contents"
 DEFAULT_OUTPUT_COLUMN = "virus_detection"
 DEFAULT_CLAMD_SOCKET = "/var/run/clamav/clamd.ctl"
@@ -100,19 +100,19 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            "--antivirus_input_column",
+            f"--{INPUT_COLUMN_KEY}",
             type=str,
             default=DEFAULT_INPUT_COLUMN,
             help="input column name",
         )
         parser.add_argument(
-            "--antivirus_output_column",
+            f"--{OUTPUT_COLUMN_KEY}",
             type=str,
             default=DEFAULT_OUTPUT_COLUMN,
             help="output column name",
         )
         parser.add_argument(
-            "--antivirus_clamd_socket",
+            f"--{CLAMD_SOCKET_KEY}",
             type=str,
             default=DEFAULT_CLAMD_SOCKET,
             help="local socket path for clamd"
@@ -124,12 +124,6 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        if len(args.antivirus_input_column) < 1:
-            logger.error("Empty value is not allowed for input_column")
-            return False
-        if len(args.antivirus_output_column) < 1:
-            logger.error("Empty value is not allowed for output_column")
-            return False
         self.params[INPUT_COLUMN_KEY] = args.antivirus_input_column
         self.params[OUTPUT_COLUMN_KEY] = args.antivirus_output_column
         self.params[CLAMD_SOCKET_KEY] = args.antivirus_clamd_socket

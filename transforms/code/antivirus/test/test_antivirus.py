@@ -1,6 +1,5 @@
-from io import BytesIO
+import os
 from typing import Tuple
-from unittest.mock import patch
 
 import pyarrow as pa
 from data_processing.test_support.transform.transform_test import AbstractTransformTest
@@ -9,19 +8,14 @@ from antivirus_transform import AntivirusTransform
 
 table = pa.Table.from_pydict({
             'document_id': ['ID_1', 'ID_2'],
-            'contents': ['INNOCENT', 'VIRUS'],
+            'contents': ['INNOCENT', 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'],
         })
 expected_table = pa.Table.from_pydict({
             'document_id': ['ID_1', 'ID_2'],
-            'contents': ['INNOCENT', 'VIRUS'],
-            'virus_detection': [None, 'VIRUS_DETECTION'],
+            'contents': ['INNOCENT', 'X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'],
+            'virus_detection': [None, 'Win.Test.EICAR_HDB-1'],
         })
 expected_metadata_list = [{"clean": 1, "infected": 1}, {}]  # transform() result  # flush() result
-
-def side_effect(arg: BytesIO) -> dict:
-    if arg.getvalue().decode() == 'VIRUS':
-        return { 'stream': ('FOUND', 'VIRUS_DETECTION') }
-    return { 'stream': ('OK', None) }
 
 
 class TestAntivirusTransform(AbstractTransformTest):
@@ -32,23 +26,17 @@ class TestAntivirusTransform(AbstractTransformTest):
 
     def get_test_transform_fixtures(self) -> list[Tuple]:
         fixtures = [
-            (AntivirusTransform({"input_column": "contents", "output_column": "virus_detection"}), [table], [expected_table], expected_metadata_list),
+            (
+                AntivirusTransform(
+                    {
+                        "antivirus_input_column": "contents", 
+                        "antivirus_output_column": "virus_detection",
+                        "antivirus_clamd_socket": os.path.abspath(os.path.join(os.getcwd(), "..", ".tmp/clamd.ctl"))
+                    }
+                ),
+                [table],
+                [expected_table],
+                expected_metadata_list
+            ),
         ]
         return fixtures
-    
-    def test_transform(
-        self,
-        transform: AntivirusTransform,
-        in_table_list: list[pa.Table],
-        expected_table_list: list[pa.Table],
-        expected_metadata_list: list[dict[str, float]],
-    ):
-        with patch('clamd.ClamdUnixSocket', autospec=True) as MockClamdUnixSocket:
-            mockInstance = MockClamdUnixSocket.return_value
-            mockInstance.instream.side_effect = side_effect
-            super().test_transform(
-                transform,
-                in_table_list,
-                expected_table_list,
-                expected_metadata_list
-            )
