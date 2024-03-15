@@ -199,7 +199,6 @@ class DataAccessLocal(DataAccess):
         :return: output file location
         """
         return path.replace(self.input_folder, self.output_folder)
-        return output_path
 
     def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
         """
@@ -207,7 +206,7 @@ class DataAccessLocal(DataAccess):
 
         Args:
             table (pyarrow.Table): The pyarrow table to save.
-            output_path (str): The path to the output file.
+            path (str): The path to the output file.
 
         Returns:
             tuple: A tuple containing:
@@ -281,25 +280,39 @@ class DataAccessLocal(DataAccess):
             logger.error(f"Error reading file {file_path}: {e}")
             raise e
 
-    def get_folder_files(self, directory_path: str, extensions: list[str] = None) -> dict[str, bytes]:
+    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) -> dict[str, bytes]:
         """
-        Gets all files within a directory, with content as byte arrays, optionally filtered by extensions.
-        :param directory_path: the absolute path to the directory to search.
-        :param extensions: A list of file extensions (without the dot) to filter by. Defaults to None (all files).
-        :return: A dictionary where keys are filenames and values are byte arrays of their content.
+        Get a list of byte content of files. The path here is an absolute path and can be anywhere.
+        The current limitation for S3 and Lakehouse is that it has to be in the same bucket
+        :param path: file path
+        :param extensions: a list of file extensions to include. If None, then all files from this and
+                           child ones will be returned
+        :param return_data: flag specifying whether the actual content of files is returned (True), or just
+                            directory is returned (False)
+        :return: A dictionary of file names/binary content will be returned
         """
+        def _get_file_content(f_name: str, dt: bool) -> bytes:
+            """
+            return file content
+            :param f_name: file name
+            :param dt: flag to return data or None
+            :return: file content
+            """
+            if dt:
+                return self.get_file(f_name)
+            return None
 
         matching_files = {}
         if extensions is None:
-            search_path = os.path.join(directory_path, "**")
+            search_path = os.path.join(path, "**")
             for filename in glob.iglob(search_path, recursive=True):
                 if not os.path.isdir(filename):
-                    matching_files[filename] = self.get_file(filename)
+                    matching_files[filename] = _get_file_content(filename, return_data)
         else:
             for ext in extensions:
-                search_path = os.path.join(directory_path, f"*.{ext}")
+                search_path = os.path.join(path, f"*.{ext}")
                 for filename in glob.iglob(search_path, recursive=True):
-                    matching_files[filename] = self.get_file(filename)
+                    matching_files[filename] = _get_file_content(filename, return_data)
         return matching_files
 
     def save_file(self, file_path: str, bytes_data: bytes) -> dict[str, Any]:
