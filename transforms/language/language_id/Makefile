@@ -19,11 +19,11 @@ include ../../.make.transforms
 	$(PIP) install --upgrade pip;		\
 	$(PIP) install setuptools wheel cmake;		\
 
-venv::	.pre-venv .transforms.venv
+venv::  .pre-venv .transforms.venv
 
-build::	venv image
+build:: venv image
 
-test::	.transforms.test
+test::  .transforms.test
 
 clean:: .transforms.clean
 
