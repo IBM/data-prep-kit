@@ -6,9 +6,6 @@ ARG ARTIFACTORY_API_KEY
 COPY requirements.txt requirements.txt
 
 RUN sudo apt update && sudo apt install gcc g++ -y
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir setuptools wheel cmake
-RUN pip install --no-cache-dir -r requirements.txt
 RUN sudo apt remove gcc g++ -y \
     && sudo apt clean \
     && sudo rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
