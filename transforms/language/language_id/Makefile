@@ -10,16 +10,14 @@ include ../../../.make.defaults
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-.PHONY:	.pre-venv
-.pre-venv::	.transforms.check_python_version
+venv::	.transforms.check_python_version
 	@$(MAKE) .transforms.check_env	# Put this first so we don't get its help
 	@# Help: Install tools required to install fasttext
 	$(PYTHON) -m venv venv
 	@source venv/bin/activate;					\
 	$(PIP) install --upgrade pip;		\
 	$(PIP) install setuptools wheel cmake;		\
-
-venv::  .pre-venv .transforms.venv
+	$(MAKE) .transforms.venv		\
 
 build:: venv image
 
