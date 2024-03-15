@@ -26,7 +26,11 @@ local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
-doc_quality_params = {ft_lang_key: ft_lang, drop_column_if_existed_key: drop_column_if_existed}
+doc_quality_params = {
+    ft_lang_key: ft_lang,
+    drop_column_if_existed_key: drop_column_if_existed,
+    "doc_quality_local_config": ParamsUtils.convert_to_ast(local_conf),
+}
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 launcher_params = {
