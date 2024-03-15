@@ -16,7 +16,7 @@ class TestDocQualityTransform(AbstractTransformTest):
         cli = [
             # When running outside the Ray orchestrator and its DataAccess/Factory, there is
             # no Runtime class to load the domains and the Transform must do it itself using
-            # the blocklist_local_config for this test.
+            # the doc_quality_local_config for this test.
             ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
         ]
 
