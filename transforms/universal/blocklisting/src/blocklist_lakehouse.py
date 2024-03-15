@@ -56,7 +56,7 @@ worker_options = {"num_cpus": 0.5}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 launcher_params = {
     "run_locally": True,
-    "max_files": -1,
+    "max_files": 2,
     "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
     "lh_config": ParamsUtils.convert_to_ast(lakehouse_config),
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
@@ -69,23 +69,10 @@ launcher_params = {
 }
 
 # launch
-run_in_ray = True
 if __name__ == "__main__":
     Path(output_folder).mkdir(parents=True, exist_ok=True)
-    if not run_in_ray:
-        sys.argv = ParamsUtils.dict_to_req(block_list_params)
-        config = BlockListTransformConfiguration()
-        parser = ArgumentParser()
-        config.add_input_params(parser)
-        args = parser.parse_args()
-        config.apply_input_params(args)
-        config = config.get_input_params()
-        transform = BlockListTransform(config)
-        print(f"config: {config}")
-        print(f"transform: {transform}")
-    else:
-        # create launcher
-        sys.argv = ParamsUtils.dict_to_req(launcher_params | block_list_params)
-        launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
-        # Launch the ray actor(s) to process the input
-        launcher.launch()
+    # create launcher
+    sys.argv = ParamsUtils.dict_to_req(launcher_params | block_list_params)
+    launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
+    # Launch the ray actor(s) to process the input
+    launcher.launch()
