@@ -1,4 +1,3 @@
-import os
 import sys
 
 from data_processing.ray import TransformLauncher
@@ -12,7 +11,6 @@ from lang_id_transform import (
 from lang_models import KIND_FASTTEXT
 
 
-print(os.environ)
 # create launcher
 launcher = TransformLauncher(transform_runtime_config=LangIdentificationTableTransformConfiguration())
 # create parameters
