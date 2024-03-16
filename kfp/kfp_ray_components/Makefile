@@ -27,5 +27,15 @@ __check_defined = \
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
 		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . --no-cache
 
-image::
-	$(MAKE) .kfp_comp.image
+image:: .kfp_comp.image
+
+build:: .kfp_comp.image
+
+publish::
+	$(DOCKER) push ${IMG}
+
+test::
+	@echo "No tests are provided"
+
+clean::
+	$(DOCKER) image rm ${IMG}

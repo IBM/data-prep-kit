@@ -3,4 +3,4 @@ data-processing-lib
 # Build transforms and their images next 
 transforms
 # Build kfp lib after transform images.
-kfp/kfp_support_lib
+kfp
