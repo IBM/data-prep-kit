@@ -235,7 +235,7 @@ class PipelinesUtils:
 
         except Exception as e:
             print(f"Failed waiting pipeline completion {e}")
-            return "failed", e.__cause__
+            return "failed", str(e)
 
 
 class RayRemoteJobs:
@@ -245,15 +245,17 @@ class RayRemoteJobs:
     ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 
     def __init__(self, server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-                 http_retries: int = 5, wait_interval: int = 2):
+                 default_image: str = "rayproject/ray:2.9.3-py310", http_retries: int = 5, wait_interval: int = 2):
         """
         Initialization
         :param server_url: API server URL. Default value is assuming running inside the cluster
+        :param default_image - default Ray image
         :param wait_interval: wait interval
         :param http_retries: http retries
         """
         self.api_server_client = KubeRayAPIs(server_url=server_url, http_retries=http_retries,
                                              wait_interval=wait_interval)
+        self.default_image = default_image
 
     def create_ray_cluster(self, name: str, namespace: str, head_node: dict[str, Any],
                            worker_nodes: list[dict[str, Any]], wait_cluster_ready: int = -1) -> tuple[int, str]:
@@ -331,7 +333,7 @@ class RayRemoteJobs:
             worker_template_names[index] = worker_node_template_name
             index += 1
         # Build head node spec
-        image = head_node.get("image", "rayproject/ray:2.9.0-py310")
+        image = head_node.get("image", self.default_image)
         image_pull_secret = head_node.get("image_pull_secret", None)
         ray_start_params = head_node.get("ray_start_params", DEFAULT_HEAD_START_PARAMS)
         volumes_dict = head_node.get("volumes", None)
@@ -358,7 +360,7 @@ class RayRemoteJobs:
             max_replicas = worker_node.get("max_replicas", 1)
             replicas = worker_node.get("replicas", 1)
             min_replicas = worker_node.get("max_replicas", 0)
-            image = worker_node.get("image", "rayproject/ray:2.9.0-py310")
+            image = worker_node.get("image", self.default_image)
             image_pull_secret = worker_node.get("image_pull_secret", None)
             ray_start_params = worker_node.get("ray_start_params", DEFAULT_WORKER_START_PARAMS)
             volumes_dict = worker_node.get("volumes", None)
@@ -545,7 +547,7 @@ class ComponentUtils:
         # Set cashing
         component.execution_options.caching_strategy.max_cache_staleness = cache_strategy
         # image pull policy
-        component.set_image_pull_policy(image_pull_policy)
+        component.container.set_image_pull_policy(image_pull_policy)
         # Set the timeout for the task
         component.set_timeout(timeout)
 
