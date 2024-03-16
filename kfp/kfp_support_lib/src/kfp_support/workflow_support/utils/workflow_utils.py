@@ -520,6 +520,7 @@ class RayRemoteJobs:
             sys.exit(1)
         self._print_log(log=log, previous_log_len=previous_log_len)
         print(f"Job completed with execution status {status}")
+        # TODO - store log to S3
 
 
 class ComponentUtils:

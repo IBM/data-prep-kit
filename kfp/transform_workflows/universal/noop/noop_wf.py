@@ -1,5 +1,3 @@
-import os
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
@@ -18,16 +16,17 @@ RUN_ID = "00"
 
 # components
 base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-guf:0.0.1-test2"
-# compute execution parameters
+# compute execution parameters. Here different tranforms might need different implementations. As
+# a result, insted of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
 )
-# start Ray
-start_ray_op = comp.load_component_from_file("../../../kfp_ray_components/startRayComponent.yaml")
+# create Ray cluster
+create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
 # execute job
-execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayComponent.yaml")
-# shut down Ray
-shutdown_ray_op = comp.load_component_from_file("../../../kfp_ray_components/stopRayComponent.yaml")
+execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayJobComponent.yaml")
+# clean up Ray
+cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
 TASK_NAME: str = "noop"
 
@@ -86,7 +85,7 @@ def noop(
     :return: None
     """
     # create clean_up task
-    clean_up_task = shutdown_ray_op(ray_name=ray_name, run_id=RUN_ID, server_url=server_url)
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=RUN_ID, server_url=server_url)
     ComponentUtils.add_settings_to_component(clean_up_task, 60)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
@@ -97,7 +96,7 @@ def noop(
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
-        ray_cluster = start_ray_op(
+        ray_cluster = create_ray_op(
             ray_name=ray_name,
             run_id=RUN_ID,
             ray_head_options=ray_head_options,
@@ -112,6 +111,7 @@ def noop(
             ray_name=ray_name,
             run_id=RUN_ID,
             additional_params=additional_params,
+            # note that the parameters below are specific for NOOP transform
             exec_params={
                 "s3_config": s3_config,
                 "noop_sleep_sec": noop_sleep_sec,
