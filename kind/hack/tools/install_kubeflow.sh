@@ -24,7 +24,7 @@ deploy() {
 	deploy_with_retries "-k" "manifests/kustomize/env/dev" "$MAX_RETRIES" "$SLEEP_TIME" || EXIT_CODE=$?
 	if [[ $EXIT_CODE -ne 0 ]]
 	then
-		echo "Kfp-Tekton deployment unsuccessful."
+		echo "Kubeflow deployment unsuccessful."
 		exit 1
 	fi
 
@@ -43,6 +43,9 @@ wait(){
 		echo "Kubeflow Deployment unsuccessful. Not all pods running"
 		exit $EXIT_CODE
 	fi
+	# disable cache for testing
+	# ref https://www.kubeflow.org/docs/components/pipelines/v1/overview/caching/#disabling-caching-in-your-kubeflow-pipelines-deployment
+	kubectl patch mutatingwebhookconfiguration cache-webhook-kubeflow --type='json' -p='[{"op":"replace", "path": "/webhooks/0/rules/0/operations/0", "value": "DELETE"}]'
 }
 
 delete(){

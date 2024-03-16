@@ -5,10 +5,10 @@ REPOROOT=../../..
 # Use "make help" to see them.
 include ../../.make.defaults
 
+# fm_data_processing_kfp package version
 VERSION=0.0.4
-TAG := "v${VERSION}"
 LIBNAME=fm_data_processing_kfp
-PYTHON=python3.10
+PYTHON=python3
 
 # Lib versions
 RAY=2.9.1
