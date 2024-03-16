@@ -49,7 +49,7 @@ def noop(
     max_files: int = -1,
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
-    cos_access_secret: str = "cos-access",
+    s3_access_secret: str = "cos-access",
     s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/doc_annotation_test/input/noop_small/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_noop_guf/'}",
 ):
     """
@@ -78,7 +78,7 @@ def noop(
         http_retries - httpt retries for API server calls
     :param lh_config - lake house configuration
     :param s3_config - s3 configuration
-    :param cos_access_secret - cos access secret
+    :param s3_access_secret - s3 access secret
     :param max_files - max files to process
     :param actor_options - actor options
     :param pipeline_id - pipeline id
@@ -125,7 +125,7 @@ def noop(
             server_url=server_url,
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
-        ComponentUtils.set_s3_env_vars_to_component(execute_job, cos_access_secret)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, s3_access_secret)
         execute_job.after(ray_cluster)
 
     # set image pull secrets

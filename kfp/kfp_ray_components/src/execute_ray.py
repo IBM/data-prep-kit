@@ -31,9 +31,9 @@ def execute_ray_jobs(
     additional_params_dict = KFPUtils.load_from_json(additional_params)
     exec_params = KFPUtils.load_from_json(exec_params)
     # Get credentials
-    access_key, secret_key, cos_url = KFPUtils.credentials()
+    access_key, secret_key, url = KFPUtils.credentials()
     exec_params["s3_cred"] = (
-        "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'cos_url': '" + cos_url + "'}"
+        "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
     )
     remote_jobs = RayRemoteJobs(
         server_url=server_url,
