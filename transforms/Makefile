@@ -5,6 +5,10 @@ include ../.make.defaults
 clean::
 	@# Help: clean, Recursively clean all subdirs 
 	$(MAKE) RULE=clean .recurse
+
+setup::
+	@# Help: setup, Recursively clean all subdirs
+
 build::
 	@# Help: build, Recursively build all subdirs 
 	$(MAKE) RULE=build .recurse

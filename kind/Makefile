@@ -13,7 +13,7 @@ export PIPELINE_VERSION := 1.8.5
 export KUBERAY := 1.0.0
 
 
-setup-kind-cluster::
+setup::
 	@# Help: Building kind cluster with everything installed
 	$(MAKE) .create-kind-cluster
 	$(MAKE) .cluster-prepare
@@ -21,9 +21,14 @@ setup-kind-cluster::
 	cd hack && ./ingress.sh deploy
 	@echo "setup-cluster completed"
 
-delete-kind-cluster::
+clean::
 	@# Help: Deleting the kind cluster
 	cd $(TOOLS_DIR); ./kind_management.sh delete_cluster
+
+build::
+
+
+test::
 
 .create-kind-cluster::
 	cd $(TOOLS_DIR); ./kind_management.sh create_cluster

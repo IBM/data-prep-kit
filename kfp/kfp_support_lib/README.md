@@ -40,7 +40,7 @@ To run the package tests perform the following:
 To begin with, establish a Kind cluster and deploy all required components by executing the makfefile command in the main directory of this repository. As an alternative, you can manually execute the instructions provided in the [README.md](../../kind/README.md) file.
 
 ```bash
-make setup-kind-cluster
+make setup
 ```
 
 The next step is to deploy the `fm_data_processing_kfp` package locally within a Python virtual environment. To do this, execute the following command from the package directory:

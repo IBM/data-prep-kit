@@ -17,15 +17,6 @@
 #
 #################################################################################################################
 
-# Add local or overriding rules here
-setup-kind-cluster::
-	@# Help: Building kind cluster with everything installed
-	cd kind && $(MAKE) setup-kind-cluster
-
-cleanup-kind-cluster::
-	@# Help: Deleting the kind cluster
-	cd kind && $(MAKE) delete-kind-cluster
-
 # Get some common rules for the whole repo
 include .make.defaults
 
@@ -36,6 +27,10 @@ include .make.defaults
 clean:: 
 	@# Help: clean, Recursively clean all subdirs 
 	$(MAKE) RULE=clean .recurse
+
+setup::
+	@# Help: setup, Recursively test in all subdirs
+	@$(MAKE) RULE=setup .recurse
 
 build:: 
 	@# Help: build, Recursively build all subdirs 

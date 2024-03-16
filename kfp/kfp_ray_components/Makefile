@@ -35,7 +35,6 @@ publish::
 	$(DOCKER) push ${IMG}
 
 test::
-	@echo "No tests are provided"
 
 clean::
 	$(DOCKER) image rm ${IMG}

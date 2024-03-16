@@ -7,6 +7,8 @@ LIBNAME=fm_data_processing
 PYTHON=python3
 ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local
 
+setup::
+
 clean::
 	@# Help: Clean up the distribution build and the venv 
 	rm -r dist venv
