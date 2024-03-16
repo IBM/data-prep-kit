@@ -23,11 +23,11 @@ compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
 )
 # start Ray
-start_ray_op = comp.load_component_from_file("../../../../kfp_ray_components/startRayComponent.yaml")
+start_ray_op = comp.load_component_from_file("../../../kfp_ray_components/startRayComponent.yaml")
 # execute job
-execute_ray_jobs_op = comp.load_component_from_file("../../../../kfp_ray_components/executeRayComponent.yaml")
+execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayComponent.yaml")
 # shut down Ray
-shutdown_ray_op = comp.load_component_from_file("../../../../kfp_ray_components/stopRayComponent.yaml")
+shutdown_ray_op = comp.load_component_from_file("../../../kfp_ray_components/stopRayComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
 TASK_NAME: str = "noop"
 
