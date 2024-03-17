@@ -9,8 +9,10 @@ MAX_RETRIES="${MAX_RETRIES:-20}"
 EXIT_CODE=0
 
 deploy() {
-	rm -rf /tmp/pipelines
-	cd /tmp
+	TEMP_DIR="$(mktemp -d)"
+	echo "Temporary dir:"
+	echo "${TEMP_DIR}"
+	cd $TEMP_DIR
 	git clone https://github.com/kubeflow/pipelines.git
 	cd pipelines
 	git checkout tags/${PIPELINE_VERSION}
@@ -31,7 +33,7 @@ deploy() {
        # FIXME: avoid using cluster-admin role
 	kubectl create clusterrolebinding pipeline-runner-extend --clusterrole cluster-admin --serviceaccount=kubeflow:pipeline-runner
 	echo "Finished Kubeflow deployment."
-	rm -rf /tmp/pipelines
+	rm -rf $TEMP_DIR
 }
 
 wait(){
