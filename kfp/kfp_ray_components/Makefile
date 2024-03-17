@@ -20,6 +20,7 @@ __check_defined = \
 .kfp_comp.image:: Dockerfile requirements.txt
 	$(call check_defined, ARTIFACTORY_USER)
 	$(call check_defined, ARTIFACTORY_API_KEY)
+	$(call check_defined, DOCKER_HOSTNAME)
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
 	$(DOCKER) build -t ${IMG} --build-arg ARTIFACTORY_USER=${ARTIFACTORY_USER} \
 	        --build-arg ARTIFACTORY_API_KEY=${ARTIFACTORY_API_KEY} \
