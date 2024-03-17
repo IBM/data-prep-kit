@@ -6,7 +6,7 @@ DOCKER=docker
 DOCKER_FILE=Dockerfile
 DOCKER_HOSTNAME ?= us.icr.io
 DOCKER_NAMESPACE ?= cil15-shared-registry/preprocessing-pipelines
-DOCKER_NAME ?= kfp-oc
+DOCKER_NAME ?= kfp-data-processing
 IMG ?= ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_TAGNAME}
 
 check_defined = \
