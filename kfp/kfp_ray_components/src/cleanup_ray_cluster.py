@@ -1,5 +1,4 @@
 import sys
-
 from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
 
 
@@ -14,10 +13,8 @@ def cleanup_ray_cluster(
         print(f"Failed to get namespace")
         sys.exit(1)
 
-    # create cluster
-    remote_jobs = RayRemoteJobs(server_url=server_url)
-
     # cleanup
+    remote_jobs = RayRemoteJobs(server_url=server_url)
     status, error = remote_jobs.delete_ray_cluster(name=name, namespace=ns)
     print(f"Deleted cluster - status: {status}, error: {error}")
 

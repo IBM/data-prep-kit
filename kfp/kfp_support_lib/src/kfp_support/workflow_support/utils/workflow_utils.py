@@ -29,7 +29,7 @@ class KFPUtils:
     Helper utilities for KFP implementations
     """
     @staticmethod
-    def credentials(access_key: str = "COS_KEY", secret_key: str = "COS_SECRET", endpoint: str = "COS_ENDPOINT") \
+    def credentials(access_key: str = "S3_KEY", secret_key: str = "S3_SECRET", endpoint: str = "ENDPOINT") \
             -> tuple[str, str, str]:
         """
         Get credentials from the environment
@@ -38,10 +38,10 @@ class KFPUtils:
         :param endpoint: environment variable for S3 endpoint
         :return:
         """
-        cos_key = os.getenv(access_key, "")
-        cos_secret = os.getenv(secret_key, "")
-        cos_endpoint = os.getenv(endpoint, "")
-        return cos_key, cos_secret, cos_endpoint
+        s3_key = os.getenv(access_key, "")
+        s3_secret = os.getenv(secret_key, "")
+        s3_endpoint = os.getenv(endpoint, "")
+        return s3_key, s3_secret, s3_endpoint
 
     @staticmethod
     def get_namespace() -> str:
@@ -130,6 +130,7 @@ class KFPUtils:
         return res
 
     # Load a string that represents a json to python dictionary
+    @staticmethod
     def load_from_json(js: str) -> dict[str, Any]:
         try:
             return json.loads(js)
@@ -234,7 +235,7 @@ class PipelinesUtils:
 
         except Exception as e:
             print(f"Failed waiting pipeline completion {e}")
-            return "failed", e.__cause__
+            return "failed", str(e)
 
 
 class RayRemoteJobs:
@@ -244,15 +245,17 @@ class RayRemoteJobs:
     ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 
     def __init__(self, server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-                 http_retries: int = 5, wait_interval: int = 2):
+                 default_image: str = "rayproject/ray:2.9.3-py310", http_retries: int = 5, wait_interval: int = 2):
         """
         Initialization
         :param server_url: API server URL. Default value is assuming running inside the cluster
+        :param default_image - default Ray image
         :param wait_interval: wait interval
         :param http_retries: http retries
         """
         self.api_server_client = KubeRayAPIs(server_url=server_url, http_retries=http_retries,
                                              wait_interval=wait_interval)
+        self.default_image = default_image
 
     def create_ray_cluster(self, name: str, namespace: str, head_node: dict[str, Any],
                            worker_nodes: list[dict[str, Any]], wait_cluster_ready: int = -1) -> tuple[int, str]:
@@ -330,7 +333,7 @@ class RayRemoteJobs:
             worker_template_names[index] = worker_node_template_name
             index += 1
         # Build head node spec
-        image = head_node.get("image", "rayproject/ray:2.9.0-py310")
+        image = head_node.get("image", self.default_image)
         image_pull_secret = head_node.get("image_pull_secret", None)
         ray_start_params = head_node.get("ray_start_params", DEFAULT_HEAD_START_PARAMS)
         volumes_dict = head_node.get("volumes", None)
@@ -357,7 +360,7 @@ class RayRemoteJobs:
             max_replicas = worker_node.get("max_replicas", 1)
             replicas = worker_node.get("replicas", 1)
             min_replicas = worker_node.get("max_replicas", 0)
-            image = worker_node.get("image", "rayproject/ray:2.9.0-py310")
+            image = worker_node.get("image", self.default_image)
             image_pull_secret = worker_node.get("image_pull_secret", None)
             ray_start_params = worker_node.get("ray_start_params", DEFAULT_WORKER_START_PARAMS)
             volumes_dict = worker_node.get("volumes", None)
@@ -519,75 +522,45 @@ class RayRemoteJobs:
             sys.exit(1)
         self._print_log(log=log, previous_log_len=previous_log_len)
         print(f"Job completed with execution status {status}")
-
-    @staticmethod
-    def default_compute_execution_params(
-        worker_options: str,  # ray worker configuration
-        actor_options: str,  # cpus per actor
-    ) -> str:
-        """
-        This is the most simplistic transform execution parameters computation
-        :param worker_options: configuration of ray workers
-        :param cluster_memory: configuration of ray actor
-        :return: number of actors
-        """
-        import json
-        import sys
-
-        try:
-            worker_options = worker_options.replace("'", '"')
-            w_options = json.loads(worker_options)
-        except Exception as e:
-            print(f"Failed to load parameters {worker_options} with error {e}")
-            sys.exit(1)
-        try:
-            actor_options = actor_options.replace("'", '"')
-            a_options = json.loads(actor_options)
-        except Exception as e:
-            print(f"Failed to load parameters {actor_options} with error {e}")
-            sys.exit(1)
-
-        cluster_cpu = w_options["replicas"] * w_options["cpu"] * 0.85
-        cluster_mem = w_options["replicas"] * w_options["memory"] * 0.85
-        print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}")
-        # compute number of actors
-        n_actors = int(cluster_cpu / a_options["num_cpus"])
-        print(f"Number of actors - {n_actors}")
-        if n_actors < 1:
-            print(f"Not enough cpu/memory to run transform, required cpu {a_options['num_cpus']}, available {cluster_cpu}")
-            sys.exit(1)
-
-        return str(n_actors)
+        # TODO - store log to S3
 
 
 class ComponentUtils:
+    """
+    Class containing methods supporting building pipelines
+    """
+
+    @staticmethod
     def add_settings_to_component(
         component: dsl.ContainerOp,
-        tmout: int,
+        timeout: int,
         image_pull_policy: str = "Always",
         cache_strategy: str = "P0D",
     ) -> None:
         """
-        Add properties to kfp component
+        Add settings to kfp component
         :param component: kfp component
-        :param tmout: timeout to set to the component in seconds
+        :param timeout: timeout to set to the component in seconds
         :param image_pull_policy: pull policy to set to the component
+        :param cache_strategy: cache strategy
         """
         # Set cashing
         component.execution_options.caching_strategy.max_cache_staleness = cache_strategy
         # image pull policy
-        component.set_image_pull_policy(image_pull_policy)
+        component.container.set_image_pull_policy(image_pull_policy)
         # Set the timeout for the task
-        component.set_timeout(tmout)
+        component.set_timeout(timeout)
 
-    env_to_key = {"COS_KEY": "cos-key", "COS_SECRET": "cos-secret", "COS_ENDPOINT": "cos-endpoint"}
-    def set_cos_env_vars_to_component(
-        component: dsl.ContainerOp, secret: str, env2key: dict[str, str] = env_to_key
+    @staticmethod
+    def set_s3_env_vars_to_component(
+            component: dsl.ContainerOp,
+            secret: str,
+            env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"}
     ) -> None:
         """
-        Set COS env variables to KFP component
+        Set S3 env variables to KFP component
         :param component: kfp component
-        :param secret: secret name with the COS credentials
+        :param secret: secret name with the S3 credentials
         :param env2key: dict with mapping each env variable to a key in the secret
         """
         for env_name, secret_key in env2key.items():
@@ -599,3 +572,44 @@ class ComponentUtils:
                     ),
                 )
             )
+
+    @staticmethod
+    def default_compute_execution_params(
+            worker_options: str,  # ray worker configuration
+            actor_options: str,  # cpus per actor
+    ) -> str:
+        """
+        This is the most simplistic transform execution parameters computation
+        :param worker_options: configuration of ray workers
+        :param actor_options: actor request requirements
+        :return: number of actors
+        """
+        import sys
+        from kfp_support.workflow_support.utils import KFPUtils
+        # convert input
+        w_options = KFPUtils.load_from_json(worker_options.replace("'", '"'))
+        a_options = KFPUtils.load_from_json(actor_options.replace("'", '"'))
+        # Compute available cluster resources
+        cluster_cpu = w_options["replicas"] * w_options["cpu"]
+        cluster_mem = w_options["replicas"] * w_options["memory"]
+        cluster_gpu = w_options["replicas"] * w_options.get("gpu", 0.)
+        print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}, GPUs {cluster_gpu}")
+        # compute number of actors
+        n_actors_cpu = int(cluster_cpu * 0.85 / a_options.get("num_cpus", .5))
+        n_actors_memory = int(cluster_mem * 0.85 / a_options.get("memory", 1))
+        n_actors = min(n_actors_cpu, n_actors_memory)
+        # Check if we need gpu calculations as well
+        actor_gpu = a_options.get("num_gpus", 0)
+        if actor_gpu > 0:
+            n_actors_gpu = int(cluster_gpu / actor_gpu)
+            n_actors = min(n_actors, n_actors_gpu)
+        print(f"Number of actors - {n_actors}")
+        if n_actors < 1:
+            print(f"Not enough cpu/gpu/memory to run transform, "
+                  f"required cpu {a_options.get('num_cpus', .5)}, available {cluster_cpu}, "
+                  f"required memory {a_options.get('memory', 1)}, available {cluster_mem}, "
+                  f"required cpu {actor_gpu}, available {cluster_gpu}"
+                  )
+            sys.exit(1)
+
+        return str(n_actors)
