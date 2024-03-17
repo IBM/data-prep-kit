@@ -38,9 +38,11 @@ class KFPUtils:
         :param endpoint: environment variable for S3 endpoint
         :return:
         """
-        s3_key = os.getenv(access_key, "")
-        s3_secret = os.getenv(secret_key, "")
-        s3_endpoint = os.getenv(endpoint, "")
+        s3_key = os.getenv(access_key, None)
+        s3_secret = os.getenv(secret_key, None)
+        s3_endpoint = os.getenv(endpoint, None)
+        if s3_key is None or s3_secret is None or s3_endpoint is None:
+            print("Failed to load s3 credentials")
         return s3_key, s3_secret, s3_endpoint
 
     @staticmethod
