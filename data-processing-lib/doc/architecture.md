@@ -18,12 +18,13 @@ The architecture includes the following core components:
 It uses the following components, all of which can/do define CLI configuration parameters.:
     * [Transform Orchestrator Configuration](../src/data_processing/ray/transform_orchestrator_configuration.py) is responsible 
      for defining and validating infrastructure parameters 
-     (e.g., number of workers, memorey and cpu, local or remote cluster, etc.). This class has very simple state
+     (e.g., number of workers, memory and cpu, local or remote cluster, etc.). This class has very simple state
      (several dictionaries) and is fully pickleable. As a result framework uses its instance as a
      parameter in remote functions/actors invocation.
     * [DataAccessFactory](../src/data_processing/data_access/data_access_factory.py) - provides the
       configuration for the type of DataAccess to use when reading/writing the input/output data for
-      the transforms.
+      the transforms.  Similar to Transform Orchestrator Configuration, this is a pickleable
+      instance that is passed between Launcher, Orchestrator and Workers.
     * [TransformConfiguration](../src/data_processing/ray/transform_runtime.py) - defines specifics
       of the transform implementation including transform implementation class, its short name, any transform-
       specific CLI parameters, and an optional TransformRuntime class, discussed below. 
