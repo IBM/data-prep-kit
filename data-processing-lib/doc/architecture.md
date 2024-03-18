@@ -68,7 +68,7 @@ Overall framework implements several layers, each of which is responsible for de
 the actual functionality. Parameters definition and validation is then invoked by Launcher (see above), while implementation 
 is invoked by Ray orchestrator and worker, which comprise one of the layers. There are 3 layers in the framework:
 
-* [CLIProvided](../src/data_processing/utils/cli_utils.py) - provides a general purpose
+* [CLIProvider](../src/data_processing/utils/cli_utils.py) - provides a general purpose
   mechanism for defining, validating and sharing CLI parameters. 
   It is used by the DataAccessFactor and Transform Configuration (below).
 * Data Access is an abstraction layer for different data access supported by the framework. The main components
