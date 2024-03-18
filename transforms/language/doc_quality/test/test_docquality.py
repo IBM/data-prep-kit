@@ -17,12 +17,13 @@ class TestDocQualityTransform(AbstractTransformTest):
             # When running outside the Ray orchestrator and its DataAccess/Factory, there is
             # no Runtime class to load the domains and the Transform must do it itself using
             # the doc_quality_local_config for this test.
+            "--docquality_local_config",
             ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
         ]
 
         # Use the DocQualityTransformConfiguration to compute the config parameters
-        bltc = DocQualityTransformConfiguration()
-        config = get_transform_config(bltc, cli)
+        dqtc = DocQualityTransformConfiguration()
+        config = get_transform_config(dqtc, cli)
 
         fixtures = [
             (

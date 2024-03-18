@@ -31,6 +31,8 @@ MODEL_DIR = "cos-optimal-llm-pile/bluepile-processing/lm_sp/"
 short_name = "docquality"
 arg_prefix = short_name
 
+docquality_data_factory_key = f"{arg_prefix}_data_factory"
+""" Key holds the data access factory for files """
 ft_lang_key = f"{arg_prefix}_ft_lang"
 """ Key holds the name of the ft_lang"""
 drop_column_if_existed_key = f"{arg_prefix}_drop_column_if_existed_key"
@@ -213,20 +215,37 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         parser.add_argument("-f", "--ft_lang", default="en")
         parser.add_argument("-dr", "--drop_column_if_existed", default=True, help="drop columns if existed")
 
-        # Add bdoc_quality-specific arguments to create the DataAccess instance to load the domains.
-        self.daf = DataAccessFactory(f"{self.name}_")
+        # Create the DataAccessFactor to use CLI args with the given docquality prefix.
+        self.daf = DataAccessFactory(f"{arg_prefix}_")
+        # Add the DataAccessFactory parameters to the transform's configuration parameters.
         self.daf.add_input_params(parser)
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
         Validate and apply the arguments that have been parsed
-        :param args: user defined arguments including at least, but perhaps more,
-        arguments as defined by add_input_arguments().
+        :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
         self.params["ft_lang"] = args.ft_lang
         self.params["drop_column_if_existed"] = args.drop_column_if_existed
-        # return True
+        # # return True
+        # return self.daf.apply_input_params(args)
+
+        # Capture the args that are specific to this transform
+        dargs = vars(args)
+        # global captured_arg_keys
+        # for arg_key in captured_arg_keys:
+        #     # Make sure parameters are defined
+        #     if dargs.get(arg_key) is None or len(dargs.get(arg_key)) < 1:
+        #         logger.info(f"parameter {arg_key} is not defined, exiting")
+        #         return False
+        #     self.params[arg_key] = dargs.get(arg_key)
+
+        # Add the DataAccessFactory to the transform's configuration parameters.
+        self.params[docquality_data_factory_key] = self.daf
+        # mark this parameter to be removed
+        self.remove_from_metadata.append(docquality_data_factory_key)
+        # Validate and populate the transform's DataAccessFactory
         return self.daf.apply_input_params(args)
 
     def get_transform_metadata(self) -> dict[str, Any]:
@@ -253,7 +272,8 @@ class DocQualityRuntime(DefaultTableTransformRuntime):
     ) -> dict[str, Any]:
         """
         Set environment for execution
-        :param DocQuality_data_access_factory - data access factory
+        :param data_access_factory - data access factory
+        :param files - list of files to process
         :return: dictionary of init params
         """
         from doc_c4_statistics import c4_load_ldnoobw_words
@@ -266,6 +286,10 @@ class DocQualityRuntime(DefaultTableTransformRuntime):
         klm = KenLMModel.from_pretrained(model_path=MODEL_DIR, language=self.ft_lang, strip_accent=strip_accent)
 
         drop_column_if_existed = self.params.get("drop_column_if_existed")
+
+        docquality_data_access_factory = self.params.get(block_data_factory_key, None)
+        if docquality_data_access_factory is None:
+            raise RuntimeError(f"Missing configuration key {block_data_factory_key}")
 
         return self.params
 
