@@ -7,11 +7,12 @@ from kfp_support.workflow_support.utils import (
     ComponentUtils,
 )
 from kubernetes import client as k8s_client
+import uuid
 
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "transformer_launcher.py"
-RUN_ID = "00"
+RUN_ID = uuid.uuid4()
 
 
 # components
