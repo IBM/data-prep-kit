@@ -15,10 +15,12 @@ The architecture includes the following core components:
 
 * [RayLauncher](../src/data_processing/ray/transform_launcher.py) accepts and validates 
  CLI parameters to establish the Ray Orchestrator with the proper configuration. 
-It uses the following components:
-    * [TransformOrchestratorConfiguration](../src/data_processing/ray/transform_orchestrator_configuration.py) - 
-      provides  the configuration of the ray cluster used, including things such as
-      the number of workers, memory and cpu, local or remote ray cluster, etc.
+It uses the following components, all of which can/do define CLI configuration parameters.:
+    * [Transform Orchestrator Configuration](../src/data_processing/ray/transform_orchestrator_configuration.py) is responsible 
+     for defining and validating infrastructure parameters 
+     (e.g., number of workers, memorey and cpu, local or remote cluster, etc.). This class has very simple state
+     (several dictionaries) and is fully pickleable. As a result framework uses its instance as a
+     parameter in remote functions/actors invocation.
     * [DataAccessFactory](../src/data_processing/data_access/data_access_factory.py) - provides the
       configuration for the type of DataAccess to use when reading/writing the input/output data for
       the transforms.
@@ -79,10 +81,7 @@ Some of the core components used by the architecture are definfed here:
     parameters that configure the instance of Data Access to be created. Data Access factory has very simple state 
     (several dictionaries) and is fully pickleable. The framework uses Data Access Factory instance as a 
     parameter in remote functions/actors invocations.
-* [Transform Orchestrator Configuration](../src/data_processing/ray/transform_orchestrator_configuration.py) is responsible 
-  for defining and validating Ray infrastructure parameters. Similar to Data Access factory, this class has very simple state
-  (several dictionaries) and is fully pickleable. As a result framework uses its instance as a
-  parameter in remote functions/actors invocation
+
  
 ## Transforms
 A brief discussion of the Transform components are provided here.
