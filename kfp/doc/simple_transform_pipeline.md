@@ -110,6 +110,8 @@ The parameters used here are as follows:
 **Note** that here we are specifying initial values for all parameters that will be propagated to the worklow UI
 (see below)
 
+**Note** Paramwters are defining both S3 and lakehouse configuration, but only one at a time can be used.
+
 ### Pipeline wiring
 
 Now that all components and input parameters are defined, we can implement pipeline wiring defining sequence of 
@@ -201,6 +203,8 @@ registry and one for S3 access). As KFP is deployed in `kubeflow` namespace, wor
 there as well, which means that secrets have to be created there as well.
 
 Once this is done we can execute the workflow. 
+
+On the worflow page (above) click on the 
 
 ## Clean up cluster
 

@@ -533,7 +533,7 @@ class RayRemoteJobs:
             return
         # Here data access is either S3 or lakehouse both of which contain self.input_folder
         try:
-            input_folder = data_access.nput_folder
+            input_folder = data_access.input_folder
         except Exception as e:
             logger.warning(f"failed to get input folder {e}")
             return
