@@ -61,12 +61,7 @@ the framework (especially metadata produced by the transform).
 These statistics are reported as metadata (`metadata.json`) by the orchestrator upon completion.
 
 ## Core Components
-To make it simpler for transform developer, data processing framework implements majority of 
-the code described above and defining extensions (plugin points) for the developer. 
-
-Overall framework implements several layers, each of which is responsible for defining and validating its parameters and 
-the actual functionality. Parameters definition and validation is then invoked by Launcher (see above), while implementation 
-is invoked by Ray orchestrator and worker, which comprise one of the layers. There are 3 layers in the framework:
+Some of the core components used by the architecture are definfed here:
 
 * [CLIProvider](../src/data_processing/utils/cli_utils.py) - provides a general purpose
   mechanism for defining, validating and sharing CLI parameters. 
@@ -84,8 +79,8 @@ is invoked by Ray orchestrator and worker, which comprise one of the layers. The
     parameters that configure the instance of Data Access to be created. Data Access factory has very simple state 
     (several dictionaries) and is fully pickleable. The framework uses Data Access Factory instance as a 
     parameter in remote functions/actors invocations.
-* [Transform Configuration](../src/data_processing/ray/transform_orchestrator_configuration.py) is responsible 
-  for defining and validating infrastructure parameters. Similar to Data Access factory, this class has very simple state
+* [Transform Orchestrator Configuration](../src/data_processing/ray/transform_orchestrator_configuration.py) is responsible 
+  for defining and validating Ray infrastructure parameters. Similar to Data Access factory, this class has very simple state
   (several dictionaries) and is fully pickleable. As a result framework uses its instance as a
   parameter in remote functions/actors invocation
  
