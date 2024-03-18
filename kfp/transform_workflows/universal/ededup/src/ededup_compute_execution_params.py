@@ -13,7 +13,7 @@ def ededup_compute_execution_params(
     :param actor_options: actor request requirements
     :param n_samples: number of samples to use
     :param params: exact dedup specific parameters containing the following keys:
-        s3_input_folder - s3 input folder
+        s3_config - s3 config
         hash_cpu - hash cpu requirements
     :return: json string, containing computed number of workers and hashes
     """
@@ -44,11 +44,7 @@ def ededup_compute_execution_params(
                 "secret_key": s3_secret,
                 "url": s3_endpoint
                 }
-    # s3_config = {"input_folder": KFPUtils.clean_path(params.get("s3_input_prefix")),
-    #              "output_folder": "",
-    #              }
-    s3_config = KFPUtils.load_from_json(params.get("s3_config").replace("'", '"'))
-    s3_config["output_folder"] = ""
+    s3_config = KFPUtils.load_from_json(params.get("s3_config", {}).replace("'", '"'))
 
     # because S3 is the only viable version for kfp-based implementation, we are here creating DataAccess S3 directly
     data_access = DataAccessS3(s3_credentials=s3_creds, s3_config=s3_config, d_sets=None, checkpoint=False, m_files=-1)
