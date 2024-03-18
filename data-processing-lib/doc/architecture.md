@@ -1,34 +1,66 @@
 # Data Processing Architecture
 
-The overall data processing architecture is presented at the picture below
+In this section we cover the high-level architecture, some of the core components.  
+
+Transform implementation and examples are provided in the [tutorial](transform-tutorials.md).
+
+## Architecture
+
+The architecture is a "standard" implementation of [Embarrassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel) to
+process many input files in parallel using a distribute network of RayWorkers.
 
 ![Processing Architecture](processing-architecture.jpg)
 
-It is comprised of three main components:
+The architecture includes the following core components: 
 
-* [Launcher](../src/data_processing/ray/transform_launcher.py) is responsible for accepting input parameters 
-  and validating them. Once all parameters are validated, the launcher will check whether user wants to create
-  local Ray cluster (parameter `run_locally` is True) or connect to the existing remote one 
-  (parameter `run_locally` is False) and either creates or connect to the existing cluster (when containing to the 
-   remote cluster we are connecting to a `localhost`, assuming that we are running on the head node of the cluster
-   or `port-forwarding` cluster's service to the local machine). Once we have the cluster we submit to it a request
-   for execution of the remote Ray function, get the execution result and the print it along with execution time
-* [Ray Orchestrator](../src/data_processing/ray/transform_orchestrator.py) is responsible for overal execution of
-  data processing job. It gets the set of the files to be processed and starts a set of Ray actors for executing 
-  transformers in parallel (see below) and a special [statistics actor](../src/data_processing/ray/transform_statistics.py).
-  To achieve better load-balancing of the processing we do not pre-split data for processing by each actor, but
-  rather using [Ray ActorPool](https://docs.ray.io/en/latest/ray-core/api/doc/ray.util.ActorPool.html) to 
-  effectively implement [master-worker pattern](https://tecadmin.net/what-is-a-master-worker-model/). Once all
-  data is processed, an orchestrator will collect execution statistics (from statistics actor) and build and save
-  it in the form of execution metadata. Finally it will return execution result to Launcher
-* [Ray worker](../src/data_processing/ray/transform_table_processor.py) is responsible for reading an individual
-  file ([PyArrow Table](https://levelup.gitconnected.com/deep-dive-into-pyarrow-understanding-its-features-and-benefits-2cce8b1466c8))
-  processing it ising a specific transform and saving both transformation results and transform specific execution
-  metadata
+* [RayLauncher](../src/data_processing/ray/transform_launcher.py) accepts and validates 
+ CLI parameters to establish the Ray Orchestrator with the proper configuration. 
+It uses the following components:
+    * [TransformOrchestratorConfiguration](../src/data_processing/ray/transform_orchestrator_configuration.py) - 
+      provides  the configuration of the ray cluster used, including things such as
+      the number of workers, memory and cpu, local or remote ray cluster, etc.
+    * [DataAccessFactory](../src/data_processing/data_access/data_access_factory.py) - provides the
+      configuration for the type of DataAccess to use when reading/writing the input/output data for
+      the transforms.
+    * [TransformConfiguration](../src/data_processing/ray/transform_runtime.py) - defines specifics
+      of the transform implementation including transform implementation class, its short name, any transform-
+      specific CLI parameters, and an optional TransformRuntime class, discussed below. 
+     
+    After all parameters are validated, the ray cluster is started and the DataAccessFactory, TransformOrchestratorConfiguraiton
+    and TransformConfiguration are given to the Ray Orchestrator, via Ray remote() method invocation.
+    The Launcher waits for the Ray Orchestrator to complete.
+* [Ray Orchestrator](../src/data_processing/ray/transform_orchestrator.py) is responsible for overall management of
+  the data processing job. It creates the actors, determines the set of input data and distributes the 
+  references to the data files to be processed by the workers. More specifically, it performs the following:
+  1. Uses the DataAccess instance created by the DataAccessFactory to determine the set of the files 
+  to be processed.  
+  2. uses the TransformConfiguration to create the TransformRuntime instance 
+  3. Uses the TransformRuntime to optionally apply additional configuration (ray object storage, etc) for the configuration
+  and operation of the Transform.
+  3. uses the TransformOrchestratorConfiguration to determine the set of RayWorkers to create
+  to execute transformers in parallel, providing the following to each worker:
+      * Ray worker configuration
+      * DataAccessFactory 
+      * Transform class and its TransformConfiguration containing the CLI parameters and any TransformRuntime additions.
+  4. in a load-balanced, round-robin fashion, distributes the names of the input files to the workers for them to transform/process.
+   
+  Additionally, to provide monitoring of long-running transforms, the orchestrator is instrumented with 
+  [custom metrics](https://docs.ray.io/en/latest/ray-observability/user-guides/add-app-metrics.html), that are exported to localhost:8080 (this is the endpoint that 
+  Prometheus would be configured to scrape).
+  Once all data is processed, the orchestrator will collect execution statistics (from the statistics actor) 
+  and build and save it in the form of execution metadata (`metadata.json`). Finally, it will return the execution 
+  result to the Launcher.
+* [Ray worker](../src/data_processing/ray/transform_table_processor.py) is responsible for 
+reading files (as [PyArrow Tables](https://levelup.gitconnected.com/deep-dive-into-pyarrow-understanding-its-features-and-benefits-2cce8b1466c8))
+assigned by the orchestrator, applying the transform to the input table and writing out the 
+resulting table(s).  Metadata produced by each table transformation is aggregated into
+Transform Statistics (below).
+* [Transform Statistics](../src/data_processing/ray/transform_statistics.py) is a general 
+purpose data collector actor aggregating the numeric metadata from different places of 
+the framework (especially metadata produced by the transform).
+These statistics are reported as metadata (`metadata.json`) by the orchestrator upon completion.
 
-Such architecture is a "standard" implementation of [Embarrassingly parallel](https://en.wikipedia.org/wiki/Embarrassingly_parallel)
-application using Ray. 
-
+## Core Components
 To make it simpler for transform developer, data processing framework implements majority of 
 the code described above and defining extensions (plugin points) for the developer. 
 
@@ -36,60 +68,42 @@ Overall framework implements several layers, each of which is responsible for de
 the actual functionality. Parameters definition and validation is then invoked by Launcher (see above), while implementation 
 is invoked by Ray orchestrator and worker, which comprise one of the layers. There are 3 layers in the framework:
 
-* Data Access is an abstraction layer for different data access supported by the the framework. The main components
+* [CLIProvided](../src/data_processing/utils/cli_utils.py) - provides a general purpose
+  mechanism for defining, validating and sharing CLI parameters. 
+  It is used by the DataAccessFactor and Transform Configuration (below).
+* Data Access is an abstraction layer for different data access supported by the framework. The main components
   of this layer are:
-  * [Data Access](../src/data_processing/data_access/data_access.py) is the basic interface for the data access, 
-    defining all the methods that are used by the different components of the framework
+  * [Data Access](../src/data_processing/data_access/data_access.py) is the basic interface for the data access, and enables the identification of 
+  input files to process, associated output files, checkpointing and general file reading/writing.
+    Currently, the framework implements several concrete implementations of the Data Access, including
+    [local data support](../src/data_processing/data_access/data_access_local.py) and
+    [s3](../src/data_processing/data_access/data_access_s3.py). Additional Data Access implementations can be added as required.
   * [Data Access Factory](../src/data_processing/data_access/data_access_factory.py) is an implementation of the 
     [factory design pattern](https://www.pentalog.com/blog/design-patterns/factory-method-design-pattern/) for creation
-    of the data access instances. In addition to this Data Access Factory defines a set of parameters for data access
-    access creation and validation rules for these parameters. Finally Data Access factory has very simple state 
-    (several dictionaries) and is fully pickleable. As a result framework uses Data Access Factory instance as a 
-    parameter in remote functions/actors invocation
-  Currently framework implements several concrete implementations of the Data Access, including 
-  [local data support](../src/data_processing/data_access/data_access_local.py) and 
-  [s3](../src/data_processing/data_access/data_access_s3.py). Additional Data Access implementations can be added as required.
-* Infrastructure is implementation of the overall framework infrastructure with several extension mechanisms 
-  for transformers' development (see below). The main components of the infrastracture are:
-  * [Infrastructure configuration](../src/data_processing/ray/transform_orchestrator_configuration.py) is responsible 
-    for defining and validating infrastructure parameters. Similar to Data Access factory, this class has very simple state
-    (several dictionaries) and is fully pickleable. As a result framework uses its instance as a
-    parameter in remote functions/actors invocation
-  * [Ray Orchestrator](../src/data_processing/ray/transform_orchestrator.py) - see above
-  * [Statistics actor](../src/data_processing/ray/transform_statistics.py) is a common purpose data collector actor
-    summing metadata from different places of framework
-  * [Ray worker](../src/data_processing/ray/transform_table_processor.py) see above
-  
-  Additionally to simplify debugging of long running transformers, Infrastructure is instrumented with 
-  [custom metrics](https://docs.ray.io/en/latest/ray-observability/user-guides/add-app-metrics.html), that are
-  exported to localhost:8080 (this is the endpoint that Prometheus would be configured to scrape)
-* Transform is an implementation of the actual transform. Unlike Data access and Infrastructure, which are provided 
-  by the framework, transform has to be implemented by user leveraging framework support. Transform implementation 
-  entails implementing the following:
-  * [AbstractTableTransform](../src/data_processing/transform/table_transform.py) - the class that implements the actual
-    transform logic - takes an input table and computes a list of output tables and transform specific metadata 
-    (for the input table). Ray worker will send this metadata to Statistics actor for summation. Additional method
-    on this class is `flush`, that needs to be implemented by a new transformer only if a transformer is buffering 
-    tables locally before submitting them to the output (see [coalesce transform](../../transforms/universal/coalesce)
-    for the example)
-  * [DefaultTableTransformConfiguration](../src/data_processing/ray/transform_runtime.py) - the class that implements 
-    definition and validation of the transform specific parameters (**Note** that only parameters required for the 
-    transform should be defined here, data access and infrastructure specific parameters are defined by the corresponding
-    layers). By default all transform specific parameters are copied to the execution metadata, which can be a problem
-    if configuration contains some sensitive information, for example passwords, secrets, etc, or any other parameters
-    that transform developer does not want to be exposed. To remove some of the parameters from being exposed add them
-    the `self.remove_from_metadata` array maintained by the class.
-    Additionally this class carries transform implementation class and transform runtime class (see below). Both
-    are defined by type, not by instance.
-    Similar to Data Access factory, this class has very simple state (several dictionaries) and is fully 
-    pickleable. As a result framework uses its instance as a parameter in remote functions/actors invocation.
-  * [DefaultTableTransformRuntime](../src/data_processing/ray/transform_runtime.py) - this class only need to 
-    implemented by advanced transforms, for example by [exact dedup](advanced-transform-tutorial.md) or when 
-    transform is using [external resources](transform-external-resources.md). This class provides two methods:
-    * `get_transform_config()` invoked by `Ray orchestrator` is a method that can be used to implement any out 
-      of bound runtime operations, for example, to create additional Ray objects, required by transformer, 
-      read additional data, etc.
-    * `compute_execution_stats` is also invoked by `Ray orchestrator` is a method that can be used for 
-      supplementing execution information exposed by the metadata (by default execution information is all the 
-      data collected by statistics)
+    of the data access instances. Data Access Factory, as a CLIProvider,  enables the definition of CLI 
+    parameters that configure the instance of Data Access to be created. Data Access factory has very simple state 
+    (several dictionaries) and is fully pickleable. The framework uses Data Access Factory instance as a 
+    parameter in remote functions/actors invocations.
+* [Transform Configuration](../src/data_processing/ray/transform_orchestrator_configuration.py) is responsible 
+  for defining and validating infrastructure parameters. Similar to Data Access factory, this class has very simple state
+  (several dictionaries) and is fully pickleable. As a result framework uses its instance as a
+  parameter in remote functions/actors invocation
+ 
+## Transforms
+A brief discussion of the Transform components are provided here.
+For a more complete discussion, see the [tutorials](transform-tutorials.md).
+
+* [Transform](../src/data_processing/transform/table_transform.py) - defines the methods required
+of any transform implementation - `transform()` and `flush()` - and provides the bulk of any transform implementation
+convert one Table to 0 or more new Tables.   In general, this is not tied to the above Ray infrastructure 
+and so can usually be used independent of Ray. 
+* [TransformRuntime ](../src/data_processing/ray/transform_runtime.py) - this class only needs to be
+extended/implemented when additional Ray components (actors, shared memory objects, etc.) are used
+by the transform. The main method `get_transform_config()` is used to enable these extensions.
+* [TransformConfiguration](../src/data_processing/ray/transform_runtime.py) - this is the bootstrap
+  class provided to the Launcher that enables the instantiation of the Transform and the TransformRuntime within
+  the architecture.  It is a CLIProvider, which allows it to define transform-specific CLI configuration
+  that is made available to the Transform's initializer.
+ 
+
 
