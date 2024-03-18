@@ -29,7 +29,7 @@ class KFPUtils:
     Helper utilities for KFP implementations
     """
     @staticmethod
-    def credentials(access_key: str = "COS_KEY", secret_key: str = "COS_SECRET", endpoint: str = "COS_ENDPOINT") \
+    def credentials(access_key: str = "S3_KEY", secret_key: str = "S3_SECRET", endpoint: str = "ENDPOINT") \
             -> tuple[str, str, str]:
         """
         Get credentials from the environment
@@ -38,10 +38,12 @@ class KFPUtils:
         :param endpoint: environment variable for S3 endpoint
         :return:
         """
-        cos_key = os.getenv(access_key, "")
-        cos_secret = os.getenv(secret_key, "")
-        cos_endpoint = os.getenv(endpoint, "")
-        return cos_key, cos_secret, cos_endpoint
+        s3_key = os.getenv(access_key, None)
+        s3_secret = os.getenv(secret_key, None)
+        s3_endpoint = os.getenv(endpoint, None)
+        if s3_key is None or s3_secret is None or s3_endpoint is None:
+            print("Failed to load s3 credentials")
+        return s3_key, s3_secret, s3_endpoint
 
     @staticmethod
     def get_namespace() -> str:
@@ -235,7 +237,7 @@ class PipelinesUtils:
 
         except Exception as e:
             print(f"Failed waiting pipeline completion {e}")
-            return "failed", e.__cause__
+            return "failed", str(e)
 
 
 class RayRemoteJobs:
@@ -245,15 +247,17 @@ class RayRemoteJobs:
     ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 
     def __init__(self, server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-                 http_retries: int = 5, wait_interval: int = 2):
+                 default_image: str = "rayproject/ray:2.9.3-py310", http_retries: int = 5, wait_interval: int = 2):
         """
         Initialization
         :param server_url: API server URL. Default value is assuming running inside the cluster
+        :param default_image - default Ray image
         :param wait_interval: wait interval
         :param http_retries: http retries
         """
         self.api_server_client = KubeRayAPIs(server_url=server_url, http_retries=http_retries,
                                              wait_interval=wait_interval)
+        self.default_image = default_image
 
     def create_ray_cluster(self, name: str, namespace: str, head_node: dict[str, Any],
                            worker_nodes: list[dict[str, Any]], wait_cluster_ready: int = -1) -> tuple[int, str]:
@@ -331,7 +335,7 @@ class RayRemoteJobs:
             worker_template_names[index] = worker_node_template_name
             index += 1
         # Build head node spec
-        image = head_node.get("image", "rayproject/ray:2.9.0-py310")
+        image = head_node.get("image", self.default_image)
         image_pull_secret = head_node.get("image_pull_secret", None)
         ray_start_params = head_node.get("ray_start_params", DEFAULT_HEAD_START_PARAMS)
         volumes_dict = head_node.get("volumes", None)
@@ -358,7 +362,7 @@ class RayRemoteJobs:
             max_replicas = worker_node.get("max_replicas", 1)
             replicas = worker_node.get("replicas", 1)
             min_replicas = worker_node.get("max_replicas", 0)
-            image = worker_node.get("image", "rayproject/ray:2.9.0-py310")
+            image = worker_node.get("image", self.default_image)
             image_pull_secret = worker_node.get("image_pull_secret", None)
             ray_start_params = worker_node.get("ray_start_params", DEFAULT_WORKER_START_PARAMS)
             volumes_dict = worker_node.get("volumes", None)
@@ -520,6 +524,7 @@ class RayRemoteJobs:
             sys.exit(1)
         self._print_log(log=log, previous_log_len=previous_log_len)
         print(f"Job completed with execution status {status}")
+        # TODO - store log to S3
 
 
 class ComponentUtils:
@@ -544,7 +549,7 @@ class ComponentUtils:
         # Set cashing
         component.execution_options.caching_strategy.max_cache_staleness = cache_strategy
         # image pull policy
-        component.set_image_pull_policy(image_pull_policy)
+        component.container.set_image_pull_policy(image_pull_policy)
         # Set the timeout for the task
         component.set_timeout(timeout)
 
@@ -552,12 +557,12 @@ class ComponentUtils:
     def set_s3_env_vars_to_component(
             component: dsl.ContainerOp,
             secret: str,
-            env2key: dict[str, str] = {"COS_KEY": "cos-key", "COS_SECRET": "cos-secret", "COS_ENDPOINT": "cos-endpoint"}
+            env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"}
     ) -> None:
         """
-        Set COS env variables to KFP component
+        Set S3 env variables to KFP component
         :param component: kfp component
-        :param secret: secret name with the COS credentials
+        :param secret: secret name with the S3 credentials
         :param env2key: dict with mapping each env variable to a key in the secret
         """
         for env_name, secret_key in env2key.items():
@@ -582,6 +587,7 @@ class ComponentUtils:
         :return: number of actors
         """
         import sys
+        from kfp_support.workflow_support.utils import KFPUtils
         # convert input
         w_options = KFPUtils.load_from_json(worker_options.replace("'", '"'))
         a_options = KFPUtils.load_from_json(actor_options.replace("'", '"'))

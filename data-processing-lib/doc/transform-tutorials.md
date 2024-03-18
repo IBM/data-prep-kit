@@ -37,12 +37,13 @@ not need this feature, a default implementation is provided to return an empty l
 
 ### Running in Ray
 When a transform is run using the Ray-based framework a number of other capabilities are involved:
-* [Transform Runtime](../src/data_processing/ray/transform_runtime.py) - this provides the ability for 
-transform implementor to create additional Ray resources (see, for example, 
-[exact dedup](../../transforms/universal/ededup/src/ededup_transform.py)) and add them to the configuration used to create a transform.
-to transform implementation. This also provide the ability to supplement statics collected by
-[Statistics](../src/data_processing/ray/transform_statistics.py) (see below) with the information collected from
-the additional Ray objects, created by Transform runtime
+* [Transform Runtime](../src/data_processing/ray/transform_runtime.py) - this provides the ability for the
+transform implementor to create additional Ray resources 
+and include them in the configuration used to create a transform
+(see, for example, [exact dedup](../../transforms/universal/ededup/src/ededup_transform.py) 
+or [blocklist](../../transforms/universal/blocklisting/src/blocklist_transform.py)).
+This also provide the ability to supplement the statics collected by
+[Statistics](../src/data_processing/ray/transform_statistics.py) (see below).
 * [Transform Configuration](../src/data_processing/ray/transform_runtime.py) - defines the following:
   * the transform class to be used, 
   * command line arguments used to initialize the Transform Runtime and generally, the Transform.

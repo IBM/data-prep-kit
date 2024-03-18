@@ -1,5 +1,4 @@
 import sys
-
 from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
 
 
