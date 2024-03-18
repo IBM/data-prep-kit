@@ -19,7 +19,7 @@ venv::	.transforms.check_python_version
 	$(PYTHON) -m venv venv
 	@source venv/bin/activate;					\
 	$(PIP) install --upgrade pip;		\
-	$(PIP) install setuptools wheel cmake;		\
+	$(PIP) install wheel;		\
 	$(MAKE) .transforms.venv		\
 
 build:: venv image
