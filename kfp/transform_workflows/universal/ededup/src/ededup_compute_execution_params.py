@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, NamedTuple
 
 
 def ededup_compute_execution_params(
@@ -6,7 +6,7 @@ def ededup_compute_execution_params(
         actor_options: str,         # actor's resource requirements
         params: dict[str, Any],     # exact dedup specific parameters
         n_samples: int = 10,        # number of samples to use
-) -> str:
+) -> NamedTuple('Output', [("workers", int), ('hashes', int)]):
     """
     Compute exact dedup execution parameters
     :param worker_options: cluster parameters
@@ -44,9 +44,12 @@ def ededup_compute_execution_params(
                 "secret_key": s3_secret,
                 "url": s3_endpoint
                 }
-    s3_config = {"input_folder": KFPUtils.clean_path(params.get("s3_input_prefix")),
-                 "output_folder": "",
-                 }
+    # s3_config = {"input_folder": KFPUtils.clean_path(params.get("s3_input_prefix")),
+    #              "output_folder": "",
+    #              }
+    s3_config = KFPUtils.load_from_json(params.get("s3_config").replace("'", '"'))
+    s3_config["output_folder"] = ""
+
     # because S3 is the only viable version for kfp-based implementation, we are here creating DataAccess S3 directly
     data_access = DataAccessS3(s3_credentials=s3_creds, s3_config=s3_config, d_sets=None, checkpoint=False, m_files=-1)
     # sample input data
@@ -84,4 +87,6 @@ def ededup_compute_execution_params(
         print(f"Try to increase the size of the cluster or increase size of the cpu per worker")
         sys.exit(1)
     print(f"Projected execution time {EXECUTION_OF_KB_DOC * avg_doc_size * number_of_docs / n_workers / 60} min")
-    return json.dumps({"workers": n_workers, "hashes": n_hashes})
+    # return json.dumps({"workers": n_workers, "hashes": n_hashes})
+    return (n_workers, n_hashes)
+    # return (1, 1)
