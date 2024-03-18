@@ -9,8 +9,8 @@ from kfp_support.workflow_support.utils import (
     ComponentUtils,
 )
 from kubernetes import client as k8s_client
-
 from src.ededup_compute_execution_params import ededup_compute_execution_params
+import uuid
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "ededup_transform.py"
@@ -18,7 +18,7 @@ RUN_ID = uuid.uuid4().hex
 
 
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1-test3"
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1-test4"
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(
     func=ededup_compute_execution_params, base_image=base_kfp_image
@@ -102,6 +102,8 @@ def ededup(
             params={"s3_config": s3_config, "hash_cpu": hash_cpu}
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
+        ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, cos_access_secret)
+
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
