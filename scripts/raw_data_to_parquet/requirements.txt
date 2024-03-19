@@ -1,0 +1,2 @@
+--extra-index-url https://${ARTIFACTORY_USER}:${ARTIFACTORY_API_KEY}@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
+fm-data-processing==0.2.0
