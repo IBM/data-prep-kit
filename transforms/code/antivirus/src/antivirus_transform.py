@@ -133,5 +133,5 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
 
 if __name__ == "__main__":
     launcher = TransformLauncher(transform_runtime_config=AntivirusTransformConfiguration())
-    logger.info("Launching noop transform")
+    logger.info("Launching antivirus transform")
     launcher.launch()
