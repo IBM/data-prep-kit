@@ -7,11 +7,12 @@ from kfp_support.workflow_support.utils import (
     ComponentUtils,
 )
 from kubernetes import client as k8s_client
+import uuid
 
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "transformer_launcher.py"
-RUN_ID = "00"
+RUN_ID = uuid.uuid4().hex
 
 
 # components
@@ -120,6 +121,7 @@ def noop(
                 "num_workers": compute_exec_params.output,
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
+                "job_id": RUN_ID
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,

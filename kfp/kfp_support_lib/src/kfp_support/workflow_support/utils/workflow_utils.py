@@ -18,6 +18,10 @@ from kfp_support.api_server_client.params import (Template, DEFAULT_HEAD_START_P
                                                   volume_decoder, HeadNodeSpec, WorkerNodeSpec, ClusterSpec, Cluster,
                                                   RayJobRequest, environment_variables_decoder)
 
+from data_processing.data_access import DataAccess
+from data_processing.utils import get_logger
+
+logger = get_logger(__name__)
 
 ONE_HOUR_SEC = 60 * 60
 ONE_DAY_SEC = ONE_HOUR_SEC * 24
@@ -42,7 +46,7 @@ class KFPUtils:
         s3_secret = os.getenv(secret_key, None)
         s3_endpoint = os.getenv(endpoint, None)
         if s3_key is None or s3_secret is None or s3_endpoint is None:
-            print("Failed to load s3 credentials")
+            logger.warning("Failed to load s3 credentials")
         return s3_key, s3_secret, s3_endpoint
 
     @staticmethod
@@ -55,7 +59,7 @@ class KFPUtils:
         try:
             file = open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r")
         except Exception as e:
-            print(f"Failed to open /var/run/secrets/kubernetes.io/serviceaccount/namespace file, exception {e}")
+            logger.warning(f"Failed to open /var/run/secrets/kubernetes.io/serviceaccount/namespace file, exception {e}")
         else:
             with file:
                 ns = file.read()
@@ -137,7 +141,7 @@ class KFPUtils:
         try:
             return json.loads(js)
         except Exception as e:
-            print(f"Failed to load parameters {js} with error {e}")
+            logger.warning(f"Failed to load parameters {js} with error {e}")
             sys.exit(1)
 
 
@@ -169,10 +173,10 @@ class PipelinesUtils:
         try:
             run_id = self.kfp_client.run_pipeline(experiment_id=experiment.id, job_name=job_name,
                                                   pipeline_id=pipeline.id, params=params)
-            print("Pipeline submitted")
+            logger.info("Pipeline submitted")
             return run_id.id
         except Exception as e:
-            print(f"Exception starting pipeline {e}")
+            logger.warning(f"Exception starting pipeline {e}")
             return None
 
     def get_experiment_by_name(self, name: str = "Default") -> models.api_experiment.ApiExperiment:
@@ -184,7 +188,7 @@ class PipelinesUtils:
         try:
             return self.kfp_client.get_experiment(experiment_name=name)
         except Exception as e:
-            print(f"Exception getting experiment {e}")
+            logger.warning(f"Exception getting experiment {e}")
             return None
 
     def get_pipeline_by_name(self, name: str, np: int = 100) -> models.api_pipeline.ApiPipeline:
@@ -200,12 +204,12 @@ class PipelinesUtils:
             pipelines = self.kfp_client.list_pipelines(page_size=np).pipelines
             required = list(filter(lambda p: name in p.name, pipelines))
             if len(required) != 1:
-                print(f"Failure to get pipeline. Number of pipelines with name {name} is {len(required)}")
+                logger.warning(f"Failure to get pipeline. Number of pipelines with name {name} is {len(required)}")
                 return None
             return required[0]
 
         except Exception as e:
-            print(f"Exception getting pipeline {e}")
+            logger.warning(f"Exception getting pipeline {e}")
             return None
 
     def wait_pipeline_completion(self, run_id: str, timeout: int = -1, wait: int = 600) -> tuple[str, str]:
@@ -229,14 +233,14 @@ class PipelinesUtils:
                     return "failed", f"Execution is taking too long"
                 run_details = self.kfp_client.get_run(run_id=run_id)
                 status = run_details.run.status
-                print(f"Got pipeline execution status {status}")
+                logger.info(f"Got pipeline execution status {status}")
 
             if status.lower() in ["succeeded", "completed"]:
                 return status, ""
             return status, run_details.run.error
 
         except Exception as e:
-            print(f"Failed waiting pipeline completion {e}")
+            logger.warning(f"Failed waiting pipeline completion {e}")
             return "failed", str(e)
 
 
@@ -470,13 +474,14 @@ class RayRemoteJobs:
             l_to_print = RayRemoteJobs.ansi_escape.sub("", l_to_print)
             print(l_to_print)
 
-    def follow_execution(self, name: str, namespace: str, submission_id: str, job_ready_timeout: int = 600,
-                         print_timeout: int = 120) -> None:
+    def follow_execution(self, name: str, namespace: str, submission_id: str, data_access: DataAccess = None,
+                         job_ready_timeout: int = 600, print_timeout: int = 120) -> None:
         """
         Follow remote job execution
         :param name: cluster name
         :param namespace: cluster namespace
         :param submission_id: job submission ID
+        :param data_access - data access class
         :param job_ready_timeout: timeout to wait for fob to become ready
         :param print_timeout: print interval
         :return: None
@@ -492,9 +497,9 @@ class RayRemoteJobs:
                 break
             time.sleep(self.api_server_client.wait_interval)
             job_ready_timeout -= self.api_server_client.wait_interval
-        print(f"job status is {job_status}")
+        logger.info(f"job status is {job_status}")
         if job_ready_timeout < 0:
-            print("timed out waiting for job become ready, exiting")
+            logger.warning("timed out waiting for job become ready, exiting")
             sys.exit(1)
         #  While job is running print log
         previous_log_len = 0
@@ -523,8 +528,16 @@ class RayRemoteJobs:
         if status // 100 != 2:
             sys.exit(1)
         self._print_log(log=log, previous_log_len=previous_log_len)
-        print(f"Job completed with execution status {status}")
-        # TODO - store log to S3
+        logger.info(f"Job completed with execution status {status}")
+        if data_access is None:
+            return
+        # Here data access is either S3 or lakehouse both of which contain self.input_folder
+        try:
+            input_folder = data_access.input_folder
+        except Exception as e:
+            logger.warning(f"failed to get input folder {e}")
+            return
+        data_access.save_file(path=input_folder, data=bytes(log, "UTF-8"))
 
 
 class ComponentUtils:
@@ -595,7 +608,7 @@ class ComponentUtils:
         cluster_cpu = w_options["replicas"] * w_options["cpu"]
         cluster_mem = w_options["replicas"] * w_options["memory"]
         cluster_gpu = w_options["replicas"] * w_options.get("gpu", 0.)
-        print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}, GPUs {cluster_gpu}")
+        logger.info(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}, GPUs {cluster_gpu}")
         # compute number of actors
         n_actors_cpu = int(cluster_cpu * 0.85 / a_options.get("num_cpus", .5))
         n_actors_memory = int(cluster_mem * 0.85 / a_options.get("memory", 1))
@@ -605,9 +618,9 @@ class ComponentUtils:
         if actor_gpu > 0:
             n_actors_gpu = int(cluster_gpu / actor_gpu)
             n_actors = min(n_actors, n_actors_gpu)
-        print(f"Number of actors - {n_actors}")
+        logger.info(f"Number of actors - {n_actors}")
         if n_actors < 1:
-            print(f"Not enough cpu/gpu/memory to run transform, "
+            logger.warning(f"Not enough cpu/gpu/memory to run transform, "
                   f"required cpu {a_options.get('num_cpus', .5)}, available {cluster_cpu}, "
                   f"required memory {a_options.get('memory', 1)}, available {cluster_mem}, "
                   f"required cpu {actor_gpu}, available {cluster_gpu}"

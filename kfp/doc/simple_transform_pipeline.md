@@ -75,19 +75,111 @@ The pipeline defines all of the parameters required for the execution:
     s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/doc_annotation_test/input/noop_small/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_noop_guf/'}",
 ```
 
+The parameters used here are as follows:
+
+* ray_name - name of the Ray cluster
+* ray_head_options - head node options, containing the following:
+  * cpu - number of cpus
+  * memory - memory
+  * image - image to use
+  * image_pull_secret - image pull secret
+* ray_worker_options - worker node options (we here are using only 1 worker pool), containing the following:
+  * replicas - number of replicas to create
+  * max_replicas - max number of replicas
+  * min_replicas - min number of replicas
+  * cpu - number of cpus
+  * memory - memory
+  * image - image to use
+  * image_pull_secret - image pull secret
+* server_url - url of the KubeRay API server
+* additional_params - additional (support) parameters, containing the following:
+  * wait_interval - wait interval for API server, sec
+  * wait_cluster_ready_tmout - time to wait for cluster ready, sec
+  * wait_cluster_up_tmout - time to wait for cluster up, sec
+  * wait_job_ready_tmout - time to wait for job ready, sec
+  * wait_print_tmout - time between prints, sec
+  * http_retries - httpt retries for API server calls
+* lh_config - lake house configuration
+* s3_config - s3 configuration
+* s3_access_secret - s3 access secret
+* max_files - max files to process
+* actor_options - actor options - see [here](../../data-processing-lib/doc/launcher-options.md)
+* pipeline_id - pipeline id
+* noop_sleep_sec - noop sleep time
+
 **Note** that here we are specifying initial values for all parameters that will be propagated to the worklow UI
 (see below)
+
+**Note** Paramwters are defining both S3 and lakehouse configuration, but only one at a time can be used.
 
 ### Pipeline wiring
 
 Now that all components and input parameters are defined, we can implement pipeline wiring defining sequence of 
 component execution and parameters submittied to every component. 
 
+```python
+    # create clean_up task
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=RUN_ID, server_url=server_url)
+    ComponentUtils.add_settings_to_component(clean_up_task, 60)
+    # pipeline definition
+    with dsl.ExitHandler(clean_up_task):
+        # compute execution params
+        compute_exec_params = compute_exec_params_op(
+            worker_options=ray_worker_options,
+            actor_options=actor_options,
+        )
+        ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
+        # start Ray cluster
+        ray_cluster = create_ray_op(
+            ray_name=ray_name,
+            run_id=RUN_ID,
+            ray_head_options=ray_head_options,
+            ray_worker_options=ray_worker_options,
+            server_url=server_url,
+            additional_params=additional_params,
+        )
+        ComponentUtils.add_settings_to_component(ray_cluster, ONE_HOUR_SEC * 2)
+        ray_cluster.after(compute_exec_params)
+        # Execute job
+        execute_job = execute_ray_jobs_op(
+            ray_name=ray_name,
+            run_id=RUN_ID,
+            additional_params=additional_params,
+            # note that the parameters below are specific for NOOP transform
+            exec_params={
+                "s3_config": s3_config,
+                "noop_sleep_sec": noop_sleep_sec,
+                "lh_config": lh_config,
+                "max_files": max_files,
+                "num_workers": compute_exec_params.output,
+                "worker_options": actor_options,
+                "pipeline_id": pipeline_id,
+            },
+            exec_script_name=EXEC_SCRIPT_NAME,
+            server_url=server_url,
+        )
+```
+
+Here we first create `cleanup_task` and the use it as an 
+[exit handler](https://www.kubeflow.org/docs/components/pipelines/v2/pipelines/control-flow/) so that it will be invoked
+in case any of the step will fail.
+Then we create each individual component passing it required parameters and specify execution sequence, for example
+(`ray_cluster.after(compute_exec_params)`).
+
 ### Additional configuration
+
+The final thing that we need to do is set some pipeline global configuration:
+
+```python
+    # set image pull secrets
+    dsl.get_pipeline_conf().set_image_pull_secrets([k8s_client.V1ObjectReference(name="prod-all-icr-io")])
+    # Configure the pipeline level to one week (in seconds)
+    dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
+```
 
 ## Compiling pipeline and deploying it to KFP
 
-To mpile pipeline execute this [file](../transform_workflows/universal/noop/noop_wf.py), which produces file `noop_wf.yaml`
+To compile pipeline execute this [file](../transform_workflows/universal/noop/noop_wf.py), which produces file `noop_wf.yaml`
 in the same directory. Now create kind cluster cluster with all required software installed using the following command: 
 
 ````shell
@@ -105,3 +197,19 @@ name pipeline noop. Once this is done, you should see something as follows:
 ![noop pipeline](noop_pipeline.png)
 
 ## Executing pipeline and watching execution results
+
+Before we can run the pipeline we need to create required secrets (one for image loading in case of secured 
+registry and one for S3 access). As KFP is deployed in `kubeflow` namespace, workflow execution will happen
+there as well, which means that secrets have to be created there as well.
+
+Once this is done we can execute the workflow. 
+
+On the worflow page (above) click on the 
+
+## Clean up cluster
+
+Finally you can delete kind cluster running the following command:
+
+```Shell
+make delete-kind-cluster
+```
