@@ -71,11 +71,17 @@ if __name__ == "__main__":
         run_id=args.run_id,
     )
     exec_params = KFPUtils.load_from_json(args.exec_params)
+    s3_config = exec_params.get("s3_config", None)
+    if s3_config == "None" or s3_config == "":
+        s3_config = None
+    lh_config = exec_params.get("lh_config", None)
+    if lh_config == "None" or lh_config == "":
+        lh_config = None
     access_key, secret_key, url = KFPUtils.credentials()
     data_factory = DataAccessFactory()
     data_factory.apply_input_params(args={
-        "s3_config": exec_params["s3_config"],
-        "lh_config": exec_params["lh_config"],
+        "s3_config": s3_config,
+        "lh_config": lh_config,
         "s3_cred": {"access_key": access_key, "secret_key": secret_key, "url": url}
     })
     data_access = data_factory.create_data_access()
