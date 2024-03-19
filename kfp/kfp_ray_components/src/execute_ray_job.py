@@ -71,14 +71,14 @@ if __name__ == "__main__":
     # convert exec params to dictionary
     exec_params = KFPUtils.load_from_json(args.exec_params)
     # convert s3 config to proper dictionary to use for data access factory
-    s3_config = exec_params.get("s3_config", None)
+    s3_config = exec_params.get("s3_config", "None")
     s3_config_ori = s3_config
     if s3_config == "None" or s3_config == "":
         s3_config = None
     else:
         s3_config = KFPUtils.load_from_json(s3_config.replace("'", '"'))
     # convert lh config to proper dictionary to use for data access factory
-    lh_config = exec_params.get("lh_config", None)
+    lh_config = exec_params.get("lh_config", "None")
     lh_config_ori = lh_config
     if lh_config == "None" or lh_config == "":
         lh_config = None

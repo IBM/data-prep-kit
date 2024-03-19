@@ -538,8 +538,7 @@ class RayRemoteJobs:
         except Exception as e:
             logger.warning(f"failed to get output folder {e}")
             return
-        if not output_folder.endswith("/"):
-            output_folder += "/"
+        output_folder = output_folder if output_folder.endswith("/") else output_folder + "/"
         execution_log_path = f"{output_folder}execution.log"
         logger.info(f"saving execution log to {execution_log_path}")
         data_access.save_file(path=execution_log_path, data=bytes(log, "UTF-8"))
