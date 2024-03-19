@@ -204,7 +204,9 @@ there as well, which means that secrets have to be created there as well.
 
 Once this is done we can execute the workflow. 
 
-On the worflow page (above) click on the 
+On the pipeline page (above) click on the `create run` button. You will see the list of the parameters, that you
+can enter, which is populated with with the default that we specified above. If you do not want to modify parameters,
+go to the bottom of the page and click 
 
 ## Clean up cluster
 
