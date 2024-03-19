@@ -1,4 +1,5 @@
 import argparse
+import sys
 import time
 
 import ray
@@ -90,7 +91,7 @@ class TransformLauncher:
                     transform_runtime_config=self.transform_runtime_config,
                 )
             )
-            logger.info("Completed orchestrator")
+            logger.debug("Completed orchestrator")
             time.sleep(10)
         except Exception as e:
             logger.info(f"Exception running ray remote orchestration\n{e}")
@@ -106,4 +107,8 @@ class TransformLauncher:
         """
         if self.__get_parameters():
             return self._submit_for_execution()
-        return 1
+        if self.run_locally:
+            return 1
+        else:
+            # if we are running in kfp exit to signal kfp that we failed
+            sys.exit(1)

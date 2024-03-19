@@ -1,5 +1,5 @@
 name: Start Ray Cluster
-description: Starts Ray cluster
+description: Creates Ray cluster
 
 inputs:
     - { name: ray_name, type: String, description: "Ray cluster user name" }
@@ -12,7 +12,7 @@ inputs:
 
 implementation:
     container:
-        image: us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-guf:0.0.1-test2
+        image: us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1-test3
         # command is a list of strings (command-line arguments).
         # The YAML language has two syntaxes for lists and you can use either of them.
         # Here we use the "flow syntax" - comma-separated strings inside square brackets.
@@ -21,7 +21,7 @@ implementation:
                 # Force the stdout and stderr streams to be unbuffered
                 -u,
                 # Path of the program inside the container
-                /pipelines/component/src/start_ray_cluster.py,
+                /pipelines/component/src/create_ray_cluster.py,
                 --ray_name,
                 { inputValue: ray_name },
                 --run_id,

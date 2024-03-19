@@ -49,11 +49,12 @@ class DataAccessLakeHouse(DataAccess):
             environment=lakehouse_config["lh_environment"],
             cos_credentials=cos_cred,
         )
+        self.output_folder = self.lh.get_output_data_path()
         self.S3 = DataAccessS3(
             s3_credentials=s3_credentials,
             s3_config={
                 "input_folder": self.lh.get_input_data_path(),
-                "output_folder": self.lh.get_output_data_path(),
+                "output_folder": self.output_folder,
             },
             d_sets=d_sets,
             checkpoint=checkpoint,
@@ -146,7 +147,7 @@ class DataAccessLakeHouse(DataAccess):
             path=f"{self.S3.output_folder}/metadata.json", data=json.dumps(metadata, indent=2).encode()
         )
         if repl is None:
-            return l, repl
+            return repl
         # Save metadata to LH
         stats = JobStats(
             pipeline_id=metadata["pipeline"],

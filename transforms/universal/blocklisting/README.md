@@ -20,22 +20,22 @@ does not match any of the blocked domains, it will be empty.
 The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py) 
 configuration for values are as follows:
 
-* _bl_annotation_column_name_ - specifies the name of the table column into which the annotation is placed.
+* _blocklist_annotation_column_name_ - specifies the name of the table column into which the annotation is placed.
 This column is **added** to the output tables.  The default is 
-* _bl_source_url_column_name_ - specifies the name of the table column holding the URL from which the document was retrieved.
-* _bl_blocked_domain_list_path_ - specifies the directory holding files matching 
+* _blocklist_source_url_column_name_ - specifies the name of the table column holding the URL from which the document was retrieved.
+* _blocklist_blocked_domain_list_path_ - specifies the directory holding files matching 
 the regular expression `domains*`.
  
 Additionally, a set of data access-specific arguments are provided that enable
 the specification of the location of domain list files, so that these
 files could be stored in the local file system or in S3 storage, for example.
 The arguments are as follows (and generally match the TransformLauncher's 
-data access arguments but with the `bl_' prefix).
+data access arguments but with the `blocklist_' prefix).
 
-* _blocklisting_local_config_ - specifies the input and outout folders, although these are not used by the transform.
-* _blocklisting_s3_config_ - specifies the input and output paths in s3.
-* _blocklisting_lh__config_ - specifies lakehouse parameters.
-* _blocklisting_s3_credentials_ - provides credentials to access the s3 storage. 
+* _blocklist_local_config_ - specifies the input and outout folders, although these are not used by the transform.
+* _blocklist_s3_config_ - specifies the input and output paths in s3.
+* _blocklist_lh_config_ - specifies lakehouse parameters.
+* _blocklist_s3_credentials_ - provides credentials to access the s3 storage. 
 
 See the Command Line options below for specifics on these.
 
@@ -94,24 +94,24 @@ When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
 [the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
 ```
---bl_blocked_domain_list_path BL_BLOCKED_DOMAIN_LIST_PATH
+--blocklist_blocked_domain_list_path BL_BLOCKED_DOMAIN_LIST_PATH
                         COS URL or local folder (file or directory) that points to the list of block listed domains.  If not running in Ray, this must be a local folder.
---bl_annotation_column_name BL_ANNOTATION_COLUMN_NAME
+--blocklist_annotation_column_name BL_ANNOTATION_COLUMN_NAME
                         Name of the table column that contains the block listed domains
---bl_source_url_column_name BL_SOURCE_URL_COLUMN_NAME
+--blocklist_source_url_column_name BL_SOURCE_URL_COLUMN_NAME
                         Name of the table column that has the document download URL
---bl_s3_cred BL_S3_CRED
+--blocklist_s3_cred BL_S3_CRED
                         AST string of options for cos credentials. Only required for COS or Lakehouse.
                         access_key: access key help text
                         secret_key: secret key help text
                         url: S3 url
                         Example: { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/cos-optimal-llm-pile/test/' }
---bl_s3_config BL_S3_CONFIG
+--blocklist_s3_config BL_S3_CONFIG
                         AST string containing input/output paths.
                         input_path: Path to input folder of files to be processed
                         output_path: Path to output folder of processed files
                         Example: { 'input_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'output_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed' }
---bl_lh_config BL_LH_CONFIG
+--blocklist_lh_config BL_LH_CONFIG
                         AST string containing input/output using lakehouse.
                         input_table: Path to input folder of files to be processed
                         input_dataset: Path to outpu folder of processed files
@@ -121,7 +121,7 @@ the following command line arguments are available in addition to
                         token: The token to use for Lakehouse authentication
                         lh_environment: Operational environment. One of STAGING or PROD
                         Example: { 'input_table': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'input_dataset': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'input_version': '1.0', 'output_table': 'ededup', 'output_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'token': 'AASDFZDF', 'lh_environment': 'STAGING' }
---bl_local_config BL_LOCAL_CONFIG
+--blocklist_local_config BL_LOCAL_CONFIG
                         ast string containing input/output folders using local fs.
                         input_folder: Path to input folder of files to be processed
                         output_folder: Path to output folder of processed files
