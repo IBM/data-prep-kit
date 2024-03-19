@@ -3,14 +3,11 @@ FROM docker.io/rayproject/ray:2.9.3-py310 AS base
 ARG ARTIFACTORY_USER
 ARG ARTIFACTORY_API_KEY
 
-COPY requirements.txt requirements.txt
-
-
 USER root 
 RUN sudo apt update && sudo apt install gcc g++ -y
 USER ray 
 
-#RUN pip install --no-cache-dir wheel 
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 USER root 
