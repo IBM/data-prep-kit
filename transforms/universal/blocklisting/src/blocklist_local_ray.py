@@ -1,6 +1,5 @@
 import os
 import sys
-from pathlib import Path
 
 from blocklist_transform import (
     BlockListTransformConfiguration,
@@ -48,7 +47,6 @@ launcher_params = {
 # launch
 if __name__ == "__main__":
     # Run the transform inside Ray
-    Path(output_folder).mkdir(parents=True, exist_ok=True)
     # Create the CLI args as will be parsed by the launcher
     sys.argv = ParamsUtils.dict_to_req(launcher_params | block_list_params)
     # Create the longer to launch with the blocklist transform.

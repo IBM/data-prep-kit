@@ -1,6 +1,5 @@
 import os
 import sys
-from pathlib import Path
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
@@ -49,7 +48,6 @@ params = {
     "delimiters": " ",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
-Path(output_folder).mkdir(parents=True, exist_ok=True)
 
 # launch
 launcher.launch()

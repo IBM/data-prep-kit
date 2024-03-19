@@ -1,6 +1,5 @@
 import os
 import sys
-from pathlib import Path
 
 from coalesce_transform import CoalesceTransformConfiguration
 from data_processing.ray import TransformLauncher
@@ -33,7 +32,5 @@ params = {
     "coalesce_target": 100,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
-Path(output_folder).mkdir(parents=True, exist_ok=True)
-
 # launch
 launcher.launch()
