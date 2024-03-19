@@ -537,7 +537,9 @@ class RayRemoteJobs:
         except Exception as e:
             logger.warning(f"failed to get input folder {e}")
             return
-        data_access.save_file(path=input_folder, data=bytes(log, "UTF-8"))
+        execution_log_path = f"{input_folder}/execution.log"
+        logger.info(f"saving execution log to {execution_log_path}")
+        data_access.save_file(path=execution_log_path, data=bytes(log, "UTF-8"))
 
 
 class ComponentUtils:
