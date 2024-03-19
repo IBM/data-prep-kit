@@ -90,7 +90,7 @@ class AbstractTest:
         :param expected_dir:
         :return:
         """
-        dir_cmp = dircmp(directory, expected_dir)
+        dir_cmp = dircmp(directory, expected_dir, ignore=[".DS_Store"])
         assert (
             len(dir_cmp.funny_files) == 0
         ), f"Files that could compare, but couldn't be read for some reason: {dir_cmp.funny_files}"
