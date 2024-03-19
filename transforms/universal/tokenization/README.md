@@ -1,70 +1,29 @@
-# Tokenization Transform 
-TODO: Below is copied from `Noop` readme and needs to be updated once this tasks done!
-
+# Data Tokenization (TODO: to be furher updated)
 Please see the set of
-[transform project conventions](../../transform-conventions.md)
+[transform project conventions](../../README.md)
 for details on general project conventions, transform configuration,
 testing and IDE set up.
 
 ## Summary 
-This transforms serves as a template for transform writers as it does
-not perform any transformations on the input (i.e., a no-operation transform).
-As such it simply copies the input parquet files to the output directory.
-It shows the basics of creating a simple 1:1 table transform.
-It also implements a single configuration value to show how configuration
-of the transform is implemented.
+The data tokenization transform maps an input table to an output table using a pre-trained tokenizer.
+The input table must contain at least two columns, by default named `document_id` and `contents`,
+and can be specified through `--tkn_doc_id_column` and `--tkn_doc_content_column` respectively.
+The `document_id` should be unique within the dataset (across all rows) and the `contents` stores
+its corresponding document content.
 
-## Configuration and command line Options
+A pre-trained tokenizer must be specified through `--tkn_tokenizer_path` parameter 
+which can either be to a folder containing the pre-trained tokenizer, or a ready-for-download tokenizer
+from Huggingface compatible with `AutoTokenizer` library (also from Huggingface).
 
-The set of dictionary keys holding [NOOPTransform](src/noop_transform.py) 
-configuration for values are as follows:
-
-* _noop_sleep_sec_ - specifies the number of seconds to sleep during table transformation. 
-
-## Running
-You can run the [noop_local.py](src/noop_local.py) to
-transform the `test1.parquet` file in [test input data](test-data/input) 
-to an `output` directory.  The directory will contain both the new
-annotated `test1.parquet` file and the `metadata.json` file.
-<pre>
-% make venv
-% source venv/bin/activate
-(venv) % cd src
-(venv) % python noop_local.py
-18:36:22 INFO - Running locally
-noop parameters are : {'sleep': 5}
-18:36:22 INFO - Using local configuration with: input_folder - /Users/dawood/git/fm-data-engineering/transforms/universal/noop/test-data output_folder - /Users/dawood/git/fm-data-engineering/transforms/universal/noop/output
-18:36:22 INFO - Not using data sets, checkpointing False, max files -1
-number of workers 5 worker options {'num_cpus': 0.8}
-pipeline id pipeline_id; number workers 5
-job details {'job category': 'preprocessing', 'job name': 'NOOP', 'job type': 'ray', 'job id': 'job_id'}
-code location {'github': 'github', 'commit_hash': '12345', 'path': 'path'}
-actor creation delay 0
-18:36:22 INFO - running locally creating Ray cluster
-2024-03-06 18:36:25,305	INFO worker.py:1715 -- Started a local Ray instance. View the dashboard at 127.0.0.1:8265 
-(orchestrate pid=40827) 18:36:26 INFO - Number of files is 3, source profile {'max_file_size': 0.034458160400390625, 'min_file_size': 0.034458160400390625, 'total_file_size': 0.10337448120117188}
-(orchestrate pid=40827) 18:36:26 INFO - Cluster resources: {'cpus': 10, 'gpus': 0, 'memory': 14.333731079474092, 'object_store': 2.0}
-(orchestrate pid=40827) 18:36:26 INFO - Number of workers - 5 with {'num_cpus': 0.8} each
-(orchestrate pid=40827) Completed 0 files in 5.348523457845052e-06 min. Waiting for completion
-(TransformTableProcessor pid=40842) 18:36:27 INFO - Sleep for 5 seconds
-(orchestrate pid=40827) 18:36:32 INFO - done flushing in 0.0018157958984375 sec
-(orchestrate pid=40827) Completed processing in 0.10258894761403402 min
-(TransformTableProcessor pid=40842) 18:36:32 INFO - Sleep completed - continue
-18:36:42 INFO - Completed execution in 0.33264248371124266 min, execution result 0
-(TransformTableProcessor pid=40843) 18:36:27 INFO - Sleep for 5 seconds
-(venv) % deactivate
-% ls ../output
-metadata.json	test1.parquet
-%
-</pre>
-
-In addition, there are some useful `make` targets (see conventions above):
-* `make venv` - creates the virtual environment.
-* `make test` - runs the tests in [test](test) directory
-* `make build` - to build the docker image
-* `make help` - displays the available `make` targets and help text.
+The tokenization transform will use the pre-trained tokenizer to tokenize each row in the input table
+to each row in the output folder as a sequence of token_ids under the `tokens` column. 
+The document id and the token count are respectively stored in the `document_id` (or name specified in `--tkn_doc_id_column`) and `token_count`. 
+The tokenizer will skip empty rows in the input table or rows leading to failure and track their counting in the `metadata`.
 
 
-
+The parameter `--tkn_chunk_size` is used when each document is tokenized by chunks (of characters). Its defaut value is `0` 
+which tokenize each document as a whole no matter how long it is. Chunks are round up by words, that means, the last word in a chunk
+will not be split into half. Though this works for most languages having spaces among words, there is a very preliminary version
+for languages having no space among words such as `ja` and it is highly recommended to customize such script for each particular language (specified via `--tkn_text_lang`)
 
 

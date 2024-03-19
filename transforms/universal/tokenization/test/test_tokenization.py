@@ -59,6 +59,5 @@ class TestTokenizationTransform(AbstractTransformTest):
 
         fixtures = [
             (TokenizationTransform(config), [table], [expected_table], expected_metadata_list),
-            (TokenizationTransform(config), [table], [expected_table], expected_metadata_list),
         ]
         return fixtures

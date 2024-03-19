@@ -28,7 +28,7 @@ def split_text(text:str,chunk_size:int,text_lang:str,reserve_consecutive_linebre
     Splitting text into chunks can be further customized depending on `text_lang`
     '''
 
-    if text_lang in ['ja']:
+    if text_lang in ['ja','cn']:
         return split_text_wout_word_space(text,chunk_size,reserve_consecutive_linebreaks)
     else:
         return split_text_with_word_space(text,chunk_size,reserve_consecutive_linebreaks)
@@ -140,9 +140,6 @@ class TokenizationTransform(AbstractTableTransform):
         a dictionary of execution statistics - arbitrary dictionary
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
-        TODO:
-            + Need specific columns only ds = ray.data.read_parquet(pq_file, filesystem=s3, columns=columns)
-            + support column mapping to [document_id, contents] (should rename it as content? or keep contents in DP?)
         """
         logger.debug(f"Transforming one table with {len(table)} rows using tokenizer {self.tokenizer_path}")
 
