@@ -27,9 +27,11 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    "Tokenization_sleep_sec": 5,
 }
 if __name__ == "__main__":
+    """
+    Done, `test-data/output/ was updated with converted ddata.
+    """
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
     Path(output_folder).mkdir(parents=True, exist_ok=True)
