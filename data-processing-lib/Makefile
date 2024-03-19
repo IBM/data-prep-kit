@@ -11,7 +11,7 @@ ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/py
 
 clean::
 	@# Help: Clean up the distribution build and the venv 
-	rm -r dist venv
+	rm -rf dist venv
 	rm -rf src/*egg-info
 
 .check-env::

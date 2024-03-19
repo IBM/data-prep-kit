@@ -1,6 +1,5 @@
 import os
 import sys
-from pathlib import Path
 
 from data_processing.data_access import DataAccessLocal
 from data_processing.ray import TransformLauncher
@@ -31,8 +30,6 @@ params = {
     "code_location": ParamsUtils.convert_to_ast(code_location),
 }
 if __name__ == "__main__":
-    # Here we show to run the transform in the ray launcher
-    Path(output_folder).mkdir(parents=True, exist_ok=True)
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params | noop_params)
     # create launcher
