@@ -228,7 +228,7 @@ class DataAccessLocal(DataAccess):
 
         except Exception as e:
             logger.error(f"Error saving table to {path}: {e}")
-            return size_in_memory, None
+            return -1, None
 
     def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
         """
