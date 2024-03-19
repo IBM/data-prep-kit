@@ -59,7 +59,8 @@ class KFPUtils:
         try:
             file = open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r")
         except Exception as e:
-            logger.warning(f"Failed to open /var/run/secrets/kubernetes.io/serviceaccount/namespace file, exception {e}")
+            logger.warning(f"Failed to open /var/run/secrets/kubernetes.io/serviceaccount/namespace file, "
+                           f"exception {e}")
         else:
             with file:
                 ns = file.read()
@@ -531,13 +532,15 @@ class RayRemoteJobs:
         logger.info(f"Job completed with execution status {status}")
         if data_access is None:
             return
-        # Here data access is either S3 or lakehouse both of which contain self.input_folder
+        # Here data access is either S3 or lakehouse both of which contain self.output_folder
         try:
-            input_folder = data_access.input_folder
+            output_folder = data_access.output_folder
         except Exception as e:
-            logger.warning(f"failed to get input folder {e}")
+            logger.warning(f"failed to get output folder {e}")
             return
-        execution_log_path = f"{input_folder}/execution.log"
+        if not output_folder.endswith("/"):
+            output_folder += "/"
+        execution_log_path = f"{output_folder}execution.log"
         logger.info(f"saving execution log to {execution_log_path}")
         data_access.save_file(path=execution_log_path, data=bytes(log, "UTF-8"))
 
@@ -623,10 +626,10 @@ class ComponentUtils:
         logger.info(f"Number of actors - {n_actors}")
         if n_actors < 1:
             logger.warning(f"Not enough cpu/gpu/memory to run transform, "
-                  f"required cpu {a_options.get('num_cpus', .5)}, available {cluster_cpu}, "
-                  f"required memory {a_options.get('memory', 1)}, available {cluster_mem}, "
-                  f"required cpu {actor_gpu}, available {cluster_gpu}"
-                  )
+                           f"required cpu {a_options.get('num_cpus', .5)}, available {cluster_cpu}, "
+                           f"required memory {a_options.get('memory', 1)}, available {cluster_mem}, "
+                           f"required cpu {actor_gpu}, available {cluster_gpu}"
+                          )
             sys.exit(1)
 
         return str(n_actors)
