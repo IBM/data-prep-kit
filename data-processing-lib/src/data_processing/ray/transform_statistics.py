@@ -28,12 +28,7 @@ class TransformStatistics(object):
         :return: None
         """
         for key, val in stats.items():
-            try:
-                self.stats[key] = self.stats.get(key, 0) + val
-            except Exception as e:
-                print(f"\n\n== Failed at key: {key} val: {val} {type(val)} \
-                    {self.stats.get(key, 0)} due to:\n {e}")
-
+            self.stats[key] = self.stats.get(key, 0) + val
             if key == "source_files":
                 self.source_document_counter.inc(val)
             if key == "source_size":
