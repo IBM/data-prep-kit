@@ -70,30 +70,21 @@ if __name__ == "__main__":
         ray_name=args.ray_name,
         run_id=args.run_id,
     )
-
     exec_params = KFPUtils.load_from_json(args.exec_params)
     s3_config = exec_params.get("s3_config", None)
-    print(f"s3_config = {s3_config}, type s3_config = {type(s3_config)}")
     if s3_config == "None" or s3_config == "":
         s3_config = None
-    else:
-        s3_config = KFPUtils.load_from_json(s3_config.replace("'", '"'))
     lh_config = exec_params.get("lh_config", None)
-    print(f"lh_config = {lh_config}, type lh_config = {type(lh_config)}")
     if lh_config == "None" or lh_config == "":
         lh_config = None
-    else:
-        lh_config = KFPUtils.load_from_json(lh_config.replace("'", '"'))
     access_key, secret_key, url = KFPUtils.credentials()
     data_factory = DataAccessFactory()
-    print(f"s3_config = {s3_config}, lh_config = {lh_config}")
     data_factory.apply_input_params(args={
         "s3_config": s3_config,
         "lh_config": lh_config,
         "s3_cred": {"access_key": access_key, "secret_key": secret_key, "url": url}
     })
     data_access = data_factory.create_data_access()
-    print(f"data access = {data_access}")
     exec_params["s3_cred"] = (
             "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
     )
