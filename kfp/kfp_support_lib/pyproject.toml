@@ -1,6 +1,6 @@
 [project]
 name = "fm_data_processing_kfp"
-version = "0.0.3.dev19"
+version = "0.0.3.dev20"
 requires-python = ">=3.10"
 description = "IBM FM Data Processing Library. KFP support"
 authors = [

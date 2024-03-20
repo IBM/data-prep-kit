@@ -603,8 +603,12 @@ class ComponentUtils:
         :param actor_options: actor request requirements
         :return: number of actors
         """
-        import sys
+        from data_processing.utils import get_logger
         from kfp_support.workflow_support.utils import KFPUtils
+        import sys
+
+        logger = get_logger(__name__)
+
         # convert input
         w_options = KFPUtils.load_from_json(worker_options.replace("'", '"'))
         a_options = KFPUtils.load_from_json(actor_options.replace("'", '"'))
