@@ -8,5 +8,5 @@ RUN pip install --no-cache-dir -r  requirements.txt
 # remove credentials-containing file
 RUN rm requirements.txt
 
-COPY ./src/coalesce_transform.py transformer_launcher.py
+COPY ./src/blocklist_transform.py . 
 ENV PYTHONPATH /home/ray
