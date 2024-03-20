@@ -8,7 +8,6 @@ from data_processing.test_support.ray import AbstractTransformLauncherTest
 from tokenization_transform import TokenizationTransformConfiguration
 
 
-from test_tokenization import table,expected_table,expected_metadata_list,config
 tkn_params = {
         # "tokenizer_path":local_tokenizer,
         # "tokenizer_path": "Rocketknight1/falcon-rw-1b", # HF's Falcon https://huggingface.co/docs/transformers/en/model_doc/falcon

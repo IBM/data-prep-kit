@@ -6,7 +6,6 @@ Libraries need to be added to venv:
 import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
-import re
 
 import pyarrow as pa
 from data_processing.ray import (
@@ -15,97 +14,12 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import get_logger
-import os,sys
 
+from data_processing.utils import get_logger
 logger = get_logger(__name__)
 
-# local_tokenizer = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tokenizers", "gpt2_based"))
 
-from transformers import AutoTokenizer
-
-def split_text(text:str,chunk_size:int,text_lang:str,reserve_consecutive_linebreaks:bool=True) -> str:
-    """
-    This function splits the given (particularly lengthy) text into chunks and returns them one by one through yielding.
-    It can be beneficial for processing very long texts (comprising tens of thousands of words)
-    where tokenization by a tokenizer may run sluggishly.
-
-    :param text: a long document
-    :param chunk_size: specified as the number of characters,
-            although chunks are rounded by words, ensuring that
-            the last word in a chunk remains intact and is not split into halves.
-    :param text_lang: a standard acronym for each language, eg, `en`, `vi`, `ja`, etc.
-    :param reserve_consecutive_linebreaks:
-        Set to true to preserve multiple consecutive line breaks in the given text.
-        Set to false to preserve only one line break for multiple consecutive line breaks.
-    :return: yielding a chunk of text each time.
-    Example:
-        text = "This is the first line.\n\n This is the 2nd line after 02 line breaks."
-        for chunk in split_text(text=text,chunk_size=25,text_lang='en'):
-            print(f"{len(chunk):3,}: {chunk}")
-        return:
-         23: This is the first line.
-          1:
-
-          1:
-
-         20: This is the 2nd line
-         21: after 02 line breaks.
-    """
-
-
-    # Additional languages without spaces among words can be added, and each language may receive distinct treatment in word splitting.
-    if text_lang in ['ja','zh']:
-        return split_text_wout_word_space(text,chunk_size,reserve_consecutive_linebreaks)
-    else:
-        return split_text_with_word_space(text,chunk_size,reserve_consecutive_linebreaks)
-
-def split_text_with_word_space(text:str,chunk_size:int,reserve_consecutive_linebreaks:bool=True) -> str:
-    '''
-    Split text into multiple chunks of characters, rounded by words, for languages with spaces between words.
-    '''
-    lines = text.split('\n')
-    for i, line in enumerate(lines):
-        current_chunk = ''
-        words = line.split()
-        for j, word in enumerate(words):
-            word += ' '
-            if len(current_chunk) + len(word) <= chunk_size:
-                current_chunk += word
-            else:
-                # current `word` is not the last one in `words`:
-                yield current_chunk.strip()
-                current_chunk = word
-        if current_chunk:
-            yield current_chunk.strip()
-
-        if reserve_consecutive_linebreaks:
-            # reserve multiple consecutive line breaks in the original text:
-            if i < len(lines) - 1:
-                yield '\n'
-
-def split_text_wout_word_space(text:str,chunk_size:int, reserve_consecutive_linebreaks:bool=True) -> str:
-    '''
-    Split the text into multiple chunks for some specific languages without spaces between words.
-    This version is preliminary and necessitates further development for each respective language.
-    '''
-    lines = text.split('\n')
-    for i, line in enumerate(lines):
-        current_chunk = ''
-        # capture words, spaces and line breaks through reg.pattern
-        words = re.findall(r'\w+|[^\w\s]+|\n+', line, re.UNICODE)
-        for j, word in enumerate(words):
-            if len(current_chunk) + len(word) <= chunk_size:
-                current_chunk += word
-            else:
-                yield current_chunk
-                current_chunk = word
-        if current_chunk:
-            yield current_chunk
-
-        if reserve_consecutive_linebreaks:
-            if i < len(lines) - 1:
-                yield '\n'
+from tokenization_utils import split_text, load_tokenizer
 
 class TokenizationTransform(AbstractTableTransform):
     """
@@ -121,7 +35,7 @@ class TokenizationTransform(AbstractTableTransform):
         # of TokenizationTransformConfiguration class
 
         super().__init__(config)
-        self.tokenizer_path = config.get("tokenizer_path", "bigcode/starcoder")
+        self.tokenizer = config.get("tokenizer", "bigcode/starcoder")
         self.doc_id_column = config.get("doc_id_column", "document_id")
         self.doc_content_column = config.get("doc_content_column", "contents")
         self.chunk_size = config.get("chunk_size", 0)
@@ -131,29 +45,9 @@ class TokenizationTransform(AbstractTableTransform):
         for k,v in config.items():
             logger.info(f"{k:20s}: {v}")
 
-        self.tokenizer = self._load_tokenizer(do_testing=False)
+        # overwrite tokenizer:
+        self.tokenizer = load_tokenizer(tokenzer_name=self.tokenizer,do_testing=True)
 
-
-    def _load_tokenizer(self,do_testing:bool=False):
-        """
-        Load and return a tokenizer.
-        This function is designed to accommodate the loading of any tokenizer compatible with
-        the Huggingface `AutoTokenizer` library, such as `bigcode/starcoder`, `Rocketknight1/falcon-rw-1b`, and others.
-        The tokenizer can be obtained either by direct download from HuggingFace or from a locally specified folder.
-        Extending this function to support other customized tokenizers is straightforward.
-        """
-        try:
-            tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_path)
-        except Exception as e:
-            sys.exit(f"Failed to load tokenizer from `{self.tokenizer_path}` with  `HF AutoTokenizer` due to\n: {e}")
-
-        # quick test tokenizer:
-        if do_testing:
-            txt = "This text is for testing purpose!"
-            token_line = tokenizer(txt)["input_ids"]
-            print(f"== {self.tokenizer_path} has tokenized `{txt}` to: {token_line}")
-
-        return tokenizer
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -162,7 +56,7 @@ class TokenizationTransform(AbstractTableTransform):
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
-        logger.debug(f"Transforming one table with {len(table)} rows using tokenizer {self.tokenizer_path}")
+        logger.debug(f"Transforming one table with {len(table)} rows using tokenizer {self.tokenizer}")
 
         # Tracking token count + document_id for non-empty row/doc:
         token_count = []
@@ -235,10 +129,10 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, tkn_, pii_, etc.)
         """
         parser.add_argument(
-            "--tkn_tokenizer_path",
+            "--tkn_tokenizer",
             type=str,
             default="bigcode/starcoder",
-            help="Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, it is the `bigcode/starcoder` from HuggingFace",
+            help="Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, `bigcode/starcoder` from HuggingFace is used" ,
         )
 
         parser.add_argument(
@@ -270,23 +164,21 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
             help="Specify >0 value to tokenize each row/doc in chunks of characters (round in words)",
         )
 
-
-
     def apply_input_params(self, args: Namespace) -> bool:
         """
         Validate and apply the arguments that have been parsed
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        if args.tkn_tokenizer_path is None:
-            print(f"Parameter tokenizer_path must be a valid tokenizer for tokenization, you specified {args.tokenizer_path}")
+        if args.tkn_tokenizer is None:
+            logger.error(f"Parameter --tkn_tokenizer must be a valid tokenizer for tokenization, you specified {args.tkn_tokenizer}")
             return False
 
         if args.tkn_doc_id_column is None or args.tkn_doc_content_column is None:
-            print(f"Parameter for `tkn_doc_id_column` and `tkn_doc_content_column` must be provided")
+            logger.error(f"Parameter for `tkn_doc_id_column` and `tkn_doc_content_column` must be provided")
             return False
 
-        self.params["tokenizer_path"] = args.tkn_tokenizer_path
+        self.params["tokenizer"] = args.tkn_tokenizer
         self.params["doc_id_column"] = args.tkn_doc_id_column
         self.params["doc_content_column"] = args.tkn_doc_content_column
         self.params["text_lang"] = args.tkn_text_lang
@@ -300,4 +192,20 @@ if __name__ == "__main__":
     logger.info("Launching Tokenization transform")
     launcher.launch()
 
+    # config = {
+    #     "tokenizer": "bigcode/starcoder",
+    #     "doc_id_column": "document_id",
+    #     "doc_content_column": "contents",
+    #     "text_lang": "en",
+    #     "chunk_size": 0,
+    # }
+    # tkn = TokenizationTransform(config)
+    #
+    # in_table = pa.Table.from_pydict({"document_id": pa.array(["doc01", "doc02", "doc03"]),
+    #                                  "contents": pa.array(
+    #                                      ["This content is for doc01", "", "Another content for doc03"])})
+    #
+    # out_table, metadata = tkn.transform(in_table)
+    # print(f"\n== out_table: {out_table}")
+    # print(f"\n== metadata: {metadata}")
 
