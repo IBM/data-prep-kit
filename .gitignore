@@ -136,4 +136,4 @@ dmypy.json
 .DS_Store
 
 
-kind/cluster/hack/.helper-functions.sh
+kind/hack/.helper-functions.sh

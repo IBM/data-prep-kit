@@ -1,17 +1,17 @@
 # KFP components
 
-All data pprocessing pipelines have the same `shape`. They all compute execution parameters, create Ray cluster,
+All data processing pipelines have the same `shape`. They all compute execution parameters, create Ray cluster,
 execute Ray job and then delete the cluster. With the exception of computing execution parameters all of the steps,
 although receiving different parameters are identical.
 
-To simplify implementation of the data processing KFP pipelines, this directoty provides several components.
+To simplify implementation of the data processing KFP pipelines, this directory provides several components.
 
 As defined by [KFP documentation](https://www.kubeflow.org/docs/components/pipelines/v1/sdk/component-development/)
 ````
 A pipeline component is a self-contained set of code that performs one step in a workflow. 
 ````
 
-The first step in creation of components its implementation. The framewwork automation includes the following 3 components:
+The first step in creation of components its implementation. The framework automation includes the following 3 components:
 * [Create Ray cluster](src/create_ray_cluster.py) is responsible for creation of the Ray cluster. Its implementation is 
   based on the [RayRemoteJobs class](../kfp_support_lib/src/kfp_support/workflow_support/README.md)
 * [execute Ray job](src/execute_ray_job.py) is responsible for submission of the Ray job, watching its execution,
@@ -32,3 +32,36 @@ Components specifications are provided here:
 * [Create Ray cluster Component](createRayComponent.yaml)
 * [execute Ray job component](executeRayJobComponent.yaml)
 * [clean up Ray cluster component](cleanupRayComponent.yaml)
+
+## Building the docker image
+
+To build the component docker image first execute the following commands to
+set the details of the docker registry as environment variables:
+
+```bash
+export DOCKER_SERVER=us.icr.io
+export DOCKER_USERNAME=iamapikey
+export DOCKER_EMAIL=iamapikey
+export DOCKER_PASSWORD=<PASSWORD>
+```
+
+As the Docker image utilizes libraries from Python Artifactory,
+set the Python Artifactory details as environment variables by executing the following commands:
+
+```bash
+export ARTIFACTORY_USER=<artifactory-user>
+export ARTIFACTORY_API_KEY=<artifactory-key>
+```
+
+Next, login to IBM cloud using the following commands:
+```bash
+ibmcloud login --sso
+ibmcloud cr region-set us-south
+ibmcloud cr login --client docker
+```
+
+Then build the image:
+
+```bash
+make build
+```

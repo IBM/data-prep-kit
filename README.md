@@ -45,6 +45,7 @@ will apply the `make build` rule into all sub-directories supporting such recurs
 Standard rules include the following:
 
 * clean
+* setup
 * build
 * test
 * publish
