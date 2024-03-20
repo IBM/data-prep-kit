@@ -9,7 +9,6 @@ import time
 from data_processing.ray import RayUtils
 from data_processing.utils import TransformUtils, RANDOM_SEED, GB, get_logger
 
-logger = get_logger(__name__)
 
 NO_SIMILARITY = -1
 REQUEST_LEN = 4096
@@ -223,6 +222,8 @@ class BucketsHash:
         self.submitter = None
         self.n_buckets = 0
         self.bucket_memory = 0
+        self.logger = get_logger(__name__)
+
 
     def add_buckets(self, bck: list[tuple[int, list[int]]]) -> None:
         """
@@ -272,7 +273,7 @@ class BucketsHash:
                 long_buckets.append(bucket)
             else:
                 short_buckets.append(bucket)
-        logger.info(f"processing buckets {len(long_buckets)} long, {len(short_buckets)} short")
+        self.logger.debug(f"processing buckets {len(long_buckets)} long, {len(short_buckets)} short")
 
         # process long buckets first - we are submitting them one at a time
         for bucket in long_buckets:
@@ -318,6 +319,8 @@ class BucketsHashProcessor:
         self.remote_docs = params["remote_docs"]
         self.remote_minhashes = params["remote_minhashes"]
         self.stats = params["statistics"]
+        self.logger = get_logger(__name__)
+
 
     def _submit_generated_docs(self, docs: dict[int, int], removed: set[int]) -> None:
         """
@@ -441,7 +444,7 @@ class BucketsHashProcessor:
                 if d not in docs:
                     docs[d] = NO_SIMILARITY
             if very_long:
-                logger.info(
+                self.logger.info(
                     f"Processed long ({bucket_len}) bucket in {(time.time() - start) / 60} "
                     f"min; "
                     f"docs chains {len(set_list)}"
@@ -462,22 +465,24 @@ class BucketsHashProcessorInvoker(object):
         self.n_processors = len(bucket_processors)
         self.pool = ActorPool(bucket_processors)
         self.submitted = 0
+        self.logger = get_logger(__name__)
+
 
     def submit_for_processing(self, buckets: list[Union[int, list[int]]]) -> None:
         # Get completed results
         if self.submitted < self.n_processors:  # still have room
             self.pool.submit(lambda a, v: a.process_buckets.remote(v), buckets)
-            logger.info("Submitted bucket processing request")
+            self.logger.debug("Submitted bucket processing request")
             self.submitted += 1
             return
         else:
             self.pool.get_next_unordered()
-            logger.info("Completed bucket processing request")
+            self.logger.debug("Completed bucket processing request")
             self.pool.submit(lambda a, v: a.process_buckets.remote(v), buckets)
-            logger.info("Submitted bucket processing request")
+            self.logger.debug("Submitted bucket processing request")
             return
 
     def wait_for_completion(self) -> None:
-        logger.info("Waiting bucket processing completion")
+        self.logger.debug("Waiting bucket processing completion")
         while self.pool.has_next():
             self.pool.get_next_unordered()
