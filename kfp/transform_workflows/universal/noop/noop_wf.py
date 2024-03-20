@@ -1,5 +1,3 @@
-import uuid
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
@@ -13,8 +11,6 @@ from kubernetes import client as k8s_client
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "transformer_launcher.py"
-RUN_ID = uuid.uuid4().hex
-
 
 # components
 base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1"
@@ -39,7 +35,7 @@ TASK_NAME: str = "noop"
 )
 def noop(
     ray_name: str = "noop-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 2, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop-guf:0.0.1",\
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop-guf:0.0.1",\
              "image_pull_secret": "prod-all-icr-io"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
             "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop-guf:0.0.1"}',
@@ -87,7 +83,7 @@ def noop(
     :return: None
     """
     # create clean_up task
-    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=RUN_ID, server_url=server_url)
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=dsl.RUN_ID_PLACEHOLDER, server_url=server_url)
     ComponentUtils.add_settings_to_component(clean_up_task, 60)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
@@ -100,7 +96,7 @@ def noop(
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
-            run_id=RUN_ID,
+            run_id=dsl.RUN_ID_PLACEHOLDER,
             ray_head_options=ray_head_options,
             ray_worker_options=ray_worker_options,
             server_url=server_url,
@@ -111,7 +107,7 @@ def noop(
         # Execute job
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
-            run_id=RUN_ID,
+            run_id=dsl.RUN_ID_PLACEHOLDER,
             additional_params=additional_params,
             # note that the parameters below are specific for NOOP transform
             exec_params={
@@ -122,7 +118,7 @@ def noop(
                 "num_workers": compute_exec_params.output,
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
-                "job_id": RUN_ID,
+                "job_id": dsl.RUN_ID_PLACEHOLDER,
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,

@@ -10,12 +10,9 @@ from kfp_support.workflow_support.utils import (
 )
 from kubernetes import client as k8s_client
 from src.ededup_compute_execution_params import ededup_compute_execution_params
-import uuid
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "ededup_transform.py"
-RUN_ID = uuid.uuid4().hex
-
 
 # components
 base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1"
@@ -91,7 +88,7 @@ def ededup(
     :return: None
     """
     # create clean_up task
-    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=RUN_ID, server_url=server_url)
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=dsl.RUN_ID_PLACEHOLDER, server_url=server_url)
     ComponentUtils.add_settings_to_component(clean_up_task, 60)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
@@ -107,7 +104,7 @@ def ededup(
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
-            run_id=RUN_ID,
+            run_id=dsl.RUN_ID_PLACEHOLDER,
             ray_head_options=ray_head_options,
             ray_worker_options=ray_worker_options,
             server_url=server_url,
@@ -118,7 +115,7 @@ def ededup(
         # Execute job
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
-            run_id=RUN_ID,
+            run_id=dsl.RUN_ID_PLACEHOLDER,
             additional_params=additional_params,
             exec_params={
                 "s3_config": s3_config,
@@ -130,6 +127,7 @@ def ededup(
                 "num_workers": compute_exec_params.outputs["workers"],
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
+                "job_id": dsl.RUN_ID_PLACEHOLDER,
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
