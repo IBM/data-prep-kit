@@ -20,6 +20,9 @@ RUN pip install --no-cache-dir -r  requirements.txt
 # remove credentials-containing file
 RUN rm requirements.txt
 
-RUN pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple fm-data-processing-kfp==0.0.3.dev12
+RUN pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple fm-data-processing-kfp==0.0.3.dev20
+
+RUN pip install pydantic==2.6.3
+RUN pip install pyiceberg==0.5.1
 
 COPY ./src /pipelines/component/src
