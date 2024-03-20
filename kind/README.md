@@ -1,6 +1,6 @@
 # Building Kind cluster with everything installed
 
-This is a manual build instruction. As an alternative, you can execute the `make setup-kind-cluster` makefile rule in the project root directory instead.
+This is a manual build instruction. As an alternative, you can execute the `make setup` makefile rule in the project root directory instead.
 
 # Before you begin
 

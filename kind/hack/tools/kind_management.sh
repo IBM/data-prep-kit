@@ -10,7 +10,7 @@ kind_delete() {
 }
 
 kind_create() {
-  kind create cluster --name $cluster_name --config ${KIND_DIR}/hack/kind-cluster-config.yaml
+  kind create cluster --name $cluster_name --config ${ROOT_DIR}/hack/kind-cluster-config.yaml
 }
 
 usage(){
