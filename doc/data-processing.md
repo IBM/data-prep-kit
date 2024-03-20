@@ -13,7 +13,7 @@ To address scalability, each transform is generally run in a cluster of identica
 making use of the Ray services, also deployed into the cluster.  A single run of a transform will convert a set
 of parquet files from a source directory into a destination directory containing the transformed parquet files.
 In general, multiple transforms are run in sequence to produce a final LLM training data set as depicted below.
-![Data Transformation Flow](data-transform-flow.jpg)
+![Data Transformation Flow](data-flow.jpg)
 
 
 
