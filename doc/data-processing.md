@@ -10,14 +10,28 @@ to, for example:
 * Derive statistics on data in one or more columns 
 * Filter the table to remove or edit rows and/or columns, for example to remove rows from blocked domains.
 
+The table is generally expected to have something like the following minimal set of columns :
+* URL source of the document (can be use for domain block listing)
+* Document id
+* Contents of the actual dcoument to be used for LLM training
+
+The following might be an example sequence of transform.
+
+![Data Transformation](data-transformation.jpg)
+
+The ordering of the transforms can change depending on the requirements on the training data. 
+
 To address scalability, each transform is generally run in a cluster of identical docker images
 making use of the Ray services, also deployed into the cluster.  A single run of a transform will convert a set
 of parquet files from a source directory (think terabytes) into a destination directory containing 
 the transformed parquet files.
-In general, multiple transforms are run in sequence to produce a final LLM training data set as depicted below.
+Multiple transforms are run in sequence on persistently stored data (i.e. parquet files)
+to produce a final LLM training data set as depicted below.
+
 ![Data Transformation Flow](data-flow.jpg)
-The ordering of the transforms can change depending on the requirements on the training. Below is one example
-with the following steps for language:
+
+The ordering of the transforms can change depending on the requirements on the training. 
+Below is one example with the following steps for language:
 1. removes duplicate documents by remove rows from the input tables 
 2. adds a column annotation identifying the document's language
 3. filters documents matchine an chosen language 
