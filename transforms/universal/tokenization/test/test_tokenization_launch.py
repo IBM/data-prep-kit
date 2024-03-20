@@ -13,7 +13,7 @@ tkn_params = {
         # "tokenizer_path": "Rocketknight1/falcon-rw-1b", # HF's Falcon https://huggingface.co/docs/transformers/en/model_doc/falcon
         # "tokenizer_path": "EleutherAI/gpt-neox-20b", # https://huggingface.co/docs/transformers/en/model_doc/gpt_neox
         # "tokenizer_path": "hf-internal-testing/llama-tokenizer",
-        "tkn_tokenizer_path": "bigcode/starcoder",
+        "tkn_tokenizer": "bigcode/starcoder",
         "tkn_doc_id_column":"document_id",
         "tkn_doc_content_column":"contents",
         "tkn_text_lang": "en",

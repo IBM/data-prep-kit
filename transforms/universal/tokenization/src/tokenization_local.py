@@ -1,6 +1,5 @@
 import os
 import sys
-from pathlib import Path
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
@@ -30,7 +29,7 @@ params = {
 }
 if __name__ == "__main__":
     """
-    Done, `test-data/output/ was updated with converted ddata.
+    Done, `../output/ was updated with converted data.
     """
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher

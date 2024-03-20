@@ -46,7 +46,7 @@ class TokenizationTransform(AbstractTableTransform):
             logger.info(f"{k:20s}: {v}")
 
         # overwrite tokenizer:
-        self.tokenizer = load_tokenizer(tokenzer_name=self.tokenizer,do_testing=True)
+        self.tokenizer = load_tokenizer(tokenzer_name=self.tokenizer,do_testing=False)
 
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
@@ -102,10 +102,10 @@ class TokenizationTransform(AbstractTableTransform):
                               "token_count": token_count})
         logger.debug(f"Done with the transformed table with {table.num_rows:,} rows")
 
-        metadata = {"num_files": 1,
-                    "num_rows": table.num_rows,
-                    "num_tokenized_rows": out_table.num_rows,
-                    "num_empty/failed_rows": len(empty_doc_ids),
+        metadata = {"nfiles": 1,
+                    "nrows": table.num_rows,
+                    "ntokenizedrows": out_table.num_rows,
+                    "nemptyrows": len(empty_doc_ids),
                     }
 
         return [out_table], metadata
@@ -192,20 +192,5 @@ if __name__ == "__main__":
     logger.info("Launching Tokenization transform")
     launcher.launch()
 
-    # config = {
-    #     "tokenizer": "bigcode/starcoder",
-    #     "doc_id_column": "document_id",
-    #     "doc_content_column": "contents",
-    #     "text_lang": "en",
-    #     "chunk_size": 0,
-    # }
-    # tkn = TokenizationTransform(config)
-    #
-    # in_table = pa.Table.from_pydict({"document_id": pa.array(["doc01", "doc02", "doc03"]),
-    #                                  "contents": pa.array(
-    #                                      ["This content is for doc01", "", "Another content for doc03"])})
-    #
-    # out_table, metadata = tkn.transform(in_table)
-    # print(f"\n== out_table: {out_table}")
-    # print(f"\n== metadata: {metadata}")
+
 
