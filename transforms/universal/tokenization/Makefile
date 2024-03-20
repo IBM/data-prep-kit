@@ -10,7 +10,7 @@ include ../../../.make.defaults
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-DOCKER_IMAGE_NAME=noop
+DOCKER_IMAGE_NAME=tokenization
 DOCKER_IMAGE_VERSION=0.6
 
 venv::	.transforms.venv
