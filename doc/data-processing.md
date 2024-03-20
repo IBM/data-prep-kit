@@ -5,9 +5,10 @@ and read as [pyarrow tables](https://arrow.apache.org/docs/python/index.html).
 
 Transforms are written to process the [table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
 to, for example:
-    * Annotate the tables to add additional data such as document quality score, language, etc.
-    * Derive statistics on data in one or more columns 
-    * Filter the table to remove or edit rows and/or columns, for example to remove rows from blocked domains.
+
+* Annotate the tables to add additional data such as document quality score, language, etc.
+* Derive statistics on data in one or more columns 
+* Filter the table to remove or edit rows and/or columns, for example to remove rows from blocked domains.
 
 To address scalability, each transform is generally run in a cluster of identical docker images
 making use of the Ray services, also deployed into the cluster.  A single run of a transform will convert a set
