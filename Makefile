@@ -25,24 +25,20 @@ include .make.defaults
 # Global rules that are generally to be implemented in the sub-directories and can
 # be overridden there (the double colon on the rule makes the overridable). 
 
-setup:: 
-	@# Help: Recursively setup in all subdirs 
-	$(MAKE) RULE=setup .recurse
-
 clean:: 
-	@# Help: Recursively clean in all subdirs 
-	$(MAKE) RULE=clean .recurse
+	@# Help: Recursively $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
 setup::
-	@# Help: setup, Recursively test in all subdirs
-	@$(MAKE) RULE=setup .recurse
+	@# Help: Recursively $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
 build:: 
-	@# Help: Recursively build in all subdirs 
-	$(MAKE) RULE=build .recurse
+	@# Help: Recursively $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
 test::  
-	@# Help: Recursively test in in all subdirs 
-	@$(MAKE) RULE=test .recurse
+	@# Help: Recursively $@ in in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 
 
