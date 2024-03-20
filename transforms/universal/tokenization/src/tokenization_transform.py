@@ -6,6 +6,7 @@ Libraries need to be added to venv:
 import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
+import re
 
 import pyarrow as pa
 from data_processing.ray import (
@@ -24,23 +25,44 @@ logger = get_logger(__name__)
 from transformers import AutoTokenizer
 
 def split_text(text:str,chunk_size:int,text_lang:str,reserve_consecutive_linebreaks:bool=True) -> str:
-    '''
-    Splitting text into chunks can be further customized depending on `text_lang`
-    '''
+    """
+    This function splits the given (particularly lengthy) text into chunks and returns them one by one through yielding.
+    It can be beneficial for processing very long texts (comprising tens of thousands of words)
+    where tokenization by a tokenizer may run sluggishly.
 
-    if text_lang in ['ja','cn']:
+    :param text: a long document
+    :param chunk_size: specified as the number of characters,
+            although chunks are rounded by words, ensuring that
+            the last word in a chunk remains intact and is not split into halves.
+    :param text_lang: a standard acronym for each language, eg, `en`, `vi`, `ja`, etc.
+    :param reserve_consecutive_linebreaks:
+        Set to true to preserve multiple consecutive line breaks in the given text.
+        Set to false to preserve only one line break for multiple consecutive line breaks.
+    :return: yielding a chunk of text each time.
+    Example:
+        text = "This is the first line.\n\n This is the 2nd line after 02 line breaks."
+        for chunk in split_text(text=text,chunk_size=25,text_lang='en'):
+            print(f"{len(chunk):3,}: {chunk}")
+        return:
+         23: This is the first line.
+          1:
+
+          1:
+
+         20: This is the 2nd line
+         21: after 02 line breaks.
+    """
+
+
+    # Additional languages without spaces among words can be added, and each language may receive distinct treatment in word splitting.
+    if text_lang in ['ja','zh']:
         return split_text_wout_word_space(text,chunk_size,reserve_consecutive_linebreaks)
     else:
         return split_text_with_word_space(text,chunk_size,reserve_consecutive_linebreaks)
 
 def split_text_with_word_space(text:str,chunk_size:int,reserve_consecutive_linebreaks:bool=True) -> str:
     '''
-    Split text into multiple chunks (word round up) for languages with space among words.
-    Currently, it does not support languages having no space among words.
-    Example:
-        text = "This is the first line.\n\n This is the 2nd line after 02 line breaks."
-        for chunk in split_text(text=text,chunk_size=25):
-            print(f"{len(chunk):3,}: {chunk}")
+    Split text into multiple chunks of characters, rounded by words, for languages with spaces between words.
     '''
     lines = text.split('\n')
     for i, line in enumerate(lines):
@@ -64,10 +86,9 @@ def split_text_with_word_space(text:str,chunk_size:int,reserve_consecutive_lineb
 
 def split_text_wout_word_space(text:str,chunk_size:int, reserve_consecutive_linebreaks:bool=True) -> str:
     '''
-    Split text into multiple chunks (word round up) for some particular languages having no space among words.
-    This version remains preliminary and requires more development for each particular language
+    Split the text into multiple chunks for some specific languages without spaces between words.
+    This version is preliminary and necessitates further development for each respective language.
     '''
-    import re
     lines = text.split('\n')
     for i, line in enumerate(lines):
         current_chunk = ''
@@ -106,9 +127,9 @@ class TokenizationTransform(AbstractTableTransform):
         self.chunk_size = config.get("chunk_size", 0)
         self.text_lang = config.get("text_lang", "en")
 
-        print(f"\n*** `config` to run:")
+        logger.info(f"\n*** `config` to run:")
         for k,v in config.items():
-            print(f"{k:20s}: {v}")
+            logger.info(f"{k:20s}: {v}")
 
         self.tokenizer = self._load_tokenizer(do_testing=False)
 
@@ -142,9 +163,6 @@ class TokenizationTransform(AbstractTableTransform):
         input parquet to the output folder, without modification.
         """
         logger.debug(f"Transforming one table with {len(table)} rows using tokenizer {self.tokenizer_path}")
-
-        if table.num_rows == 0:
-            raise("== There is no row in the input table!")
 
         # Tracking token count + document_id for non-empty row/doc:
         token_count = []
@@ -220,7 +238,7 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
             "--tkn_tokenizer_path",
             type=str,
             default="bigcode/starcoder",
-            help="Path to tokenizer used for tokenization. It can be a path to a local tokenizer or a downloadable HuggingFace tokenizer",
+            help="Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, it is the `bigcode/starcoder` from HuggingFace",
         )
 
         parser.add_argument(
@@ -281,3 +299,4 @@ if __name__ == "__main__":
     launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfiguration())
     logger.info("Launching Tokenization transform")
     launcher.launch()
+

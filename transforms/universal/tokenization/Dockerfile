@@ -1,4 +1,3 @@
-#FROM python:3.10.12-slim-bullseye
 FROM public.ecr.aws/docker/library/python:3.10.13-slim-bullseye
 
 ENV TZ=US \

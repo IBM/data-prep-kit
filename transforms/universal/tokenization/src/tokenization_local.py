@@ -34,7 +34,6 @@ if __name__ == "__main__":
     """
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    Path(output_folder).mkdir(parents=True, exist_ok=True)
     launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()
