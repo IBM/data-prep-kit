@@ -17,24 +17,6 @@
 #
 #################################################################################################################
 
-# Add local or overriding rules here
-include Makefile.env
-
-include cluster.mk
-
-.PHONY: setup-kind-cluster
-setup-kind-cluster:
-	$(MAKE) delete-kind-cluster
-	$(MAKE) create-kind-cluster
-	$(MAKE) cluster-prepare
-	$(MAKE) cluster-prepare-wait
-	cd $(KIND_DIR)/hack && ./ingress.sh deploy
-	@echo "setup-cluster completed"
-
-.PHONY: cleanup-kind-cluster
-cleanup-kind-cluster:
-	$(MAKE) delete-kind-cluster
-
 # Get some common rules for the whole repo
 include .make.defaults
 
@@ -45,6 +27,10 @@ include .make.defaults
 clean:: 
 	@# Help: clean, Recursively clean all subdirs 
 	$(MAKE) RULE=clean .recurse
+
+setup::
+	@# Help: setup, Recursively test in all subdirs
+	@$(MAKE) RULE=setup .recurse
 
 build:: 
 	@# Help: build, Recursively build all subdirs 
