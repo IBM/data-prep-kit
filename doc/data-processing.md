@@ -15,7 +15,7 @@ The table is generally expected to have something like the following minimal set
 * Document id
 * Contents of the actual dcoument to be used for LLM training
 
-The following might be an example sequence of transform.
+The following might be an example sequence of transforms.
 
 ![Data Transformation](data-transformation.jpg)
 
@@ -30,12 +30,11 @@ to produce a final LLM training data set as depicted below.
 
 ![Data Transformation Flow](data-flow.jpg)
 
-The ordering of the transforms can change depending on the requirements on the training. 
-Below is one example with the following steps for language:
-1. removes duplicate documents by remove rows from the input tables 
-2. adds a column annotation identifying the document's language
-3. filters documents matchine an chosen language 
-4. scores each document with a quality score
+Below is another example with the following steps for language:
+1. Removes duplicate documents by remove rows from the input tables 
+2. Adds a column annotation identifying the document's language
+3. Filters documents matchine an chosen language 
+4. Scores each document with a quality score
 5. Filters documents for a minimum quality score (not shown below)
 N. Tokenizes each document, placing tokens in a new column.
 The result is a set of documents that are ready for LLM training.
