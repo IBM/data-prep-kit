@@ -8,11 +8,12 @@ PYTHON=python
 PYTEST=pytest
 ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local
 
-
 clean::
 	@# Help: Clean up the distribution build and the venv 
 	rm -rf dist venv
 	rm -rf src/*egg-info
+
+setup::
 
 .check-env::
 	@if [ -z "$(VERSION)" ]; then echo "You must provide VERSION"; false; fi
@@ -23,6 +24,9 @@ update-toml:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml 
 	sed -e 's/^version[ ]*=.*/version = "'${VERSION}'"/' pyproject.toml > tt.toml
 	mv tt.toml pyproject.toml
+
+setup::
+
 
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
