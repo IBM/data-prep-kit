@@ -33,8 +33,10 @@ from cc_net_prepro import cc_net_normalize
 
 
 # Ensure following path to folder having pre-trained KenLM + SentencePiece (sp):
-PATH_TO_PRETRAINED_MODELS = "/dev/cos/bluepile-processing/lm_sp/"  # on a VM
+# PATH_TO_PRETRAINED_MODELS = "/dev/cos/bluepile-processing/lm_sp/"  # on a VM
 # PATH_TO_PRETRAINED_MODELS = '~/BigData/04-FM/lm_sp/'  # on a MAC
+
+PATH_TO_PRETRAINED_MODELS = "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/"  # local
 TEST_MODE = 0
 
 

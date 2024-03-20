@@ -62,6 +62,6 @@ if __name__ == "__main__":
     ft_lang = "en"
     ldnoobw = load_bad_words(
         ft_lang,
-        file_path="/tmp/ldnoobw/en",
+        file_path="/test-data/docq/ldnoobw/en",
     )
     print(f"== {ft_lang} has {len(ldnoobw)} words")
