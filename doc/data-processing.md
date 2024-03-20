@@ -36,12 +36,12 @@ Below is another example with the following steps for language:
 3. Filters documents matchine an chosen language 
 4. Scores each document with a quality score
 5. Filters documents for a minimum quality score (not shown below)
-N. Tokenizes each document, placing tokens in a new column.
-
-The result is a set of documents that are ready for LLM training.
+6. ,,,
+7. ,,,
+8. Tokenizes each document, placing tokens in a new column.
 
 ![Data Transformation Flow](data-flow-example.jpg)
 
-
+The result is a set of documents that are ready for LLM training.
 
  
