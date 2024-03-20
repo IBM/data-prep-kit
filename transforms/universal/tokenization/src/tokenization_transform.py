@@ -191,4 +191,3 @@ if __name__ == "__main__":
     launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfiguration())
     logger.info("Launching Tokenization transform")
     launcher.launch()
-
