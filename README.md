@@ -12,7 +12,7 @@ more complex transformations requiring coordination among transforming nodes.
 This might include operations such as de-duplification, merging, and splitting.
 
 Topics to explorer
-   * [Data schema and processing](data-processing.md)
+   * [Data schema and processing](doc/data-processing.md)
    * [Available Transforms](transforms/README.md)
    * [Core library](data-processing-lib/README.md) and [its documentation](data-processing-lib/doc/overview.md)
 
