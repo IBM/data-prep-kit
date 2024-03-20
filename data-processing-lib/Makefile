@@ -25,6 +25,9 @@ update-toml:: .check-env
 	sed -e 's/^version[ ]*=.*/version = "'${VERSION}'"/' pyproject.toml > tt.toml
 	mv tt.toml pyproject.toml
 
+setup::
+
+
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
 	${PYTHON} -m pip install --upgrade build

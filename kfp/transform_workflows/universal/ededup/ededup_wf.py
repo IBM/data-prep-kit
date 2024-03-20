@@ -1,3 +1,5 @@
+import os
+
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
@@ -7,17 +9,16 @@ from kfp_support.workflow_support.utils import (
     ComponentUtils,
 )
 from kubernetes import client as k8s_client
-
+from src.ededup_compute_execution_params import ededup_compute_execution_params
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "transformer_launcher.py"
+EXEC_SCRIPT_NAME: str = "ededup_transform.py"
 
 # components
 base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1"
-# compute execution parameters. Here different tranforms might need different implementations. As
-# a result, insted of creating a component we are creating it in place here.
+# compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(
-    func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
+    func=ededup_compute_execution_params, base_image=base_kfp_image
 )
 # create Ray cluster
 create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
@@ -26,31 +27,33 @@ execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components
 # clean up Ray
 cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "noop"
+TASK_NAME: str = "ededup"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for noop",
+    description="Pipeline for ededup",
 )
-def noop(
-    ray_name: str = "noop-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop-guf:0.0.1",\
+def ededup(
+    ray_name: str = "ededup-kfp-ray",  # name of Ray cluster
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/ededup-guf:0.0.1",\
              "image_pull_secret": "prod-all-icr-io"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop-guf:0.0.1"}',
+            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/ededup-guf:0.0.1"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
-    noop_sleep_sec: int = 10,
+    hash_cpu: float = 0.5,
+    num_hashes: int = 0,
+    doc_column: str = "contents",
     lh_config: str = "None",
     max_files: int = -1,
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
-    s3_access_secret: str = "cos-access",
-    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/doc_annotation_test/input/noop_small/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_noop_guf/'}",
+    cos_access_secret: str = "cos-access",
+    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_ededup_guf/'}",
 ):
     """
-    Pipeline to execute NOOP transform
+    Pipeline to execute EDEDUP transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -75,11 +78,13 @@ def noop(
         http_retries - httpt retries for API server calls
     :param lh_config - lake house configuration
     :param s3_config - s3 configuration
-    :param s3_access_secret - s3 access secret
+    :param cos_access_secret - cos access secret
     :param max_files - max files to process
     :param actor_options - actor options
     :param pipeline_id - pipeline id
-    :param noop_sleep_sec - noop sleep time
+    :param hash_cpu -
+    :param num_hashes -
+    :param doc_column -
     :return: None
     """
     # create clean_up task
@@ -91,8 +96,11 @@ def noop(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=actor_options,
+            params={"s3_config": s3_config, "hash_cpu": hash_cpu}
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
+        ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, cos_access_secret)
+
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
@@ -109,13 +117,14 @@ def noop(
             ray_name=ray_name,
             run_id=dsl.RUN_ID_PLACEHOLDER,
             additional_params=additional_params,
-            # note that the parameters below are specific for NOOP transform
             exec_params={
                 "s3_config": s3_config,
-                "noop_sleep_sec": noop_sleep_sec,
+                "hash_cpu": hash_cpu,
+                "num_hashes": compute_exec_params.outputs["hashes"],
+                "doc_column": doc_column,
                 "lh_config": lh_config,
                 "max_files": max_files,
-                "num_workers": compute_exec_params.output,
+                "num_workers": compute_exec_params.outputs["workers"],
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
                 "job_id": dsl.RUN_ID_PLACEHOLDER,
@@ -124,7 +133,7 @@ def noop(
             server_url=server_url,
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
-        ComponentUtils.set_s3_env_vars_to_component(execute_job, s3_access_secret)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, cos_access_secret)
         execute_job.after(ray_cluster)
 
     # set image pull secrets
@@ -135,4 +144,4 @@ def noop(
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(noop, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(ededup, __file__.replace(".py", ".yaml"))

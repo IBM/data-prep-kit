@@ -4,6 +4,7 @@
 # sub-projects underneath this directory.  Currently, the common/standardized set of rules are as follows
 # and supported by .make.defaults 
 #
+# setup: 
 # clean: 
 # build:
 # test:
@@ -25,19 +26,19 @@ include .make.defaults
 # be overridden there (the double colon on the rule makes the overridable). 
 
 clean:: 
-	@# Help: clean, Recursively clean all subdirs 
-	$(MAKE) RULE=clean .recurse
+	@# Help: Recursively $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
 setup::
-	@# Help: setup, Recursively test in all subdirs
-	@$(MAKE) RULE=setup .recurse
+	@# Help: Recursively $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
 build:: 
-	@# Help: build, Recursively build all subdirs 
-	$(MAKE) RULE=build .recurse
+	@# Help: Recursively $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
 test::  
-	@# Help: test, Recursively test in all subdirs 
-	@$(MAKE) RULE=test .recurse
+	@# Help: Recursively $@ in in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 
 
