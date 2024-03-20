@@ -605,6 +605,10 @@ class ComponentUtils:
         """
         import sys
         from kfp_support.workflow_support.utils import KFPUtils
+        from data_processing.utils import get_logger
+
+        logger = get_logger(__name__)
+
         # convert input
         w_options = KFPUtils.load_from_json(worker_options.replace("'", '"'))
         a_options = KFPUtils.load_from_json(actor_options.replace("'", '"'))

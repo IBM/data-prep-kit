@@ -206,7 +206,15 @@ Once this is done we can execute the workflow.
 
 On the pipeline page (above) click on the `create run` button. You will see the list of the parameters, that you
 can enter, which is populated with with the default that we specified above. If you do not want to modify parameters,
-go to the bottom of the page and click 
+go to the bottom of the page and click `start` button
+
+This will start workflow execution. Once it completes you will see something similar to below 
+
+![execution result](execution_result.png)
+
+Note that the log (on the left) has the complete execution log.
+
+Additionally the log is saved to S3 (location is denoted but the last line in the log)
 
 ## Clean up cluster
 
