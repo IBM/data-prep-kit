@@ -5,9 +5,9 @@ for details on general project conventions, transform configuration,
 testing and IDE set up.
 
 ## Summary 
-This filter scans the `contents` column of an input dataset using ClamAV, and outputs corresponding tables containing `virus_detection` column.
+This filter scans the 'contents' column of an input table using [ClamAV](https://www.clamav.net/), and outputs corresponding tables containing 'virus_detection' column (by default).
 
-If a virus is detected, the `virus_detection` column contains the detected virus signature name; otherwise `null` (`None`).
+If a virus is detected, the 'virus_detection' column contains the detected virus signature name; otherwise [null](https://arrow.apache.org/docs/python/generated/pyarrow.null.html).
 
 ## Configuration and Command Line Options
 
