@@ -1,0 +1,37 @@
+name: Start Ray Cluster
+description: Creates Ray cluster
+
+inputs:
+    - { name: ray_name, type: String, description: "Ray cluster user name" }
+    - { name: run_id, type: String, description: "The KFP Run ID" }
+    - { name: ray_head_options, type: String, default: "", description: "ray head configuration" }
+    - { name: ray_worker_options, type: String, default: "", description: "ray worker configuration" }
+    - { name: server_url, type: String, default: "", description: "url of api server" }
+    - { name: additional_params, type: String, default: "{}", description: "additional parameters" }
+
+
+implementation:
+    container:
+        image: us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1
+        # command is a list of strings (command-line arguments).
+        # The YAML language has two syntaxes for lists and you can use either of them.
+        # Here we use the "flow syntax" - comma-separated strings inside square brackets.
+        command: [
+                python,
+                # Force the stdout and stderr streams to be unbuffered
+                -u,
+                # Path of the program inside the container
+                /pipelines/component/src/create_ray_cluster.py,
+                --ray_name,
+                { inputValue: ray_name },
+                --run_id,
+                { inputValue: run_id },
+                --ray_head_options,
+                { inputValue: ray_head_options },
+                --ray_worker_options,
+                { inputValue: ray_worker_options },
+                --server_url,
+                { inputValue: server_url },
+                --additional_params,
+                { inputValue: additional_params },
+            ]

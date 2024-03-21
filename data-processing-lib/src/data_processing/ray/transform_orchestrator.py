@@ -11,7 +11,7 @@ from data_processing.ray import (
     TransformStatistics,
     TransformTableProcessor,
 )
-from data_processing.utils import ParamsUtils, get_logger
+from data_processing.utils import get_logger
 from ray.util import ActorPool
 from ray.util.metrics import Gauge
 

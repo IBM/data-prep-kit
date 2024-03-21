@@ -4,6 +4,9 @@ from typing import Any
 import pyarrow as pa
 import mmh3
 import hashlib
+from data_processing.utils import get_logger
+
+logger = get_logger(__name__)
 
 
 RANDOM_SEED = 42
@@ -93,3 +96,19 @@ class TransformUtils:
             table = table.drop(columns=[name])
         # append column
         return table.append_column(field_=name, column=[content])
+
+    @staticmethod
+    def verify_no_duplicate_columns(table: pa.Table, file: str) -> bool:
+        """
+        Verify that resulting table does not have duplicate columns
+        :param table: table
+        :param file: file where we are saving the table
+        :return: True, if there are no duplicates, False otherwise
+        """
+        columns_list = table.schema.names
+        columns_set = set(columns_list)
+        if len(columns_set) != len(columns_list):
+            logger.warning(f"Resulting table for file {file} contains duplicate columns {columns_list}. Skipping")
+            return False
+        return True
+

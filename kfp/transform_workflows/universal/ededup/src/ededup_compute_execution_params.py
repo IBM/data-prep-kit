@@ -1,19 +1,19 @@
-from typing import Any
+from typing import Any, NamedTuple
 
 
 def ededup_compute_execution_params(
-        worker_options: str,        # ray worker configuration
-        actor_options: str,         # actor's resource requirements
-        params: dict[str, Any],     # exact dedup specific parameters
-        n_samples: int = 10,        # number of samples to use
-) -> str:
+    worker_options: str,  # ray worker configuration
+    actor_options: str,  # actor's resource requirements
+    params: dict[str, Any],  # exact dedup specific parameters
+    n_samples: int = 10,  # number of samples to use
+) -> NamedTuple("Output", [("workers", int), ("hashes", int)]):
     """
     Compute exact dedup execution parameters
     :param worker_options: cluster parameters
     :param actor_options: actor request requirements
     :param n_samples: number of samples to use
     :param params: exact dedup specific parameters containing the following keys:
-        s3_input_folder - s3 input folder
+        s3_config - s3 config
         hash_cpu - hash cpu requirements
     :return: json string, containing computed number of workers and hashes
     """
@@ -21,46 +21,35 @@ def ededup_compute_execution_params(
     import json
     import math
     import sys
-    from kfp_support.workflow_support.utils import KFPUtils
+
     from data_processing.data_access import DataAccessS3
-    from data_processing.utils import KB, GB
+    from data_processing.utils import GB, KB
+    from kfp_support.workflow_support.utils import KFPUtils
 
     EXECUTION_OF_KB_DOC = 0.00025
 
     # Get cluster parameters
-    try:
-        worker_options = worker_options.replace("'", '"')
-        w_options = json.loads(worker_options)
-    except Exception as e:
-        print(f"Failed to load parameters {worker_options} with error {e}")
-        sys.exit(1)
-    cluster_cpu = w_options["replicas"] * w_options["cpu"] * 0.85
-    cluster_memory = w_options["replicas"] * w_options["memory"] * 0.85
+    w_options = KFPUtils.load_from_json(worker_options.replace("'", '"'))
+    cluster_cpu = w_options["replicas"] * w_options["cpu"]
+    cluster_memory = w_options["replicas"] * w_options["memory"]
     print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_memory}")
+    cluster_cpu *= 0.85
+    cluster_memory *= 0.85
     # get actor requirements
-    try:
-        actor_options = actor_options.replace("'", '"')
-        a_options = json.loads(actor_options)
-    except Exception as e:
-        print(f"Failed to load parameters {actor_options} with error {e}")
-        sys.exit(1)
+    a_options = KFPUtils.load_from_json(actor_options.replace("'", '"'))
     actor_cpu = a_options["num_cpus"]
     print(f"actor required cpu {actor_cpu}")
     # get credentials
     s3_key, s3_secret, s3_endpoint = KFPUtils.credentials()
-    s3_creds = {"access_key": s3_key,
-                "secret_key": s3_secret,
-                "url": s3_endpoint
-                }
-    s3_config = {"input_folder": KFPUtils.clean_path(params.get("s3_input_prefix")),
-                 "output_folder": "",
-                 }
+    s3_creds = {"access_key": s3_key, "secret_key": s3_secret, "url": s3_endpoint}
+    s3_config = KFPUtils.load_from_json(params.get("s3_config", {}).replace("'", '"'))
+
     # because S3 is the only viable version for kfp-based implementation, we are here creating DataAccess S3 directly
     data_access = DataAccessS3(s3_credentials=s3_creds, s3_config=s3_config, d_sets=None, checkpoint=False, m_files=-1)
     # sample input data
     sampling = data_access.sample_input_data(n_samples=n_samples)
-    avg_doc_size = sampling.get('average doc size KB')
-    number_of_docs = sampling.get('estimated number of docs')
+    avg_doc_size = sampling.get("average doc size KB")
+    number_of_docs = sampling.get("estimated number of docs")
     avg_table_size = sampling.get("average table size MB") / KB
     # compute number of hashes
     n_hashes = math.ceil(number_of_docs * 32 / GB)
@@ -76,9 +65,9 @@ def ededup_compute_execution_params(
         )
         sys.exit(1)
     # Define number of workers
-    n_workers = int((.85 * cluster_cpu - required_hash_cpu) / actor_cpu)
+    n_workers = int((0.85 * cluster_cpu - required_hash_cpu) / actor_cpu)
     print(f"Number of workers - {n_workers}")
-    if n_workers < 5:
+    if n_workers < 2:
         print(f"Cluster is too small - estimated number of workers {n_workers}")
         sys.exit(1)
     # Limit amount of workers and processors to prevent S3 saturation
@@ -92,4 +81,6 @@ def ededup_compute_execution_params(
         print(f"Try to increase the size of the cluster or increase size of the cpu per worker")
         sys.exit(1)
     print(f"Projected execution time {EXECUTION_OF_KB_DOC * avg_doc_size * number_of_docs / n_workers / 60} min")
-    return json.dumps({"workers": n_workers, "hashes": n_hashes})
+    # return json.dumps({"workers": n_workers, "hashes": n_hashes})
+    return (n_workers, n_hashes)
+    # return (1, 1)

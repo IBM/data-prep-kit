@@ -1,72 +1,43 @@
 import os
-import sys
-from argparse import ArgumentParser
-from pathlib import Path
 
 from blocklist_transform import (
     BlockListTransform,
-    BlockListTransformConfiguration,
     annotation_column_name_key,
     blocked_domain_list_path_key,
     source_url_column_name_key,
 )
-from data_processing.ray import TransformLauncher
+from data_processing.data_access import DataAccessLocal
 from data_processing.utils import ParamsUtils
 
 
 # create parameters
-
-blocklist_conf_url = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/domains"))
-blocklist_annotation_column_name = "blocklisted"
-blocklist_doc_source_url_column = "title"
-
-
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
+blocklist_conf_url = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/domains"))
+blocklist_annotation_column_name = "blocklisted"
+blocklist_doc_source_url_column = "title"
+
 block_list_params = {
     blocked_domain_list_path_key: blocklist_conf_url,
     annotation_column_name_key: blocklist_annotation_column_name,
     source_url_column_name_key: blocklist_doc_source_url_column,
     "blocklist_local_config": ParamsUtils.convert_to_ast(local_conf),
 }
-worker_options = {"num_cpus": 0.8}
-code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
-launcher_params = {
-    "run_locally": True,
-    "max_files": -1,
-    "local_config": ParamsUtils.convert_to_ast(local_conf),
-    "worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "num_workers": 5,
-    "checkpointing": False,
-    "pipeline_id": "pipeline_id",
-    "job_id": "job_id",
-    "creation_delay": 0,
-    "code_location": ParamsUtils.convert_to_ast(code_location),
-}
-
-# launch
-run_in_ray = False
-run_in_ray = True
 if __name__ == "__main__":
-    Path(output_folder).mkdir(parents=True, exist_ok=True)
-    if not run_in_ray:
-        sys.argv = ParamsUtils.dict_to_req(block_list_params)
-        config = BlockListTransformConfiguration()
-        parser = ArgumentParser()
-        config.add_input_params(parser)
-        args = parser.parse_args()
-        config.apply_input_params(args)
-        config = config.get_input_params()
-        transform = BlockListTransform(config)
-        print(f"config: {config}")
-        print(f"transform: {transform}")
-    else:
-        # create launcher
-        sys.argv = ParamsUtils.dict_to_req(launcher_params | block_list_params)
-        launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
-        # Launch the ray actor(s) to process the input
-        launcher.launch()
+    # Here we show how to run outside of ray
+    # Blocklist transform needs a DataAccess to ready the domain list.
+    data_access = DataAccessLocal(local_conf)
+    block_list_params["data_access"] = data_access
+    # Create and configure the transform.
+    transform = BlockListTransform(block_list_params)
+    # Use the local data access to read a parquet table.
+    table = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
+    print(f"input table: {table}")
+    # Transform the table
+    table_list, metadata = transform.transform(table)
+    print(f"\noutput table: {table_list}")
+    print(f"output metadata : {metadata}")

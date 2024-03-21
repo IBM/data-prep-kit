@@ -13,6 +13,7 @@ class AbstractTableTransform:
         """
         Initialize based on the dictionary of configuration information.
         """
+        self.config = config
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """

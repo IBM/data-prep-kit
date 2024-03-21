@@ -4,6 +4,7 @@
 # sub-projects underneath this directory.  Currently, the common/standardized set of rules are as follows
 # and supported by .make.defaults 
 #
+# setup: 
 # clean: 
 # build:
 # test:
@@ -17,20 +18,6 @@
 #
 #################################################################################################################
 
-# Add local or overriding rules here
-include Makefile.env
-
-include cluster.mk
-
-.PHONY: setup-kind-cluster
-setup-kind-cluster:
-	$(MAKE) delete-kind-cluster
-	$(MAKE) create-kind-cluster
-	$(MAKE) cluster-prepare
-	$(MAKE) cluster-prepare-wait
-	cd $(KIND_DIR)/hack && ./ingress.sh deploy
-	@echo "setup-cluster completed"
-
 # Get some common rules for the whole repo
 include .make.defaults
 
@@ -39,15 +26,19 @@ include .make.defaults
 # be overridden there (the double colon on the rule makes the overridable). 
 
 clean:: 
-	@# Help: clean, Recursively clean all subdirs 
-	$(MAKE) RULE=clean .recurse
+	@# Help: Recursively $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
+
+setup::
+	@# Help: Recursively $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
 build:: 
-	@# Help: build, Recursively build all subdirs 
-	$(MAKE) RULE=build .recurse
+	@# Help: Recursively $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
 test::  
-	@# Help: test, Recursively test in all subdirs 
-	@$(MAKE) RULE=test .recurse
+	@# Help: Recursively $@ in in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 
 

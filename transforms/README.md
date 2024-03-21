@@ -1,5 +1,37 @@
 # Transforms
-This is the root director of all transforms.  It is organized as follows
+
+The transformation framework is designed to operate on rows of columnar data, generally contained
+in [parquet](https://arrow.apache.org/docs/python/parquet.html) files 
+and read as [pyarrow tables](https://arrow.apache.org/docs/python/index.html).
+
+Transforms are written to process the [table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
+to, for example:
+    * Annotate the tables to add additional data such as document quality score, language, etc.
+    * Filter the table to remove or edit rows and/or columns, for example to remove rows from blocked domain. 
+
+While these transformation modules were originally built for pre-training, they are also useful for fine-tuning data preparation.
+
+## Annotating Transforms
+Annotating transforms examine 1 or more columns of data, typically a _content_ column containing a document
+to be annotated.  The content is often spoken/text or programming language, generally to build
+a large language model (LLM).  Examples of annotation might include:
+
+    * Language identification - an additional string column is added to identify the language of the document content. 
+    * Document quality - an additional float column is added to associated a quality score with the document. 
+    * Block listing - an addtional boolean column is added that indicates if the content source url 
+      (in one of the columns) is from a blocked domain. 
+
+## Filtering Transforms
+Filtering transforms modify the rows and/or columns, usually based on associated column values.  
+For example,
+
+    * Language selection - remove rows that do not match the desired language 
+    * Document quality threshold - remove rows that do not meet a minimum document quality value. 
+    * Block listing - remove rows that have been flagged as having been sourced from undesirable domains. 
+
+
+## Transform Organization
+This directory hierarchy of transforms is organized as follows:
 
 * `universal` - transforms applicable across code and language model data include
     * Schema modification 
@@ -49,7 +81,7 @@ The `Makefile` also defines a number of macros/variables that can be set, includ
 python executable and more.
 
 ### Configuration and command line options
-A transform generally accept a dictionary of configuration to
+A transform generally accepts a dictionary of configuration to
 control its operation.  For example, the size of a table, the location
 of a model, etc. These are set either explicitly in dictionaries
 (e.g. during testing) or from the command line when run from a Ray launcher.
@@ -57,6 +89,8 @@ of a model, etc. These are set either explicitly in dictionaries
 When specified on the command line, they are specified by prefixing with
 `--` (dash dash).  For example, `--mytransform_some_cfg somevalue` sets 
 the value for the `mytransform_some_cfg` configuration key value to `somevalue`. 
+To avoid potential collisions with options for the Ray launcher, Data Access Factory and others, 
+it is strongly encouraged to not use single dash options with a single or small number of characters (e.g. -n).
 
 In general, a common prefix (i.e. `mytransform_`) is used to help distinguish these keys, primarily
 for ease-of-use/readability command line use, logging, etc.  This is not required, but

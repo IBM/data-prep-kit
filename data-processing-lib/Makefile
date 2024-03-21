@@ -4,13 +4,16 @@ include ../.make.defaults
 VERSION=0.2.0
 TAG := "v${VERSION}"
 LIBNAME=fm_data_processing
-PYTHON=python3
+PYTHON=python
+PYTEST=pytest
 ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local
 
 clean::
 	@# Help: Clean up the distribution build and the venv 
-	rm -r dist venv
+	rm -rf dist venv
 	rm -rf src/*egg-info
+
+setup::
 
 .check-env::
 	@if [ -z "$(VERSION)" ]; then echo "You must provide VERSION"; false; fi
@@ -21,6 +24,9 @@ update-toml:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml 
 	sed -e 's/^version[ ]*=.*/version = "'${VERSION}'"/' pyproject.toml > tt.toml
 	mv tt.toml pyproject.toml
+
+setup::
+
 
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
@@ -47,10 +53,15 @@ venv::	pyproject.toml .check-env
 	source venv/bin/activate; 	\
 	pip install --upgrade pip;	\
 	pip install -e .;		\
-	pip install pytest pytest-cov pytest-forked
+	pip install pytest pytest-cov 
 
+# Here we run each test directory of tests and each ray launched test separately, because
+# it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.
+# pytest-forked was tried, but then we get SIGABRT in pytest when running the s3 tests, some of which are skipped.. 
 test::  
 	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
-	source venv/bin/activate;		\
-	export PYTHONPATH=../src:.:$$PYTHONPATH; \
-	cd test; pytest --forked  . 
+	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/transform;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/data_access;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/ray/ray_util_test.py;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/ray/test_noop_launch.py;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/ray/launcher_test.py;	
