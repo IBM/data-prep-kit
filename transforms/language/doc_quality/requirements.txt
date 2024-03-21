@@ -2,12 +2,13 @@
 # The following url for fm-data-processing.  Contact David Wood, dawood@us.ibm.com, if you don't have pypi access
 --extra-index-url https://${ARTIFACTORY_USER}:${ARTIFACTORY_API_KEY}@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
 fm-data-processing==0.2.0
+# TODO: pip install https://github.com/kpu/kenlm/archive/master.zip
 ### For docquality
 numpy==1.24.1
 pandas==1.5.3
 pyarrow==14.0.2
 sentencepiece
 pydantic==2.5.3
-ray[default]==2.9.1
+ray[default]==2.9.3
 packaging
 binpacking

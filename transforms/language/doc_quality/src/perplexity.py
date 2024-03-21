@@ -1,24 +1,3 @@
-"""
-@ Create on: 2023/04/25
-@ Description:
-    To compute perplexity (quality score) for documents.
-@ Require installation of KenLM and SentencePiece as follows:
-    pip install https://github.com/kpu/kenlm/archive/master.zip
-    pip install sentencepiece
-@ Download pre-trained KenLM model for English language on Wikipedia
-    through cc_net (https://github.com/facebookresearch/cc_net):
-        make lang=en lm
-  Save 2 downloaded files (en.arpa.bin, en.sp.model) to local machine
-  as its size is > 4GB.
-  Or access them in COS at:
-    s3://cos-optimal-llm-pile/bluepile-processing/lm_sp/
-@ To train KenLM on other languages or on text corpus other than Wikipedia (e.g, OSCAR)
-  please refer to this HF repo: https://github.com/bigscience-workshop/data_tooling/tree/master/kenlm_training
-  (related to HF's ROOTS/BLOOM project https://arxiv.org/pdf/2303.03915.pdf). This project has also provided pre-trained models trained on Wikipedia and OSCAR datasets.
-  They can be directly downloaded from: https://huggingface.co/edugp/kenlm/tree/main/
-  in two corresponding folders `wikipedia` or `oscar` folder.
-"""
-
 import logging
 
 
@@ -36,7 +15,8 @@ from cc_net_prepro import cc_net_normalize
 # PATH_TO_PRETRAINED_MODELS = "/dev/cos/bluepile-processing/lm_sp/"  # on a VM
 # PATH_TO_PRETRAINED_MODELS = '~/BigData/04-FM/lm_sp/'  # on a MAC
 
-PATH_TO_PRETRAINED_MODELS = "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/"  # local
+PATH_TO_PRETRAINED_MODELS = os.path.join(os.path.expanduser("~/BigData/04-FM/lm_sp/"), "en.sp.model")
+# "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/"  # local
 TEST_MODE = 0
 
 
