@@ -16,10 +16,6 @@ s3_cred = {
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 tkn_params = {
-        # "tokenizer_path":local_tokenizer,
-        # "tokenizer_path": "Rocketknight1/falcon-rw-1b", # HF's Falcon https://huggingface.co/docs/transformers/en/model_doc/falcon
-        # "tokenizer_path": "EleutherAI/gpt-neox-20b", # https://huggingface.co/docs/transformers/en/model_doc/gpt_neox
-        # "tokenizer_path": "hf-internal-testing/llama-tokenizer",
         "tkn_tokenizer_path": "bigcode/starcoder",
         "tkn_doc_id_column":"document_id",
         "tkn_doc_content_column":"contents",
@@ -29,8 +25,6 @@ tkn_params = {
 s3_conf = {
     "input_folder": "cos-optimal-llm-pile/bluepile-processing/xh/opensource/input/",
     "output_folder": "cos-optimal-llm-pile/bluepile-processing/xh/opensource/output/",
-    # "input_folder": "cos-optimal-llm-pile/test/david/input/",
-    # "output_folder": "cos-optimal-llm-pile/test/david/output/",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
@@ -48,10 +42,5 @@ params = {
     "code_location": ParamsUtils.convert_to_ast(code_location),
 }
 
-
 sys.argv = ParamsUtils.dict_to_req(d=params | tkn_params)
-# for arg in sys.argv:
-#     print(arg)
-
-# launch
 launcher.launch()

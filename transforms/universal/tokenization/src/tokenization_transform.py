@@ -26,10 +26,10 @@ class TokenizationTransform(AbstractTableTransform):
     """
     def __init__(self, config: dict[str, Any]):
         """
-        Initialize based on the dictionary of configuration information.
-        This is generally called with configuration parsed from the CLI arguments defined
-        by the companion runtime, TokenizationTransformRuntime.  If running inside the RayMutatingDriver,
-        these will be provided by that class with help from the RayMutatingDriver.
+        This class is used to transform an input table to an output table utilizing a tokenizer.
+        The input table must contain at least two columns, with default names set as `document_id` and `contents`.
+        The tokenizer will tokenize each row in `contents` into a sequence of token_ids and write it to `tokens` column
+        in the output table, along with the document id and token count stored respectively in `document_id` and `token_count` column.
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of TokenizationTransformConfiguration class
@@ -160,7 +160,7 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
             "--tkn_chunk_size",
             type=int,
             default=0,
-            help="Specify >0 value to tokenize each row/doc in chunks of characters (rounded in words)",
+            help="Specify >0 value to tokenize each row/text in chunks of characters (rounded in words)",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
