@@ -37,7 +37,7 @@ Our pipeline includes 4 steps - compute execution parameters, create Ray cluster
 Ray cluster. FOr each step we have to define a component that will execute them:
 
 ```python
-    base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1-test3"
+    base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1"
     # execute parameters
     compute_exec_params_op = comp.func_to_container_op(
         func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
