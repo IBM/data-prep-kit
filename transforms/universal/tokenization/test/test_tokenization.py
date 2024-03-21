@@ -40,9 +40,6 @@ Config (parameter settings) for the run:
 '''
 config = {
             "tokenizer": "bigcode/starcoder",
-            # "tokenizer": "Rocketknight1/falcon-rw-1b", # HF's Falcon https://huggingface.co/docs/transformers/en/model_doc/falcon
-            # "tokenizer": "EleutherAI/gpt-neox-20b", # https://huggingface.co/docs/transformers/en/model_doc/gpt_neox
-            # "tokenizer": "hf-internal-testing/llama-tokenizer",
             "doc_id_column":"document_id",
             "doc_content_column":"contents",
             "text_lang": "en",

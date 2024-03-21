@@ -82,7 +82,7 @@ class TokenizationTransform(AbstractTableTransform):
                     token_line = self.tokenizer(doc_content)["input_ids"]
             except Exception as e:
                 # skip failed row/doc, treat it as `empty` and move on:
-                logger.info(f"Failed in tokenizing `{doc_content}` due to:\n {e}")
+                logger.warning(f"Failed in tokenizing `{doc_content}` due to:\n {e}")
                 empty_doc_ids.append(doc_id)
                 continue
 
@@ -189,4 +189,3 @@ if __name__ == "__main__":
     launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfiguration())
     logger.info("Launching Tokenization transform")
     launcher.launch()
-

@@ -98,8 +98,10 @@ def load_tokenizer(tokenzer_name:str):
     Load and return a tokenizer specified in `tokenizer_name`
     This function is designed to accommodate the loading of any tokenizer compatible with
     the Huggingface `AutoTokenizer` library, such as `bigcode/starcoder`, `Rocketknight1/falcon-rw-1b`, and others.
-    The tokenizer can be obtained either by direct download from HuggingFace or from a locally specified folder.
+
     Extending this function to support other customized tokenizers is straightforward.
+    :param tokenizer_name: name of tokenizer. It can be one downloadable from HuggingFace or from a locally specified folder.
+    :return: a tokenizer
     """
     try:
         tokenizer = AutoTokenizer.from_pretrained(tokenzer_name)
