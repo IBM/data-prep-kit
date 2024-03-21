@@ -186,23 +186,7 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    # launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfiguration())
-    # logger.info("Launching Tokenization transform")
-    # launcher.launch()
+    launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfiguration())
+    logger.info("Launching Tokenization transform")
+    launcher.launch()
 
-    config = {
-            "tokenizer": "bigcode/starcoder",
-            "doc_id_column": "document_id",
-            "doc_content_column": "contents",
-            "text_lang": "en",
-            "chunk_size": 0,
-        }
-    tkn = TokenizationTransform(config)
-
-    in_table = pa.Table.from_pydict({"document_id": pa.array(["doc01", "doc02", "doc03"]),
-                                     "contents": pa.array(
-                                         ["This content is for doc01", "", "Another content for doc03"])})
-
-    out_table, metadata = tkn.transform(in_table)
-    print(f"\n== out_table: {out_table}")
-    print(f"\n== metadata: {metadata}")
