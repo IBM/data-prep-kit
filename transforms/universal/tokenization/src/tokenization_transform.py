@@ -41,12 +41,12 @@ class TokenizationTransform(AbstractTableTransform):
         self.chunk_size = config.get("chunk_size", 0)
         self.text_lang = config.get("text_lang", "en")
 
-        logger.info(f"\n*** `config` to run:")
+        logger.debug(f"\n*** `config` to run:")
         for k,v in config.items():
-            logger.info(f"{k:20s}: {v}")
+            logger.debug(f"{k:20s}: {v}")
 
         # overwrite tokenizer:
-        self.tokenizer = load_tokenizer(tokenzer_name=self.tokenizer,do_testing=False)
+        self.tokenizer = load_tokenizer(tokenzer_name=self.tokenizer)
 
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
@@ -161,7 +161,7 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
             "--tkn_chunk_size",
             type=int,
             default=0,
-            help="Specify >0 value to tokenize each row/doc in chunks of characters (round in words)",
+            help="Specify >0 value to tokenize each row/doc in chunks of characters (rounded in words)",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
@@ -171,12 +171,10 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         if args.tkn_tokenizer is None:
-            logger.error(f"Parameter --tkn_tokenizer must be a valid tokenizer for tokenization, you specified {args.tkn_tokenizer}")
-            return False
+            raise RuntimeError(f"Parameter --tkn_tokenizer must be a valid tokenizer for tokenization, you specified {args.tkn_tokenizer}")
 
         if args.tkn_doc_id_column is None or args.tkn_doc_content_column is None:
-            logger.error(f"Parameter for `tkn_doc_id_column` and `tkn_doc_content_column` must be provided")
-            return False
+            raise RuntimeError(f"Values for `--tkn_doc_id_column` and `--tkn_doc_content_column` must be provided")
 
         self.params["tokenizer"] = args.tkn_tokenizer
         self.params["doc_id_column"] = args.tkn_doc_id_column
@@ -188,6 +186,23 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfiguration())
-    logger.info("Launching Tokenization transform")
-    launcher.launch()
+    # launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfiguration())
+    # logger.info("Launching Tokenization transform")
+    # launcher.launch()
+
+    config = {
+            "tokenizer": "bigcode/starcoder",
+            "doc_id_column": "document_id",
+            "doc_content_column": "contents",
+            "text_lang": "en",
+            "chunk_size": 0,
+        }
+    tkn = TokenizationTransform(config)
+
+    in_table = pa.Table.from_pydict({"document_id": pa.array(["doc01", "doc02", "doc03"]),
+                                     "contents": pa.array(
+                                         ["This content is for doc01", "", "Another content for doc03"])})
+
+    out_table, metadata = tkn.transform(in_table)
+    print(f"\n== out_table: {out_table}")
+    print(f"\n== metadata: {metadata}")

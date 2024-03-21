@@ -28,9 +28,7 @@ params = {
     "code_location": ParamsUtils.convert_to_ast(code_location),
 }
 if __name__ == "__main__":
-    """
-    Done, `../output/ was updated with converted data.
-    """
+
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
     launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfiguration())

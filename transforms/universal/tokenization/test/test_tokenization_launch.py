@@ -1,10 +1,6 @@
-# This helps to be able to run the test from within an IDE which seems to use the location of the
-# file as the working directory.
-
 import os
 
 from data_processing.test_support.ray import AbstractTransformLauncherTest
-# from data_processing.test_support.transform import NOOPTransformConfiguration
 from tokenization_transform import TokenizationTransformConfiguration
 
 

@@ -93,7 +93,7 @@ def split_text_wout_word_space(text:str,chunk_size:int, reserve_consecutive_line
             if i < len(lines) - 1:
                 yield '\n'
 
-def load_tokenizer(tokenzer_name:str,do_testing:bool=False):
+def load_tokenizer(tokenzer_name:str):
     """
     Load and return a tokenizer specified in `tokenizer_name`
     This function is designed to accommodate the loading of any tokenizer compatible with
@@ -102,14 +102,8 @@ def load_tokenizer(tokenzer_name:str,do_testing:bool=False):
     Extending this function to support other customized tokenizers is straightforward.
     """
     try:
-        tok = AutoTokenizer.from_pretrained(tokenzer_name)
+        tokenizer = AutoTokenizer.from_pretrained(tokenzer_name)
     except Exception as e:
-        sys.exit(f"Failed to load tokenizer from `{tokenzer_name}` with  `HF AutoTokenizer` due to\n: {e}")
+        raise RuntimeError(f"Failed to load tokenizer from `{tokenzer_name}` with  `HF AutoTokenizer` due to\n: {e}")
 
-    # quick test tokenizer:
-    if do_testing:
-        txt = "This text is for testing purpose!"
-        token_line = tok(txt)["input_ids"]
-        logger.info(f"== Tokenizer `{tokenzer_name}` has tokenized `{txt}` to: {token_line}")
-
-    return tok
+    return tokenizer
