@@ -27,20 +27,19 @@ clean::
 	@echo "Checks passed"
 
 .compile-pipeline::
-	$(info Use make compile-pipelines to compile all pipelines)
 	. ${VENV_ACTIVATE} && cd ${DIR} && ${PYTHON} ${WF_NAME}.py
 
 %.yaml: %.py
-	make compile-pipeline WF_NAME=$(shell (basename $< .py)) DIR=$(shell (dirname $<))
+	make .compile-pipeline WF_NAME=$(shell (basename $< .py)) DIR=$(shell (dirname $<))
 
 .reconcile-requirement::
 	@for file in $(PYTHON_WF); do \
 		sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}\"/" $$file; \
+	done
 
-build:: 
+build:: venv
 	@# Help: Compile the pipelines
 	${PYTHON} -m pip install --upgrade build
-	${PYTHON} -m build
 	make .reconcile-requirement
 	make ${YAML_WF}
 
@@ -50,11 +49,12 @@ publish:: .check-env
 
 venv::	.check-env
 	@# Help: Create the virtual environment using pyproject.toml 
+	sed -i.back "s/fm-data-processing==[0-9].*/fm-data-processing==${FM_DATA_PROCESSING}/" ../kfp_ray_components/requirements.txt
 	rm -rf venv	
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE}; 	\
-	pip install ray==${RAY} \
-	pip install kfp==${KFP} \
-	pip install kfp-support==${FM_DATA_PROCESSING_KFP}
+	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple \
+	pip install -r ../kfp_ray_components/requirements.txt \
+	pip install -i https://test.pypi.org/simple/ fm-data-processing-kfp==${FM_DATA_PROCESSING_KFP}
 
 test::

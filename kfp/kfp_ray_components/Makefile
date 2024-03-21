@@ -23,6 +23,7 @@ __check_defined = \
 	$(call check_defined, ARTIFACTORY_USER)
 	$(call check_defined, ARTIFACTORY_API_KEY)
 	$(call check_defined, DOCKER_HOSTNAME)
+	sed -i.back "s/fm-data-processing==[0-9].*/fm-data-processing==${FM_DATA_PROCESSING}/" requirements.txt
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
 	$(DOCKER) build -t ${IMG} --build-arg ARTIFACTORY_USER=${ARTIFACTORY_USER} \
 	        --build-arg ARTIFACTORY_API_KEY=${ARTIFACTORY_API_KEY} \
