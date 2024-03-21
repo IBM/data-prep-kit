@@ -183,9 +183,9 @@ To compile pipeline execute this [file](../transform_workflows/universal/noop/no
 in the same directory. Now create kind cluster cluster with all required software installed using the following command: 
 
 ````shell
- make setup-kind-cluster
+ make setup
 ````
-**Note** that this command has to run from the project root directory
+**Note** that this command has to run from the project kind subdirectory
 
 Once the cluster is up, go to `localhost:8080/kfp/`, which will bring up KFP UI, see below:
 
@@ -221,5 +221,7 @@ Additionally the log is saved to S3 (location is denoted but the last line in th
 Finally you can delete kind cluster running the following command:
 
 ```Shell
-make delete-kind-cluster
+make clean
 ```
+
+**Note** that this command has to run from the project kind subdirectory
