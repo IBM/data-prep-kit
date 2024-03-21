@@ -25,6 +25,7 @@ IMG ?= ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_TAGNAM
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
 	$(DOCKER) build -t ${IMG} --build-arg ARTIFACTORY_USER=${ARTIFACTORY_USER} \
 	        --build-arg ARTIFACTORY_API_KEY=${ARTIFACTORY_API_KEY} \
+		--build-arg FM_DATA_PROCESSING=${FM_DATA_PROCESSING} \
 		--build-arg FM_DATA_PROCESSING_KFP=${FM_DATA_PROCESSING_KFP} \
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
 		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . --no-cache

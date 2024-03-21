@@ -26,9 +26,9 @@ clean::
 	@echo "Checks passed"
 
 update-toml:: .check-env
-	@# Help: Copy the Makefile distribution version into the pyproject.toml 
-	sed -e 's/^version[ ]*=.*/version = "'${FM_DATA_PROCESSING_KFP}'"/' pyproject.toml > tt.toml
-	mv tt.toml pyproject.toml
+	@# Help: Copy the Makefile distribution version into the pyproject.toml
+	sed -i.back 's/^version[ ]*=.*/version = "'${FM_DATA_PROCESSING_KFP}'"/' pyproject.toml
+	sed -i.back 's/kfp==[0-9].*/kfp==${KFP}",/' pyproject.toml
 
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
