@@ -23,12 +23,12 @@ The following might be an example sequence of transforms.
 
 The ordering of the transforms can change depending on the requirements on the training data. 
 
-To address scalability, each transform is generally run in a dedicated Ray cluster
-deployed into a kubernetes cluster.  A single run of a specific transform will convert a set
-of parquet files from a source directory (think mega/terabytes) into a destination directory containing 
-the transformed parquet files.
-Multiple transforms are run in sequence on persistently stored data (i.e. parquet files)
-to produce a final LLM training data set as depicted below.
+Each transform is generally run on a set of input files (think terabytes) to produce a set
+of output files.   
+The transforms are generally sequenced, each accepting the completed set of output files from a
+previous the previous transform in the sequence. 
+To address scalability, a transform is generally run in a dedicated Ray cluster
+deployed into a kubernetes cluster.  
 
 ![Data Transformation Flow](data-flow.jpg)
 
