@@ -48,7 +48,9 @@ publish:: .check-env
 	@${PYTHON} -m twine upload --verbose --non-interactive --skip-existing --repository testpypi dist/*
 
 venv::	.check-env
-	@# Help: Create the virtual environment using pyproject.toml 
+	@# Help: Create the virtual environment
+	$(call check_defined, ARTIFACTORY_USER)
+	$(call check_defined, ARTIFACTORY_API_KEY)
 	sed -i.back "s/fm-data-processing==[0-9].*/fm-data-processing==${FM_DATA_PROCESSING}/" ../kfp_ray_components/requirements.txt
 	rm -rf venv	
 	$(PYTHON) -m venv venv

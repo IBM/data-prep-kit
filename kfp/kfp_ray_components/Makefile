@@ -1,6 +1,11 @@
 # Define the root of the local git clone for the common rules to be able
 # # know where they are running from.
 REPOROOT=../..
+
+# Include the common rules.
+# Use "make help" to see them.
+include ../../.make.defaults
+
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/\$\([A-Z_]*\)\-\([a-z]*\)/{\1\}\-\2/g' | sed 's/=/:=/' | sed 's/^/export /' >> makeenv")
 include makeenv
@@ -10,13 +15,6 @@ DOCKER_HOSTNAME ?= us.icr.io
 DOCKER_NAMESPACE ?= cil15-shared-registry/preprocessing-pipelines
 DOCKER_NAME ?= kfp-data-processing
 IMG ?= ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_TAGNAME}
-
-check_defined = \
-        $(strip $(foreach 1,$1, \
-        $(call __check_defined,$1,$(strip $(value 2)))))
-__check_defined = \
-        $(if $(value $1),, \
-        $(error Undefined $1$(if $2, ($2))))
 
 # Create the docker image making sure the preloaded models are available to copy into the image
 .kfp_comp.image:: Dockerfile requirements.txt
