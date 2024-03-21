@@ -1,12 +1,14 @@
-from typing import Any
+from typing import Any, NamedTuple
 
 
 def fdedup_compute_execution_params(
-        worker_options: str,        # ray worker configuration
-        actor_options: str,         # actor's resource requirements
-        params: dict[str, Any],     # fuzzy dedup specific parameters
-        n_samples: int = 10,        # number of samples to use
-        ) -> str:
+    worker_options: str,  # ray worker configuration
+    actor_options: str,  # actor's resource requirements
+    params: dict[str, Any],  # fuzzy dedup specific parameters
+    n_samples: int = 10,  # number of samples to use
+) -> NamedTuple(
+    "Output", [("workers", int), ("preprocessors", int), ("docs", int), ("buckets", int), ("min_hashes", int)]
+):
     """
     Compute fuzzy dedup execution parameters
     :param worker_options: cluster parameters
@@ -15,7 +17,7 @@ def fdedup_compute_execution_params(
     :param params: fuzzy dedup specific parameters containing the following keys:
         threshold - threshold for fuzzy computations
         num_permutations - number of permutation
-        s3_input_folder - s3 input folder
+        s3_config - s3 config
         bucket_cpu - bucket actor cpu requirements
         minhash_cpu - minhash actor cpu requirements
         doc_cpu - doc actor cpu requirements
@@ -29,18 +31,19 @@ def fdedup_compute_execution_params(
     import json
     import math
     import sys
-    from kfp_support.workflow_support.utils import KFPUtils
+
     from data_processing.data_access import DataAccessS3
-    from data_processing.utils import KB, GB
+    from data_processing.utils import GB, KB
+    from kfp_support.workflow_support.utils import KFPUtils
     from scipy.integrate import quad as integrate
 
     EXECUTION_OF_KB_DOC = 0.003
 
     def fuzzy_optimal_param(
-            threshold: float,
-            num_perm: int,
-            false_positive_weight: float,
-            false_negative_weight: float,
+        threshold: float,
+        num_perm: int,
+        false_positive_weight: float,
+        false_negative_weight: float,
     ) -> tuple[int, int]:
         """
         Computes parameters for fuzzy dedup
@@ -50,6 +53,7 @@ def fdedup_compute_execution_params(
         :param false_negative_weight: false negative weight
         :return: number of buckets and bucket length
         """
+
         def _false_positive_probability(ths: float, b: int, r: int) -> float:
             """
             Compute false positive probability
@@ -108,19 +112,14 @@ def fdedup_compute_execution_params(
     print(f"actor required cpu {actor_cpu}")
     # get credentials
     s3_key, s3_secret, s3_endpoint = KFPUtils.credentials()
-    s3_creds = {"access_key": s3_key,
-                "secret_key": s3_secret,
-                "url": s3_endpoint
-                }
-    s3_config = {"input_folder": KFPUtils.clean_path(params.get("s3_input_prefix")),
-                 "output_folder": "",
-                 }
+    s3_creds = {"access_key": s3_key, "secret_key": s3_secret, "url": s3_endpoint}
+    s3_config = KFPUtils.load_from_json(params.get("s3_config", {}).replace("'", '"'))
     # because S3 is the only viable version for kfp-based implementation, we are here creating DataAccess S3 directly
     data_access = DataAccessS3(s3_credentials=s3_creds, s3_config=s3_config, d_sets=None, checkpoint=False, m_files=-1)
     # sample input data
     sampling = data_access.sample_input_data(n_samples=n_samples)
-    avg_doc_size = sampling.get('average doc size KB')
-    number_of_docs = sampling.get('estimated number of docs')
+    avg_doc_size = sampling.get("average doc size KB")
+    number_of_docs = sampling.get("estimated number of docs")
     avg_table_size = sampling.get("average table size MB") / KB
     # we are creating more buckets actors, so that we get better parallelization for bucket processing
     b_actors = math.ceil(num_buckets * number_of_docs * 64 * 1.1 / GB)
@@ -158,9 +157,7 @@ def fdedup_compute_execution_params(
     print(f"Required execution memory {r_mem} GB")
     if r_mem > cluster_memory:
         print(f"Not enough memory to run de duping, required {r_mem}, available {cluster_memory}")
-        print(
-            f"Try to increase the size of the cluster or increase size of the cpu per worker (current {actor_cpu})"
-        )
+        print(f"Try to increase the size of the cluster or increase size of the cpu per worker (current {actor_cpu})")
         sys.exit(1)
 
     print(
@@ -171,12 +168,13 @@ def fdedup_compute_execution_params(
     projected_execution = EXECUTION_OF_KB_DOC * avg_doc_size * number_of_docs / n_workers / 60
     print(f"Projected execution time {projected_execution} min")
     # return
-    return json.dumps(
-        {
-            "workers": n_workers,
-            "preprocessors": n_preprocessors,
-            "docs": d_actors,
-            "buckets": b_actors,
-            "min_hashes": m_actors,
-        }
-    )
+    # return json.dumps(
+    #     {
+    #         "workers": n_workers,
+    #         "preprocessors": n_preprocessors,
+    #         "docs": d_actors,
+    #         "buckets": b_actors,
+    #         "min_hashes": m_actors,
+    #     }
+    # )
+    return (n_workers, n_preprocessors, d_actors, b_actors, m_actors)
