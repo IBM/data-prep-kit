@@ -13,14 +13,7 @@ include ../../../.make.defaults
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-venv::	.transforms.check_python_version
-	@$(MAKE) .transforms.check_env	# Put this first so we don't get its help
-	@# Help: Install tools required to install fasttext
-	$(PYTHON) -m venv venv
-	@source venv/bin/activate;					\
-	$(PIP) install --upgrade pip;		\
-	$(PIP) install wheel;		\
-	$(MAKE) .transforms.venv		\
+venv::	.transforms.venv
 
 build:: venv image
 
