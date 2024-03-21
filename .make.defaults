@@ -34,7 +34,8 @@ help::
 # It enables the processing of  a common set of rules on all sub-projects underneath this directory.  
 # Currently, the common/standardized set of rules are as follows and supported by makefile.include
 #
-# clean: 
+# clean:
+# setup: 
 # build:
 # test:
 #

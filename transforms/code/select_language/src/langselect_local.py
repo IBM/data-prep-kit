@@ -1,6 +1,5 @@
 import os
 import sys
-from pathlib import Path
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
@@ -17,7 +16,7 @@ language_column_name = "language"
 selected_languages_file = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                                        "../test-data/languages/allowed-code-languages.txt"))
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/output"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
@@ -42,7 +41,6 @@ params = {
 }
 
 if __name__ == "__main__":
-    Path(output_folder).mkdir(parents=True, exist_ok=True)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # launch
     launcher.launch()

@@ -12,7 +12,7 @@ deploy() {
 	helm repo add kuberay https://ray-project.github.io/kuberay-helm/
 	helm repo update
 	helm install kuberay-operator kuberay/kuberay-operator -n kuberay --version ${KUBERAY} --set image.pullPolicy=IfNotPresent --create-namespace
-	helm install -f ${KIND_DIR}/hack/ray_api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay --set image.pullPolicy=IfNotPresent
+	helm install -f ${ROOT_DIR}/hack/ray_api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay --set image.pullPolicy=IfNotPresent
 	echo "Finished KubeRay deployment."
 }
 

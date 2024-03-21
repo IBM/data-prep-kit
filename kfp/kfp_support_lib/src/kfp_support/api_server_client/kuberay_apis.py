@@ -4,6 +4,10 @@ import time
 from kfp_support.api_server_client.params import (Template, Cluster, RayJobRequest, RayJobInfo,
                                                   template_decoder, templates_decoder, cluster_decoder,
                                                   clusters_decoder)
+from data_processing.utils import get_logger
+
+logger = get_logger(__name__)
+
 
 _headers = {"Content-Type": "application/json", "accept": "application/json"}
 
@@ -49,11 +53,11 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, templates_decoder(response.json())
                 else:
-                    print(f"Failed to list compute templates, status : {response.status_code}")
+                    logger.warning(f"Failed to list compute templates, status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to list compute templates, exception : {e}")
+                logger.warning(f"Failed to list compute templates, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -78,11 +82,11 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, templates_decoder(response.json())
                 else:
-                    print(f"Failed to list compute templates for namespace {ns}, status : {response.status_code}")
+                    logger.warning(f"Failed to list compute templates for namespace {ns}, status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to list compute templates for namespace {ns}, exception : {e}")
+                logger.warning(f"Failed to list compute templates for namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -108,11 +112,11 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, template_decoder(response.json())
                 else:
-                    print(f"Failed to get compute template {name} for namespace {ns}, status : {response.status_code}")
+                    logger.warning(f"Failed to get compute template {name} for namespace {ns}, status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to get compute template {name} for namespace {ns}, exception : {e}")
+                logger.warning(f"Failed to get compute template {name} for namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -136,11 +140,11 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 else:
-                    print(f"Failed to create compute template, status : {response.status_code}")
+                    logger.warning(f"Failed to create compute template, status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to create compute template, exception : {e}")
+                logger.warning(f"Failed to create compute template, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -168,11 +172,11 @@ class KubeRayAPIs:
                     # not found - no need to retry
                     return response.status_code, response.json()["message"]
                 else:
-                    print(f"Failed to delete compute template, status : {response.status_code}")
+                    logger.warning(f"Failed to delete compute template, status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to delete compute template, exception : {e}")
+                logger.warning(f"Failed to delete compute template, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -196,11 +200,11 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, clusters_decoder(response.json())
                 else:
-                    print(f"Failed to list cluster, status : {response.status_code}")
+                    logger.warning(f"Failed to list cluster, status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to list cluster, exception : {e}")
+                logger.warning(f"Failed to list cluster, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -225,11 +229,11 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, clusters_decoder(response.json())
                 else:
-                    print(f"Failed to list clusters in namespace {ns}, status : {response.status_code}")
+                    logger.warning(f"Failed to list clusters in namespace {ns}, status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to list clusters in namespace {ns}, exception : {e}")
+                logger.warning(f"Failed to list clusters in namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -255,11 +259,11 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, cluster_decoder(response.json())
                 else:
-                    print(f"Failed to get cluster {name} in namespace {ns}, status : {response.status_code}")
+                    logger.warning(f"Failed to get cluster {name} in namespace {ns}, status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to get cluster {name} in namespace {ns}, exception : {e}")
+                logger.warning(f"Failed to get cluster {name} in namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -283,11 +287,11 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 else:
-                    print(f"Failed to create cluster , status : {response.status_code}")
+                    logger.warning(f"Failed to create cluster , status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to create cluster , exception : {e}")
+                logger.warning(f"Failed to create cluster , exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -380,11 +384,11 @@ class KubeRayAPIs:
                     # not found - no need to retry
                     return response.status_code, response.json()["message"]
                 else:
-                    print(f"Failed to delete cluster , status : {response.status_code}")
+                    logger.warning(f"Failed to delete cluster , status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to delete cluster , exception : {e}")
+                logger.warning(f"Failed to delete cluster , exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -411,12 +415,12 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, response.json()["submissionId"]
                 else:
-                    print(f"Failed to submit job to the cluster {name} in namespace {ns}, "
+                    logger.warning(f"Failed to submit job to the cluster {name} in namespace {ns}, "
                           f"status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to submit job to the cluster {name} in namespace {ns}, exception : {e}")
+                logger.warning(f"Failed to submit job to the cluster {name} in namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -443,12 +447,12 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, RayJobInfo(response.json())
                 else:
-                    print(f"Failed to get job {sid} from the cluster {name} in namespace {ns}, "
+                    logger.warning(f"Failed to get job {sid} from the cluster {name} in namespace {ns}, "
                           f"status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to get job {sid} from the cluster {name} in namespace {ns}, exception : {e}")
+                logger.warning(f"Failed to get job {sid} from the cluster {name} in namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -475,12 +479,12 @@ class KubeRayAPIs:
                     job_info_array = response.json().get("submissions", None)
                     return response.status_code, None, [RayJobInfo(i) for i in job_info_array]
                 else:
-                    print(f"Failed to list jobs from the cluster {name} in namespace {ns}, "
+                    logger.warning(f"Failed to list jobs from the cluster {name} in namespace {ns}, "
                           f"status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to list jobs from the cluster {name} in namespace {ns}, exception : {e}")
+                logger.warning(f"Failed to list jobs from the cluster {name} in namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -507,12 +511,12 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, response.json().get("log", "")
                 else:
-                    print(f"Failed to get log for jobs {sid} from the cluster {name} in namespace {ns}, "
+                    logger.warning(f"Failed to get log for jobs {sid} from the cluster {name} in namespace {ns}, "
                           f"status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to get log for jobs {sid} from the cluster {name} in namespace {ns}, exception : {e}")
+                logger.warning(f"Failed to get log for jobs {sid} from the cluster {name} in namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -538,12 +542,12 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 else:
-                    print(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, "
+                    logger.warning(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, "
                           f"status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, exception : {e}")
+                logger.warning(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -569,12 +573,12 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 else:
-                    print(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, "
+                    logger.warning(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, "
                           f"status : {response.status_code}")
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                print(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, exception : {e}")
+                logger.warning(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
             time.sleep(1)

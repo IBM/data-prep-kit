@@ -261,15 +261,28 @@ class DataAccessS3(DataAccess):
             filedata = gzip.decompress(filedata)
         return filedata
 
-    def get_folder_files(self, path: str, extensions: list[str] = None) -> dict[str, bytes]:
+    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) -> dict[str, bytes]:
         """
         Get a list of byte content of files. The path here is an absolute path and can be anywhere.
         The current limitation for S3 and Lakehouse is that it has to be in the same bucket
         :param path: file path
         :param extensions: a list of file extensions to include. If None, then all files from this and
                            child ones will be returned
+        :param return_data: flag specifying whether the actual content of files is returned (True), or just
+                            directory is returned (False)
         :return: A dictionary of file names/binary content will be returned
         """
+        def _get_file_content(name: str, dt: bool) -> bytes:
+            """
+            return file content
+            :param name: file name
+            :param dt: flag to return data or None
+            :return: file content
+            """
+            if dt:
+                return self.get_file(name)
+            return None
+
         result = {}
         files = self.arrS3.list_files(key=path)
         for file in files:
@@ -277,16 +290,12 @@ class DataAccessS3(DataAccess):
             if extensions is None:
                 if not f_name.endswith("/"):
                     # skip folders
-                    f_bytes = self.get_file(path=f_name)
-                    if f_bytes is not None:
-                        result[f_name] = f_bytes
+                    result[f_name] = _get_file_content(f_name, return_data)
             else:
                 for ext in extensions:
                     if f_name.endswith(ext):
                         # include the file
-                        f_bytes = self.get_file(path=f_name)
-                        if f_bytes is not None:
-                            result[f_name] = f_bytes
+                        result[f_name] = _get_file_content(f_name, return_data)
                         break
         return result
 
