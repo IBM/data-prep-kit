@@ -1,4 +1,5 @@
 # KFP support library
+
 This provides support for implementing KFP pipelines automating transform's execution.
 It comprises 2 main modules
 * [api server client](src/kfp_support/api_server_client/README.md) 
@@ -23,4 +24,44 @@ pre-commit install
 If you don't have pre-commit, you can install from [here](https://pre-commit.com/)
 
 ## Library Artifact Build and Publish
+
+The process of creating a release for `fm_data_processing_kfp` package  involves the following steps:
+
+cd to the package directory.
+
+update the version in the Makefile.
+
+run `make build` and `make publish`.
+
+## Testing
+
+To run the package tests perform the following:
+
+To begin with, establish a Kind cluster and deploy all required components by executing the makfefile command in the main directory of this repository. As an alternative, you can manually execute the instructions provided in the [README.md](../../kind/README.md) file.
+
+```bash
+make setup
+```
+
+The next step is to deploy the `fm_data_processing_kfp` package locally within a Python virtual environment. To do this, execute the following command from the package directory:
+
+```bash
+make  build
+```
+
+lastly, execute the tests:
+
+```bash
+make test
+```
+
+### Cleanup
+
+It is advisable to execute the following command prior to running `make test` once more.
+This will ensure that any previous test runs resources are removed before starting new tests.
+
+```bash
+kubectl delete workflows -n kubeflow --all
+```
+
 

@@ -11,6 +11,10 @@ transformer's implementation. Currently it includes the following methods:
 * `validate_columns` check whether required columns exist in the table
 * `add_column` adds column to the table avoiding duplicates. If the column with the given name already exists it will 
 be removed before it is added
+* `validate_path` cleans up s3 path - Removes white spaces from the input/output paths
+  removes schema prefix (s3://, http:// https://), if exists
+  adds the "/" character at the end, if it doesn't exist
+  removes URL encoding
 
 It also contain two variables:
 * `RANDOM_SEED` number that is used for methods that require seed

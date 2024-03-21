@@ -220,6 +220,7 @@ class DataAccessLocal(DataAccess):
         size_in_memory = table.nbytes
         try:
             # Write the table to parquet format
+            os.makedirs(os.path.dirname(path), exist_ok=True)
             pq.write_table(table, path)
 
             # Get file size and create file_info
@@ -228,7 +229,7 @@ class DataAccessLocal(DataAccess):
 
         except Exception as e:
             logger.error(f"Error saving table to {path}: {e}")
-            return size_in_memory, None
+            return -1, None
 
     def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
         """
@@ -329,6 +330,7 @@ class DataAccessLocal(DataAccess):
         """
 
         try:
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
             with open(file_path, "wb") as f:
                 f.write(bytes_data)
             file_info = {"name": file_path, "size": os.path.getsize(file_path)}

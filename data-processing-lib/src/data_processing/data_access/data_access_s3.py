@@ -4,7 +4,7 @@ from typing import Any
 
 import pyarrow
 from data_processing.data_access import ArrowS3, DataAccess
-from data_processing.utils import GB, MB
+from data_processing.utils import GB, MB, TransformUtils
 
 
 class DataAccessS3(DataAccess):
@@ -33,8 +33,8 @@ class DataAccessS3(DataAccess):
             secret_key=s3_credentials["secret_key"],
             endpoint=s3_credentials["url"],
         )
-        self.input_folder = s3_config["input_folder"]
-        self.output_folder = s3_config["output_folder"]
+        self.input_folder = TransformUtils.clean_path(s3_config["input_folder"])
+        self.output_folder = TransformUtils.clean_path(s3_config["output_folder"])
         self.d_sets = d_sets
         self.checkpoint = checkpoint
         self.m_files = m_files
@@ -284,7 +284,7 @@ class DataAccessS3(DataAccess):
             return None
 
         result = {}
-        files = self.arrS3.list_files(key=path)
+        files = self.arrS3.list_files(key=TransformUtils.clean_path(path))
         for file in files:
             f_name = str(file["name"])
             if extensions is None:

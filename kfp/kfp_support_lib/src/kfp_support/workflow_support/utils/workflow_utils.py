@@ -59,49 +59,12 @@ class KFPUtils:
         try:
             file = open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r")
         except Exception as e:
-            logger.warning(f"Failed to open /var/run/secrets/kubernetes.io/serviceaccount/namespace file, exception {e}")
+            logger.warning(f"Failed to open /var/run/secrets/kubernetes.io/serviceaccount/namespace file, "
+                           f"exception {e}")
         else:
             with file:
                 ns = file.read()
         return ns
-
-    @staticmethod
-    def clean_path(path: str = "") -> str:
-        """
-        Clean path parameters:
-            Removes white spaces from the input/output paths
-            Removes schema prefix (s3://, http:// https://), if exists
-            Adds the "/" character at the end, if it doesn't exist
-            Removed URL encoding
-        :param path: path to clean up
-        :return: clean path
-        """
-        path = path.strip()
-        if path == "":
-            return path
-        from urllib.parse import unquote, urlparse, urlunparse
-
-        # Parse the URL
-        parsed_url = urlparse(path)
-        if parsed_url.scheme in ["http", "https"]:
-            # Remove host
-            parsed_url = parsed_url._replace(netloc="")
-            parsed_url = parsed_url._replace(path=parsed_url.path[1:])
-
-        # Remove the schema
-        parsed_url = parsed_url._replace(scheme="")
-
-        # Reconstruct the URL without the schema
-        url_without_schema = urlunparse(parsed_url)
-
-        # Remove //
-        if url_without_schema[:2] == "//":
-            url_without_schema = url_without_schema.replace("//", "", 1)
-
-        return_path = unquote(url_without_schema)
-        if return_path[-1] != "/":
-            return_path += "/"
-        return return_path
 
     @staticmethod
     def runtime_name(ray_name: str = "", run_id: str = "") -> str:
@@ -531,13 +494,16 @@ class RayRemoteJobs:
         logger.info(f"Job completed with execution status {status}")
         if data_access is None:
             return
-        # Here data access is either S3 or lakehouse both of which contain self.input_folder
+        # Here data access is either S3 or lakehouse both of which contain self.output_folder
         try:
-            input_folder = data_access.input_folder
+            output_folder = data_access.output_folder
         except Exception as e:
-            logger.warning(f"failed to get input folder {e}")
+            logger.warning(f"failed to get output folder {e}")
             return
-        data_access.save_file(path=input_folder, data=bytes(log, "UTF-8"))
+        output_folder = output_folder if output_folder.endswith("/") else output_folder + "/"
+        execution_log_path = f"{output_folder}execution.log"
+        logger.info(f"saving execution log to {execution_log_path}")
+        data_access.save_file(path=execution_log_path, data=bytes(log, "UTF-8"))
 
 
 class ComponentUtils:
@@ -601,6 +567,10 @@ class ComponentUtils:
         """
         import sys
         from kfp_support.workflow_support.utils import KFPUtils
+        from data_processing.utils import get_logger
+
+        logger = get_logger(__name__)
+
         # convert input
         w_options = KFPUtils.load_from_json(worker_options.replace("'", '"'))
         a_options = KFPUtils.load_from_json(actor_options.replace("'", '"'))
@@ -621,10 +591,10 @@ class ComponentUtils:
         logger.info(f"Number of actors - {n_actors}")
         if n_actors < 1:
             logger.warning(f"Not enough cpu/gpu/memory to run transform, "
-                  f"required cpu {a_options.get('num_cpus', .5)}, available {cluster_cpu}, "
-                  f"required memory {a_options.get('memory', 1)}, available {cluster_mem}, "
-                  f"required cpu {actor_gpu}, available {cluster_gpu}"
-                  )
+                           f"required cpu {a_options.get('num_cpus', .5)}, available {cluster_cpu}, "
+                           f"required memory {a_options.get('memory', 1)}, available {cluster_mem}, "
+                           f"required cpu {actor_gpu}, available {cluster_gpu}"
+                          )
             sys.exit(1)
 
         return str(n_actors)
