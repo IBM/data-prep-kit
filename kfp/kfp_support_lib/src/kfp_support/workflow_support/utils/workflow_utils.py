@@ -67,44 +67,6 @@ class KFPUtils:
         return ns
 
     @staticmethod
-    def clean_path(path: str = "") -> str:
-        """
-        Clean path parameters:
-            Removes white spaces from the input/output paths
-            Removes schema prefix (s3://, http:// https://), if exists
-            Adds the "/" character at the end, if it doesn't exist
-            Removed URL encoding
-        :param path: path to clean up
-        :return: clean path
-        """
-        path = path.strip()
-        if path == "":
-            return path
-        from urllib.parse import unquote, urlparse, urlunparse
-
-        # Parse the URL
-        parsed_url = urlparse(path)
-        if parsed_url.scheme in ["http", "https"]:
-            # Remove host
-            parsed_url = parsed_url._replace(netloc="")
-            parsed_url = parsed_url._replace(path=parsed_url.path[1:])
-
-        # Remove the schema
-        parsed_url = parsed_url._replace(scheme="")
-
-        # Reconstruct the URL without the schema
-        url_without_schema = urlunparse(parsed_url)
-
-        # Remove //
-        if url_without_schema[:2] == "//":
-            url_without_schema = url_without_schema.replace("//", "", 1)
-
-        return_path = unquote(url_without_schema)
-        if return_path[-1] != "/":
-            return_path += "/"
-        return return_path
-
-    @staticmethod
     def runtime_name(ray_name: str = "", run_id: str = "") -> str:
         """
         Get unique runtime name
