@@ -389,12 +389,14 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         bucket_processor_invoker = BucketsHashProcessorInvoker.options(
             num_cpus=self.params.get("bucket_cpu", 0.5)
         ).remote(bucket_processors=bucket_processors_list)
+        logger.info(f"created bucket processor invoker")
         # Add invoker to the buckets
         bucket_replies = [
             collector.add_processing_submitter.remote(submitter=bucket_processor_invoker)
             for collector in bucket_collectors
         ]
         RayUtils.wait_for_execution_completion(replies=bucket_replies)
+        logger.info(f"added invoker to bucket collectors")
         # start bucket processing and wait for completion
         start = time.time()
         bucket_replies = [collector.process_buckets.remote() for collector in bucket_collectors]

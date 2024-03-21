@@ -1,3 +1,4 @@
+import os
 from abc import abstractmethod
 from argparse import ArgumentParser
 from filecmp import dircmp
@@ -90,7 +91,7 @@ class AbstractTest:
         :param expected_dir:
         :return:
         """
-        dir_cmp = dircmp(directory, expected_dir)
+        dir_cmp = dircmp(directory, expected_dir, ignore=[".DS_Store"])
         assert (
             len(dir_cmp.funny_files) == 0
         ), f"Files that could compare, but couldn't be read for some reason: {dir_cmp.funny_files}"
@@ -103,3 +104,10 @@ class AbstractTest:
             assert len(dir_cmp.diff_files) == 1, f"Files that did not match the expected {dir_cmp.diff_files}"
         else:
             assert len(dir_cmp.diff_files) == 0, f"Files that did not match the expected {dir_cmp.diff_files}"
+
+        # Traverse into the subdirs since dircmp doesn't seem to do that.
+        subdirs = [f.name for f in os.scandir(expected_dir) if f.is_dir()]
+        for subdir in subdirs:
+            d1 = os.path.join(directory, subdir)
+            d2 = os.path.join(expected_dir, subdir)
+            AbstractTest.validate_directory_contents(d1, d2)

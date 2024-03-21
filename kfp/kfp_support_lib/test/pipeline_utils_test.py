@@ -5,7 +5,7 @@ def test_pipelines():
     """
     Test pipelines utils
     """
-    utils = PipelinesUtils()
+    utils = PipelinesUtils(host="http://localhost:8080/kfp")
     # get pipeline by name
     pipeline = utils.get_pipeline_by_name("[Tutorial] DSL - Control structures")
     assert pipeline is not None

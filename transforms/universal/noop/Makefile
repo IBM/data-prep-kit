@@ -29,3 +29,5 @@ install-lib-src:: .transforms.install-lib-src
 
 
 
+
+setup:: .transforms.setup

@@ -37,7 +37,7 @@ Our pipeline includes 4 steps - compute execution parameters, create Ray cluster
 Ray cluster. FOr each step we have to define a component that will execute them:
 
 ```python
-    base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1-test3"
+    base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1"
     # execute parameters
     compute_exec_params_op = comp.func_to_container_op(
         func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
@@ -110,6 +110,8 @@ The parameters used here are as follows:
 **Note** that here we are specifying initial values for all parameters that will be propagated to the worklow UI
 (see below)
 
+**Note** Paramwters are defining both S3 and lakehouse configuration, but only one at a time can be used.
+
 ### Pipeline wiring
 
 Now that all components and input parameters are defined, we can implement pipeline wiring defining sequence of 
@@ -181,9 +183,9 @@ To compile pipeline execute this [file](../transform_workflows/universal/noop/no
 in the same directory. Now create kind cluster cluster with all required software installed using the following command: 
 
 ````shell
- make setup-kind-cluster
+ make setup
 ````
-**Note** that this command has to run from the project root directory
+**Note** that this command has to run from the project kind subdirectory
 
 Once the cluster is up, go to `localhost:8080/kfp/`, which will bring up KFP UI, see below:
 
@@ -202,10 +204,24 @@ there as well, which means that secrets have to be created there as well.
 
 Once this is done we can execute the workflow. 
 
+On the pipeline page (above) click on the `create run` button. You will see the list of the parameters, that you
+can enter, which is populated with with the default that we specified above. If you do not want to modify parameters,
+go to the bottom of the page and click `start` button
+
+This will start workflow execution. Once it completes you will see something similar to below 
+
+![execution result](execution_result.png)
+
+Note that the log (on the left) has the complete execution log.
+
+Additionally the log is saved to S3 (location is denoted but the last line in the log)
+
 ## Clean up cluster
 
 Finally you can delete kind cluster running the following command:
 
 ```Shell
-make delete-kind-cluster
+make clean
 ```
+
+**Note** that this command has to run from the project kind subdirectory
