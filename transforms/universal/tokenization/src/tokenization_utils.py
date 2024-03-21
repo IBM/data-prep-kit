@@ -110,6 +110,7 @@ def load_tokenizer(tokenizer_name: str):
     try:
         tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
     except Exception as e:
-        raise RuntimeError(f"Failed to load tokenizer from `{tokenizer_name}` with  `HF AutoTokenizer` due to\n: {e}")
+        logger.error(f"Failed to load tokenizer from `{tokenizer_name}` with  `HF AutoTokenizer`")
+        raise RuntimeError(e)
 
     return tokenizer

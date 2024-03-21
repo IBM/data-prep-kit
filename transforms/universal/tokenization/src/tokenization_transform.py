@@ -170,10 +170,12 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         if args.tkn_tokenizer is None:
-            raise RuntimeError(f"Parameter --tkn_tokenizer must be a valid tokenizer for tokenization, you specified {args.tkn_tokenizer}")
+            logger.error(f"Parameter --tkn_tokenizer must be a valid tokenizer for tokenization, you specified {args.tkn_tokenizer}")
+            return False
 
         if args.tkn_doc_id_column is None or args.tkn_doc_content_column is None:
-            raise RuntimeError(f"Values for `--tkn_doc_id_column` and `--tkn_doc_content_column` must be provided")
+            logger.error(f"Values for `--tkn_doc_id_column` and `--tkn_doc_content_column` must be provided")
+            return False
 
         self.params["tokenizer"] = args.tkn_tokenizer
         self.params["doc_id_column"] = args.tkn_doc_id_column
