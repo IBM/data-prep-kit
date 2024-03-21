@@ -11,7 +11,6 @@ ARG GIT_COMMIT
 
 LABEL build-date=$BUILD_DATE
 LABEL git-commit=$GIT_COMMIT
-LABEL fm-data-processing=${FM_DATA_PROCESSING}
 LABEL fm-data-processing-kfp=${FM_DATA_PROCESSING_KFP}
 
 # install libraries

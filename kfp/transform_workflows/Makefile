@@ -9,10 +9,12 @@ include makeenv
 # Use "make help" to see them.
 include ../../.make.defaults
 
-LIBNAME=fm_data_processing_kfp
-PYTHON=python
+PYTHON=python3
 PYTEST=pytest
 VENV_ACTIVATE=venv/bin/activate
+
+PYTHON_WF := $(shell find ./ -name *_wf.py)
+YAML_WF=$(patsubst %.py, %.yaml, ${PYTHON_WF})
 
 clean::
 	@# Help: Clean up the distribution build and the venv 
@@ -24,33 +26,35 @@ clean::
 	@if [ -z "$(FM_DATA_PROCESSING_KFP)" ]; then echo "You must provide FM_DATA_PROCESSING_KFP"; false; fi
 	@echo "Checks passed"
 
-update-toml:: .check-env
-	@# Help: Copy the Makefile distribution version into the pyproject.toml 
-	sed -e 's/^version[ ]*=.*/version = "'${FM_DATA_PROCESSING_KFP}'"/' pyproject.toml > tt.toml
-	mv tt.toml pyproject.toml
+.compile-pipeline::
+	$(info Use make compile-pipelines to compile all pipelines)
+	. ${VENV_ACTIVATE} && cd ${DIR} && ${PYTHON} ${WF_NAME}.py
 
-build:: update-toml venv
-	@# Help: Build the distribution for publishing to a pypi 
+%.yaml: %.py
+	make compile-pipeline WF_NAME=$(shell (basename $< .py)) DIR=$(shell (dirname $<))
+
+.reconcile-requirement::
+	@for file in $(PYTHON_WF); do \
+		sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}\"/" $$file; \
+
+build:: 
+	@# Help: Compile the pipelines
 	${PYTHON} -m pip install --upgrade build
 	${PYTHON} -m build
+	make .reconcile-requirement
+	make ${YAML_WF}
 
 publish:: .check-env
 	@# Help: Publish the wheel to and pypi
 	@${PYTHON} -m twine upload --verbose --non-interactive --skip-existing --repository testpypi dist/*
 
-venv::	pyproject.toml .check-env
+venv::	.check-env
 	@# Help: Create the virtual environment using pyproject.toml 
 	rm -rf venv	
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE}; 	\
-	pip install -e .;		\
 	pip install ray==${RAY} \
-	pip install pytest pytest-cov 
+	pip install kfp==${KFP} \
+	pip install kfp-support==${FM_DATA_PROCESSING_KFP}
 
-test:: 	
-	@# Help: Use the already-built virtual environment to run pytest on the test directory.
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) api_params_test.py;
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST)  kfp_utils_test.py;
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) kuberay_api_test.py;
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) pipeline_utils_test.py;
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) ray_remote_jobs_test.py;
+test::
