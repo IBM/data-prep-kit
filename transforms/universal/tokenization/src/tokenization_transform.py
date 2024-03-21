@@ -46,7 +46,7 @@ class TokenizationTransform(AbstractTableTransform):
             logger.debug(f"{k:20s}: {v}")
 
         # overwrite tokenizer:
-        self.tokenizer = load_tokenizer(tokenzer_name=self.tokenizer)
+        self.tokenizer = load_tokenizer(tokenizer_name=self.tokenizer)
 
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
@@ -76,7 +76,6 @@ class TokenizationTransform(AbstractTableTransform):
                     # tokenize document by chunks:
                     token_line = []
                     for chunk in split_text(doc_content,self.chunk_size, self.text_lang):
-                        print(f"== {chunk}")
                         token_line.extend(self.tokenizer(chunk)["input_ids"])
                 else:
                     token_line = self.tokenizer(doc_content)["input_ids"]
