@@ -41,14 +41,15 @@ def split_text(text: str, chunk_size: int, text_lang: str, reserve_consecutive_l
 
     # Additional languages without spaces among words can be added, and each language may receive distinct treatment in word splitting.
     if text_lang in ['ja', 'zh']:
-        return split_text_wout_word_space(text, chunk_size, reserve_consecutive_linebreaks)
+        return _split_text_wout_word_space(text, chunk_size, reserve_consecutive_linebreaks)
     else:
-        return split_text_with_word_space(text, chunk_size, reserve_consecutive_linebreaks)
+        return _split_text_with_word_space(text, chunk_size, reserve_consecutive_linebreaks)
 
 
-def split_text_with_word_space(text: str, chunk_size: int, reserve_consecutive_linebreaks: bool = True) -> str:
+def _split_text_with_word_space(text: str, chunk_size: int, reserve_consecutive_linebreaks: bool = True) -> str:
     '''
     Split text into multiple chunks of characters, rounded by words, for languages with spaces between words.
+    For input/output, please refer to the split_text() function
     '''
     lines = text.split('\n')
     for i, line in enumerate(lines):
@@ -71,10 +72,11 @@ def split_text_with_word_space(text: str, chunk_size: int, reserve_consecutive_l
                 yield '\n'
 
 
-def split_text_wout_word_space(text: str, chunk_size: int, reserve_consecutive_linebreaks: bool = True) -> str:
+def _split_text_wout_word_space(text: str, chunk_size: int, reserve_consecutive_linebreaks: bool = True) -> str:
     '''
     Split the text into multiple chunks for some specific languages without spaces between words.
     This version is preliminary and necessitates further development for each respective language.
+    For input/output, please refer to the split_text() function
     '''
     lines = text.split('\n')
     for i, line in enumerate(lines):
