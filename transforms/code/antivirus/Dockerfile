@@ -1,4 +1,4 @@
-FROM docker.io/rayproject/ray:2.9.1-py310 AS base
+FROM docker.io/rayproject/ray:2.9.3-py310 AS base
 USER root
 RUN apt -y update \
     && apt install -y clamav-daemon \
@@ -11,11 +11,10 @@ FROM clamav/clamav:latest AS clamav
 FROM base AS clamav-local
 USER root
 COPY --link --chown=1000:100 --chmod=774 --from=clamav /var/lib/clamav/ /var/lib/clamav/
-COPY --chown=1000:100 --chmod=774 ./docker/clamd.conf /etc/clamav/clamd.conf
+COPY --chown=1000:100 --chmod=774 clamd.conf /etc/clamav/clamd.conf
 RUN freshclam \
-    #&& mkdir -p /var/run/clamav \
-    #&& chown -R 1000:100 /var/run/clamav /var/log/clamav /var/lib/clamav
-    && chown -R 1000:100 /var/log/clamav /var/lib/clamav
+    && mkdir -p /var/run/clamav \
+    && chown -R 1000:100 /var/run/clamav /var/log/clamav /var/lib/clamav
 USER 1000
 CMD ["/bin/bash", "-c", "freshclam && clamd --debug --foreground"]
 
