@@ -1,6 +1,5 @@
-
 from data_processing.utils import get_logger
-import os,sys
+import os, sys
 
 import re
 
@@ -10,7 +9,8 @@ logger = get_logger(__name__)
 
 from transformers import AutoTokenizer
 
-def split_text(text:str,chunk_size:int,text_lang:str,reserve_consecutive_linebreaks:bool=True) -> str:
+
+def split_text(text: str, chunk_size: int, text_lang: str, reserve_consecutive_linebreaks: bool = True) -> str:
     """
     This function splits the given (particularly lengthy) text into chunks and returns them one by one through yielding.
     It can be beneficial for processing very long texts (comprising tens of thousands of words)
@@ -39,14 +39,14 @@ def split_text(text:str,chunk_size:int,text_lang:str,reserve_consecutive_linebre
          21: after 02 line breaks.
     """
 
-
     # Additional languages without spaces among words can be added, and each language may receive distinct treatment in word splitting.
-    if text_lang in ['ja','zh']:
-        return split_text_wout_word_space(text,chunk_size,reserve_consecutive_linebreaks)
+    if text_lang in ['ja', 'zh']:
+        return split_text_wout_word_space(text, chunk_size, reserve_consecutive_linebreaks)
     else:
-        return split_text_with_word_space(text,chunk_size,reserve_consecutive_linebreaks)
+        return split_text_with_word_space(text, chunk_size, reserve_consecutive_linebreaks)
 
-def split_text_with_word_space(text:str,chunk_size:int,reserve_consecutive_linebreaks:bool=True) -> str:
+
+def split_text_with_word_space(text: str, chunk_size: int, reserve_consecutive_linebreaks: bool = True) -> str:
     '''
     Split text into multiple chunks of characters, rounded by words, for languages with spaces between words.
     '''
@@ -70,7 +70,8 @@ def split_text_with_word_space(text:str,chunk_size:int,reserve_consecutive_lineb
             if i < len(lines) - 1:
                 yield '\n'
 
-def split_text_wout_word_space(text:str,chunk_size:int, reserve_consecutive_linebreaks:bool=True) -> str:
+
+def split_text_wout_word_space(text: str, chunk_size: int, reserve_consecutive_linebreaks: bool = True) -> str:
     '''
     Split the text into multiple chunks for some specific languages without spaces between words.
     This version is preliminary and necessitates further development for each respective language.
@@ -93,7 +94,8 @@ def split_text_wout_word_space(text:str,chunk_size:int, reserve_consecutive_line
             if i < len(lines) - 1:
                 yield '\n'
 
-def load_tokenizer(tokenzer_name:str):
+
+def load_tokenizer(tokenizer_name: str):
     """
     Load and return a tokenizer specified in `tokenizer_name`
     This function is designed to accommodate the loading of any tokenizer compatible with
@@ -104,8 +106,8 @@ def load_tokenizer(tokenzer_name:str):
     :return: a tokenizer
     """
     try:
-        tokenizer = AutoTokenizer.from_pretrained(tokenzer_name)
+        tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
     except Exception as e:
-        raise RuntimeError(f"Failed to load tokenizer from `{tokenzer_name}` with  `HF AutoTokenizer` due to\n: {e}")
+        raise RuntimeError(f"Failed to load tokenizer from `{tokenizer_name}` with  `HF AutoTokenizer` due to\n: {e}")
 
     return tokenizer
