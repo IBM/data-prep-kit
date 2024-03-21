@@ -1,24 +1,33 @@
-
-# Define the root of the local git clone for the common rules to be able
+# Define the root of the local git clone for the common rules to be able 
 # know where they are running from.
 REPOROOT=../../..
 # Include the common rules.
-# Use "make help" to see them.
+# Use "make help" to see them. 
+include ../../../.make.defaults
+
+# Include a library of common .transform.* targets which most
+# transforms should be able to reuse.  However, feel free
+# to override/redefine the rules below. 
 include ../../.make.transforms
 
 DOCKER_IMAGE_NAME=select-langauge
 DOCKER_IMAGE_VERSION=0.1.0
 
-clean: .transforms.clean
+venv::	.transforms.venv
 
-test:  .transforms.test
+build::	.transforms.build
 
-image: .transforms.image
+test::	.transforms.test
 
-build: .transforms.build
+clean:: .transforms.clean
 
-venv:  .transforms.venv
+image:: .transforms.image
 
 test-lib-src:: .transforms.test-lib-src
 
 install-lib-src:: .transforms.install-lib-src
+
+
+
+
+setup:: .transforms.setup

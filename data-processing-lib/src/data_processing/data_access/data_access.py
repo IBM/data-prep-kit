@@ -39,13 +39,15 @@ class DataAccess:
         """
         pass
 
-    def get_folder_files(self, path: str, extensions: list[str] = None) -> dict[str, bytes]:
+    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) -> dict[str, bytes]:
         """
         Get a list of byte content of files. The path here is an absolute path and can be anywhere.
         The current limitation for S3 and Lakehouse is that it has to be in the same bucket
         :param path: file path
         :param extensions: a list of file extensions to include. If None, then all files from this and
                            child ones will be returned
+        :param return_data: flag specifying whether the actual content of files is returned (True), or just
+                            directory is returned (False)
         :return: A dictionary of file names/binary content will be returned
         """
         pass

@@ -38,7 +38,7 @@ class TransformTableProcessor:
         self.base_table_stats = params.get("base_table_stats", True)
         self.last_empty = " "
 
-    def process_table(self, f_name: str) -> None:
+    def process_data(self, f_name: str) -> None:
         """
         Method processing an individual file
         :param f_name: file name

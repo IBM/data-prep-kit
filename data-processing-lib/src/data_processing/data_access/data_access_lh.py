@@ -49,11 +49,12 @@ class DataAccessLakeHouse(DataAccess):
             environment=lakehouse_config["lh_environment"],
             cos_credentials=cos_cred,
         )
+        self.output_folder = self.lh.get_output_data_path()
         self.S3 = DataAccessS3(
             s3_credentials=s3_credentials,
             s3_config={
                 "input_folder": self.lh.get_input_data_path(),
-                "output_folder": self.lh.get_output_data_path(),
+                "output_folder": self.output_folder,
             },
             d_sets=d_sets,
             checkpoint=checkpoint,
@@ -146,7 +147,7 @@ class DataAccessLakeHouse(DataAccess):
             path=f"{self.S3.output_folder}/metadata.json", data=json.dumps(metadata, indent=2).encode()
         )
         if repl is None:
-            return l, repl
+            return repl
         # Save metadata to LH
         stats = JobStats(
             pipeline_id=metadata["pipeline"],
@@ -209,13 +210,15 @@ class DataAccessLakeHouse(DataAccess):
         """
         return self.S3.save_file(path=path, data=data)
 
-    def get_folder_files(self, path: str, extensions: list[str] = None) -> dict[str, bytes]:
+    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) -> dict[str, bytes]:
         """
         Get a list of byte content of files. The path here is an absolute path and can be anywhere.
         The current limitation for S3 and Lakehouse is that it has to be in the same bucket
         :param path: file path
         :param extensions: a list of file extensions to include. If None, then all files from this and
                            child ones will be returned
+        :param return_data: flag specifying whether the actual content of files is returned (True), or just
+                            directory is returned (False)
         :return: A dictionary of file names/binary content will be returned
         """
-        return self.S3.get_folder_files(path=path, extensions=extensions)
+        return self.S3.get_folder_files(path=path, extensions=extensions, return_data=return_data)

@@ -10,7 +10,6 @@ This library provides 3 main classes:
 This class contains a collection of functions useful for KFP pipelines implementation, which include: 
 * credentials - get S3 credentials from the environment
 * get_namespace - get the name of the kubernetes namespace we are running in
-* clean_path - clean up S3 path representation (remove spaces, etc)
 * runtime_name - generates unique runtime name
 * dict_to_req - convert dictionary of request parameters to a proper formatted JSON string
 * load_from_json - convert json string to dictionary and exit with error if conversion fails
