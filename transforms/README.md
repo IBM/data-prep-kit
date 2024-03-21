@@ -9,6 +9,8 @@ to, for example:
     * Annotate the tables to add additional data such as document quality score, language, etc.
     * Filter the table to remove or edit rows and/or columns, for example to remove rows from blocked domain. 
 
+While these transformation modules were originally built for pre-training, they are also useful for fine-tuning data preparation.
+
 ## Annotating Transforms
 Annotating transforms examine 1 or more columns of data, typically a _content_ column containing a document
 to be annotated.  The content is often spoken/text or programming language, generally to build

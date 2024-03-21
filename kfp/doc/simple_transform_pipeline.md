@@ -37,7 +37,7 @@ Our pipeline includes 4 steps - compute execution parameters, create Ray cluster
 Ray cluster. FOr each step we have to define a component that will execute them:
 
 ```python
-    base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1-test3"
+    base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1"
     # execute parameters
     compute_exec_params_op = comp.func_to_container_op(
         func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
@@ -183,9 +183,9 @@ To compile pipeline execute this [file](../transform_workflows/universal/noop/no
 in the same directory. Now create kind cluster cluster with all required software installed using the following command: 
 
 ````shell
- make setup-kind-cluster
+ make setup
 ````
-**Note** that this command has to run from the project root directory
+**Note** that this command has to run from the project kind subdirectory
 
 Once the cluster is up, go to `localhost:8080/kfp/`, which will bring up KFP UI, see below:
 
@@ -221,5 +221,7 @@ Additionally the log is saved to S3 (location is denoted but the last line in th
 Finally you can delete kind cluster running the following command:
 
 ```Shell
-make delete-kind-cluster
+make clean
 ```
+
+**Note** that this command has to run from the project kind subdirectory
