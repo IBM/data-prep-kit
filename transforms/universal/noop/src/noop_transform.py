@@ -9,10 +9,16 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import get_logger
+from data_processing.utils import CLIArgumentProvider, get_logger
 
 
 logger = get_logger(__name__)
+
+cli_prefix = "noop_"
+sleep_key = "sleep"
+pwd_key = "sleep"
+sleep_cli_param = f"{cli_prefix}{sleep_key}"
+pwd_cli_param = f"{cli_prefix}{pwd_key}"
 
 
 class NOOPTransform(AbstractTableTransform):
@@ -69,7 +75,7 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            "--noop_sleep_sec",
+            f"--{sleep_key}",
             type=int,
             default=1,
             help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
@@ -77,7 +83,7 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
         # An example of a command line option that we don't want included in the metadata collected by the Ray orchestrator
         # See below for remove_from_metadata addition so that it is not reported.
         parser.add_argument(
-            "--noop_pwd",
+            f"--{pwd_key}",
             type=str,
             default="nothing",
             help="A dummy password which should be filtered out of the metadata",
@@ -89,14 +95,15 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        if args.noop_sleep_sec <= 0:
-            print(f"Parameter noop_sleep_sec should be greater then 0, you specified {args.noop_sleep_sec}")
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        if captured.get(sleep_key) < 0:
+            print(f"Parameter noop_sleep_sec should be non-negative. you specified {args.noop_sleep_sec}")
             return False
-        self.params["sleep"] = args.noop_sleep_sec
-        self.params["pwd"] = args.noop_pwd
+
+        self.params = self.params | captured
         logger.info(f"noop parameters are : {self.params}")
         # Don't publish this in the metadata produced by the ray orchestrator.
-        self.remove_from_metadata.append("pwd")
+        self.remove_from_metadata.append(pwd_key)
         return True
 
 

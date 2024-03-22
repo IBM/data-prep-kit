@@ -1,6 +1,3 @@
-DOCKER_IMAGE_NAME=language_id
-DOCKER_IMAGE_VERSION=0.1
-
 # Define the root of the local git clone for the common rules to be able 
 # know where they are running from.
 REPOROOT=../../..
@@ -13,11 +10,14 @@ include ../../../.make.defaults
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
+DOCKER_IMAGE_NAME=doc_id
+DOCKER_IMAGE_VERSION=0.1
+
 venv::	.transforms.venv
 
-build:: .transforms.build
+build::	.transforms.build
 
-test::  .transforms.test
+test::	.transforms.test
 
 clean:: .transforms.clean
 
@@ -26,5 +26,6 @@ image:: .transforms.image
 test-lib-src:: .transforms.test-lib-src
 
 install-lib-src:: .transforms.install-lib-src
+
 
 setup:: .transforms.setup

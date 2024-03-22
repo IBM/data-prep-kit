@@ -5,7 +5,7 @@ import os
 
 import pyarrow as pa
 from data_processing.test_support.ray import AbstractTransformLauncherTest
-from lang_id_implementation import (
+from lang_id_transform import (
     PARAM_CONTENT_COLUMN_NAME,
     PARAM_MODEL_CREDENTIAL,
     PARAM_MODEL_KIND,
