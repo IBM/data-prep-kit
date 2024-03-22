@@ -92,17 +92,8 @@ the following command line arguments are available in addition to
                         AST string containing input/output paths.
                         input_path: Path to input folder of files to be processed
                         output_path: Path to output folder of processed files
-                        Example: { 'input_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'output_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed' }
-  --lh_config LH_CONFIG
-                        AST string containing input/output using lakehouse.
-                        input_table: Path to input folder of files to be processed
-                        input_dataset: Path to outpu folder of processed files
-                        input_version: Version number to be associated with the input.
-                        output_table: Name of table into which data is written
-                        output_path: Path to output folder of processed files
-                        token: The token to use for Lakehouse authentication
-                        lh_environment: Operational environment. One of STAGING or PROD
-                        Example: { 'input_table': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'input_dataset': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'input_version': '1.0', 'output_table': 'ededup', 'output_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'token': 'AASDFZDF', 'lh_environment': 'STAGING' }
+                        Example: { 'input_path': '/cos-optimal-llm-pile/bluepile-processing/xh/opensource/input', 'output_path': '/cos-optimal-llm-pile/bluepile-processing/xh/opensource/output' }
+ 
   --local_config LOCAL_CONFIG
                         ast string containing input/output folders using local fs.
                         input_folder: Path to input folder of files to be processed
