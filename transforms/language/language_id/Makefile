@@ -1,6 +1,5 @@
-SHELL=/bin/bash
-DOCKER_IMAGE_NAME=noop
-DOCKER_IMAGE_VERSION=0.6
+DOCKER_IMAGE_NAME=language_id
+DOCKER_IMAGE_VERSION=0.1
 
 # Define the root of the local git clone for the common rules to be able 
 # know where they are running from.
@@ -14,14 +13,11 @@ include ../../../.make.defaults
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-DOCKER_IMAGE_NAME=language_identification
-DOCKER_IMAGE_VERSION=0.6
-
 venv::	.transforms.venv
 
-build::	.transforms.build
+build:: .transforms.build
 
-test::	.transforms.test
+test::  .transforms.test
 
 clean:: .transforms.clean
 

@@ -77,6 +77,7 @@ help::
 
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
+# We install wheel, because it seems to be required for fasttext install on redhat.
 .PHONY: .transforms.venv
 .transforms.venv::	requirements.txt .transforms.check_python_version
 	@$(MAKE) .transforms.check_env	# Put this first so we don't get its help
@@ -88,7 +89,7 @@ help::
 	fi
 	. venv/bin/activate;			\
 	$(PIP) install --upgrade pip;		\
-	$(PIP) install setuptools wheel cmake;		\
+	$(PIP) install wheel;			\
 	$(PIP) install -r requirements.txt;	\
 	$(PIP) install pytest;			\
 
