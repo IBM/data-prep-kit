@@ -43,7 +43,7 @@ help::
 	@echo DOCKER_IMAGE_VERSION - the version of the docker image to produce.  DOCKER_IMAGE_VERSION=$(DOCKER_IMAGE_VERSION)
 	@$(MAKE) .transforms.check_required_macros
 
-.PHONY: transforms.setup
+.PHONY: .transforms.setup
 .transforms.setup::
 	@# Help:  Do nothing, since nothing to setup by default. 
  
