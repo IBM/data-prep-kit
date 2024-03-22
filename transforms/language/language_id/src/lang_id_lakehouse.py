@@ -34,6 +34,11 @@ lakehouse_config = {
 
 worker_options = {"num_cpus": 1}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
+langid_config = {
+    PARAM_MODEL_KIND: KIND_FASTTEXT,
+    PARAM_MODEL_URL: "facebook/fasttext-language-identification",
+    PARAM_MODEL_CREDENTIAL: DPFConfig.HUGGING_FACE_TOKEN,
+}
 params = {
     "run_locally": True,
     "max_files": -1,
@@ -46,9 +51,7 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    PARAM_MODEL_KIND: KIND_FASTTEXT,
-    PARAM_MODEL_URL: "facebook/fasttext-language-identification",
-    PARAM_MODEL_CREDENTIAL: DPFConfig.HUGGING_FACE_TOKEN,
+    **langid_config,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 
