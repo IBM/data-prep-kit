@@ -7,7 +7,7 @@ testing and IDE set up.
 
 ## Summary
 
-This transform annotates documents with document "ids".  
+This transform annotates documents with document "ids".
 It supports the following transformations of the original data:
 * Adding document hash: this enables the addition of a document hash-based id to the data.
 The hash is calculated with `hashlib.sha256(doc.encode("utf-8")).hexdigest()`. 
