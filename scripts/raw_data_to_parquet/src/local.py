@@ -9,10 +9,10 @@ from raw_data_to_parquet import run
 if __name__ == "__main__":
 
     input_folder = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "..","test-data", "input")
+        os.path.join(os.path.dirname(__file__), "..", "test-data", "input")
     )
     output_folder = os.path.join(
-        os.path.join(os.path.dirname(__file__),"..","test-data"), "output"
+        os.path.join(os.path.dirname(__file__), "..", "test-data"), "output"
     )
     Path(output_folder).mkdir(parents=True, exist_ok=True)
     local_conf = {

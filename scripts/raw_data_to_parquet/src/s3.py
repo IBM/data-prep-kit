@@ -17,8 +17,7 @@ s3_conf = {
 params = {
     "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
     "s3_config": ParamsUtils.convert_to_ast(s3_conf),
-
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()
