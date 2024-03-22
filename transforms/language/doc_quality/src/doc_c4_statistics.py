@@ -1,5 +1,4 @@
 """
-@ Create on: 2023/11/08
 @ Description:
     Implement C4 heuristic rules applied to documents as presented in:
         + "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer" paper updated on 2023Sept19

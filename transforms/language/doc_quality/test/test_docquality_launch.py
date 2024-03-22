@@ -5,6 +5,13 @@ from data_processing.utils import ParamsUtils
 from doc_quality_transform import DocQualityTransformConfiguration
 
 
+docq_params = {
+    "ft_lang": "en",
+    "bad_word_filepath": "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/",
+    "MODEL_DIR": "../lm_sp/",
+}
+
+
 class TestRayDocQualityTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
@@ -13,9 +20,6 @@ class TestRayDocQualityTransform(AbstractTransformLauncherTest):
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
-        config = {
-            ##
-            "docquality_local_config": ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
-        }
-        fixtures = [(DocQualityTransformConfiguration(), config, basedir + "/input", basedir + "/expected")]
+
+        fixtures = [(DocQualityTransformConfiguration(), docq_params, basedir + "/input", basedir + "/expected")]
         return fixtures

@@ -1,3 +1,25 @@
+"""
+@ Description:
+    To compute perplexity (quality score) for documents.
+@ Require installation of KenLM and SentencePiece as follows:
+    pip install https://github.com/kpu/kenlm/archive/master.zip
+    pip install sentencepiece
+@ Download pre-trained KenLM model for English language on Wikipedia
+    through cc_net (https://github.com/facebookresearch/cc_net):
+        git clone https://github.com/facebookresearch/cc_net
+        cd cc_net/
+        make lang=en dl_lm
+  Save 2 downloaded files (en.arpa.bin, en.sp.model) to local machine
+  as its size is > 4GB.
+  Or access them in COS at:
+    s3://cos-optimal-llm-pile/bluepile-processing/lm_sp/
+@ To train KenLM on other languages or on text corpus other than Wikipedia (e.g, OSCAR)
+  please refer to this HF repo: https://github.com/bigscience-workshop/data_tooling/tree/master/kenlm_training
+  (related to HF's ROOTS/BLOOM project https://arxiv.org/pdf/2303.03915.pdf). This project has also provided pre-trained models trained on Wikipedia and OSCAR datasets.
+  They can be directly downloaded from: https://huggingface.co/edugp/kenlm/tree/main/
+  in two corresponding folders `wikipedia` or `oscar` folder.
+"""
+
 import logging
 
 
@@ -12,11 +34,9 @@ from cc_net_prepro import cc_net_normalize
 
 
 # Ensure following path to folder having pre-trained KenLM + SentencePiece (sp):
-# PATH_TO_PRETRAINED_MODELS = "/dev/cos/bluepile-processing/lm_sp/"  # on a VM
-# PATH_TO_PRETRAINED_MODELS = '~/BigData/04-FM/lm_sp/'  # on a MAC
+# PATH_TO_PRETRAINED_MODELS = os.path.join(os.path.expanduser("~/BigData/04-FM/lm_sp/"), "en.sp.model")
+# PATH_TO_PRETRAINED_MODELS = os.path.join(os.path.expanduser("~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/"), "en.sp.model")
 
-PATH_TO_PRETRAINED_MODELS = os.path.join(os.path.expanduser("~/BigData/04-FM/lm_sp/"), "en.sp.model")
-# "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/"  # local
 TEST_MODE = 0
 
 
@@ -145,6 +165,7 @@ class KenLMModel:
 
         """Load pre-trained KenLM and sp: """
         try:
+            # print ('model_pathmodel_pathmodel_pathmodel_pathmodel_pathmodel_pathmodel_pathmodel_path:', os.path.join(model_path, f"{language}.arpa.bin"))
             self.kenlm_model = kenlm.Model(os.path.join(model_path, f"{language}.arpa.bin"))
             self.sp_tokenizer = SentencePieceModel(os.path.join(model_path, f"{language}.sp.model"))
         except Exception as e:
@@ -261,19 +282,10 @@ class KenLMModel:
 
 if __name__ == "__main__":
     # ''' Only sp tokenizer'''
-    model_path = os.path.join(os.path.expanduser("~/BigData/04-FM/lm_sp/"), "ja.sp.model")
-    spm = SentencePieceModel(model_path)
-    out_text = spm.tokenize(
-        text="これは机です。あれは鉛筆です。",
-        strip_accent=True,
-        lower_case=False,
-        digit_2_zero=True,
-        punct_level=1,
-        language="ja",
-        verbose=True,
+    model_path = os.path.join(
+        os.path.expanduser("~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/"),
+        "en.sp.model",
     )
-    #
-    model_path = os.path.join(os.path.expanduser("~/BigData/04-FM/lm_sp/"), "en.sp.model")
     spm = SentencePieceModel(model_path)
     out_text = spm.tokenize(
         text="Café élevàtor ôperàtor naïve Noël façade don't",
@@ -285,19 +297,9 @@ if __name__ == "__main__":
         verbose=True,
     )
 
-    """ Get PPL's score via KenLM + sp model:"""
-    # following doc has PPL= 525.7 if strip_accent=True, and = 528.4 if strip_accent=False (perhaps due to mix of en and ja)
-    doc = "MENU ホーム 店舗のご案内 スタッフ紹介 求人情報 写真集 赤・ピンク系 黄色・オレンジ系 青・紫系 白系・緑系 ミックス その他 お問合せ よくある質問 プライバシーポリシー ブログ ホームHome 店舗のご案内About スタッフ紹介Staff 求人情報 写真集Photo 赤・ピンク系 黄色・オレンジ系 青・紫系 白系・緑系 ミックス その他 お問合せContact よくある質問 プライバシーポリシー ブログBlog その他 HOME その他 ムーンダスト 2021年5月9日/ 最終更新日 : 2021年5月10日hananoaceその他 ムーンダスト 本日は、母の日という事もありたくさんのご来店＆ご注文いただきまして誠にありがとうございます♪ふくやまです(^▽^)/ 母の日と言えば赤やピンクのカーネーションが真っ先に頭に浮かぶと思うのですが… 花のエースではその他にもたくさんの色をご用意しております(*^^*) こんな色もあるの、ご存じですか？？ ↓ Moondust（ムーンダスト） 世界で唯一花弁に青い色素を持つカーネーションです。 上品な色合いと花もちの良さが高く評価されています。 花言葉は『永遠の幸福』 ほぅ…高貴な色ですねぇ…( *´艸｀) 珍しい色のカーネーションをお探しの方にはオススメです(*^-^*) 母の日のタイミングを逃した方も、まだまだ間に合いますよ。 お母さんへの感謝の気持ちをぜひお花で贈ってみてください。きっと喜んでいただけると思いますよ♪ 関連記事を表示 花巻空港⛄ 2022年1月25日 お祝いスタンド花 2022年1月21日 白オンリーの花束 2022年1月17日 毛越寺 2022年1月12日 PayPayキャンペーン1/10まで♪ 2022年1月4日 お供え用花束 2021年12月26日 お祝いアレンジメント 2021年12月22日 お供え用アレンジメント 2021年12月18日 おうちでピザ作り🍕 2021年12月14日 縁起の良いお正月花❁ 2021年12月10日 カテゴリー その他 タグ ふくやま その他 前の記事 母の日ラッシュ～☆ 2021年5月8日 その他 次の記事 続・母の日 2021年5月10日 最近の投稿 花巻空港⛄ 2022年1月25日 退職のお祝いアレンジメント 2022年1月24日 久々のラーメン🍜穴場✨ 2022年1月23日 お誕生会 2022年1月22日 お祝いスタンド花 2022年1月21日 古希のお祝い 2022年1月20日 春色アレンジメント🌼 2022年1月19日 春の鉢物入荷 2022年1月18日 白オンリーの花束 2022年1月17日 お誕生日用のお花 2022年1月16日 カテゴリー 入荷情報 イベント＆行事 お花について アレンジメント 花束 スタンド 鉢 スタッフプライベート日記 その他 アーカイブ 2022年1月 2021年12月 2021年11月 2021年10月 2021年9月 2021年8月 2021年7月 2021年6月 2021年5月 2021年4月 2021年3月 2021年2月 2021年1月 2020年12月 2020年11月 2020年10月 2020年9月 2020年8月 2020年7月 2020年6月 2020年5月 2020年4月 2020年3月 2020年2月 2020年1月 2019年12月 2019年11月 2019年10月 お問い合わせ お気軽にお問い合わせください HOME サイトマップ 石鳥谷店 TEL：(0198)45-4556 四日町店 TEL：(0198)23-1623 花巻店 TEL：(0198)24-0575 営業時間 8:30～18:30 Copyright © 花のエース All Rights Reserved. Powered by WordPress with Lightning Theme & VK All in One Expansion Unit by Vektor,Inc. technology."
-    # doc = '2021年9月19日 15時35分 新型コロナ 国内感染者数 群馬県は、県内で新たに34人が新型コロナウイルスに感染していることが確認されたと19日、発表しました。 続きを読む 県内で感染が確認された人は、1万6339人となり、このうち168人が死亡しています。 社会ニュース一覧へ戻る'
-    # doc = '参院静岡、山口両選挙区の補欠選挙が７日、告示された。岸田政権発足後初めての国政選挙で、２４日に投開票される。与野党は衆院選（１９日公示、３１日投開票）の前哨戦と位置付け、選挙戦に臨む。新型コロナウイルス対策が主な争点となる。 岸田文雄首相は午後、ＪＲ静岡駅前で自民党候補の応援演説を予定。立憲民主党の杉尾秀哉副幹事長、国民民主党の玉木雄一郎代表はＪＲ静岡駅前で推薦候補の出陣式に参加する。'
-    model_path = os.path.join(os.path.expanduser("~/BigData/04-FM/lm_sp/"))
-    klm = KenLMModel.from_pretrained(
-        model_path=model_path, language="ja", strip_accent=False, lower_case=True, digit_2_zero=True, punct_level=1
+    model_path = os.path.join(
+        os.path.expanduser("~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/")
     )
-
-    print(f"== Above doc has perplexity: {klm.get_perplexity(doc)}")
-
-    model_path = os.path.join(os.path.expanduser("~/BigData/04-FM/lm_sp/"))
     klm = KenLMModel.from_pretrained(
         model_path=model_path, language="en", strip_accent=True, lower_case=True, digit_2_zero=True, punct_level=1
     )
