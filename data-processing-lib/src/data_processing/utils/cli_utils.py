@@ -23,6 +23,25 @@ class CLIArgumentProvider:
     with the required information and apply/validate user provided information
     """
 
+    @staticmethod
+    def capture_parameters(args: argparse.Namespace, prefix: str, keep_prefix: bool = True):
+        """
+        Converts a namespace of values into a dictionary of keys and values where the keys
+        match the given prefix.
+        :param args: namespace instance to read keys/values from
+        :param prefix: optional prefix to restrict the set of namespace keys considered for inclusion in the returned dictionary
+        :param keep_prefix:  controls whether or not the prefix is stripped from the keys in the resulting dictionary.
+        :return:  a dictionary of keys matching the prefix and their values.  The keys in the dictionary may or may not include the prefix.
+        """
+        captured = {}
+        args_dict = vars(args)
+        for key, value in args_dict.items():
+            if prefix is None or key.startswith(prefix):
+                if prefix is not None and not keep_prefix:
+                    key = key.replace(prefix, "")
+                captured[key] = value
+        return captured
+
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
         Add arguments to the given parser.

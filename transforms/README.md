@@ -34,7 +34,7 @@ For example,
 This directory hierarchy of transforms is organized as follows:
 
 * `universal` - transforms applicable across code and language model data include
-    * Schema modification 
+    * Doc id addition 
     * Deduplicatifation - both exact and fuzzy
     * Coalesce/split
     * Blocklisting
