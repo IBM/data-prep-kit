@@ -65,8 +65,11 @@ class TokenizationTransform(AbstractTableTransform):
         # Track empty document_id of empty rows/docs:
         empty_doc_ids = []
 
-        # #tokens per doc/row, eg: [[978, 1923, 313, 317], [317, 4294],...]
+        # num. of tokens per doc/row, eg: [[978, 1923, 313, 317], [317, 4294],...]
         doc_tokens = []
+
+        # document length in #characters:
+        doc_lengths = []
 
         for idx in range(table.num_rows):
             doc_id = table[self.doc_id_column][idx].as_py()
@@ -91,6 +94,7 @@ class TokenizationTransform(AbstractTableTransform):
                 empty_doc_ids.append(doc_id)
                 continue
             else:
+                doc_lengths.append(len(doc_content))
                 doc_tokens.append(token_line)
                 processed_doc_ids.append(doc_id)
                 token_count.append(num_tokens)
@@ -98,13 +102,16 @@ class TokenizationTransform(AbstractTableTransform):
 
         out_table = pa.table({"tokens": doc_tokens,
                               self.doc_id_column: processed_doc_ids,
+                              "document_length": doc_lengths,
                               "token_count": token_count})
         logger.debug(f"Done with the transformed table with {table.num_rows:,} rows")
 
-        metadata = {"nfiles": 1,
-                    "nrows": table.num_rows,
-                    "ntokenizedrows": out_table.num_rows,
-                    "nemptyrows": len(empty_doc_ids),
+        metadata = {"num_files": 1,
+                    "num_rows": table.num_rows,
+                    "num_tokenized_rows": out_table.num_rows,
+                    "num_empty_rows": len(empty_doc_ids),
+                    "num_tokens": sum(token_count),
+                    "num_chars": sum(doc_lengths),
                     }
 
         return [out_table], metadata
