@@ -45,6 +45,7 @@ class DocQualityTransform(AbstractTableTransform):
             "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/en",
         )
         self.drop_column_if_existed = config.get("drop_column_if_existed", True)
+        self.col_name = config.get("col_name", "contents")
 
         self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.ft_lang, file_path=self.bad_word_filepath)
         self.MODEL_DIR = config.get("MODEL_DIR", "../lm_sp/")
@@ -206,6 +207,11 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
             default=True,
             help="drop columns if existed",
         )
+        parser.add_argument(
+            "--col_name",
+            default="contents",
+            help="column name that contain document text",
+        )
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
@@ -215,7 +221,7 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         """
         self.params["ft_lang"] = args.ft_lang
         self.params["drop_column_if_existed"] = args.drop_column_if_existed
-
+        self.params["col_name"] = args.col_name
         return True
 
     def get_transform_metadata(self) -> dict[str, Any]:
@@ -228,8 +234,38 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    # create launcher
-    launcher = TransformLauncher(transform_runtime_config=DocQualityTransformConfiguration())
-    logger.info("Launching Doc Quality transform")
-    # launch
-    launcher.launch()
+    # # create launcher
+    # launcher = TransformLauncher(transform_runtime_config=DocQualityTransformConfiguration())
+    # logger.info("Launching Doc Quality transform")
+    # # launch
+    # launcher.launch()
+
+    config = {
+        "ft_lang": "en",
+        "bad_word_filepath": "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/",
+        "MODEL_DIR": "../lm_sp/",
+    }
+    docq = DocQualityTransform(config)
+
+    in_table = pa.Table.from_pydict(
+        {
+            "document_id": pa.array(["doc01", "doc02"]),
+            "contents": pa.array(
+                [
+                    " : This documents is for test . ? ",
+                    "This javascript has Lore ipsum. It also has strong word {big black}. * 100",
+                ]
+            ),
+        }
+    )
+    out_table, metadata = docq.transform(in_table)
+
+    import pandas as pd
+
+    pd.set_option("display.max_rows", None)
+    pd.set_option("display.max_columns", None)
+
+    out_table = out_table[0].to_pandas()
+
+    print(f"\n== out: {out_table}")
+    print(f"\n== metadata: {metadata}")
