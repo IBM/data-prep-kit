@@ -536,15 +536,19 @@ class ComponentUtils:
     def set_s3_env_vars_to_component(
             component: dsl.ContainerOp,
             secret: str,
-            env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"}
+            env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"},
+            prefix: str = None,
     ) -> None:
         """
         Set S3 env variables to KFP component
         :param component: kfp component
         :param secret: secret name with the S3 credentials
         :param env2key: dict with mapping each env variable to a key in the secret
+        :param prefix: prefix to add to env name
         """
         for env_name, secret_key in env2key.items():
+            if prefix is not None:
+                env_name = f"{prefix}_{env_name}"
             component = component.add_env_variable(
                 k8s_client.V1EnvVar(
                     name=env_name,
