@@ -1,4 +1,4 @@
-DOCKER_IMAGE_NAME=language_identification
+DOCKER_IMAGE_NAME=language_id
 DOCKER_IMAGE_VERSION=0.1
 
 # Define the root of the local git clone for the common rules to be able 
