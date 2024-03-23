@@ -23,7 +23,9 @@ clean::
 	rm makeenv
 
 .check-env::
-	@if [ -z "$(FM_DATA_PROCESSING_KFP)" ]; then echo "You must provide FM_DATA_PROCESSING_KFP"; false; fi
+	$(call check_defined, ARTIFACTORY_USER)
+	$(call check_defined, ARTIFACTORY_API_KEY)
+	$(call check_defined, FM_DATA_PROCESSING_KFP)
 	@echo "Checks passed"
 
 .compile-pipeline::
@@ -49,8 +51,6 @@ publish:: .check-env
 
 venv::	.check-env
 	@# Help: Create the virtual environment
-	$(call check_defined, ARTIFACTORY_USER)
-	$(call check_defined, ARTIFACTORY_API_KEY)
 	sed -i.back "s/fm-data-processing==[0-9].*/fm-data-processing==${FM_DATA_PROCESSING}/" ../kfp_ray_components/requirements.txt
 	rm -rf venv	
 	$(PYTHON) -m venv venv
