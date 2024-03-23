@@ -87,8 +87,10 @@ def raw_to_parquet(
             ".zip", ".parquet"
         )
         # Save the PyArrow table as a Parquet file and get metadata
+        print("output_file_name",output_file_name)
         metadata = data_access.save_table(output_file_name, table)
-        if metadata:
+        if metadata[1]:
+            
             return (True, {"path": file_path, "bytes_in_memory": metadata[0]})
         else:
             raise Exception("Failed to upload")

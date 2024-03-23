@@ -108,7 +108,7 @@ class TestRawToParquet(unittest.TestCase):
     def test_process_zip_sucessfully(self):
         with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
             mock_zip_to_table.return_value = "mocked_table"
-            self.mock_data_access_instance.save_table.return_value = (None, {})
+            self.mock_data_access_instance.save_table.return_value = (0, {"k","v"})
             self.mock_data_access_instance.get_output_location.return_value = (
                 "output_file.parquet"
             )
@@ -117,7 +117,7 @@ class TestRawToParquet(unittest.TestCase):
 
             # Assertions
             self.assertEqual(
-                result, (True, {"path": "test.zip", "bytes_in_memory": None})
+                result, (True, {"path": "test.zip", "bytes_in_memory": 0})
             )
             self.mock_data_access_instance.get_output_location.assert_called_once_with(
                 "test.zip"
@@ -137,7 +137,7 @@ class TestRawToParquet(unittest.TestCase):
     def test_failed_to_upload(self):
         with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
             mock_zip_to_table.return_value = "mocked_table"
-            self.mock_data_access_instance.save_table.return_value = None
+            self.mock_data_access_instance.save_table.return_value = (0, {})
 
             result = raw_to_parquet(self.mock_data_access_factory_instance, "test.zip")
 
