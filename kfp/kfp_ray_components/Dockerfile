@@ -20,7 +20,6 @@ RUN pip install --no-cache-dir -r  requirements.txt
 # remove credentials-containing file
 RUN rm requirements.txt
 
-
 RUN pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple fm-data-processing-kfp==${FM_DATA_PROCESSING_KFP}
 
 RUN pip install pydantic==2.6.3
