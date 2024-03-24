@@ -73,7 +73,7 @@ n_actors = int((0.85 * execution_required_memory - document_actors * doc_cpu) / 
 # cap n_actors not to overwhelm S3
 if n_actors > 2000:
     n_actors = 2000
-print(f"number of actors {n_actors}")
+print(f"number of workers {n_actors}")
 
 
 print(f"required execution memory : {execution_required_memory}")
