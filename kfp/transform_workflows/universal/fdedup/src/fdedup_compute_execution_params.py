@@ -167,14 +167,4 @@ def fdedup_compute_execution_params(
 
     projected_execution = EXECUTION_OF_KB_DOC * avg_doc_size * number_of_docs / n_workers / 60
     print(f"Projected execution time {projected_execution} min")
-    # return
-    # return json.dumps(
-    #     {
-    #         "workers": n_workers,
-    #         "preprocessors": n_preprocessors,
-    #         "docs": d_actors,
-    #         "buckets": b_actors,
-    #         "min_hashes": m_actors,
-    #     }
-    # )
     return (n_workers, n_preprocessors, d_actors, b_actors, m_actors)

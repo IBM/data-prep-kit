@@ -42,7 +42,6 @@ def fdedup(
             "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/fdedup:guftest"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
-    # num_hashes: int = 0,
     lh_config: str = "None",
     max_files: int = -1,
     actor_options: str = "{'num_cpus': 0.8}",
@@ -135,7 +134,6 @@ def fdedup(
             additional_params=additional_params,
             exec_params={
                 "s3_config": s3_config,
-                # "num_hashes": compute_exec_params.outputs["min_hashes"],
                 "doc_column": doc_column,
                 "lh_config": lh_config,
                 "max_files": max_files,
