@@ -48,7 +48,7 @@ def fdedup(
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     cos_access_secret: str = "cos-access",
-    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_fdedup_guf/'}",
+    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=fuzzy_dedup/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_fdedup_guf/'}",
     # columns used
     doc_column: str = "contents",
     id_column: str = "int_id_column",
