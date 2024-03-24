@@ -70,6 +70,9 @@ execution_required_memory = math.ceil(
 )
 
 n_actors = int((0.85 * execution_required_memory - document_actors * doc_cpu) / processor_cpu)
+# cap n_actors not to overwhelm S3
+if n_actors > 2000:
+    n_actors = 2000
 print(f"number of actors {n_actors}")
 
 
