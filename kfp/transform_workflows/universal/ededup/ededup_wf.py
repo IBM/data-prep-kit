@@ -82,9 +82,9 @@ def ededup(
     :param max_files - max files to process
     :param actor_options - actor options
     :param pipeline_id - pipeline id
-    :param hash_cpu -
-    :param num_hashes -
-    :param doc_column -
+    :param hash_cpu - number of CPUs per hash
+    :param num_hashes - number of hash actors to use
+    :param doc_column - key for accessing data
     :return: None
     """
     # create clean_up task

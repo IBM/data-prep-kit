@@ -97,9 +97,21 @@ def fdedup(
     :param max_files - max files to process
     :param actor_options - actor options
     :param pipeline_id - pipeline id
-    :param hash_cpu -
-    :param num_hashes -
-    :param doc_column -
+    :param doc_column - document column name
+    :param id_column - integer document id column name
+    :param cluster_column - cluster column name
+    :param bucket_cpu - number of CPUs per bucket hash
+    :param doc_cpu - number of CPUs per doc hash
+    :param mhash_cpu - number of CPUs per minhash hash
+    :param num_doc_actors - number of doc actors to use
+    :param num_bucket_actors - number of bucket actors to use
+    :param num_minhash_actors - number of minhash actors to use
+    :param num_preprocessors - number of preprocessors to use
+    :param num_permutations - number of permutations
+    :param threshold - threshold
+    :param shingles_size - number of words in shingle
+    :param japanese_data - japanese data indicator
+    :param delimiters - delimiter for splitting document
     :return: None
     """
     # create clean_up task
