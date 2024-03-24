@@ -99,5 +99,5 @@ kind delete cluster --name goofy
 alternatively you can execute
 
 ```shell
-make cleanup-kind-cluster
+make clean
 ```

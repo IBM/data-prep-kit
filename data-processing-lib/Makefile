@@ -13,8 +13,6 @@ clean::
 	rm -rf dist venv
 	rm -rf src/*egg-info
 
-setup::
-
 .check-env::
 	@if [ -z "$(VERSION)" ]; then echo "You must provide VERSION"; false; fi
 	@if [ -z "$(ARTIFACTORY_USER)" ] || [ -z "$(ARTIFACTORY_API_KEY)" ]; then echo "You must set ARTIFACTORY_USER and ARTIFACTORY_API_KEY env vars"; false ; fi
@@ -26,7 +24,6 @@ update-toml:: .check-env
 	mv tt.toml pyproject.toml
 
 setup::
-
 
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
