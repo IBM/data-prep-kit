@@ -67,44 +67,6 @@ class KFPUtils:
         return ns
 
     @staticmethod
-    def clean_path(path: str = "") -> str:
-        """
-        Clean path parameters:
-            Removes white spaces from the input/output paths
-            Removes schema prefix (s3://, http:// https://), if exists
-            Adds the "/" character at the end, if it doesn't exist
-            Removed URL encoding
-        :param path: path to clean up
-        :return: clean path
-        """
-        path = path.strip()
-        if path == "":
-            return path
-        from urllib.parse import unquote, urlparse, urlunparse
-
-        # Parse the URL
-        parsed_url = urlparse(path)
-        if parsed_url.scheme in ["http", "https"]:
-            # Remove host
-            parsed_url = parsed_url._replace(netloc="")
-            parsed_url = parsed_url._replace(path=parsed_url.path[1:])
-
-        # Remove the schema
-        parsed_url = parsed_url._replace(scheme="")
-
-        # Reconstruct the URL without the schema
-        url_without_schema = urlunparse(parsed_url)
-
-        # Remove //
-        if url_without_schema[:2] == "//":
-            url_without_schema = url_without_schema.replace("//", "", 1)
-
-        return_path = unquote(url_without_schema)
-        if return_path[-1] != "/":
-            return_path += "/"
-        return return_path
-
-    @staticmethod
     def runtime_name(ray_name: str = "", run_id: str = "") -> str:
         """
         Get unique runtime name
@@ -574,15 +536,19 @@ class ComponentUtils:
     def set_s3_env_vars_to_component(
             component: dsl.ContainerOp,
             secret: str,
-            env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"}
+            env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"},
+            prefix: str = None,
     ) -> None:
         """
         Set S3 env variables to KFP component
         :param component: kfp component
         :param secret: secret name with the S3 credentials
         :param env2key: dict with mapping each env variable to a key in the secret
+        :param prefix: prefix to add to env name
         """
         for env_name, secret_key in env2key.items():
+            if prefix is not None:
+                env_name = f"{prefix}_{env_name}"
             component = component.add_env_variable(
                 k8s_client.V1EnvVar(
                     name=env_name,

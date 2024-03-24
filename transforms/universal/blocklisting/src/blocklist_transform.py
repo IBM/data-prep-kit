@@ -13,7 +13,7 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import TransformUtils, get_logger
+from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
 
@@ -39,16 +39,23 @@ def _get_domain_list(domain_list_url: str, data_access: DataAccess) -> set[str]:
 
 
 short_name = "blocklist"
-arg_prefix = short_name
+cli_prefix = short_name + "_"
 
-annotation_column_name_key = f"{arg_prefix}_annotation_column_name"
+annotation_column_name_key = "annotation_column_name"
 """ Key holds the name of the column to create in the output table"""
-source_url_column_name_key = f"{arg_prefix}_source_url_column_name"
+source_url_column_name_key = "source_url_column_name"
 """ Key holds the name of the column holding the URL from which the document was retrieved"""
-blocked_domain_list_path_key = f"{arg_prefix}_blocked_domain_list_path"
+blocked_domain_list_path_key = "blocked_domain_list_path"
 """ Key holds the directory holding 1 or more domain* files listing the urls to identify """
-block_data_factory_key = f"{arg_prefix}_data_factory"
-""" Key holds the data access factory for domain files """
+block_data_factory_key = "data_factory"
+
+annotation_column_name_cli_param = f"{cli_prefix}{annotation_column_name_key}"
+""" Key holds the name of the column to create in the output table"""
+source_url_column_name_cli_param = f"{cli_prefix}{source_url_column_name_key}"
+""" Key holds the name of the column holding the URL from which the document was retrieved"""
+blocked_domain_list_path_cli_param = f"{cli_prefix}{blocked_domain_list_path_key}"
+""" Key holds the directory holding 1 or more domain* files listing the urls to identify """
+
 block_data_access_key = "data_access"
 """ Key holds the data access for reading domain files.  If not present, then block_data_factory_key is expected"""
 _domain_ref_key = "__domain_refs"
@@ -178,14 +185,14 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
         """
         # The DataAccess created by the DataAccessFactory below will use this url
         parser.add_argument(
-            f"--{blocked_domain_list_path_key}",
+            f"--{blocked_domain_list_path_cli_param}",
             type=str,
             required=False,
             default=blocked_domain_list_path_default,
             help="S3/COS URL or local folder (file or directory) that points to the list of block listed domains.",
         )
         parser.add_argument(
-            f"--{annotation_column_name_key}",
+            f"--{annotation_column_name_cli_param}",
             type=str,
             required=False,
             default=annotation_column_name_default,
@@ -193,14 +200,14 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
         )
 
         parser.add_argument(
-            f"--{source_url_column_name_key}",
+            f"--{source_url_column_name_cli_param}",
             type=str,
             required=False,
             default=source_column_name_default,
             help="Name of the table column that has the document download URL",
         )
         # Create the DataAccessFactor to use CLI args with the given blocklist prefix.
-        self.daf = DataAccessFactory(f"{arg_prefix}_")
+        self.daf = DataAccessFactory(cli_prefix)
         # Add the DataAccessFactory parameters to the transform's configuration parameters.
         self.daf.add_input_params(parser)
 
@@ -211,14 +218,16 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         # Capture the args that are specific to this transform
-        dargs = vars(args)
-        global captured_arg_keys
-        for arg_key in captured_arg_keys:
-            # Make sure parameters are defined
-            if dargs.get(arg_key) is None or len(dargs.get(arg_key)) < 1:
-                logger.info(f"parameter {arg_key} is not defined, exiting")
-                return False
-            self.params[arg_key] = dargs.get(arg_key)
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        self.params = self.params | captured
+        # dargs = vars(args)
+        # global captured_arg_keys
+        # for arg_key in captured_arg_keys:
+        #     # Make sure parameters are defined
+        #     if dargs.get(arg_key) is None or len(dargs.get(arg_key)) < 1:
+        #         logger.info(f"parameter {arg_key} is not defined, exiting")
+        #         return False
+        #     self.params[arg_key] = dargs.get(arg_key)
 
         # Add the DataAccessFactory to the transform's configuration parameters.
         self.params[block_data_factory_key] = self.daf

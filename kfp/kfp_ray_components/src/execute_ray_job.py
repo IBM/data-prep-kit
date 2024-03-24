@@ -57,11 +57,10 @@ if __name__ == "__main__":
     parser.add_argument("-rn", "--ray_name", type=str, default="")
     parser.add_argument("-id", "--run_id", type=str, default="")
     parser.add_argument("-ap", "--additional_params", type=str, default="{}")
-    parser.add_argument("-n", "--notifier_str", type=str, default="")
+    parser.add_argument("-su", "--server_url", type=str, default="")
     # The component converts the dictionary to json string
     parser.add_argument("-ep", "--exec_params", type=str, default="{}")
     parser.add_argument("-esn", "--exec_script_name", default="transformer_launcher.py", type=str)
-    parser.add_argument("-su", "--server_url", type=str, default="")
 
     args = parser.parse_args()
     cluster_name = KFPUtils.runtime_name(
