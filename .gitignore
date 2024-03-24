@@ -137,3 +137,5 @@ dmypy.json
 
 
 kind/hack/.helper-functions.sh
+**/*.back
+kfp/*/makeenv

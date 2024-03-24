@@ -9,9 +9,6 @@ clean::
 	@# Help: Recursively clean all subdirs 
 	$(MAKE) RULE=clean .recurse
 
-setup::
-	@# Help: setup, Recursively clean all subdirs
-
 build::
 	@# Help: Recursively build all subdirs 
 	$(MAKE) RULE=build .recurse
