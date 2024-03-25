@@ -4,5 +4,10 @@ python:
     - "3.10"
 
 script:
-    - cd data-processing-lib; make venv; make test
-    - cd transforms; make venv ; make test-lib-src
+    - cd data-processing-lib
+    - echo pwd=$(pwd)
+    - make venv test
+    - echo pwd=$(pwd)
+    - cd ../transforms
+    - echo pwd=$(pwd)
+    - make venv test-lib-src
