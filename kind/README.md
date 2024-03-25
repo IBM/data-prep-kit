@@ -7,8 +7,9 @@ This is a manual build instruction. As an alternative, you can execute the `make
 Ensure that you have the following:
 
 - [Helm](https://helm.sh/) 3.10.0 or greater must be installed and configured on your machine.
-- [Kind](https://kind.sigs.k8s.io/) tool for running local Kubernetes clusters 0.14.0 or newer.
+- [Kind](https://kind.sigs.k8s.io/) tool for running local Kubernetes clusters 0.14.0 or newer must be installed on your machine.
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) 1.26 or newer must be installed on your machine.
+- [wget](https://www.gnu.org/software/wget/) 1.21 must be installed on your machine. 
 
 
 ## Create cluster
@@ -98,5 +99,5 @@ kind delete cluster --name goofy
 alternatively you can execute
 
 ```shell
-make cleanup-kind-cluster
+make clean
 ```

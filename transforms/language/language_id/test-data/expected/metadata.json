@@ -15,9 +15,9 @@
         "path": "path"
     },
     "job_input_params": {
-        "model_kind": "fasttext",
-        "model_url": "facebook/fasttext-language-identification",
-        "content_column_name": "text",
+        "lang_id_model_kind": "fasttext",
+        "lang_id_model_url": "facebook/fasttext-language-identification",
+        "lang_id_content_column_name": "text",
         "checkpointing": false,
         "max_files": -1,
         "number of workers": 2,

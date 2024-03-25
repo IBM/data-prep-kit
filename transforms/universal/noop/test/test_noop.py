@@ -1,6 +1,6 @@
 import pyarrow as pa
 from data_processing.test_support.transform.transform_test import AbstractTransformTest
-from noop_transform import NOOPTransform
+from noop_transform import NOOPTransform, sleep_key
 
 
 table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})
@@ -16,7 +16,6 @@ class TestNOOPTransform(AbstractTransformTest):
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         fixtures = [
-            (NOOPTransform({"sleep": 0}), [table], [expected_table], expected_metadata_list),
-            (NOOPTransform({"sleep": 0}), [table], [expected_table], expected_metadata_list),
+            (NOOPTransform({sleep_key: 0}), [table], [expected_table], expected_metadata_list),
         ]
         return fixtures
