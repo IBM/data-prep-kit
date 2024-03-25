@@ -75,6 +75,8 @@ help::
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
 # We install wheel, because it seems to be required for fasttext install on redhat.
+# We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
+# they will end up installing into that PYTHON and NOT the venv.
 .PHONY: .transforms.venv
 .transforms.venv::	requirements.txt .transforms.check_python_version
 	@$(MAKE) .transforms.check_env	# Put this first so we don't get its help
@@ -84,11 +86,11 @@ help::
 	    echo '[global]' > venv/pip.conf;					\
 	    echo "extra-index-url = $(EXTRA_ARTIFACTORY_URL)" >> venv/pip.conf;	\
 	fi
-	. venv/bin/activate;			\
-	$(PIP) install --upgrade pip;		\
-	$(PIP) install wheel;			\
-	$(PIP) install -r requirements.txt;	\
-	$(PIP) install pytest;			\
+	@source venv/bin/activate;		\
+	pip install --upgrade pip;		\
+	pip install wheel;			\
+	pip install -r requirements.txt;	\
+	pip install pytest;			\
 
 .transforms.check_env::
 	@# Help: Make sure Artifactory credentials are in the environment variables. 
@@ -110,8 +112,8 @@ help::
 	@# Help: Install the source from the data processing library for $(PYTHON) 
 	@echo Installing source from data processing library for venv 
 	@source venv/bin/activate;					\
-	$(PIP) uninstall -y fm-data-processing;			\
-	$(PIP) install 						\
+	pip uninstall -y fm-data-processing;			\
+	pip install 						\
 		--extra-index-url $(EXTRA_ARTIFACTORY_URL)		\
 		-e $(REPOROOT)/data-processing-lib/;			\
 	if [ $$? -eq 0 ]; then	\
