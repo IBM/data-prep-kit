@@ -16,8 +16,8 @@ GB = 1024 * MB
 
 class TestInit:
     path_dict = {
-        "input_folder": os.path.join(os.sep, "tmp", "input"),
-        "output_folder": os.path.join(os.sep, "tmp", "output"),
+        "input_folder": os.path.join(os.sep, "tmp", "input_guf"),
+        "output_folder": os.path.join(os.sep, "tmp", "output_guf"),
     }
     dal = DataAccessLocal(path_dict, d_sets=["dset1", "dset2"], checkpoint=True, m_files=0)
     size_stat_dict_empty = {"max_file_size": 0.0, "min_file_size": float(GB), "total_file_size": 0.0}
@@ -47,7 +47,7 @@ class TestGetFilesFolder(TestInit):
         result = self.dal._get_files_folder(str(directory), cm_files=0)
         os.remove(file_path)
         os.rmdir(directory)
-        assert result == (["/tmp/input/empty_dir/file.parquet"], self.size_stat_dict)
+        assert result == (["/tmp/input_guf/empty_dir/file.parquet"], self.size_stat_dict)
 
     def test_multiple_files(self):
         """
