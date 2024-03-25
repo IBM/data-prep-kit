@@ -13,6 +13,7 @@ include ../../.make.defaults
 LIBNAME=fm_data_processing_kfp
 PYTHON=python
 PYTEST=pytest
+PYTHON_VERSION=$(shell ${PYTHON} --version)
 VENV_ACTIVATE=venv/bin/activate
 
 clean::
@@ -21,7 +22,19 @@ clean::
 	rm -rf src/*egg-info
 	rm makeenv
 
-.check-env::
+.PHONY: .check_python_version
+.check_python_version::
+	@version=$$(echo $(PYTHON_VERSION) | sed -e 's/Python[ ]*//');  \
+		major=$$(echo $$version | awk -F. '{print $$1}');               \
+		minor=$$(echo $$version | awk -F. '{print $$2}');               \
+		if [ $$major -lt 3 -o $$minor -lt 10 -o $$minor -gt 12 ]; then  \
+ 		echo Python 3.10 or 3.11 is required;                   \
+		echo Try overriding PYTHON=$(PYTHON).  For example, "'"make PYTHON=python3.10" ...'";   \
+		exit 1;                                                 \
+	fi
+
+
+.check-env:: .check_python_version
 	$(call check_defined, FM_DATA_PROCESSING_KFP)
 	$(call check_defined, ARTIFACTORY_USER)
 	$(call check_defined, ARTIFACTORY_API_KEY)
