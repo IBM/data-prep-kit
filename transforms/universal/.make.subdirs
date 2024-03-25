@@ -1,6 +1,7 @@
-blocklisting
-noop
 fdedup
+
+#blocklisting
+#noop
 #split_file
 
 #ededup
