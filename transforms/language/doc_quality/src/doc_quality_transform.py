@@ -44,7 +44,6 @@ class DocQualityTransform(AbstractTableTransform):
             "bad_word_filepath" + self.ft_lang,
             "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/en",
         )
-        self.drop_column_if_existed = config.get("drop_column_if_existed", True)
         self.col_name = config.get("col_name", "contents")
 
         self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.ft_lang, file_path=self.bad_word_filepath)
@@ -89,20 +88,6 @@ class DocQualityTransform(AbstractTableTransform):
             "docq_ellipsis_line_ratio",
             "docq_alphabet_word_ratio",
         ]
-        for column in new_columns:
-            if column in table.column_names:
-                if self.drop_column_if_existed:
-                    if not self.warning_issued:
-                        # print(f"WARNING: drop existing column {column}. {input_parquet_path}")
-                        print(f"WARNING: drop existing column {column}")
-                        self.warning_issued = True
-                    table = table.drop(column)
-                else:
-                    print(
-                        f"ERROR: existing column {column} found and drop_column_if_existed is false. "
-                        f"Terminating..."
-                    )
-                    exit(-1)
 
         docq_total_words = []
         docq_mean_word_len = []
@@ -203,11 +188,6 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
             default="en",
         )
         parser.add_argument(
-            "--drop_column_if_existed",
-            default=True,
-            help="drop columns if existed",
-        )
-        parser.add_argument(
             "--col_name",
             default="contents",
             help="column name that contain document text",
@@ -230,7 +210,6 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         self.params["ft_lang"] = args.ft_lang
-        self.params["drop_column_if_existed"] = args.drop_column_if_existed
         self.params["col_name"] = args.col_name
         self.params["bad_word_filepath"] = args.bad_word_filepath
         self.params["MODEL_DIR"] = args.MODEL_DIR
