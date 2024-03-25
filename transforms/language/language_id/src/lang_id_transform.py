@@ -6,6 +6,7 @@ import pyarrow as pa
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
+    TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils
@@ -16,10 +17,10 @@ from nlp import get_lang_ds_pa
 Reference https://github.ibm.com/ai-foundation/foundation-model-stack/tree/main/preprocessing/ray/language_identification_sentence_split
 """
 
-PARAM_MODEL_CREDENTIAL = "model_credential"
-PARAM_MODEL_KIND = "model_kind"
-PARAM_MODEL_URL = "model_url"
-PARAM_CONTENT_COLUMN_NAME = "content_column_name"
+PARAM_MODEL_CREDENTIAL = "lang_id_model_credential"
+PARAM_MODEL_KIND = "lang_id_model_kind"
+PARAM_MODEL_URL = "lang_id_model_url"
+PARAM_CONTENT_COLUMN_NAME = "lang_id_content_column_name"
 
 
 class LangIdentificationTransform(AbstractTableTransform):
@@ -60,7 +61,7 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
 
     """
     Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
+    configuration with CLI args.
     """
 
     def __init__(self):
@@ -80,11 +81,11 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
         """
         parser.add_argument(
             f"--{PARAM_MODEL_CREDENTIAL}",
-            default=None,
+            required=True,
             help="Credential to access model for language detection placed in url",
         )
-        parser.add_argument(f"--{PARAM_MODEL_KIND}", default="", help="Kind of model for language detection")
-        parser.add_argument(f"--{PARAM_MODEL_URL}", default=None, help="Url to model for language detection")
+        parser.add_argument(f"--{PARAM_MODEL_KIND}", required=True, help="Kind of model for language detection")
+        parser.add_argument(f"--{PARAM_MODEL_URL}", required=True, help="Url to model for language detection")
         parser.add_argument(f"--{PARAM_CONTENT_COLUMN_NAME}", default="contents", help="Column name to get content")
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
@@ -94,9 +95,14 @@ class LangIdentificationTableTransformConfiguration(DefaultTableTransformConfigu
         arguments as defined by add_input_arguments().
         :return: True, if validate pass or False otherwise
         """
-        self.params[PARAM_MODEL_CREDENTIAL] = args.model_credential
-        self.params[PARAM_MODEL_KIND] = args.model_kind
-        self.params[PARAM_MODEL_URL] = args.model_url
-        self.params[PARAM_CONTENT_COLUMN_NAME] = args.content_column_name
+        self.params[PARAM_MODEL_CREDENTIAL] = args.lang_id_model_credential
+        self.params[PARAM_MODEL_KIND] = args.lang_id_model_kind
+        self.params[PARAM_MODEL_URL] = args.lang_id_model_url
+        self.params[PARAM_CONTENT_COLUMN_NAME] = args.lang_id_content_column_name
         self.remove_from_metadata.append(PARAM_MODEL_CREDENTIAL)
         return True
+
+
+if __name__ == "__main__":
+    launcher = TransformLauncher(transform_runtime_config=LangIdentificationTableTransformConfiguration())
+    launcher.launch()

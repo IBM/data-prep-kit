@@ -1,7 +1,7 @@
 # Split  files
 
 Please see the set of
-[transform project conventions](../../transform-conventions.md)
+[transform project conventions](../../README.md)
 for details on general project conventions, transform configuration,
 testing and IDE set up.
 
@@ -17,7 +17,7 @@ tables into smaller ones we currently support two tipes of splitting:
 A [docker file](Dockerfile) that can be used for building docker image. You can use
 
 ```shell
-make build to build it
+make build 
 ```
 
 ## Configuration and command line Options

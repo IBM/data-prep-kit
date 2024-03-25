@@ -273,12 +273,13 @@ class BucketsHash:
                 long_buckets.append(bucket)
             else:
                 short_buckets.append(bucket)
-        self.logger.debug(f"processing buckets {len(long_buckets)} long, {len(short_buckets)} short")
+        self.logger.info(f"processing buckets {len(long_buckets)} long, {len(short_buckets)} short")
 
         # process long buckets first - we are submitting them one at a time
         for bucket in long_buckets:
             if len(bucket) > 2 * LONG_BUCKET:
                 # For very long buckets, split them
+                self.logger.info(f"Splitting bucket of length len(bucket) into chunks")
                 smaller_bucket = [bucket[i * LONG_BUCKET:(i + 1) * LONG_BUCKET]
                                   for i in range((len(bucket) + LONG_BUCKET - 1) // LONG_BUCKET)]
                 for b in smaller_bucket:
@@ -472,17 +473,17 @@ class BucketsHashProcessorInvoker(object):
         # Get completed results
         if self.submitted < self.n_processors:  # still have room
             self.pool.submit(lambda a, v: a.process_buckets.remote(v), buckets)
-            self.logger.debug("Submitted bucket processing request")
+            self.logger.info("Submitted bucket processing request")
             self.submitted += 1
             return
         else:
             self.pool.get_next_unordered()
-            self.logger.debug("Completed bucket processing request")
+            self.logger.info("Completed bucket processing request")
             self.pool.submit(lambda a, v: a.process_buckets.remote(v), buckets)
-            self.logger.debug("Submitted bucket processing request")
+            self.logger.info("Submitted bucket processing request")
             return
 
     def wait_for_completion(self) -> None:
-        self.logger.debug("Waiting bucket processing completion")
+        self.logger.info("Waiting bucket processing completion")
         while self.pool.has_next():
             self.pool.get_next_unordered()

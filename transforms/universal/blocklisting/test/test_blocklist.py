@@ -2,10 +2,13 @@ import pyarrow as pa
 from blocklist_transform import (
     BlockListTransform,
     BlockListTransformConfiguration,
+    annotation_column_name_cli_param,
     annotation_column_name_default,
     annotation_column_name_key,
+    blocked_domain_list_path_cli_param,
     blocked_domain_list_path_key,
     source_column_name_default,
+    source_url_column_name_cli_param,
     source_url_column_name_key,
 )
 from data_processing.ray.transform_runtime import get_transform_config
@@ -24,11 +27,11 @@ class TestBlockListTransform(AbstractTransformTest):
             # When running outside the Ray orchestrator and its DataAccess/Factory, there is
             # no Runtime class to load the domains and the Transform must do it itself using
             # the blocklist_local_config for this test.
-            f"--{blocked_domain_list_path_key}",
+            f"--{blocked_domain_list_path_cli_param}",
             "../test-data/domains/arjel",
-            f"--{annotation_column_name_key}",
+            f"--{annotation_column_name_cli_param}",
             annotation_column_name_default,
-            f"--{source_url_column_name_key}",
+            f"--{source_url_column_name_cli_param}",
             source_column_name_default,
             "--blocklist_local_config",
             ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),

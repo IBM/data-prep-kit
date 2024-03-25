@@ -1,4 +1,3 @@
-import os
 import sys
 
 from data_processing.ray import TransformLauncher
@@ -54,6 +53,7 @@ params = {
     "delimiters": " ",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
+
 
 # launch
 launcher.launch()

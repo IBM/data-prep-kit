@@ -28,13 +28,14 @@ class TransformStatistics(object):
         :return: None
         """
         for key, val in stats.items():
-            self.stats[key] = self.stats.get(key, 0) + val
-            if key == "source_files":
-                self.source_document_counter.inc(val)
-            if key == "source_size":
-                self.data_read_counter.inc(val)
-            if key == "result_files":
-                self.result_document_counter.inc(val)
+            if val > 0:
+                self.stats[key] = self.stats.get(key, 0) + val
+                if key == "source_files":
+                    self.source_document_counter.inc(val)
+                if key == "source_size":
+                    self.data_read_counter.inc(val)
+                if key == "result_files":
+                    self.result_document_counter.inc(val)
 
     def get_execution_stats(self) -> dict[str, Any]:
         """

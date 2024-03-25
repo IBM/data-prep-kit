@@ -13,25 +13,25 @@ fuzzy dedup and should not be modified.
 
 
 # change these parameters for specific use case
-number_of_docs = 8423678743
+number_of_docs = 5000000000
 # Fuzzy dedup params
 n_permutations = 64
-threshold = 0.75
+threshold = 0.7
 false_positive = 0.5
 false_negative = 0.5
 # Number of workers for initial run
-n_workers = 1000
+n_workers = 1500
 # pod cpus
-ray_node_cpu = 15
+ray_node_cpu = 30
 # cpu sizes fo actors
 processor_cpu = 1.0
-bucket_cpu = 1.0
-minhash_cpu = 1.0
+bucket_cpu = .75
+minhash_cpu = .75
 doc_cpu = 0.5
 # Experimental values, do not change
-bucket_actor_memory = 2.0
+bucket_actor_memory = 3.0
 minhash_actor_memory = 5.0
-document_actor_memory = 2.5
+document_actor_memory = 3.0
 processor_memory = 2.0
 num_buckets, length_bucket = fuzzy_optimal_param(
     threshold=threshold,
@@ -39,16 +39,21 @@ num_buckets, length_bucket = fuzzy_optimal_param(
     false_positive_weight=false_positive,
     false_negative_weight=false_negative,
 )
+print(f"threshold {threshold}, num permutations {n_permutations}")
 print(f"Fuzzy parameters: num buckets {num_buckets}, bucket length {length_bucket}")
+
+print(f"Number of documents {number_of_docs}")
 
 bucket_actors = math.ceil(num_buckets * number_of_docs * 64 * 1.1 / GB)
 document_actors = math.ceil(number_of_docs * 48 * 1.1 / GB)
 minhash_actors = math.ceil(number_of_docs * 128 * 1.1 / GB)
 
-print(f"desired workers {n_workers}")
-print(f"Required document actors {document_actors}")
-print(f"Required minhash actors {minhash_actors}")
-print(f"Required bucket actors {bucket_actors}")
+print(f"desired of preprocessors {n_workers} with cpu {processor_cpu}")
+print(f"Required document actors {document_actors} with cpu {doc_cpu}")
+print(f"Required minhash actors {minhash_actors} with cpu {minhash_cpu}")
+print(f"Required bucket actors {bucket_actors} with cpu {bucket_cpu}")
+
+
 
 execution_required_cpus = math.ceil(
     (processor_cpu * n_workers + bucket_actors * bucket_cpu + minhash_actors * minhash_cpu +
@@ -63,6 +68,14 @@ execution_required_memory = math.ceil(
     (n_workers * processor_memory + bucket_actors * bucket_actor_memory + minhash_actors * minhash_actor_memory +
      document_actors * document_actor_memory) / 0.6
 )
+
+n_actors = int((0.85 * execution_required_memory - document_actors * doc_cpu) / processor_cpu)
+# cap n_actors not to overwhelm S3
+if n_actors > 2000:
+    n_actors = 2000
+print(f"number of workers {n_actors}")
+
+
 print(f"required execution memory : {execution_required_memory}")
 print(f"Minimal required memory per ray node is {math.ceil(execution_required_memory / n_ray_nodes)} GB. "
       f"Practically use the larger number")

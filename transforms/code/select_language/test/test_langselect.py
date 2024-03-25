@@ -1,15 +1,18 @@
 import pyarrow as pa
-from langselect_transform import (
-    LangSelectorTransform, LangSelectorTransformConfiguration,
-    lang_known_selector, lang_lang_column_key, lang_allowed_langs_file_key
-)
 from data_processing.data_access import DataAccessLocal
 from data_processing.ray.transform_runtime import get_transform_config
 from data_processing.test_support.transform import AbstractTransformTest
 from data_processing.utils import ParamsUtils
+from langselect_transform import (
+    LangSelectorTransform,
+    LangSelectorTransformConfiguration,
+    lang_allowed_langs_file_key,
+    lang_known_selector,
+    lang_lang_column_key,
+)
 
 
-class TestBlockListTransform(AbstractTransformTest):
+class TestLangSelectorTransform(AbstractTransformTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -19,7 +22,7 @@ class TestBlockListTransform(AbstractTransformTest):
         cli = [
             # When running outside the Ray orchestrator and its DataAccess/Factory, there is
             # no Runtime class to load the domains and the Transform must do it itself using
-            # the blocklist_local_config for this test.
+            # the lang_select_local_config for this test.
             f"--{lang_allowed_langs_file_key}",
             "../test-data/languages/allowed-code-languages.txt",
             f"--{lang_lang_column_key}",
@@ -72,4 +75,4 @@ class TestBlockListTransform(AbstractTransformTest):
 
 
 if __name__ == "__main__":
-    t = TestBlockListTransform()
+    t = TestLangSelectorTransform()
