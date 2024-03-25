@@ -1,3 +1,4 @@
+SHELL=/bin/bash
 #######################################################################################
 # Lists all targets and optional help text found in the target.
 # Adapted from https://stackoverflow.com/a/65243296/45375
