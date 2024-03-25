@@ -1,0 +1,11 @@
+# These ae passing
+blocklisting
+noop
+
+# These are failing
+#split_file
+#fdedup
+#ededup
+#doc_id
+#coalesce
+#tokenization

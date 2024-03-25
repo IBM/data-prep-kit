@@ -8,6 +8,11 @@ env:
     jobs:
         - DOCKER=docker
 
+branches:
+    only:
+        - dev
+        - main
+
 # Enable/install podman
 #before_install:
 #    - sudo apt-get update
