@@ -4,5 +4,5 @@ python:
     - "3.10"
 
 script:
-    - cd data-processing-lib; make test
+    - cd data-processing-lib; make venv; make test
     - cd transforms; make venv ; make test-lib-src
