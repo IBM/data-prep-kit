@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pyarrow
+import pytest
 from data_processing.data_access import DataAccessLocal
 
 
