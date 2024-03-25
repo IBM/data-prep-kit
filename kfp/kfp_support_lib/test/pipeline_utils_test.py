@@ -7,7 +7,7 @@ def test_pipelines():
     """
     utils = PipelinesUtils(host="http://localhost:8080/kfp")
     # get pipeline by name
-    pipeline = utils.get_pipeline_by_name("[Tutorial] Data passing in python components")
+    pipeline = utils.get_pipeline_by_name("[Tutorial] DSL - Control structures")
     assert pipeline is not None
     # get default experiment
     experiment = utils.get_experiment_by_name()
