@@ -9,9 +9,7 @@ env:
         - DOCKER=docker
 
 # Enable/install podman
-before_install:
-    - sudo mkdir /tmp
-    - sudo chmod 777 /tmp
+#before_install:
 #    - sudo apt-get update
 #    - sudo apt-get -y install podman
 #    - podman machine init
