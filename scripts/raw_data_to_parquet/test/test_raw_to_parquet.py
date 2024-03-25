@@ -5,6 +5,7 @@ from unittest.mock import patch, MagicMock
 from parameterized import parameterized
 import unittest
 import pyarrow as pa
+import pandas as pd
 
 
 def create_test_zip(file_names, contents_list):
@@ -107,7 +108,7 @@ class TestRawToParquet(unittest.TestCase):
 
     def test_process_zip_sucessfully(self):
         with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
-            mock_zip_to_table.return_value = "mocked_table"
+            mock_zip_to_table.return_value = pa.Table.from_pandas(pd.DataFrame([]))
             self.mock_data_access_instance.save_table.return_value = (0, {"k","v"})
             self.mock_data_access_instance.get_output_location.return_value = (
                 "output_file.parquet"
@@ -117,13 +118,13 @@ class TestRawToParquet(unittest.TestCase):
 
             # Assertions
             self.assertEqual(
-                result, (True, {"path": "test.zip", "bytes_in_memory": 0})
+                result, (True, {"path": "test.zip", "bytes_in_memory": 0,'row_count': 0})
             )
             self.mock_data_access_instance.get_output_location.assert_called_once_with(
                 "test.zip"
             )
             self.mock_data_access_instance.save_table.assert_called_once_with(
-                "output_file.parquet", "mocked_table"
+                "output_file.parquet", pa.Table.from_pandas(pd.DataFrame([]))
             )
 
     def test_unsupported_file_type(self):
@@ -136,7 +137,7 @@ class TestRawToParquet(unittest.TestCase):
 
     def test_failed_to_upload(self):
         with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
-            mock_zip_to_table.return_value = "mocked_table"
+            mock_zip_to_table.return_value = pa.Table.from_pandas(pd.DataFrame([]))
             self.mock_data_access_instance.save_table.return_value = (0, {})
 
             result = raw_to_parquet(self.mock_data_access_factory_instance, "test.zip")
@@ -148,7 +149,7 @@ class TestRawToParquet(unittest.TestCase):
 
     def test_exception_handling(self):
         with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
-            mock_zip_to_table.return_value = "mocked_table"
+            mock_zip_to_table.return_value = pa.Table.from_pandas(pd.DataFrame([]))
             self.mock_data_access_instance.save_table.side_effect = Exception(
                 "Test exception"
             )
@@ -163,13 +164,14 @@ class TestRawToParquet(unittest.TestCase):
 class TestGenerateStats(unittest.TestCase):
     def test_successful_metadata(self):
         metadata = [
-            (True, {"path": "file1.txt", "bytes_in_memory": 100}),
-            (True, {"path": "file2.txt", "bytes_in_memory": 200}),
+            (True, {"path": "file1.txt", "bytes_in_memory": 100,"row_count":10}),
+            (True, {"path": "file2.txt", "bytes_in_memory": 200,"row_count":20}),
         ]
         expected_result = {
             "total_files_given": 2,
             "total_files_processed": 2,
             "total_files_failed_to_processed": 0,
+            "total_no_of_rows":30,
             "total_bytes_in_memory": 300,
             "failure_details": [],
         }
@@ -179,13 +181,14 @@ class TestGenerateStats(unittest.TestCase):
 
     def test_failed_metadata(self):
         metadata = [
-            (True, {"path": "file1.txt", "bytes_in_memory": 100}),
+            (True, {"path": "file1.txt", "bytes_in_memory": 100,"row_count":10}),
             (False, {"path": "file2.txt", "error": "Failed to process"}),
         ]
         expected_result = {
             "total_files_given": 2,
             "total_files_processed": 1,
             "total_files_failed_to_processed": 1,
+            "total_no_of_rows":10,
             "total_bytes_in_memory": 100,
             "failure_details": [{"path": "file2.txt", "error": "Failed to process"}],
         }
@@ -199,6 +202,7 @@ class TestGenerateStats(unittest.TestCase):
             "total_files_given": 0,
             "total_files_processed": 0,
             "total_files_failed_to_processed": 0,
+            "total_no_of_rows":0,
             "total_bytes_in_memory": 0,
             "failure_details": [],
         }
@@ -215,6 +219,7 @@ class TestGenerateStats(unittest.TestCase):
             "total_files_given": 2,
             "total_files_processed": 0,
             "total_files_failed_to_processed": 2,
+            "total_no_of_rows":0,
             "total_bytes_in_memory": 0,
             "failure_details": [
                 {"path": "file1.txt", "error": "Failed to process"},

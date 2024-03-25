@@ -42,7 +42,9 @@ def zip_to_table(data_access: DataAccess, file_path) -> pa.table:
                                     "document": zip_name,
                                     "contents": content_string,
                                     "document_id": str(uuid.uuid4()),
-                                    "ext": TransformUtils.get_file_extension(file_path),
+                                    "ext": TransformUtils.get_file_extension(
+                                        member.filename
+                                    ),
                                     "hash": TransformUtils.str_to_hash(content_string),
                                     "size": TransformUtils.deep_get_size(
                                         content_string
@@ -87,11 +89,17 @@ def raw_to_parquet(
             ".zip", ".parquet"
         )
         # Save the PyArrow table as a Parquet file and get metadata
-        print("output_file_name",output_file_name)
+        print("output_file_name", output_file_name)
         metadata = data_access.save_table(output_file_name, table)
         if metadata[1]:
-            
-            return (True, {"path": file_path, "bytes_in_memory": metadata[0]})
+            return (
+                True,
+                {
+                    "path": file_path,
+                    "bytes_in_memory": metadata[0],
+                    "row_count": table.num_rows,
+                },
+            )
         else:
             raise Exception("Failed to upload")
 
@@ -119,13 +127,17 @@ def generate_stats(metadata: list) -> dict[str, Any]:
             failure_details.append(m[1])
 
     # Create DataFrame from success details to calculate total bytes in memory
-    success_df = pd.DataFrame(sucess_details, columns=["path", "bytes_in_memory"])
+    success_df = pd.DataFrame(
+        sucess_details, columns=["path", "bytes_in_memory", "row_count"]
+    )
     total_bytes_in_memory = success_df["bytes_in_memory"].sum()
+    total_row_count = success_df["row_count"].sum()
 
     return {
         "total_files_given": len(metadata),
         "total_files_processed": success,
         "total_files_failed_to_processed": failures,
+        "total_no_of_rows": int(total_row_count),
         "total_bytes_in_memory": int(total_bytes_in_memory),
         "failure_details": failure_details,
     }
