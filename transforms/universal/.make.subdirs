@@ -1,10 +1,10 @@
 # These ae passing
-split_file
 blocklisting
 noop
 
 # These are failing
-fdedup
+#split_file
+#fdedup
 #ededup
 #doc_id
 #coalesce
