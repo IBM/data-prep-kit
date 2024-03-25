@@ -157,12 +157,27 @@ class TestGetInputFiles(TestInit):
             file.touch()
         output_file.touch()
 
+        print(f"input_path = {input_path} has the following files")
+        for filename in os.listdir(input_path):
+            print(filename)
+        print(f"output_path = {output_path} has the following files")
+        for filename in os.listdir(output_path):
+            print(filename)
+        print(f"input_files = {input_files}")
+        print(f"output_files = {output_file}")
+
         file_list, size_dict = self.dal._get_input_files(str(input_path), str(output_path), cm_files=0)
         result = (sorted(file_list), size_dict)
+
+        print(f"result = {result}")
+
         expected_result = (
             sorted([file.name for file in input_files if file.name != output_file.name]),
             self.size_stat_dict,
         )
+
+        print(f"expected_result = {expected_result}")
+
         input_files.append(output_file)
         self.cleanup(
             directories_to_remove=[input_path, output_path],
