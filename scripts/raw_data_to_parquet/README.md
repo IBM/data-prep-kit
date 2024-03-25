@@ -4,10 +4,10 @@
 This Python script is designed to convert raw data files, particularly ZIP files, into Parquet format. It is built to handle concurrent processing of multiple files using multiprocessing for efficient execution.
 Each file contained within the ZIP is transformed into a distinct row within the Parquet dataset, adhering to the below schema.
 
-**file_path:**
+**title:**
 
 - **Description:** Path to the file within the ZIP archive.
-- **Example:** `"file_path": "data/file.txt"`
+- **Example:** `"title": "data/file.txt"`
 
 **document:**
 

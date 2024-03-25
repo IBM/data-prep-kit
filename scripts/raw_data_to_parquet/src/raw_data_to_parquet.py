@@ -38,7 +38,7 @@ def zip_to_table(data_access: DataAccess, file_path) -> pa.table:
                         if content_string and len(content_string) > 0:
                             data.append(
                                 {
-                                    "file_path": member.filename,
+                                    "title": member.filename,
                                     "document": zip_name,
                                     "contents": content_string,
                                     "document_id": str(uuid.uuid4()),
@@ -58,7 +58,7 @@ def zip_to_table(data_access: DataAccess, file_path) -> pa.table:
                     except Exception as e:
                         print(f" skipping {member.filename} Error: {str(e)}")
 
-    table = pa.Table.from_pandas(pd.DataFrame(data))
+    table=pa.Table.from_pylist(data)
     return table
 
 

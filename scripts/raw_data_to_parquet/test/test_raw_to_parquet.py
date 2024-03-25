@@ -5,7 +5,6 @@ from unittest.mock import patch, MagicMock
 from parameterized import parameterized
 import unittest
 import pyarrow as pa
-import pandas as pd
 
 
 def create_test_zip(file_names, contents_list):
@@ -40,7 +39,7 @@ class TestZipToTable(unittest.TestCase):
                 ["file1.txt", "file2.csv"],
                 ["content of file1", "content of file2"],
                 [
-                    "file_path",
+                    "title",
                     "document",
                     "contents",
                     "document_id",
@@ -62,7 +61,7 @@ class TestZipToTable(unittest.TestCase):
         # Assertions
         self.assertTrue(table)
         self.assertListEqual(table.column_names, expected_column_names)
-        self.assertEqual(table.schema.field("file_path").type, pa.string())
+        self.assertEqual(table.schema.field("title").type, pa.string())
         self.assertEqual(table.schema.field("document").type, pa.string())
         self.assertEqual(table.schema.field("contents").type, pa.string())
         self.assertEqual(table.schema.field("document_id").type, pa.string())
@@ -108,7 +107,7 @@ class TestRawToParquet(unittest.TestCase):
 
     def test_process_zip_sucessfully(self):
         with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
-            mock_zip_to_table.return_value = pa.Table.from_pandas(pd.DataFrame([]))
+            mock_zip_to_table.return_value = pa.Table.from_pylist([])
             self.mock_data_access_instance.save_table.return_value = (0, {"k","v"})
             self.mock_data_access_instance.get_output_location.return_value = (
                 "output_file.parquet"
@@ -124,7 +123,7 @@ class TestRawToParquet(unittest.TestCase):
                 "test.zip"
             )
             self.mock_data_access_instance.save_table.assert_called_once_with(
-                "output_file.parquet", pa.Table.from_pandas(pd.DataFrame([]))
+                "output_file.parquet", pa.Table.from_pylist([])
             )
 
     def test_unsupported_file_type(self):
@@ -137,7 +136,7 @@ class TestRawToParquet(unittest.TestCase):
 
     def test_failed_to_upload(self):
         with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
-            mock_zip_to_table.return_value = pa.Table.from_pandas(pd.DataFrame([]))
+            mock_zip_to_table.return_value = pa.Table.from_pylist([])
             self.mock_data_access_instance.save_table.return_value = (0, {})
 
             result = raw_to_parquet(self.mock_data_access_factory_instance, "test.zip")
@@ -149,7 +148,7 @@ class TestRawToParquet(unittest.TestCase):
 
     def test_exception_handling(self):
         with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
-            mock_zip_to_table.return_value = pa.Table.from_pandas(pd.DataFrame([]))
+            mock_zip_to_table.return_value = pa.Table.from_pylist([])
             self.mock_data_access_instance.save_table.side_effect = Exception(
                 "Test exception"
             )
