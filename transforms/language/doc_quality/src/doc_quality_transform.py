@@ -246,36 +246,8 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    # # create launcher
-    # launcher = TransformLauncher(transform_runtime_config=DocQualityTransformConfiguration())
-    # logger.info("Launching Doc Quality transform")
-    # # launch
-    # launcher.launch()
-
-    config = {
-        "ft_lang": "en",
-        "bad_word_filepath": "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/",
-        "MODEL_DIR": "../lm_sp/",
-    }
-    docq = DocQualityTransform(config)
-
-    in_table = pa.Table.from_pydict(
-        {
-            "document_id": pa.array(["doc01", "doc02"]),
-            "contents": pa.array(
-                [
-                    " : This documents is for test . ? ",
-                    "This javascript has Lore ipsum. It also has strong word {big black}. * 100",
-                ]
-            ),
-        }
-    )
-    out_table, metadata = docq.transform(in_table)
-
-    # import pandas as pd
-    # pd.set_option("display.max_rows", None)
-    # pd.set_option("display.max_columns", None)
-    # out_table = out_table[0].to_pandas()
-
-    print(f"\n== out: {out_table}")
-    print(f"\n== metadata: {metadata}")
+    # create launcher
+    launcher = TransformLauncher(transform_runtime_config=DocQualityTransformConfiguration())
+    logger.info("Launching Doc Quality transform")
+    # launch
+    launcher.launch()
