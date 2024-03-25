@@ -7,7 +7,7 @@ from doc_quality_transform import DocQualityTransformConfiguration
 
 docq_params = {
     "ft_lang": "en",
-    "bad_word_filepath": "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/",
+    "bad_word_filepath": "../test-data/docq/ldnoobw/",
     "MODEL_DIR": "../lm_sp/",
 }
 

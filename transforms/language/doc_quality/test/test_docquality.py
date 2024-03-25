@@ -8,7 +8,6 @@ from doc_quality_transform import DocQualityTransform
 """
 input table:
 """
-
 table = pa.Table.from_pydict(
     {"document_id": pa.array(["doc01"]), "contents": pa.array([" : This documents is for test . ? "])}
 )
@@ -21,7 +20,6 @@ expected output table:
 schema = table.schema
 data = table.to_pydict()
 expected_table = pa.Table.from_pydict(data, schema=schema)
-
 
 expected_table = expected_table.append_column("docq_total_words", pa.array([8]))
 expected_table = expected_table.append_column("docq_mean_word_len", pa.array([3.125]))
@@ -36,7 +34,6 @@ expected_table = expected_table.append_column("docq_alphabet_word_ratio", pa.arr
 expected_table = expected_table.append_column("docq_contain_common_en_words", pa.array([False]))
 expected_table = expected_table.append_column("metakenlm_docq_perplex_score", pa.array([6709.1]))
 
-
 expected_metadata_list = [{"total_docs_count": 1}, {}]
 
 
@@ -45,7 +42,7 @@ Config (parameter settings) for the run:
 """
 config = {
     "ft_lang": "en",
-    "bad_word_filepath": "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/",
+    "bad_word_filepath": "../test-data/docq/ldnoobw/",
     "MODEL_DIR": "../lm_sp/",
 }
 

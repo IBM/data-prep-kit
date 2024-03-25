@@ -212,6 +212,16 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
             default="contents",
             help="column name that contain document text",
         )
+        parser.add_argument(
+            "--bad_word_filepath",
+            default="../test-data/docq/ldnoobw/",
+            help="path to bad word file",
+        )
+        parser.add_argument(
+            "--MODEL_DIR",
+            default="../lm_sp/",
+            help="path to model",
+        )
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
@@ -222,6 +232,8 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["ft_lang"] = args.ft_lang
         self.params["drop_column_if_existed"] = args.drop_column_if_existed
         self.params["col_name"] = args.col_name
+        self.params["bad_word_filepath"] = args.bad_word_filepath
+        self.params["MODEL_DIR"] = args.MODEL_DIR
         return True
 
     def get_transform_metadata(self) -> dict[str, Any]:
@@ -260,12 +272,10 @@ if __name__ == "__main__":
     )
     out_table, metadata = docq.transform(in_table)
 
-    import pandas as pd
-
-    pd.set_option("display.max_rows", None)
-    pd.set_option("display.max_columns", None)
-
-    out_table = out_table[0].to_pandas()
+    # import pandas as pd
+    # pd.set_option("display.max_rows", None)
+    # pd.set_option("display.max_columns", None)
+    # out_table = out_table[0].to_pandas()
 
     print(f"\n== out: {out_table}")
     print(f"\n== metadata: {metadata}")
