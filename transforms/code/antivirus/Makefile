@@ -13,7 +13,7 @@ venv::	.transforms.venv
 	@$(DOCKER) build --target clamav-local -f Dockerfile -t clamav-local:latest .
 	@rm -rf .tmp && mkdir .tmp && chmod 777 .tmp
 	@echo "$(DOCKER) run -d --name clamav -v \$$PWD/.tmp:/var/run/clamav clamav-local:latest" >> ./venv/bin/activate
-	@sed -i -e "s/deactivate () {/deactivate () {\nfor c in \`docker ps -a | grep clamav | cut -f1 -d ' '\`; do $(DOCKER) rm -f -v \$$c; done/" ./venv/bin/activate
+	@sed -i -e "s/deactivate () {/deactivate () {\nfor c in \`$(DOCKER) ps -a | grep clamav | cut -f1 -d ' '\`; do $(DOCKER) rm -f -v \$$c; done/" ./venv/bin/activate
 
 build::	.transforms.build
 

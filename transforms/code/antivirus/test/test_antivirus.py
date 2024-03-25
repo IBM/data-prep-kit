@@ -1,10 +1,31 @@
 import os
+import time
 from typing import Tuple
 
+import clamd
 import pyarrow as pa
 from data_processing.test_support.transform.transform_test import AbstractTransformTest
+from data_processing.utils import get_logger
 from antivirus_transform import AntivirusTransform
 
+
+TEST_SOCKET = os.path.abspath(os.path.join(os.getcwd(), "..", ".tmp/clamd.ctl"))
+INIT_TIMEOUT_SEC=60
+logger = get_logger(__name__)
+cd = clamd.ClamdUnixSocket(TEST_SOCKET)
+check_end = time.time() + INIT_TIMEOUT_SEC
+while True:
+    try:
+        cd.ping()
+        break
+    except Exception as err:
+        if time.time() < check_end:
+            logger.debug('waiting until clamd is ready...')
+            time.sleep(1)
+        else:
+            logger.error(f"clamd didn't become ready in {INIT_TIMEOUT_SEC} sec. Please check if clamav container is running.")
+            raise err
+del cd
 
 table = pa.Table.from_pydict({
             'document_id': ['ID_1', 'ID_2'],
@@ -31,7 +52,7 @@ class TestAntivirusTransform(AbstractTransformTest):
                     {
                         "antivirus_input_column": "contents", 
                         "antivirus_output_column": "virus_detection",
-                        "antivirus_clamd_socket": os.path.abspath(os.path.join(os.getcwd(), "..", ".tmp/clamd.ctl"))
+                        "antivirus_clamd_socket": TEST_SOCKET
                     }
                 ),
                 [table],
