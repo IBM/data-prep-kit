@@ -21,8 +21,8 @@ docq_params = {
     "MODEL_DIR": "../lm_sp/",
 }
 s3_conf = {
-    "input_folder": "cos-optimal-llm-pile/bluepile-processing/he/opensource/input/",
-    "output_folder": "cos-optimal-llm-pile/bluepile-processing/he/opensource/output/",
+    "input_folder": "cos-optimal-llm-pile/test/hajar/input/",
+    "output_folder": "cos-optimal-llm-pile/test/hajar/output/",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
