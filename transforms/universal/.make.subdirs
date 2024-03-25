@@ -1,9 +1,10 @@
+# These ae passing
+split_file
+blocklisting
+noop
+
+# These are failing
 fdedup
-
-#blocklisting
-#noop
-#split_file
-
 #ededup
 #doc_id
 #coalesce
