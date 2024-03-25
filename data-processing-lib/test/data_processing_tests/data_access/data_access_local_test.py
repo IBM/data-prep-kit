@@ -305,7 +305,6 @@ class TestGetFilesToProcess(TestInit):
             out_path_2,
         ) = self.multiple_missing_files_setup()
 
-        logger.info(f"result = {result}")
         expected_result = (
             sorted(
                 [str(file.absolute()) for file in in_files_1 if file.absolute() != out_file_2.absolute()]
@@ -313,7 +312,6 @@ class TestGetFilesToProcess(TestInit):
             ),
             self.size_stat_dict_1,
         )
-        logger.info(f"expected_result = {expected_result}")
         self.multiple_missing_files_cleanup(
             in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
         )
@@ -352,9 +350,15 @@ class TestGetFilesToProcess(TestInit):
             out_path_2,
         ) = self.multiple_missing_files_setup()
         expected_result = ([str(in_files_1[-1].absolute())], self.size_stat_dict)
+
+        logger.info(f"result = {result}")
+        logger.info(f"in_files_1 = {in_files_1}")
+        logger.info(f"expected_result = {expected_result}")
+
         self.multiple_missing_files_cleanup(
             in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
         )
+        assert 1 == 0
         assert result == expected_result
 
     def test_non_existent_dataset(self):
