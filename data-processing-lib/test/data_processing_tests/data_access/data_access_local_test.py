@@ -13,6 +13,11 @@ KB = 1024
 MB = 1024 * KB
 GB = 1024 * MB
 
+from data_processing.utils import get_logger
+
+
+logger = get_logger(__name__)
+
 
 class TestInit:
     path_dict = {
@@ -157,26 +162,13 @@ class TestGetInputFiles(TestInit):
             file.touch()
         output_file.touch()
 
-        print(f"input_path = {input_path} has the following files")
-        for filename in os.listdir(input_path):
-            print(filename)
-        print(f"output_path = {output_path} has the following files")
-        for filename in os.listdir(output_path):
-            print(filename)
-        print(f"input_files = {input_files}")
-        print(f"output_files = {output_file}")
-
         file_list, size_dict = self.dal._get_input_files(str(input_path), str(output_path), cm_files=0)
         result = (sorted(file_list), size_dict)
-
-        print(f"result = {result}")
 
         expected_result = (
             sorted([file.name for file in input_files if file.name != output_file.name]),
             self.size_stat_dict,
         )
-
-        print(f"expected_result = {expected_result}")
 
         input_files.append(output_file)
         self.cleanup(
@@ -312,6 +304,8 @@ class TestGetFilesToProcess(TestInit):
             in_path_2,
             out_path_2,
         ) = self.multiple_missing_files_setup()
+
+        logger.info(f"result = {result}")
         expected_result = (
             sorted(
                 [str(file.absolute()) for file in in_files_1 if file.absolute() != out_file_2.absolute()]
@@ -319,9 +313,11 @@ class TestGetFilesToProcess(TestInit):
             ),
             self.size_stat_dict_1,
         )
+        logger.info(f"expected_result = {expected_result}")
         self.multiple_missing_files_cleanup(
             in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
         )
+
         assert result == expected_result
 
         self.dal.checkpoint = False
