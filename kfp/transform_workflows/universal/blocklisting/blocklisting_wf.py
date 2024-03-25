@@ -35,10 +35,10 @@ PREFIX: str = "blocklist"
 )
 def blocklisting(
     ray_name: str = "blocklisting-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop-guf:0.0.1",\
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/blocklist:guftest",\
              "image_pull_secret": "prod-all-icr-io"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/blocklisting-guf:0.0.1"}',
+            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/blocklist:guftest"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
     lh_config: str = "None",
@@ -46,11 +46,11 @@ def blocklisting(
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     s3_access_secret: str = "cos-access",
-    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/doc_annotation_test/input/noop_small/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_noop_guf/'}",
+    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklost_guf/'}",
     blocklist_annotation_column_name: str = "blocklisted",
     blocklist_source_url_column_name: str = "title",
     blocklist_blocked_domain_list_path: str = "",
-    blocklist_s3_config = "{'input_folder': 'cos-optimal-llm-pile/', 'output_folder': 'cos-optimal-llm-pile/'}",
+    blocklist_s3_config = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklost_guf/'}",
     blocklist_s3_access_secret: str = "cos-access",
 ) -> None:
     """
