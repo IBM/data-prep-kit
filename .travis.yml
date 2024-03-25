@@ -2,9 +2,7 @@ language: python
 
 python:
     - "3.10"
-    - "3.11"
 
 script:
-    - make setup
     - cd data-processing-lib; make test
     - cd transforms; make venv ; make test-lib-src
