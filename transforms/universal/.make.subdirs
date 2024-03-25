@@ -1,8 +1,9 @@
 blocklisting
-ededup
-fdedup
 noop
-split_file
+fdedup
+#split_file
+
+#ededup
 #doc_id
 #coalesce
 #tokenization
