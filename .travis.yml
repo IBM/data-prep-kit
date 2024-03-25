@@ -7,15 +7,14 @@ python:
 env:
     jobs:
         - DOCKER=docker
-        - DOCKER=podman
 
 # Enable/install podman
-before_install:
-    - sudo apt-get update
-    - sudo apt-get -y install podman
-    - podman machine init
-    - podman machine start
-    - podman info
+#before_install:
+#    - sudo apt-get update
+#    - sudo apt-get -y install podman
+#    - podman machine init
+#    - podman machine start
+#    - podman info
 
 script:
     - cd data-processing-lib
