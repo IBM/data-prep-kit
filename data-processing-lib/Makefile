@@ -4,8 +4,6 @@ include ../.make.defaults
 VERSION=0.2.0
 TAG := "v${VERSION}"
 LIBNAME=fm_data_processing
-PYTHON=python
-PYTEST=pytest
 ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local
 
 clean::
@@ -27,7 +25,7 @@ setup::
 
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
-	${PYTHON} -m pip install --upgrade build
+	${PIP} --upgrade build
 	${PYTHON} -m build
 
 publish:: .check-env
@@ -48,9 +46,9 @@ venv::	pyproject.toml .check-env
 	echo '[global]' > venv/pip.conf
 	echo "extra-index-url = https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple" >> venv/pip.conf
 	source venv/bin/activate; 	\
-	pip install --upgrade pip;	\
-	pip install -e .;		\
-	pip install pytest pytest-cov 
+	$(PIP) install --upgrade pip;	\
+	$(PIP) install -e .;		\
+	$(PIP) install pytest pytest-cov 
 
 # Here we run each test directory of tests and each ray launched test separately, because
 # it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.
