@@ -15,9 +15,14 @@ s3_cred = {
     "secret_key": DPFConfig.S3_SECRET_KEY,
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
+docq_params = {
+    "ft_lang": "en",
+    "bad_word_filepath": "../test-data/docq/ldnoobw/",
+    "MODEL_DIR": "../lm_sp/",
+}
 s3_conf = {
-    "input_folder": "cos-optimal-llm-pile/test/hajar/input/",
-    "output_folder": "cos-optimal-llm-pile/test/hajar/output/",
+    "input_folder": "cos-optimal-llm-pile/bluepile-processing/he/opensource/input/",
+    "output_folder": "cos-optimal-llm-pile/bluepile-processing/he/opensource/output/",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
@@ -33,11 +38,8 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    "noop_sleep_sec": 5,
 }
-sys.argv = ParamsUtils.dict_to_req(d=params)
-# for arg in sys.argv:
-#     print(arg)
+sys.argv = ParamsUtils.dict_to_req(d=params | docq_params)
 
 # launch
 launcher.launch()
