@@ -16,13 +16,6 @@ from dotenv import load_dotenv
 logger = get_logger(__name__)
 
 
-# BAD_WORD_DIR = "cos-optimal-llm-pile/bluepile-processing/docq/ldnoobw/"
-# BAD_WORD_DIR = "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/"   #local
-
-# MODEL_DIR = "cos-optimal-llm-pile/bluepile-processing/lm_sp/"
-# MODEL_DIR = "../lm_sp/"       #local
-
-
 class DocQualityTransform(AbstractTableTransform):
     """
     Implements various docuement quality metrics to documents in a pyarrow Table.
