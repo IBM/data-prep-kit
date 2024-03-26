@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from doc_quality_transform import DocQualityTransform, DocQualityTransformConfiguration
+from docquality_transform import DocQualityTransform, DocQualityTransformConfiguration
 
 
 # create parameters

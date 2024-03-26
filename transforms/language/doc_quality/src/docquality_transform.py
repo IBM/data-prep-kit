@@ -24,7 +24,7 @@ class DocQualityTransform(AbstractTableTransform):
     def __init__(self, config: dict):
         """
         This class is used to transform an input table to an output table utilizing a doc quality annotator.
-        The input table must contain at least two columns, with default names set as `document_id` and `contents`.
+        The input table must contain at least two columns, by default named `document_id` and `contents`.
         The doc quality transformer will add document quality metrics to the input table.
         """
         from doc_c4_statistics import c4_load_ldnoobw_words
@@ -35,15 +35,16 @@ class DocQualityTransform(AbstractTableTransform):
         self.ft_lang = config.get("ft_lang", "en")
         self.bad_word_filepath = config.get(
             "bad_word_filepath" + self.ft_lang,
-            "~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/en",
+            "../test-data/docq/ldnoobw/en",
         )
-        self.col_name = config.get("col_name", "contents")
+        self.docq_doc_content_column = config.get("docq_doc_content_column", "contents")
+        self.docq_doc_id_column = config.get("docq_doc_id_column", "document_id")
 
         self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.ft_lang, file_path=self.bad_word_filepath)
-        self.MODEL_DIR = config.get("MODEL_DIR", "../lm_sp/")
+        self.model_dir = config.get("model_dir", "../lm_sp/")
         strip_accent = True
         self.klm = KenLMModel.from_pretrained(
-            model_path=self.MODEL_DIR, language=self.ft_lang, strip_accent=strip_accent
+            model_path=self.model_dir, language=self.ft_lang, strip_accent=strip_accent
         )
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
@@ -99,7 +100,7 @@ class DocQualityTransform(AbstractTableTransform):
             docq_avg_ja_sentence_len = []
             docq_first_ja_alphabet_pos = []
 
-        for text in table[self.col_name].to_pylist():
+        for text in table[self.docq_doc_content_column].to_pylist():
             total_words, mean_word_len, symbol_to_word_ratio = compute_word_statistics(text)
             docq_total_words.append(total_words)
             docq_mean_word_len.append(mean_word_len)
@@ -181,9 +182,14 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
             default="en",
         )
         parser.add_argument(
-            "--col_name",
+            "--docq_doc_content_column",
             default="contents",
             help="column name that contain document text",
+        )
+        parser.add_argument(
+            "--docq_doc_id_column",
+            default="document_id",
+            help="column name that contain document id",
         )
         parser.add_argument(
             "--bad_word_filepath",
@@ -191,7 +197,7 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
             help="path to bad word file",
         )
         parser.add_argument(
-            "--MODEL_DIR",
+            "--model_dir",
             default="../lm_sp/",
             help="path to model",
         )
@@ -203,9 +209,10 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         self.params["ft_lang"] = args.ft_lang
-        self.params["col_name"] = args.col_name
+        self.params["docq_doc_content_column"] = args.docq_doc_content_column
+        self.params["docq_doc_id_column"] = args.docq_doc_id_column
         self.params["bad_word_filepath"] = args.bad_word_filepath
-        self.params["MODEL_DIR"] = args.MODEL_DIR
+        self.params["model_dir"] = args.model_dir
         return True
 
     def get_transform_metadata(self) -> dict[str, Any]:

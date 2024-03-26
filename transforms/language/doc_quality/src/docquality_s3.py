@@ -3,7 +3,7 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import DPFConfig, ParamsUtils
-from doc_quality_transform import DocQualityTransformConfiguration
+from docquality_transform import DocQualityTransformConfiguration
 
 
 print(os.environ)
@@ -17,8 +17,9 @@ s3_cred = {
 }
 docq_params = {
     "ft_lang": "en",
+    "docq_doc_content_column": "contents",
     "bad_word_filepath": "../test-data/docq/ldnoobw/",
-    "MODEL_DIR": "../lm_sp/",
+    "model_dir": "../lm_sp/",
 }
 s3_conf = {
     "input_folder": "cos-optimal-llm-pile/test/hajar/input/",
