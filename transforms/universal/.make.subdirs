@@ -1,6 +1,7 @@
 # These ae passing
 blocklisting
 noop
+tokenization
 
 # These are failing
 #split_file
@@ -8,4 +9,4 @@ noop
 #ededup
 #doc_id
 #coalesce
-#tokenization
+
