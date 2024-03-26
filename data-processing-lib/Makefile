@@ -1,7 +1,7 @@
 # Use make help, to see the available rules
 include ../.make.defaults
 
-VERSION=0.2.0
+VERSION=0.3.0
 TAG := "v${VERSION}"
 LIBNAME=fm_data_processing
 ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local
@@ -25,7 +25,7 @@ setup::
 
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
-	${PIP} --upgrade build
+	${PIP} install --upgrade build
 	${PYTHON} -m build
 
 publish:: .check-env
