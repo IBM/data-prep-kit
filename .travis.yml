@@ -1,10 +1,31 @@
-language: python
+os: linux
 
+language: python
 python:
     - "3.10"
-    - "3.11"
+
+env:
+    jobs:
+        - DOCKER=docker
+
+branches:
+    only:
+        - dev
+        - main
+
+# Enable/install podman
+#before_install:
+#    - sudo apt-get update
+#    - sudo apt-get -y install podman
+#    - podman machine init
+#    - podman machine start
+#    - podman info
 
 script:
-    - make setup
-    - cd data-processing-lib; make test
-    - cd transforms; make venv ; make test-lib-src
+    - cd data-processing-lib
+    - echo pwd=$(pwd)
+    - make DOCKER=$DOCKER venv test
+    - echo pwd=$(pwd)
+    - cd ../transforms
+    - echo pwd=$(pwd)
+    - make DOCKER=$DOCKER venv test-lib-src
