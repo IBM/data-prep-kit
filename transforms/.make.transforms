@@ -14,17 +14,14 @@
 # 	rm -rf other-stuff
 #
 #######################################################################################
+include $(REPOROOT)/.make.defaults
+
 DOCKER=podman
 DOCKER_FILE=Dockerfile
 DOCKER_REGISTRY=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
 EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
 
-# Command to run python 
-PYTHON=python
-PIP=$(PYTHON) -m pip
-PYTHON_VERSION=$(shell python --version)
-# Command to run pytest
-PYTEST=pytest
+PYTHON_VERSION=$(shell $(PYTHON) --version)
 
 # The following taken from https://stackoverflow.com/a/65243296/45375
 # Lists all targets and optional help text found in the target.
@@ -54,7 +51,7 @@ help::
 	major=$$(echo $$version | awk -F. '{print $$1}');		\
 	minor=$$(echo $$version | awk -F. '{print $$2}');		\
 	if [ $$major -lt 3 -o $$minor -lt 10 -o $$minor -gt 12 ]; then	\
-		echo Python 3.10 or 3.11 is required;			\
+		echo Python 3.10 or 3.11 is required, but got $$version;	\
 		echo Try overriding PYTHON=$(PYTHON).  For example, "'"make PYTHON=python3.10" ...'"; 	\
 		exit 1;							\
 	fi
@@ -78,6 +75,8 @@ help::
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
 # We install wheel, because it seems to be required for fasttext install on redhat.
+# We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
+# they will end up installing into that PYTHON and NOT the venv.
 .PHONY: .transforms.venv
 .transforms.venv::	requirements.txt .transforms.check_python_version
 	@$(MAKE) .transforms.check_env	# Put this first so we don't get its help
@@ -87,11 +86,11 @@ help::
 	    echo '[global]' > venv/pip.conf;					\
 	    echo "extra-index-url = $(EXTRA_ARTIFACTORY_URL)" >> venv/pip.conf;	\
 	fi
-	. venv/bin/activate;			\
-	$(PIP) install --upgrade pip;		\
-	$(PIP) install wheel;			\
-	$(PIP) install -r requirements.txt;	\
-	$(PIP) install pytest;			\
+	@source venv/bin/activate;		\
+	pip install --upgrade pip;		\
+	pip install wheel;			\
+	pip install -r requirements.txt;	\
+	pip install pytest;			\
 
 .transforms.check_env::
 	@# Help: Make sure Artifactory credentials are in the environment variables. 
@@ -113,8 +112,8 @@ help::
 	@# Help: Install the source from the data processing library for $(PYTHON) 
 	@echo Installing source from data processing library for venv 
 	@source venv/bin/activate;					\
-	$(PIP) uninstall -y fm-data-processing;			\
-	$(PIP) install 						\
+	pip uninstall -y fm-data-processing;			\
+	pip install 						\
 		--extra-index-url $(EXTRA_ARTIFACTORY_URL)		\
 		-e $(REPOROOT)/data-processing-lib/;			\
 	if [ $$? -eq 0 ]; then	\
