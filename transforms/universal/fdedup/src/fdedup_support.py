@@ -12,7 +12,8 @@ from data_processing.utils import TransformUtils, RANDOM_SEED, GB, get_logger
 
 NO_SIMILARITY = -1
 REQUEST_LEN = 4096
-LONG_BUCKET = 10000
+LONG_BUCKET = 5000
+LONG_BUCKET_PRINT = 1000
 
 
 def find(s: str, ch: str) -> list[int]:
@@ -404,6 +405,7 @@ class BucketsHashProcessor:
             unvisited = set(bucket)
 
             # combine similar documents
+            index = 0
             while len(unvisited) > 0:
                 current_doc_id = unvisited.pop()
                 current_mh = hashes[current_doc_id][1]
@@ -417,6 +419,11 @@ class BucketsHashProcessor:
                             unvisited.discard(other_doc_id)
                 if len(current_set) > 0:
                     set_list.append(current_set)
+                index += 1
+                if index % LONG_BUCKET_PRINT == 0:
+                    self.logger.info(f"processing very long {bucket_len} bucket, {index} documents so far")
+            if index > LONG_BUCKET_PRINT:
+                self.logger.info(f"done processing very long {bucket_len}")
 
             # process created sets
             for current_set in set_list:
@@ -474,14 +481,14 @@ class BucketsHashProcessorInvoker(object):
         # Get completed results
         if self.submitted < self.n_processors:  # still have room
             self.pool.submit(lambda a, v: a.process_buckets.remote(v), buckets)
-            self.logger.info("Submitted bucket processing request")
+            self.logger.debug("Submitted bucket processing request")
             self.submitted += 1
             return
         else:
             self.pool.get_next_unordered()
-            self.logger.info("Completed bucket processing request")
+            self.logger.debug("Completed bucket processing request")
             self.pool.submit(lambda a, v: a.process_buckets.remote(v), buckets)
-            self.logger.info("Submitted bucket processing request")
+            self.logger.debug("Submitted bucket processing request")
             return
 
     def wait_for_completion(self) -> None:

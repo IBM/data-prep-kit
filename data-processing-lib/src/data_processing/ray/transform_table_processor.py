@@ -47,12 +47,13 @@ class TransformTableProcessor:
         logger.debug(f"Begin processing file {f_name}")
         if self.data_access is None:
             logger.warning("No data_access found. Returning.")
-            return
+        return
         t_start = time.time()
         # Read source table
         table = self.data_access.get_table(path=f_name)
         if table is None:
             logger.warning("File read resulted in None. Returning.")
+            self.stats.add_stats.remote({"failed_reads": 1})
             return
         if self.base_table_stats:
             self.stats.add_stats.remote({"source_files": 1, "source_size": table.nbytes})
@@ -65,8 +66,8 @@ class TransformTableProcessor:
                 logger.debug(f"Done transforming table from {f_name}")
             else:
                 logger.info(f"table: {f_name} is empty, skipping processing")
-                out_tables = [table]
-                stats = {}
+                self.stats.add_stats.remote({"skipped empty tables": 1})
+                return
             # save results
             self._submit_table(f_name=f_name, t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
@@ -121,6 +122,9 @@ class TransformTableProcessor:
                                     "table_processing": time.time() - t_start,
                                 }
                             )
+                    else:
+                        logger.warning(f"Failed to write file {output_name}")
+                        self.stats.add_stats.remote({"failed_writes": 1})
             case _:
                 # we have more then 1 table
                 table_sizes = 0
@@ -133,9 +137,11 @@ class TransformTableProcessor:
                         table_sizes += out_tables[index].nbytes
                         logger.debug(f"Writing transformed file {f_name}, {index + 1} of {count}  to {output_name_indexed}")
                         output_file_size, save_res = self.data_access.save_table(
-                            path=f"{output_file_name}_{index}.parquet", table=out_tables[index]
+                            path=output_name_indexed, table=out_tables[index]
                         )
                         if save_res is None:
+                            logger.warning(f"Failed to write file {output_name_indexed}")
+                            self.stats.add_stats.remote({"failed_writes": 1})
                             break
                 if self.base_table_stats:
                     self.stats.add_stats.remote(
