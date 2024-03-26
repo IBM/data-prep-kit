@@ -18,9 +18,9 @@ from data_processing.transform import AbstractTableTransform
 from data_processing.utils import get_logger
 logger = get_logger(__name__)
 
-from tokenization_utils import split_text, load_tokenizer
-import sys
-CHUNK_INTERVAL = 100
+from tokenization_utils import split_text, load_tokenizer, is_valid_argument_string
+
+CHUNK_CHECKPOINT_INTERVAL = 100
 
 class TokenizationTransform(AbstractTableTransform):
     """
@@ -94,7 +94,7 @@ class TokenizationTransform(AbstractTableTransform):
                         token_line.extend(self.tokenizer(chunk)["input_ids"])
                         doc_len_so_far += len(chunk)
 
-                        if (chunk_idx+1)%CHUNK_INTERVAL==0 or (doc_len_so_far==doc_length):
+                        if (chunk_idx+1)%CHUNK_CHECKPOINT_INTERVAL==0 or (doc_len_so_far == doc_length):
                             elapse_time = int(time.time() - start_time)
                             logger.info(f"row_idx: {idx:5,} "
                                         f"(doc_id: {doc_id}) "
@@ -207,6 +207,13 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
         if args.tkn_tokenizer is None:
             logger.error(f"Parameter --tkn_tokenizer must be a valid tokenizer for tokenization, you specified {args.tkn_tokenizer}")
             return False
+
+        if args.tkn_tokenizer_args is not None:
+            if not is_valid_argument_string(args.tkn_tokenizer_args):
+                logger.error(
+                    f"Parameter --tkn_tokenizer_args must be a valid argument string of `key1=value1,key2=value2`, you specified {args.tkn_tokenizer_args}")
+                return False
+
 
         if args.tkn_doc_id_column is None or args.tkn_doc_content_column is None:
             logger.error(f"Values for `--tkn_doc_id_column` and `--tkn_doc_content_column` must be provided")

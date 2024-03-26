@@ -8,7 +8,7 @@ logger = get_logger(__name__)
 # local_tokenizer = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tokenizers", "gpt2_based"))
 
 from transformers import AutoTokenizer
-
+import re
 
 def split_text(text: str, chunk_size: int, text_lang: str) -> str:
     """
@@ -142,3 +142,27 @@ def load_tokenizer(tokenizer_name: str,tokenizer_args:dict):
         raise RuntimeError(e)
 
     return tokenizer
+
+def is_valid_argument_string(s:str) -> bool:
+    """
+    This is to initially check whether a given string contains valid key=value pairs
+    for arguments of a tokenizer.
+    :param s: string that will be checked whether being valid
+    to be converted to key=value pairs. An example of a valid input string:
+        s="cache_dir=/tmp/hf,use_auth_token=hf_huZIVsYjFNYBiZAjLapBngwSlgP"
+    :return: boolean indicating whether s is valid string for arguments
+    """
+
+    pattern = r'^\s*\w+\s*=\s*\S+\s*$'
+
+    # split s into pairs based on comma:
+    pairs = s.split(',')
+
+    # check valid of key=value pair:
+    for pair in pairs:
+        if not re.match(pattern, pair):
+            return False
+        # Additional check for consecutive equal signs:
+        if '==' in pair:
+            return False
+    return True
