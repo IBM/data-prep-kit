@@ -56,11 +56,11 @@ class AbstractTest:
             assert t1.schema == t2.schema, f"Schema of the two tables is not the same"
             rows1 = t1.num_rows
             rows2 = t2.num_rows
-            assert rows1 == rows2, f"Number of rows in table #{i} ({l1}) does not match expected number ({l2})"
+            assert rows1 == rows2, f"Number of rows in table #{i} ({rows1}) does not match expected number ({rows2})"
             for j in range(rows1):
                 r1 = t1.take([j])
                 r2 = t2.take([j])
-                assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {2}"
+                assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {r2}"
 
     @staticmethod
     def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
@@ -141,7 +141,12 @@ class AbstractTest:
             if "parquet" in file:
                 # It seems file can be different on disk, but contain the same column/row values.
                 # so for these, do the inmemory comparison.
-                AbstractTest._validate_table_files(expected, src)
+                try:
+                    AbstractTest._validate_table_files(expected, src)
+                except AssertionError as e:
+                    logger.info(f"Copying file with difference: {src} to {dest}")
+                    shutil.copyfile(src, dest)
+                    raise e
             elif "metadata" in file:
                 pass
             else:
