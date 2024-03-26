@@ -46,11 +46,11 @@ def blocklisting(
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     s3_access_secret: str = "cos-access",
-    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklost_guf/'}",
+    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklist_guf/'}",
     blocklist_annotation_column_name: str = "blocklisted",
     blocklist_source_url_column_name: str = "title",
-    blocklist_blocked_domain_list_path: str = "",
-    blocklist_s3_config = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklost_guf/'}",
+    blocklist_blocked_domain_list_path: str = "cos-optimal-llm-pile/doc_annotation_test/domains",
+    blocklist_s3_config = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklist_guf/'}",
     blocklist_s3_access_secret: str = "cos-access",
 ) -> None:
     """
