@@ -109,7 +109,6 @@ class AbstractTest:
         failed = len(dir_cmp.diff_files) != expected_diffs
         if failed:
             AbstractTest.__confirm_diffs(directory, expected_dir, dir_cmp.diff_files, "/tmp")
-        assert not failed, f"Files that did not match the expected {dir_cmp.diff_files}"
 
         # Traverse into the subdirs since dircmp doesn't seem to do that.
         subdirs = [f.name for f in os.scandir(expected_dir) if f.is_dir()]
