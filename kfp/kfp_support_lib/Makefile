@@ -4,16 +4,18 @@ REPOROOT=../..
 
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/\$\([A-Z_]*\)\-\([a-z]*\)/{\1\}\-\2/g' | sed 's/=/:=/' | sed 's/^/export /' >> makeenv")
-include makeenv
 
+include makeenv
 # Include the common rules.
 # Use "make help" to see them.
 include ../../.make.defaults
 
 LIBNAME=fm_data_processing_kfp
 PYTHON=python
-PYTEST=pytest
-PYTHON_VERSION=$(shell ${PYTHON} --version)
+PIP=$(PYTHON) -m pip
+# Command to run pytest
+PYTEST=pytest -s
+PYTHON_VERSION=$(shell $(PYTHON) --version)
 VENV_ACTIVATE=venv/bin/activate
 
 clean::
@@ -21,18 +23,6 @@ clean::
 	rm -r dist venv
 	rm -rf src/*egg-info
 	rm makeenv
-
-.PHONY: .check_python_version
-.check_python_version::
-	@version=$$(echo $(PYTHON_VERSION) | sed -e 's/Python[ ]*//');  \
-		major=$$(echo $$version | awk -F. '{print $$1}');               \
-		minor=$$(echo $$version | awk -F. '{print $$2}');               \
-		if [ $$major -lt 3 -o $$minor -lt 10 -o $$minor -gt 12 ]; then  \
- 		echo Python 3.10 or 3.11 is required;                   \
-		echo Try overriding PYTHON=$(PYTHON).  For example, "'"make PYTHON=python3.10" ...'";   \
-		exit 1;                                                 \
-	fi
-
 
 .check-env:: .check_python_version
 	$(call check_defined, FM_DATA_PROCESSING_KFP)

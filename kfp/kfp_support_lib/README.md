@@ -50,7 +50,7 @@ To begin with, establish a Kind cluster and deploy all required components by ex
 make setup
 ```
 
-The next step is to deploy the `fm_data_processing_kfp` package locally within a Python virtual environment. To do this, execute the following command from the package directory:
+The next step is to deploy the `fm_data_processing_kfp` package locally within a Python virtual environment. To do this, "set the artifactory credentials, if you have not set it before:
 
 ```bash
 export ARTIFACTORY_USER=<artifactory-user>
