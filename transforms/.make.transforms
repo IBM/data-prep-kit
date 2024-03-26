@@ -22,7 +22,7 @@ EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifa
 # Command to run python 
 PYTHON=python
 PIP=$(PYTHON) -m pip
-PYTHON_VERSION=$(shell ${PYTHON} --version)
+PYTHON_VERSION=$(shell python --version)
 # Command to run pytest
 PYTEST=pytest
 
