@@ -9,4 +9,5 @@ RUN pip install --no-cache-dir -r  requirements.txt
 RUN rm requirements.txt
 
 COPY ./src/tokenizer_transform.py .
+COPY ./src/tokenization_utils.py .
 ENV PYTHONPATH /home/ray
