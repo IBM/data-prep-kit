@@ -1,9 +1,11 @@
 import os
+import shutil
 from abc import abstractmethod
 from argparse import ArgumentParser
 from filecmp import dircmp
 
 import pyarrow as pa
+from data_processing.data_access import DataAccessLocal
 from data_processing.ray import DefaultTableTransformConfiguration
 from data_processing.utils import get_logger
 
@@ -101,9 +103,13 @@ class AbstractTest:
         if "metadata.json" in dir_cmp.diff_files:
             # metadata.json has things like dates and times and output folders.
             logger.warning("Differences in metadata.json being ignored for now.")
-            assert len(dir_cmp.diff_files) == 1, f"Files that did not match the expected {dir_cmp.diff_files}"
+            expected_diffs = 1
         else:
-            assert len(dir_cmp.diff_files) == 0, f"Files that did not match the expected {dir_cmp.diff_files}"
+            expected_diffs = 0
+        failed = len(dir_cmp.diff_files) != expected_diffs
+        if failed:
+            AbstractTest._debug_diffs(directory, expected_dir, dir_cmp.diff_files, "/tmp")
+        assert not failed, f"Files that did not match the expected {dir_cmp.diff_files}"
 
         # Traverse into the subdirs since dircmp doesn't seem to do that.
         subdirs = [f.name for f in os.scandir(expected_dir) if f.is_dir()]
@@ -111,3 +117,33 @@ class AbstractTest:
             d1 = os.path.join(directory, subdir)
             d2 = os.path.join(expected_dir, subdir)
             AbstractTest.validate_directory_contents(d1, d2)
+
+    @staticmethod
+    def _show_diff(parquet1: str, parquet2: str):
+        da = DataAccessLocal()
+        t1 = da.get_table(parquet1)
+        t2 = da.get_table(parquet2)
+        try:
+            # Just execute for its messages.
+            AbstractTest.validate_expected_tables([t1], [t2])
+        except:
+            pass
+
+    @staticmethod
+    def _debug_diffs(src_dir: str, expected_dir: str, diff_files: list, dest_dir: str):
+        """
+        Copy all files from the source dir to the dest dir.
+        :param src_dir:
+        :param expected_dir:
+        :param diff_files:
+        :param dest_dir:
+        :return:
+        """
+        for file in diff_files:
+            expected = os.path.join(expected_dir, file)
+            src = os.path.join(src_dir, file)
+            dest = os.path.join(dest_dir, file)
+            if "parquet" in file:
+                AbstractTest._show_diff(expected, src)
+            logger.info(f"Copying file with difference: {src} to {dest}")
+            shutil.copyfile(src, dest)
