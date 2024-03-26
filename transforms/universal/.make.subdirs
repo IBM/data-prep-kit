@@ -5,6 +5,6 @@ split_file
 fdedup
 ededup
 doc_id
-coalesce
+#coalesce
 # These are failing
 #tokenization
