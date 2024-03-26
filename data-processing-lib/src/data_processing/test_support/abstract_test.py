@@ -1,7 +1,6 @@
 import os
 import shutil
 from abc import abstractmethod
-from argparse import ArgumentParser
 from filecmp import dircmp
 
 import pyarrow as pa
@@ -47,6 +46,7 @@ class AbstractTest:
         """
         assert table_list is not None, "Transform output table is None"
         assert expected_table_list is not None, "Test misconfigured: expected table list is None"
+
         l1 = len(table_list)
         l2 = len(expected_table_list)
         assert l1 == l2, f"Number of transformed tables ({l1}) is not the expected number ({l2})"
@@ -54,10 +54,10 @@ class AbstractTest:
             t1 = table_list[i]
             t2 = expected_table_list[i]
             assert t1.schema == t2.schema, f"Schema of the two tables is not the same"
-            l1 = t1.num_rows
-            l2 = t2.num_rows
-            assert l1 == l2, f"Number of rows in table #{i} ({l1}) does not match expected number ({l2})"
-            for j in range(l1):
+            rows1 = t1.num_rows
+            rows2 = t2.num_rows
+            assert rows1 == rows2, f"Number of rows in table #{i} ({l1}) does not match expected number ({l2})"
+            for j in range(rows1):
                 r1 = t1.take([j])
                 r2 = t2.take([j])
                 assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {2}"
