@@ -16,9 +16,9 @@ def test_table_sampling_data():
     print(f"\nprofiled directory {input_folder}")
     print(f"profile {profile}")
     assert profile['estimated number of docs'] == 5.0
-    assert profile['max_file_size'] <  0.035
-    assert profile['min_file_size'] <  0.035
-    assert profile['total_file_size'] <  0.035
+    assert profile['max_file_size'] < 0.035
+    assert profile['min_file_size'] < 0.035
+    assert profile['total_file_size'] < 0.035
     assert profile['average table size MB'] < 0.016
 
 

@@ -13,16 +13,16 @@ fuzzy dedup and should not be modified.
 
 
 # change these parameters for specific use case
-number_of_docs = 5000000000
+number_of_docs = 2500000000
 # Fuzzy dedup params
 n_permutations = 64
 threshold = 0.7
 false_positive = 0.5
 false_negative = 0.5
 # Number of workers for initial run
-n_workers = 1500
+n_workers = 800
 # pod cpus
-ray_node_cpu = 30
+ray_node_cpu = 40
 # cpu sizes fo actors
 processor_cpu = 1.0
 bucket_cpu = .75
@@ -71,8 +71,8 @@ execution_required_memory = math.ceil(
 
 n_actors = int((0.85 * execution_required_memory - document_actors * doc_cpu) / processor_cpu)
 # cap n_actors not to overwhelm S3
-if n_actors > 2000:
-    n_actors = 2000
+if n_actors > 800:
+    n_actors = 800
 print(f"number of workers {n_actors}")
 
 
