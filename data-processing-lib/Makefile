@@ -46,9 +46,9 @@ venv::	pyproject.toml .check-env
 	echo '[global]' > venv/pip.conf
 	echo "extra-index-url = https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple" >> venv/pip.conf
 	source venv/bin/activate; 	\
-	$(PIP) install --upgrade pip;	\
-	$(PIP) install -e .;		\
-	$(PIP) install pytest pytest-cov 
+	pip install --upgrade pip;	\
+	pip install -e .;		\
+	pip install pytest pytest-cov 
 
 # Here we run each test directory of tests and each ray launched test separately, because
 # it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.
