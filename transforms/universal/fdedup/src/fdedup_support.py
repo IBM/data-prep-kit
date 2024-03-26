@@ -286,6 +286,7 @@ class BucketsHash:
                     ray.get(self.submitter.submit_for_processing.remote([b]))
             else:
                 ray.get(self.submitter.submit_for_processing.remote([bucket]))
+            self.logger.info("Done submitting long buckets")
 
         # And now the rest of buckets
         bucket_chunks = [short_buckets[i * 100:(i + 1) * 100] for i in range((len(short_buckets) + 99) // 100 )]
