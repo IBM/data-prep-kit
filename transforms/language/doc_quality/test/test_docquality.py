@@ -2,7 +2,7 @@ from typing import Tuple
 
 import pyarrow as pa
 from data_processing.test_support.transform.transform_test import AbstractTransformTest
-from doc_quality_transform import DocQualityTransform
+from docquality_transform import DocQualityTransform
 
 
 """
@@ -43,7 +43,7 @@ Config (parameter settings) for the run:
 config = {
     "ft_lang": "en",
     "bad_word_filepath": "../test-data/docq/ldnoobw/",
-    "MODEL_DIR": "../lm_sp/",
+    "model_dir": "../lm_sp/",
 }
 
 
