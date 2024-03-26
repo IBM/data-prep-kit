@@ -11,7 +11,7 @@ local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
-noop_params = {"noop_sleep_sec": 2}
+noop_params = {"sleep_sec": 2}
 if __name__ == "__main__":
     # Here we show how to run outside of ray
     # Create and configure the transform.

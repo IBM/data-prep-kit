@@ -1,8 +1,11 @@
 import os
+import shutil
 from abc import abstractmethod
 from filecmp import dircmp
 
 import pyarrow as pa
+from data_processing.data_access import DataAccessLocal
+from data_processing.ray import DefaultTableTransformConfiguration
 from data_processing.utils import get_logger
 
 
@@ -53,11 +56,11 @@ class AbstractTest:
             assert t1.schema == t2.schema, f"Schema of the two tables is not the same"
             rows1 = t1.num_rows
             rows2 = t2.num_rows
-            assert rows1 == rows2, f"Number of rows in table #{i} ({l1}) does not match expected number ({l2})"
+            assert rows1 == rows2, f"Number of rows in table #{i} ({rows1}) does not match expected number ({rows2})"
             for j in range(rows1):
                 r1 = t1.take([j])
                 r2 = t2.take([j])
-                assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {2}"
+                assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {r2}"
 
     @staticmethod
     def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
@@ -96,13 +99,16 @@ class AbstractTest:
         ), f"Files that could compare, but couldn't be read for some reason: {dir_cmp.funny_files}"
         assert len(dir_cmp.common_funny) == 0, f"Types of the following files don't match: {dir_cmp.common_funny}"
         assert len(dir_cmp.right_only) == 0, f"Files found only in expected output directory: {dir_cmp.right_only}"
-        assert len(dir_cmp.left_only) == 0, f"Files files missing in test output directory: {dir_cmp.left_only}"
+        assert len(dir_cmp.left_only) == 0, f"Files missing in test output directory: {dir_cmp.left_only}"
         if "metadata.json" in dir_cmp.diff_files:
             # metadata.json has things like dates and times and output folders.
             logger.warning("Differences in metadata.json being ignored for now.")
-            assert len(dir_cmp.diff_files) == 1, f"Files that did not match the expected {dir_cmp.diff_files}"
+            expected_diffs = 1
         else:
-            assert len(dir_cmp.diff_files) == 0, f"Files that did not match the expected {dir_cmp.diff_files}"
+            expected_diffs = 0
+        failed = len(dir_cmp.diff_files) != expected_diffs
+        if failed:
+            AbstractTest.__confirm_diffs(directory, expected_dir, dir_cmp.diff_files, "/tmp")
 
         # Traverse into the subdirs since dircmp doesn't seem to do that.
         subdirs = [f.name for f in os.scandir(expected_dir) if f.is_dir()]
@@ -110,3 +116,40 @@ class AbstractTest:
             d1 = os.path.join(directory, subdir)
             d2 = os.path.join(expected_dir, subdir)
             AbstractTest.validate_directory_contents(d1, d2)
+
+    @staticmethod
+    def _validate_table_files(parquet1: str, parquet2: str):
+        da = DataAccessLocal()
+        t1 = da.get_table(parquet1)
+        t2 = da.get_table(parquet2)
+        AbstractTest.validate_expected_tables([t1], [t2])
+
+    @staticmethod
+    def __confirm_diffs(src_dir: str, expected_dir: str, diff_files: list, dest_dir: str):
+        """
+        Copy all files from the source dir to the dest dir.
+        :param src_dir:
+        :param expected_dir:
+        :param diff_files:
+        :param dest_dir:
+        :return:
+        """
+        for file in diff_files:
+            expected = os.path.join(expected_dir, file)
+            src = os.path.join(src_dir, file)
+            dest = os.path.join(dest_dir, file)
+            if "parquet" in file:
+                # It seems file can be different on disk, but contain the same column/row values.
+                # so for these, do the inmemory comparison.
+                try:
+                    AbstractTest._validate_table_files(expected, src)
+                except AssertionError as e:
+                    logger.info(f"Copying file with difference: {src} to {dest}")
+                    shutil.copyfile(src, dest)
+                    raise e
+            elif "metadata" in file:
+                pass
+            else:
+                logger.info(f"Copying file with difference: {src} to {dest}")
+                shutil.copyfile(src, dest)
+                assert False, "Files {src} and {dest} are different"

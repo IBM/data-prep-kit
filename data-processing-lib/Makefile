@@ -1,7 +1,7 @@
 # Use make help, to see the available rules
 include ../.make.defaults
 
-VERSION=0.2.0
+VERSION=0.3.0
 TAG := "v${VERSION}"
 LIBNAME=fm_data_processing
 ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local
@@ -25,7 +25,7 @@ setup::
 
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
-	${PIP} --upgrade build
+	${PIP} install --upgrade build
 	${PYTHON} -m build
 
 publish:: .check-env
@@ -46,9 +46,9 @@ venv::	pyproject.toml .check-env
 	echo '[global]' > venv/pip.conf
 	echo "extra-index-url = https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple" >> venv/pip.conf
 	source venv/bin/activate; 	\
-	$(PIP) install --upgrade pip;	\
-	$(PIP) install -e .;		\
-	$(PIP) install pytest pytest-cov 
+	pip install --upgrade pip;	\
+	pip install -e .;		\
+	pip install pytest pytest-cov 
 
 # Here we run each test directory of tests and each ray launched test separately, because
 # it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.
@@ -58,7 +58,7 @@ test::
 	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/transform;	
 	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/ray/ray_util_test.py;	
 	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/ray/launcher_test.py;	
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/ray/test_noop_launch.py;	
 
-#	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/ray/test_noop_launch.py;	
 #	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/data_access;	
 
