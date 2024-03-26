@@ -99,7 +99,7 @@ class AbstractTest:
         ), f"Files that could compare, but couldn't be read for some reason: {dir_cmp.funny_files}"
         assert len(dir_cmp.common_funny) == 0, f"Types of the following files don't match: {dir_cmp.common_funny}"
         assert len(dir_cmp.right_only) == 0, f"Files found only in expected output directory: {dir_cmp.right_only}"
-        assert len(dir_cmp.left_only) == 0, f"Files files missing in test output directory: {dir_cmp.left_only}"
+        assert len(dir_cmp.left_only) == 0, f"Files missing in test output directory: {dir_cmp.left_only}"
         if "metadata.json" in dir_cmp.diff_files:
             # metadata.json has things like dates and times and output folders.
             logger.warning("Differences in metadata.json being ignored for now.")
@@ -108,7 +108,7 @@ class AbstractTest:
             expected_diffs = 0
         failed = len(dir_cmp.diff_files) != expected_diffs
         if failed:
-            AbstractTest._debug_diffs(directory, expected_dir, dir_cmp.diff_files, "/tmp")
+            AbstractTest.__confirm_diffs(directory, expected_dir, dir_cmp.diff_files, "/tmp")
         assert not failed, f"Files that did not match the expected {dir_cmp.diff_files}"
 
         # Traverse into the subdirs since dircmp doesn't seem to do that.
@@ -119,18 +119,14 @@ class AbstractTest:
             AbstractTest.validate_directory_contents(d1, d2)
 
     @staticmethod
-    def _show_diff(parquet1: str, parquet2: str):
+    def _validate_table_files(parquet1: str, parquet2: str):
         da = DataAccessLocal()
         t1 = da.get_table(parquet1)
         t2 = da.get_table(parquet2)
-        try:
-            # Just execute for its messages.
-            AbstractTest.validate_expected_tables([t1], [t2])
-        except:
-            pass
+        AbstractTest.validate_expected_tables([t1], [t2])
 
     @staticmethod
-    def _debug_diffs(src_dir: str, expected_dir: str, diff_files: list, dest_dir: str):
+    def __confirm_diffs(src_dir: str, expected_dir: str, diff_files: list, dest_dir: str):
         """
         Copy all files from the source dir to the dest dir.
         :param src_dir:
@@ -144,6 +140,12 @@ class AbstractTest:
             src = os.path.join(src_dir, file)
             dest = os.path.join(dest_dir, file)
             if "parquet" in file:
-                AbstractTest._show_diff(expected, src)
-            logger.info(f"Copying file with difference: {src} to {dest}")
-            shutil.copyfile(src, dest)
+                # It seems file can be different on disk, but contain the same column/row values.
+                # so for these, do the inmemory comparison.
+                AbstractTest._validate_table_files(expected, src)
+            elif "metadata" in file:
+                pass
+            else:
+                logger.info(f"Copying file with difference: {src} to {dest}")
+                shutil.copyfile(src, dest)
+                assert False, "Files {src} and {dest} are different"
