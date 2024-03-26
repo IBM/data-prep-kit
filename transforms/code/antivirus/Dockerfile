@@ -9,7 +9,7 @@ USER ray
 FROM clamav/clamav:latest AS clamav
 FROM base AS clamav-local
 USER root
-COPY --link --chown=ray:users --chmod=774 --from=clamav /var/lib/clamav/ /var/lib/clamav/
+COPY --chown=ray:users --chmod=774 --from=clamav /var/lib/clamav/ /var/lib/clamav/
 COPY --chown=ray:users --chmod=774 clamd.conf /etc/clamav/clamd.conf
 RUN freshclam \
     && mkdir -p /var/run/clamav \
