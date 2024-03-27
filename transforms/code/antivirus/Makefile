@@ -7,7 +7,7 @@ REPOROOT=../../..
 include ../../.make.transforms
 
 DOCKER_IMAGE_NAME=antivirus
-DOCKER_IMAGE_VERSION=0.2
+DOCKER_IMAGE_VERSION=0.3
 
 venv::	.transforms.venv
 	@$(DOCKER) build --target clamav-local -f Dockerfile -t clamav-local:latest .

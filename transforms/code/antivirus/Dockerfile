@@ -15,7 +15,7 @@ RUN freshclam \
     && mkdir -p /var/run/clamav \
     && chown -R ray:users /var/run/clamav /var/log/clamav /var/lib/clamav
 USER ray
-CMD ["/bin/bash", "-c", "freshclam && clamd --debug --foreground"]
+CMD ["/bin/bash", "-c", "clamd --debug --foreground"]
 
 FROM base AS antivirus
 
@@ -27,6 +27,7 @@ COPY --from=clamav-local --chown=ray:users /etc/clamav/clamd.conf /etc/clamav/cl
 COPY --from=clamav-local --chown=ray:users /var/log/clamav/clamav.log /var/log/clamav/clamav.log
 COPY --from=clamav-local --chown=ray:users /var/run/clamav /var/run/clamav
 COPY requirements.txt requirements.txt
+COPY entrypoint.sh entrypoint.sh
 
 RUN pip install --no-cache-dir -r requirements.txt \
     && rm -rf requirements.txt .cache/pip
@@ -34,4 +35,4 @@ RUN pip install --no-cache-dir -r requirements.txt \
 COPY src/*_transform.py  ./
 ENV PYTHONPATH /home/ray
 
-CMD ["/bin/bash", "-c", "clamd --foreground"]
+ENTRYPOINT ["./entrypoint.sh"]
