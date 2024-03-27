@@ -63,23 +63,6 @@ class DocQualityTransform(AbstractTableTransform):
         Put Transform-specific to convert one Table to another Table.
         This implementation makes no modifications so effectively implements a copy of the input parquet to the output folder, without modification.
         """
-        new_columns = [
-            "docq_total_words",
-            "docq_mean_word_len",
-            "docq_symbol_to_word_ratio",
-            "docq_sentence_count",
-            "docq_lorem_ipsum_ratio",
-            "docq_curly_bracket_ratio",
-            "docq_contain_bad_word",
-            "docq_avg_ja_sentence_len",
-            "docq_first_ja_alphabet_pos",
-            "metakenlm_docq_perplex_score",
-            "docq_contain_common_en_words",
-            "docq_bullet_point_ratio",
-            "docq_ellipsis_line_ratio",
-            "docq_alphabet_word_ratio",
-        ]
-
         docq_total_words = []
         docq_mean_word_len = []
         docq_symbol_to_word_ratio = []
