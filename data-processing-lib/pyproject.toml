@@ -1,6 +1,6 @@
 [project]
 name = "fm_data_processing"
-version = "0.2.0"
+version = "0.3.0"
 requires-python = ">=3.10"
 description = "Data Processing Library"
 authors = [
