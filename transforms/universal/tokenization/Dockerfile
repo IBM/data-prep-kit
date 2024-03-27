@@ -8,6 +8,6 @@ RUN pip install --no-cache-dir -r  requirements.txt
 # remove credentials-containing file
 RUN rm requirements.txt
 
-COPY ./src/tokenizer_transform.py .
+COPY ./src/tokenization_transform.py .
 COPY ./src/tokenization_utils.py .
 ENV PYTHONPATH /home/ray
