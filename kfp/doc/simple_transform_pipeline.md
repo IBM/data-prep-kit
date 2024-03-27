@@ -12,7 +12,7 @@ In this tutorial, we will show the following:
 
 [Overall implementation](../transform_workflows/universal/noop/noop_wf.py) roughly contains 4 major sections:
 
-* Components definition - definition of the main steps of our pipeline
+* Components definition - defintion of the main steps of our pipeline
 * Input parameters definition 
 * Pipeline wiring - definition of the sequence of invocation (with parameter passing) of participating components
 * Additional configuration
@@ -98,7 +98,7 @@ The parameters used here are as follows:
   * wait_cluster_up_tmout - time to wait for cluster up, sec
   * wait_job_ready_tmout - time to wait for job ready, sec
   * wait_print_tmout - time between prints, sec
-  * http_retries - http retries for API server calls
+  * http_retries - httpt retries for API server calls
 * lh_config - lake house configuration
 * s3_config - s3 configuration
 * s3_access_secret - s3 access secret
@@ -115,7 +115,7 @@ The parameters used here are as follows:
 ### Pipeline wiring
 
 Now that all components and input parameters are defined, we can implement pipeline wiring defining sequence of 
-component execution and parameters submitted to every component.
+component execution and parameters submittied to every component. 
 
 ```python
     # create clean_up task
