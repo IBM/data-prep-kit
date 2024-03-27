@@ -4,7 +4,7 @@ from pathlib import Path
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import DPFConfig, ParamsUtils
-from langselect_transform import (
+from lang_filtering_transform import (
     LangSelectorTransformConfiguration,
     lang_allowed_langs_file_key,
     lang_known_selector,

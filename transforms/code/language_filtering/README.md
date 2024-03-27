@@ -20,7 +20,7 @@ configuration for values are as follows:
 
 ## Running
 
-We provide a demo of the transform usage for [local file system](src/langselect_local.py)
+We provide a demo of the transform usage for [local file system](src/lang_filtering_local.py)
 
 # Release notes
 
