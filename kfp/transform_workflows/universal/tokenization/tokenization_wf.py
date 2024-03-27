@@ -34,10 +34,10 @@ TASK_NAME: str = "tokenization"
 )
 def tokenization(
     ray_name: str = "tkn-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/tokenization-guf:0.0.1",\
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/tokenization-guf:0.1.0",\
              "image_pull_secret": "prod-all-icr-io"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/tokenization-guf:0.0.1"}',
+            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/tokenization-guf:0.1.0"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
     lh_config: str = "None",
@@ -46,10 +46,11 @@ def tokenization(
     pipeline_id: str = "pipeline_id",
     s3_access_secret: str = "cos-access",
     s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/tokenize/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_tokenization_guf/'}",
-    tkn_tokenizer_path: str = "bigcode/starcoder",
+    tkn_tokenizer: str = "hf-internal-testing/llama-tokenizer",
     tkn_doc_id_column: str = "document_id",
     tkn_doc_content_column: str = "contents",
     tkn_text_lang: str = "en",
+    tkn_tokenizer_args: str = "cache_dir=/tmp/hf",
     tkn_chunk_size: int = 0,
 ):
     """
@@ -82,7 +83,8 @@ def tokenization(
     :param max_files - max files to process
     :param actor_options - actor options
     :param pipeline_id - pipeline id
-    :param tkn_tokenizer_path - Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, `bigcode/starcoder` from HuggingFace is used
+    :param tkn_tokenizer - Tokenizer used for tokenization
+    :param tkn_tokenizer_args - Arguments for tokenizer.
     :param tkn_doc_id_column - Column contains document id which values should be unique across dataset
     :param tkn_doc_content_column - Column contains document content
     :param tkn_text_lang - Specify language used in the text content for better text splitting if needed
@@ -126,7 +128,8 @@ def tokenization(
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
                 "job_id": dsl.RUN_ID_PLACEHOLDER,
-                "tkn_tokenizer": tkn_tokenizer_path,
+                "tkn_tokenizer": tkn_tokenizer,
+                "tkn_tokenizer_args": tkn_tokenizer_args,
                 "tkn_doc_id_column": tkn_doc_id_column,
                 "tkn_doc_content_column": tkn_doc_content_column,
                 "tkn_text_lang": tkn_text_lang,
