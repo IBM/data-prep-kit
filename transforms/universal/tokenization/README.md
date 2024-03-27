@@ -5,32 +5,38 @@ for details on general project conventions, transform configuration,
 testing and IDE set up.
 
 ## Summary 
-The data tokenization transform maps an input table to an output table using a pre-trained tokenizer.
+The data tokenization transform maps a (no-empty) input table to an output table using a pre-trained tokenizer.
 The input table must contain at least two columns, by default named `document_id` and `contents`,
 and can be specified through `--tkn_doc_id_column` and `--tkn_doc_content_column` respectively.
-The `document_id` should be unique within the dataset (across all rows) and the `contents` stores
+The `document_id` should be unique within the dataset and the `contents` stores
 its corresponding document content.
 
-A pre-trained tokenizer must be specified through `--tkn_tokenizer_path` parameter 
-which can either be to a folder containing the pre-trained tokenizer, or a ready-for-download tokenizer
-from Huggingface compatible with `AutoTokenizer` library (also from Huggingface).
+A pre-trained tokenizer must be specified through `--tkn_tokenizer` parameter 
+which can be the name of a ready-for-download tokenizer
+from Huggingface such as `hf-internal-testing/llama-tokenizer`, `bigcode/starcoder` or those being loadable by Huggingface `AutoTokenizer` library.
+Parameter `--tkn_tokenizer_args` can be further used to specify extra arguments for the corresponding tokenizer. For example,
+`cache_dir=/tmp/hf,token=user_auth_token` could be used for tokenizer `bigcode/starcoder`.
 
-The tokenization transform will use the pre-trained tokenizer to tokenize each row in the input table
-to each row in the output folder as a sequence of token_ids under the `tokens` column. 
-The document id and the token count are respectively stored in the `document_id` (or name specified in `--tkn_doc_id_column`) and `token_count`. 
-The tokenizer will skip empty rows in the input table or rows leading to failure and track their counting in the `metadata`.
+The tokenization transform utilizes the pre-trained tokenizer to tokenize each row (assuming a document) in the input table
+to each row in the output folder. There are four columns in the output tables named `tokens,document_id,document_length,token_count`. 
+The `tokens` stores the sequence of token_ids returned by the tokenizer in tokenizing the document. The `document_id` (or the name specified in `--tkn_doc_id_column`) stores the document id,
+while `document_length,token_count` respectively stores the length of the document and the total token count. 
+The tokenizer will skip empty rows/documents in the input table or rows returned no tokens or failure by the tokenizer. 
+The count of such rows will be stored in the `num_empty_rows` of the `metadata` file.
 
+For some tokenizers, their tokenization process could be slow for long documents with millions of characters.
+In such case, parameter `--tkn_chunk_size` should be used to specify the length to spit a document into chunks
+(for `en` text, this parameter should be set to `20000`, equivalently to 15 pages) . 
+The tokenizer will tokenize each chunk individually and concatenate their returned token_ids. 
+The default value for `--tkn_chunk_size` is `0` 
+which tokenizes each document as a whole no matter how long it is. 
 
-The parameter `--tkn_chunk_size` is used when each document is tokenized by chunks (of characters). Its defaut value is `0` 
-which tokenize each document as a whole no matter how long it is. Chunks are round up by words, that means, the last word in a chunk
-will not be split into half. Though this works for most languages having spaces among words, there is a very preliminary version
-for languages having no space among words such as `ja` and it is highly recommended to customize such script for each particular language (specified via `--tkn_text_lang`)
 
 ## Running
 You can run the [tokenization_local.py](src/tokenization_local.py) to
-transform all three parquet files (some are in a sub-directory) in [test input data](test-data/input) 
-to [output](output) directory. This directory will contain both sub-directory and the new three
-tokenized parquet files and the `metadata.json` file.
+transform all parquet files (some are in sub-directories) in [test input data](test-data/ds01/input) 
+to [output](output) directory. This directory will contain both sub-directories and the transformed (tokenized)
+parquet files and the `metadata.json` file. It will skip empty parquet files in folder [dataset=empty](test-data/ds01/input/lang=en/dataset=empty) 
 <pre>
 % make venv
 % source venv/bin/activate
@@ -74,7 +80,9 @@ the following command line arguments are available in addition to
   --run_locally RUN_LOCALLY
                         running ray local flag
   --tkn_tokenizer TKN_TOKENIZER
-                        Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, `bigcode/starcoder` from HuggingFace is used
+                        Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, `hf-internal-testing/llama-tokenizer` from HuggingFace is used
+  --tkn_tokenizer_args TKN_TOKENIZER_ARGS
+                        Arguments for tokenizer. For example, `cache_dir=/tmp/hf,use_auth_token=Your_HF_authentication_token` could be arguments for tokenizer `bigcode/starcoder` from HuggingFace
   --tkn_doc_id_column TKN_DOC_ID_COLUMN
                         Column contains document id which values should be unique across dataset
   --tkn_doc_content_column TKN_DOC_CONTENT_COLUMN

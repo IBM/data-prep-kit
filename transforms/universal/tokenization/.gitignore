@@ -1,4 +1,5 @@
 test-data/output
 output/*
 src/run_*.py
-src/tokenizers
+tokenizers
+qtest

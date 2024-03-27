@@ -23,6 +23,7 @@ class TransformStatistics(object):
         self.empty_table_counter = Counter("empty_tables", "Total empty tables read")
         self.failed_read_counter = Counter("failed_read_files", "Total read failed files")
         self.failed_write_counter = Counter("failed_write_files", "Total write failed files")
+        self.transform_exceptions_counter = Counter("transform_exceptions", "Transform exception occurred")
 
     def add_stats(self, stats=dict[str, Any]) -> None:
         """
@@ -45,6 +46,8 @@ class TransformStatistics(object):
                     self.failed_read_counter.inc(val)
                 if key == "failed_writes":
                     self.failed_write_counter.inc(val)
+                if key == "transform execution exception":
+                    self.transform_exceptions_counter.inc(val)
 
     def get_execution_stats(self) -> dict[str, Any]:
         """
