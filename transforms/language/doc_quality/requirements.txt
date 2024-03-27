@@ -11,9 +11,6 @@ fm-data-processing==0.2.0
 ### For docquality
 numpy==1.24.1
 pandas==1.5.3
-pyarrow==14.0.2
 sentencepiece
-pydantic==2.5.3
-ray[default]==2.9.3
 packaging
 binpacking
