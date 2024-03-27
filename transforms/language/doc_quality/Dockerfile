@@ -5,6 +5,7 @@ ARG ARTIFACTORY_API_KEY
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
+RUN pip install --no-cache-dir https://github.com/kpu/kenlm/archive/master.zip
 # remove credentials-containing file
 RUN rm requirements.txt
 

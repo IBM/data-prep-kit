@@ -14,6 +14,7 @@ DOCKER_IMAGE_VERSION=0.1.0
 
 
 venv::	.transforms.venv
+	source venv/bin/activate;pip install https://github.com/kpu/kenlm/archive/master.zip
 
 build::	.transforms.build
 
