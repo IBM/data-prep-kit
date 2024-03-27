@@ -2,8 +2,8 @@
 blocklisting
 noop
 #split_file
-fdedup
-ededup
+#fdedup
+#ededup
 doc_id
 #coalesce
 # These are failing
