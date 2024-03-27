@@ -4,10 +4,10 @@
 fm-data-processing==0.2.0
 # TODO: pip install https://github.com/kpu/kenlm/archive/master.zip
 # TODO: Download pre-trained KenLM model for English language on Wikipedia
-        through cc_net (https://github.com/facebookresearch/cc_net):
-        git clone https://github.com/facebookresearch/cc_net
-        cd cc_net/
-        make lang=en dl_lm
+#       through cc_net (https://github.com/facebookresearch/cc_net):
+#       git clone https://github.com/facebookresearch/cc_net
+#       cd cc_net/
+#       make lang=en dl_lm
 ### For docquality
 numpy==1.24.1
 pandas==1.5.3

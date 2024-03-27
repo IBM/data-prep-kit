@@ -9,7 +9,7 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import get_logger
+from data_processing.utils import TransformUtils, get_logger
 from doc_c4_statistics import (
     c4_contain_pattern_ratio,
     c4_contains_ldnoobw_words,
@@ -128,6 +128,8 @@ class DocQualityTransform(AbstractTableTransform):
         table = table.append_column("docq_alphabet_word_ratio", pa.array(docq_alphabet_word_ratio))
         table = table.append_column("docq_contain_common_en_words", pa.array(docq_contain_common_en_words))
         table = table.append_column("metakenlm_docq_perplex_score", pa.array(docq_perplex_score))
+
+        # TransformUtils.add_column(table=table, name="metakenlm_docq_perplex_score", content=docq_perplex_score)
 
         if self.ft_lang == "ja":
             table = table.append_column("docq_avg_ja_sentence_len", pa.array(docq_avg_ja_sentence_len))
