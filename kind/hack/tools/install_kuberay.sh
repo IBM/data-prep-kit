@@ -30,6 +30,7 @@ wait(){
 
 delete(){
 	helm uninstall kuberay-operator -n kuberay
+	helm uninstall kuberay-apiserver -n kuberay
 }
 
 usage(){

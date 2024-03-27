@@ -21,7 +21,7 @@ class DataAccessLocal(DataAccess):
 
     def __init__(
         self,
-        path_config: dict[str, str],
+        path_config: dict[str, str] = None,
         d_sets: list[str] = None,
         checkpoint: bool = False,
         m_files: int = 0,
@@ -30,8 +30,12 @@ class DataAccessLocal(DataAccess):
         Create data access class for folder based configuration
         :param path_config: dictionary of path info
         """
-        self.input_folder = path_config["input_folder"]
-        self.output_folder = path_config["output_folder"]
+        if path_config is None:
+            self.input_folder = "/tmp"
+            self.output_folder = "/tmp"
+        else:
+            self.input_folder = path_config["input_folder"]
+            self.output_folder = path_config["output_folder"]
         self.d_sets = d_sets
         self.checkpoint = checkpoint
         self.m_files = m_files
@@ -292,6 +296,7 @@ class DataAccessLocal(DataAccess):
                             directory is returned (False)
         :return: A dictionary of file names/binary content will be returned
         """
+
         def _get_file_content(f_name: str, dt: bool) -> bytes:
             """
             return file content

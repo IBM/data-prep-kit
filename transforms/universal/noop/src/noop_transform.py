@@ -15,8 +15,8 @@ from data_processing.utils import CLIArgumentProvider, get_logger
 logger = get_logger(__name__)
 
 cli_prefix = "noop_"
-sleep_key = "sleep"
-pwd_key = "sleep"
+sleep_key = "sleep_sec"
+pwd_key = "pwd"
 sleep_cli_param = f"{cli_prefix}{sleep_key}"
 pwd_cli_param = f"{cli_prefix}{pwd_key}"
 
@@ -36,7 +36,7 @@ class NOOPTransform(AbstractTableTransform):
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of NOOPTransformConfiguration class
         super().__init__(config)
-        self.sleep = config.get("sleep", 1)
+        self.sleep = config.get("sleep_sec", 1)
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -75,7 +75,7 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            f"--{sleep_key}",
+            f"--{sleep_cli_param}",
             type=int,
             default=1,
             help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
@@ -83,7 +83,7 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
         # An example of a command line option that we don't want included in the metadata collected by the Ray orchestrator
         # See below for remove_from_metadata addition so that it is not reported.
         parser.add_argument(
-            f"--{pwd_key}",
+            f"--{pwd_cli_param}",
             type=str,
             default="nothing",
             help="A dummy password which should be filtered out of the metadata",
