@@ -6,8 +6,11 @@ from pathlib import Path
 from blocklist_transform import (
     BlockListTransform,
     BlockListTransformConfiguration,
+    annotation_column_name_cli_param,
     annotation_column_name_key,
+    blocked_domain_list_path_cli_param,
     blocked_domain_list_path_key,
+    source_url_column_name_cli_param,
     source_url_column_name_key,
 )
 from data_processing.ray import TransformLauncher
@@ -29,9 +32,9 @@ local_conf = {
     "output_folder": output_folder,
 }
 block_list_params = {
-    blocked_domain_list_path_key: blocklist_conf_url,
-    annotation_column_name_key: blocklist_annotation_column_name,
-    source_url_column_name_key: blocklist_doc_source_url_column,
+    blocked_domain_list_path_cli_param: blocklist_conf_url,
+    annotation_column_name_cli_param: blocklist_annotation_column_name,
+    source_url_column_name_cli_param: blocklist_doc_source_url_column,
     "blocklist_local_config": ParamsUtils.convert_to_ast(local_conf),
 }
 
