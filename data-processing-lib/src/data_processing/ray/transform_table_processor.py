@@ -47,7 +47,7 @@ class TransformTableProcessor:
         logger.debug(f"Begin processing file {f_name}")
         if self.data_access is None:
             logger.warning("No data_access found. Returning.")
-        return
+            return
         t_start = time.time()
         # Read source table
         table = self.data_access.get_table(path=f_name)
@@ -85,7 +85,7 @@ class TransformTableProcessor:
             # get flush results
             logger.debug(f"Begin flushing transform")
             out_tables, stats = self.transform.flush()
-            logger.debug(f"Done flushing transform")
+            logger.debug(f"Done flushing transform, got {len(out_tables)} tables")
             # Here we are using the name of the last table, that did not return anything
             self._submit_table(f_name=self.last_empty, t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
@@ -100,6 +100,7 @@ class TransformTableProcessor:
         :param stats: execution statistics to populate
         :return: None
         """
+        logger.debug(f"submitting tables {f_name}, number of tables {len(out_tables)}")
         # Compute output file location. Preserve sub folders for Wisdom
         match len(out_tables):
             case 0:
