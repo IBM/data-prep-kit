@@ -10,7 +10,18 @@ from data_processing.ray import (
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import get_logger
-from dotenv import load_dotenv
+from doc_c4_statistics import (
+    c4_contain_pattern_ratio,
+    c4_contains_ldnoobw_words,
+    c4_sentence_count,
+)
+from doc_Gopher_statistics import (
+    compute_average_japanese_sentence_length,
+    compute_bullet_point_ellipsis_alphabet_word_ratio,
+    compute_word_statistics,
+    contains_common_English_words,
+    find_first_japanese_alphabet_position,
+)
 
 
 logger = get_logger(__name__)
@@ -48,20 +59,6 @@ class DocQualityTransform(AbstractTableTransform):
         )
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
-
-        from doc_c4_statistics import (
-            c4_contain_pattern_ratio,
-            c4_contains_ldnoobw_words,
-            c4_sentence_count,
-        )
-        from doc_Gopher_statistics import (
-            compute_average_japanese_sentence_length,
-            compute_bullet_point_ellipsis_alphabet_word_ratio,
-            compute_word_statistics,
-            contains_common_English_words,
-            find_first_japanese_alphabet_position,
-        )
-
         """
         Put Transform-specific to convert one Table to another Table.
         This implementation makes no modifications so effectively implements a copy of the input parquet to the output folder, without modification.
