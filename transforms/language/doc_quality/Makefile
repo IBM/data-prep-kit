@@ -36,7 +36,7 @@ clean:: .transforms.clean
 
 image:: .transforms.image
 
-test-lib-src:: .transforms.test-lib-src
+test-lib-src:: model-en .transforms.test-lib-src
 
 install-lib-src:: .transforms.install-lib-src
 

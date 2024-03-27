@@ -5,6 +5,16 @@ from data_processing.data_access import DataAccessLocal
 from test_docquality import TestDocQualityTransform
 
 
+# # Define the arrays for each column
+# document_id = pa.array(["doc01"])
+# contents = pa.array([" : This documents is for test . ? "])
+#
+# # Define the column names
+# names = ["document_id", "contents"]
+#
+# # Create the PyArrow table from the arrays
+# table = pa.Table.from_arrays([document_id, contents], names=names)
+
 """
 input table:
 """
