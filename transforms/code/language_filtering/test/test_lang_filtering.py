@@ -1,9 +1,8 @@
 import pyarrow as pa
-from data_processing.data_access import DataAccessLocal
 from data_processing.ray.transform_runtime import get_transform_config
 from data_processing.test_support.transform import AbstractTransformTest
 from data_processing.utils import ParamsUtils
-from langselect_transform import (
+from lang_filtering_transform import (
     LangSelectorTransform,
     LangSelectorTransformConfiguration,
     lang_allowed_langs_file_key,
