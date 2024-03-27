@@ -61,7 +61,7 @@ helm install kuberay-operator kuberay/kuberay-operator -n kuberay --version 1.0.
 Next install API server and wait for it to be ready:
 
 ```shell
-helm install -f ${ROOT_DIR}/hack/ray_api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay
+helm install -f ${ROOT_DIR}/hack/ray_api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver --version 1.1.0 -n kuberay
 kubectl wait --for=condition=ready --all pod -n kuberay --timeout=120s
 ```
 

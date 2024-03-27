@@ -10,7 +10,8 @@ include ../.make.defaults
 export TOOLS_DIR=${ROOT_DIR}/hack/tools
 
 export PIPELINE_VERSION := 1.8.5
-export KUBERAY := 1.0.0
+export KUBERAY_OPERATOR := 1.0.0
+export KUBERAY_APISERVER := 1.1.0
 
 
 setup::

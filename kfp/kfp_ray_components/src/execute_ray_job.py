@@ -38,7 +38,11 @@ def execute_ray_jobs(
     status, error, submission = remote_jobs.submit_job(
         name=name, namespace=ns, request=e_params, executor=exec_script_name
     )
-    print(f"submit job - status: {status}, error: {error}, submission id {submission}")
+    if status != 200:
+        print(f"Failed to submit job - status: {status}, error: {error}, submission id {submission}")
+        exit(1)
+
+    print(f"submitted job successfully, submission id {submission}")
     # print execution log
     remote_jobs.follow_execution(
         name=name,

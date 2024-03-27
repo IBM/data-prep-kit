@@ -55,7 +55,7 @@ class DataAccessLocal(DataAccess):
         parquet_files = []
         total_input_file_size = 0
         i = 0
-        for c_path in Path(path).rglob("*.parquet"):
+        for c_path in sorted(Path(path).rglob("*.parquet")):
             if i >= cm_files > 0:
                 break
             size = c_path.stat().st_size
@@ -96,12 +96,12 @@ class DataAccessLocal(DataAccess):
 
         input_files = set(os.path.basename(path) for path in Path(input_path).rglob("*.parquet"))
         output_files = set(os.path.basename(path) for path in Path(output_path).rglob("*.parquet"))
-        missing_files = input_files - output_files
+        input_only_files = input_files - output_files
 
         total_input_file_size = 0
         i = 0
         parquet_files = []
-        for filename in missing_files:
+        for filename in sorted(input_only_files):
             if i >= cm_files > 0:
                 break
             parquet_files.append(filename)
@@ -311,13 +311,13 @@ class DataAccessLocal(DataAccess):
         matching_files = {}
         if extensions is None:
             search_path = os.path.join(path, "**")
-            for filename in glob.iglob(search_path, recursive=True):
+            for filename in sorted(glob.iglob(search_path, recursive=True)):
                 if not os.path.isdir(filename):
                     matching_files[filename] = _get_file_content(filename, return_data)
         else:
             for ext in extensions:
                 search_path = os.path.join(path, f"*.{ext}")
-                for filename in glob.iglob(search_path, recursive=True):
+                for filename in sorted(glob.iglob(search_path, recursive=True)):
                     matching_files[filename] = _get_file_content(filename, return_data)
         return matching_files
 

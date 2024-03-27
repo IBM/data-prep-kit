@@ -16,7 +16,7 @@ s3_cred = {
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 tkn_params = {
-        "tkn_tokenizer_path": "bigcode/starcoder",
+        "tkn_tokenizer": "hf-internal-testing/llama-tokenizer",
         "tkn_doc_id_column":"document_id",
         "tkn_doc_content_column":"contents",
         "tkn_text_lang": "en",
