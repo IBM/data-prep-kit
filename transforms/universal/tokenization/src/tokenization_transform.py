@@ -18,8 +18,9 @@ from data_processing.transform import AbstractTableTransform
 from data_processing.utils import get_logger
 logger = get_logger(__name__)
 
+from tokenization_utils import split_text, load_tokenizer, is_valid_argument_string
 
-from tokenization_utils import split_text, load_tokenizer
+CHUNK_CHECKPOINT_INTERVAL = 100
 
 class TokenizationTransform(AbstractTableTransform):
     """
@@ -35,7 +36,8 @@ class TokenizationTransform(AbstractTableTransform):
         # of TokenizationTransformConfiguration class
 
         super().__init__(config)
-        self.tokenizer = config.get("tokenizer", "bigcode/starcoder")
+        self.tokenizer = config.get("tokenizer","hf-internal-testing/llama-tokenizer")
+        self.tokenizer_args = config.get("tokenizer_args", None)
         self.doc_id_column = config.get("doc_id_column", "document_id")
         self.doc_content_column = config.get("doc_content_column", "contents")
         self.chunk_size = config.get("chunk_size", 0)
@@ -46,7 +48,8 @@ class TokenizationTransform(AbstractTableTransform):
             logger.debug(f"{k:20s}: {v}")
 
         # overwrite tokenizer:
-        self.tokenizer = load_tokenizer(tokenizer_name=self.tokenizer)
+        self.tokenizer = load_tokenizer(tokenizer_name=self.tokenizer,
+                                        tokenizer_args=self.tokenizer_args)
 
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
@@ -74,12 +77,30 @@ class TokenizationTransform(AbstractTableTransform):
         for idx in range(table.num_rows):
             doc_id = table[self.doc_id_column][idx].as_py()
             doc_content = table[self.doc_content_column][idx].as_py()
+            doc_length = len(doc_content)
+
+            # skip empty document/row:
+            if doc_length == 0:
+                empty_doc_ids.append(doc_id)
+                continue
+
             try:
-                if self.chunk_size > 0 and len(doc_content) > self.chunk_size:
+                if self.chunk_size > 0 and doc_length > self.chunk_size:
                     # tokenize document by chunks:
+                    start_time = time.time()
                     token_line = []
-                    for chunk in split_text(doc_content,self.chunk_size, self.text_lang):
+                    doc_len_so_far = 0
+                    for chunk_idx,chunk in enumerate(split_text(doc_content,self.chunk_size, self.text_lang)):
                         token_line.extend(self.tokenizer(chunk)["input_ids"])
+                        doc_len_so_far += len(chunk)
+
+                        if (chunk_idx+1)%CHUNK_CHECKPOINT_INTERVAL==0 or (doc_len_so_far == doc_length):
+                            elapse_time = int(time.time() - start_time)
+                            logger.info(f"row_idx: {idx:5,} "
+                                        f"(doc_id: {doc_id}) "
+                                        f"chunk_idx: {chunk_idx:6,} ({doc_len_so_far:11,}/{doc_length:11,} {100*doc_len_so_far/doc_length:5.1f}%) "
+                                        f"#tokens: {len(token_line):9,} "
+                                        f"elapse_time:{elapse_time: .1f}(s)")
                 else:
                     token_line = self.tokenizer(doc_content)["input_ids"]
             except Exception as e:
@@ -89,12 +110,12 @@ class TokenizationTransform(AbstractTableTransform):
                 continue
 
             num_tokens = len(token_line)
-            # skip empty document:
+            # skip document with empty returned tokens:
             if num_tokens == 0:
                 empty_doc_ids.append(doc_id)
                 continue
             else:
-                doc_lengths.append(len(doc_content))
+                doc_lengths.append(doc_length)
                 doc_tokens.append(token_line)
                 processed_doc_ids.append(doc_id)
                 token_count.append(num_tokens)
@@ -137,8 +158,15 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
         parser.add_argument(
             "--tkn_tokenizer",
             type=str,
-            default="bigcode/starcoder",
-            help="Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, `bigcode/starcoder` from HuggingFace is used" ,
+            default="hf-internal-testing/llama-tokenizer",
+            help="Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, `hf-internal-testing/llama-tokenizer` from HuggingFace is used" ,
+        )
+
+        parser.add_argument(
+            "--tkn_tokenizer_args",
+            type=str,
+            default=None,
+            help="Arguments for tokenizer. For example, `cache_dir=/tmp/hf,use_auth_token=Your_HF_authentication_token` could be arguments for `bigcode/starcoder`",
         )
 
         parser.add_argument(
@@ -159,7 +187,7 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
             "--tkn_text_lang",
             type=str,
             default="en",
-            help="Specify language used in the text content for better text splitting if needed",
+            help="Specify language used in text content for better text splitting if needed",
         )
 
         # This parameter may help to better tokenize very long doc/row (in chunks):
@@ -180,11 +208,25 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
             logger.error(f"Parameter --tkn_tokenizer must be a valid tokenizer for tokenization, you specified {args.tkn_tokenizer}")
             return False
 
+        if args.tkn_tokenizer_args is not None:
+            if not is_valid_argument_string(args.tkn_tokenizer_args):
+                logger.error(
+                    f"Parameter --tkn_tokenizer_args must be a valid argument string of `key1=value1,key2=value2`, you specified {args.tkn_tokenizer_args}")
+                return False
+
+
         if args.tkn_doc_id_column is None or args.tkn_doc_content_column is None:
             logger.error(f"Values for `--tkn_doc_id_column` and `--tkn_doc_content_column` must be provided")
             return False
 
+        # For MVP1: only support english text:
+        if args.tkn_text_lang !='en':
+            logger.error(f"This version has not supported languages other than `en` yet, you specified {args.tkn_text_lang}")
+            return False
+
+
         self.params["tokenizer"] = args.tkn_tokenizer
+        self.params["tokenizer_args"] = args.tkn_tokenizer_args
         self.params["doc_id_column"] = args.tkn_doc_id_column
         self.params["doc_content_column"] = args.tkn_doc_content_column
         self.params["text_lang"] = args.tkn_text_lang

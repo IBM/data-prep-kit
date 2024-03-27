@@ -72,6 +72,8 @@ class TransformTableProcessor:
             self._submit_table(f_name=f_name, t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
             logger.warning(f"Exception {e} processing file {f_name}: {traceback.format_exc()}")
+            self.stats.add_stats.remote({"transform execution exception": 1})
+
 
     def flush(self) -> None:
         """
@@ -90,6 +92,7 @@ class TransformTableProcessor:
             self._submit_table(f_name=self.last_empty, t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
             logger.warning(f"Exception {e} flushing: {traceback.format_exc()}")
+            self.stats.add_stats.remote({"transform execution exception": 1})
 
     def _submit_table(self, f_name: str, t_start: float, out_tables: list[pa.Table], stats: dict[str, Any]) -> None:
         """
