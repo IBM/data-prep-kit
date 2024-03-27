@@ -9,16 +9,16 @@ from kfp_support.workflow_support.utils import (
     ComponentUtils,
 )
 from kubernetes import client as k8s_client
-from src.ededup_compute_execution_params import ededup_compute_execution_params
+from src.fdedup_compute_execution_params import fdedup_compute_execution_params
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "ededup_transform.py"
+EXEC_SCRIPT_NAME: str = "fdedup_transform.py"
 
 # components
 base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1"
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(
-    func=ededup_compute_execution_params, base_image=base_kfp_image
+    func=fdedup_compute_execution_params, base_image=base_kfp_image
 )
 # create Ray cluster
 create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
@@ -27,33 +27,48 @@ execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components
 # clean up Ray
 cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "ededup"
+TASK_NAME: str = "fdedup"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for ededup",
+    description="Pipeline for fdedup",
 )
-def ededup(
-    ray_name: str = "ededup-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/ededup-guf:0.0.1",\
+def fdedup(
+    ray_name: str = "fdedup-kfp-ray",  # name of Ray cluster
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/fdedup:guftest",\
              "image_pull_secret": "prod-all-icr-io"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/ededup-guf:0.0.1"}',
+            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/fdedup:guftest"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
-    hash_cpu: float = 0.5,
-    num_hashes: int = 0,
-    doc_column: str = "contents",
     lh_config: str = "None",
     max_files: int = -1,
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     s3_access_secret: str = "cos-access",
-    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_ededup_guf/'}",
+    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=fuzzy_dedup/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_fdedup_guf/'}",
+    # columns used
+    doc_column: str = "contents",
+    id_column: str = "int_id_column",
+    cluster_column: str =  "cluster",
+    # infrastructure
+    bucket_cpu: float = 0.5,
+    doc_cpu: float = 0.5,
+    mhash_cpu: float = 0.5,
+    num_doc_actors: int = 1,
+    num_bucket_actors: int = 1,
+    num_minhash_actors: int = 1,
+    num_preprocessors: int = 2,
+    # fuzzy parameters
+    num_permutations: int = 64,
+    threshold: float = 0.8,
+    shingles_size: int = 5,
+    japanese_data: bool = False,
+    delimiters: str = " ",
 ):
     """
-    Pipeline to execute EDEDUP transform
+    Pipeline to execute FDEDUP transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -82,9 +97,21 @@ def ededup(
     :param max_files - max files to process
     :param actor_options - actor options
     :param pipeline_id - pipeline id
-    :param hash_cpu - number of CPUs per hash
-    :param num_hashes - number of hash actors to use
-    :param doc_column - key for accessing data
+    :param doc_column - document column name
+    :param id_column - integer document id column name
+    :param cluster_column - cluster column name
+    :param bucket_cpu - number of CPUs per bucket hash
+    :param doc_cpu - number of CPUs per doc hash
+    :param mhash_cpu - number of CPUs per minhash hash
+    :param num_doc_actors - number of doc actors to use
+    :param num_bucket_actors - number of bucket actors to use
+    :param num_minhash_actors - number of minhash actors to use
+    :param num_preprocessors - number of preprocessors to use
+    :param num_permutations - number of permutations
+    :param threshold - threshold
+    :param shingles_size - number of words in shingle
+    :param japanese_data - japanese data indicator
+    :param delimiters - delimiter for splitting document
     :return: None
     """
     # create clean_up task
@@ -96,7 +123,7 @@ def ededup(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=actor_options,
-            params={"s3_config": s3_config, "hash_cpu": hash_cpu}
+            params={"threshold": threshold, "num_permutations": num_permutations, "s3_config": s3_config, "bucket_cpu": bucket_cpu, "doc_cpu": doc_cpu, "minhash_cpu": mhash_cpu}
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, s3_access_secret)
@@ -119,8 +146,6 @@ def ededup(
             additional_params=additional_params,
             exec_params={
                 "s3_config": s3_config,
-                "hash_cpu": hash_cpu,
-                "num_hashes": compute_exec_params.outputs["hashes"],
                 "doc_column": doc_column,
                 "lh_config": lh_config,
                 "max_files": max_files,
@@ -128,6 +153,21 @@ def ededup(
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
                 "job_id": dsl.RUN_ID_PLACEHOLDER,
+                "doc_column": doc_column,
+                "id_column": id_column,
+                "cluster_column": cluster_column,
+                "bucket_cpu": bucket_cpu,
+                "doc_cpu": doc_cpu,
+                "mhash_cpu": mhash_cpu,
+                "num_doc_actors": compute_exec_params.outputs["docs"],
+                "num_bucket_actors": compute_exec_params.outputs["buckets"],
+                "num_minhash_actors": compute_exec_params.outputs["min_hashes"],
+                "num_preprocessors": compute_exec_params.outputs["preprocessors"],
+                "num_permutations": num_permutations,
+                "threshold": threshold,
+                "shingles_size": shingles_size,
+                "japanese_data": japanese_data,
+                "delimiters": delimiters,
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
@@ -144,4 +184,4 @@ def ededup(
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(ededup, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(fdedup, __file__.replace(".py", ".yaml"))

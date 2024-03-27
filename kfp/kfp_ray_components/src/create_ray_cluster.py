@@ -44,7 +44,11 @@ def start_ray_cluster(
         wait_cluster_ready=dict_params.get("wait_cluster_ready_tmout", -1),
     )
 
-    print(f"Created cluster - status: {status}, error: {error}")
+    if status != 200:
+        print(f"Failed to created cluster - status: {status}, error: {error}")
+        exit(1)
+
+    print(f"Created cluster successfully")
 
 
 if __name__ == "__main__":
