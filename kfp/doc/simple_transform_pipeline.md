@@ -8,16 +8,19 @@ In this tutorial, we will show the following:
 * How to compile a pipeline and deploy it to KFP
 * How to execute pipeline and view execution results
 
+Note: the project and the explanation below are based on [KFPv1](https://www.kubeflow.org/docs/components/pipelines/v1/)
+
 ## Implementing pipeline
 
-[Overall implementation](../transform_workflows/universal/noop/noop_wf.py) roughly contains 4 major sections:
+[Overall implementation](../transform_workflows/universal/noop/noop_wf.py) roughly contains 5 major sections:
 
-* Components definition - defintion of the main steps of our pipeline
+* Imports
+* Components definition - definition of the main steps of our pipeline
 * Input parameters definition 
 * Pipeline wiring - definition of the sequence of invocation (with parameter passing) of participating components
 * Additional configuration
 
-You should start by defining imports:
+### Imports definitions:
 
 ```python
 import kfp.compiler as compiler
@@ -34,7 +37,7 @@ from kubernetes import client as k8s_client
 ### Components definition
 
 Our pipeline includes 4 steps - compute execution parameters, create Ray cluster, submit and watch Ray job, clean up 
-Ray cluster. FOr each step we have to define a component that will execute them:
+Ray cluster. For each step we have to define a component that will execute them:
 
 ```python
     base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1"
@@ -49,14 +52,15 @@ Ray cluster. FOr each step we have to define a component that will execute them:
     # clean up Ray
     cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
 ```
-Note that here we are using components described in this [document](../kfp_ray_components/README.md) for `create_ray_op`, 
-`execute_ray_jobs_op` and `cleanup_ray_op`  while `compute_exec_params_op` component is build inline, because it might
-differ significantly. For "simple" components we are using [defauld implementation](../kfp_support_lib/src/kfp_support/workflow_support/utils/workflow_utils.py),
-while, for example for ededup, we are using a very [specialized one](../transform_workflows/universal/ededup/src/ededup_compute_execution_params.py).
+Note: here we are using shared components described in this [document](../kfp_ray_components/README.md) for `create_ray_op`, 
+`execute_ray_jobs_op` and `cleanup_ray_op`,  while `compute_exec_params_op` component is built inline, because it might
+differ significantly. For "simple" pipeline cases we can use the 
+[default implementation](../kfp_support_lib/src/kfp_support/workflow_support/utils/workflow_utils.py),
+while, for example for exact dedup, we are using a very [specialized one](../transform_workflows/universal/ededup/src/ededup_compute_execution_params.py).
 
 ### Input parameters definition
 
-The pipeline defines all of the parameters required for the execution:
+The input parameters section defines all the parameters required for the pipeline execution:
 
 ```python
     ray_name: str = "noop-kfp-ray",  # name of Ray cluster
@@ -79,43 +83,43 @@ The parameters used here are as follows:
 
 * ray_name - name of the Ray cluster
 * ray_head_options - head node options, containing the following:
-  * cpu - number of cpus
-  * memory - memory
-  * image - image to use
+  * cpu - number of cpu cores
+  * memory - memory in GB
+  * image - image which will be used by the Ray head Pod
   * image_pull_secret - image pull secret
 * ray_worker_options - worker node options (we here are using only 1 worker pool), containing the following:
-  * replicas - number of replicas to create
-  * max_replicas - max number of replicas
-  * min_replicas - min number of replicas
-  * cpu - number of cpus
-  * memory - memory
-  * image - image to use
+  * replicas - number of workers to create
+  * max_replicas - max number of workers
+  * min_replicas - min number of workers
+  * cpu - number of cpu cores per worker
+  * memory - memory in GB per worker
+  * image - image which will be used by the Ray worker Pods
   * image_pull_secret - image pull secret
-* server_url - url of the KubeRay API server
+* server_url - URL of the KubeRay API server
 * additional_params - additional (support) parameters, containing the following:
   * wait_interval - wait interval for API server, sec
   * wait_cluster_ready_tmout - time to wait for cluster ready, sec
   * wait_cluster_up_tmout - time to wait for cluster up, sec
   * wait_job_ready_tmout - time to wait for job ready, sec
   * wait_print_tmout - time between prints, sec
-  * http_retries - httpt retries for API server calls
-* lh_config - lake house configuration
-* s3_config - s3 configuration
-* s3_access_secret - s3 access secret
-* max_files - max files to process
+  * http_retries - http retries for API server calls
+* lh_config - Lakehouse configuration
+* s3_config - S3 configuration
+* s3_access_secret - S3 access secret
+* max_files - max files to process, if it is `-1`, all files will be processed.
 * actor_options - actor options - see [here](../../data-processing-lib/doc/launcher-options.md)
 * pipeline_id - pipeline id
-* noop_sleep_sec - noop sleep time
+* noop_sleep_sec - noop pipeline's sleep time
 
-**Note** that here we are specifying initial values for all parameters that will be propagated to the worklow UI
+**Note** that here we are specifying initial values for all parameters that will be propagated to the workflow UI
 (see below)
 
-**Note** Paramwters are defining both S3 and lakehouse configuration, but only one at a time can be used.
+**Note** Parameters are defining both S3 and Lakehouse configuration, but only one at a time can be used.
 
 ### Pipeline wiring
 
-Now that all components and input parameters are defined, we can implement pipeline wiring defining sequence of 
-component execution and parameters submittied to every component. 
+Now, when all components and input parameters are defined, we can implement pipeline wiring defining sequence of 
+component execution and parameters submitted to every component. 
 
 ```python
     # create clean_up task
@@ -161,8 +165,9 @@ component execution and parameters submittied to every component.
 ```
 
 Here we first create `cleanup_task` and the use it as an 
-[exit handler](https://www.kubeflow.org/docs/components/pipelines/v2/pipelines/control-flow/) so that it will be invoked
-in case any of the step will fail.
+[exit handler](https://kubeflow-pipelines.readthedocs.io/en/stable/source/dsl.html#kfp.dsl.ExitHandler) which will be 
+invoked either the steps into it succeeded or failed.
+
 Then we create each individual component passing it required parameters and specify execution sequence, for example
 (`ray_cluster.after(compute_exec_params)`).
 
@@ -179,8 +184,9 @@ The final thing that we need to do is set some pipeline global configuration:
 
 ## Compiling pipeline and deploying it to KFP
 
-To compile pipeline execute this [file](../transform_workflows/universal/noop/noop_wf.py), which produces file `noop_wf.yaml`
-in the same directory. Now create kind cluster cluster with all required software installed using the following command: 
+To compile pipeline execute Python with this [file](../transform_workflows/universal/noop/noop_wf.py), which will 
+produce file `noop_wf.yaml` in the same directory. Now create a kind cluster with all required software installed 
+using the following command: 
 
 ````shell
  make setup
@@ -205,8 +211,8 @@ there as well, which means that secrets have to be created there as well.
 Once this is done we can execute the workflow. 
 
 On the pipeline page (above) click on the `create run` button. You will see the list of the parameters, that you
-can enter, which is populated with with the default that we specified above. If you do not want to modify parameters,
-go to the bottom of the page and click `start` button
+can redefine or use the default values that we specified above. After that,
+go to the bottom of the page and click the `start` button
 
 This will start workflow execution. Once it completes you will see something similar to below 
 
@@ -214,11 +220,11 @@ This will start workflow execution. Once it completes you will see something sim
 
 Note that the log (on the left) has the complete execution log.
 
-Additionally the log is saved to S3 (location is denoted but the last line in the log)
+Additionally, the log is saved to S3 (location is denoted but the last line in the log)
 
 ## Clean up cluster
 
-Finally you can delete kind cluster running the following command:
+Finally, you can delete kind cluster running the following command:
 
 ```Shell
 make clean
