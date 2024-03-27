@@ -4,7 +4,7 @@ noop
 #split_file
 #fdedup
 #ededup
-doc_id
+#doc_id
 #coalesce
 # These are failing
 tokenization
