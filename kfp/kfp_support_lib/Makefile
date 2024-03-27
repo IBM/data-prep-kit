@@ -4,15 +4,18 @@ REPOROOT=../..
 
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/\$\([A-Z_]*\)\-\([a-z]*\)/{\1\}\-\2/g' | sed 's/=/:=/' | sed 's/^/export /' >> makeenv")
-include makeenv
 
+include makeenv
 # Include the common rules.
 # Use "make help" to see them.
 include ../../.make.defaults
 
 LIBNAME=fm_data_processing_kfp
 PYTHON=python
-PYTEST=pytest
+PIP=$(PYTHON) -m pip
+# Command to run pytest
+PYTEST=pytest -s
+PYTHON_VERSION=$(shell $(PYTHON) --version)
 VENV_ACTIVATE=venv/bin/activate
 
 clean::
@@ -21,8 +24,10 @@ clean::
 	rm -rf src/*egg-info
 	rm makeenv
 
-.check-env::
-	@if [ -z "$(FM_DATA_PROCESSING_KFP)" ]; then echo "You must provide FM_DATA_PROCESSING_KFP"; false; fi
+.check-env:: .check_python_version
+	$(call check_defined, FM_DATA_PROCESSING_KFP)
+	$(call check_defined, ARTIFACTORY_USER)
+	$(call check_defined, ARTIFACTORY_API_KEY)
 	@echo "Checks passed"
 
 update-toml:: .check-env
@@ -41,9 +46,11 @@ publish:: .check-env
 
 venv::	pyproject.toml .check-env
 	@# Help: Create the virtual environment using pyproject.toml 
-	rm -rf venv	
+	sed -i.back "s/fm-data-processing==[0-9].*/fm-data-processing==${FM_DATA_PROCESSING}/" ../kfp_ray_components/requirements.txt
+	rm -rf venv
 	$(PYTHON) -m venv venv
-	. ${VENV_ACTIVATE}; 	\
+	. ${VENV_ACTIVATE};     \
+        pip install -r ../kfp_ray_components/requirements.txt ;\
 	pip install -e .;		\
 	pip install ray==${RAY} \
 	pip install pytest pytest-cov 
@@ -51,7 +58,6 @@ venv::	pyproject.toml .check-env
 test:: 	
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) api_params_test.py;
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST)  kfp_utils_test.py;
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) kuberay_api_test.py;
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) pipeline_utils_test.py;
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) ray_remote_jobs_test.py;

@@ -29,7 +29,14 @@ The process of creating a release for `fm_data_processing_kfp` package  involves
 
 cd to the package directory.
 
-update the version in the Makefile.
+update the version in [requirements.env](../requirements.env) file.
+
+Set the Python Artifactory details as environment variables by executing the following commands:
+
+```bash
+export ARTIFACTORY_USER=<artifactory-user>
+export ARTIFACTORY_API_KEY=<artifactory-key>
+```
 
 run `make build` and `make publish`.
 
@@ -43,9 +50,11 @@ To begin with, establish a Kind cluster and deploy all required components by ex
 make setup
 ```
 
-The next step is to deploy the `fm_data_processing_kfp` package locally within a Python virtual environment. To do this, execute the following command from the package directory:
+The next step is to deploy the `fm_data_processing_kfp` package locally within a Python virtual environment. To do this, "set the artifactory credentials, if you have not set it before:
 
 ```bash
+export ARTIFACTORY_USER=<artifactory-user>
+export ARTIFACTORY_API_KEY=<artifactory-key>
 make  build
 ```
 
