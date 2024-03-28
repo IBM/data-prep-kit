@@ -11,9 +11,10 @@ import pandas as pd
 import pyarrow as pa
 from data_processing.data_access import DataAccess, DataAccessFactory
 from data_processing.utils import TransformUtils
+from utils import detect_language
 
 
-def zip_to_table(data_access: DataAccess, file_path) -> pa.table:
+def zip_to_table(data_access: DataAccess, file_path, detect_prog_lang: Any) -> pa.table:
     """
     Extracts contents from a ZIP file and converts them into a PyArrow table.
 
@@ -36,34 +37,39 @@ def zip_to_table(data_access: DataAccess, file_path) -> pa.table:
                         # Decode the content
                         content_string = TransformUtils.decode_content(content_bytes)
                         if content_string and len(content_string) > 0:
-                            data.append(
-                                {
-                                    "title": member.filename,
-                                    "document": zip_name,
-                                    "contents": content_string,
-                                    "document_id": str(uuid.uuid4()),
-                                    "ext": TransformUtils.get_file_extension(
-                                        member.filename
-                                    ),
-                                    "hash": TransformUtils.str_to_hash(content_string),
-                                    "size": TransformUtils.deep_get_size(
-                                        content_string
-                                    ),
-                                    "date_acquired": datetime.now().isoformat(),
-                                }
-                            )
+                            ext = TransformUtils.get_file_extension(member.filename)
+                            print("ext", ext)
+                            row_data = {
+                                "title": member.filename,
+                                "document": zip_name,
+                                "contents": content_string,
+                                "document_id": str(uuid.uuid4()),
+                                "ext": ext,
+                                "hash": TransformUtils.str_to_hash(content_string),
+                                "size": TransformUtils.deep_get_size(content_string),
+                                "date_acquired": datetime.now().isoformat(),
+                            }
+                            if detect_prog_lang:
+                                lang = detect_prog_lang.get_lang_from_ext(ext)
+                                print("lang", lang)
+                                row_data["lang"] = lang
+
+                            data.append(row_data)
                         else:
                             raise Exception("No contents decoded")
 
                     except Exception as e:
                         print(f" skipping {member.filename} Error: {str(e)}")
 
-    table=pa.Table.from_pylist(data)
+    table = pa.Table.from_pylist(data)
     return table
 
 
 def raw_to_parquet(
-    data_access_factory: DataAccessFactory, file_path
+    data_access_factory: DataAccessFactory,
+    file_path,
+    detect_prog_lang: Any,
+    snapshot: str,
 ) -> tuple[bool, dict[str:Any]]:
     """
     Converts raw data file (ZIP) to Parquet format and saves it.
@@ -80,7 +86,12 @@ def raw_to_parquet(
         # Get the file extension
         ext = TransformUtils.get_file_extension(file_path)
         if ext == ".zip":
-            table = zip_to_table(data_access, file_path)
+            table = zip_to_table(data_access, file_path, detect_prog_lang)
+
+            snapshot_column = [snapshot] * table.num_rows
+            table = TransformUtils.add_column(
+                table=table, name="snapshot", content=snapshot_column
+            )
         else:
             raise Exception(f"Got {ext} file, not supported")
 
@@ -145,6 +156,15 @@ def generate_stats(metadata: list) -> dict[str, Any]:
 
 def run():
     parser = argparse.ArgumentParser(description="raw-data-to-parquet")
+    parser.add_argument(
+        "-detect_programming_lang",
+        "--detect_programming_lang",
+        type=bool,
+        help="generate programming lang",
+    )
+    parser.add_argument(
+        "-snapshot", "--snapshot", type=str, help="Name the dataset", default=""
+    )
 
     data_access_factory = DataAccessFactory()
     data_access_factory.add_input_params(parser)
@@ -161,15 +181,18 @@ def run():
     if len(file_paths) != 0:
         print(f"Number of files is {len(file_paths)} ")
         metadata = []
+        detect_prog_lang = (
+            detect_language.Detect_Programming_Lang()
+            if args.detect_programming_lang
+            else None
+        )
+
         with Pool() as p:
             # Processes each file concurrently
             results = p.starmap_async(
                 raw_to_parquet,
                 [
-                    (
-                        data_access_factory,
-                        file_path,
-                    )
+                    (data_access_factory, file_path, detect_prog_lang, args.snapshot)
                     for file_path in file_paths.keys()
                 ],
             )

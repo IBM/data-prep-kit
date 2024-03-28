@@ -44,7 +44,25 @@ Each file contained within the ZIP is transformed into a distinct row within the
 - **Description:** Timestamp indicating when the file was processed.
 - **Example:** `"date_acquired": "2024-03-25T12:00:00"`
 
+**snapshot:** (optional)
 
+- **Description:** Name indicating which dataset it belong to.
+- **Example:** `"snapshot": "code"`
+
+**lang:** (optional)
+
+- **Description:** Programming language detected using the file extension.
+- **Example:** `"lang": "Java"`
+
+
+
+## Configuration and command line Options
+
+The set of dictionary keys holding [RAW_DATA_TO_PARQUET](src/raw_data_to_parquet.py) 
+configuration for values are as follows:
+
+* detect_programming_lang (bool): if set to True,enables the detection of the programming language based on the file extension. 
+* snapshot (str): Each row in the dataset will be labeled with this snapshot name.
 
 ## Running
 
