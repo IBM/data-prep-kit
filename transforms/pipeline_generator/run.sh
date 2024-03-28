@@ -8,4 +8,4 @@ VENV_ACTIVATE=${ROOT_DIR}/env/bin/activate
 
 source $VENV_ACTIVATE
 mkdir -p ${ROOT_DIR}/${DIST_DIR}/
-python3 pipeline_generator.py -c code_quality/pipeline_definitions.yaml -od ${ROOT_DIR}/${DIST_DIR}/
+python3 pipeline_generator.py -c example/pipeline_definitions.yaml -od ${ROOT_DIR}/${DIST_DIR}/

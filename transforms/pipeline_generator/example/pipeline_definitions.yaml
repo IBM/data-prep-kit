@@ -12,7 +12,7 @@ pipeline_common_input_parameters_values:
     input_folder: "cos-optimal-llm-pile/doc_annotation_test/input/noop_small/"
     output_folder: "cos-optimal-llm-pile/doc_annotation_test/output_noop_guf/"
 
-pipeline_transfrom_input_parameters:
+pipeline_transform_input_parameters:
    pipeline_arguments:
         - name: "noop_sleep_sec"
           type: "int"

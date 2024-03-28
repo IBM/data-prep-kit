@@ -9,7 +9,7 @@ PIPELINE_TEMPLATE_FILE = "pipeline.ptmpl"
 INPUT_PARAMETERS = "input_parameters"
 PIPELINE_PARAMETERS = "pipeline_parameters"
 PIPELINE_COMMON_INPUT_PARAMETERS_VALUES = "pipeline_common_input_parameters_values"
-PIPELINE_TRANSFORM_INPUT_PARAMETERS = "pipeline_transfrom_input_parameters"
+PIPELINE_TRANSFORM_INPUT_PARAMETERS = "pipeline_transform_input_parameters"
 
 NAME = "name"
 TYPE = "type"
