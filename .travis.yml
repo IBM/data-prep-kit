@@ -21,11 +21,7 @@ branches:
 #    - podman machine start
 #    - podman info
 
-script:
-    - cd data-processing-lib
-    - echo pwd=$(pwd)
-    - make DOCKER=$DOCKER venv test
-    - echo pwd=$(pwd)
-    - cd ../transforms
-    - echo pwd=$(pwd)
-    - make DOCKER=$DOCKER venv test-lib-src
+script: cd data-processing-lib
+    && make DOCKER=$DOCKER venv test
+    && cd ../transforms
+    && make DOCKER=$DOCKER venv test-lib-src

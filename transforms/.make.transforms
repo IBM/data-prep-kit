@@ -111,10 +111,9 @@ help::
 
 .PHONY: .transforms.test-lib-src
 .transforms.test-lib-src::
-	$(MAKE) .transforms.install-lib-src 
-	@# Help: Run pytest on the test directory after installing data-process-lib source into the current venv
+	@# Help: Run pytest on the test directory with data-processing-lib/src in PYTHONPATH 
 	source venv/bin/activate;			\
-	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
+	export PYTHONPATH=../src:.:$(REPOROOT)/data-processing/lib/src:$$PYTHONPATH;	\
 	cd test; $(PYTEST) . 
 
 .PHONY: .transforms.test # because there is a directory called tests in the projects
