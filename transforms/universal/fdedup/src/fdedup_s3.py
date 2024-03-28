@@ -51,6 +51,7 @@ params = {
     "shingles_size": 5,
     "japanese_data": False,
     "delimiters": " ",
+    "use_doc_snapshot": False
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

@@ -344,3 +344,20 @@ class DataAccessLocal(DataAccess):
         except Exception as e:
             logger.error(f"Error saving bytes to file {file_path}: {e}")
             return None
+
+    def save_file_rel(self, file_path: str, bytes_data: bytes) -> dict[str, Any]:
+        """
+        Saves bytes to a file and returns a dictionary with file information.
+
+        Args:
+            bytes_data (bytes): The bytes data to save.
+            file_path (str): File path relative to output path.
+
+        Returns:
+            dict or None: A dictionary with "name" and "size" keys if successful,
+                        or None if saving fails.
+        """
+        return self.save_file(
+            file_path=os.path.join(self.output_folder, file_path),
+            bytes_data=bytes_data,
+        )

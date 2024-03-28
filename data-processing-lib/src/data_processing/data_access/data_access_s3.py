@@ -309,3 +309,14 @@ class DataAccessS3(DataAccess):
         in the case of failure dict is None
         """
         return self.arrS3.save_file(key=path, data=data)
+
+    def save_file_rel(self, path: str, data: bytes) -> dict[str, Any]:
+        """
+        Save byte array to the file
+        :param path: file path relative to output directory
+        :param data: byte array
+        :return: a dictionary as
+        defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
+        in the case of failure dict is None
+        """
+        return self.save_file(path=f"{self.output_folder}{path}", data=data)
