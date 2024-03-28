@@ -122,9 +122,6 @@ class TestDocQualityTransform(AbstractTransformTest):
 
     def get_test_transform_fixtures(self) -> list[tuple]:
 
-        print("tabletabletabletabletabletabletabletabletable", table.schema)
-        print("expected_tableexpected_tableexpected_tableexpected", expected_table.schema)
-
         fixtures = [
             (
                 DocQualityTransform(config),
