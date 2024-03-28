@@ -1,13 +1,8 @@
 import argparse
 from argparse import ArgumentParser
-from typing import Any
 
 import pyarrow as pa
-from data_processing.ray import (
-    DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
-    TransformLauncher,
-)
+from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils, get_logger
 from doc_c4_statistics import (
@@ -43,19 +38,19 @@ class DocQualityTransform(AbstractTableTransform):
 
         super().__init__(config)
         self.warning_issued = config.get("warning_issued", False)
-        self.ft_lang = config.get("ft_lang", "en")
+        self.docq_text_lang = config.get("docq_text_lang", "en")
         self.bad_word_filepath = config.get(
-            "bad_word_filepath" + self.ft_lang,
+            "bad_word_filepath" + self.docq_text_lang,
             "../test-data/docq/ldnoobw/en",
         )
         self.docq_doc_content_column = config.get("docq_doc_content_column", "contents")
         self.docq_doc_id_column = config.get("docq_doc_id_column", "document_id")
 
-        self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.ft_lang, file_path=self.bad_word_filepath)
-        self.model_dir = config.get("model_dir", "../lm_sp/")
+        self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.docq_text_lang, file_path=self.bad_word_filepath)
+        self.docq_kenLM_model = config.get("docq_kenLM_model", "../lm_sp/")
         strip_accent = True
         self.klm = KenLMModel.from_pretrained(
-            model_path=self.model_dir, language=self.ft_lang, strip_accent=strip_accent
+            model_path=self.docq_kenLM_model, language=self.docq_text_lang, strip_accent=strip_accent
         )
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
@@ -75,7 +70,7 @@ class DocQualityTransform(AbstractTableTransform):
         docq_alphabet_word_ratio = []
         docq_contain_common_en_words = []
         docq_perplex_score = []
-        if self.ft_lang == "ja":
+        if self.docq_text_lang == "ja":
             # for japanese language, add 2 extra columns for 2 heuristic rules:
             docq_avg_ja_sentence_len = []
             docq_first_ja_alphabet_pos = []
@@ -86,15 +81,15 @@ class DocQualityTransform(AbstractTableTransform):
             docq_mean_word_len.append(mean_word_len)
             docq_symbol_to_word_ratio.append(symbol_to_word_ratio)
 
-            docq_sentence_count.append(c4_sentence_count(text, ft_lang=self.ft_lang))
+            docq_sentence_count.append(c4_sentence_count(text, ft_lang=self.docq_text_lang))
 
             docq_lorem_ipsum_ratio.append(
-                c4_contain_pattern_ratio(text, pattern="lorem ipsum", ft_lang=self.ft_lang, normalize_text=True)
+                c4_contain_pattern_ratio(text, pattern="lorem ipsum", ft_lang=self.docq_text_lang, normalize_text=True)
             )
             curly_bracket_ratio = 0.0
             for sign in ["{", "}"]:
                 curly_bracket_ratio += c4_contain_pattern_ratio(
-                    text, pattern=sign, ft_lang=self.ft_lang, normalize_text=False
+                    text, pattern=sign, ft_lang=self.docq_text_lang, normalize_text=False
                 )
             docq_curly_bracket_ratio.append(curly_bracket_ratio)
             docq_contain_bad_word.append(c4_contains_ldnoobw_words(text, self.re_pattern))
@@ -108,11 +103,11 @@ class DocQualityTransform(AbstractTableTransform):
             docq_ellipsis_line_ratio.append(ellipsis_line_ratio)
             docq_alphabet_word_ratio.append(alphabet_word_ratio)
 
-            docq_contain_common_en_words.append(contains_common_English_words(text, self.ft_lang))
+            docq_contain_common_en_words.append(contains_common_English_words(text, self.docq_text_lang))
 
             docq_perplex_score.append(self.klm.get_perplexity(text))
 
-            if self.ft_lang == "ja":
+            if self.docq_text_lang == "ja":
                 docq_avg_ja_sentence_len.append(compute_average_japanese_sentence_length(text))
                 docq_first_ja_alphabet_pos.append(find_first_japanese_alphabet_position(text))
 
@@ -139,7 +134,7 @@ class DocQualityTransform(AbstractTableTransform):
         )
         table = TransformUtils.add_column(table=table, name="metakenlm_docq_perplex_score", content=docq_perplex_score)
 
-        if self.ft_lang == "ja":
+        if self.docq_text_lang == "ja":
             table = table.append_column("docq_avg_ja_sentence_len", pa.array(docq_avg_ja_sentence_len))
             table = table.append_column("docq_first_ja_alphabet_pos", pa.array(docq_first_ja_alphabet_pos))
 
@@ -168,7 +163,7 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, docq_, pii_, etc.)
         """
         parser.add_argument(
-            "--ft_lang",
+            "--docq_text_lang",
             default="en",
         )
         parser.add_argument(
@@ -187,9 +182,9 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
             help="path to bad word file",
         )
         parser.add_argument(
-            "--model_dir",
+            "--docq_kenLM_model",
             default="../lm_sp/",
-            help="path to model",
+            help="path to docq_kenLM_model",
         )
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
@@ -198,11 +193,34 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        self.params["ft_lang"] = args.ft_lang
+        if args.docq_kenLM_model is None:
+            logger.error(
+                f"Parameter --docq_kenLM_model must be a valid kenLM model for calculating perplexity, you specified {args.docq_kenLM_model}"
+            )
+            return False
+
+        if args.bad_word_filepath is None:
+            logger.error(
+                f"Parameter --bad_word_filepath must be a valid path to bad_word file, you specified {args.bad_word_filepath}"
+            )
+            return False
+
+        if args.docq_doc_content_column is None:
+            logger.error(f"Value for `--docq_doc_content_column` must be provided")
+            return False
+
+        # For MVP1: only support english text:
+        if args.docq_text_lang != "en":
+            logger.error(
+                f"This version has not supported languages other than `en` yet, you specified {args.docq_text_lang}"
+            )
+            return False
+
+        self.params["docq_kenLM_model"] = args.docq_kenLM_model
+        self.params["bad_word_filepath"] = args.bad_word_filepath
+        self.params["docq_text_lang"] = args.docq_text_lang
         self.params["docq_doc_content_column"] = args.docq_doc_content_column
         self.params["docq_doc_id_column"] = args.docq_doc_id_column
-        self.params["bad_word_filepath"] = args.bad_word_filepath
-        self.params["model_dir"] = args.model_dir
         return True
 
 

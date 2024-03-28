@@ -1,14 +1,14 @@
 import os
 
 from data_processing.test_support.ray import AbstractTransformLauncherTest
-from data_processing.utils import ParamsUtils
 from docquality_transform import DocQualityTransformConfiguration
 
 
 docq_params = {
-    "ft_lang": "en",
+    "docq_text_lang": "en",
+    "docq_doc_content_column": "contents",
     "bad_word_filepath": "../test-data/docq/ldnoobw/",
-    "model_dir": "../lm_sp/",
+    "docq_kenLM_model": "../lm_sp/",
 }
 
 
