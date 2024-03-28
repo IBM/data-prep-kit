@@ -2,6 +2,7 @@ from scipy.integrate import quad as integrate
 import numpy as np
 from typing import Any, Iterator, Union
 import ray
+from ray import cloudpickle
 from ray.actor import ActorHandle
 from ray.util import ActorPool
 
@@ -121,8 +122,21 @@ class DocCollector:
         """
         Initializer
         """
-        self.ids = {}
+        self.logger = get_logger(__name__)
+        self.actor_id = params.get("id")
         self.removed = set()
+        data_access_factory = params.get("data_access")
+        self.data_access = data_access_factory.create_data_access()
+        snapshot = params.get("snapshot", None)
+        if snapshot is None:
+            self.ids = {}
+        else:
+            try:
+                bids = self.data_access.get_file(snapshot)
+                self.ids = cloudpickle.loads(bids)
+            except Exception as e:
+                self.logger.warning(f"Failed to load doc collector {self.actor_id} with exception {e}")
+                raise e
 
     def add_documents(self, dr: tuple[list[tuple[int, int]], list[int]]) -> None:
         """
@@ -154,10 +168,21 @@ class DocCollector:
         """
         result = {}
         for doc_id in docs:
-            r = self.ids.get(doc_id)
+            r = self.ids.get(doc_id, None)
             if r is not None:
                 result[doc_id] = r
         return result
+
+    def snapshot(self) -> None:
+        """
+        Snapshotting itself
+        """
+        try:
+            b_doc = cloudpickle.dumps(self.ids)
+            self.data_access.save_file_rel(f"snapshot/docs/doc_collector_{self.actor_id}", b_doc)
+        except Exception as e:
+            self.logger.warning(f"Failed to snapshot doc collector {self.actor_id} with exception {e}")
+            raise e
 
     def get_size(self) -> tuple[int, float, int, float]:
         """
@@ -178,7 +203,20 @@ class DocsMinHash:
         Initialize
         :param params: parameters
         """
-        self.docs = {}
+        self.logger = get_logger(__name__)
+        self.actor_id = params.get("id")
+        data_access_factory = params.get("data_access")
+        self.data_access = data_access_factory.create_data_access()
+        snapshot = params.get("snapshot", None)
+        if snapshot is None:
+            self.docs = {}
+        else:
+            try:
+                bdocs = self.data_access.get_file(snapshot)
+                self.docs = cloudpickle.loads(bdocs)
+            except Exception as e:
+                self.logger.warning(f"Failed to load minhash collector {self.actor_id} with exception {e}")
+                raise e
 
     def add_minhashes(self, updates: list[tuple[int, int, np.array]]) -> None:
         """
@@ -202,6 +240,17 @@ class DocsMinHash:
                 result.append((doc_id, info[0], info[1:]))
         return result
 
+    def snapshot(self) -> None:
+        """
+        Snapshotting itself
+        """
+        try:
+            b_doc = cloudpickle.dumps(self.docs)
+            self.data_access.save_file_rel(f"snapshot/minhash/minhash_collector_{self.actor_id}", b_doc)
+        except Exception as e:
+            self.logger.warning(f"Failed to snapshot minhash collector {self.actor_id} with exception {e}")
+            raise e
+
     def get_size(self) -> tuple[int, float]:
         """
         Get size of used min hashes
@@ -219,12 +268,23 @@ class BucketsHash:
         """
         Initialization
         """
-        self.buckets = {}
         self.submitter = None
         self.n_buckets = 0
         self.bucket_memory = 0
         self.logger = get_logger(__name__)
-
+        self.actor_id = params.get("id")
+        data_access_factory = params.get("data_access")
+        self.data_access = data_access_factory.create_data_access()
+        snapshot = params.get("snapshot", None)
+        if snapshot is None:
+            self.buckets = {}
+        else:
+            try:
+                b_buckets = self.data_access.get_file(snapshot)
+                self.buckets = cloudpickle.loads(b_buckets)
+            except Exception as e:
+                self.logger.warning(f"Failed to load buckets collector {self.actor_id} with exception {e}")
+                raise e
 
     def add_buckets(self, bck: list[tuple[int, list[int]]]) -> None:
         """
@@ -290,9 +350,20 @@ class BucketsHash:
             self.logger.info("Done submitting long buckets")
 
         # And now the rest of buckets
-        bucket_chunks = [short_buckets[i * 100:(i + 1) * 100] for i in range((len(short_buckets) + 99) // 100 )]
+        bucket_chunks = [short_buckets[i * 100:(i + 1) * 100] for i in range((len(short_buckets) + 99) // 100)]
         for b in bucket_chunks:
             ray.get(self.submitter.submit_for_processing.remote(b))
+
+    def snapshot(self) -> None:
+        """
+        Snapshotting itself
+        """
+        try:
+            b_buckets = cloudpickle.dumps(self.buckets)
+            self.data_access.save_file_rel(f"snapshot/buckets/buckets_collector_{self.actor_id}", b_buckets)
+        except Exception as e:
+            self.logger.warning(f"Failed to snapshot buckets collector {self.actor_id} with exception {e}")
+            raise e
 
     def get_size(self) -> tuple[int, float]:
         """
@@ -323,7 +394,6 @@ class BucketsHashProcessor:
         self.remote_minhashes = params["remote_minhashes"]
         self.stats = params["statistics"]
         self.logger = get_logger(__name__)
-
 
     def _submit_generated_docs(self, docs: dict[int, int], removed: set[int]) -> None:
         """
@@ -475,7 +545,6 @@ class BucketsHashProcessorInvoker(object):
         self.pool = ActorPool(bucket_processors)
         self.submitted = 0
         self.logger = get_logger(__name__)
-
 
     def submit_for_processing(self, buckets: list[Union[int, list[int]]]) -> None:
         # Get completed results

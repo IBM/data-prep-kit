@@ -21,7 +21,7 @@ PYTHON_VERSION=$(shell $(PYTHON) --version)
 help::
 	@printf "%-20s %s\n" "Target" "Description"
 	@printf "%-20s %s\n" "------" "-----------"
-	@export submakes=$$(find ./* -name Makefile -d 1);	\
+	@export submakes=$$(find ./* -mindepth 1 -maxdepth 1 -name Makefile);	\
 	make -pqR : 2>/dev/null \
 		| awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' \
 		| sort \
@@ -102,7 +102,7 @@ __check_defined = \
 
 .PHONY: .check_python_version
 .check_python_version::
-	version=$$(echo $(PYTHON_VERSION) | sed -e 's/Python[ ]*//');  \
+	@version=$$(echo $(PYTHON_VERSION) | sed -e 's/Python[ ]*//');  \
 	major=$$(echo $$version | awk -F. '{print $$1}');               \
 	minor=$$(echo $$version | awk -F. '{print $$2}');               \
 	if [ $$major -lt 3 -o $$minor -lt 10 -o $$minor -gt 11 ]; then  \

@@ -67,6 +67,19 @@ In the fuzzy dedup implementation, the [transformer](src/fdedup_transform.py) on
 table, it checks document ids with the `DocumentsCollector` cache and removes all of the rows which do not have ids in 
 the hash 
 
+## Snapshotting
+
+Fuzzy dedup often runs on very large data sets and implements three very distinct phases:
+* Building buckets
+* Processing buckets
+* Filtering data
+To improve recoverability of fuzzy dedup, current implementation includes snapshotting - at the end of the first two 
+phases we snapshot the current state of execution - bucket and minhash actors after the first phase and document actors 
+after the second. This snapshotting provide code with the ability to restart from the existing snapshot. You can use one
+of two configuration flags (assuming snapshots exist):
+* `use_bucket_snapshot` to start from the second phase
+* `use_doc_snapshot` to start from the third phase
+
 ## Building
 
 A [docker file](Dockerfile) that can be used for building docker image. You can use 
@@ -92,6 +105,9 @@ configuration for values are as follows:
 * _shingles_size_ - specifies shingles size
 * _japanese_data_ - specifies whether to use japanese specific document splitting
 * _delimiters_ - specifies delimiter for non japanese document splitting
+* _snapshot_delay_ - delay between different actors reading/writing snapshot not to overwhelm storage
+* -use_bucket_snapshot_ - run from the existing buckets snapshot (bypass building buckets)
+* -use_doc_snapshot_ - run from the existing docs snapshot (bypass building and processing buckets)
 
 Above you see both parameters and their values for small runs (tens of files). We also provide an 
 [estimate](src/cluster_estimator.py) to roughly determine cluster size for running transformer.

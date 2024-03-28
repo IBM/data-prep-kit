@@ -1,7 +1,7 @@
 import os
 from split_file_transform import SplitFileTransformConfiguration
 from data_processing.test_support.ray import AbstractTransformLauncherTest
-from data_processing.utils import ParamsUtils
+
 
 
 class TestRayBlocklistTransform(AbstractTransformLauncherTest):
