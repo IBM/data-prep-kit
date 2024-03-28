@@ -1,10 +1,12 @@
 import io
-import zipfile
-from raw_data_to_parquet import zip_to_table, raw_to_parquet, generate_stats
-from unittest.mock import patch, MagicMock
-from parameterized import parameterized
 import unittest
+import zipfile
+from unittest.mock import MagicMock, patch
+
 import pyarrow as pa
+from parameterized import parameterized
+from raw_data_to_parquet import generate_stats, raw_to_parquet, zip_to_table
+from utils import detect_language
 
 
 def create_test_zip(file_names, contents_list):
@@ -33,6 +35,13 @@ class TestZipToTable(unittest.TestCase):
         self.mock_instance = self.mock_data_access.return_value
         self.addCleanup(self.mock_data_access_patcher.stop)
 
+        self.mock_detect_lang_patcher = patch(
+            "utils.detect_langauge.Detect_Programming_Lang"
+        )
+        self.mock_detect_lang = self.mock_data_access_patcher.start()
+        self.mock_detect_lang_instance = self.mock_detect_lang.return_value
+        self.addCleanup(self.mock_detect_lang_patcher.stop)
+
     @parameterized.expand(
         [
             (
@@ -47,16 +56,20 @@ class TestZipToTable(unittest.TestCase):
                     "hash",
                     "size",
                     "date_acquired",
+                    "lang",
                 ],
             ),
         ]
     )
     def test_valid_zip(self, file_names, contents, expected_column_names):
-
         test_file_path = "test.zip"
         self.mock_instance.get_file.return_value = create_test_zip(file_names, contents)
+        self.mock_detect_lang_instance.get_lang_from_ext.return_value = "unknown"
 
-        table = zip_to_table(self.mock_instance, test_file_path)
+        table = zip_to_table(
+            self.mock_instance, test_file_path, self.mock_detect_lang_instance
+        )
+        print("t--", table)
 
         # Assertions
         self.assertTrue(table)
@@ -69,13 +82,14 @@ class TestZipToTable(unittest.TestCase):
         self.assertEqual(table.schema.field("hash").type, pa.string())
         self.assertEqual(table.schema.field("size").type, pa.int64())
         self.assertEqual(table.schema.field("date_acquired").type, pa.string())
+        self.assertEqual(table.schema.field("lang").type, pa.string())
         self.assertEqual(len(table), len(file_names))
 
         with patch(
             "data_processing.utils.TransformUtils.decode_content"
         ) as mock_decode_content:
             mock_decode_content.side_effect = Exception("Decoding failed")
-            table = zip_to_table(self.mock_instance, test_file_path)
+            table = zip_to_table(self.mock_instance, test_file_path, True)
             self.assertEqual(len(table), 0)
 
     @parameterized.expand([(["empty_file.txt"], [""]), ([], [])])
@@ -83,13 +97,12 @@ class TestZipToTable(unittest.TestCase):
         test_file_path = "test.zip"
         self.mock_instance.get_file.return_value = create_test_zip(file_names, contents)
 
-        table = zip_to_table(self.mock_instance, test_file_path)
+        table = zip_to_table(self.mock_instance, test_file_path, True)
 
         self.assertFalse(table)
 
 
 class TestRawToParquet(unittest.TestCase):
-
     def setUp(self):
         self.mock_data_access_factory_patcher = patch(
             "data_processing.data_access.DataAccessFactory"
@@ -106,28 +119,35 @@ class TestRawToParquet(unittest.TestCase):
         )
 
     def test_process_zip_sucessfully(self):
-        with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
-            mock_zip_to_table.return_value = pa.Table.from_pylist([])
-            self.mock_data_access_instance.save_table.return_value = (0, {"k","v"})
-            self.mock_data_access_instance.get_output_location.return_value = (
-                "output_file.parquet"
-            )
+        with patch(
+            "data_processing.utils.TransformUtils.add_column"
+        ) as mock_add_column:
+            with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
+                mock_zip_to_table.return_value = pa.Table.from_pylist([])
+                mock_add_column.return_value = pa.Table.from_pylist([])
+                self.mock_data_access_instance.save_table.return_value = (0, {"k", "v"})
+                self.mock_data_access_instance.get_output_location.return_value = (
+                    "output_file.parquet"
+                )
 
-            result = raw_to_parquet(self.mock_data_access_factory_instance, "test.zip")
+                result = raw_to_parquet(
+                    self.mock_data_access_factory_instance, "test.zip", True, "code"
+                )
 
-            # Assertions
-            self.assertEqual(
-                result, (True, {"path": "test.zip", "bytes_in_memory": 0,'row_count': 0})
-            )
-            self.mock_data_access_instance.get_output_location.assert_called_once_with(
-                "test.zip"
-            )
-            self.mock_data_access_instance.save_table.assert_called_once_with(
-                "output_file.parquet", pa.Table.from_pylist([])
-            )
+                # Assertions
+                self.assertEqual(
+                    result,
+                    (True, {"path": "test.zip", "bytes_in_memory": 0, "row_count": 0}),
+                )
+                self.mock_data_access_instance.get_output_location.assert_called_once_with(
+                    "test.zip"
+                )
+                self.mock_data_access_instance.save_table.assert_called_once_with(
+                    "output_file.parquet", pa.Table.from_pylist([])
+                )
 
     def test_unsupported_file_type(self):
-        result = raw_to_parquet(self.mock_data_access_factory, "test.txt")
+        result = raw_to_parquet(self.mock_data_access_factory, "test.txt", True, "code")
 
         self.assertEqual(
             result,
@@ -139,7 +159,9 @@ class TestRawToParquet(unittest.TestCase):
             mock_zip_to_table.return_value = pa.Table.from_pylist([])
             self.mock_data_access_instance.save_table.return_value = (0, {})
 
-            result = raw_to_parquet(self.mock_data_access_factory_instance, "test.zip")
+            result = raw_to_parquet(
+                self.mock_data_access_factory_instance, "test.zip", True, "code"
+            )
 
             # Assertions
             self.assertEqual(
@@ -153,7 +175,9 @@ class TestRawToParquet(unittest.TestCase):
                 "Test exception"
             )
 
-            result = raw_to_parquet(self.mock_data_access_factory_instance, "test.zip")
+            result = raw_to_parquet(
+                self.mock_data_access_factory_instance, "test.zip", True, "code"
+            )
 
             self.assertEqual(
                 result, (False, {"path": "test.zip", "error": "Test exception"})
@@ -163,14 +187,14 @@ class TestRawToParquet(unittest.TestCase):
 class TestGenerateStats(unittest.TestCase):
     def test_successful_metadata(self):
         metadata = [
-            (True, {"path": "file1.txt", "bytes_in_memory": 100,"row_count":10}),
-            (True, {"path": "file2.txt", "bytes_in_memory": 200,"row_count":20}),
+            (True, {"path": "file1.txt", "bytes_in_memory": 100, "row_count": 10}),
+            (True, {"path": "file2.txt", "bytes_in_memory": 200, "row_count": 20}),
         ]
         expected_result = {
             "total_files_given": 2,
             "total_files_processed": 2,
             "total_files_failed_to_processed": 0,
-            "total_no_of_rows":30,
+            "total_no_of_rows": 30,
             "total_bytes_in_memory": 300,
             "failure_details": [],
         }
@@ -180,14 +204,14 @@ class TestGenerateStats(unittest.TestCase):
 
     def test_failed_metadata(self):
         metadata = [
-            (True, {"path": "file1.txt", "bytes_in_memory": 100,"row_count":10}),
+            (True, {"path": "file1.txt", "bytes_in_memory": 100, "row_count": 10}),
             (False, {"path": "file2.txt", "error": "Failed to process"}),
         ]
         expected_result = {
             "total_files_given": 2,
             "total_files_processed": 1,
             "total_files_failed_to_processed": 1,
-            "total_no_of_rows":10,
+            "total_no_of_rows": 10,
             "total_bytes_in_memory": 100,
             "failure_details": [{"path": "file2.txt", "error": "Failed to process"}],
         }
@@ -201,7 +225,7 @@ class TestGenerateStats(unittest.TestCase):
             "total_files_given": 0,
             "total_files_processed": 0,
             "total_files_failed_to_processed": 0,
-            "total_no_of_rows":0,
+            "total_no_of_rows": 0,
             "total_bytes_in_memory": 0,
             "failure_details": [],
         }
@@ -218,7 +242,7 @@ class TestGenerateStats(unittest.TestCase):
             "total_files_given": 2,
             "total_files_processed": 0,
             "total_files_failed_to_processed": 2,
-            "total_no_of_rows":0,
+            "total_no_of_rows": 0,
             "total_bytes_in_memory": 0,
             "failure_details": [
                 {"path": "file1.txt", "error": "Failed to process"},
@@ -226,5 +250,20 @@ class TestGenerateStats(unittest.TestCase):
             ],
         }
         result = generate_stats(metadata)
-        
+
         self.assertEqual(result, expected_result)
+
+
+class TestDetectProgrammingLang(unittest.TestCase):
+    def setUp(self):
+        self.detector = detect_language.Detect_Programming_Lang()
+
+    def test_get_lang_from_ext_known(self):
+        ext = ".py"
+        lang = self.detector.get_lang_from_ext(ext)
+        self.assertEqual(lang, "Python")
+
+    def test_get_lang_from_ext_unknown(self):
+        ext = ".xyz"
+        lang = self.detector.get_lang_from_ext(ext)
+        self.assertEqual(lang, "unknown")
