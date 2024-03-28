@@ -106,7 +106,7 @@ if __name__ == "__main__":
     exec_params["s3_cred"] = (
             "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
     )
-    exec_params[f"{prefix}s3_cred"] = (
+    exec_params[f"{prefix}_s3_cred"] = (
             "{'access_key': '" + extra_access_key + "', 'secret_key': '" + extra_secret_key + "', 'url': '" + extra_url + "'}"
     )
     # Execute Ray jobs

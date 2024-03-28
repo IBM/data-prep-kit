@@ -49,7 +49,7 @@ def ededup(
     max_files: int = -1,
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
-    cos_access_secret: str = "cos-access",
+    s3_access_secret: str = "cos-access",
     s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_ededup_guf/'}",
 ):
     """
@@ -78,13 +78,13 @@ def ededup(
         http_retries - httpt retries for API server calls
     :param lh_config - lake house configuration
     :param s3_config - s3 configuration
-    :param cos_access_secret - cos access secret
+    :param s3_access_secret - s3 access secret
     :param max_files - max files to process
     :param actor_options - actor options
     :param pipeline_id - pipeline id
-    :param hash_cpu -
-    :param num_hashes -
-    :param doc_column -
+    :param hash_cpu - number of CPUs per hash
+    :param num_hashes - number of hash actors to use
+    :param doc_column - key for accessing data
     :return: None
     """
     # create clean_up task
@@ -99,7 +99,7 @@ def ededup(
             params={"s3_config": s3_config, "hash_cpu": hash_cpu}
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
-        ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, cos_access_secret)
+        ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, s3_access_secret)
 
         # start Ray cluster
         ray_cluster = create_ray_op(
@@ -133,7 +133,7 @@ def ededup(
             server_url=server_url,
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
-        ComponentUtils.set_s3_env_vars_to_component(execute_job, cos_access_secret)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, s3_access_secret)
         execute_job.after(ray_cluster)
 
     # set image pull secrets

@@ -21,8 +21,6 @@ DOCKER_FILE=Dockerfile
 DOCKER_REGISTRY=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
 EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
 
-PYTHON_VERSION=$(shell $(PYTHON) --version)
-
 # The following taken from https://stackoverflow.com/a/65243296/45375
 # Lists all targets and optional help text found in the target.
 # :: rule means we first run the help from the main make.defaults.
@@ -45,19 +43,6 @@ help::
 	@# Help:  Do nothing, since nothing to setup by default. 
  
 
-.PHONY: .transforms.check_python_version
-.transforms.check_python_version::
-	@version=$$(echo $(PYTHON_VERSION) | sed -e 's/Python[ ]*//');	\
-	major=$$(echo $$version | awk -F. '{print $$1}');		\
-	minor=$$(echo $$version | awk -F. '{print $$2}');		\
-	if [ $$major -lt 3 -o $$minor -lt 10 -o $$minor -gt 12 ]; then	\
-		echo Python 3.10 or 3.11 is required, but got $$version;	\
-		echo Try overriding PYTHON=$(PYTHON).  For example, "'"make PYTHON=python3.10" ...'"; 	\
-		exit 1;							\
-	fi
-	
-	
-
 .PHONY: .transforms.check_required_macros
 .transforms.check_required_macros::
 	@if [ -z "$(DOCKER_IMAGE_NAME)" ]; then		\
@@ -78,7 +63,7 @@ help::
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
 .PHONY: .transforms.venv
-.transforms.venv::	requirements.txt .transforms.check_python_version
+.transforms.venv::	requirements.txt .check_python_version
 	@$(MAKE) .transforms.check_env	# Put this first so we don't get its help
 	@# Help: Create the virtual environment using requirements.txt
 	$(PYTHON) -m venv venv
@@ -126,10 +111,9 @@ help::
 
 .PHONY: .transforms.test-lib-src
 .transforms.test-lib-src::
-	$(MAKE) .transforms.install-lib-src 
-	@# Help: Run pytest on the test directory after installing data-process-lib source into the current venv
+	@# Help: Run pytest on the test directory with data-processing-lib/src in PYTHONPATH 
 	source venv/bin/activate;			\
-	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
+	export PYTHONPATH=../src:.:$(REPOROOT)/data-processing/lib/src:$$PYTHONPATH;	\
 	cd test; $(PYTEST) . 
 
 .PHONY: .transforms.test # because there is a directory called tests in the projects

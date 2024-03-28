@@ -28,6 +28,7 @@ class TestInit:
     size_stat_dict_empty = {"max_file_size": 0.0, "min_file_size": float(GB), "total_file_size": 0.0}
     size_stat_dict = {"max_file_size": 0.0, "min_file_size": 0.0, "total_file_size": 0.0}
     size_stat_dict_1 = {"max_file_size": 1.0, "min_file_size": 0.0, "total_file_size": 1.0}
+    size_stat_dict_1_1 = {"max_file_size": 1.0, "min_file_size": 1.0, "total_file_size": 1.0}
 
 
 class TestGetFilesFolder(TestInit):
@@ -67,8 +68,8 @@ class TestGetFilesFolder(TestInit):
             fp.write(" " * MB)
 
         file_list, size_dict = self.dal._get_files_folder(str(directory), cm_files=0)
-        results = (sorted(file_list), size_dict)
-        expected_results = (sorted([str(file.absolute()) for file in files]), self.size_stat_dict_1)
+        results = (file_list, size_dict)
+        expected_results = ([str(file.absolute()) for file in files], self.size_stat_dict_1)
         for file in files:
             os.remove(file)
         os.rmdir(directory)
@@ -163,10 +164,10 @@ class TestGetInputFiles(TestInit):
         output_file.touch()
 
         file_list, size_dict = self.dal._get_input_files(str(input_path), str(output_path), cm_files=0)
-        result = (sorted(file_list), size_dict)
+        result = (file_list, size_dict)
 
         expected_result = (
-            sorted([file.name for file in input_files if file.name != output_file.name]),
+            [file.name for file in input_files if file.name != output_file.name],
             self.size_stat_dict,
         )
 
@@ -278,9 +279,8 @@ class TestGetFilesToProcess(TestInit):
         out_file_2.touch()
         with open(in_files_1[0], "w") as fp:
             fp.write(" " * MB)
-
         file_list, size_dict = self.dal.get_files_to_process()
-        result = (sorted(file_list), size_dict)
+        result = (file_list, size_dict)
         return result, in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
 
     def multiple_missing_files_cleanup(
@@ -306,10 +306,8 @@ class TestGetFilesToProcess(TestInit):
         ) = self.multiple_missing_files_setup()
 
         expected_result = (
-            sorted(
-                [str(file.absolute()) for file in in_files_1 if file.absolute() != out_file_2.absolute()]
-                + [str(file.absolute()) for file in in_files_2 if file.name != out_file_2.name]
-            ),
+            [str(file.absolute()) for file in in_files_1 if file.absolute() != out_file_2.absolute()]
+            + [str(file.absolute()) for file in in_files_2 if file.name != out_file_2.name],
             self.size_stat_dict_1,
         )
         self.multiple_missing_files_cleanup(
@@ -330,7 +328,7 @@ class TestGetFilesToProcess(TestInit):
             out_path_2,
         ) = self.multiple_missing_files_setup()
         expected_result = (
-            sorted([str(file.absolute()) for file in in_files_1] + [str(file.absolute()) for file in in_files_2]),
+            [str(file.absolute()) for file in in_files_1] + [str(file.absolute()) for file in in_files_2],
             self.size_stat_dict_1,
         )
         self.multiple_missing_files_cleanup(
@@ -349,16 +347,11 @@ class TestGetFilesToProcess(TestInit):
             in_path_2,
             out_path_2,
         ) = self.multiple_missing_files_setup()
-        expected_result = ([str(in_files_1[-1].absolute())], self.size_stat_dict)
-
-        logger.info(f"result = {result}")
-        logger.info(f"in_files_1 = {in_files_1}")
-        logger.info(f"expected_result = {expected_result}")
+        expected_result = ([str(in_files_1[0].absolute())], self.size_stat_dict_1_1)
 
         self.multiple_missing_files_cleanup(
             in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
         )
-        assert 1 == 0
         assert result == expected_result
 
     def test_non_existent_dataset(self):
