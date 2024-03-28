@@ -222,3 +222,14 @@ class DataAccessLakeHouse(DataAccess):
         :return: A dictionary of file names/binary content will be returned
         """
         return self.S3.get_folder_files(path=path, extensions=extensions, return_data=return_data)
+
+    def save_file_rel(self, path: str, data: bytes) -> dict[str, Any]:
+        """
+        Save byte array to the file
+        :param path: file path relative to output directory
+        :param data: byte array
+        :return: a dictionary as
+        defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
+        in the case of failure dict is None
+        """
+        return self.S3.save_file_rel(path=path, data=data)

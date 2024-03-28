@@ -21,7 +21,7 @@ class TestRayBlocklistTransform(AbstractTransformLauncherTest):
             "bucket_cpu": 0.5,
             "doc_cpu": 0.5,
             "mhash_cpu": 0.5,
-            "num_doc_actors": 1,
+            "num_doc_actors": 2,
             "num_bucket_actors": 1,
             "num_minhash_actors": 1,
             "num_preprocessors": 2,

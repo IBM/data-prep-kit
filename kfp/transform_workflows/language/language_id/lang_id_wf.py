@@ -1,5 +1,3 @@
-import os
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
@@ -9,16 +7,17 @@ from kfp_support.workflow_support.utils import (
     ComponentUtils,
 )
 from kubernetes import client as k8s_client
-from src.ededup_compute_execution_params import ededup_compute_execution_params
 
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "ededup_transform.py"
+EXEC_SCRIPT_NAME: str = "lang_id_transform.py"
 
 # components
 base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1"
-# compute execution parameters
-compute_exec_params_op = comp.func_to_container_op(func=ededup_compute_execution_params, base_image=base_kfp_image)
+# compute execution parameters. Use default one for now.
+compute_exec_params_op = comp.func_to_container_op(
+    func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
+)
 # create Ray cluster
 create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
 # execute job
@@ -26,33 +25,34 @@ execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components
 # clean up Ray
 cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "ededup"
+TASK_NAME: str = "lang_id"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for ededup",
+    description="Pipeline for language id",
 )
-def ededup(
-    ray_name: str = "ededup-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/ededup-guf:0.0.1",\
+def lang_id(
+    ray_name: str = "langid-kfp-ray",  # name of Ray cluster
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/langid-guf:0.0.1",\
              "image_pull_secret": "prod-all-icr-io"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/ededup-guf:0.0.1"}',
+            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/langid-guf:0.0.1"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
-    hash_cpu: float = 0.5,
-    num_hashes: int = 0,
-    doc_column: str = "contents",
+    lang_id_model_credential: str = "",
+    lang_id_model_kind: str = "fasttext",
+    lang_id_model_url: str = "facebook/fasttext-language-identification",
+    lang_id_content_column_name: str = "contents",
     lh_config: str = "None",
     max_files: int = -1,
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     s3_access_secret: str = "cos-access",
-    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_ededup_guf/'}",
+    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_langid_guf/'}",
 ):
     """
-    Pipeline to execute EDEDUP transform
+    Pipeline to execute LANG_ID transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -81,9 +81,10 @@ def ededup(
     :param max_files - max files to process
     :param actor_options - actor options
     :param pipeline_id - pipeline id
-    :param hash_cpu - number of CPUs per hash
-    :param num_hashes - number of hash actors to use
-    :param doc_column - key for accessing data
+    :param lang_id_model_credential - Credential to access model for language detection placed in url
+    :param lang_id_model_kind - Kind of model for language detection
+    :param lang_id_model_url - Url to model for language detection
+    :param lang_id_content_column_name - Column name to get content
     :return: None
     """
     # create clean_up task
@@ -95,7 +96,6 @@ def ededup(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=actor_options,
-            params={"s3_config": s3_config, "hash_cpu": hash_cpu},
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, s3_access_secret)
@@ -118,12 +118,13 @@ def ededup(
             additional_params=additional_params,
             exec_params={
                 "s3_config": s3_config,
-                "hash_cpu": hash_cpu,
-                "num_hashes": compute_exec_params.outputs["hashes"],
-                "doc_column": doc_column,
+                "lang_id_model_credential": lang_id_model_credential,
+                "lang_id_model_kind": lang_id_model_kind,
+                "lang_id_model_url": lang_id_model_url,
+                "lang_id_content_column_name": lang_id_content_column_name,
                 "lh_config": lh_config,
                 "max_files": max_files,
-                "num_workers": compute_exec_params.outputs["workers"],
+                "num_workers": compute_exec_params.output,
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
                 "job_id": dsl.RUN_ID_PLACEHOLDER,
@@ -143,4 +144,4 @@ def ededup(
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(ededup, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(lang_id, __file__.replace(".py", ".yaml"))

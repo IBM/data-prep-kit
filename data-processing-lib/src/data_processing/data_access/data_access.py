@@ -62,6 +62,16 @@ class DataAccess:
         in the case of failure dict is None
         """
 
+    def save_file_rel(self, path: str, data: bytes) -> dict[str, Any]:
+        """
+        Save byte array to the file
+        :param path: file path relative to output directory
+        :param data: byte array
+        :return: a dictionary as
+        defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
+        in the case of failure dict is None
+        """
+
     def get_output_location(self, path: str) -> str:
         """
         Get output location based on input

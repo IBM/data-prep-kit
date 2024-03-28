@@ -2,7 +2,6 @@ from typing import Tuple
 
 import pyarrow as pa
 from data_processing.test_support.transform.transform_test import AbstractTransformTest
-from split_file_transform import SplitFileTransform
 
 
 # todo: copied from noop.  Needs attention to set real test data.

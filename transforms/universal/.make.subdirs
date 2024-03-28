@@ -1,7 +1,7 @@
 # These ae passing
 blocklisting
 noop
-#split_file
+split_file
 fdedup
 ededup
 doc_id
