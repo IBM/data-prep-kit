@@ -357,6 +357,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
                 self.document_collectors[i] = (DocCollector.options(**{"num_cpus": self.params.get("doc_cpu", 0.5)})
                                                .remote({"id": i, "data_access": data_access_factory, "snapshot": file}))
                 time.sleep(self.snapshot_delay)
+            logger.info(f"Created {len(self.document_collectors)} document collectors to continue processing")
         else:
             logger.info("starting run from the beginning")
             self._create_doc_actors(data_access_factory=data_access_factory, statistics=statistics, files=files)
@@ -391,6 +392,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
                 bucket_collectors[i] = (BucketsHash.options(**{"num_cpus": self.params.get("bucket_cpu", 0.5)})
                                         .remote({"id": i, "data_access": data_access_factory, "snapshot": file}))
                 time.sleep(self.snapshot_delay)
+            logger.info(f"Created {len(bucket_collectors)} bucket collectors to continue processing")
             # recreate minhash collectors
             path = f"{self._get_output_folder(data_access)}snapshot/minhash"
             files = data_access.get_folder_files(path=path)
@@ -404,6 +406,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             self._process_buckets(data_access_factory=data_access_factory, statistics=statistics,
                                   bucket_collectors=bucket_collectors, minhash_collectors=minhash_collectors,
                                   mn_min_hash=mn_min_hash)
+            logger.info(f"Created {len(minhash_collectors)} minhash collectors to continue processing")
         else:
             logger.info("continuing from the very beginning")
             self._create_doc_actors_internal(data_access_factory=data_access_factory, statistics=statistics,

@@ -48,7 +48,7 @@ params = {
     "delimiters": " ",
     "snapshot_delay": 1,
     "use_doc_snapshot": False,
-    "use_bucket_snapshot": True,
+    "use_bucket_snapshot": False,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 
