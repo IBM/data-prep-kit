@@ -34,7 +34,7 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    "coalesce_target": 100,
+    "coalesce_target_mb": 100,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 # for arg in sys.argv:

@@ -5,10 +5,11 @@ import pyarrow as pa
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
-    TransformLauncher
+    TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import LOCAL_TO_DISK, MB, get_logger
+
 
 logger = get_logger(__name__)
 
@@ -23,7 +24,7 @@ class CoalesceTransform(AbstractTableTransform):
         Initialize based on the dictionary of configuration information.
         """
         super().__init__(config)
-        self.coalesce_target = LOCAL_TO_DISK * MB * config.get("coalesce_target", 1.0)
+        self.coalesce_target = LOCAL_TO_DISK * MB * config.get("coalesce_target_mb", 1.0)
         self.output_buffer = []
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
@@ -89,8 +90,8 @@ class CoalesceTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            "--coalesce_target",
-            type=int,
+            "--coalesce_target_mb",
+            type=float,
             default=0,
             help="Coalesce target (MB)",
         )
@@ -101,10 +102,10 @@ class CoalesceTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        if args.coalesce_target <= 0:
-            logger.info(f"Parameter coalesce_target should be greater then 0, you specified {args.coalesce_target}")
+        if args.coalesce_target_mb <= 0:
+            logger.info(f"Parameter coalesce_target should be greater then 0, you specified {args.coalesce_target_mb}")
             return False
-        self.params["coalesce_target"] = args.coalesce_target
+        self.params["coalesce_target_mb"] = args.coalesce_target_mb
         logger.info(f"Coalesce parameters are : {self.params}")
         return True
 

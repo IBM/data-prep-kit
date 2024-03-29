@@ -25,12 +25,12 @@ make build to build it
 The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py)
 configuration for values are as follows:
 
-* _coalesce_target_ - specifies coalesce target in MB
+* _coalesce_target_mb_ - specifies coalesce target in MB
 
 ## Running
 
 We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/coalesce_local.py), [s3](src/coalesce_s3.py) and [lakehouse](src/coalesce_lakehouse.py)
+[local file system](src/coalesce_local_ray.py), [s3](src/coalesce_s3.py) and [lakehouse](src/coalesce_lakehouse.py)
 
 # Release notes
 

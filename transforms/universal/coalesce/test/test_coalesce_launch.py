@@ -1,4 +1,5 @@
 import os
+
 from coalesce_transform import CoalesceTransformConfiguration
 from data_processing.test_support.ray import AbstractTransformLauncherTest
 from data_processing.utils import ParamsUtils
@@ -15,7 +16,7 @@ class TestRayBlocklistTransform(AbstractTransformLauncherTest):
         config = {
             # When running in ray, our Runtime's get_transform_config() method  will load the domains using
             # the orchestrator's DataAccess/Factory. So we don't need to provide the bl_local_config configuration.
-            "coalesce_target": 100,
+            "coalesce_target_mb": 0.1,
         }
         fixtures = [(CoalesceTransformConfiguration(), config, basedir + "/input", basedir + "/expected")]
         return fixtures
