@@ -20,7 +20,7 @@ expected_table = pa.Table.from_pydict(
     {
         "doc": pa.array(["Tom", "Joe"]),
         "doc_hash": pa.array([TransformUtils.str_to_hash("Tom"), TransformUtils.str_to_hash("Joe")]),
-        "doc_int": pa.array([0, 1]),
+        # "doc_int": pa.array([0, 1]),   Can't generate integer doc ids outside of Ray
     }
 )
 expected_metadata_list = [{}, {}]  # transform() result  # flush() result
@@ -37,7 +37,7 @@ class TestDocIDTransform(AbstractTransformTest):
         config = {
             doc_column_name_key: "doc",
             hash_column_name_key: "doc_hash",
-            int_column_name_key: "doc_int",
+            # int_column_name_key: "doc_int",    Can't generate integer ids outside of ray
         }
         fixtures.append((DocIDTransform(config), [table], [expected_table], expected_metadata_list))
         return fixtures
