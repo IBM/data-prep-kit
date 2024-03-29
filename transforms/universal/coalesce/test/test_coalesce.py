@@ -32,6 +32,6 @@ class TestCoalesceTransform(AbstractTransformTest):
 
     def get_test_transform_fixtures(self) -> list[Tuple]:
         fixtures = [
-            (CoalesceTransform({}), [table], [expected_table], expected_metadata_list),
+            (CoalesceTransform({"coalesce_target_mb": 0.1}), [table], [expected_table], expected_metadata_list),
         ]
         return fixtures

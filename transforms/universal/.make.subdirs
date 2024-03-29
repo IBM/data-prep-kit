@@ -1,10 +1,10 @@
 # These ae passing
+coalesce
 blocklisting
 noop
 split_file
 fdedup
 ededup
 doc_id
-#coalesce
-# These are failing
 tokenization
+# These are failing
