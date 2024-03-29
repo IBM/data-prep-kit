@@ -21,7 +21,36 @@ branches:
 #    - podman machine start
 #    - podman info
 
-script: cd data-processing-lib
-    && make DOCKER=$DOCKER venv test
-    && cd ../transforms
-    && make DOCKER=$DOCKER venv test-lib-src
+jobs:
+    include:
+        - stage: data-processing-lib-tests
+          name: "Testing data-processing-lib"
+          script:
+          - |
+            cd data-processing-lib
+            make DOCKER=$DOCKER venv test
+            cd ../transforms
+            make DOCKER=$DOCKER venv test-lib-src
+        - stage: kfp-support-lib-tests
+          name: "Testing kfp-support-lib"
+          install:
+          - source kind/requirements.env
+          - export PATH=$PATH:/tmp/
+          - curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+          - curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+          - chmod 700 /tmp/get_helm.sh
+          - HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
+          - chmod 777 /tmp/helm
+          - chmod 777 /tmp/kind
+          - curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
+          - chmod 777 /tmp/kubectl
+          script:
+          - |
+            export DEPLOY_KUBEFLOW=0
+            cd kind
+            make setup || travis_terminate 1
+            cd $TRAVIS_BUILD_DIR/kfp/kfp_support_lib
+            kubectl get ingress -A
+            make build
+            make test
+

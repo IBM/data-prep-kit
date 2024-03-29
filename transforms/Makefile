@@ -3,8 +3,7 @@ REPOROOT=../
 include ../.make.defaults
 
 setup::
-	@# Help: Recursively setup all subdirs 
-	$(MAKE) RULE=setup .recurse
+
 clean::
 	@# Help: Recursively clean all subdirs 
 	$(MAKE) RULE=clean .recurse
