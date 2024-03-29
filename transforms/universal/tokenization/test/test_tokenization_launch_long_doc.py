@@ -13,8 +13,8 @@ tkn_params = {
         }
 class TestRayTokenizationTransform(AbstractTransformLauncherTest):
     """
-    Extends the super-class to define the test data for the tests defined there.
-    The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
+    This tests a tokenizer in tokenizing a very long document in a parquet file through tokenizing each chunk of it.
+    By tokenizing each chunk of text and merging them, it helps to improve the running time.
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
