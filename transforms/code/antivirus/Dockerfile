@@ -6,11 +6,11 @@ RUN apt -y update \
     && rm -rf /var/lib/apt/lists/*
 USER ray
 
-FROM clamav/clamav:latest AS clamav
+FROM docker.io/clamav/clamav:latest AS clamav
 FROM base AS clamav-local
 USER root
-COPY --chown=ray:users --chmod=774 --from=clamav /var/lib/clamav/ /var/lib/clamav/
-COPY --chown=ray:users --chmod=774 clamd.conf /etc/clamav/clamd.conf
+COPY --chown=ray:users --from=clamav /var/lib/clamav/ /var/lib/clamav/
+COPY --chown=ray:users clamd.conf /etc/clamav/clamd.conf
 RUN freshclam \
     && mkdir -p /var/run/clamav \
     && chown -R ray:users /var/run/clamav /var/log/clamav /var/lib/clamav

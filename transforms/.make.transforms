@@ -15,6 +15,7 @@
 #
 #######################################################################################
 include $(REPOROOT)/.make.defaults
+ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 
 DOCKER=podman
 DOCKER_FILE=Dockerfile
@@ -113,7 +114,7 @@ help::
 .transforms.test-lib-src::
 	@# Help: Run pytest on the test directory with data-processing-lib/src in PYTHONPATH 
 	source venv/bin/activate;			\
-	export PYTHONPATH=../src:.:$(REPOROOT)/data-processing/lib/src:$$PYTHONPATH;	\
+	export PYTHONPATH=../src:.:$(ABS_REPOROOT)/data-processing-lib/src:$$PYTHONPATH;	\
 	cd test; $(PYTEST) . 
 
 .PHONY: .transforms.test # because there is a directory called tests in the projects
