@@ -3,6 +3,7 @@ import numpy as np
 from typing import Any, Iterator, Union
 import ray
 from ray import cloudpickle
+from ray.util.metrics import Counter
 from ray.actor import ActorHandle
 from ray.util import ActorPool
 
@@ -285,6 +286,9 @@ class BucketsHash:
             except Exception as e:
                 self.logger.warning(f"Failed to load buckets collector {self.actor_id} with exception {e}")
                 raise e
+        self.bucket_created_counter = Counter("bucket_created", "Amount of buckets created")
+        self.long_bucket_submit_counter = Counter("long_bucket_submitted", "Amount of long buckets submitted")
+        self.short_bucket_submit_counter = Counter("short_bucket_submitted", "Amount of short buckets submitted")
 
     def add_buckets(self, bck: list[tuple[int, list[int]]]) -> None:
         """
@@ -305,6 +309,7 @@ class BucketsHash:
                     self.buckets[b_hash] = bucket[1][0]
                 else:
                     self.buckets[b_hash] = bucket[1]
+                self.bucket_created_counter.inc(1)
 
     def add_processing_submitter(self, submitter: ActorHandle) -> None:
         """
@@ -345,14 +350,17 @@ class BucketsHash:
                                   for i in range((len(bucket) + LONG_BUCKET - 1) // LONG_BUCKET)]
                 for b in smaller_bucket:
                     ray.get(self.submitter.submit_for_processing.remote([b]))
+                    self.long_bucket_submit_counter.inc(1)
             else:
                 ray.get(self.submitter.submit_for_processing.remote([bucket]))
-            self.logger.info("Done submitting long buckets")
+                self.long_bucket_submit_counter.inc(1)
+        self.logger.info("Done submitting long buckets")
 
         # And now the rest of buckets
         bucket_chunks = [short_buckets[i * 100:(i + 1) * 100] for i in range((len(short_buckets) + 99) // 100)]
         for b in bucket_chunks:
             ray.get(self.submitter.submit_for_processing.remote(b))
+            self.short_bucket_submit_counter.inc(len(b))
 
     def snapshot(self) -> None:
         """
@@ -394,6 +402,7 @@ class BucketsHashProcessor:
         self.remote_minhashes = params["remote_minhashes"]
         self.stats = params["statistics"]
         self.logger = get_logger(__name__)
+        self.bucket_processed_counter = Counter("bucket_processed", "Amount of buckets processed")
 
     def _submit_generated_docs(self, docs: dict[int, int], removed: set[int]) -> None:
         """
@@ -464,6 +473,7 @@ class BucketsHashProcessor:
                 # This hash has a single document
                 if bucket not in docs:
                     docs[bucket] = NO_SIMILARITY
+                self.bucket_processed_counter.inc(1)
                 continue
             # multiple documents
             start = time.time()
@@ -528,7 +538,7 @@ class BucketsHashProcessor:
                     f"min; "
                     f"docs chains {len(set_list)}"
                 )
-
+            self.bucket_processed_counter.inc(1)
         # Submit docs
         self._submit_generated_docs(docs, removed)
         # peg stats
