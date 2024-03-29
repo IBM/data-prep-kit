@@ -26,11 +26,11 @@ EOF
 
 case "$op" in
 	cleanup)
-		header_text "Uninstalling NGINX"
+		header_text "Uninstalling ingress"
 		delete
 		;;
 	deploy)
-		header_text "Installing NGINX"
+		header_text "Installing ingress"
 		deploy
 		;;
 	*)
