@@ -13,8 +13,10 @@ tkn_params = {
         }
 class TestRayTokenizationTransform(AbstractTransformLauncherTest):
     """
-    This tests a tokenizer in tokenizing a very long document in a parquet file through tokenizing each chunk of it.
-    By tokenizing each chunk of text and merging them, it helps to improve the running time.
+    This involves testing a tokenizer by tokenizing a lengthy document
+    through segmenting it into chunks and then tokenizing each segment individually.
+    By tokenizing the text in this manner and subsequently merging the tokenized chunks,
+    it contributes to enhancing the overall runtime efficiency.
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:

@@ -31,9 +31,9 @@ params = {
 }
 if __name__ == "__main__":
     """
-    This shows the impact of `tkn_chunk_size` in tokenizing a long document (~16.8 million characters).
-    Tokenizing the whole document in a single shot (i.e., tkn_chunk_size=0) can take much longer time 
-    than splitting it into chunks of ~20_000 characters each.
+    This illustrates the impact of `tkn_chunk_size` in tokenizing a lengthy document (~16.8 million characters).
+    Tokenizing the entire document in one operation (i.e., with tkn_chunk_size=0) may 
+    require significantly more time compared to dividing it into chunks of approximately 20,000 characters each.
     """
 
     sys.argv = ParamsUtils.dict_to_req(d=params)
