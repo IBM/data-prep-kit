@@ -27,12 +27,10 @@ COPY --from=clamav-local --chown=ray:users /etc/clamav/clamd.conf /etc/clamav/cl
 COPY --from=clamav-local --chown=ray:users /var/log/clamav/clamav.log /var/log/clamav/clamav.log
 COPY --from=clamav-local --chown=ray:users /var/run/clamav /var/run/clamav
 COPY requirements.txt requirements.txt
-COPY entrypoint.sh entrypoint.sh
 
 RUN pip install --no-cache-dir -r requirements.txt \
-    && rm -rf requirements.txt .cache/pip
+    && rm -rf requirements.txt .cache/pip \
+    && echo "clamd" >> .profile
 
 COPY src/*_transform.py  ./
 ENV PYTHONPATH /home/ray
-
-ENTRYPOINT ["./entrypoint.sh"]
