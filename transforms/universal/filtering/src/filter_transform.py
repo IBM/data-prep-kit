@@ -15,24 +15,29 @@ logger = get_logger(__name__)
 short_name = "filter"
 cli_prefix = short_name + "_"
 
-sql_statement_key = "sql_statement"
-""" Key holds the SQL statement used for filtering"""
-sql_params_dict_key = "sql_params_dict"
-""" AST Key holds the dictionary of SQL statement parameters"""
+filter_criteria_key = "criteria_list"
+""" AST Key holds the list of filter criteria (in SQL WHERE clause format)"""
+filter_logical_operator_key = "logical_operator"
+""" Key holds the logical operator that joins filter criteria (AND or OR)"""
+filter_columns_to_drop_key = "columns_to_drop"
+""" AST Key holds the list of columns to drop after filtering"""
 
-sql_statement_cli_param = f"{cli_prefix}{sql_statement_key}"
-""" Key holds the SQL statement used for filtering"""
-sql_params_dict_cli_param = f"{cli_prefix}{sql_params_dict_key}"
-""" AST Key holds the dictionary of SQL statement parameters"""
+filter_criteria_cli_param = f"{cli_prefix}{filter_criteria_key}"
+""" AST Key holds the list of filter criteria (in SQL WHERE clause format)"""
+filter_logical_operator_cli_param = f"{cli_prefix}{filter_logical_operator_key}"
+""" Key holds the logical operator that joins filter criteria (AND or OR)"""
+filter_columns_to_drop_cli_param = f"{cli_prefix}{filter_columns_to_drop_key}"
+""" AST Key holds the list of columns to drop after filtering"""
 
-captured_arg_keys = [sql_statement_key, sql_params_dict_key]
+captured_arg_keys = [filter_criteria_key, filter_columns_to_drop_key]
 """ The set of keys captured from the command line """
 
 # defaults
-sql_statement_default = "SELECT * FROM table"
-""" The default SQL statement used for filtering """
-sql_params_dict_default = ast.literal_eval("{}")
-""" The default dictionary of SQL statement parameters"""
+filter_criteria_default = ast.literal_eval("[]")
+""" The default list of filter criteria (in SQL WHERE clause format)"""
+filter_logical_operator_default = "AND"
+filter_columns_to_drop_default = ast.literal_eval("[]")
+""" The default list of columns to drop"""
 
 
 class FilterTransform(AbstractTableTransform):
@@ -50,8 +55,9 @@ class FilterTransform(AbstractTableTransform):
         """
 
         super().__init__(config)
-        self.sql_statement = config.get(sql_statement_key, sql_statement_default)
-        self.sql_params_dict = config.get(sql_params_dict_key, sql_params_dict_default)
+        self.filter_criteria = config.get(filter_criteria_key, filter_criteria_default)
+        self.logical_operator = config.get(filter_logical_operator_key, filter_logical_operator_default)
+        self.columns_to_drop = config.get(filter_columns_to_drop_key, filter_columns_to_drop_default)
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
         """
@@ -63,20 +69,49 @@ class FilterTransform(AbstractTableTransform):
 
         # move table under a different name, to avoid SQL query parsing error
         input_table = table
-        # execute prepared SQL query
+        total_docs = input_table.num_rows
+        total_columns = input_table.num_columns
+        total_bytes = input_table.nbytes
+
+        # initialize the metadata dictionary
+        metadata = {
+            "total_docs_count": total_docs,
+            "total_bytes_count": total_bytes,
+            "total_columns_count": total_columns,
+        }
+
+        # initialize the SQL statement used for filtering
+        sql_statement = "SELECT * FROM input_table"
+        if len(self.filter_criteria) > 0:
+            # populate metadata with filtering stats for each filter criterion
+            for filter_criterion in self.filter_criteria:
+                criterion_sql = f"{sql_statement} WHERE {filter_criterion}"
+                filter_table = duckdb.execute(criterion_sql).arrow()
+                docs_filtered = total_docs - filter_table.num_rows
+                bytes_filtered = total_bytes - filter_table.nbytes
+                metadata[f"docs_filtered_by '{filter_criterion}'"] = docs_filtered
+                metadata[f"bytes_filtered_by '{filter_criterion}'"] = bytes_filtered
+
+            # use filtering criteria to build the SQL query for filtering
+            where_clause = f" {self.logical_operator} ".join(self.filter_criteria)
+            sql_statement = f"{sql_statement} WHERE {where_clause}"
+
+        # filter using SQL statement
         try:
-            filtered_table = duckdb.execute(self.sql_statement, self.sql_params_dict).arrow()
+            filtered_table = duckdb.execute(sql_statement).arrow()
         except Exception as ex:
             logger.error(f"FilterTransform::transform failed: {ex}")
             raise ex
 
-        metadata = {
-            "total_docs_count": input_table.num_rows,
-            "total_bytes_count": input_table.nbytes,
-            "filtered_docs_count": filtered_table.num_rows,
-            "filtered_bytes_count": filtered_table.nbytes,
-        }
-        return [filtered_table], metadata
+        # add global filter stats to metadata
+        metadata["docs_after_filter"] = filtered_table.num_rows
+        metadata["bytes_after_filter"] = filtered_table.nbytes
+
+        # drop any columns requested from the final result
+        filtered_table_cols_dropped = filtered_table.drop_columns(self.columns_to_drop)
+        metadata["columns_after_filter"] = filtered_table_cols_dropped.num_columns
+
+        return [filtered_table_cols_dropped], metadata
 
 
 class FilterTransformConfiguration(DefaultTableTransformConfiguration):
@@ -99,23 +134,26 @@ class FilterTransformConfiguration(DefaultTableTransformConfiguration):
         """
 
         parser.add_argument(
-            f"--{sql_statement_cli_param}",
-            type=str,
+            f"--{filter_criteria_cli_param}",
+            type=ast.literal_eval,
             required=True,
-            help="SQL statement used for filtering",
+            default=ast.literal_eval("[]"),
+            help="list of filter criteria (in SQL WHERE clause format)",
         )
-
         parser.add_argument(
-            f"--{sql_params_dict_cli_param}",
+            f"--{filter_columns_to_drop_cli_param}",
             type=ast.literal_eval,
             required=False,
-            default=ast.literal_eval("{}"),
-            help="AST string containing SQL statement parameters.\n",  # + ParamsUtils.get_ast_help_text(help_example_dict),
+            default=ast.literal_eval("[]"),
+            help="list of columns to drop after filtering",
         )
-        # help_example_dict = {
-        #     "$lang_score": 0.5,
-        #     "$perplexity_score": 520.0,
-        # }
+        parser.add_argument(
+            f"--{filter_logical_operator_cli_param}",
+            type=str,
+            required=False,
+            default="AND",
+            help="logical operator (AND or OR) that joins filter criteria",
+        )
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """

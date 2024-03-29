@@ -7,8 +7,9 @@ from data_processing.utils import ParamsUtils
 
 from transforms.universal.filtering.src.filter_transform import (
     FilterTransformConfiguration,
-    sql_params_dict_cli_param,
-    sql_statement_cli_param,
+    filter_columns_to_drop_cli_param,
+    filter_criteria_cli_param,
+    filter_logical_operator_cli_param,
 )
 
 
@@ -20,12 +21,17 @@ local_conf = {
     "output_folder": output_folder,
 }
 
-filter_sql_statement = "SELECT * FROM input_table WHERE title='https://poker'"
-filter_sql_params_dict = {}
+filter_criteria = [
+    "docq_total_words > 100 AND docq_total_words < 200",
+    "ibmkenlm_docq_perplex_score < 230",
+]
+filter_logical_operator = "AND"
+filter_columns_to_drop = ["extra", "cluster"]
 
 filter_params = {
-    sql_statement_cli_param: filter_sql_statement,
-    sql_params_dict_cli_param: json.dumps(filter_sql_params_dict),
+    filter_criteria_cli_param: filter_criteria,
+    filter_columns_to_drop_cli_param: filter_columns_to_drop,
+    filter_logical_operator_cli_param: filter_logical_operator,
 }
 
 worker_options = {"num_cpus": 0.8}
