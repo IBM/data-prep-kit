@@ -93,7 +93,8 @@ class FilterTransform(AbstractTableTransform):
                 metadata[f"bytes_filtered_by '{filter_criterion}'"] = bytes_filtered
 
             # use filtering criteria to build the SQL query for filtering
-            where_clause = f" {self.logical_operator} ".join(self.filter_criteria)
+            filter_clauses = [f"({x})" for x in self.filter_criteria]
+            where_clause = f" {self.logical_operator} ".join(filter_clauses)
             sql_statement = f"{sql_statement} WHERE {where_clause}"
 
         # filter using SQL statement
