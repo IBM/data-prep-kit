@@ -1,89 +1,246 @@
-# URL Block List Annotator 
+# Filtering
 Please see the set of
 [transform project conventions](../../README.md)
 for details on general project conventions, transform configuration,
 testing and IDE set up.
 
 ## Summary 
-The block listing annotator/transform maps an input table to an output table
-by  using a list of domains that are intended to be blocked 
-(i.e. ultimately removed from the tables).
-The input table contains a column, by default named `title`,
-that holds the source url for the content in a given row.
-The output table is annotated to include a new column,
-named `blocklisted` by default, that contains the name
-of the blocked domain.  If the value of the source url 
-does not match any of the blocked domains, it will be empty.
+
+Filtering cleans up data by:
+ * Removing the rows that do not meet a specific set of criteria.
+ * Dropping the columns that are no longer needed (e.g. annotation columns, used for filtering rows).
 
 ## Configuration and command line Options
 
-The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py) 
+The set of dictionary keys holding [FilterTransform](src/filter_transform.py) 
 configuration for values are as follows:
 
-* _blocklist_annotation_column_name_ - specifies the name of the table column into which the annotation is placed.
-This column is **added** to the output tables.  The default is 
-* _blocklist_source_url_column_name_ - specifies the name of the table column holding the URL from which the document was retrieved.
-* _blocklist_blocked_domain_list_path_ - specifies the directory holding files matching 
-the regular expression `domains*`.
- 
+* _filter_criteria_list_ - specifies the list of row filter criteria (in SQL WHERE clause format). Each filter criterion is a string. The default value of this parameter is `[]` (an empty list, meaning that all the rows in the input table will be kept). 
+* _filter_logical_operator_ - specifies the logical operator that joins filter criteria (`AND` or `OR`). The default value of this parameter is `AND`.
+* _filter_columns_to_drop_ - the list with the names of the columns to drop after row filtering is complete. The default value of this parameter is `[]` (an empty list, meaning that all the columns in the input table will be kept)
+
 Additionally, a set of data access-specific arguments are provided that enable
 the specification of the location of domain list files, so that these
 files could be stored in the local file system or in S3 storage, for example.
 The arguments are as follows (and generally match the TransformLauncher's 
-data access arguments but with the `blocklist_' prefix).
+data access arguments but with the `filter_` prefix).
 
-* _blocklist_local_config_ - specifies the input and outout folders, although these are not used by the transform.
-* _blocklist_s3_config_ - specifies the input and output paths in s3.
-* _blocklist_lh_config_ - specifies lakehouse parameters.
-* _blocklist_s3_credentials_ - provides credentials to access the s3 storage. 
+* _filter_local_config_ - specifies the input and outout folders, although these are not used by the transform.
+* _filter_s3_config_ - specifies the input and output paths in s3.
+* _filter_lh_config_ - specifies lakehouse parameters.
+* _filter_s3_credentials_ - provides credentials to access the s3 storage. 
 
 See the Command Line options below for specifics on these.
 
+## Example
+Consider a table with eight text documents, where each row has additional info about that document (date acquired, source URL, etc.), and a set of quality signals for that document.  
+
+```
+|----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
+│ document | title    | contents | date_acq | extra    | cluster  | ft_lang | ft_score | docq_tot | docq_mea | ibmkenl │
+│ ---      | ---      | ---      | uired    | ---      | ---      | ---     | ---      | al_words | n_word_l | m_docq_ │
+│ str      | str      | str      | ---      | struct[5 | i64      | str     | f64      | ---      | en       | perplex │
+│          |          |          | datetime | ]        |          |         |          | i64      | ---      | _score  │
+│          |          |          | [ns]     |          |          |         |          |          | f64      | ---     │
+│          |          |          |          |          |          |         |          |          |          | f64     │
+|----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
+│ CC-MAIN- | https:// | BACKGROU | 2023-07- | {"applic | -1       | en      | 1.0      | 77       | 5.662338 | 226.5   │
+│ 20190221 | www.sema | ND       | 05       | ation/ht |          |         |          |          |          |         │
+│ 132217-2 | nticscho | The      | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+│ 01902211 | lar.org/ | Rhinitis |          | ype=resp |          |         |          |          |          |         │
+│ …        | …        | Control  |          | …        |          |         |          |          |          |         │
+│          |          | …        |          |          |          |         |          |          |          |         │
+│ CC-MAIN- | https:// | Travel + | 2023-07- | {"applic | -1       | en      | 1.0      | 321      | 5.05919  | 245.0   │
+│ 20200528 | www.torn | Leisure: | 27       | ation/ht |          |         |          |          |          |         │
+│ 232803-2 | osnews.g | The 5    | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+│ 02005290 | r/en/tou | best     |          | ype=resp |          |         |          |          |          |         │
+│ …        | …        | res…     |          | …        |          |         |          |          |          |         │
+│ CC-MAIN- | https:// | Stourbri | 2023-07- | {"applic | -1       | en      | 1.0      | 646      | 5.27709  | 230.3   │
+│ 20190617 | www.stou | dge      | 04       | ation/ht |          |         |          |          |          |         │
+│ 103006-2 | rbridgen | College  | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+│ 01906171 | ews.co.u | to close |          | ype=resp |          |         |          |          |          |         │
+│ …        | …        | BMe…     |          | …        |          |         |          |          |          |         │
+│ CC-MAIN- | https:// | Our      | 2023-07- | {"applic | -1       | en      | 1.0      | 242      | 5.557851 | 407.2   │
+│ 20180318 | www.univ | Guidance | 19       | ation/ht |          |         |          |          |          |         │
+│ 184945-2 | ariety.c | Philosop | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+│ 01803182 | om/app/s | hy       |          | ype=resp |          |         |          |          |          |         │
+│ …        | …        | High     |          | …        |          |         |          |          |          |         │
+│          |          | sch…     |          |          |          |         |          |          |          |         │
+│ CC-MAIN- | http://h | Hukun    | 2023-07- | {"applic | -1       | en      | 1.0      | 169      | 4.840237 | 240.5   │
+│ 20180120 | urur.com | Hurur    | 18       | ation/ht |          |         |          |          |          |         │
+│ 083038-2 | /hukun-h | running  | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+│ 01801201 | urur-run | for Ward |          | ype=resp |          |         |          |          |          |         │
+│ …        | …        | 1 c…     |          | …        |          |         |          |          |          |         │
+│ CC-MAIN- | https:// | Life's   | 2023-07- | {"applic | -1       | en      | 1.0      | 61       | 4.786885 | 244.0   │
+│ 20180522 | www.chap | Reverie  | 18       | ation/ht |          |         |          |          |          |         │
+│ 131652-2 | ters.ind | Kobo     | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+│ 01805221 | igo.ca/e | ebook |  |          | ype=resp |          |         |          |          |          |         │
+│ …        | …        | Sept…    |          | …        |          |         |          |          |          |         │
+│ CC-MAIN- | http://w | Kamis,   | 2023-07- | {"applic | 18008253 | en      | 1.0      | 509      | 4.738703 | 224.6   │
+│ 20181120 | ww.onedo | 10 Maret | 05       | ation/ht | 113      |         |          |          |          |         │
+│ 130743-2 | llarfoll | 2016     | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+│ 01811201 | owers.co | Buy      |          | ype=resp |          |         |          |          |          |         │
+│ …        | …        | Twitter… |          | …        |          |         |          |          |          |         │
+│ CC-MAIN- | http://w | Rory     | 2023-07- | {"applic | -1       | en      | 1.0      | 223      | 4.829596 | 167.5   │
+│ 20171213 | ww.iron- | Fallon   | 09       | ation/ht |          |         |          |          |          |         │
+│ 104259-2 | bru.co.u | joins    | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+│ 01712131 | k/rory-f | Bristol  |          | ype=resp |          |         |          |          |          |         │
+│ …        | …        | Rovers…  |          | …        |          |         |          |          |          |         │
+|----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
+```
+#### Example 1 - two numerical filtering criteria joined by AND
+To filter this table and only keep the documents that have between 100 and 500 words **and** a perplexity score less than 230, and furthermore, drop the `extra` and `cluster` columns, invoke filtering with the following parameters:
+```
+filter_criteria_list = ["docq_total_words > 100 AND docq_total_words < 500", "ibmkenlm_docq_perplex_score < 230"]
+filter_logical_operator = "AND"
+filter_columns_to_drop = ["extra", "cluster"]
+```
+This filter operation applied on the table above will return the following result:
+```
+|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+│ document    | title       | contents    | date_acquir | ft_lang | ft_score | docq_total_ | docq_mean_w | ibmkenlm_do │
+│ ---         | ---         | ---         | ed          | ---     | ---      | words       | ord_len     | cq_perplex_ │
+│ str         | str         | str         | ---         | str     | f64      | ---         | ---         | score       │
+│             |             |             | datetime[ns |         |          | i64         | f64         | ---         │
+│             |             |             | ]           |         |          |             |             | f64         │
+|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+│ CC-MAIN-201 | http://www. | Rory Fallon | 2023-07-09  | en      | 1.0      | 223         | 4.829596    | 167.5       │
+│ 71213104259 | iron-bru.co | joins       | 05:00:00    |         |          |             |             |             │
+│ -201712131… | .uk/rory-f… | Bristol     |             |         |          |             |             |             │
+│             |             | Rovers…     |             |         |          |             |             |             │
+|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+
+```
+
+#### Example 2 - two numerical filtering criteria joined by OR
+To filter this table and only keep the documents that have between 100 and 500 words **or** a perplexity score less than 230, and furthermore, drop the `extra` and `cluster` columns, invoke filtering with the following parameters:
+```
+filter_criteria_list = ["docq_total_words > 100 AND docq_total_words < 500", "ibmkenlm_docq_perplex_score < 230"]
+filter_logical_operator = "OR"
+filter_columns_to_drop = ["extra", "cluster"]
+```
+This filter operation applied on the table above will return the following result:
+```
+|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+│ document    | title       | contents    | date_acquir | ft_lang | ft_score | docq_total_ | docq_mean_w | ibmkenlm_do │
+│ ---         | ---         | ---         | ed          | ---     | ---      | words       | ord_len     | cq_perplex_ │
+│ str         | str         | str         | ---         | str     | f64      | ---         | ---         | score       │
+│             |             |             | datetime[ns |         |          | i64         | f64         | ---         │
+│             |             |             | ]           |         |          |             |             | f64         │
+|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+│ CC-MAIN-201 | https://www | BACKGROUND  | 2023-07-05  | en      | 1.0      | 77          | 5.662338    | 226.5       │
+│ 90221132217 | .semanticsc | The         | 05:00:00    |         |          |             |             |             │
+│ -201902211… | holar.org/… | Rhinitis    |             |         |          |             |             |             │
+│             |             | Control …   |             |         |          |             |             |             │
+│ CC-MAIN-201 | http://www. | Kamis, 10   | 2023-07-05  | en      | 1.0      | 509         | 4.738703    | 224.6       │
+│ 81120130743 | onedollarfo | Maret 2016  | 05:00:00    |         |          |             |             |             │
+│ -201811201… | llowers.co… | Buy         |             |         |          |             |             |             │
+│             |             | Twitter…    |             |         |          |             |             |             │
+│ CC-MAIN-201 | http://www. | Rory Fallon | 2023-07-09  | en      | 1.0      | 223         | 4.829596    | 167.5       │
+│ 71213104259 | iron-bru.co | joins       | 05:00:00    |         |          |             |             |             │
+│ -201712131… | .uk/rory-f… | Bristol     |             |         |          |             |             |             │
+│             |             | Rovers…     |             |         |          |             |             |             │
+│ CC-MAIN-202 | https://www | Travel +    | 2023-07-27  | en      | 1.0      | 321         | 5.05919     | 245.0       │
+│ 00528232803 | .tornosnews | Leisure:    | 05:00:00    |         |          |             |             |             │
+│ -202005290… | .gr/en/tou… | The 5 best  |             |         |          |             |             |             │
+│             |             | res…        |             |         |          |             |             |             │
+│ CC-MAIN-201 | https://www | Our         | 2023-07-19  | en      | 1.0      | 242         | 5.557851    | 407.2       │
+│ 80318184945 | .univariety | Guidance    | 05:00:00    |         |          |             |             |             │
+│ -201803182… | .com/app/s… | Philosophy  |             |         |          |             |             |             │
+│             |             | High sch…   |             |         |          |             |             |             │
+│ CC-MAIN-201 | http://huru | Hukun Hurur | 2023-07-18  | en      | 1.0      | 169         | 4.840237    | 240.5       │
+│ 80120083038 | r.com/hukun | running for | 05:00:00    |         |          |             |             |             │
+│ -201801201… | -hurur-run… | Ward 1 c…   |             |         |          |             |             |             │
+|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+```
+
+#### Example 3 - two filtering criteria based on non-numerical (datetime and string) types
+
+To filter this table and only keep the documents that were acquired between 2023-07-04 and 2023-07-08 and were downloaded using the `HTTPS` protocol, without dropping any columns, invoke filtering with the following parameters:
+```
+filter_criteria_list = ["date_acquired BETWEEN '2023-07-04' AND '2023-07-08'", "title LIKE 'https://%'"]
+filter_logical_operator = "AND"
+filter_columns_to_drop = []
+```
+
+This filter operation applied on the table above will return the following result:
+```
+|----------|----------|----------|----------|----------|---------|---------|----------|----------|----------|----------|
+│ document | title    | contents | date_acq | extra    | cluster | ft_lang | ft_score | docq_tot | docq_mea | ibmkenlm │
+│ ---      | ---      | ---      | uired    | ---      | ---     | ---     | ---      | al_words | n_word_l | _docq_pe │
+│ str      | str      | str      | ---      | struct[5 | i64     | str     | f64      | ---      | en       | rplex_sc │
+│          |          |          | datetime | ]        |         |         |          | i64      | ---      | ore      │
+│          |          |          | [ns]     |          |         |         |          |          | f64      | ---      │
+│          |          |          |          |          |         |         |          |          |          | f64      │
+|----------|----------|----------|----------|----------|---------|---------|----------|----------|----------|----------|
+│ CC-MAIN- | https:// | BACKGROU | 2023-07- | {"applic | -1      | en      | 1.0      | 77       | 5.662338 | 226.5    │
+│ 20190221 | www.sema | ND       | 05       | ation/ht |         |         |          |          |          |          │
+│ 132217-2 | nticscho | The      | 05:00:00 | tp; msgt |         |         |          |          |          |          │
+│ 01902211 | lar.org/ | Rhinitis |          | ype=resp |         |         |          |          |          |          │
+│ …        | …        | Control  |          | …        |         |         |          |          |          |          │
+│          |          | …        |          |          |         |         |          |          |          |          │
+│ CC-MAIN- | https:// | Stourbri | 2023-07- | {"applic | -1      | en      | 1.0      | 646      | 5.27709  | 230.3    │
+│ 20190617 | www.stou | dge      | 04       | ation/ht |         |         |          |          |          |          │
+│ 103006-2 | rbridgen | College  | 05:00:00 | tp; msgt |         |         |          |          |          |          │
+│ 01906171 | ews.co.u | to close |          | ype=resp |         |         |          |          |          |          │
+│ …        | …        | BMe…     |          | …        |         |         |          |          |          |          │
+|----------|----------|----------|----------|----------|---------|---------|----------|----------|----------|----------|
+```
+
+
 ## Running
-You can run the [blocklist_local.py](src/blocklist_local.py) to
-transform the `test1.parquet` file in [test input data](test-data/input) 
-to an `output` directory.  The directory will contain both the new
-annotated `test1.parquet` file and the `metadata.json` file.
+You can run the [filter_local.py](src/filter_local.py) (python-only implementation) or [filter_local_ray.py](src/filter_local_ray.py) (ray-based  implementation) to transform the `test1.parquet` file in [test input data](test-data/input) to an `output` directory.  The directory will contain both the new annotated `test1.parquet` file and the `metadata.json` file.
+
+#### Running as ray-based application
+```
+(venv) cma:src$ python filter_local_ray.py
+12:48:01 INFO - Running locally
+12:48:01 INFO - Using local configuration with: input_folder - /home/cma/de/fm-data-engineering/transforms/universal/filtering/test-data/input output_folder - /home/cma/de/fm-data-engineering/transforms/universal/filtering/output
+12:48:01 INFO - Not using data sets, checkpointing False, max files -1
+12:48:01 INFO - number of workers 5 worker options {'num_cpus': 0.8}
+12:48:01 INFO - pipeline id pipeline_id; number workers 5
+12:48:01 INFO - job details {'job category': 'preprocessing', 'job name': 'filter', 'job type': 'ray', 'job id': 'job_id'}
+12:48:01 INFO - code location {'github': 'github', 'commit_hash': '12345', 'path': 'path'}
+12:48:01 INFO - actor creation delay 0
+2024-03-31 12:48:03,390	INFO worker.py:1715 -- Started a local Ray instance. View the dashboard at 127.0.0.1:8265 
+(orchestrate pid=308034) 12:48:04 INFO - orchestrator started at 2024-03-31 12:48:04
+(orchestrate pid=308034) 12:48:04 INFO - Number of files is 1, source profile {'max_file_size': 0.15915775299072266, 'min_file_size': 0.15915775299072266, 'total_file_size': 0.15915775299072266}
+(orchestrate pid=308034) 12:48:04 INFO - Cluster resources: {'cpus': 20, 'gpus': 0, 'memory': 31.60095291212201, 'object_store': 15.800476455129683}
+(orchestrate pid=308034) 12:48:04 INFO - Number of workers - 5 with {'num_cpus': 0.8} each
+(orchestrate pid=308034) 12:48:04 INFO - Completed 0 files in 5.312760670979818e-06 min. Waiting for completion
+(orchestrate pid=308034) 12:48:06 INFO - Completed processing in 0.022701112429300944 min
+12:48:16 INFO - Completed execution in 0.24697633584340414 min, execution result 0
+```
+#### Running as pure python application
 <pre>
 % make venv
 % source venv/bin/activate
 (venv) % cd src
-(venv) % python blocklist_local.py
-number of workers 5 worker options {'num_cpus': 0.8}
-pipeline id pipeline_id; number workers 5
-job details {'job category': 'preprocessing', 'job name': 'blocklist', 'job type': 'ray', 'job id': 'job_id'}
-code location {'github': 'github', 'commit_hash': '12345', 'path': 'path'}
-actor creation delay 0
-21:12:13 INFO - Running locally
-21:12:13 INFO - Using local configuration with: input_folder - /Users/boris/Projects/fm-data-engineering/transforms/universal/blocklisting/test-data/input output_folder - /Users/boris/Projects/fm-data-engineering/transforms/universal/blocklisting/test-data/output
-21:12:13 INFO - Not using data sets, checkpointing False, max files -1
-21:12:13 INFO - Using local configuration with: input_folder - /Users/boris/Projects/fm-data-engineering/transforms/universal/blocklisting/test-data/input output_folder - /Users/boris/Projects/fm-data-engineering/transforms/universal/blocklisting/test-data/output
-21:12:13 INFO - Not using data sets, checkpointing False, max files -1
-21:12:13 INFO - running locally creating Ray cluster
-2024-03-09 21:12:15,845	INFO worker.py:1715 -- Started a local Ray instance. View the dashboard at 127.0.0.1:8265 
-(orchestrate pid=53753) 21:12:18 INFO - Number of files is 1, source profile {'max_file_size': 0.0007181167602539062, 'min_file_size': 0.0007181167602539062, 'total_file_size': 0.0007181167602539062}
-(orchestrate pid=53753) 21:12:18 INFO - Cluster resources: {'cpus': 16, 'gpus': 0, 'memory': 11.931072616949677, 'object_store': 2.0}
-(orchestrate pid=53753) 21:12:18 INFO - Number of workers - 5 with {'num_cpus': 0.8} each
-(orchestrate pid=53753) 21:12:18 INFO - Reading domain list from /Users/boris/Projects/fm-data-engineering/transforms/universal/blocklisting/test-data/domains 
-(orchestrate pid=53753) 21:12:18 INFO - Added 27 domains to domain list
-(orchestrate pid=53753) Completed 0 files in 5.880991617838542e-06 min. Waiting for completion
-(orchestrate pid=53753) Completed processing in 0.03663013378779093 min
-(orchestrate pid=53753) 21:12:20 INFO - done flushing in 0.03952503204345703 sec
-21:12:30 INFO - Completed execution in 0.2948205312093099 min, execution result 0
+(venv) % python filter_local.py
+input table has 100 rows
+
+output table has 11 rows
+output metadata : {'total_docs_count': 100, 'total_bytes_count': 478602, 'total_columns_count': 25, "docs_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'": 78, "bytes_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'": 429191, "docs_filtered_by 'ibmkenlm_docq_perplex_score < 230'": 53, "bytes_filtered_by 'ibmkenlm_docq_perplex_score < 230'": 275911, 'docs_after_filter': 11, 'bytes_after_filter': 24061, 'columns_after_filter': 23}
 (venv) % deactivate
 % ls ../output
 metadata.json	test1.parquet
 %
 </pre>
 
+### Filter Statistics
+As shown in the output of the local run of filtering, the metadata contains several statistics:
+* Global statistics:  
+  * `total_docs_count`, `total_bytes_count`, `total_columns_count`: total number of documents (rows), bytes, and columns that were present in the input table, before filtering took place  
+  * `docs_after_filter`, `bytes_after_filter`, `columns_after_filter`: total number of documents (rows), bytes, and columns that were present in the output table, after filtering took place  
+* Per-criteria statistics: these statistics show the impact of each filtering criteria - number of documents and bytes that it filters out, when applied by itself. We ran the local filter with two filtering criteria, and these are the stats for each of them:  
+  * `docs_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'`, `bytes_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'` - the number of documents and bytes filtered out by the `docq_total_words > 100 AND docq_total_words < 200` filtering condition  
+  * `docs_filtered_by 'ibmkenlm_docq_perplex_score < 230'`, `bytes_filtered_by 'ibmkenlm_docq_perplex_score < 230'`  - the number of documents and bytes filtered out by the `ibmkenlm_docq_perplex_score < 230` filtering condition  
+
+
 ### Building the Docker Image
 ```shell
 % make image 
 ...
-% podman images
-REPOSITORY                            TAG                    IMAGE ID      CREATED         SIZE
-localhost/blocklisting                0.1.0                  f6d4fbad1ab3  9 minutes ago   1.14 GB
-%
 
 ````
 In addition, there are some useful `make` targets (see conventions above)
@@ -94,40 +251,11 @@ When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
 [the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
 ```
---blocklist_blocked_domain_list_path BL_BLOCKED_DOMAIN_LIST_PATH
-                        COS URL or local folder (file or directory) that points to the list of block listed domains.  If not running in Ray, this must be a local folder.
---blocklist_annotation_column_name BL_ANNOTATION_COLUMN_NAME
-                        Name of the table column that contains the block listed domains
---blocklist_source_url_column_name BL_SOURCE_URL_COLUMN_NAME
-                        Name of the table column that has the document download URL
---blocklist_s3_cred BL_S3_CRED
-                        AST string of options for cos credentials. Only required for COS or Lakehouse.
-                        access_key: access key help text
-                        secret_key: secret key help text
-                        url: S3 url
-                        Example: { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/cos-optimal-llm-pile/test/' }
---blocklist_s3_config BL_S3_CONFIG
-                        AST string containing input/output paths.
-                        input_path: Path to input folder of files to be processed
-                        output_path: Path to output folder of processed files
-                        Example: { 'input_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'output_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed' }
---blocklist_lh_config BL_LH_CONFIG
-                        AST string containing input/output using lakehouse.
-                        input_table: Path to input folder of files to be processed
-                        input_dataset: Path to outpu folder of processed files
-                        input_version: Version number to be associated with the input.
-                        output_table: Name of table into which data is written
-                        output_path: Path to output folder of processed files
-                        token: The token to use for Lakehouse authentication
-                        lh_environment: Operational environment. One of STAGING or PROD
-                        Example: { 'input_table': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'input_dataset': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'input_version': '1.0', 'output_table': 'ededup', 'output_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'token': 'AASDFZDF', 'lh_environment': 'STAGING' }
---blocklist_local_config BL_LOCAL_CONFIG
-                        ast string containing input/output folders using local fs.
-                        input_folder: Path to input folder of files to be processed
-                        output_folder: Path to output folder of processed files
-                        Example: { 'input_folder': './input', 'output_folder': '/tmp/output' }
+python  [-h] [--run_locally RUN_LOCALLY] --filter_criteria_list FILTER_CRITERIA_LIST
+               [--filter_columns_to_drop FILTER_COLUMNS_TO_DROP] [--filter_logical_operator FILTER_LOGICAL_OPERATOR]
+               [--s3_cred S3_CRED] [--s3_config S3_CONFIG] [--lh_config LH_CONFIG] [--local_config LOCAL_CONFIG]
+               [--max_files MAX_FILES] [--checkpointing CHECKPOINTING] [--data_sets DATA_SETS]
+               [--num_workers NUM_WORKERS] [--worker_options WORKER_OPTIONS] [--pipeline_id PIPELINE_ID]
+               [--job_id JOB_ID] [--creation_delay CREATION_DELAY] [--code_location CODE_LOCATION]
 
 ```
-
-
-
