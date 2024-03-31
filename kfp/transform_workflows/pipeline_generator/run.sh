@@ -1,10 +1,8 @@
 #!/bin/bash
 
-# TODO: implement this logic in Makefile
-
 DIST_DIR=$1
-ROOT_DIR=${PWD}/../..
-VENV_ACTIVATE=${ROOT_DIR}/env/bin/activate
+ROOT_DIR=${PWD}/..
+VENV_ACTIVATE=${ROOT_DIR}/../kfp_support_lib/venv/bin/activate
 
 source $VENV_ACTIVATE
 mkdir -p ${ROOT_DIR}/${DIST_DIR}/

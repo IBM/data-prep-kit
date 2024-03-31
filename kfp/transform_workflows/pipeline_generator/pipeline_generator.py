@@ -19,10 +19,7 @@ DESCRIPTION = "description"
 
 def get_pipeline_input_parameters(arguments) -> str:
     ret_str = ""
-    # ret_str = "" + get_generic_params(arguments["ray_parameters"])
-    # ret_str += f"\n    additional_params: str = '{json.dumps(arguments['additional_parameters'])}',"
     ret_str += get_generic_params(arguments.get("pipeline_arguments", None))
-    # ret_str += get_generic_params(arguments.get("cos_parameters", None))
     return ret_str
 
 
@@ -40,25 +37,6 @@ def get_generic_params(params) -> str:
     return ret_str
 
 
-def get_execute_job_params(args) -> (str, str):
-    ret_execute_job_params = "{"
-    cos_access = ""
-    if args is not None:
-        cos = args.get("cos_parameters", None)
-        if cos is not None:
-            for a in cos:
-                if a[NAME] != "cos_access_secret":
-                    ret_execute_job_params += f' "{a[NAME]}":{a[NAME]},'
-                else:
-                    cos_access = a[NAME]
-        pargs = args.get("pipeline_arguments", None)
-        if pargs is not None:
-            for a in pargs:
-                ret_execute_job_params += f' "{a[NAME]}":{a[NAME]},'
-    ret_execute_job_params = ret_execute_job_params + "}"
-    return ret_execute_job_params, cos_access
-
-
 def get_execute_job_params_guf(args) -> (str):
     ret_execute_job_params = ""
     if args is not None:
@@ -69,13 +47,6 @@ def get_execute_job_params_guf(args) -> (str):
     return ret_execute_job_params
 
 
-# def update_additional_parameters(pipeline_def):
-#     pipeline_add_params = pipeline_def[INPUT_PARAMETERS].get("pipeline_additional_parameters", None)
-#     if pipeline_add_params is not None:
-#         pipeline_definitions[INPUT_PARAMETERS]["additional_parameters"].update(pipeline_add_params)
-
-
-# TODO add input arguments to set the destination folder and the yaml configurations.
 if __name__ == "__main__":
     import argparse
     import os
@@ -92,7 +63,6 @@ if __name__ == "__main__":
     with open(args.config_file, "r") as file:
         pipeline_definitions = yaml.safe_load(file)
 
-    # update_additional_parameters(pipeline_definitions)
     pipeline_parameters = pipeline_definitions[PIPELINE_PARAMETERS]
     common_input_params_values = pipeline_definitions[PIPELINE_COMMON_INPUT_PARAMETERS_VALUES]
 
@@ -103,11 +73,9 @@ if __name__ == "__main__":
     fout = open(f"{pipeline_parameters[NAME]}_wf.py", "wt")
 
     # define the generated pipeline input parameters
-    # input_parameters = get_pipeline_input_parameters(pipeline_definitions[INPUT_PARAMETERS])
     transform_input_parameters = get_pipeline_input_parameters(pipeline_definitions[PIPELINE_TRANSFORM_INPUT_PARAMETERS])
 
     # define arguments to the Ray execution job
-    # execute_job_params, cos_access_secret = get_execute_job_params(pipeline_definitions[INPUT_PARAMETERS])
     execute_job_params = get_execute_job_params_guf(pipeline_definitions[PIPELINE_TRANSFORM_INPUT_PARAMETERS])
 
     compute_func_name = pipeline_parameters.get("compute_func_name", "")
@@ -134,7 +102,6 @@ if __name__ == "__main__":
             .replace("__pipeline_description__", pipeline_parameters["description"])
             .replace("__pipeline_arguments__", transform_input_parameters)
             .replace("__execute_job_params__", execute_job_params)
-            # .replace("__cos_access_secret__", cos_access_secret)
             .replace("__compute_func_name__", compute_func_name)
             .replace("__compute_import__", compute_func_import)
             .replace("__script_name__", pipeline_parameters["script_name"])
