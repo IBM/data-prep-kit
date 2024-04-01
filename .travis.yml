@@ -27,10 +27,8 @@ jobs:
           name: "Testing data-processing-lib"
           script:
           - |
-            cd data-processing-lib
-            make DOCKER=$DOCKER venv test || travis_terminate 1
-            cd ../transforms
-            make DOCKER=$DOCKER venv test-lib-src || travis_terminate 1
+            make -C data-processing-lib DOCKER=$DOCKER venv test || travis_terminate 1
+            make -C transforms DOCKER=$DOCKER venv test-lib-src || travis_terminate 1
         - stage: kfp-support-lib-tests
           name: "Testing kfp-support-lib"
           install:
@@ -47,10 +45,8 @@ jobs:
           script:
           - |
             export DEPLOY_KUBEFLOW=0
-            cd kind
-            make setup || travis_terminate 1
-            cd $TRAVIS_BUILD_DIR/kfp/kfp_support_lib
+            make -C kind setup || travis_terminate 1
             kubectl get ingress -A
-            make build || travis_terminate 1
-            make test
+            make -C kfp/kfp_support_lib build || travis_terminate 1
+            make -C kfp/kfp_support_lib test || travis_terminate 1
 
