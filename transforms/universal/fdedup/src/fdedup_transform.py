@@ -1,6 +1,7 @@
 import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
+import random
 
 import mmh3
 import numpy as np
@@ -35,6 +36,7 @@ from text_normalizer import normalize as text_normalize
 
 
 logger = get_logger(__name__)
+RANDOM_DELAY_LIMIT = 6
 
 
 class FdedupTransform(AbstractTableTransform):
@@ -213,6 +215,7 @@ class FdedupTransform(AbstractTableTransform):
         flush(0)
         # peg stats
         stats = {"generated buckets": num_buckets, "generated minhashes": num_minhashes}
+        time.sleep(int(random.random() * RANDOM_DELAY_LIMIT))
         return [], stats
 
 
@@ -281,6 +284,7 @@ class FdedupFilter(AbstractTableTransform):
         out_table = TransformUtils.add_column(table=table.filter(mask), name=self.cluster_column, content=clusters)
         # build execution statistics
         stats = {"source_documents": table.num_rows, "result_documents": out_table.num_rows}
+        time.sleep(int(random.random() * RANDOM_DELAY_LIMIT))
         return [out_table], stats
 
 
