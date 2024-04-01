@@ -3,3 +3,4 @@ output/*
 src/run_*.py
 tokenizers
 qtest
+.vscode

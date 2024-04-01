@@ -10,7 +10,7 @@ from kubernetes import client as k8s_client
 
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "transform/langselect_transform.py"
+EXEC_SCRIPT_NAME: str = "transform/lang_filtering_transform.py"
 
 # components
 base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.2"
