@@ -19,7 +19,7 @@ Upon component version update, modify the [`requirements.env`](./requirements.en
 
 ### 3. (Optional) Build the library
 
-Run the `make -C kfp_support_lib build` command to build the kfp_support_lib library if a new version should be created
+Run the `make -C kfp_support_lib build` command to build the `fm_data_processing_kfp` library if a new version should be created
 
 ### 4. (Optional) Publish the library
 

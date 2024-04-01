@@ -36,7 +36,7 @@ update-toml:: .check-env
 	sed -i.back 's/fm_data_processing==[0-9].*/fm_data_processing==${FM_DATA_PROCESSING}",/' pyproject.toml
 	sed -i.back 's/kfp==[0-9].*/kfp==${KFP}",/' pyproject.toml
 
-build:: update-toml venv
+build:: clean update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
 	${PYTHON} -m pip install --upgrade build
 	${PYTHON} -m build
