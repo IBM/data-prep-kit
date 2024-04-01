@@ -20,9 +20,9 @@ VENV_ACTIVATE=venv/bin/activate
 
 clean::
 	@# Help: Clean up the distribution build and the venv 
-	rm -r dist venv
-	rm -rf src/*egg-info
-	rm makeenv
+	rm -r dist venv || true
+	rm -rf src/*egg-info || true
+	rm makeenv || true
 
 .check-env:: .check_python_version
 	$(call check_defined, FM_DATA_PROCESSING_KFP)
