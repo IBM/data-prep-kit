@@ -42,19 +42,9 @@ build:: clean update-toml venv
 	${PYTHON} -m build
 
 publish:: .check-env
-publish:: export SCRIPT_RESULT=$(shell ./lib-version.sh)
 publish::
 	@# Help: Publish the wheel to testpypi
-	make .push
-
-.PHONY: .push
-.push:
-ifeq  ("$(SCRIPT_RESULT)", "ok")
-	echo "pusing new version"
 	@${PYTHON} -m twine upload --verbose --non-interactive --skip-existing --repository testpypi dist/*
-else
-	echo "skip push, version already exists"
-endif
 
 venv::	pyproject.toml .check-env
 	@# Help: Create the virtual environment using pyproject.toml 
