@@ -4,14 +4,16 @@ language: python
 python:
     - "3.10"
 
-env:
-    jobs:
-        - DOCKER=docker
-
 branches:
     only:
         - dev
         - main
+
+env:
+    matrix:
+        - DOCKER=docker DIRECTORY=data-processing-lib
+        - DIRECTORY=kfp/kfp_support_lib
+        - DOCKER=docker DIRECTORY=transforms
 
 # Enable/install podman
 #before_install:
@@ -21,32 +23,25 @@ branches:
 #    - podman machine start
 #    - podman info
 
-jobs:
-    include:
-        - stage: data-processing-lib-tests
-          name: "Testing data-processing-lib"
-          script:
-          - |
-            make -C data-processing-lib DOCKER=$DOCKER venv test || travis_terminate 1
-            make -C transforms DOCKER=$DOCKER venv test-lib-src || travis_terminate 1
-        - stage: kfp-support-lib-tests
-          name: "Testing kfp-support-lib"
-          install:
-          - source kind/requirements.env
-          - export PATH=$PATH:/tmp/
-          - curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-          - curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-          - chmod 700 /tmp/get_helm.sh
-          - HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
-          - chmod 777 /tmp/helm
-          - chmod 777 /tmp/kind
-          - curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
-          - chmod 777 /tmp/kubectl
-          script:
-          - |
-            export DEPLOY_KUBEFLOW=0
-            make -C kind setup || travis_terminate 1
-            kubectl get ingress -A
-            make -C kfp/kfp_support_lib build || travis_terminate 1
-            make -C kfp/kfp_support_lib test || travis_terminate 1
+script: 
+- |
+  if [[ "${DIRECTORY}" == "kfp/kfp_support_lib" ]]; then
+     source kind/requirements.env
+     export PATH=$PATH:/tmp/
+     curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+     curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+     chmod 700 /tmp/get_helm.sh
+     HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
+     chmod 777 /tmp/helm
+     chmod 777 /tmp/kind
+     curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
+     chmod 777 /tmp/kubectl
+     export DEPLOY_KUBEFLOW=0
+     make -C kind setup || travis_terminate 1
+  fi;
+  if [[ "${DIRECTORY}" == "transforms" ]]; then
+     make -C transforms DOCKER=${DOCKER} venv test-lib-src || travis_terminate 1
+  else
+     make -C $DIRECTORY DOCKER=${DOCKER} build test || travis_terminate 1
+  fi;
 
