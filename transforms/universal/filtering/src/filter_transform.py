@@ -89,28 +89,33 @@ class FilterTransform(AbstractTableTransform):
                 filter_table = duckdb.execute(criterion_sql).arrow()
                 docs_filtered = total_docs - filter_table.num_rows
                 bytes_filtered = total_bytes - filter_table.nbytes
-                metadata[f"docs_filtered_by '{filter_criterion}'"] = docs_filtered
-                metadata[f"bytes_filtered_by '{filter_criterion}'"] = bytes_filtered
+                metadata[f"docs_filtered_out_by '{filter_criterion}'"] = docs_filtered
+                metadata[f"bytes_filtered_out_by '{filter_criterion}'"] = bytes_filtered
 
             # use filtering criteria to build the SQL query for filtering
             filter_clauses = [f"({x})" for x in self.filter_criteria]
             where_clause = f" {self.logical_operator} ".join(filter_clauses)
             sql_statement = f"{sql_statement} WHERE {where_clause}"
 
-        # filter using SQL statement
-        try:
-            filtered_table = duckdb.execute(sql_statement).arrow()
-        except Exception as ex:
-            logger.error(f"FilterTransform::transform failed: {ex}")
-            raise ex
+            # filter using SQL statement
+            try:
+                filtered_table = duckdb.execute(sql_statement).arrow()
+            except Exception as ex:
+                logger.error(f"FilterTransform::transform failed: {ex}")
+                raise ex
+        else:
+            filtered_table = table
+
+        # drop any columns requested from the final result
+        if len(self.columns_to_drop) > 0:
+            filtered_table_cols_dropped = filtered_table.drop_columns(self.columns_to_drop)
+        else:
+            filtered_table_cols_dropped = filtered_table
 
         # add global filter stats to metadata
         metadata["docs_after_filter"] = filtered_table.num_rows
-        metadata["bytes_after_filter"] = filtered_table.nbytes
-
-        # drop any columns requested from the final result
-        filtered_table_cols_dropped = filtered_table.drop_columns(self.columns_to_drop)
         metadata["columns_after_filter"] = filtered_table_cols_dropped.num_columns
+        metadata["bytes_after_filter"] = filtered_table.nbytes
 
         return [filtered_table_cols_dropped], metadata
 
