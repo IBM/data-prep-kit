@@ -11,7 +11,7 @@ authors = [
 dependencies = [
     "kfp==1.8.22",
     "requests",
-    "fm_data_processing",
+    "fm_data_processing==0.3.0",
 ]
 
 [build-system]
