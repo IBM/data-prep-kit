@@ -5,31 +5,29 @@ for details on general project conventions, transform configuration,
 testing and IDE set up.
 
 ## Summary 
-The data tokenization transform maps a (no-empty) input table to an output table using a pre-trained tokenizer.
-The input table must contain at least two columns, by default named `document_id` and `contents`,
-and can be specified through `--tkn_doc_id_column` and `--tkn_doc_content_column` respectively.
-The `document_id` should be unique within the dataset and the `contents` stores
+The data tokenization transform maps a (non-empty) input table to an output table using a pre-trained tokenizer.
+The input table must contain at least two columns, by default named `document_id` and `contents`. Different column names can be specified through `--tkn_doc_id_column` and `--tkn_doc_content_column` respectively.
+The value of each `document_id` should be unique within the dataset and the `contents` stores
 its corresponding document content.
 
-A pre-trained tokenizer must be specified through `--tkn_tokenizer` parameter 
+A pre-trained tokenizer must be specified through the `--tkn_tokenizer` parameter,
 which can be the name of a ready-for-download tokenizer
-from Huggingface such as `hf-internal-testing/llama-tokenizer`, `bigcode/starcoder` or those being loadable by Huggingface `AutoTokenizer` library.
-Parameter `--tkn_tokenizer_args` can be further used to specify extra arguments for the corresponding tokenizer. For example,
-`cache_dir=/tmp/hf,token=user_auth_token` could be used for tokenizer `bigcode/starcoder`.
+from HuggingFace such as `hf-internal-testing/llama-tokenizer`, `bigcode/starcoder` or any others that can loaded by the Huggingface `AutoTokenizer` library.
+The `--tkn_tokenizer_args` parameter can be further used to specify extra arguments for the corresponding tokenizer. For example,
+`use_auth_token=<your token>` could be used when loading HuggingFace tokenizers like `bigcode/starcoder`, that require an access token to be provided.
 
 The tokenization transform utilizes the pre-trained tokenizer to tokenize each row (assuming a document) in the input table
 to each row in the output folder. There are four columns in the output tables named `tokens,document_id,document_length,token_count`. 
 The `tokens` stores the sequence of token_ids returned by the tokenizer in tokenizing the document. The `document_id` (or the name specified in `--tkn_doc_id_column`) stores the document id,
 while `document_length,token_count` respectively stores the length of the document and the total token count. 
-The tokenizer will skip empty rows/documents in the input table or rows returned no tokens or failure by the tokenizer. 
+The tokenizer will skip empty rows/documents in the input table or rows returning no tokens or failure by the tokenizer.
 The count of such rows will be stored in the `num_empty_rows` of the `metadata` file.
 
 For some tokenizers, their tokenization process could be slow for long documents with millions of characters.
 In such case, parameter `--tkn_chunk_size` should be used to specify the length to spit a document into chunks
-(for `en` text, this parameter should be set to `20000`, equivalently to 15 pages) . 
+(for `en` text, this parameter should be set to `20000`, equivalently to 15 pages).
 The tokenizer will tokenize each chunk individually and concatenate their returned token_ids. 
-The default value for `--tkn_chunk_size` is `0` 
-which tokenizes each document as a whole no matter how long it is. 
+The default value for `--tkn_chunk_size` is `0` which tokenizes each document as a whole no matter how long it is. 
 
 
 ## Running
@@ -43,7 +41,7 @@ parquet files and the `metadata.json` file. It will skip empty parquet files in 
 (venv) % cd src
 (venv) % python tokenization_local.py
 17:07:48 INFO - Running locally
-17:07:48 INFO - Using local configuration with: input_folder - /Users/xdang/00proj/04-FM/01_code/fm-data-engineering/transforms/universal/tokenization/test-data/input output_folder - /Users/xdang/00proj/04-FM/01_code/fm-data-engineering/transforms/universal/tokenization/output
+17:07:48 INFO - Using local configuration with: input_folder - /src/transforms/universal/tokenization/test-data/input output_folder - /src/transforms/universal/tokenization/output
 17:07:48 INFO - Not using data sets, checkpointing False, max files -1
 17:07:48 INFO - number of workers 5 worker options {'num_cpus': 0.8}
 17:07:48 INFO - pipeline id pipeline_id; number workers 5
@@ -95,12 +93,12 @@ the following command line arguments are available in addition to
                         access_key: access key help text
                         secret_key: secret key help text
                         url: S3 url
-                        Example: { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/cos-optimal-llm-pile/test/' }
+                        Example: { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/bucket_name/test/' }
   --s3_config S3_CONFIG
                         AST string containing input/output paths.
                         input_path: Path to input folder of files to be processed
                         output_path: Path to output folder of processed files
-                        Example: { 'input_path': '/cos-optimal-llm-pile/bluepile-processing/xh/opensource/input', 'output_path': '/cos-optimal-llm-pile/bluepile-processing/xh/opensource/output' }
+                        Example: { 'input_path': '/bucket_name/input', 'output_path': '/bucket_name/output' }
  
   --local_config LOCAL_CONFIG
                         ast string containing input/output folders using local fs.
