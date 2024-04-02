@@ -1,38 +1,25 @@
 import os
-import sys
 
-from data_processing.ray import TransformLauncher
+from data_processing.data_access import DataAccessLocal
 from data_processing.utils import ParamsUtils
-from resize_transform import ResizeTransformConfiguration
+from resize_transform import ResizeTransform
 
 
-print(os.environ)
-# create launcher
-launcher = TransformLauncher(transform_runtime_config=ResizeTransformConfiguration())
-# create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
-local_conf = {
-    "input_folder": input_folder,
-    "output_folder": output_folder,
-}
-worker_options = {"num_cpus": 0.8}
-code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
-params = {
-    "run_locally": True,
-    "max_files": -1,
-    "local_config": ParamsUtils.convert_to_ast(local_conf),
-    "worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "num_workers": 3,
-    "checkpointing": False,
-    "pipeline_id": "pipeline_id",
-    "job_id": "job_id",
-    "creation_delay": 0,
-    "code_location": ParamsUtils.convert_to_ast(code_location),
-    "max_bytes_per_table": 1,
-    #    "max_rows_per_table": 150
-}
-sys.argv = ParamsUtils.dict_to_req(d=params)
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
+resize_params = {"max_rows_per_table": 75}
+if __name__ == "__main__":
+    # Here we show how to run outside of ray
+    # Create and configure the transform.
+    transform = ResizeTransform(resize_params)
 
-# launch
-launcher.launch()
+    # Use the local data access to read a parquet table that has 200 rows
+    data_access = DataAccessLocal()
+    table = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
+
+    # Transform the table to tables of 75 rows.  This should give two tables each with 75 rows.
+    table_list, metadata = transform.transform(table)
+    print(f"# of output tables: {len(table_list)}")
+    # Then flush the buffer which should contain the remaining 50 rows.
+    table_list, metadata = transform.flush()
+    table = table_list[0]
+    print(f"Flushed output table with {table.num_rows} (expecting 50)")

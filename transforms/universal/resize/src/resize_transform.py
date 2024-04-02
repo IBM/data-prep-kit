@@ -9,10 +9,17 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import LOCAL_TO_DISK, MB, get_logger
+from data_processing.utils import LOCAL_TO_DISK, MB, CLIArgumentProvider, get_logger
 
 
 logger = get_logger(__name__)
+
+max_rows_per_table_key = "max_rows_per_table"
+max_mbytes_per_table_key = "max_mbytes_per_table"
+shortname = "resize"
+cli_prefix = f"{shortname}_"
+max_rows_per_table_cli_param = f"{cli_prefix}{max_rows_per_table_key}"
+max_mbytes_per_table_cli_param = f"{cli_prefix}{max_mbytes_per_table_key}"
 
 
 class ResizeTransform(AbstractTableTransform):
@@ -26,8 +33,8 @@ class ResizeTransform(AbstractTableTransform):
         Initialize based on the dictionary of configuration information.
         """
         super().__init__(config)
-        self.max_rows_per_table = config.get("max_rows_per_table", 0)
-        self.max_bytes_per_table = LOCAL_TO_DISK * MB * config.get("max_mbytes_per_table", 0)
+        self.max_rows_per_table = config.get(max_rows_per_table_key, 0)
+        self.max_bytes_per_table = LOCAL_TO_DISK * MB * config.get(max_mbytes_per_table_key, 0)
         logger.debug(f"max bytes = {self.max_bytes_per_table}")
         logger.debug(f"max rows = {self.max_rows_per_table}")
         self.buffer = None
@@ -112,7 +119,7 @@ class ResizeTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name="Resize", runtime_class=DefaultTableTransformRuntime, transform_class=ResizeTransform)
+        super().__init__(name=shortname, runtime_class=DefaultTableTransformRuntime, transform_class=ResizeTransform)
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -123,13 +130,13 @@ class ResizeTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            "--max_rows_per_table",
+            f"--{max_rows_per_table_cli_param}",
             type=int,
             default=-1,
             help="Max number of rows per table",
         )
         parser.add_argument(
-            "--max_mbytes_per_table",
+            f"--{max_mbytes_per_table_cli_param}",
             type=float,
             default=-1,
             help="Max in-memory (not on-disk) table size (MB)",
@@ -141,19 +148,20 @@ class ResizeTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        if args.max_rows_per_table <= 0 and args.max_mbytes_per_table <= 0:
+        # Capture the args that are specific to this transform
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        self.params = self.params | captured
+        # dargs = vars(args)
+        if self.params.get(max_rows_per_table_key) <= 0 and self.params.get(max_mbytes_per_table_key) <= 0:
             logger.info("Neither max documents per table nor max table size are defined")
             return False
-        if args.max_rows_per_table > 0 and args.max_mbytes_per_table > 0:
+        if self.params.get(max_rows_per_table_key) > 0 and self.params.get(max_mbytes_per_table_key) > 0:
             logger.info("Both max documents per table and max table size are defined. Only one should be present")
             return False
-        self.params["max_rows_per_table"] = args.max_rows_per_table
-        self.params["max_mbytes_per_table"] = args.max_mbytes_per_table
         logger.info(f"Split file parameters are : {self.params}")
         return True
 
 
 if __name__ == "__main__":
-
     launcher = TransformLauncher(transform_runtime_config=ResizeTransformConfiguration())
     launcher.launch()

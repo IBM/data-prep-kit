@@ -7,10 +7,9 @@ testing and IDE set up.
 
 ## Summary
 
-This is a fairly simple transformer that is converting large files into smaller ones ones by splitting original
-tables into smaller ones we currently support two tipes of splitting:
-* splitting based on memory
-* splitting based on the amount of documents
+This is a simple transformer that is resizing the input tables to a specified size. 
+* resizing based on in-memory size of the tables.
+* resized based on the number of rows in the tables. 
 
 ## Building
 
@@ -25,13 +24,13 @@ make build
 The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py)
 configuration for values are as follows:
 
-* _max_table_size_ - specifies max size of table on disk/S3
+* _max_rows_per_table - specifies max size of table on disk/S3
 * _max_documents_table_ - specifies max documents per table
 
 ## Running
 
 We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/resize_local.py), [s3](src/resize_s3.py) and [lakehouse](src/resize_lakehouse.py)
+[local file system](src/resize_local_ray.py), [s3](src/resize_s3.py) and [lakehouse](src/resize_lakehouse.py)
 
 # Release notes
 
