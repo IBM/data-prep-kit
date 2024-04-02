@@ -33,8 +33,8 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    "max_table_size": 1,
-    #    "max_documents_table": 150
+    "max_bytes_per_table": 1,
+    #    "max_rows_per_table": 150
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

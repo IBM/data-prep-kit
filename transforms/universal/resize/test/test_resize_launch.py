@@ -11,12 +11,32 @@ class TestRayResizeTransform(AbstractTransformLauncherTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
+        # The following based on 3 identical input files of about 39kbytes, and 200 rows
+        fixtures = []
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
-        config = {
-            # When running in ray, our Runtime's get_transform_config() method  will load the domains using
-            # the orchestrator's DataAccess/Factory. So we don't need to provide the bl_local_config configuration.
-            "max_table_size": 1,
-            #    "max_documents_table": 150
-        }
-        fixtures = [(ResizeTransformConfiguration(), config, basedir + "/input", basedir + "/expected")]
+
+        # Split into 4 or so files
+        config = {"max_rows_per_table": 125}
+        fixtures.append((ResizeTransformConfiguration(), config, basedir + "/input", basedir + "/expected-rows-125"))
+
+        # # Merge into 2 or so files
+        config = {"max_rows_per_table": 300}
+        fixtures.append((ResizeTransformConfiguration(), config, basedir + "/input", basedir + "/expected-rows-300"))
+
+        # # Merge all into a single table
+        config = {"max_mbytes_per_table": 1}
+        fixtures.append((ResizeTransformConfiguration(), config, basedir + "/input", basedir + "/expected-mbytes-1"))
+
+        # # Merge the 1st 2 and some of the 2nd with the 3rd
+        config = {"max_mbytes_per_table": 0.05}
+        fixtures.append(
+            (ResizeTransformConfiguration(), config, basedir + "/input", basedir + "/expected-mbytes-0.05")
+        )
+
+        # Split into 4 or so files
+        config = {"max_mbytes_per_table": 0.02}
+        fixtures.append(
+            (ResizeTransformConfiguration(), config, basedir + "/input", basedir + "/expected-mbytes-0.02")
+        )
+
         return fixtures
