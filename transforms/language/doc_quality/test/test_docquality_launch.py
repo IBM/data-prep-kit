@@ -1,10 +1,12 @@
 import os
 
 from data_processing.test_support.ray import AbstractTransformLauncherTest
+from data_processing.utils import ParamsUtils
 from docquality_transform import DocQualityTransformConfiguration
 
 
 docq_params = {
+    "docquality_local_config": ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
     "docq_text_lang": "en",
     "docq_doc_content_column": "contents",
     "bad_word_filepath": "../test-data/docq/ldnoobw/",

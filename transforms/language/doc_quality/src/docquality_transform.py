@@ -2,13 +2,14 @@ import argparse
 from argparse import ArgumentParser
 
 import pyarrow as pa
-from data_processing.data_access import DataAccess, DataAccessFactory
+from data_processing.data_access import DataAccessFactory
 from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from doc_c4_statistics import (
     c4_contain_pattern_ratio,
     c4_contains_ldnoobw_words,
+    c4_load_ldnoobw_words,
     c4_sentence_count,
 )
 from doc_Gopher_statistics import (
@@ -18,6 +19,7 @@ from doc_Gopher_statistics import (
     contains_common_English_words,
     find_first_japanese_alphabet_position,
 )
+from perplexity import KenLMModel
 
 
 logger = get_logger(__name__)
@@ -25,6 +27,8 @@ logger = get_logger(__name__)
 short_name = "docquality"
 cli_prefix = short_name + "_"
 docquality_data_factory_key = "data_factory"
+docquality_data_access_key = "data_access"
+""" Key holds the data access for reading docquality related files.  If not present, then docquality_data_factory_key is expected"""
 
 
 class DocQualityTransform(AbstractTableTransform):
@@ -38,9 +42,6 @@ class DocQualityTransform(AbstractTableTransform):
         The input table must contain at least two columns, by default named `document_id` and `contents`.
         The doc quality transformer will add document quality metrics to the input table.
         """
-        from doc_c4_statistics import c4_load_ldnoobw_words
-        from perplexity import KenLMModel
-
         super().__init__(config)
         self.warning_issued = config.get("warning_issued", False)
         self.docq_text_lang = config.get("docq_text_lang", "en")
@@ -52,7 +53,18 @@ class DocQualityTransform(AbstractTableTransform):
         self.docq_doc_id_column = config.get("docq_doc_id_column", "document_id")
 
         self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.docq_text_lang, file_path=self.bad_word_filepath)
-        self.docq_kenLM_model = config.get("docq_kenLM_model", "../lm_sp/")
+
+        docq_kenLM_model = config.get("docq_kenLM_model", "../lm_sp/")
+        if docq_kenLM_model is None:
+            data_access = config.get(docquality_data_access_key, None)
+            if data_access is None:
+                daf = config.get(docquality_data_factory_key, None)
+                if daf is None:
+                    raise RuntimeError(f"Missing configuration value for key {docquality_data_factory_key}")
+                data_access = daf.create_data_access()
+            self.docq_kenLM_model = data_access.get_folder_files()
+        else:
+            self.docq_kenLM_model = docq_kenLM_model
         strip_accent = True
         self.klm = KenLMModel.from_pretrained(
             model_path=self.docq_kenLM_model, language=self.docq_text_lang, strip_accent=strip_accent
@@ -186,13 +198,13 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
             "--bad_word_filepath",
             type=str,
             default="../test-data/docq/ldnoobw/",
-            help="path to bad word file",
+            help="Path to bad word file: S3/COS URL or local folder (file or directory) that points to bad word file",
         )
         parser.add_argument(
             "--docq_kenLM_model",
             type=str,
             default="../lm_sp/",
-            help="path to docq_kenLM_model",
+            help="path to docq_kenLM_model: S3/COS URL or local folder (file or directory) that points to docq_kenLM_model",
         )
         # Create the DataAccessFactor to use CLI args with the given docquality prefix.
         self.daf = DataAccessFactory(cli_prefix)

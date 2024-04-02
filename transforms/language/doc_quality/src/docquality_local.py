@@ -1,7 +1,7 @@
 import os
 import sys
-from argparse import ArgumentParser
 
+from data_processing.data_access import DataAccessLocal
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
 from docquality_transform import DocQualityTransform, DocQualityTransformConfiguration
@@ -30,9 +30,23 @@ params = {
 }
 
 if __name__ == "__main__":
+    # Here we show how to run outside of ray
+    # docquality transform needs a DataAccess to ready the kenLM model.
+    data_access = DataAccessLocal(local_conf)
+    params["data_access"] = data_access
 
-    sys.argv = ParamsUtils.dict_to_req(d=params)
-    # create launcher
-    launcher = TransformLauncher(transform_runtime_config=DocQualityTransformConfiguration())
-    # Launch the ray actor(s) to process the input
-    launcher.launch()
+    # Create and configure the transform.
+    transform = DocQualityTransform(params)
+    # Use the local data access to read a parquet table.
+    table = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
+    print(f"input table: {table}")
+    # Transform the table
+    table_list, metadata = transform.transform(table)
+    print(f"\noutput table: {table_list}")
+    print(f"output metadata : {metadata}")
+
+    # sys.argv = ParamsUtils.dict_to_req(d=params)
+    # # create launcher
+    # launcher = TransformLauncher(transform_runtime_config=DocQualityTransformConfiguration())
+    # # Launch the ray actor(s) to process the input
+    # launcher.launch()

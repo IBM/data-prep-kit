@@ -16,10 +16,10 @@ s3_cred = {
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 docq_params = {
-    "ft_lang": "en",
+    "docq_text_lang": "en",
     "docq_doc_content_column": "contents",
     "bad_word_filepath": "../test-data/docq/ldnoobw/",
-    "model_dir": "../lm_sp/",
+    "docq_kenLM_model": "../lm_sp/",
 }
 s3_conf = {
     "input_folder": "cos-optimal-llm-pile/test/hajar/input/",
