@@ -13,21 +13,21 @@ fuzzy dedup and should not be modified.
 
 
 # change these parameters for specific use case
-number_of_docs = 2500000000
+number_of_docs = 4000000000
 # Fuzzy dedup params
 n_permutations = 64
 threshold = 0.7
 false_positive = 0.5
 false_negative = 0.5
 # Number of workers for initial run
-n_workers = 800
+n_workers = 1200
 # pod cpus
-ray_node_cpu = 40
+ray_node_cpu = 50
 # cpu sizes fo actors
 processor_cpu = 1.0
 bucket_cpu = .75
 minhash_cpu = .75
-doc_cpu = 0.5
+doc_cpu = 0.75
 # Experimental values, do not change
 bucket_actor_memory = 3.0
 minhash_actor_memory = 5.0

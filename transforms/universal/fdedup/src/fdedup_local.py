@@ -46,9 +46,10 @@ params = {
     "shingles_size": 5,
     "japanese_data": False,
     "delimiters": " ",
+    "random_delay_limit": 15,
     "snapshot_delay": 1,
     "use_doc_snapshot": False,
-    "use_bucket_snapshot": True,
+    "use_bucket_snapshot": False,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

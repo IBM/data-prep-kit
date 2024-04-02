@@ -8,7 +8,7 @@ from tokenization_transform import TokenizationTransformConfiguration
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data","ds01", "input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output","ds01"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
