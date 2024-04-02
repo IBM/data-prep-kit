@@ -91,8 +91,12 @@ class TransformTableProcessor:
             # Here we are using the name of the last table, that did not return anything
             output_file_name = self.last_fname.removesuffix(".parquet")
             if self.last_fname_next_index is None:
+                # The filename was NOT used to write out a file yet.
+                # This happens when _submit() is called with a filename, but with no tables.
+                # In this case, we can use the filename w/o an index.
                 output_file_name = f"{output_file_name}.parquet"
             else:
+                # The filename was used to write out a file, so we need to include an index.
                 output_file_name = f"{output_file_name}_{self.last_fname_next_index}.parquet"
             self._submit_table(f_name=output_file_name, t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
