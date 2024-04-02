@@ -19,19 +19,6 @@ configuration for values are as follows:
 * _filter_logical_operator_ - specifies the logical operator that joins filter criteria (`AND` or `OR`). The default value of this parameter is `AND`.
 * _filter_columns_to_drop_ - the list with the names of the columns to drop after row filtering is complete. The default value of this parameter is `[]` (an empty list, meaning that all the columns in the input table will be kept)
 
-Additionally, a set of data access-specific arguments are provided that enable
-the specification of the location of domain list files, so that these
-files could be stored in the local file system or in S3 storage, for example.
-The arguments are as follows (and generally match the TransformLauncher's 
-data access arguments but with the `filter_` prefix).
-
-* _filter_local_config_ - specifies the input and outout folders, although these are not used by the transform.
-* _filter_s3_config_ - specifies the input and output paths in s3.
-* _filter_lh_config_ - specifies lakehouse parameters.
-* _filter_s3_credentials_ - provides credentials to access the s3 storage. 
-
-See the Command Line options below for specifics on these.
-
 ## Example
 Consider a table with eight text documents, where each row has additional info about that document (date acquired, source URL, etc.), and a set of quality signals for that document.  
 
