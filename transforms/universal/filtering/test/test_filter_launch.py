@@ -24,24 +24,83 @@ class TestRayFilterTransform(AbstractTransformLauncherTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
+        fixtures = []
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
-        config = {
-            # When running in ray, our Runtime's get_transform_config() method  will load the domains using
-            # the orchestrator's DataAccess/Factory. So we don't need to provide the bl_local_config configuration.
-            "local_config": ParamsUtils.convert_to_ast(
+
+        fixtures.append(
+            (
+                FilterTransformConfiguration(),
                 {
-                    "input_folder": os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/")),
-                    "output_folder": os.path.abspath(os.path.join(os.path.dirname(__file__), "../output")),
-                }
-            ),
-            filter_criteria_cli_param: [
-                "docq_total_words > 100 AND docq_total_words < 200",
-                "ibmkenlm_docq_perplex_score < 230",
-            ],
-            filter_logical_operator_cli_param: filter_logical_operator_default,
-            filter_columns_to_drop_cli_param: ["extra", "cluster"],
-        }
-        input_dir = os.path.join(basedir, "input")
-        expected_dir = os.path.join(basedir, "expected", "test1")
-        fixtures = [(FilterTransformConfiguration(), config, input_dir, expected_dir)]
+                    filter_criteria_cli_param: [
+                        "docq_total_words > 100 AND docq_total_words < 200",
+                        "ibmkenlm_docq_perplex_score < 230",
+                    ],
+                    filter_logical_operator_cli_param: filter_logical_operator_default,
+                    filter_columns_to_drop_cli_param: ["extra", "cluster"],
+                },
+                os.path.join(basedir, "input"),
+                os.path.join(basedir, "expected", "test-and"),
+            )
+        )
+
+        fixtures.append(
+            (
+                FilterTransformConfiguration(),
+                {
+                    filter_criteria_cli_param: [
+                        "docq_total_words > 100 AND docq_total_words < 200",
+                        "ibmkenlm_docq_perplex_score < 230",
+                    ],
+                    filter_logical_operator_cli_param: "OR",
+                    filter_columns_to_drop_cli_param: ["extra", "cluster"],
+                },
+                os.path.join(basedir, "input"),
+                os.path.join(basedir, "expected", "test-or"),
+            )
+        )
+
+        fixtures.append(
+            (
+                FilterTransformConfiguration(),
+                {
+                    filter_criteria_cli_param: [],
+                    filter_logical_operator_cli_param: filter_logical_operator_default,
+                    filter_columns_to_drop_cli_param: [],
+                },
+                os.path.join(basedir, "input"),
+                os.path.join(basedir, "expected", "test-default"),
+            )
+        )
+
+        fixtures.append(
+            (
+                FilterTransformConfiguration(),
+                {
+                    filter_criteria_cli_param: [
+                        "date_acquired BETWEEN '2023-07-04' AND '2023-07-08'",
+                        "title LIKE 'https://%'",
+                    ],
+                    filter_logical_operator_cli_param: filter_logical_operator_default,
+                    filter_columns_to_drop_cli_param: [],
+                },
+                os.path.join(basedir, "input"),
+                os.path.join(basedir, "expected", "test-datetime-like"),
+            )
+        )
+
+        fixtures.append(
+            (
+                FilterTransformConfiguration(),
+                {
+                    filter_criteria_cli_param: [
+                        "hash IN ('e3b9ede15e7f396da1e39b0dfb32ba6c', 'bc0ef9ddd11e90342a50f494f6293e8d', 'cf1a5cde8e8734c3c75eb5e1229c9b15')",  # pragma: allowlist secret
+                    ],
+                    filter_logical_operator_cli_param: filter_logical_operator_default,
+                    filter_columns_to_drop_cli_param: [],
+                },
+                os.path.join(basedir, "input"),
+                os.path.join(basedir, "expected", "test-in"),
+            )
+        )
+
         return fixtures
