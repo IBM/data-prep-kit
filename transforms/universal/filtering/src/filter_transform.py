@@ -158,6 +158,7 @@ class FilterTransformConfiguration(DefaultTableTransformConfiguration):
             type=str,
             required=False,
             default="AND",
+            choices=["AND", "OR"],
             help="logical operator (AND or OR) that joins filter criteria",
         )
 
