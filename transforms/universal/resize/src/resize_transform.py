@@ -16,10 +16,15 @@ logger = get_logger(__name__)
 
 max_rows_per_table_key = "max_rows_per_table"
 max_mbytes_per_table_key = "max_mbytes_per_table"
+size_type_key = "size_type"
 shortname = "resize"
 cli_prefix = f"{shortname}_"
 max_rows_per_table_cli_param = f"{cli_prefix}{max_rows_per_table_key}"
 max_mbytes_per_table_cli_param = f"{cli_prefix}{max_mbytes_per_table_key}"
+size_type_cli_param = f"{cli_prefix}{size_type_key}"
+size_type_disk = "disk"
+size_type_memory = "memory"
+size_type_default = size_type_disk
 
 
 class ResizeTransform(AbstractTableTransform):
@@ -34,7 +39,12 @@ class ResizeTransform(AbstractTableTransform):
         """
         super().__init__(config)
         self.max_rows_per_table = config.get(max_rows_per_table_key, 0)
-        self.max_bytes_per_table = LOCAL_TO_DISK * MB * config.get(max_mbytes_per_table_key, 0)
+
+        self.max_bytes_per_table = MB * config.get(max_mbytes_per_table_key, 0)
+        disk_memory = config.get(size_type_key, size_type_default)
+        if size_type_default in disk_memory:
+            self.max_bytes_per_table *= LOCAL_TO_DISK
+
         logger.debug(f"max bytes = {self.max_bytes_per_table}")
         logger.debug(f"max rows = {self.max_rows_per_table}")
         self.buffer = None
@@ -139,7 +149,16 @@ class ResizeTransformConfiguration(DefaultTableTransformConfiguration):
             f"--{max_mbytes_per_table_cli_param}",
             type=float,
             default=-1,
-            help="Max in-memory (not on-disk) table size (MB)",
+            help=f"Max table size (MB). Size is measured according to the --{size_type_cli_param} parameter",
+        )
+        parser.add_argument(
+            f"--{size_type_cli_param}",
+            type=str,
+            required=False,
+            default=size_type_default,
+            choices=[size_type_disk, size_type_memory],
+            help=f"Determines how memory is measured when using the --{max_mbytes_per_table_cli_param} option."
+            "'memory' measures the in-process memory footprint and 'disk' makes and estimate of the resulting parquet file size.",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:

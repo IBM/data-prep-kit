@@ -24,22 +24,33 @@ make build
 The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py)
 configuration for values are as follows:
 
-* _max_rows_per_table - specifies max size of table on disk/S3
-* _max_documents_table_ - specifies max documents per table
+* _max_rows_per_table_ - specifies max documents per table
+* _max_mbytes_per_table - specifies max size of table, according to the _size_type_ value.
+* _size_type_ - indicates how table size is measured. Can be one of
+    * memory - table size is measure by the in-process memory used by the table
+    * disk - table size is estimated as the on-disk size of the parquet files.  This is an estimate only
+        as files are generally compressed on disk and so may not be exact due varying compression ratios.
+        This is the default.
+
+Only one of the _max_rows_per_table_ and _max_mbytes_per_table_ may be used.
 
 ## Running
 
 We also provide several demos of the transform usage for different data storage options, including
 [local file system](src/resize_local_ray.py), [s3](src/resize_s3.py) and [lakehouse](src/resize_lakehouse.py)
 
-# Release notes
 
-Only one split type is supported for a given run, if both `max_table_size` and `max_documents_table` are specified, the 
-error will be thrown and execution will abort
-This transformer creates more files then the input. It will create files preserving original name plus integer index 
-appended to it
-Note that max table size is specified in MB and refers to the size on disk/in S3. We are assuming there that the memory
-size is roughly twice the size on disk
+### Launched Command Line Options 
+When running the transform with the Ray launcher (i.e. TransformLauncher),
+the following command line arguments are available in addition to 
+[the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md) and map to the configuration keys above.
 
-Also note, that as a result of flushing we can have a set of smaller files (the ones that were not combined with 
-anything or partially combined) the amount of such smaller files is roughly equal to the amount of workers
+```
+  --resize_max_rows_per_table RESIZE_MAX_ROWS_PER_TABLE
+                        Max number of rows per table
+  --resize_max_mbytes_per_table RESIZE_MAX_MBYTES_PER_TABLE
+                        Max table size (MB). Size is measured according to the --resize_size_type parameter
+  --resize_size_type {disk,memory}
+                        Determines how memory is measured when using the --resize_max_mbytes_per_table option.'memory' measures the in-process memory footprint and 'disk' ma
+```
+
