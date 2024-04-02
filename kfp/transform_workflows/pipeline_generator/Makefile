@@ -1,5 +1,8 @@
 ROOT_DIR := ${CURDIR}
 
+# Use make help, to see the available rules
+include ../../../.make.defaults
+
 PIPELINE_DEFINITION ?= ${ROOT_DIR}/example/pipeline_definitions.yaml
 PIPELINE_DIST_DIR ?= ${ROOT_DIR}/../universal/
 
