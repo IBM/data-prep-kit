@@ -4,6 +4,8 @@ pipeline_parameters:
     script_name: "transformer_launcher.py"
     prefix: ""
     multi_s3: False
+    compute_func_name: ""
+    compute_func_import: ""
 
 pipeline_common_input_parameters_values:
     transform_image: "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop-guf:0.0.1"
