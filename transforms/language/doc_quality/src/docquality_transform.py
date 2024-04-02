@@ -47,14 +47,17 @@ class DocQualityTransform(AbstractTableTransform):
         self.docq_text_lang = config.get("docq_text_lang", "en")
         self.docq_bad_word_filepath = config.get(
             "docq_bad_word_filepath" + self.docq_text_lang,
-            "../test-data/docq/ldnoobw/en",
+            "/Users/hajaremami/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/en",
         )
         self.docq_doc_content_column = config.get("docq_doc_content_column", "contents")
         self.docq_doc_id_column = config.get("docq_doc_id_column", "document_id")
 
         self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.docq_text_lang, file_path=self.docq_bad_word_filepath)
 
-        docq_kenLM_model = config.get("docq_kenLM_model", "../lm_sp/")
+        docq_kenLM_model = config.get(
+            "docq_kenLM_model",
+            "/Users/hajaremami/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/",
+        )
         if docq_kenLM_model is None:
             data_access = config.get(docquality_data_access_key, None)
             if data_access is None:
@@ -197,13 +200,13 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         parser.add_argument(
             "--docq_bad_word_filepath",
             type=str,
-            default="../test-data/docq/ldnoobw/",
+            default="/Users/hajaremami/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/",
             help="Path to bad word file: S3/COS URL or local folder (file or directory) that points to bad word file",
         )
         parser.add_argument(
             "--docq_kenLM_model",
             type=str,
-            default="../lm_sp/",
+            default="/Users/hajaremami/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/",
             help="path to docq_kenLM_model: S3/COS URL or local folder (file or directory) that points to docq_kenLM_model",
         )
         # Create the DataAccessFactor to use CLI args with the given docquality prefix.
