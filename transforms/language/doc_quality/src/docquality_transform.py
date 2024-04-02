@@ -2,9 +2,10 @@ import argparse
 from argparse import ArgumentParser
 
 import pyarrow as pa
+from data_processing.data_access import DataAccess, DataAccessFactory
 from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import TransformUtils, get_logger
+from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from doc_c4_statistics import (
     c4_contain_pattern_ratio,
     c4_contains_ldnoobw_words,
@@ -20,6 +21,10 @@ from doc_Gopher_statistics import (
 
 
 logger = get_logger(__name__)
+
+short_name = "docquality"
+cli_prefix = short_name + "_"
+docquality_data_factory_key = "data_factory"
 
 
 class DocQualityTransform(AbstractTableTransform):
@@ -154,6 +159,7 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
     def __init__(self):
         super().__init__(name="DocQuality", transform_class=DocQualityTransform)
         self.params = {}
+        self.daf = None
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -178,14 +184,20 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         )
         parser.add_argument(
             "--bad_word_filepath",
+            type=str,
             default="../test-data/docq/ldnoobw/",
             help="path to bad word file",
         )
         parser.add_argument(
             "--docq_kenLM_model",
+            type=str,
             default="../lm_sp/",
             help="path to docq_kenLM_model",
         )
+        # Create the DataAccessFactor to use CLI args with the given docquality prefix.
+        self.daf = DataAccessFactory(cli_prefix)
+        # Add the DataAccessFactory parameters to the transform's configuration parameters.
+        self.daf.add_input_params(parser)
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
@@ -193,6 +205,10 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
+        # Capture the args that are specific to this transform
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        self.params = self.params | captured
+
         if args.docq_kenLM_model is None:
             logger.error(
                 f"Parameter --docq_kenLM_model must be a valid kenLM model for calculating perplexity, you specified {args.docq_kenLM_model}"
@@ -221,7 +237,13 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["docq_text_lang"] = args.docq_text_lang
         self.params["docq_doc_content_column"] = args.docq_doc_content_column
         self.params["docq_doc_id_column"] = args.docq_doc_id_column
-        return True
+        # return True
+        # Add the DataAccessFactory to the transform's configuration parameters.
+        self.params[docquality_data_factory_key] = self.daf
+        # mark this parameter to be removed
+        self.remove_from_metadata.append(docquality_data_factory_key)
+        # Validate and populate the transform's DataAccessFactory
+        return self.daf.apply_input_params(args)
 
 
 if __name__ == "__main__":
