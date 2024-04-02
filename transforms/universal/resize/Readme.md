@@ -51,6 +51,8 @@ the following command line arguments are available in addition to
   --resize_max_mbytes_per_table RESIZE_MAX_MBYTES_PER_TABLE
                         Max table size (MB). Size is measured according to the --resize_size_type parameter
   --resize_size_type {disk,memory}
-                        Determines how memory is measured when using the --resize_max_mbytes_per_table option.'memory' measures the in-process memory footprint and 'disk' ma
+                        Determines how memory is measured when using the --resize_max_mbytes_per_table option.
+                        'memory' measures the in-process memory footprint and 
+                        'disk' makes an estimate of the resulting parquet file size.
 ```
 

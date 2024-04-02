@@ -158,7 +158,7 @@ class ResizeTransformConfiguration(DefaultTableTransformConfiguration):
             default=size_type_default,
             choices=[size_type_disk, size_type_memory],
             help=f"Determines how memory is measured when using the --{max_mbytes_per_table_cli_param} option."
-            "'memory' measures the in-process memory footprint and 'disk' makes and estimate of the resulting parquet file size.",
+            "\n'memory' measures the in-process memory footprint and \n'disk' makes an estimate of the resulting parquet file size.",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
