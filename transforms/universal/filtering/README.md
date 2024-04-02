@@ -240,9 +240,6 @@ the following command line arguments are available in addition to
 ```
 python  [-h] [--run_locally RUN_LOCALLY] --filter_criteria_list FILTER_CRITERIA_LIST
                [--filter_columns_to_drop FILTER_COLUMNS_TO_DROP] [--filter_logical_operator FILTER_LOGICAL_OPERATOR]
-               [--s3_cred S3_CRED] [--s3_config S3_CONFIG] [--lh_config LH_CONFIG] [--local_config LOCAL_CONFIG]
-               [--max_files MAX_FILES] [--checkpointing CHECKPOINTING] [--data_sets DATA_SETS]
-               [--num_workers NUM_WORKERS] [--worker_options WORKER_OPTIONS] [--pipeline_id PIPELINE_ID]
-               [--job_id JOB_ID] [--creation_delay CREATION_DELAY] [--code_location CODE_LOCATION]
+              ...
 
 ```
