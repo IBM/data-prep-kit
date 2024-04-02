@@ -113,7 +113,7 @@ class TestFilterTransform(AbstractTransformTest):
         )
 
         # test filters that use IN queries (p IN ('x', 'y', 'z'))
-        filter_criteria = """["hash IN ('e3b9ede15e7f396da1e39b0dfb32ba6c', 'bc0ef9ddd11e90342a50f494f6293e8d', 'cf1a5cde8e8734c3c75eb5e1229c9b15')"]"""  # pragma: allowlist secret
+        filter_criteria = """["document IN ('CC-MAIN-20190221132217-20190221154217-00305.warc.gz', 'CC-MAIN-20200528232803-20200529022803-00154.warc.gz', 'CC-MAIN-20190617103006-20190617125006-00025.warc.gz')"]"""
         filter_logical_operator = filter_logical_operator_default
         filter_columns_to_drop = """[]"""
         input_dir = os.path.join(basedir, "input")
