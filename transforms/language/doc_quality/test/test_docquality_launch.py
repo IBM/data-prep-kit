@@ -9,7 +9,7 @@ docq_params = {
     "docquality_local_config": ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
     "docq_text_lang": "en",
     "docq_doc_content_column": "contents",
-    "bad_word_filepath": "../test-data/docq/ldnoobw/",
+    "docq_bad_word_filepath": "../test-data/docq/ldnoobw/",
     "docq_kenLM_model": "../lm_sp/",
 }
 

@@ -18,7 +18,7 @@ s3_cred = {
 docq_params = {
     "docq_text_lang": "en",
     "docq_doc_content_column": "contents",
-    "bad_word_filepath": "../test-data/docq/ldnoobw/",
+    "docq_bad_word_filepath": "../test-data/docq/ldnoobw/",
     "docq_kenLM_model": "../lm_sp/",
 }
 s3_conf = {

@@ -45,14 +45,14 @@ class DocQualityTransform(AbstractTableTransform):
         super().__init__(config)
         self.warning_issued = config.get("warning_issued", False)
         self.docq_text_lang = config.get("docq_text_lang", "en")
-        self.bad_word_filepath = config.get(
-            "bad_word_filepath" + self.docq_text_lang,
+        self.docq_bad_word_filepath = config.get(
+            "docq_bad_word_filepath" + self.docq_text_lang,
             "../test-data/docq/ldnoobw/en",
         )
         self.docq_doc_content_column = config.get("docq_doc_content_column", "contents")
         self.docq_doc_id_column = config.get("docq_doc_id_column", "document_id")
 
-        self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.docq_text_lang, file_path=self.bad_word_filepath)
+        self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.docq_text_lang, file_path=self.docq_bad_word_filepath)
 
         docq_kenLM_model = config.get("docq_kenLM_model", "../lm_sp/")
         if docq_kenLM_model is None:
@@ -195,7 +195,7 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
             help="column name that contain document id",
         )
         parser.add_argument(
-            "--bad_word_filepath",
+            "--docq_bad_word_filepath",
             type=str,
             default="../test-data/docq/ldnoobw/",
             help="Path to bad word file: S3/COS URL or local folder (file or directory) that points to bad word file",
@@ -227,9 +227,9 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
             )
             return False
 
-        if args.bad_word_filepath is None:
+        if args.docq_bad_word_filepath is None:
             logger.error(
-                f"Parameter --bad_word_filepath must be a valid path to bad_word file, you specified {args.bad_word_filepath}"
+                f"Parameter --docq_bad_word_filepath must be a valid path to bad_word file, you specified {args.docq_bad_word_filepath}"
             )
             return False
 
@@ -245,7 +245,7 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
             return False
 
         self.params["docq_kenLM_model"] = args.docq_kenLM_model
-        self.params["bad_word_filepath"] = args.bad_word_filepath
+        self.params["docq_bad_word_filepath"] = args.docq_bad_word_filepath
         self.params["docq_text_lang"] = args.docq_text_lang
         self.params["docq_doc_content_column"] = args.docq_doc_content_column
         self.params["docq_doc_id_column"] = args.docq_doc_id_column
