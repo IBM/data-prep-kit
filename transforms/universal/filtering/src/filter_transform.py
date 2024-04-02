@@ -1,5 +1,6 @@
 import argparse
 import ast
+import json
 from typing import Any
 
 import duckdb
@@ -139,19 +140,28 @@ class FilterTransformConfiguration(DefaultTableTransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
 
+        sample_sql = [
+            "docq_total_words > 100 AND docq_total_words < 200",
+            "docq_perplex_score < 230",
+            "date_acquired BETWEEN '2023-07-04' AND '2023-07-08'",
+            "title LIKE 'https://%%'",
+            "document_id IN ('doc-id-1', 'doc-id-2', 'doc-id-3')",
+        ]
+        columns_to_drop_example = ["column1", "column2"]
+
         parser.add_argument(
             f"--{filter_criteria_cli_param}",
             type=ast.literal_eval,
             required=True,
             default=ast.literal_eval("[]"),
-            help="list of filter criteria (in SQL WHERE clause format)",
+            help=f"list of filter criteria (in SQL WHERE clause format), for example: {json.dumps(sample_sql, indent=2, default=str)}",
         )
         parser.add_argument(
             f"--{filter_columns_to_drop_cli_param}",
             type=ast.literal_eval,
             required=False,
             default=ast.literal_eval("[]"),
-            help="list of columns to drop after filtering",
+            help=f"list of columns to drop after filtering, for example: {json.dumps(columns_to_drop_example)}",
         )
         parser.add_argument(
             f"--{filter_logical_operator_cli_param}",
