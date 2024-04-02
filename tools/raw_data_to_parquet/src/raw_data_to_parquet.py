@@ -70,6 +70,7 @@ def raw_to_parquet(
     file_path,
     detect_prog_lang: Any,
     snapshot: str,
+    domain: str,
 ) -> tuple[bool, dict[str:Any]]:
     """
     Converts raw data file (ZIP) to Parquet format and saves it.
@@ -91,6 +92,10 @@ def raw_to_parquet(
             snapshot_column = [snapshot] * table.num_rows
             table = TransformUtils.add_column(
                 table=table, name="snapshot", content=snapshot_column
+            )
+            domain_column = [domain] * table.num_rows
+            table = TransformUtils.add_column(
+                table=table, name="domain", content=domain_column
             )
         else:
             raise Exception(f"Got {ext} file, not supported")
@@ -165,6 +170,13 @@ def run():
     parser.add_argument(
         "-snapshot", "--snapshot", type=str, help="Name the dataset", default=""
     )
+    parser.add_argument(
+        "-domain",
+        "--domain",
+        type=str,
+        help="To identify whether data is code or nl",
+        default="",
+    )
 
     data_access_factory = DataAccessFactory()
     data_access_factory.add_input_params(parser)
@@ -192,7 +204,13 @@ def run():
             results = p.starmap_async(
                 raw_to_parquet,
                 [
-                    (data_access_factory, file_path, detect_prog_lang, args.snapshot)
+                    (
+                        data_access_factory,
+                        file_path,
+                        detect_prog_lang,
+                        args.snapshot,
+                        args.domain,
+                    )
                     for file_path in file_paths.keys()
                 ],
             )

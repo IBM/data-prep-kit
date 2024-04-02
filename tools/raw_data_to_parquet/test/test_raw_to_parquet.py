@@ -69,7 +69,6 @@ class TestZipToTable(unittest.TestCase):
         table = zip_to_table(
             self.mock_instance, test_file_path, self.mock_detect_lang_instance
         )
-        print("t--", table)
 
         # Assertions
         self.assertTrue(table)
@@ -131,7 +130,7 @@ class TestRawToParquet(unittest.TestCase):
                 )
 
                 result = raw_to_parquet(
-                    self.mock_data_access_factory_instance, "test.zip", True, "code"
+                    self.mock_data_access_factory_instance, "test.zip", True, "github","code"
                 )
 
                 # Assertions
@@ -147,7 +146,7 @@ class TestRawToParquet(unittest.TestCase):
                 )
 
     def test_unsupported_file_type(self):
-        result = raw_to_parquet(self.mock_data_access_factory, "test.txt", True, "code")
+        result = raw_to_parquet(self.mock_data_access_factory, "test.txt", True, "github","code")
 
         self.assertEqual(
             result,
@@ -160,7 +159,7 @@ class TestRawToParquet(unittest.TestCase):
             self.mock_data_access_instance.save_table.return_value = (0, {})
 
             result = raw_to_parquet(
-                self.mock_data_access_factory_instance, "test.zip", True, "code"
+                self.mock_data_access_factory_instance, "test.zip", True, "github", "code"
             )
 
             # Assertions
@@ -176,7 +175,7 @@ class TestRawToParquet(unittest.TestCase):
             )
 
             result = raw_to_parquet(
-                self.mock_data_access_factory_instance, "test.zip", True, "code"
+                self.mock_data_access_factory_instance, "test.zip", True, "githib", "NL"
             )
 
             self.assertEqual(

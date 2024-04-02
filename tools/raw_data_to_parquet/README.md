@@ -47,12 +47,17 @@ Each file contained within the ZIP is transformed into a distinct row within the
 **snapshot:** (optional)
 
 - **Description:** Name indicating which dataset it belong to.
-- **Example:** `"snapshot": "code"`
+- **Example:** `"snapshot": "github"`
 
 **lang:** (optional)
 
 - **Description:** Programming language detected using the file extension.
 - **Example:** `"lang": "Java"`
+
+**domain:** (optional)
+
+- **Description:** Name indicating which domain it belong to, whether code, natural language etc..
+- **Example:** `"domain": "code"`
 
 
 

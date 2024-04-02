@@ -20,8 +20,9 @@ if __name__ == "__main__":
     }
     params = {
         "local_config": ParamsUtils.convert_to_ast(local_conf),
-        # "detect_programming_lang": True,
-        # "snapshot": "github",
+        "detect_programming_lang": True,
+        "snapshot": "github",
+        "domain": "code",
     }
 
     sys.argv = ParamsUtils.dict_to_req(d=params)
