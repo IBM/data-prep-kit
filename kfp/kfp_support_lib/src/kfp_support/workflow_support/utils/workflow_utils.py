@@ -328,7 +328,7 @@ class RayRemoteJobs:
         for worker_node in worker_nodes:
             max_replicas = worker_node.get("max_replicas", 1)
             replicas = worker_node.get("replicas", 1)
-            min_replicas = worker_node.get("max_replicas", 0)
+            min_replicas = worker_node.get("min_replicas", 0)
             image = worker_node.get("image", self.default_image)
             image_pull_secret = worker_node.get("image_pull_secret", None)
             ray_start_params = worker_node.get("ray_start_params", DEFAULT_WORKER_START_PARAMS)
