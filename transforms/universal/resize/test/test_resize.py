@@ -3,7 +3,7 @@ from typing import Tuple
 
 import pyarrow as pa
 from data_processing.data_access import DataAccess, DataAccessLocal
-from data_processing.test_support.abstract_test import get_tables_in_folder
+from data_processing.test_support import get_tables_in_folder
 from data_processing.test_support.transform.transform_test import AbstractTransformTest
 from resize_transform import ResizeTransform
 
