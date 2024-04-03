@@ -22,9 +22,9 @@ DEPLOY_KUBEFLOW ?= 1
 
 clean::
 	@# Help: Clean up the distribution build and the venv 
-	rm -r dist venv
-	rm -rf src/*egg-info
-	rm makeenv
+	rm -r dist venv || true
+	rm -rf src/*egg-info || true
+	rm makeenv || true
 
 .check-env:: .check_python_version
 	$(call check_defined, FM_DATA_PROCESSING_KFP)
@@ -35,15 +35,17 @@ clean::
 update-toml:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml
 	sed -i.back 's/^version[ ]*=.*/version = "'${FM_DATA_PROCESSING_KFP}'"/' pyproject.toml
+	sed -i.back 's/fm_data_processing==[0-9].*/fm_data_processing==${FM_DATA_PROCESSING}",/' pyproject.toml
 	sed -i.back 's/kfp==[0-9].*/kfp==${KFP}",/' pyproject.toml
 
-build:: update-toml venv
+build:: clean update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
 	${PYTHON} -m pip install --upgrade build
 	${PYTHON} -m build
 
 publish:: .check-env
-	@# Help: Publish the wheel to and pypi
+publish::
+	@# Help: Publish the wheel to testpypi
 	@${PYTHON} -m twine upload --verbose --non-interactive --skip-existing --repository testpypi dist/*
 
 venv::	pyproject.toml .check-env
