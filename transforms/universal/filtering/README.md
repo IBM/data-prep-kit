@@ -236,20 +236,6 @@ When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
 [the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
 ```
-usage: filter_transform.py [-h] [--run_locally RUN_LOCALLY] --filter_criteria_list FILTER_CRITERIA_LIST
-                           [--filter_columns_to_drop FILTER_COLUMNS_TO_DROP] [--filter_logical_operator {AND,OR}]
-                           [--s3_cred S3_CRED] [--s3_config S3_CONFIG] [--lh_config LH_CONFIG]
-                           [--local_config LOCAL_CONFIG] [--max_files MAX_FILES] [--checkpointing CHECKPOINTING]
-                           [--data_sets DATA_SETS] [--num_workers NUM_WORKERS] [--worker_options WORKER_OPTIONS]
-                           [--pipeline_id PIPELINE_ID] [--job_id JOB_ID] [--creation_delay CREATION_DELAY]
-                           [--code_location CODE_LOCATION]
-
-Driver for filter processing
-
-options:
-  -h, --help            show this help message and exit
-  --run_locally RUN_LOCALLY
-                        running ray local flag
   --filter_criteria_list FILTER_CRITERIA_LIST
                         list of filter criteria (in SQL WHERE clause format), for example: [
                           "docq_total_words > 100 AND docq_total_words < 200",
