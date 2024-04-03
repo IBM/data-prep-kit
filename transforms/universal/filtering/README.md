@@ -24,12 +24,11 @@ Consider a table with eight text documents, where each row has additional info a
 
 ```
 |----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
-│ document | title    | contents | date_acq | extra    | cluster  | ft_lang | ft_score | docq_tot | docq_mea | ibmkenl │
-│ ---      | ---      | ---      | uired    | ---      | ---      | ---     | ---      | al_words | n_word_l | m_docq_ │
-│ str      | str      | str      | ---      | struct[5 | i64      | str     | f64      | ---      | en       | perplex │
-│          |          |          | datetime | ]        |          |         |          | i64      | ---      | _score  │
-│          |          |          | [ns]     |          |          |         |          |          | f64      | ---     │
-│          |          |          |          |          |          |         |          |          |          | f64     │
+│ document | title    | contents | date_acq | extra    | cluster  | ft_lang | ft_score | docq_tot | docq_mea | docq_pe │
+│ ---      | ---      | ---      | uired    | ---      | ---      | ---     | ---      | al_words | n_word_l | rplex_s │
+│ str      | str      | str      | ---      | struct[5 | i64      | str     | f64      | ---      | en       | core    │
+│          |          |          | datetime | ]        |          |         |          | i64      | ---      | ---     │
+│          |          |          | [ns]     |          |          |         |          |          | f64      | f64     │
 |----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
 │ CC-MAIN- | https:// | BACKGROU | 2023-07- | {"applic | -1       | en      | 1.0      | 77       | 5.662338 | 226.5   │
 │ 20190221 | www.sema | ND       | 05       | ation/ht |          |         |          |          |          |         │
@@ -78,18 +77,18 @@ Consider a table with eight text documents, where each row has additional info a
 #### Example 1 - two numerical filtering criteria joined by AND
 To filter this table and only keep the documents that have between 100 and 500 words **and** a perplexity score less than 230, and furthermore, drop the `extra` and `cluster` columns, invoke filtering with the following parameters:
 ```
-filter_criteria_list = ["docq_total_words > 100 AND docq_total_words < 500", "ibmkenlm_docq_perplex_score < 230"]
+filter_criteria_list = ["docq_total_words > 100 AND docq_total_words < 500", "docq_perplex_score < 230"]
 filter_logical_operator = "AND"
 filter_columns_to_drop = ["extra", "cluster"]
 ```
 This filter operation applied on the table above will return the following result:
 ```
 |-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
-│ document    | title       | contents    | date_acquir | ft_lang | ft_score | docq_total_ | docq_mean_w | ibmkenlm_do │
-│ ---         | ---         | ---         | ed          | ---     | ---      | words       | ord_len     | cq_perplex_ │
-│ str         | str         | str         | ---         | str     | f64      | ---         | ---         | score       │
-│             |             |             | datetime[ns |         |          | i64         | f64         | ---         │
-│             |             |             | ]           |         |          |             |             | f64         │
+│ document    | title       | contents    | date_acquir | ft_lang | ft_score | docq_total_ | docq_mean_w | docq_perple │
+│ ---         | ---         | ---         | ed          | ---     | ---      | words       | ord_len     | x_score     │
+│ str         | str         | str         | ---         | str     | f64      | ---         | ---         | ---         │
+│             |             |             | datetime[ns |         |          | i64         | f64         | f64         │
+│             |             |             | ]           |         |          |             |             |             │
 |-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
 │ CC-MAIN-201 | http://www. | Rory Fallon | 2023-07-09  | en      | 1.0      | 223         | 4.829596    | 167.5       │
 │ 71213104259 | iron-bru.co | joins       | 05:00:00    |         |          |             |             |             │
@@ -102,18 +101,18 @@ This filter operation applied on the table above will return the following resul
 #### Example 2 - two numerical filtering criteria joined by OR
 To filter this table and only keep the documents that have between 100 and 500 words **or** a perplexity score less than 230, and furthermore, drop the `extra` and `cluster` columns, invoke filtering with the following parameters:
 ```
-filter_criteria_list = ["docq_total_words > 100 AND docq_total_words < 500", "ibmkenlm_docq_perplex_score < 230"]
+filter_criteria_list = ["docq_total_words > 100 AND docq_total_words < 500", "docq_perplex_score < 230"]
 filter_logical_operator = "OR"
 filter_columns_to_drop = ["extra", "cluster"]
 ```
 This filter operation applied on the table above will return the following result:
 ```
 |-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
-│ document    | title       | contents    | date_acquir | ft_lang | ft_score | docq_total_ | docq_mean_w | ibmkenlm_do │
-│ ---         | ---         | ---         | ed          | ---     | ---      | words       | ord_len     | cq_perplex_ │
-│ str         | str         | str         | ---         | str     | f64      | ---         | ---         | score       │
-│             |             |             | datetime[ns |         |          | i64         | f64         | ---         │
-│             |             |             | ]           |         |          |             |             | f64         │
+│ document    | title       | contents    | date_acquir | ft_lang | ft_score | docq_total_ | docq_mean_w | docq_perple |
+│ ---         | ---         | ---         | ed          | ---     | ---      | words       | ord_len     | x_score     │
+│ str         | str         | str         | ---         | str     | f64      | ---         | ---         | ---         │
+│             |             |             | datetime[ns |         |          | i64         | f64         | f64         │
+│             |             |             | ]           |         |          |             |             |             │
 |-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
 │ CC-MAIN-201 | https://www | BACKGROUND  | 2023-07-05  | en      | 1.0      | 77          | 5.662338    | 226.5       │
 │ 90221132217 | .semanticsc | The         | 05:00:00    |         |          |             |             |             │
@@ -152,14 +151,13 @@ filter_columns_to_drop = []
 
 This filter operation applied on the table above will return the following result:
 ```
-|----------|----------|----------|----------|----------|---------|---------|----------|----------|----------|----------|
-│ document | title    | contents | date_acq | extra    | cluster | ft_lang | ft_score | docq_tot | docq_mea | ibmkenlm │
-│ ---      | ---      | ---      | uired    | ---      | ---     | ---     | ---      | al_words | n_word_l | _docq_pe │
-│ str      | str      | str      | ---      | struct[5 | i64     | str     | f64      | ---      | en       | rplex_sc │
-│          |          |          | datetime | ]        |         |         |          | i64      | ---      | ore      │
-│          |          |          | [ns]     |          |         |         |          |          | f64      | ---      │
-│          |          |          |          |          |         |         |          |          |          | f64      │
-|----------|----------|----------|----------|----------|---------|---------|----------|----------|----------|----------|
+|----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
+│ document | title    | contents | date_acq | extra    | cluster  | ft_lang | ft_score | docq_tot | docq_mea | docq_pe │
+│ ---      | ---      | ---      | uired    | ---      | ---      | ---     | ---      | al_words | n_word_l | rplex_s │
+│ str      | str      | str      | ---      | struct[5 | i64      | str     | f64      | ---      | en       | core    │
+│          |          |          | datetime | ]        |          |         |          | i64      | ---      | ---     │
+│          |          |          | [ns]     |          |          |         |          |          | f64      | f64     │
+|----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
 │ CC-MAIN- | https:// | BACKGROU | 2023-07- | {"applic | -1      | en      | 1.0      | 77       | 5.662338 | 226.5    │
 │ 20190221 | www.sema | ND       | 05       | ation/ht |         |         |          |          |          |          │
 │ 132217-2 | nticscho | The      | 05:00:00 | tp; msgt |         |         |          |          |          |          │
@@ -207,7 +205,7 @@ You can run the [filter_local.py](src/filter_local.py) (python-only implementati
 input table has 100 rows
 
 output table has 11 rows
-output metadata : {'total_docs_count': 100, 'total_bytes_count': 478602, 'total_columns_count': 25, "docs_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'": 78, "bytes_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'": 429191, "docs_filtered_by 'ibmkenlm_docq_perplex_score < 230'": 53, "bytes_filtered_by 'ibmkenlm_docq_perplex_score < 230'": 275911, 'docs_after_filter': 11, 'bytes_after_filter': 24061, 'columns_after_filter': 23}
+output metadata : {'total_docs_count': 100, 'total_bytes_count': 478602, 'total_columns_count': 25, "docs_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'": 78, "bytes_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'": 429191, "docs_filtered_by 'docq_perplex_score < 230'": 53, "bytes_filtered_by 'docq_perplex_score < 230'": 275911, 'docs_after_filter': 11, 'bytes_after_filter': 24061, 'columns_after_filter': 23}
 (venv) % deactivate
 % ls ../output
 metadata.json	test1.parquet
@@ -221,7 +219,7 @@ As shown in the output of the local run of filtering, the metadata contains seve
   * `docs_after_filter`, `bytes_after_filter`, `columns_after_filter`: total number of documents (rows), bytes, and columns that were present in the output table, after filtering took place  
 * Per-criteria statistics: these statistics show the impact of each filtering criteria - number of documents and bytes that it filters out, when applied by itself. We ran the local filter with two filtering criteria, and these are the stats for each of them:  
   * `docs_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'`, `bytes_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'` - the number of documents and bytes filtered out by the `docq_total_words > 100 AND docq_total_words < 200` filtering condition  
-  * `docs_filtered_by 'ibmkenlm_docq_perplex_score < 230'`, `bytes_filtered_by 'ibmkenlm_docq_perplex_score < 230'`  - the number of documents and bytes filtered out by the `ibmkenlm_docq_perplex_score < 230` filtering condition  
+  * `docs_filtered_by 'docq_perplex_score < 230'`, `bytes_filtered_by 'docq_perplex_score < 230'`  - the number of documents and bytes filtered out by the `docq_perplex_score < 230` filtering condition  
 
 
 ### Building the Docker Image
@@ -238,8 +236,17 @@ When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
 [the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
 ```
-python  [-h] [--run_locally RUN_LOCALLY] --filter_criteria_list FILTER_CRITERIA_LIST
-               [--filter_columns_to_drop FILTER_COLUMNS_TO_DROP] [--filter_logical_operator FILTER_LOGICAL_OPERATOR]
-              ...
+  --filter_criteria_list FILTER_CRITERIA_LIST
+                        list of filter criteria (in SQL WHERE clause format), for example: [
+                          "docq_total_words > 100 AND docq_total_words < 200",
+                          "docq_perplex_score < 230",
+                          "date_acquired BETWEEN '2023-07-04' AND '2023-07-08'",
+                          "title LIKE 'https://%'",
+                          "document_id IN ('doc-id-1', 'doc-id-2', 'doc-id-3')"
+                        ]
+  --filter_columns_to_drop FILTER_COLUMNS_TO_DROP
+                        list of columns to drop after filtering, for example: ["column1", "column2"]
+  --filter_logical_operator {AND,OR}
+                        logical operator (AND or OR) that joins filter criteria
 
 ```
