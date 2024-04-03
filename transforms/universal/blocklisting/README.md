@@ -110,7 +110,7 @@ the following command line arguments are available in addition to
                         AST string containing input/output paths.
                         input_path: Path to input folder of files to be processed
                         output_path: Path to output folder of processed files
-                        Example: { 'input_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'output_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed' }
+                        Example: { 'input_path': '/bucket_name/input', 'output_path': '/bucket_name/output' }
 --blocklist_lh_config BL_LH_CONFIG
                         AST string containing input/output using lakehouse.
                         input_table: Path to input folder of files to be processed
