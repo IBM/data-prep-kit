@@ -33,10 +33,6 @@ import sentencepiece
 from cc_net_prepro import cc_net_normalize
 
 
-# Ensure following path to folder having pre-trained KenLM + SentencePiece (sp):
-# PATH_TO_PRETRAINED_MODELS = os.path.join(os.path.expanduser("~/BigData/04-FM/lm_sp/"), "en.sp.model")
-# PATH_TO_PRETRAINED_MODELS = os.path.join(os.path.expanduser("~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/"), "en.sp.model")
-
 TEST_MODE = 0
 
 
@@ -282,8 +278,14 @@ class KenLMModel:
 
 if __name__ == "__main__":
     # ''' Only sp tokenizer'''
+
+    # defaults
+    basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+    docq_kenLM_model_default = basedir + "/lm_sp/"
+    """ The default path for the docq_kenLM_model """
+
     model_path = os.path.join(
-        os.path.expanduser("~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/"),
+        docq_kenLM_model_default,
         "en.sp.model",
     )
     spm = SentencePieceModel(model_path)
@@ -297,9 +299,7 @@ if __name__ == "__main__":
         verbose=True,
     )
 
-    model_path = os.path.join(
-        os.path.expanduser("~/Desktop/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/")
-    )
+    model_path = docq_kenLM_model_default
     klm = KenLMModel.from_pretrained(
         model_path=model_path, language="en", strip_accent=True, lower_case=True, digit_2_zero=True, punct_level=1
     )

@@ -5,12 +5,14 @@ from data_processing.utils import ParamsUtils
 from docquality_transform import DocQualityTransformConfiguration
 
 
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+
 docq_params = {
-    "docquality_local_config": ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
+    "docq_local_config": ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
     "docq_text_lang": "en",
     "docq_doc_content_column": "contents",
-    "docq_bad_word_filepath": "/Users/hajaremami/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/",
-    "docq_kenLM_model": "/Users/hajaremami/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/",
+    "docq_bad_word_filepath": basedir + "/test-data/docq/ldnoobw/",
+    "docq_kenLM_model": basedir + "/lm_sp/",
 }
 
 

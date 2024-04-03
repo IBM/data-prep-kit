@@ -1,3 +1,4 @@
+import os
 from typing import Tuple
 
 import pyarrow as pa
@@ -77,11 +78,14 @@ expected_metadata_list = [{"total_docs_count": 1}, {}]
 """
 Config (parameter settings) for the run:
 """
+
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+
 config = {
     "docq_text_lang": "en",
     "docq_doc_content_column": "contents",
-    "docq_bad_word_filepath": "../test-data/docq/ldnoobw/",
-    "docq_kenLM_model": "../lm_sp/",
+    "docq_bad_word_filepath": basedir + "/test-data/docq/ldnoobw/",
+    "docq_kenLM_model": basedir + "/lm_sp/",
 }
 
 

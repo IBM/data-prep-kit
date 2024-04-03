@@ -1,4 +1,5 @@
 import argparse
+import os
 from argparse import ArgumentParser
 
 import pyarrow as pa
@@ -24,11 +25,20 @@ from perplexity import KenLMModel
 
 logger = get_logger(__name__)
 
-short_name = "docquality"
+short_name = "docq"
 cli_prefix = short_name + "_"
 docquality_data_factory_key = "data_factory"
 docquality_data_access_key = "data_access"
 """ Key holds the data access for reading docquality related files.  If not present, then docquality_data_factory_key is expected"""
+
+
+# defaults
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+
+docq_bad_word_filepath_default = basedir + "/test-data/docq/ldnoobw/"
+""" The default value for the docq_bad_word_filepath"""
+docq_kenLM_model_default = basedir + "/lm_sp/"
+""" The default path for the docq_kenLM_model """
 
 
 class DocQualityTransform(AbstractTableTransform):
@@ -47,7 +57,7 @@ class DocQualityTransform(AbstractTableTransform):
         self.docq_text_lang = config.get("docq_text_lang", "en")
         self.docq_bad_word_filepath = config.get(
             "docq_bad_word_filepath" + self.docq_text_lang,
-            "/Users/hajaremami/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/en",
+            docq_bad_word_filepath_default + self.docq_text_lang,
         )
         self.docq_doc_content_column = config.get("docq_doc_content_column", "contents")
         self.docq_doc_id_column = config.get("docq_doc_id_column", "document_id")
@@ -56,7 +66,7 @@ class DocQualityTransform(AbstractTableTransform):
 
         docq_kenLM_model = config.get(
             "docq_kenLM_model",
-            "/Users/hajaremami/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/",
+            docq_kenLM_model_default,
         )
         if docq_kenLM_model is None:
             data_access = config.get(docquality_data_access_key, None)
@@ -200,13 +210,15 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         parser.add_argument(
             "--docq_bad_word_filepath",
             type=str,
-            default="/Users/hajaremami/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/test-data/docq/ldnoobw/",
+            required=True,
+            default=docq_bad_word_filepath_default,
             help="Path to bad word file: S3/COS URL or local folder (file or directory) that points to bad word file",
         )
         parser.add_argument(
             "--docq_kenLM_model",
             type=str,
-            default="/Users/hajaremami/GUF_hajar/fm-data-engineering/transforms/language/doc_quality/lm_sp/",
+            required=True,
+            default=docq_kenLM_model_default,
             help="path to docq_kenLM_model: S3/COS URL or local folder (file or directory) that points to docq_kenLM_model",
         )
         # Create the DataAccessFactor to use CLI args with the given docquality prefix.
