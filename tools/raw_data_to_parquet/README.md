@@ -66,8 +66,44 @@ Each file contained within the ZIP is transformed into a distinct row within the
 The set of dictionary keys holding [RAW_DATA_TO_PARQUET](src/raw_data_to_parquet.py) 
 configuration for values are as follows:
 
-* detect_programming_lang (bool): if set to True,enables the detection of the programming language based on the file extension. 
-* snapshot (str): Each row in the dataset will be labeled with this snapshot name.
+-detect_programming_lang DETECT_PROGRAMMING_LANG, --detect_programming_lang DETECT_PROGRAMMING_LANG
+                        generate programming lang
+  -snapshot SNAPSHOT, --snapshot SNAPSHOT
+                        Name the dataset
+  -domain DOMAIN, --domain DOMAIN
+                        To identify whether data is code or nl
+  --s3_cred S3_CRED     AST string of options for cos credentials. Only required for COS or Lakehouse.
+                        access_key: access key help text secret_key: secret key help text url: S3 url Example:
+                        { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/cos-optimal-
+                        llm-pile/test/' }
+  --s3_config S3_CONFIG
+                        AST string containing input/output paths. input_path: Path to input folder of files to
+                        be processed output_path: Path to output folder of processed files Example: {
+                        'input_path': '/cos-optimal-llm-pile/bluepile-
+                        processing/rel0_8/cc15_30_preproc_ededup', 'output_path': '/cos-optimal-llm-
+                        pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed' }
+  --lh_config LH_CONFIG
+                        AST string containing input/output using lakehouse. input_table: Path to input folder
+                        of files to be processed input_dataset: Path to outpu folder of processed files
+                        input_version: Version number to be associated with the input. output_table: Name of
+                        table into which data is written output_path: Path to output folder of processed files
+                        token: The token to use for Lakehouse authentication lh_environment: Operational
+                        environment. One of STAGING or PROD Example: { 'input_table': '/cos-optimal-llm-
+                        pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'input_dataset': '/cos-
+                        optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed',
+                        'input_version': '1.0', 'output_table': 'ededup', 'output_path': '/cos-optimal-llm-
+                        pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'token': 'AASDFZDF',
+                        'lh_environment': 'STAGING' }
+  --local_config LOCAL_CONFIG
+                        ast string containing input/output folders using local fs. input_folder: Path to input
+                        folder of files to be processed output_folder: Path to output folder of processed files
+                        Example: { 'input_folder': './input', 'output_folder': '/tmp/output' }
+  --max_files MAX_FILES
+                        Max amount of files to process
+  --checkpointing CHECKPOINTING
+                        checkpointing flag
+  --data_sets DATA_SETS
+                        List of data sets
 
 ## Running
 
