@@ -12,7 +12,62 @@ class DataAccess:
     Base class for data access (interface), defining all the methods
     """
 
+    def get_num_samples(self) -> int:
+        """
+        Get number of samples for input
+        :return: Number of samples
+        """
+        pass
+
+    def get_output_folder(self) -> str:
+        """
+        Get output folder as a string
+        :return: output_folder
+        """
+        pass
+
+    @staticmethod
+    def get_random_file_set(n_samples: int, files: list[str]) -> list[str]:
+        """
+        Get random set of files
+        :param n_samples: set size
+        :param files: list of original files
+        :return: set of randomly selected files
+        """
+        # Pick files to include
+        if len(files) > n_samples:
+            # Pick files at random
+            files_set = [int(random.random() * len(files)) for _ in range(n_samples)]
+        else:
+            # use all existing files
+            files_set = range(len(files))
+        logger.info(f"Using files {files} to sample data")
+        result = [""] * len(files_set)
+        index = 0
+        for f in files_set:
+            result[index] = files[f]
+        return result
+
     def get_files_to_process(self) -> tuple[list[str], dict[str, float]]:
+        """
+        Get files to process
+        :return: list of files and a dictionary of the files profile:
+            "max_file_size_MB",
+            "min_file_size_MB",
+            "avg_file_size_MB",
+            "total_file_size_MB"
+        """
+        if self.get_output_folder() is None:
+            logger.warning("Input/Output are not defined, returning empty list")
+            return [], {}
+        path_list, path_profile = self.get_files_to_process_internal()
+        n_samples = self.get_num_samples()
+        if n_samples > 0:
+            files = self.get_random_file_set(n_samples=n_samples, files=path_list)
+            return files, path_profile
+        return path_list, path_profile
+
+    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float]]:
         """
         Get files to process
         :return: list of files and a dictionary of the files profile:
@@ -56,16 +111,6 @@ class DataAccess:
         """
         Save byte array to the file
         :param path: file path
-        :param data: byte array
-        :return: a dictionary as
-        defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
-        """
-
-    def save_file_rel(self, path: str, data: bytes) -> dict[str, Any]:
-        """
-        Save byte array to the file
-        :param path: file path relative to output directory
         :param data: byte array
         :return: a dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
@@ -128,23 +173,15 @@ class DataAccess:
             estimated number of docs
         """
         # get files to process
-        path_list, path_profile = self.get_files_to_process()
+        path_list, path_profile = self.get_files_to_process_internal()
         # Pick files to sample
-        if len(path_list) > n_samples:
-            # Pick files at random
-            files = [int(random.random() * len(path_list)) for _ in range(n_samples)]
-        else:
-            # use all existing files
-            files = range(len(path_list))
-        logger.info(f"Using files {files} to sample data")
-
+        files = self.get_random_file_set(n_samples=n_samples, files=path_list)
         # Read table and compute number of docs and sizes
         number_of_docs = []
         table_sizes = []
         n_tables = 0
         for f in files:
-            f_name = path_list[f]
-            table = self.get_table(path=f_name)
+            table = self.get_table(path=f)
             if table is not None:
                 n_tables += 1
                 number_of_docs.append(table.num_rows)
