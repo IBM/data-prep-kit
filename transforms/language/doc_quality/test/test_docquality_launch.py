@@ -11,7 +11,7 @@ docq_params = {
     "docq_local_config": ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
     "docq_text_lang": "en",
     "docq_doc_content_column": "contents",
-    "docq_bad_word_filepath": basedir + "/test-data/docq/ldnoobw/",
+    "docq_bad_word_filepath": basedir + "/ldnoobw/",
     "docq_kenLM_model": basedir + "/lm_sp/",
 }
 

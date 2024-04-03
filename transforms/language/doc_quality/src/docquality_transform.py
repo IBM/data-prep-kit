@@ -33,11 +33,9 @@ docquality_data_access_key = "data_access"
 
 
 # defaults
-basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
-
-docq_bad_word_filepath_default = basedir + "/test-data/docq/ldnoobw/"
+docq_bad_word_filepath_default = "../ldnoobw/"
 """ The default value for the docq_bad_word_filepath"""
-docq_kenLM_model_default = basedir + "/lm_sp/"
+docq_kenLM_model_default = "../lm_sp/"
 """ The default path for the docq_kenLM_model """
 
 
@@ -210,14 +208,14 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         parser.add_argument(
             "--docq_bad_word_filepath",
             type=str,
-            required=True,
+            required=False,
             default=docq_bad_word_filepath_default,
             help="Path to bad word file: S3/COS URL or local folder (file or directory) that points to bad word file",
         )
         parser.add_argument(
             "--docq_kenLM_model",
             type=str,
-            required=True,
+            required=False,
             default=docq_kenLM_model_default,
             help="path to docq_kenLM_model: S3/COS URL or local folder (file or directory) that points to docq_kenLM_model",
         )
