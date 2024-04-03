@@ -40,7 +40,7 @@ data access arguments but with the `blocklist_' prefix).
 See the Command Line options below for specifics on these.
 
 ## Running
-You can run the [blocklist_local.py](src/blocklist_local.py) to
+You can run the [blocklist_local_ray.py](src/blocklist_local_ray.py) to
 transform the `test1.parquet` file in [test input data](test-data/input) 
 to an `output` directory.  The directory will contain both the new
 annotated `test1.parquet` file and the `metadata.json` file.
@@ -48,7 +48,7 @@ annotated `test1.parquet` file and the `metadata.json` file.
 % make venv
 % source venv/bin/activate
 (venv) % cd src
-(venv) % python blocklist_local.py
+(venv) % python blocklist_local_ray.py
 number of workers 5 worker options {'num_cpus': 0.8}
 pipeline id pipeline_id; number workers 5
 job details {'job category': 'preprocessing', 'job name': 'blocklist', 'job type': 'ray', 'job id': 'job_id'}
