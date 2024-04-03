@@ -29,9 +29,9 @@ COPY --from=clamav-local --chown=ray:users /var/run/clamav /var/run/clamav
 COPY requirements.txt requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt \
-    && rm -rf requirements.txt .cache/pip \
-    && echo "cdprocess=\$(ps aux | grep [c]lamd | wc -l)" >> .profile \
-    && echo "if [ \$cdprocess -eq 0 ]; then echo 'Starting up clamd'; clamd; fi" >> .profile
+    && rm -rf requirements.txt .cache/pip
 
 COPY src/*_transform.py  ./
 ENV PYTHONPATH /home/ray
+
+CMD ["/bin/bash", "-c", "clamd --foreground"]
