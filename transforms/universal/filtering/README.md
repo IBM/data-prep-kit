@@ -201,7 +201,7 @@ You can run the [filter_local.py](src/filter_local.py) (python-only implementati
 % make venv
 % source venv/bin/activate
 (venv) % cd src
-(venv) % python filter_local.py
+(venv) % python filter_local_ray.py
 input table has 100 rows
 
 output table has 11 rows
