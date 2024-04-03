@@ -38,7 +38,6 @@ def zip_to_table(data_access: DataAccess, file_path, detect_prog_lang: Any) -> p
                         content_string = TransformUtils.decode_content(content_bytes)
                         if content_string and len(content_string) > 0:
                             ext = TransformUtils.get_file_extension(member.filename)
-                            print("ext", ext)
                             row_data = {
                                 "title": member.filename,
                                 "document": zip_name,
@@ -51,7 +50,6 @@ def zip_to_table(data_access: DataAccess, file_path, detect_prog_lang: Any) -> p
                             }
                             if detect_prog_lang:
                                 lang = detect_prog_lang.get_lang_from_ext(ext)
-                                print("lang", lang)
                                 row_data["lang"] = lang
 
                             data.append(row_data)
