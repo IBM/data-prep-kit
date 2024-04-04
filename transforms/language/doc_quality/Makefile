@@ -34,7 +34,7 @@ clean:: .transforms.clean
 	rm -rf cc_net
 	rm -rf lm_sp
 
-image:: .transforms.image
+image:: model-en .transforms.image
 
 test-lib-src:: model-en .transforms.test-lib-src
 
