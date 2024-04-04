@@ -6,7 +6,7 @@ REPOROOT=../../..
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-DOCKER_IMAGE_NAME=antivirus
+TRANSFORM_NAME=antivirus
 DOCKER_IMAGE_VERSION=0.2
 
 venv::	.transforms.venv
@@ -26,3 +26,6 @@ image:: .transforms.image
 test-lib-src:: .transforms.test-lib-src
 
 install-lib-src:: .transforms.install-lib-src
+
+test-image:: .transforms.test-image
+

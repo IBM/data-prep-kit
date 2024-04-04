@@ -6,7 +6,7 @@ REPOROOT=../../..
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-DOCKER_IMAGE_NAME=tokenization
+TRANSFORM_NAME=tokenization
 DOCKER_IMAGE_VERSION=0.1.0
 
 
@@ -23,4 +23,7 @@ image:: .transforms.image
 test-lib-src:: .transforms.test-lib-src
 
 install-lib-src:: .transforms.install-lib-src
+
+
+test-image:: .transforms.test-image
 
