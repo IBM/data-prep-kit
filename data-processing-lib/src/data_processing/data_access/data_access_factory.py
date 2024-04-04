@@ -197,6 +197,7 @@ class DataAccessFactory(CLIArgumentProvider):
                 return False
             self.s3_config = s3_config
             logger.info(
+                f"data factory {self.cli_arg_prefix} "
                 f'Using s3 configuration: input path - {self.s3_config["input_folder"]}, '
                 f'output path - {self.s3_config["output_folder"]}'
             )
@@ -209,6 +210,7 @@ class DataAccessFactory(CLIArgumentProvider):
             self.lh_config = lh_config
             utils.add_if_missing(self.lh_config, "token", DPFConfig.LAKEHOUSE_TOKEN)
             logger.info(
+                f"data factory {self.cli_arg_prefix} "
                 f'Using lake house configuration: input table - {self.lh_config["input_table"]}, '
                 f'input_dataset - {self.lh_config["input_dataset"]}, '
                 f'input_version - {self.lh_config["input_version"]}, '
@@ -221,6 +223,7 @@ class DataAccessFactory(CLIArgumentProvider):
                 return False
             self.local_config = local_config
             logger.info(
+                f"data factory {self.cli_arg_prefix} "
                 f"Using local configuration with: "
                 f"input_folder - {self.local_config['input_folder']} "
                 f"output_folder - {self.local_config['output_folder']}"
@@ -229,25 +232,35 @@ class DataAccessFactory(CLIArgumentProvider):
             if not self.__validate_s3_cred(s3_credentials=self.s3_cred):
                 return False
             self.s3_cred = s3_cred
-            logger.info('Using s3 configuration without input/output path')
+            logger.info(
+                f"data factory {self.cli_arg_prefix} "
+                'Using s3 configuration without input/output path'
+            )
         else:
-            logger.info('Using local configuration without input/output path')
+            logger.info(
+                f"data factory {self.cli_arg_prefix} "
+                'Using local configuration without input/output path'
+            )
 
         # Check whether both max_files and number samples are defined
         if max_files > 0 and n_samples > 0:
-            logger.error(f"Both max files {max_files} and random samples {n_samples} are defined. Only one "
-                         f"allowed at a time")
+            logger.error(
+                f"data factory {self.cli_arg_prefix} "
+                f"Both max files {max_files} and random samples {n_samples} are defined. Only one allowed at a time")
             return False
         self.checkpointing = checkpointing
         self.max_files = max_files
         self.n_samples = n_samples
         self.files_to_use = files_to_use
         if data_sets is None or len(data_sets) < 1:
-            logger.info(f"Not using data sets, checkpointing {self.checkpointing}, max files {self.max_files}, "
-                        f"random samples {self.n_samples}, files to use {self.files_to_use}")
+            logger.info(
+                f"data factory {self.cli_arg_prefix} "
+                f"Not using data sets, checkpointing {self.checkpointing}, max files {self.max_files}, "
+                f"random samples {self.n_samples}, files to use {self.files_to_use}")
         else:
             self.dsets = data_sets.split(",")
             logger.info(
+                f"data factory {self.cli_arg_prefix} "
                 f"Using data sets {self.dsets}, checkpointing {self.checkpointing}, max files {self.max_files}, "
                 f"random samples {self.n_samples}, files to use {self.files_to_use}"
             )
