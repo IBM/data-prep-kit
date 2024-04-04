@@ -50,13 +50,13 @@ def filtering(
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     s3_access_secret: str = "cos-access",
-    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/filter-input/input/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_filter_guf/'}",
-    filter_criteria_list: list = ['docq_total_words > 100 AND docq_total_words < 200', 'ibmkenlm_docq_perplex_score < 230'],
+    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/filtering-input/input/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_filtering_guf/'}",
+    filter_criteria_list: str = "['docq_total_words > 100 AND docq_total_words < 200', 'ibmkenlm_docq_perplex_score < 230']",
     filter_logical_operator: str = "AND",
-    filter_columns_to_drop: list = ['extra', 'cluster'],
+    filter_columns_to_drop: str = "['extra', 'cluster']",
 ):
     """
-    Pipeline to execute NOOP transform
+    Pipeline to execute Filtering transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
