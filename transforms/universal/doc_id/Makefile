@@ -6,7 +6,7 @@ REPOROOT=../../..
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-DOCKER_IMAGE_NAME=doc_id
+TRANSFORM_NAME=doc_id
 DOCKER_IMAGE_VERSION=0.1
 
 venv::	.transforms.venv
@@ -25,3 +25,6 @@ install-lib-src:: .transforms.install-lib-src
 
 
 setup:: .transforms.setup
+
+test-image:: .transforms.test-image
+

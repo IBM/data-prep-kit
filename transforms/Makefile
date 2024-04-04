@@ -5,20 +5,29 @@ include ../.make.defaults
 setup::
 
 clean::
-	@# Help: Recursively clean all subdirs 
-	$(MAKE) RULE=clean .recurse
+	@# Help: Recursively make $@ all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
 build::
-	@# Help: Recursively build all subdirs 
-	$(MAKE) RULE=build .recurse
+	@# Help: Recursively make $@ in subdirs 
+	$(MAKE) RULE=$@ .recurse
 venv::
-	@# Help: Recursively create venv in subdirs 
-	$(MAKE) RULE=venv .recurse
+	@# Help: Recursively make $@ in subdirs 
+	$(MAKE) RULE=$@ .recurse
+
+image:: 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
+test-image:: 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
 test:: 
-	@# Help: Recursively test in all subdirs 
-	@$(MAKE) RULE=test .recurse
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 
 test-lib-src::
 	@# Help: Install the library source into the venv and test 
-	$(MAKE) RULE=test-lib-src .recurse
+	$(MAKE) RULE=$@ .recurse
 

@@ -8,6 +8,5 @@ RUN pip install --no-cache-dir -r  requirements.txt
 # remove credentials-containing file
 RUN rm requirements.txt
 
-COPY  --chown=ray ./src /home/ray/transform
-COPY  --chown=ray ./test-data /home/ray/test-data
+COPY src/lang_filtering_transform.py . 
 ENV PYTHONPATH /home/ray
