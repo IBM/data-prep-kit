@@ -16,4 +16,5 @@ COPY /cc_net/data/lm_sp/en* /lm_sp
 RUN rm -rf /cc_net
 
 COPY ./src/docquality_transform.py .
+COPY ./src/docquality_utils.py .
 ENV PYTHONPATH /home/ray
