@@ -180,7 +180,7 @@ class DataAccessFactory(CLIArgumentProvider):
         # check that only one (S3, LakeHouse, or Local) configuration is specified
         if s3_config_specified + lh_config_specified + local_config_specified > 1:
             logger.error(
-                f"prefix {self.cli_arg_prefix} "
+                f"data factory {self.cli_arg_prefix} "
                 f"{'S3, ' if s3_config_specified == 1 else ''}"
                 f"{'Lakehouse, ' if lh_config_specified == 1 else ''}"
                 f"{'Local ' if local_config_specified == 1 else ''}"

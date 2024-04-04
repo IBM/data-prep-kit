@@ -22,7 +22,7 @@ class DataAccessS3(DataAccess):
             d_sets: list[str] = None,
             checkpoint: bool = False,
             m_files: int = -1,
-            n_samples: int = 1,
+            n_samples: int = -1,
             files_to_use: list[str] = ['.parquet'],
     ):
         """
