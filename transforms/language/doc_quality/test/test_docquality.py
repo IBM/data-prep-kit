@@ -84,7 +84,7 @@ basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 config = {
     "docq_text_lang": "en",
     "docq_doc_content_column": "contents",
-    "docq_bad_word_filepath": basedir + "/ldnoobw/",
+    "docq_bad_word_filepath": basedir + "/ldnoobw/en",
     "docq_kenLM_model": basedir + "/lm_sp/",
 }
 
