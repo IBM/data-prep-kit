@@ -9,18 +9,26 @@ from lang_filtering_transform import (
     lang_allowed_langs_file_key,
     lang_known_selector,
     lang_lang_column_key,
+    lang_output_column_key,
 )
 
 
 # create launcher
-launcher = TransformLauncher(transform_runtime_config=LangSelectorTransformConfiguration())
+launcher = TransformLauncher(
+    transform_runtime_config=LangSelectorTransformConfiguration()
+)
 # create parameters
 language_column_name = "language"
+annotated_column_name = "lang_selected"
 
 selected_languages_file = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "../test-data/languages/allowed-code-languages.txt")
+    os.path.join(
+        os.path.dirname(__file__), "../test-data/languages/allowed-code-languages.txt"
+    )
 )
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
+input_folder = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../test-data/input")
+)
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
 local_conf = {
     "input_folder": input_folder,
@@ -49,6 +57,7 @@ code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 langselect_config = {
     lang_allowed_langs_file_key: selected_languages_file,
     lang_lang_column_key: language_column_name,
+    lang_output_column_key: annotated_column_name,
     lang_known_selector: True,
     "lang_select_local_config": ParamsUtils.convert_to_ast(local_conf),
 }
