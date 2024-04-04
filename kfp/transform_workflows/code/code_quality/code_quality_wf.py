@@ -51,11 +51,47 @@ def code_quality(
     pipeline_id: str = "pipeline_id",
     s3_access_secret: str = "cos-access",
     s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/code-quality-input/input/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_code_quality_guf/'}",
-    cq_contents_column_name: str = "contents",  # Name of the column holds the data to process
-    cq_language_column_name: str = "language",  # Name of the column holds the programming language details
-    cq_tokenizer: str = "codeparrot/codeparrot",  # Name or path to the tokenizer
-    cq_hf_token: str = "",  # Huggingface auth token to download and use the tokenizer
+    cq_contents_column_name: str = "contents",
+    cq_language_column_name: str = "language",
+    cq_tokenizer: str = "codeparrot/codeparrot",
+    cq_hf_token: str = "None",
 ):
+    """
+    Pipeline to execute Code Quality transform
+    :param ray_name: name of the Ray cluster
+    :param ray_head_options: head node options, containing the following:
+        cpu - number of cpus
+        memory - memory
+        image - image to use
+        image_pull_secret - image pull secret
+    :param ray_worker_options: worker node options (we here are using only 1 worker pool), containing the following:
+        replicas - number of replicas to create
+        max_replicas - max number of replicas
+        min_replicas - min number of replicas
+        cpu - number of cpus
+        memory - memory
+        image - image to use
+        image_pull_secret - image pull secret
+    :param server_url - server url
+    :param additional_params: additional (support) parameters, containing the following:
+        wait_interval - wait interval for API server, sec
+        wait_cluster_ready_tmout - time to wait for cluster ready, sec
+        wait_cluster_up_tmout - time to wait for cluster up, sec
+        wait_job_ready_tmout - time to wait for job ready, sec
+        wait_print_tmout - time between prints, sec
+        http_retries - httpt retries for API server calls
+    :param lh_config - lake house configuration
+    :param s3_config - s3 configuration
+    :param s3_access_secret - s3 access secret
+    :param max_files - max files to process
+    :param actor_options - actor options
+    :param pipeline_id - pipeline id
+    :param cq_contents_column_name - Name of the column holds the data to process
+    :param cq_language_column_name - Name of the column holds the programming language details
+    :param cq_tokenizer - Name or path to the tokenizer
+    :param cq_hf_token - Huggingface auth token to download and use the tokenizer
+    :return: None
+    """
     # create clean_up task
     clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=dsl.RUN_ID_PLACEHOLDER, server_url=server_url)
     ComponentUtils.add_settings_to_component(clean_up_task, 60)
