@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pyarrow as pa
 from parameterized import parameterized
-from raw_data_to_parquet import generate_stats, raw_to_parquet, zip_to_table
+from ingest2parquet import generate_stats, raw_to_parquet, zip_to_table
 from utils import detect_language
 
 
@@ -121,7 +121,7 @@ class TestRawToParquet(unittest.TestCase):
         with patch(
             "data_processing.utils.TransformUtils.add_column"
         ) as mock_add_column:
-            with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
+            with patch("ingest2parquet.zip_to_table") as mock_zip_to_table:
                 mock_zip_to_table.return_value = pa.Table.from_pylist([])
                 mock_add_column.return_value = pa.Table.from_pylist([])
                 self.mock_data_access_instance.save_table.return_value = (0, {"k", "v"})
@@ -154,7 +154,7 @@ class TestRawToParquet(unittest.TestCase):
         )
 
     def test_failed_to_upload(self):
-        with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
+        with patch("ingest2parquet.zip_to_table") as mock_zip_to_table:
             mock_zip_to_table.return_value = pa.Table.from_pylist([])
             self.mock_data_access_instance.save_table.return_value = (0, {})
 
@@ -168,7 +168,7 @@ class TestRawToParquet(unittest.TestCase):
             )
 
     def test_exception_handling(self):
-        with patch("raw_data_to_parquet.zip_to_table") as mock_zip_to_table:
+        with patch("ingest2parquet.zip_to_table") as mock_zip_to_table:
             mock_zip_to_table.return_value = pa.Table.from_pylist([])
             self.mock_data_access_instance.save_table.side_effect = Exception(
                 "Test exception"

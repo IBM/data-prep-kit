@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 from data_processing.utils import ParamsUtils
-from raw_data_to_parquet import run
+from ingest2parquet import run
 
 
 if __name__ == "__main__":

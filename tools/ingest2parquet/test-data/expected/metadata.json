@@ -6,11 +6,11 @@
   "total_bytes_in_memory": 79661,
   "failure_details": [],
   "source": {
-    "name": "/Users/sapthasurendran/Documents/GUF/fm-data-engineering/tools/raw_data_to_parquet/test-data/input",
+    "name": "/Users/sapthasurendran/Documents/GUF/fm-data-engineering/tools/ingest2parquet/test-data/input",
     "type": "path"
   },
   "target": {
-    "name": "/Users/sapthasurendran/Documents/GUF/fm-data-engineering/tools/raw_data_to_parquet/src/../test-data/output",
+    "name": "/Users/sapthasurendran/Documents/GUF/fm-data-engineering/tools/ingest2parquet/src/../test-data/output",
     "type": "path"
   }
 }

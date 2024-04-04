@@ -1,7 +1,7 @@
 import sys
 
 from data_processing.utils import DPFConfig, ParamsUtils
-from raw_data_to_parquet import run
+from ingest2parquet import run
 
 
 # create parameters
