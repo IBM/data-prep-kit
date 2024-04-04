@@ -51,21 +51,6 @@ hash_column_name_cli_param = f"{cli_prefix}{hash_column_name_key}"
 int_column_name_cli_param = f"{cli_prefix}{int_column_name_key}"
 
 doc_column_name_default = "contents"
-import threading
-
-
-_threadLock = threading.Lock()
-_global_index = 0
-
-
-def _next_index():
-    value = 0
-    global _threadLock
-    with _threadLock:
-        global _global_index
-        value = _global_index
-        _global_index += 1
-    return value
 
 
 class DocIDTransform(AbstractTableTransform):
@@ -85,8 +70,10 @@ class DocIDTransform(AbstractTableTransform):
         self.id_generator = config.get(_id_generator_key, None)
         if self.hash_column is None and self.int_column is None:
             raise RuntimeError("At least one of hash or integer column names must be specified.")
-        # if self.id_generator is None and self.int_column is not None:
-        #     raise RuntimeError("Integer id generation requested, but there is no id generating actor defined (are we running Ray?).")
+        if self.id_generator is None and self.int_column is not None:
+            raise RuntimeError(
+                "Integer id generation requested, but there is no id generating actor defined (are we running Ray?)."
+            )
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -107,13 +94,8 @@ class DocIDTransform(AbstractTableTransform):
             table = TransformUtils.add_column(table=table, name=self.hash_column, content=doc_ids)
         if self.int_column is not None:
             # add integer document id
-            if self.id_generator is None:  # Not running in ray, so just use a global index within this process.
-                int_doc_ids = [0] * table.num_rows
-                for n in range(table.num_rows):
-                    int_doc_ids[n] = _next_index()
-            else:
-                sid = ray.get(self.id_generator.get_ids.remote(table.num_rows))
-                int_doc_ids = list(range(sid, table.num_rows + sid))
+            sid = ray.get(self.id_generator.get_ids.remote(table.num_rows))
+            int_doc_ids = list(range(sid, table.num_rows + sid))
             table = TransformUtils.add_column(table=table, name=self.int_column, content=int_doc_ids)
         return [table], {}
 

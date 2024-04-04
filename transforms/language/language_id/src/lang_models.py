@@ -1,3 +1,4 @@
+import math
 from abc import ABCMeta, abstractmethod
 
 # import pyizumo
@@ -30,7 +31,7 @@ class FastTextModel(LangModel):
         label, score = self.nlp.predict(
             text.replace("\n", " "), 1
         )  # replace newline to avoid ERROR: predict processes one line at a time (remove '\n') skipping the file
-        return standardize_tag(label[0].replace("__label__", "")), score[0]
+        return standardize_tag(label[0].replace("__label__", "")), math.floor(score[0] * 1000) / 1000
 
 
 class LangModelFactory:

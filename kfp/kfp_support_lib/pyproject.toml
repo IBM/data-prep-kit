@@ -1,8 +1,8 @@
 [project]
 name = "fm_data_processing_kfp"
-version = "0.0.3.dev21"
+version = "0.0.3.dev26"
 requires-python = ">=3.10"
-description = "IBM FM Data Processing Library. KFP support"
+description = "FM Data Processing Library. KFP support"
 authors = [
     { name = "David Wood", email = "dawood@us.ibm.com" },
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
@@ -11,7 +11,7 @@ authors = [
 dependencies = [
     "kfp==1.8.22",
     "requests",
-    "fm_data_processing",
+    "fm_data_processing==0.3.0",
 ]
 
 [build-system]

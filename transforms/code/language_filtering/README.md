@@ -1,22 +1,24 @@
 # Select Language
 
 This is a transform which can be used while preprocessing code data. It allows the
-user to specify the programming languages for which the data should be retained.
-The data which belongs to the programming languages which are not selected is dropped.
+user to specify the programming languages for which the data should be retained. It adds a new
+annotation column which can specify boolean True/False based on whether the rows belong to the
+specified programming languages. The rows which belongs to the programming languages which are
+not selected are annotated as False.
 
 It requires a text file specifying the allowed languages. It is specified by the
-commandline param `ls_allowed_langs_file`. A sample file is included at `data/allowed-code-languages.lst`.
+commandline param `lang_select_allowed_langs_file`. A sample file is included at `data/allowed-code-languages.lst`.
 The column specifying programming languages is to be specified by
-commandline params `ls_language_column`.
+commandline params `lang_select_language_column`.
 
 ## Configuration and command line Options
 
-The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.py)
-configuration for values are as follows:
+The set of dictionary keys holding configuration for values are as follows:
 
-* _ls_allowed_langs_file_ - specifies the location of the list of supported languages
-* _ls_language_column_ - specifies the name of the column containing the language
-* _ls_return_known_ - specifies whether to return supported or unsupported languages
+* _lang_select_allowed_langs_file_ - specifies the location of the list of supported languages
+* _lang_select_language_column_ - specifies the name of the column containing the language
+* _lang_select_output_column_ - specifies the name of the annotation column appended to the parquet. 
+* _lang_select_return_known_ - specifies whether to return supported or unsupported languages
 
 ## Running
 

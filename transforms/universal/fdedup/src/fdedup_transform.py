@@ -1,6 +1,7 @@
 import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
+import random
 
 import mmh3
 import numpy as np
@@ -56,6 +57,7 @@ class FdedupTransform(AbstractTableTransform):
             remote_minhashes - minhash actors
             is_japanese - japanese flag
             delimiter - delimiter
+            random_delay_limit - random delay limit
         """
         super().__init__(config)
         self.doc_column = config.get("doc_column", "")
@@ -71,6 +73,7 @@ class FdedupTransform(AbstractTableTransform):
         if self.is_japanese:
             self.sp = sentencepiece.SentencePieceProcessor()
             self.sp.load("./ja.sp.model")
+        self.random_delay_limit = config.get("random_delay_limit", 10)
 
     def _generate_word_shingles(self, text: str) -> list[str]:
         """
@@ -213,6 +216,7 @@ class FdedupTransform(AbstractTableTransform):
         flush(0)
         # peg stats
         stats = {"generated buckets": num_buckets, "generated minhashes": num_minhashes}
+        time.sleep(int(random.random() * self.random_delay_limit))
         return [], stats
 
 
@@ -229,12 +233,14 @@ class FdedupFilter(AbstractTableTransform):
             doc_id_int_column - name of int doc id column
             cluster_column - name of the cluster column
             remote_docs - list of remote doc collectors
+            random_delay_limit - random delay limit
         """
         super().__init__(config)
         self.doc_column = config.get("doc_column", "")
         self.doc_id_column = config.get("doc_id_int_column", "")
         self.cluster_column = config.get("cluster_column", "")
         self.docs = config.get("remote_docs", "")
+        self.random_delay_limit = config.get("random_delay_limit", 10)
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -281,6 +287,7 @@ class FdedupFilter(AbstractTableTransform):
         out_table = TransformUtils.add_column(table=table.filter(mask), name=self.cluster_column, content=clusters)
         # build execution statistics
         stats = {"source_documents": table.num_rows, "result_documents": out_table.num_rows}
+        time.sleep(int(random.random() * self.random_delay_limit))
         return [out_table], stats
 
 
@@ -308,6 +315,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             snapshot_delay - delay (sec) in sending snapshot requests to actors
             use_bucket_snapshot - use bucket snapshot
             use_doc_snapshot - use doc snapshot
+            random_delay_limit - random_delay limit
             # fuzzy specific parameters
             num_permutations - number of permutations
             threshold - threshold
@@ -322,6 +330,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         self.sum_mh_mem = 0
         self.document_collectors = []
         self.snapshot_delay = self.params.get("snapshot_delay", 1)
+        self.random_delay_limit = self.params.get("random_delay_limit", 10)
 
     @staticmethod
     def _get_output_folder(data_access: DataAccess) -> str:
@@ -357,6 +366,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
                 self.document_collectors[i] = (DocCollector.options(**{"num_cpus": self.params.get("doc_cpu", 0.5)})
                                                .remote({"id": i, "data_access": data_access_factory, "snapshot": file}))
                 time.sleep(self.snapshot_delay)
+            logger.info(f"Created {len(self.document_collectors)} document collectors to continue processing")
         else:
             logger.info("starting run from the beginning")
             self._create_doc_actors(data_access_factory=data_access_factory, statistics=statistics, files=files)
@@ -365,6 +375,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             "doc_id_int_column": self.params.get("id_column", ""),
             "cluster_column": self.params.get("cluster_column", ""),
             "remote_docs": self.document_collectors,
+            "random_delay_limit": self.random_delay_limit,
         }
 
     def _create_doc_actors(
@@ -391,6 +402,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
                 bucket_collectors[i] = (BucketsHash.options(**{"num_cpus": self.params.get("bucket_cpu", 0.5)})
                                         .remote({"id": i, "data_access": data_access_factory, "snapshot": file}))
                 time.sleep(self.snapshot_delay)
+            logger.info(f"Created {len(bucket_collectors)} bucket collectors to continue processing")
             # recreate minhash collectors
             path = f"{self._get_output_folder(data_access)}snapshot/minhash"
             files = data_access.get_folder_files(path=path)
@@ -404,6 +416,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             self._process_buckets(data_access_factory=data_access_factory, statistics=statistics,
                                   bucket_collectors=bucket_collectors, minhash_collectors=minhash_collectors,
                                   mn_min_hash=mn_min_hash)
+            logger.info(f"Created {len(minhash_collectors)} minhash collectors to continue processing")
         else:
             logger.info("continuing from the very beginning")
             self._create_doc_actors_internal(data_access_factory=data_access_factory, statistics=statistics,
@@ -448,6 +461,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             length_bucket=length_bucket,
             bucket_collectors=bucket_collectors,
             minhash_collectors=minhash_collectors,
+            random_delay_limit=self.random_delay_limit
         )
         # At this point we can snapshot both bucket and minhash collectors for potential restart
         logger.info("creating minhash snapshots")
@@ -576,6 +590,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         length_bucket: int,
         bucket_collectors: list[ActorHandle],
         minhash_collectors: list[ActorHandle],
+        random_delay_limit: int,
     ) -> None:
         """
         Preprocess tables - build, run and cleanup
@@ -587,6 +602,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         :param length_bucket - bucket length
         :param bucket_collectors - bucket collector actors
         :param minhash_collectors - minhash_collector actors
+        :param random_delay_limit - max for random dalay limit
         :return: None
         """
         worker_options = self.params.get("worker_options", None)
@@ -612,6 +628,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
                 "remote_minhashes": minhash_collectors,
                 "is_japanese": self.params.get("is_japanese", False),
                 "delimiter": self.params.get("delimiter", " "),
+                "random_delay_limit": random_delay_limit,
             },
             "base_table_stats": False,
         }
@@ -727,6 +744,7 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         parser.add_argument(
             "--use_doc_snapshot", type=lambda x: bool(str2bool(x)), default=False, help="flag to continue with doc snapshot"
         )
+        parser.add_argument("--random_delay_limit", type=int, default=10, help="maximum delay between read")
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -753,6 +771,7 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["world_shingle_size"] = args.shingles_size
         self.params["is_japanese"] = args.japanese_data
         self.params["delimiters"] = args.delimiters
+        self.params["random_delay_limit"] = args.random_delay_limit
         # snapshots
         self.params["snapshot_delay"] = args.snapshot_delay
         if args.use_bucket_snapshot and args.use_doc_snapshot:

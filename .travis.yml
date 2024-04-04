@@ -4,14 +4,17 @@ language: python
 python:
     - "3.10"
 
-env:
-    jobs:
-        - DOCKER=docker
-
 branches:
     only:
         - dev
         - main
+
+env:
+    matrix:
+        - OPERATION=data-lib-test DOCKER=docker
+        - OPERATION=transform-src-test DOCKER=docker
+        - OPERATION=transform-image-test DOCKER=docker
+        - OPERATION=kfp-test
 
 # Enable/install podman
 #before_install:
@@ -21,7 +24,34 @@ branches:
 #    - podman machine start
 #    - podman info
 
-script: cd data-processing-lib
-    && make DOCKER=$DOCKER venv test
-    && cd ../transforms
-    && make DOCKER=$DOCKER venv test-lib-src
+script:
+    - |
+        case $OPERATION in
+          kfp-test)
+              source kind/requirements.env
+              export PATH=$PATH:/tmp/
+              curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+              curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+              chmod 700 /tmp/get_helm.sh
+              HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
+              chmod 777 /tmp/helm
+              chmod 777 /tmp/kind
+              curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
+              chmod 777 /tmp/kubectl
+              export DEPLOY_KUBEFLOW=0
+              make -C kind setup || travis_terminate 1
+          ;;
+          data-lib-test)
+                   make -C data-processing-lib DOCKER=${DOCKER} venv test || travis_terminate 1
+          ;;
+          transform-src-test)
+                   make -C transforms DOCKER=${DOCKER} venv test-lib-src || travis_terminate 1
+          ;;
+          transform-image-test)
+                   make -C transforms DOCKER=${DOCKER} image test-image || travis_terminate 1
+          ;;
+          *)
+              echo Unrecogognized operation "'"$OPERATION"'"
+              travis_terminate 1
+          ;;
+        esac

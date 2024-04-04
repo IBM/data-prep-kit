@@ -66,7 +66,10 @@ help::
 		exit 1;				\
 	fi
 	@if [ -e .make.subdirs ]; then		\
-	    SUB_MAKE_DIRS=$$(cat .make.subdirs | sed -e 's/^#.*//') ;	\
+	    SUB_MAKE_DIRS=$$(cat .make.subdirs | sed -e 's/^#.*//' -e 's/ //g') ;	\
+	    if [ -z "$$SUB_MAKE_DIRS" ]; then	\
+	        SUB_MAKE_DIRS=$$(echo */ | sort);	\
+	    fi;					\
 	else					\
 	    SUB_MAKE_DIRS=$$(echo */ | sort);	\
 	fi;					\

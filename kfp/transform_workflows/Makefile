@@ -3,7 +3,7 @@
 REPOROOT=../..
 
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
-IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/\$\([A-Z_]*\)\-\([a-z]*\)/{\1\}\-\2/g' | sed 's/=/:=/' | sed 's/^/export /' >> makeenv")
+
 include makeenv
 # Include the common rules.
 # Use "make help" to see them.
@@ -18,9 +18,10 @@ YAML_WF=$(patsubst %.py, %.yaml, ${PYTHON_WF})
 
 clean::
 	@# Help: Clean up the distribution build and the venv 
-	rm -r dist venv
-	rm -rf src/*egg-info
-	rm makeenv
+	rm -r dist venv || true
+	rm -rf src/*egg-info || true
+	rm makeenv || true
+	find . -iname "*_wf.yaml" |  xargs rm -f || true
 
 .check-env:: .check_python_version
 	$(call check_defined, ARTIFACTORY_USER)

@@ -198,6 +198,7 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
             help="Specify >0 value to tokenize each row/text in chunks of characters (rounded in words)",
         )
 
+
     def apply_input_params(self, args: Namespace) -> bool:
         """
         Validate and apply the arguments that have been parsed
@@ -207,6 +208,10 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
         if args.tkn_tokenizer is None:
             logger.error(f"Parameter --tkn_tokenizer must be a valid tokenizer for tokenization, you specified {args.tkn_tokenizer}")
             return False
+
+        # set arguments for tokenizer to None if it is an empty string (supporting KFP):
+        if args.tkn_tokenizer_args=="":
+            args.tkn_tokenizer_args=None
 
         if args.tkn_tokenizer_args is not None:
             if not is_valid_argument_string(args.tkn_tokenizer_args):
