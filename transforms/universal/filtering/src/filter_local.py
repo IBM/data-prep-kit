@@ -1,8 +1,7 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-
-from transforms.universal.filtering.src.filter_transform import (
+from filter_transform import (
     FilterTransform,
     filter_columns_to_drop_key,
     filter_criteria_key,
