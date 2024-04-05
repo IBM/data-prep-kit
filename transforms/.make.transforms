@@ -155,7 +155,8 @@ test-locals::
 	@# Help: Run the *local*.py files in the src directory 
 	@source venv/bin/activate;		\
 	export PYTHONPATH=src;			\
-	for i in $$(ls src/*local*.py); do	\
+	files=$$(find src -name '*local*.py' );		\
+	for i in $$files; do			\
 	    python $$i;				\
 	    if [ $$? -ne 0 ];	then		\
 		exit 1;				\

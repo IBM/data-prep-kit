@@ -2,10 +2,10 @@ import os
 import sys
 from pathlib import Path
 
+from antivirus_transform import AntivirusTransformConfiguration
 from data_processing.data_access.data_access_local import DataAccessLocal
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from antivirus_transform import AntivirusTransformConfiguration
 
 
 # create parameters
