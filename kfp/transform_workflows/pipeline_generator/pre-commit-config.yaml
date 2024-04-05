@@ -1,8 +1,3 @@
-######################################################### {COPYRIGHT-TOP} ###
-# IBM Confidential
-# IBM Watson Machine Learning Core - Internal Tooling
-# Copyright IBM Corp. 2022
-######################################################### {COPYRIGHT-END} ###
 repos:
     - repo: https://github.com/pre-commit/mirrors-prettier
       rev: v3.0.0-alpha.9-for-vscode

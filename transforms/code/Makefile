@@ -22,3 +22,11 @@ test-lib-src::
 	@# Help: Recursively test in all subdirs using source from data-processing-lib
 	$(MAKE) RULE=test-lib-src .recurse
 
+image:: 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
+test-image:: 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+

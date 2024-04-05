@@ -13,7 +13,7 @@ from kubernetes import client as k8s_client
 EXEC_SCRIPT_NAME: str = "antivirus_transform.py"
 
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1"
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.3"
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, insted of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(

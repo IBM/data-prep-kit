@@ -6,7 +6,7 @@ REPOROOT=../../..
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-DOCKER_IMAGE_NAME=ededup
+TRANSFORM_NAME=ededup
 DOCKER_IMAGE_VERSION=0.1
 
 venv::	.transforms.venv
@@ -26,3 +26,6 @@ install-lib-src:: .transforms.install-lib-src
 
 
 setup:: .transforms.setup
+
+test-image:: .transforms.test-image
+

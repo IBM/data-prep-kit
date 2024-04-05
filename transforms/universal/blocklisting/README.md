@@ -40,7 +40,7 @@ data access arguments but with the `blocklist_' prefix).
 See the Command Line options below for specifics on these.
 
 ## Running
-You can run the [blocklist_local.py](src/blocklist_local.py) to
+You can run the [blocklist_local_ray.py](src/blocklist_local_ray.py) to
 transform the `test1.parquet` file in [test input data](test-data/input) 
 to an `output` directory.  The directory will contain both the new
 annotated `test1.parquet` file and the `metadata.json` file.
@@ -48,7 +48,7 @@ annotated `test1.parquet` file and the `metadata.json` file.
 % make venv
 % source venv/bin/activate
 (venv) % cd src
-(venv) % python blocklist_local.py
+(venv) % python blocklist_local_ray.py
 number of workers 5 worker options {'num_cpus': 0.8}
 pipeline id pipeline_id; number workers 5
 job details {'job category': 'preprocessing', 'job name': 'blocklist', 'job type': 'ray', 'job id': 'job_id'}
@@ -110,7 +110,7 @@ the following command line arguments are available in addition to
                         AST string containing input/output paths.
                         input_path: Path to input folder of files to be processed
                         output_path: Path to output folder of processed files
-                        Example: { 'input_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'output_path': '/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed' }
+                        Example: { 'input_path': '/bucket_name/input', 'output_path': '/bucket_name/output' }
 --blocklist_lh_config BL_LH_CONFIG
                         AST string containing input/output using lakehouse.
                         input_table: Path to input folder of files to be processed
