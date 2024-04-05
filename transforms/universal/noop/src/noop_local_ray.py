@@ -14,7 +14,7 @@ local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
-noop_params = {"noop_sleep_sec": 2}
+noop_params = {"noop_sleep_sec": 1}
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
@@ -25,7 +25,7 @@ params = {
     # orchestrator
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "num_workers": 5,
-     "pipeline_id": "pipeline_id",
+    "pipeline_id": "pipeline_id",
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),

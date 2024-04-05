@@ -1,7 +1,7 @@
 import os
 
+from antivirus_transform import AntivirusTransform
 from data_processing.data_access.data_access_local import DataAccessLocal
-from antivirus_transform import AntivirusTransform 
 
 
 # create parameters

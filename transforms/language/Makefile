@@ -23,6 +23,9 @@ image::
 test-image:: 
 	@# Help: Recursively $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
+test-locals:: 
+	@# Help: Recursively $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 
 test-lib-src::
 	@# Help: Recursively test in all subdirs using source from data-processing-lib
