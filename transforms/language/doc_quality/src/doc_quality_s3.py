@@ -15,11 +15,13 @@ s3_cred = {
     "secret_key": DPFConfig.S3_SECRET_KEY,
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
+
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 docq_params = {
     "docq_text_lang": "en",
     "docq_doc_content_column": "contents",
-    "docq_bad_word_filepath": "../test-data/docq/ldnoobw/",
-    "docq_kenLM_model": "../lm_sp/",
+    "docq_bad_word_filepath": basedir + "/ldnoobw/en",
+    "docq_kenLM_model": basedir + "/lm_sp/",
 }
 s3_conf = {
     "input_folder": "cos-optimal-llm-pile/test/hajar/input/",
