@@ -7,13 +7,7 @@ from unittest.mock import patch
 import pyarrow
 import pytest
 from data_processing.data_access import DataAccessLocal
-
-
-KB = 1024
-MB = 1024 * KB
-GB = 1024 * MB
-
-from data_processing.utils import get_logger
+from data_processing.utils import get_logger, GB, MB, KB
 
 
 logger = get_logger(__name__)
@@ -24,7 +18,7 @@ class TestInit:
         "input_folder": os.path.join(os.sep, "tmp", "input_guf"),
         "output_folder": os.path.join(os.sep, "tmp", "output_guf"),
     }
-    dal = DataAccessLocal(path_dict, d_sets=["dset1", "dset2"], checkpoint=True, m_files=0)
+    dal = DataAccessLocal(path_dict, d_sets=["dset1", "dset2"], checkpoint=True, m_files=-1)
     size_stat_dict_empty = {"max_file_size": 0.0, "min_file_size": float(GB), "total_file_size": 0.0}
     size_stat_dict = {"max_file_size": 0.0, "min_file_size": 0.0, "total_file_size": 0.0}
     size_stat_dict_1 = {"max_file_size": 1.0, "min_file_size": 0.0, "total_file_size": 1.0}
@@ -150,7 +144,7 @@ class TestGetInputFiles(TestInit):
             directories_to_remove=[input_path, output_path],
             files_to_remove=[input_file, output_file],
         )
-        assert result == ([input_file.name], self.size_stat_dict)
+        assert result == ([str(input_file.absolute())], self.size_stat_dict)
 
     def test_multiple_missing_files(self):
         """
@@ -167,7 +161,7 @@ class TestGetInputFiles(TestInit):
         result = (file_list, size_dict)
 
         expected_result = (
-            [file.name for file in input_files if file.name != output_file.name],
+            [str(file.absolute()) for file in input_files if str(file.absolute()) != str(output_file.absolute())],
             self.size_stat_dict,
         )
 
@@ -284,7 +278,7 @@ class TestGetFilesToProcess(TestInit):
         return result, in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
 
     def multiple_missing_files_cleanup(
-        self, in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
+            self, in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
     ):
         files_to_remove = in_files_1 + in_files_2 + [out_file_2]
         directories_to_remove = [in_path_1, out_path_1, in_path_2, out_path_2]
@@ -307,7 +301,7 @@ class TestGetFilesToProcess(TestInit):
 
         expected_result = (
             [str(file.absolute()) for file in in_files_1 if file.absolute() != out_file_2.absolute()]
-            + [str(file.absolute()) for file in in_files_2 if file.name != out_file_2.name],
+            + [str(file.absolute()) for file in in_files_2 if str(file.absolute()) != str(out_file_2.absolute())],
             self.size_stat_dict_1,
         )
         self.multiple_missing_files_cleanup(
@@ -500,9 +494,9 @@ class TestSaveJobMetadata(TestInit):
         )
         assert metadata_file_path == os.path.join(self.dal.output_folder, "metadata.json")
         assert (
-            len(metadata_dict) == 8
-            and metadata_dict.get("source", {}).get("name", "") == self.dal.input_folder
-            and metadata_dict.get("target", {}).get("name", "") == self.dal.output_folder
+                len(metadata_dict) == 8
+                and metadata_dict.get("source", {}).get("name", "") == self.dal.input_folder
+                and metadata_dict.get("target", {}).get("name", "") == self.dal.output_folder
         )
 
 
@@ -566,13 +560,13 @@ class TestGetFolderFiles(TestInit):
         f.write(b"asdf.qwer.com")
 
     def test_one_extension(self):
-        contents_txt = self.dal.get_folder_files(self.test_dir, ["txt"])
+        contents_txt = self.dal.get_folder_files(self.test_dir, [".txt"])
         assert len(contents_txt) == 1
         assert self.text_file_path in contents_txt
         assert contents_txt[self.text_file_path] == b"This is text content."
 
     def test_one_non_existing_extension(self):
-        contents_jpg = self.dal.get_folder_files(self.test_dir, ["jpg"])
+        contents_jpg = self.dal.get_folder_files(self.test_dir, [".jpg"])
         assert not contents_jpg
 
     def test_all_files(self):
@@ -584,7 +578,7 @@ class TestGetFolderFiles(TestInit):
         assert contents_all[self.domain_file_path] == b"asdf.qwer.com"
 
     def test_multiple_extensions(self):
-        contents_txt_pdf = self.dal.get_folder_files(self.test_dir, ["txt", "pdf"])
+        contents_txt_pdf = self.dal.get_folder_files(self.test_dir, [".txt", ".pdf"])
         assert len(contents_txt_pdf) == 2
         assert contents_txt_pdf[self.text_file_path] == b"This is text content."
         assert contents_txt_pdf[self.pdf_file_path][:4] == b"\x25\x50\x44\x46"  # Check PDF header

@@ -28,6 +28,7 @@ from fdedup_support import (
     MurmurMH,
     find,
     fuzzy_optimal_param,
+    get_snapshot_folder,
 )
 from ray.actor import ActorHandle
 from ray.util import ActorPool
@@ -132,7 +133,7 @@ class FdedupTransform(AbstractTableTransform):
         ]
 
     def _submit_buckets_minhashes(
-        self, buckets: dict[int, list[int]], minhashes: list[tuple[int, int, np.array]]
+            self, buckets: dict[int, list[int]], minhashes: list[tuple[int, int, np.array]]
     ) -> None:
         """
         Submit buckets to hash
@@ -332,20 +333,8 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         self.snapshot_delay = self.params.get("snapshot_delay", 1)
         self.random_delay_limit = self.params.get("random_delay_limit", 10)
 
-    @staticmethod
-    def _get_output_folder(data_access: DataAccess) -> str:
-        """
-        Get output folder from data access
-        :param data_access: data access class
-        :return: output folder
-        """
-        output_folder = data_access.output_folder
-        if not output_folder.endswith("/"):
-            output_folder += "/"
-        return output_folder
-
     def get_transform_config(
-        self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
+            self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
     ) -> dict[str, Any]:
         """
         Set environment for filter execution
@@ -357,7 +346,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         if self.params.get("use_doc_snapshot", False):
             logger.info("continuing from the document actors snapshot")
             data_access = data_access_factory.create_data_access()
-            path = f"{self._get_output_folder(data_access)}snapshot/docs"
+            path = f"{get_snapshot_folder(data_access)}docs"
             files = data_access.get_folder_files(path=path)
             logger.info(f"Found the following snapshot files {files.keys()}")
             self.document_collectors = [None] * len(files)
@@ -393,9 +382,9 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             logger.info("continuing from the bucket actors snapshot")
             data_access = data_access_factory.create_data_access()
             # recreate bucket collectors
-            path = f"{self._get_output_folder(data_access)}snapshot/buckets"
+            path = f"{get_snapshot_folder(data_access)}buckets"
             files = data_access.get_folder_files(path=path)
-            logger.info(f"Found the following bucket snapshot files {files.keys()}")
+            logger.debug(f"Found the following bucket snapshot files {files.keys()}")
             bucket_collectors = [None] * len(files)
             for file in files.keys():
                 i = int(file[file.rfind("_") + 1:])
@@ -404,14 +393,14 @@ class FdedupRuntime(DefaultTableTransformRuntime):
                 time.sleep(self.snapshot_delay)
             logger.info(f"Created {len(bucket_collectors)} bucket collectors to continue processing")
             # recreate minhash collectors
-            path = f"{self._get_output_folder(data_access)}snapshot/minhash"
+            path = f"{get_snapshot_folder(data_access)}minhash"
             files = data_access.get_folder_files(path=path)
-            logger.info(f"Found the following minhash snapshot files {files.keys()}")
+            logger.debug(f"Found the following minhash snapshot files {files.keys()}")
             minhash_collectors = [None] * len(files)
             for file in files.keys():
                 i = int(file[file.rfind("_") + 1:])
                 minhash_collectors[i] = (DocsMinHash.options(**{"num_cpus": self.params.get("mhash_cpu", 0.5)})
-                                 .remote({"id": i, "data_access": data_access_factory, "snapshot": file}))
+                                         .remote({"id": i, "data_access": data_access_factory, "snapshot": file}))
                 time.sleep(self.snapshot_delay)
             self._process_buckets(data_access_factory=data_access_factory, statistics=statistics,
                                   bucket_collectors=bucket_collectors, minhash_collectors=minhash_collectors,
@@ -581,16 +570,16 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         ray.kill(bucket_processor_invoker)
 
     def _preprocess_tables(
-        self,
-        data_access_factory: DataAccessFactory,
-        statistics: ActorHandle,
-        files: list[str],
-        mn_min_hash: MurmurMH,
-        num_buckets: int,
-        length_bucket: int,
-        bucket_collectors: list[ActorHandle],
-        minhash_collectors: list[ActorHandle],
-        random_delay_limit: int,
+            self,
+            data_access_factory: DataAccessFactory,
+            statistics: ActorHandle,
+            files: list[str],
+            mn_min_hash: MurmurMH,
+            num_buckets: int,
+            length_bucket: int,
+            bucket_collectors: list[ActorHandle],
+            minhash_collectors: list[ActorHandle],
+            random_delay_limit: int,
     ) -> None:
         """
         Preprocess tables - build, run and cleanup

@@ -104,7 +104,7 @@ def orchestrate(
         start = time.time()
         replies = [processor.flush.remote() for processor in processors]
         RayUtils.wait_for_execution_completion(replies)
-        logger.debug(f"done flushing in {time.time() - start} sec")
+        logger.info(f"done flushing in {time.time() - start} sec")
         # Compute execution statistics
         logger.debug("Computing execution stats")
         stats = runtime.compute_execution_stats(ray.get(statistics.get_execution_stats.remote()))
@@ -122,7 +122,7 @@ def orchestrate(
             "execution_stats": resources,
             "job_output_stats": stats,
         }
-        logger.debug(f"Saved job metadata: {metadata}.")
+        logger.info(f"Saved job metadata: {metadata}.")
         data_access.save_job_metadata(metadata)
         logger.debug("Saved job metadata.")
         return 0

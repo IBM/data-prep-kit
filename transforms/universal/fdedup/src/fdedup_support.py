@@ -10,6 +10,7 @@ from ray.util import ActorPool
 import time
 from data_processing.ray import RayUtils
 from data_processing.utils import TransformUtils, RANDOM_SEED, GB, get_logger
+from data_processing.data_access import DataAccess
 
 
 NO_SIMILARITY = -1
@@ -27,6 +28,16 @@ def find(s: str, ch: str) -> list[int]:
     """
     return [i for i, ltr in enumerate(s) if ltr == ch]
 
+def get_snapshot_folder(data_access: DataAccess) -> str:
+    """
+    Get output folder from data access
+    :param data_access: data access class
+    :return: output folder
+    """
+    output_folder = data_access.get_output_folder()
+    if not output_folder.endswith("/"):
+        output_folder += "/"
+    return f"{output_folder}snapshot/"
 
 def fuzzy_optimal_param(
         threshold: float,
@@ -180,7 +191,8 @@ class DocCollector:
         """
         try:
             b_doc = cloudpickle.dumps(self.ids)
-            self.data_access.save_file_rel(f"snapshot/docs/doc_collector_{self.actor_id}", b_doc)
+            self.data_access.save_file(
+                f"{get_snapshot_folder(self.data_access)}docs/doc_collector_{self.actor_id}", b_doc)
         except Exception as e:
             self.logger.warning(f"Failed to snapshot doc collector {self.actor_id} with exception {e}")
             raise e
@@ -247,7 +259,8 @@ class DocsMinHash:
         """
         try:
             b_doc = cloudpickle.dumps(self.docs)
-            self.data_access.save_file_rel(f"snapshot/minhash/minhash_collector_{self.actor_id}", b_doc)
+            self.data_access.save_file(
+                f"{get_snapshot_folder(self.data_access)}minhash/minhash_collector_{self.actor_id}", b_doc)
         except Exception as e:
             self.logger.warning(f"Failed to snapshot minhash collector {self.actor_id} with exception {e}")
             raise e
@@ -368,7 +381,8 @@ class BucketsHash:
         """
         try:
             b_buckets = cloudpickle.dumps(self.buckets)
-            self.data_access.save_file_rel(f"snapshot/buckets/buckets_collector_{self.actor_id}", b_buckets)
+            self.data_access.save_file(
+                f"{get_snapshot_folder(self.data_access)}buckets/buckets_collector_{self.actor_id}", b_buckets)
         except Exception as e:
             self.logger.warning(f"Failed to snapshot buckets collector {self.actor_id} with exception {e}")
             raise e
