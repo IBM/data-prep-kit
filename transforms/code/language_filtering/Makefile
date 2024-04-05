@@ -6,7 +6,7 @@ REPOROOT=../../..
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-DOCKER_IMAGE_NAME=select-langauge
+TRANSFORM_NAME=lang_filtering
 DOCKER_IMAGE_VERSION=0.1.0
 
 venv::	.transforms.venv
@@ -23,7 +23,7 @@ test-lib-src:: .transforms.test-lib-src
 
 install-lib-src:: .transforms.install-lib-src
 
-
-
-
 setup:: .transforms.setup
+
+test-image:: .transforms.test-image
+

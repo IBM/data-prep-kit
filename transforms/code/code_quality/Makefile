@@ -4,7 +4,7 @@
 REPOROOT=../../..
 include ../../.make.transforms
 
-DOCKER_IMAGE_NAME=code-quality
+TRANSFORM_NAME=cq
 DOCKER_IMAGE_VERSION=0.1.0
 
 # Use default rule inherited from makefile.common
@@ -26,4 +26,7 @@ venv:: .transforms.venv
 install-lib-src:: .transforms.install-lib-src
 
 test-lib-src:: .transforms.install-lib-src
+
+
+test-image:: .transforms.test-image
 

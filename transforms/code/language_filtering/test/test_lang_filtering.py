@@ -8,6 +8,7 @@ from lang_filtering_transform import (
     lang_allowed_langs_file_key,
     lang_known_selector,
     lang_lang_column_key,
+    lang_output_column_key,
 )
 
 
@@ -26,13 +27,17 @@ class TestLangSelectorTransform(AbstractTransformTest):
             "../test-data/languages/allowed-code-languages.txt",
             f"--{lang_lang_column_key}",
             "language",
+            f"--{lang_output_column_key}",
+            "allowed",
             f"--{lang_known_selector}",
             "True",
             "--lang_select_local_config",
-            ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
+            ParamsUtils.convert_to_ast(
+                {"input_folder": "/tmp", "output_folder": "/tmp"}
+            ),
         ]
 
-        # Use the BlockListTransformConfiguration to compute the config parameters
+        # Use the LangSelectorTransformConfiguration to compute the config parameters
         lstc = LangSelectorTransformConfiguration()
         config = get_transform_config(lstc, cli)
 
@@ -57,13 +62,16 @@ class TestLangSelectorTransform(AbstractTransformTest):
     names = ["language"]
     input_df = pa.Table.from_arrays([languages], names=names)
 
-    filtered = pa.array(
+    outa = pa.array(
         [
-            "Java",
-            "C",
-        ]
+            False,
+            True,
+            True,
+        ],
     )
-    expected_output_df = pa.Table.from_arrays([filtered], names=names)
+    expected_output_df = pa.Table.from_arrays(
+        [languages, outa], names=["language", "allowed"]
+    )
     expected_metadata_list = [
         {
             "supported languages": 2,
