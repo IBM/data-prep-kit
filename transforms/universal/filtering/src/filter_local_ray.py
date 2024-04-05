@@ -4,8 +4,7 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-
-from transforms.universal.filtering.src.filter_transform import (
+from filter_transform import (
     FilterTransformConfiguration,
     filter_columns_to_drop_cli_param,
     filter_criteria_cli_param,
