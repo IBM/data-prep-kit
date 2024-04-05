@@ -93,15 +93,16 @@ class ResizeTransform(AbstractTableTransform):
         else:
             # split based on size
             current_size = 0.0
-            for n in range(table.num_rows):
-                current_size += table.slice(offset=n, length=1).nbytes
-                if current_size > self.max_bytes_per_table:
-                    logger.debug(f"capturing slice, current_size={current_size}")
-                    # Reached the size
-                    a_slice = table.slice(offset=start_row, length=(n - start_row))
-                    result.append(a_slice)
-                    start_row = n
-                    current_size = 0.0
+            if table.nbytes > self.max_bytes_per_table:
+                for n in range(table.num_rows):
+                    current_size += table.slice(offset=n, length=1).nbytes
+                    if current_size > self.max_bytes_per_table:
+                        logger.debug(f"capturing slice, current_size={current_size}")
+                        # Reached the size
+                        a_slice = table.slice(offset=start_row, length=(n - start_row))
+                        result.append(a_slice)
+                        start_row = n
+                        current_size = 0.0
         if start_row < table.num_rows:
             # buffer remaining chunk for next call
             logger.debug(f"Buffering table starting at row {start_row}")

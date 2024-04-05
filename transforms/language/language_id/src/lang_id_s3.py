@@ -35,17 +35,20 @@ langid_config = {
     PARAM_MODEL_CREDENTIAL: DPFConfig.HUGGING_FACE_TOKEN,
 }
 params = {
+    # where to run
     "run_locally": True,
-    "max_files": -1,
-    "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    # Data access. Only required parameters are specified
+    "data_local_config": ParamsUtils.convert_to_ast(local_conf),
+    "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
+    "data_s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    # orchestrator
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "num_workers": 2,
-    "checkpointing": False,
     "pipeline_id": "pipeline_id",
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
+    # lang id specific
     **langid_config,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)

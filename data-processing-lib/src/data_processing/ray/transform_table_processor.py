@@ -83,6 +83,11 @@ class TransformTableProcessor:
         :return: None
         """
         t_start = time.time()
+        if self.last_fname is None:
+            # for some reason a given worker never processed anything. Happens in testing
+            # when the amount of workers is greater then the amount of files
+            logger.info("skipping flush, no name for file is defined")
+            return
         try:
             # get flush results
             logger.debug(f"Begin flushing transform")

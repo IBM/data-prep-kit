@@ -20,7 +20,7 @@ class AbstractTransformLauncherTest(AbstractTest):
     def _get_argv(cli_params: dict[str, Any], in_table_path: str, out_table_path: str):
         args = {} | cli_params
         local_ast = {"input_folder": in_table_path, "output_folder": out_table_path}
-        args["local_config"] = local_ast
+        args["data_local_config"] = local_ast
         args["run_locally"] = "True"
         argv = ParamsUtils.dict_to_req(args)
         return argv

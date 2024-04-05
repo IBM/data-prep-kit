@@ -5,7 +5,6 @@ from filecmp import dircmp
 
 import pyarrow as pa
 from data_processing.data_access import DataAccessLocal
-from data_processing.ray import DefaultTableTransformConfiguration
 from data_processing.utils import get_logger
 
 
