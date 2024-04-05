@@ -3,7 +3,7 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import DPFConfig, ParamsUtils
-from docquality_transform import DocQualityTransformConfiguration
+from doc_quality_transform import DocQualityTransformConfiguration
 
 
 print(os.environ)

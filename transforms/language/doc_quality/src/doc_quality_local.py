@@ -4,7 +4,7 @@ import sys
 from data_processing.data_access import DataAccessLocal
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from docquality_transform import DocQualityTransform, DocQualityTransformConfiguration
+from doc_quality_transform import DocQualityTransform, DocQualityTransformConfiguration
 
 
 # create parameters

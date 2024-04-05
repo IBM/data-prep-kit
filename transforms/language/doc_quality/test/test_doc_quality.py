@@ -3,7 +3,7 @@ from typing import Tuple
 
 import pyarrow as pa
 from data_processing.test_support.transform.transform_test import AbstractTransformTest
-from docquality_transform import DocQualityTransform
+from doc_quality_transform import DocQualityTransform
 
 
 """

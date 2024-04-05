@@ -19,24 +19,23 @@ venv::	.transforms.venv
 cc_net:
 	git clone https://github.com/facebookresearch/cc_net
 
-model-en: cc_net lm_sp
-	cd cc_net/;$(MAKE) lang=en dl_lm
-	cp cc_net/data/lm_sp/en* lm_sp
-
-lm_sp:
+lm_sp: cc_net
 	mkdir lm_sp
+	cd cc_net/;$(MAKE) lang=en dl_lm
+	cp cc_net/data/lm_sp/* lm_sp
+
 	
 build::	.transforms.build
 
-test::	model-en .transforms.test
+test::	lm_sp .transforms.test
 
 clean:: .transforms.clean
 	rm -rf cc_net
 	rm -rf lm_sp
 
-image:: model-en .transforms.image
+image:: lm_sp .transforms.image
 
-test-lib-src:: model-en .transforms.test-lib-src
+test-lib-src:: lm_sp .transforms.test-lib-src
 
 install-lib-src:: .transforms.install-lib-src
 

@@ -37,7 +37,7 @@ domain (i.e., en Wikipedia). Journalistic and well written content. Distribution
 shapes.
 
 ## Running
-You can run the [docquality_local.py](src/docquality_local.py) to
+You can run the [docquality_local.py](src/doc_quality_local.py) to
 transform all parquet files in [test input data](test-data/input) 
 to [output](output) directory. This directory will contain both the new
 annotated parquet files and the `metadata.json` file.

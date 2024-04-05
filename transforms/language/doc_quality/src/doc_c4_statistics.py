@@ -11,7 +11,7 @@ import re
 import string
 
 from cc_net_prepro import _remove_unicode_punct, unicode_normalization
-from docquality_utils import get_time, load_bad_words
+from doc_quality_utils import get_time, load_bad_words
 
 
 TRANSLATION_TABLE_PUNCTUATION = str.maketrans("", "", string.punctuation)
