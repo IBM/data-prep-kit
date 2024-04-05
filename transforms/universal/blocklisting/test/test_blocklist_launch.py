@@ -23,7 +23,6 @@ class TestRayBlocklistTransform(AbstractTransformLauncherTest):
         config = {
             # When running in ray, our Runtime's get_transform_config() method  will load the domains using
             # the orchestrator's DataAccess/Factory. So we don't need to provide the bl_local_config configuration.
-            "blocklist_local_config": ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
             blocked_domain_list_path_cli_param: os.path.abspath(
                 os.path.join(os.path.dirname(__file__), "../test-data/domains/arjel")
             ),

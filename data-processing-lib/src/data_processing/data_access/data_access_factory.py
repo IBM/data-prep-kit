@@ -172,9 +172,9 @@ class DataAccessFactory(CLIArgumentProvider):
         lh_config = arg_dict.get(f"{self.cli_arg_prefix}lh_config")
         local_config = arg_dict.get(f"{self.cli_arg_prefix}local_config")
         checkpointing = arg_dict.get(f"{self.cli_arg_prefix}checkpointing")
-        max_files = arg_dict.get(f"{self.cli_arg_prefix}max_files")
+        max_files = arg_dict.get(f"{self.cli_arg_prefix}max_files", -1)
         data_sets = arg_dict.get(f"{self.cli_arg_prefix}data_sets")
-        n_samples = arg_dict.get(f"{self.cli_arg_prefix}num_samples")
+        n_samples = arg_dict.get(f"{self.cli_arg_prefix}num_samples", -1)
         files_to_use = arg_dict.get(f"{self.cli_arg_prefix}files_to_use")
         # check which configuration (S3, LakeHouse, or Local) is specified
         s3_config_specified = 1 if s3_config is not None else 0

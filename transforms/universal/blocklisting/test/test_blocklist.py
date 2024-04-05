@@ -30,8 +30,6 @@ class TestBlockListTransform(AbstractTransformTest):
             annotation_column_name_default,
             f"--{source_url_column_name_cli_param}",
             source_column_name_default,
-            "--blocklist_local_config",
-            ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
         ]
 
         # Use the BlockListTransformConfiguration to compute the config parameters
