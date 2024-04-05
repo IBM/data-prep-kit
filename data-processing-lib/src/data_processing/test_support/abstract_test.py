@@ -5,7 +5,6 @@ from filecmp import dircmp
 
 import pyarrow as pa
 from data_processing.data_access import DataAccessLocal
-from data_processing.ray import DefaultTableTransformConfiguration
 from data_processing.utils import get_logger
 
 
@@ -114,10 +113,6 @@ class AbstractTest:
         :return:
         """
         dir_cmp = dircmp(directory, expected_dir, ignore=[".DS_Store"])
-        print(f"funny files {dir_cmp.funny_files}")
-        print(f"common funny  {dir_cmp.common_funny}")
-        print(f"right only {dir_cmp.right_only}")
-        print(f"left only {dir_cmp.left_only}")
         len_funny = len(dir_cmp.funny_files)  # Do this earlier than an assert for debugging reasons.
         assert len_funny == 0, f"Files that could compare, but couldn't be read for some reason: {dir_cmp.funny_files}"
         assert len(dir_cmp.common_funny) == 0, f"Types of the following files don't match: {dir_cmp.common_funny}"

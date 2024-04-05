@@ -20,7 +20,7 @@ class TestRayResizeTransform(AbstractTransformLauncherTest):
         config = {"resize_max_rows_per_table": 125} | common_config
         fixtures.append((ResizeTransformConfiguration(), config, basedir + "/input", basedir + "/expected-rows-125"))
 
-        # # Merge into 2 or so files
+        # Merge into 2 or so files
         config = {"resize_max_rows_per_table": 300} | common_config
         fixtures.append((ResizeTransformConfiguration(), config, basedir + "/input", basedir + "/expected-rows-300"))
 
