@@ -34,6 +34,8 @@ class DataAccessFactory(CLIArgumentProvider):
         to be created by the create_data_access() method.
         :param cli_arg_prefix:  if provided, this will be prepended to all the CLI arguments names.
                Make sure it ends with _
+        :param enable_data_navigation: if true enables CLI args and cofniguration for input/output paths,
+            data sets, checkpointing, files to use, sampling and max files.
         This allows the creation of transform-specific (or other) DataAccess instances based on the
         transform-specific prefix (e.g. bl_ for blocklist transform).  The resulting keys returned
         in get_input_params() will include the prefix.  The underlying AST or other values of those
