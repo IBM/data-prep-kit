@@ -22,9 +22,10 @@ configuration for values are as follows:
 
 For testing and running this transform on local, we are using a unix socket shared with a docker container.
 However, docker for mac doesn't support a shared unix socket.
-For Mac users, please ensure that you have installed `clamd` command, and it runs with a local unix socket: `/var/run/clamav/clamd.ctl`.
+For Mac users, ClamAV will be set up by running `make venv`.
+If thet script doesn't work for you, please ensure that you have installed `clamd` command, and it runs with a local unix socket: `/var/run/clamav/clamd.ctl`.
 
-Example for set up for Mac:
+Example for manual set up for Mac:
 
 1. Install ClamAV with Homebrew
     ```sh
@@ -32,23 +33,23 @@ Example for set up for Mac:
     ```
 1. Copy and edit config files.
     ```sh
-    cp /opt/homebrew/etc/clamav/clamd.conf.sample /opt/homebrew/etc/clamav/clamd.conf
-    sed -i -e 's/^Example/# Example/' /opt/homebrew/etc/clamav/clamd.conf
-    echo "DatabaseDirectory /var/lib/clamav" >> /opt/homebrew/etc/clamav/clamd.conf
-    echo "LocalSocket /var/run/clamav/clamd.ctl" >> /opt/homebrew/etc/clamav/clamd.conf
-    cp /opt/homebrew/etc/clamav/freshclam.conf.sample /opt/homebrew/etc/clamav/freshclam.conf
-    sed -i -e 's/^Example/# Example/' /opt/homebrew/etc/clamav/freshclam.conf
-    echo "DatabaseDirectory /var/lib/clamav" >> /opt/homebrew/etc/clamav/freshclam.conf
+    cp $(brew --prefix)/etc/clamav/clamd.conf.sample $(brew --prefix)/etc/clamav/clamd.conf
+    sed -i '' -e 's/^Example/# Example/' $(brew --prefix)/etc/clamav/clamd.conf
+    echo "DatabaseDirectory /var/lib/clamav" >> $(brew --prefix)/etc/clamav/clamd.conf
+    echo "LocalSocket /var/run/clamav/clamd.ctl" >> $(brew --prefix)/etc/clamav/clamd.conf
+    cp $(brew --prefix)/etc/clamav/freshclam.conf.sample $(brew --prefix)/etc/clamav/freshclam.conf
+    sed -i '' -e 's/^Example/# Example/' $(brew --prefix)/etc/clamav/freshclam.conf
+    echo "DatabaseDirectory /var/lib/clamav" >> $(brew --prefix)/etc/clamav/freshclam.conf
     ```
 1. Create a directory for a local unix socket
     ```sh
-    sudo mkdir /var/run/clamav
-    sudo chown ${UID}:${GID} /var/run/clamav
+    sudo mkdir -p /var/run/clamav
+    sudo chown $(id -u):$(id -g) /var/run/clamav
     ```
 1. Create a direcotry for a database of ClamAV
     ```sh
-    sudo mkdir /var/lib/clamav
-    sudo chown ${UID}:${GID} /var/lib/clamav
+    sudo mkdir -p /var/lib/clamav
+    sudo chown $(id -u):$(id -g) /var/lib/clamav
     ```
 1. Update a database of ClamAV
     ```sh

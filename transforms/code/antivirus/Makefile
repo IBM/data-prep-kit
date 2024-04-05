@@ -12,6 +12,7 @@ DOCKER_IMAGE_VERSION=0.2
 OS := $(shell uname -s)
 ifeq ($(OS),Darwin)
 venv::	.transforms.venv
+	@./install_clamd_mac.sh
 	@echo -e "ln -s /var/run/clamav .tmp\nif [\$$(ps aux | grep '[c]lamd' | wc -l) -eq 0 ]; then\n    clamd\nfi" >> ./venv/bin/activate
 	@sed -i -e "s#deactivate () {#deactivate () {\nps aux | grep '[c]lamd' | awk '{print \$$2}' | xargs kill\nrm -rf ${PWD}/.tmp#" ./venv/bin/activate
 else
