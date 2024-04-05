@@ -145,7 +145,21 @@ help::
 	cd test; $(PYTEST) . 
 
 
-.PHONE: .transforms.test-image
+.PHONY: .transforms.test-image
 .transforms.test-image::
 	@# Help: Test an already-built image (use make image) to be sure the --help option works
 	$(DOCKER) run -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) python $(TRANSFORM_SRC_FILE) --help
+
+.PHONY: .transforms.test-local
+test-locals::
+	@# Help: Run the *local*.py files in the src directory 
+	@source venv/bin/activate;		\
+	export PYTHONPATH=src;			\
+	files=$$(find src -name '*local*.py' );		\
+	for i in $$files; do			\
+	    python $$i;				\
+	    if [ $$? -ne 0 ];	then		\
+		exit 1;				\
+	    fi;					\
+	done	
+	

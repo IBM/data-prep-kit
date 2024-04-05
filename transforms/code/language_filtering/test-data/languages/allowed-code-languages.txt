@@ -1,4 +1,0 @@
-Java
-C
-Go
-ABAP

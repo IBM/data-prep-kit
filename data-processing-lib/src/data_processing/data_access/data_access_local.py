@@ -1,4 +1,3 @@
-import glob
 import gzip
 import json
 import os
@@ -20,28 +19,68 @@ class DataAccessLocal(DataAccess):
     """
 
     def __init__(
-        self,
-        path_config: dict[str, str] = None,
-        d_sets: list[str] = None,
-        checkpoint: bool = False,
-        m_files: int = 0,
+            self,
+            path_config: dict[str, str] = None,
+            d_sets: list[str] = None,
+            checkpoint: bool = False,
+            m_files: int = -1,
+            n_samples: int = -1,
+            files_to_use: list[str] = ['.parquet'],
     ):
         """
         Create data access class for folder based configuration
         :param path_config: dictionary of path info
         """
         if path_config is None:
-            self.input_folder = "/tmp"
-            self.output_folder = "/tmp"
+            self.input_folder = None
+            self.output_folder = None
         else:
             self.input_folder = path_config["input_folder"]
             self.output_folder = path_config["output_folder"]
         self.d_sets = d_sets
         self.checkpoint = checkpoint
         self.m_files = m_files
+        self.n_samples = n_samples
+        self.files_to_use = files_to_use
+
+    def get_num_samples(self) -> int:
+        """
+        Get number of samples for input
+        :return: Number of samples
+        """
+        return self.n_samples
+
+    def get_output_folder(self) -> str:
+        """
+        Get output folder as a string
+        :return: output_folder
+        """
+        return self.output_folder
+
+    @staticmethod
+    def _get_all_files_ext(path: str, extensions: list[str]) -> list[str]:
+        """
+        Get files with the given extension for a given folder and all subfolders
+        :param path: starting path
+        :param extensions: List of extensions, None - all
+        :return: List of files
+        """
+        files = []
+        for c_path in sorted(Path(path).rglob("*")):
+            # for every file
+            s_path = str(c_path.absolute())
+            if extensions is None:
+                if c_path.is_dir():
+                    continue
+            else:
+                _, extension = os.path.splitext(s_path)
+                if extension not in extensions:
+                    continue
+            files.append(s_path)
+        return files
 
     def _get_files_folder(
-        self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
+            self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
     ) -> tuple[list[str], dict[str, float]]:
         """
         Support method.  Lists all parquet files in a directory and their sizes.
@@ -52,14 +91,14 @@ class DataAccessLocal(DataAccess):
         :return: tuple of file list and profile
         """
         # Get files list, their total size, max and min size of the files in the list.
-        parquet_files = []
+        result_files = []
         total_input_file_size = 0
         i = 0
-        for c_path in sorted(Path(path).rglob("*.parquet")):
+        for c_path in sorted(self._get_all_files_ext(path=path, extensions=self.files_to_use)):
             if i >= cm_files > 0:
                 break
-            size = c_path.stat().st_size
-            parquet_files.append(str(c_path.absolute()))
+            size = Path(c_path).stat().st_size
+            result_files.append(c_path)
             total_input_file_size += size
             if min_file_size > size:
                 min_file_size = size
@@ -67,7 +106,7 @@ class DataAccessLocal(DataAccess):
                 max_file_size = size
             i += 1
         return (
-            parquet_files,
+            result_files,
             {
                 "max_file_size": max_file_size / MB,
                 "min_file_size": min_file_size / MB,
@@ -76,12 +115,12 @@ class DataAccessLocal(DataAccess):
         )
 
     def _get_input_files(
-        self,
-        input_path: str,
-        output_path: str,
-        cm_files: int,
-        max_file_size: int = 0,
-        min_file_size: int = MB * GB,
+            self,
+            input_path: str,
+            output_path: str,
+            cm_files: int,
+            max_file_size: int = 0,
+            min_file_size: int = MB * GB,
     ) -> tuple[list[str], dict[str, float]]:
         """
         Get list and size of files from input path, that do not exist in the output path
@@ -94,17 +133,17 @@ class DataAccessLocal(DataAccess):
                 path=input_path, cm_files=cm_files, min_file_size=min_file_size, max_file_size=max_file_size
             )
 
-        input_files = set(os.path.basename(path) for path in Path(input_path).rglob("*.parquet"))
-        output_files = set(os.path.basename(path) for path in Path(output_path).rglob("*.parquet"))
+        input_files = set(self._get_all_files_ext(path=input_path, extensions=self.files_to_use))
+        output_files = set(self._get_all_files_ext(path=output_path, extensions=self.files_to_use))
         input_only_files = input_files - output_files
 
         total_input_file_size = 0
         i = 0
-        parquet_files = []
+        output_files = []
         for filename in sorted(input_only_files):
             if i >= cm_files > 0:
                 break
-            parquet_files.append(filename)
+            output_files.append(filename)
             size = os.path.getsize(os.path.join(input_path, filename))
             total_input_file_size += size
             if min_file_size > size:
@@ -113,7 +152,7 @@ class DataAccessLocal(DataAccess):
                 max_file_size = size
             i += 1
         return (
-            parquet_files,
+            output_files,
             {
                 "max_file_size": max_file_size / MB,
                 "min_file_size": min_file_size / MB,
@@ -121,7 +160,7 @@ class DataAccessLocal(DataAccess):
             },
         )
 
-    def get_files_to_process(self) -> tuple[list[str], dict[str, float]]:
+    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float]]:
         """
         Get files to process
         :return: list of files and a dictionary of the files profile:
@@ -129,6 +168,9 @@ class DataAccessLocal(DataAccess):
             "min_file_size",
             "total_file_size"
         """
+        if self.output_folder is None:
+            logger.error("Get files to process. local configuration is not present, returning empty")
+            return [], {}
         # Check if we are using data sets
         if self.d_sets is not None:
             # get a list of subdirectory paths matching d_sets
@@ -202,6 +244,9 @@ class DataAccessLocal(DataAccess):
         :param path: input file location
         :return: output file location
         """
+        if self.output_folder is None:
+            logger.error("Get output location. local configuration is not defined, returning None")
+            return None
         return path.replace(self.input_folder, self.output_folder)
 
     def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
@@ -254,6 +299,9 @@ class DataAccessLocal(DataAccess):
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
         in the case of failure dict is None
         """
+        if self.output_folder is None:
+            logger.error("local configuration is not defined, csn't save metadata")
+            return None
         metadata["source"] = {"name": self.input_folder, "type": "path"}
         metadata["target"] = {"name": self.output_folder, "type": "path"}
         return self.save_file(
@@ -309,16 +357,8 @@ class DataAccessLocal(DataAccess):
             return None
 
         matching_files = {}
-        if extensions is None:
-            search_path = os.path.join(path, "**")
-            for filename in sorted(glob.iglob(search_path, recursive=True)):
-                if not os.path.isdir(filename):
-                    matching_files[filename] = _get_file_content(filename, return_data)
-        else:
-            for ext in extensions:
-                search_path = os.path.join(path, f"*.{ext}")
-                for filename in sorted(glob.iglob(search_path, recursive=True)):
-                    matching_files[filename] = _get_file_content(filename, return_data)
+        for filename in sorted(self._get_all_files_ext(path=path, extensions=extensions)):
+            matching_files[filename] = _get_file_content(filename, return_data)
         return matching_files
 
     def save_file(self, file_path: str, bytes_data: bytes) -> dict[str, Any]:
@@ -344,20 +384,3 @@ class DataAccessLocal(DataAccess):
         except Exception as e:
             logger.error(f"Error saving bytes to file {file_path}: {e}")
             return None
-
-    def save_file_rel(self, file_path: str, bytes_data: bytes) -> dict[str, Any]:
-        """
-        Saves bytes to a file and returns a dictionary with file information.
-
-        Args:
-            bytes_data (bytes): The bytes data to save.
-            file_path (str): File path relative to output path.
-
-        Returns:
-            dict or None: A dictionary with "name" and "size" keys if successful,
-                        or None if saving fails.
-        """
-        return self.save_file(
-            file_path=os.path.join(self.output_folder, file_path),
-            bytes_data=bytes_data,
-        )

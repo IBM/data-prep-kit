@@ -1,10 +1,13 @@
 import gzip
 import json
 from typing import Any
+import os
 
 import pyarrow
 from data_processing.data_access import ArrowS3, DataAccess
-from data_processing.utils import GB, MB, TransformUtils
+from data_processing.utils import GB, MB, TransformUtils, get_logger
+
+logger = get_logger(__name__)
 
 
 class DataAccessS3(DataAccess):
@@ -13,12 +16,14 @@ class DataAccessS3(DataAccess):
     """
 
     def __init__(
-        self,
-        s3_credentials: dict[str, str],
-        s3_config: dict[str, str],
-        d_sets: list[str],
-        checkpoint: bool,
-        m_files: int,
+            self,
+            s3_credentials: dict[str, str],
+            s3_config: dict[str, str] = None,
+            d_sets: list[str] = None,
+            checkpoint: bool = False,
+            m_files: int = -1,
+            n_samples: int = -1,
+            files_to_use: list[str] = ['.parquet'],
     ):
         """
         Create data access class for folder based configuration
@@ -27,20 +32,42 @@ class DataAccessS3(DataAccess):
         :param d_sets list of the data sets to use
         :param checkpoint: flag to return only files that do not exist in the output directory
         :param m_files: max amount of files to return
+        :param n_samples: amount of files to randomly sample
+        :param files_to_use: files extensions of files to include
         """
         self.arrS3 = ArrowS3(
             access_key=s3_credentials["access_key"],
             secret_key=s3_credentials["secret_key"],
             endpoint=s3_credentials["url"],
         )
-        self.input_folder = TransformUtils.clean_path(s3_config["input_folder"])
-        self.output_folder = TransformUtils.clean_path(s3_config["output_folder"])
+        if s3_config is None:
+            self.input_folder = None
+            self.input_folder = None
+        else:
+            self.input_folder = TransformUtils.clean_path(s3_config["input_folder"])
+            self.output_folder = TransformUtils.clean_path(s3_config["output_folder"])
         self.d_sets = d_sets
         self.checkpoint = checkpoint
         self.m_files = m_files
+        self.n_samples = n_samples
+        self.files_to_use = files_to_use
+
+    def get_num_samples(self) -> int:
+        """
+        Get number of samples for input
+        :return: Number of samples
+        """
+        return self.n_samples
+
+    def get_output_folder(self) -> str:
+        """
+        Get output folder as a string
+        :return: output_folder
+        """
+        return self.output_folder
 
     def _get_files_folder(
-        self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
+            self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
     ) -> tuple[list[str], dict[str, float]]:
         """
         Support method to get list input files and their profile
@@ -57,9 +84,11 @@ class DataAccessS3(DataAccess):
         for file in self.arrS3.list_files(path):
             if i >= cm_files > 0:
                 break
-            # Only use .parquet files
-            if str(file["name"]).endswith(".parquet"):
-                p_list.append(str(file["name"]))
+            # Only use specified files
+            f_name = str(file["name"])
+            _, extension = os.path.splitext(f_name)
+            if extension in self.files_to_use:
+                p_list.append(f_name)
                 size = file["size"]
                 total_input_file_size += size
                 if min_file_size > size:
@@ -77,12 +106,12 @@ class DataAccessS3(DataAccess):
         )
 
     def _get_input_files(
-        self,
-        input_path: str,
-        output_path: str,
-        cm_files: int,
-        max_file_size: int = 0,
-        min_file_size: int = MB * GB,
+            self,
+            input_path: str,
+            output_path: str,
+            cm_files: int,
+            max_file_size: int = 0,
+            min_file_size: int = MB * GB,
     ) -> tuple[list[str], dict[str, float]]:
         """
         Get list and size of files from input path, that do not exist in the output path
@@ -105,7 +134,8 @@ class DataAccessS3(DataAccess):
                 break
             # Only use .parquet files
             f_name = str(file["name"])
-            if f_name.endswith(".parquet") and f_name not in output_base_names:
+            _, extension = os.path.splitext(f_name)
+            if extension in self.files_to_use and f_name not in output_base_names:
                 p_list.append(f_name)
                 size = file["size"]
                 total_input_file_size += size
@@ -123,7 +153,7 @@ class DataAccessS3(DataAccess):
             },
         )
 
-    def get_files_to_process(self) -> tuple[list[str], dict[str, float]]:
+    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float]]:
         """
         Get files to process
         :return: list of files and a dictionary of the files profile:
@@ -131,6 +161,9 @@ class DataAccessS3(DataAccess):
             "min_file_size",
             "total_file_size"
         """
+        if self.output_folder is None:
+            logger.error("Get files to process. S3 configuration is not present, returning empty")
+            return [], {}
         # Check if we are using data sets
         if self.d_sets is not None:
             # get folders for the input
@@ -193,6 +226,9 @@ class DataAccessS3(DataAccess):
         :param path: input file location
         :return: output file location
         """
+        if self.output_folder is None:
+            logger.error("Get out put location. S3 configuration is not provided, returning None")
+            return None
         return path.replace(self.input_folder, self.output_folder)
 
     def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
@@ -246,6 +282,9 @@ class DataAccessS3(DataAccess):
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
         in the case of failure dict is None
         """
+        if self.output_folder is None:
+            logger.error("S3 configuration is not provided, can't save metadata")
+            return None
         metadata["source"] = {"name": self.input_folder, "type": "path"}
         metadata["target"] = {"name": self.output_folder, "type": "path"}
         return self.save_file(path=f"{self.output_folder}metadata.json", data=json.dumps(metadata, indent=2).encode())
@@ -309,14 +348,3 @@ class DataAccessS3(DataAccess):
         in the case of failure dict is None
         """
         return self.arrS3.save_file(key=path, data=data)
-
-    def save_file_rel(self, path: str, data: bytes) -> dict[str, Any]:
-        """
-        Save byte array to the file
-        :param path: file path relative to output directory
-        :param data: byte array
-        :return: a dictionary as
-        defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
-        """
-        return self.save_file(path=f"{self.output_folder}{path}", data=data)

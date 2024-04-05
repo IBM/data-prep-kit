@@ -207,7 +207,7 @@ class BlockListTransformConfiguration(DefaultTableTransformConfiguration):
             help="Name of the table column that has the document download URL",
         )
         # Create the DataAccessFactor to use CLI args with the given blocklist prefix.
-        self.daf = DataAccessFactory(cli_prefix)
+        self.daf = DataAccessFactory(cli_prefix, False)
         # Add the DataAccessFactory parameters to the transform's configuration parameters.
         self.daf.add_input_params(parser)
 

@@ -18,12 +18,13 @@ local_conf = {
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
+    # where to run
     "run_locally": True,
-    "max_files": -1,
-    "local_config": ParamsUtils.convert_to_ast(local_conf),
+    # Data access. Only required parameters are specified
+    "data_local_config": ParamsUtils.convert_to_ast(local_conf),
+    # Orchestration parameters
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "num_workers": 3,
-    "checkpointing": False,
     "pipeline_id": "pipeline_id",
     "job_id": "job_id",
     "creation_delay": 0,
@@ -46,7 +47,9 @@ params = {
     "shingles_size": 5,
     "japanese_data": False,
     "delimiters": " ",
-    "random_delay_limit": 15,
+    # Random delay between reads
+    "random_delay_limit": 5,
+    # snapshotting
     "snapshot_delay": 1,
     "use_doc_snapshot": False,
     "use_bucket_snapshot": False,

@@ -59,14 +59,14 @@ class TestLauncher(TransformLauncher):
 def test_launcher():
     params = {
         "run_locally": True,
-        "max_files": -1,
         "worker_options": ParamsUtils.convert_to_ast(worker_options),
         "num_workers": 5,
-        "checkpointing": False,
         "pipeline_id": "pipeline_id",
         "job_id": "job_id",
         "creation_delay": 0,
         "code_location": ParamsUtils.convert_to_ast(code_location),
+        "data_max_files": -1,
+        "data_checkpointing": False,
     }
     # cos not defined
     sys.argv = ParamsUtils.dict_to_req(d=params)
@@ -75,9 +75,9 @@ def test_launcher():
             name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
-    assert 1 == res
+    assert 0 == res
     # Add S3 configuration
-    params["s3_config"] = ParamsUtils.convert_to_ast(s3_conf)
+    params["data_s3_config"] = ParamsUtils.convert_to_ast(s3_conf)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
@@ -86,7 +86,7 @@ def test_launcher():
     ).launch()
     assert 1 == res
     # Add S3 credentials
-    params["s3_cred"] = ParamsUtils.convert_to_ast(s3_cred)
+    params["data_s3_cred"] = ParamsUtils.convert_to_ast(s3_cred)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
@@ -95,7 +95,7 @@ def test_launcher():
     ).launch()
     assert 0 == res
     # Add lake house
-    params["lh_config"] = ParamsUtils.convert_to_ast(lakehouse_conf)
+    params["data_lh_config"] = ParamsUtils.convert_to_ast(lakehouse_conf)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
@@ -104,7 +104,7 @@ def test_launcher():
     ).launch()
     assert 1 == res
     # Add local config, should fail because now three different configs exist
-    params["local_config"] = ParamsUtils.convert_to_ast(local_conf)
+    params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
@@ -113,7 +113,7 @@ def test_launcher():
     ).launch()
     assert 1 == res
     # remove local config, should still fail, because two configs left
-    del params["local_config"]
+    del params["data_local_config"]
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
@@ -123,7 +123,7 @@ def test_launcher():
     assert 1 == res
 
     # remove s3 config, now it should work
-    del params["s3_config"]
+    del params["data_s3_config"]
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
@@ -137,12 +137,12 @@ def test_launcher():
 def test_local_config():
     # test that the driver works with local configuration
     params = {
-        "local_config": ParamsUtils.convert_to_ast(local_conf),
         "run_locally": True,
-        "max_files": -1,
+        "data_local_config": ParamsUtils.convert_to_ast(local_conf),
+        "data_max_files": -1,
+        "data_checkpointing": False,
         "worker_options": ParamsUtils.convert_to_ast(worker_options),
         "num_workers": 5,
-        "checkpointing": False,
         "pipeline_id": "pipeline_id",
         "job_id": "job_id",
         "creation_delay": 0,
@@ -161,10 +161,10 @@ def test_local_config_validate():
     # test the validation of the local configuration
     params = {
         "run_locally": True,
-        "max_files": -1,
+        "data_max_files": -1,
+        "data_checkpointing": False,
         "worker_options": ParamsUtils.convert_to_ast(worker_options),
         "num_workers": 5,
-        "checkpointing": False,
         "pipeline_id": "pipeline_id",
         "job_id": "job_id",
         "creation_delay": 0,
@@ -172,13 +172,18 @@ def test_local_config_validate():
     }
     # invalid local configurations, driver launch should fail with any of these
     local_conf_empty = {}
-    local_conf_no_input = {
-        "output_folder": os.path.join(os.sep, "tmp", "output"),
-    }
-    local_conf_no_output = {
-        "input_folder": os.path.join(os.sep, "tmp", "input"),
-    }
-    params["local_config"] = ParamsUtils.convert_to_ast(local_conf_empty)
+    local_conf_no_input = {"output_folder": "output_folder"}
+    local_conf_no_output = {"input_folder": "input_folder"}
+    params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf_empty)
+    sys.argv = ParamsUtils.dict_to_req(d=params)
+    print(f"parameters {sys.argv}")
+    res = TestLauncher(
+        transform_runtime_config=DefaultTableTransformConfiguration(
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        ),
+    ).launch()
+    assert 1 == res
+    params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf_no_input)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
@@ -186,23 +191,15 @@ def test_local_config_validate():
         ),
     ).launch()
     assert 1 == res
-    params["local_config"] = ParamsUtils.convert_to_ast(local_conf_no_input)
+    params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf_no_output)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
             name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
-    assert 1 == res
-    params["local_config"] = ParamsUtils.convert_to_ast(local_conf_no_output)
-    sys.argv = ParamsUtils.dict_to_req(d=params)
-    res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
-        ),
-    ).launch()
-    assert 1 == res
-    params["local_config"] = ParamsUtils.convert_to_ast(local_conf)
+    assert 1 == res  
+    params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
@@ -210,4 +207,56 @@ def test_local_config_validate():
         ),
     ).launch()
     assert 0 == res
-    sys.argv = []
+
+
+def test_s3_config_validate():
+    # test the validation of the local configuration
+    params = {
+        "run_locally": True,
+        "data_max_files": -1,
+        "data_checkpointing": False,
+        "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
+        "worker_options": ParamsUtils.convert_to_ast(worker_options),
+        "num_workers": 5,
+        "pipeline_id": "pipeline_id",
+        "job_id": "job_id",
+        "creation_delay": 0,
+        "code_location": ParamsUtils.convert_to_ast(code_location),
+    }
+    # invalid local configurations, driver launch should fail with any of these
+    s3_conf_empty = {}
+    s3_conf_no_input = {"output_folder": "output_folder"}
+    s3_conf_no_output = {"input_folder": "input_folder"}
+    params["data_s3_config"] = ParamsUtils.convert_to_ast(s3_conf_empty)
+    sys.argv = ParamsUtils.dict_to_req(d=params)
+    print(f"parameters {sys.argv}")
+    res = TestLauncher(
+        transform_runtime_config=DefaultTableTransformConfiguration(
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        ),
+    ).launch()
+    assert 1 == res
+    params["data_s3_config"] = ParamsUtils.convert_to_ast(s3_conf_no_input)
+    sys.argv = ParamsUtils.dict_to_req(d=params)
+    res = TestLauncher(
+        transform_runtime_config=DefaultTableTransformConfiguration(
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        ),
+    ).launch()
+    assert 1 == res
+    params["data_s3_config"] = ParamsUtils.convert_to_ast(s3_conf_no_output)
+    sys.argv = ParamsUtils.dict_to_req(d=params)
+    res = TestLauncher(
+        transform_runtime_config=DefaultTableTransformConfiguration(
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        ),
+    ).launch()
+    assert 1 == res
+    params["data_s3_config"] = ParamsUtils.convert_to_ast(s3_conf)
+    sys.argv = ParamsUtils.dict_to_req(d=params)
+    res = TestLauncher(
+        transform_runtime_config=DefaultTableTransformConfiguration(
+            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        ),
+    ).launch()
+    assert 0 == res
