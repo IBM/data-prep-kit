@@ -14,8 +14,12 @@ branches:
 env:
     matrix:
         - OPERATION=data-lib-test DOCKER=docker
-        - OPERATION=transform-src-test DOCKER=docker
-        - OPERATION=transform-image-test DOCKER=docker
+        - OPERATION=transform-src-test   DIR=transforms/code DOCKER=docker
+        - OPERATION=transform-src-test   DIR=transforms/language DOCKER=docker
+        - OPERATION=transform-src-test   DIR=transforms/universal DOCKER=docker
+        - OPERATION=transform-image-test DIR=transforms/code DOCKER=docker
+        - OPERATION=transform-image-test DIR=transforms/language DOCKER=docker
+        - OPERATION=transform-image-test DIR=transforms/universal DOCKER=docker
         - OPERATION=kfp-test
         - OPERATION=tools-test
 
@@ -48,10 +52,10 @@ script:
                    make -C data-processing-lib DOCKER=${DOCKER} venv test || travis_terminate 1
           ;;
           transform-src-test)
-                   make -C transforms DOCKER=${DOCKER} venv test-lib-src || travis_terminate 1
+                   make -C ${DIR} DOCKER=${DOCKER} venv test-lib-src || travis_terminate 1
           ;;
           transform-image-test)
-                   make -C transforms DOCKER=${DOCKER} image test-image || travis_terminate 1
+                   make -C ${DIR} DOCKER=${DOCKER} image test-image || travis_terminate 1
           ;;
           tools-test)
                    make -C tools DOCKER=${DOCKER} venv test-lib-src || travis_terminate 1
