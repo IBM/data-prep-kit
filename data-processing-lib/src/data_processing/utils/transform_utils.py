@@ -1,3 +1,4 @@
+import os
 import string
 import sys
 from typing import Any
@@ -63,6 +64,34 @@ class TransformUtils:
         :return: int hash
         """
         return mmh3.hash(s, seed=RANDOM_SEED, signed=False)
+    
+    @staticmethod
+    def decode_content(content_bytes:bytes, encoding:str="utf-8")->str:
+        """
+        Decode the given bytes content using the specified encoding.
+        :param content_bytes: The bytes content to decode
+        :param encoding:The encoding to use while decoding the content. Default is 'utf-8'
+        :return: str: The decoded content as a string if successful,otherwise empty string if an error occurs during decoding.
+        """
+        try:
+            content_string = content_bytes.decode(encoding)
+            return content_string
+        except Exception as e:
+            print(f"Error -> {e}")
+            return ""
+        
+    @staticmethod
+    def get_file_extension(file_path) -> str:
+        """
+        Get the file extension from the given file path.
+        :param file_path : The path of the file.
+        :return: str: The file extension including the dot ('.') if present, otherwise an empty string.
+        """
+        ext = os.path.splitext(file_path)[1]
+        if len(ext) > 0:
+            return ext
+        else:
+            return ""
 
     @staticmethod
     def validate_columns(table: pa.Table, required: list[str]) -> bool:

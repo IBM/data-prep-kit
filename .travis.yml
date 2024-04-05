@@ -15,6 +15,7 @@ env:
         - OPERATION=transform-src-test DOCKER=docker
         - OPERATION=transform-image-test DOCKER=docker
         - OPERATION=kfp-test
+        - OPERATION=tools-test
 
 # Enable/install podman
 #before_install:
@@ -49,6 +50,9 @@ script:
           ;;
           transform-image-test)
                    make -C transforms DOCKER=${DOCKER} image test-image || travis_terminate 1
+          ;;
+          tools-test)
+                   make -C tools DOCKER=${DOCKER} venv test-lib-src || travis_terminate 1
           ;;
           *)
               echo Unrecogognized operation "'"$OPERATION"'"
