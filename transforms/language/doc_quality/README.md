@@ -12,7 +12,7 @@ The doc quality transformer will add document quality metrics to the input table
 including the criteria described in [Deepmind's Gopher paper](https://arxiv.org/pdf/2112.11446.pdf) and the [perplexity
 estimation implementation by Kenneth Heafield](https://github.com/kpu/kenlm). 
 
- A pre-trained kenLM+sp must be specified through `--model_dir` parameter 
+ A pre-trained kenLM+sp must be specified through `--docq_kenLM_model` parameter 
 which is a folder containing the pre-trained kenLM+sp.
 The document quality transform will use the pre-trained kenLM+sp to calculate the perplexity score
 of each row in the input table to each row in the output folder under the `metakenlm_docq_perplex_score` column.
@@ -37,7 +37,7 @@ domain (i.e., en Wikipedia). Journalistic and well written content. Distribution
 shapes.
 
 ## Running
-You can run the [doc_quality_local.py](src/docquality_local.py) to
+You can run the [docquality_local.py](src/docquality_local.py) to
 transform all parquet files in [test input data](test-data/input) 
 to [output](output) directory. This directory will contain both the new
 annotated parquet files and the `metadata.json` file.
@@ -92,13 +92,13 @@ the following command line arguments are available in addition to
 ```
   --run_locally RUN_LOCALLY
                         running ray local flag
-  --ft_lang FT_LANG
+  --docq_text_lang FT_LANG
                         Specify language used in the text content if needed. By defaut, "en" is used
   --docq_doc_content_column DOCQ_DOC_CONTENT_COLUMN
                         Column contains document content
-  --bad_word_filepath BAD_WORD_FILEPATH
+  --docq_bad_word_filepath BAD_WORD_FILEPATH
                         a path to bad word file. By defaut, `../test-data/docq/ldnoobw/` is used
-  --model_dir MODEL_DIR 
+  --docq_kenLM_model MODEL_DIR 
                         a path to kenLM model. By defaut, `../lm_sp/` is used
   --s3_cred S3_CRED     AST string of options for cos credentials. Only required for COS or Lakehouse.
                         access_key: access key help text
