@@ -9,7 +9,7 @@ REPOROOT=../../..
 # to override/redefine the rules below.
 include ../../.make.transforms
 
-DOCKER_IMAGE_NAME=doc_quality
+TRANSFORM_NAME=doc_quality
 DOCKER_IMAGE_VERSION=0.1.0
 
 
@@ -40,4 +40,7 @@ test-lib-src:: model-en .transforms.test-lib-src
 
 install-lib-src:: .transforms.install-lib-src
 
+setup:: .transforms.setup
 
+
+test-image:: .transforms.test-image

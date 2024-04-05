@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir https://github.com/kpu/kenlm/archive/master.zip
 RUN rm requirements.txt
 
 # Copy the model files into the "lm_sp" directory
-COPY /cc_net/data/lm_sp/en* /lm_sp
+COPY /cc_net/data/lm_sp/* /lm_sp
 
 # Optionally, remove the "cc_net" folder if needed
 RUN rm -rf /cc_net
