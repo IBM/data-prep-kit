@@ -3,7 +3,7 @@
 fm-data-processing==0.3.0
 mmh3
 xxhash
-scipy
 tqdm==4.64.0
+scipy
 sentencepiece==0.1.99
 
