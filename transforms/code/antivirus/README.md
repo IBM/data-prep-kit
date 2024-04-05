@@ -18,6 +18,44 @@ configuration for values are as follows:
 * _antivirus_output_column_ - specifies the output column's name of the detected virus signature name. (default: `virus_detection`)
 * _antivirus_clamd_socket_ - specifies the socket path for ClamAV. (default: `/var/run/clamav/clamd.ctl`)
 
+## For local running/testing on Mac
+
+For testing and running this transform on local, we are using a unix socket shared with a docker container.
+However, docker for mac doesn't support a shared unix socket.
+For Mac users, ClamAV will be set up by running `make venv`.
+If thet script doesn't work for you, please ensure that you have installed `clamd` command, and it runs with a local unix socket: `/var/run/clamav/clamd.ctl`.
+
+Example for manual set up for Mac:
+
+1. Install ClamAV with Homebrew
+    ```sh
+    brew install clamav
+    ```
+1. Copy and edit config files.
+    ```sh
+    cp $(brew --prefix)/etc/clamav/clamd.conf.sample $(brew --prefix)/etc/clamav/clamd.conf
+    sed -i '' -e 's/^Example/# Example/' $(brew --prefix)/etc/clamav/clamd.conf
+    echo "DatabaseDirectory /var/lib/clamav" >> $(brew --prefix)/etc/clamav/clamd.conf
+    echo "LocalSocket /var/run/clamav/clamd.ctl" >> $(brew --prefix)/etc/clamav/clamd.conf
+    cp $(brew --prefix)/etc/clamav/freshclam.conf.sample $(brew --prefix)/etc/clamav/freshclam.conf
+    sed -i '' -e 's/^Example/# Example/' $(brew --prefix)/etc/clamav/freshclam.conf
+    echo "DatabaseDirectory /var/lib/clamav" >> $(brew --prefix)/etc/clamav/freshclam.conf
+    ```
+1. Create a directory for a local unix socket
+    ```sh
+    sudo mkdir -p /var/run/clamav
+    sudo chown $(id -u):$(id -g) /var/run/clamav
+    ```
+1. Create a direcotry for a database of ClamAV
+    ```sh
+    sudo mkdir -p /var/lib/clamav
+    sudo chown $(id -u):$(id -g) /var/lib/clamav
+    ```
+1. Update a database of ClamAV
+    ```sh
+    freshclam
+    ```
+
 ## Running
 You can run the [antivirus_local_ray.py](src/antivirus_local_ray.py) to
 transform the `sample.parquet` file in [test input data](test-data/input) 
