@@ -28,7 +28,7 @@ class DataAccessFactory(CLIArgumentProvider):
     This class has to be serializable, so that we can pass it to the actors
     """
 
-    def __init__(self, cli_arg_prefix: str = "data_"):
+    def __init__(self, cli_arg_prefix: str = "data_", enable_data_navigation: bool = True):
         """
         Create the factory to parse a set of args that will then define the type of DataAccess object
         to be created by the create_data_access() method.
@@ -50,6 +50,7 @@ class DataAccessFactory(CLIArgumentProvider):
         self.files_to_use = []
         self.cli_arg_prefix = cli_arg_prefix
         self.params = {}
+        self.enable_data_navigation = enable_data_navigation
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
@@ -74,6 +75,11 @@ class DataAccessFactory(CLIArgumentProvider):
             help="AST string of options for cos credentials. Only required for COS or Lakehouse.\n"
             + ParamsUtils.get_ast_help_text(help_example_dict),
         )
+
+        if self.enable_data_navigation:
+            self.__add_data_navigation_params(parser)
+
+    def __add_data_navigation_params(self, parser):
         help_example_dict = {
             "input_path": [
                 "/cos-optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup",
@@ -135,8 +141,7 @@ class DataAccessFactory(CLIArgumentProvider):
             default=False,
             help="checkpointing flag",
         )
-        parser.add_argument(
-            f"--{self.cli_arg_prefix}data_sets", type=str, default=None, help="List of data sets")
+        parser.add_argument(f"--{self.cli_arg_prefix}data_sets", type=str, default=None, help="List of data sets")
         parser.add_argument(
             f"--{self.cli_arg_prefix}files_to_use",
             type=ast.literal_eval,
@@ -144,10 +149,7 @@ class DataAccessFactory(CLIArgumentProvider):
             help="list of files extensions to choose",
         )
         parser.add_argument(
-            f"--{self.cli_arg_prefix}num_samples",
-            type=int,
-            default=-1,
-            help="number of random files to process"
+            f"--{self.cli_arg_prefix}num_samples", type=int, default=-1, help="number of random files to process"
         )
 
     def apply_input_params(self, args: Union[dict, argparse.Namespace]) -> bool:
@@ -196,11 +198,14 @@ class DataAccessFactory(CLIArgumentProvider):
             if not self.__validate_s3_cred(s3_credentials=self.s3_cred):
                 return False
             self.s3_config = s3_config
-            logger.info(
-                f"data factory {self.cli_arg_prefix} "
-                f'Using s3 configuration: input path - {self.s3_config["input_folder"]}, '
-                f'output path - {self.s3_config["output_folder"]}'
-            )
+            if self.s3_config is None:
+                logger.info(f"Validated S3 data access factory {self.cli_arg_prefix}")
+            else:
+                logger.info(
+                    f"Validated S3 data access factory {self.cli_arg_prefix} "
+                    f'input path - {self.s3_config["input_folder"]}, '
+                    f'output path - {self.s3_config["output_folder"]}'
+                )
         elif lh_config_specified == 1:
             if not self._validate_lh_config(lh_config=lh_config):
                 return False
@@ -208,44 +213,44 @@ class DataAccessFactory(CLIArgumentProvider):
             if not self.__validate_s3_cred(s3_credentials=self.s3_cred):
                 return False
             self.lh_config = lh_config
-            logger.info(
-                f"data factory {self.cli_arg_prefix} "
-                f'Using lake house configuration: input table - {self.lh_config["input_table"]}, '
-                f'input_dataset - {self.lh_config["input_dataset"]}, '
-                f'input_version - {self.lh_config["input_version"]}, '
-                f'output table - {self.lh_config["output_table"]}, '
-                f'output_path - {self.lh_config["output_path"]}, '
-                f'lh_environment - {self.lh_config["lh_environment"]} '
-            )
+            if self.lh_config is None:
+                logger.info(f"Validated Lakehouse data access factory {self.cli_arg_prefix}")
+            else:
+                logger.info(
+                    f"Validated Lakehouse data factory {self.cli_arg_prefix} "
+                    f'input table - {self.lh_config["input_table"]}, '
+                    f'input_dataset - {self.lh_config["input_dataset"]}, '
+                    f'input_version - {self.lh_config["input_version"]}, '
+                    f'output table - {self.lh_config["output_table"]}, '
+                    f'output_path - {self.lh_config["output_path"]}, '
+                    f'lh_environment - {self.lh_config["lh_environment"]} '
+                )
         elif local_config_specified == 1:
             if not self._validate_local_config(local_config=local_config):
                 return False
             self.local_config = local_config
-            logger.info(
-                f"data factory {self.cli_arg_prefix} "
-                f"Using local configuration with: "
-                f"input_folder - {self.local_config['input_folder']} "
-                f"output_folder - {self.local_config['output_folder']}"
-            )
+            if self.local_config is None:
+                logger.info(f"Validated local data access factory {self.cli_arg_prefix}")
+            else:
+                logger.info(
+                    f"Validated local data factory {self.cli_arg_prefix} "
+                    f"input_folder - {self.local_config['input_folder']} "
+                    f"output_folder - {self.local_config['output_folder']}"
+                )
         elif s3_cred is not None:
             if not self.__validate_s3_cred(s3_credentials=self.s3_cred):
                 return False
             self.s3_cred = s3_cred
-            logger.info(
-                f"data factory {self.cli_arg_prefix} "
-                'Using s3 configuration without input/output path'
-            )
+            logger.info(f"data factory {self.cli_arg_prefix} " "Using s3 configuration without input/output path")
         else:
-            logger.info(
-                f"data factory {self.cli_arg_prefix} "
-                'Using local configuration without input/output path'
-            )
+            logger.info(f"data factory {self.cli_arg_prefix} " "Using local configuration without input/output path")
 
         # Check whether both max_files and number samples are defined
         if max_files > 0 and n_samples > 0:
             logger.error(
                 f"data factory {self.cli_arg_prefix} "
-                f"Both max files {max_files} and random samples {n_samples} are defined. Only one allowed at a time")
+                f"Both max files {max_files} and random samples {n_samples} are defined. Only one allowed at a time"
+            )
             return False
         self.checkpointing = checkpointing
         self.max_files = max_files
@@ -255,7 +260,8 @@ class DataAccessFactory(CLIArgumentProvider):
             logger.info(
                 f"data factory {self.cli_arg_prefix} "
                 f"Not using data sets, checkpointing {self.checkpointing}, max files {self.max_files}, "
-                f"random samples {self.n_samples}, files to use {self.files_to_use}")
+                f"random samples {self.n_samples}, files to use {self.files_to_use}"
+            )
         else:
             self.dsets = data_sets.split(",")
             logger.info(
@@ -307,6 +313,8 @@ class DataAccessFactory(CLIArgumentProvider):
         :param local_config: dictionary of local config
         :return: True if local config is valid, False otherwise
         """
+        if not self.enable_data_navigation:
+            return True
         valid_config = True
         if local_config.get("input_folder", "") == "":
             valid_config = False
@@ -322,6 +330,8 @@ class DataAccessFactory(CLIArgumentProvider):
         :param s3_config: dictionary of local config
         :return: True if s3l config is valid, False otherwise
         """
+        if not self.enable_data_navigation:
+            return True
         valid_config = True
         if s3_config.get("input_folder", "") == "":
             valid_config = False
@@ -337,6 +347,8 @@ class DataAccessFactory(CLIArgumentProvider):
         :param s3_config: dictionary of local config
         :return: True if s3l config is valid, False otherwise
         """
+        if not self.enable_data_navigation:
+            return True
         valid_config = True
         if lh_config.get("input_table", "") == "":
             valid_config = False
