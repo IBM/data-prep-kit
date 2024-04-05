@@ -208,7 +208,6 @@ class DataAccessFactory(CLIArgumentProvider):
             if not self.__validate_s3_cred(s3_credentials=self.s3_cred):
                 return False
             self.lh_config = lh_config
-            utils.add_if_missing(self.lh_config, "token", DPFConfig.LAKEHOUSE_TOKEN)
             logger.info(
                 f"data factory {self.cli_arg_prefix} "
                 f'Using lake house configuration: input table - {self.lh_config["input_table"]}, '
@@ -342,7 +341,8 @@ class DataAccessFactory(CLIArgumentProvider):
         if lh_config.get("input_table", "") == "":
             valid_config = False
             logger.error(f"prefix '{self.cli_arg_prefix}': Could not find input table in lh config")
-        if lh_config.get("input_dataset", "") == "":
+        if lh_config.get("input_dataset", None) is None:
+            # Note data set can be an empty strin
             valid_config = False
             logger.error(f"prefix '{self.cli_arg_prefix}': Could not find input_dataset in lh config")
         if lh_config.get("input_version", "") == "":
