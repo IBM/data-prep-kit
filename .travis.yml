@@ -1,14 +1,16 @@
-os: linux
+os:
+    - linux
+    - osx
 
 language: python
 python:
     - "3.10"
+    - "3.11"
 
 branches:
     only:
         - dev
         - main
-
 env:
     matrix:
         - OPERATION=data-lib-test DOCKER=docker
