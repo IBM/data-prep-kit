@@ -384,7 +384,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             # recreate bucket collectors
             path = f"{get_snapshot_folder(data_access)}buckets"
             files = data_access.get_folder_files(path=path)
-            logger.info(f"Found the following bucket snapshot files {files.keys()}")
+            logger.debug(f"Found the following bucket snapshot files {files.keys()}")
             bucket_collectors = [None] * len(files)
             for file in files.keys():
                 i = int(file[file.rfind("_") + 1:])
@@ -395,7 +395,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             # recreate minhash collectors
             path = f"{get_snapshot_folder(data_access)}minhash"
             files = data_access.get_folder_files(path=path)
-            logger.info(f"Found the following minhash snapshot files {files.keys()}")
+            logger.debug(f"Found the following minhash snapshot files {files.keys()}")
             minhash_collectors = [None] * len(files)
             for file in files.keys():
                 i = int(file[file.rfind("_") + 1:])

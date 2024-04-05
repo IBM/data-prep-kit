@@ -17,7 +17,7 @@ local_conf = {
 # worker_options = {"num_cpus": 0.8}
 # code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 
-doc_id_params = {"doc_column": "contents", "hash_column": "doc_hash", "int_column": "doc_index"}
+doc_id_params = {"doc_column": "contents", "hash_column": "doc_hash"}
 
 if __name__ == "__main__":
     # Here we show how to run outside of ray
