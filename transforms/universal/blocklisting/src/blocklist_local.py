@@ -7,8 +7,6 @@ from blocklist_transform import (
     source_url_column_name_key,
 )
 from data_processing.data_access import DataAccessLocal
-from data_processing.utils import ParamsUtils
-
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
@@ -25,7 +23,6 @@ block_list_params = {
     blocked_domain_list_path_key: blocklist_conf_url,
     annotation_column_name_key: blocklist_annotation_column_name,
     source_url_column_name_key: blocklist_doc_source_url_column,
-    "blocklist_local_config": ParamsUtils.convert_to_ast(local_conf),
 }
 if __name__ == "__main__":
     # Here we show how to run outside of ray

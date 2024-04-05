@@ -5,11 +5,30 @@ from filecmp import dircmp
 
 import pyarrow as pa
 from data_processing.data_access import DataAccessLocal
-from data_processing.ray import DefaultTableTransformConfiguration
 from data_processing.utils import get_logger
 
 
 logger = get_logger(__name__)
+
+
+def get_tables_in_folder(dir) -> list[pa.Table]:
+    """
+    Get  list of Tables loaded from the parquet files in the given directory.  The returned
+    list is sorted lexigraphically by the name of the file.
+    :param dir:
+    :return:
+    """
+    tables = []
+    dal = DataAccessLocal()
+    files = dal.get_folder_files(dir, extensions=["parquet"], return_data=False)
+    filenames = []
+    for filename in files:
+        filenames.append(filename)
+    filenames = sorted(filenames)
+    for filename in filenames:
+        t = dal.get_table(filename)
+        tables.append(t)
+    return tables
 
 
 class AbstractTest:
@@ -94,9 +113,8 @@ class AbstractTest:
         :return:
         """
         dir_cmp = dircmp(directory, expected_dir, ignore=[".DS_Store"])
-        assert (
-            len(dir_cmp.funny_files) == 0
-        ), f"Files that could compare, but couldn't be read for some reason: {dir_cmp.funny_files}"
+        len_funny = len(dir_cmp.funny_files)  # Do this earlier than an assert for debugging reasons.
+        assert len_funny == 0, f"Files that could compare, but couldn't be read for some reason: {dir_cmp.funny_files}"
         assert len(dir_cmp.common_funny) == 0, f"Types of the following files don't match: {dir_cmp.common_funny}"
         assert len(dir_cmp.right_only) == 0, f"Files found only in expected output directory: {dir_cmp.right_only}"
         assert len(dir_cmp.left_only) == 0, f"Files missing in test output directory: {dir_cmp.left_only}"

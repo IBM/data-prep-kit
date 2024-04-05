@@ -16,19 +16,18 @@ s3_cred = {
 s3_conf = {
     "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=fuzzy_dedup/",
     "output_folder": "cos-optimal-llm-pile/boris-da-test/",
-    # "input_folder": "cos-optimal-llm-pile/test/david/input/",
-    # "output_folder": "cos-optimal-llm-pile/test/david/output/",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
+    # where to run
     "run_locally": True,
-    "max_files": -1,
-    "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    # Data access. Only required parameters are specified
+    "data_s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
+    # Orchestration parameters
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "num_workers": 3,
-    "checkpointing": False,
     "pipeline_id": "pipeline_id",
     "job_id": "job_id",
     "creation_delay": 0,
@@ -41,7 +40,7 @@ params = {
     "bucket_cpu": 0.5,
     "doc_cpu": 0.5,
     "mhash_cpu": 0.5,
-    "num_doc_actors": 1,
+    "num_doc_actors": 2,
     "num_bucket_actors": 1,
     "num_minhash_actors": 1,
     "num_preprocessors": 2,
@@ -51,7 +50,12 @@ params = {
     "shingles_size": 5,
     "japanese_data": False,
     "delimiters": " ",
-    "use_doc_snapshot": False
+    # Random delay between reads
+    "random_delay_limit": 5,
+    # snapshotting
+    "snapshot_delay": 1,
+    "use_doc_snapshot": False,
+    "use_bucket_snapshot": False,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

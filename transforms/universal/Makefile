@@ -3,22 +3,34 @@ REPOROOT=../..
 include ../../.make.defaults
 
 clean::
-	@# Help: Recursively clean all subdirs 
-	$(MAKE) RULE=clean .recurse
+	@# Help: Recursively make $@ all subdirs 
+	$(MAKE) RULE=$@ .recurse
 build::
-	@# Help: Recursively build all subdirs 
-	$(MAKE) RULE=build .recurse
+	@# Help: Recursively make $@ all subdirs 
+	$(MAKE) RULE=$@ .recurse
 venv::
-	@# Help: Recursively create venv in all subdirs 
-	$(MAKE) RULE=venv .recurse
+	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
 test:: 
-	@# Help: Recursively test in all subdirs 
-	@$(MAKE) RULE=test .recurse
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 setup:: 
-	@# Help: Recursively $@ in all subdirs 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
+image:: 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
+test-image:: 
+	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
 test-lib-src::
 	@# Help: Recursively test in all subdirs using source from data-processing-lib
 	$(MAKE) RULE=test-lib-src .recurse
+
+test-locals::
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 

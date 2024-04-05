@@ -13,7 +13,7 @@ from kubernetes import client as k8s_client
 EXEC_SCRIPT_NAME: str = "lang_id_transform.py"
 
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.2"
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.3"
 # compute execution parameters. Use default one for now.
 compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image

@@ -20,7 +20,7 @@ configuration for values are as follows:
 * _noop_sleep_sec_ - specifies the number of seconds to sleep during table transformation. 
 
 ## Running
-You can run the [noop_local.py](src/noop_local.py) to
+You can run the [noop_local_ray.py](src/noop_local_ray.py) to
 transform the `test1.parquet` file in [test input data](test-data/input) 
 to an `output` directory.  The directory will contain both the new
 annotated `test1.parquet` file and the `metadata.json` file.
@@ -28,7 +28,7 @@ annotated `test1.parquet` file and the `metadata.json` file.
 % make venv
 % source venv/bin/activate
 (venv) % cd src
-(venv) % python noop_local.py
+(venv) % python noop_local_ray.py
 18:36:22 INFO - Running locally
 noop parameters are : {'sleep': 5}
 18:36:22 INFO - Using local configuration with: input_folder - /Users/dawood/git/fm-data-engineering/transforms/universal/noop/test-data output_folder - /Users/dawood/git/fm-data-engineering/transforms/universal/noop/output
@@ -52,7 +52,7 @@ actor creation delay 0
 (TransformTableProcessor pid=40843) 18:36:27 INFO - Sleep for 5 seconds
 (venv) % deactivate
 % ls ../output
-metadata.json	sample1.parquet
+metadata.json	test1.parquet
 %
 </pre>
 

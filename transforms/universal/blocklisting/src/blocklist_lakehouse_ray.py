@@ -1,17 +1,12 @@
 import os
 import sys
-from argparse import ArgumentParser
 from pathlib import Path
 
 from blocklist_transform import (
-    BlockListTransform,
     BlockListTransformConfiguration,
     annotation_column_name_cli_param,
-    annotation_column_name_key,
     blocked_domain_list_path_cli_param,
-    blocked_domain_list_path_key,
     source_url_column_name_cli_param,
-    source_url_column_name_key,
 )
 from data_processing.ray import TransformLauncher
 from data_processing.utils import DPFConfig, ParamsUtils
@@ -35,7 +30,6 @@ block_list_params = {
     blocked_domain_list_path_cli_param: blocklist_conf_url,
     annotation_column_name_cli_param: blocklist_annotation_column_name,
     source_url_column_name_cli_param: blocklist_doc_source_url_column,
-    "blocklist_local_config": ParamsUtils.convert_to_ast(local_conf),
 }
 
 s3_cred = {
@@ -58,13 +52,15 @@ lakehouse_config = {
 worker_options = {"num_cpus": 0.5}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 launcher_params = {
+    # where to run
     "run_locally": True,
-    "max_files": 2,
-    "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "lh_config": ParamsUtils.convert_to_ast(lakehouse_config),
+    # Data access. Only required parameters are specified
+    "data_lh_config": ParamsUtils.convert_to_ast(lakehouse_config),
+    "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
+    # orchestrator
+    "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "num_workers": 2,
-    "checkpointing": False,
     "pipeline_id": "pipeline_id",
     "job_id": "job_id",
     "creation_delay": 0,

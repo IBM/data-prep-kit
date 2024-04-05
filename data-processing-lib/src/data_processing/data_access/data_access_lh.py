@@ -11,6 +11,10 @@ from lakehouse import (
     LakehouseForProcessingTask,
     SourceCodeDetails,
 )
+from data_processing.utils import get_logger
+
+
+logger = get_logger(__name__)
 
 
 class DataAccessLakeHouse(DataAccess):
@@ -19,12 +23,14 @@ class DataAccessLakeHouse(DataAccess):
     """
 
     def __init__(
-        self,
-        s3_credentials: dict[str, str],
-        lakehouse_config: dict[str, str],
-        d_sets: list[str],
-        checkpoint: bool,
-        m_files: int,
+            self,
+            s3_credentials: dict[str, str],
+            lakehouse_config: dict[str, str] = None,
+            d_sets: list[str] = None,
+            checkpoint: bool = False,
+            m_files: int = -1,
+            n_samples: int = 1,
+            files_to_use: list[str] = ['.parquet'],
     ):
         """
         Create data access class for lake house based configuration
@@ -32,24 +38,30 @@ class DataAccessLakeHouse(DataAccess):
         :param lakehouse_config: dictionary of lakehouse info
         :param d_sets list of the data sets to use
         :param checkpoint: flag to return only files that do not exist in the output directory
-        :param m_files: max amount of files to return"""
-        cos_cred = CosCredentials(
-            key=s3_credentials["access_key"],
-            secret=s3_credentials["secret_key"],
-            region="us-east",
-            endpoint=s3_credentials["url"],
-        )
-        self.lh = LakehouseForProcessingTask(
-            input_table_name=lakehouse_config["input_table"],
-            dataset=lakehouse_config["input_dataset"],
-            version=lakehouse_config["input_version"],
-            output_table_name=lakehouse_config["output_table"],
-            output_path=lakehouse_config["output_path"],
-            token=lakehouse_config["token"],
-            environment=lakehouse_config["lh_environment"],
-            cos_credentials=cos_cred,
-        )
-        self.output_folder = self.lh.get_output_data_path()
+        :param m_files: max amount of files to return
+        :param n_samples: amount of files to randomly sample
+        :param files_to_use: files extensions of files to include
+        """
+        if lakehouse_config is None:
+            self.output_folder = None
+        else:
+            cos_cred = CosCredentials(
+                key=s3_credentials["access_key"],
+                secret=s3_credentials["secret_key"],
+                region="us-east",
+                endpoint=s3_credentials["url"],
+            )
+            self.lh = LakehouseForProcessingTask(
+                input_table_name=lakehouse_config["input_table"],
+                dataset=lakehouse_config["input_dataset"],
+                version=lakehouse_config["input_version"],
+                output_table_name=lakehouse_config["output_table"],
+                output_path=lakehouse_config["output_path"],
+                token=lakehouse_config["token"],
+                environment=lakehouse_config["lh_environment"],
+                cos_credentials=cos_cred,
+            )
+            self.output_folder = self.lh.get_output_data_path()
         self.S3 = DataAccessS3(
             s3_credentials=s3_credentials,
             s3_config={
@@ -59,9 +71,26 @@ class DataAccessLakeHouse(DataAccess):
             d_sets=d_sets,
             checkpoint=checkpoint,
             m_files=m_files,
+            n_samples=n_samples,
+            files_to_use=files_to_use
         )
+        self.n_samples = n_samples
 
-    def get_files_to_process(self) -> tuple[list[str], dict[str, float]]:
+    def get_num_samples(self) -> int:
+        """
+        Get number of samples for input
+        :return: Number of samples
+        """
+        return self.n_samples
+
+    def get_output_folder(self) -> str:
+        """
+        Get output folder as a string
+        :return: output_folder
+        """
+        return self.output_folder
+
+    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float]]:
         """
         Get files to process
         :return: list of files and a dictionary of the files profile:
@@ -86,6 +115,9 @@ class DataAccessLakeHouse(DataAccess):
         :param path: input file location
         :return: output file location
         """
+        if self.output_folder is None:
+            logger.error("Getting output location. Lake house is not configured, returning None")
+            return None
         return self.lh.get_output_file_path_from(file_path=path)
 
     def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
@@ -97,7 +129,9 @@ class DataAccessLakeHouse(DataAccess):
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
         in the case of failure dict is None
         """
-
+        if self.output_folder is None:
+            logger.error("Saving table. Lake house is not configured, operation skipped")
+            return 0, None
         l, repl = self.S3.save_table_with_schema(path=path, table=table)
         if repl is None:
             return l, {}
@@ -127,6 +161,9 @@ class DataAccessLakeHouse(DataAccess):
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
         in the case of failure dict is None
         """
+        if self.output_folder is None:
+            logger.error("Lake house is not configured, save job metadata operation skipped")
+            return None
         metadata["source"] = {
             "name": self.lh.input_table_name,
             "type": "table",
@@ -222,14 +259,3 @@ class DataAccessLakeHouse(DataAccess):
         :return: A dictionary of file names/binary content will be returned
         """
         return self.S3.get_folder_files(path=path, extensions=extensions, return_data=return_data)
-
-    def save_file_rel(self, path: str, data: bytes) -> dict[str, Any]:
-        """
-        Save byte array to the file
-        :param path: file path relative to output directory
-        :param data: byte array
-        :return: a dictionary as
-        defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
-        """
-        return self.S3.save_file_rel(path=path, data=data)

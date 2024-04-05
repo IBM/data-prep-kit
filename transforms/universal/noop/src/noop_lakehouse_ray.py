@@ -31,17 +31,19 @@ lakehouse_config = {
 worker_options = {"num_cpus": 0.5}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
+    # where to run
     "run_locally": True,
-    "max_files": 6,
-    "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "lh_config": ParamsUtils.convert_to_ast(lakehouse_config),
+    # Data access. Only required parameters are specified
+    "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
+    "data_lh_config": ParamsUtils.convert_to_ast(lakehouse_config),
+    # orchestrator
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "num_workers": 6,
-    "checkpointing": False,
     "pipeline_id": "pipeline_id",
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
+    # Noop
     "noop_sleep_sec": 1,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)

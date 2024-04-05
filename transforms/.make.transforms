@@ -1,8 +1,20 @@
-#
 # Include this to get access to a common set of rules for reuse in transform projects.
-# Before including,  REPOROOT must be defined.  For example,
-# REPOROOT=../../..
 # include ../../.make.transforms
+#
+# Before including, the following must be defined:
+# REPOROOT points to the top of the git repository. 
+# 	For example REPOROOT=../../..
+# TRANSFORM_NAME defines the name of the transform and is used to derive
+#  	DOCKER_IMAGE_NAME and TRANSFORM_SRC_FILE if not already defined.
+
+# Optional inputs (that have defaults)
+# TRANSFORM_SRC_FILE is the base name of the python source file containing the main()
+#	that is used to launch the transform in Ray.  
+#       By convention this name defaults to $(TRANSFORM_NAME)_transform.py.
+#	This file is then assumed to be in the home dir of the docker image and
+#	can be run with "python $(TRANSFORM_SRC_FILE) --help"
+# DOCKER_IMAGE_NAME is the name of the docker image.  
+#	By default its value is $(TRANSFORM_NAME).
 #
 # Targets defined here use double colon so can be overriden
 #
@@ -21,6 +33,10 @@ DOCKER=podman
 DOCKER_FILE=Dockerfile
 DOCKER_REGISTRY=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
 EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
+DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
+# By convention the name of the python file is as follows and contains a main to start the ray-based transform
+# This file is used when starting the transformers in the Docker image.
+TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_transform.py
 
 # The following taken from https://stackoverflow.com/a/65243296/45375
 # Lists all targets and optional help text found in the target.
@@ -33,9 +49,13 @@ help::
 	@echo DOCKER_REGISTRY - the name of the docker registry to use.  DOCKER_REGISTRY=$(DOCKER_REGISTRY)
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
 	@echo EXTRA_ARTIFACTORY_URL - the url of an additional artifactory to satisfy dependencies.  EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL)
+	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
+	@echo TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_transform.py)
 	@echo ""
 	@echo Macros that require definition in the including Makefile
-	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
+	@echo REPOROOT defines root directory of this repository (such as ../../..) 
+	@echo TRANSFORM_NAME defines the name of the transform and is used to 
+	@echo     define default values of DOCKER_IMAGE_NAME and TRANSFORM_SRC_FILE.  For, example 'noop'
 	@echo DOCKER_IMAGE_VERSION - the version of the docker image to produce.  DOCKER_IMAGE_VERSION=$(DOCKER_IMAGE_VERSION)
 	@$(MAKE) .transforms.check_required_macros
 
@@ -124,3 +144,22 @@ help::
 	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
 	cd test; $(PYTEST) . 
 
+
+.PHONY: .transforms.test-image
+.transforms.test-image::
+	@# Help: Test an already-built image (use make image) to be sure the --help option works
+	$(DOCKER) run -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) python $(TRANSFORM_SRC_FILE) --help
+
+.PHONY: .transforms.test-local
+test-locals::
+	@# Help: Run the *local*.py files in the src directory 
+	@source venv/bin/activate;		\
+	export PYTHONPATH=src;			\
+	files=$$(find src -name '*local*.py' );		\
+	for i in $$files; do			\
+	    python $$i;				\
+	    if [ $$? -ne 0 ];	then		\
+		exit 1;				\
+	    fi;					\
+	done	
+	

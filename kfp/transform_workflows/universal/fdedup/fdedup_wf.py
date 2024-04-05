@@ -15,7 +15,7 @@ from src.fdedup_compute_execution_params import fdedup_compute_execution_params
 EXEC_SCRIPT_NAME: str = "fdedup_transform.py"
 
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.2"
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.3"
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(
     func=fdedup_compute_execution_params, base_image=base_kfp_image

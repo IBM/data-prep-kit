@@ -1,6 +1,3 @@
-DOCKER_IMAGE_NAME=language_id
-DOCKER_IMAGE_VERSION=0.1
-
 # Define the root of the local git clone for the common rules to be able 
 # know where they are running from.
 REPOROOT=../../..
@@ -8,6 +5,9 @@ REPOROOT=../../..
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
 include ../../.make.transforms
+
+TRANSFORM_NAME=lang_id
+DOCKER_IMAGE_VERSION=0.1
 
 venv::	.transforms.venv
 
@@ -24,3 +24,6 @@ test-lib-src:: .transforms.test-lib-src
 install-lib-src:: .transforms.install-lib-src
 
 setup:: .transforms.setup
+
+test-image:: .transforms.test-image
+

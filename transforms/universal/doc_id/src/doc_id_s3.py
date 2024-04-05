@@ -1,4 +1,3 @@
-import os
 import sys
 
 from data_processing.ray import TransformLauncher
@@ -21,17 +20,19 @@ s3_conf = {
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
+    # where to run
     "run_locally": True,
-    "max_files": -1,
-    "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    # Data access. Only required parameters are specified
+    "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
+    "data_s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    # orchestrator
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "num_workers": 3,
-    "checkpointing": False,
     "pipeline_id": "pipeline_id",
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
+    # doc id
     "doc_id_doc_column": "contents",
     "doc_id_hash_column": "hash_column",
     "doc_id_int_column": "int_id_column",

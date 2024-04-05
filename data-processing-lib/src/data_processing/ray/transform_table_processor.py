@@ -4,7 +4,7 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.utils import get_logger, TransformUtils
+from data_processing.utils import TransformUtils, get_logger
 
 
 logger = get_logger(__name__)
@@ -36,7 +36,8 @@ class TransformTableProcessor:
         # Create statistics
         self.stats = params.get("statistics", None)
         self.base_table_stats = params.get("base_table_stats", True)
-        self.last_empty = " "
+        self.last_fname = None
+        self.last_fname_next_index = None
 
     def process_data(self, f_name: str) -> None:
         """
@@ -74,7 +75,6 @@ class TransformTableProcessor:
             logger.warning(f"Exception {e} processing file {f_name}: {traceback.format_exc()}")
             self.stats.add_stats.remote({"transform execution exception": 1})
 
-
     def flush(self) -> None:
         """
         This is supporting method for transformers, that implement buffering of tables, for example coalesce.
@@ -83,13 +83,27 @@ class TransformTableProcessor:
         :return: None
         """
         t_start = time.time()
+        if self.last_fname is None:
+            # for some reason a given worker never processed anything. Happens in testing
+            # when the amount of workers is greater then the amount of files
+            logger.info("skipping flush, no name for file is defined")
+            return
         try:
             # get flush results
             logger.debug(f"Begin flushing transform")
             out_tables, stats = self.transform.flush()
             logger.debug(f"Done flushing transform, got {len(out_tables)} tables")
             # Here we are using the name of the last table, that did not return anything
-            self._submit_table(f_name=self.last_empty, t_start=t_start, out_tables=out_tables, stats=stats)
+            output_file_name = self.last_fname.removesuffix(".parquet")
+            if self.last_fname_next_index is None:
+                # The filename was NOT used to write out a file yet.
+                # This happens when _submit() is called with a filename, but with no tables.
+                # In this case, we can use the filename w/o an index.
+                output_file_name = f"{output_file_name}.parquet"
+            else:
+                # The filename was used to write out a file, so we need to include an index.
+                output_file_name = f"{output_file_name}_{self.last_fname_next_index}.parquet"
+            self._submit_table(f_name=output_file_name, t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
             logger.warning(f"Exception {e} flushing: {traceback.format_exc()}")
             self.stats.add_stats.remote({"transform execution exception": 1})
@@ -103,13 +117,14 @@ class TransformTableProcessor:
         :param stats: execution statistics to populate
         :return: None
         """
-        logger.debug(f"submitting tables {f_name}, number of tables {len(out_tables)}")
+        logger.debug(f"submitting tables under file named {f_name}, number of tables {len(out_tables)}")
         # Compute output file location. Preserve sub folders for Wisdom
+        self.last_fname = f_name
+        self.last_fname_next_index = None
         match len(out_tables):
             case 0:
                 # no tables - save input file name for flushing
                 logger.debug(f"Transform did not produce a transformed table for file {f_name}")
-                self.last_empty = f_name
             case 1:
                 # we have exactly 1 table
                 output_name = self.data_access.get_output_location(path=f_name)
@@ -129,6 +144,7 @@ class TransformTableProcessor:
                     else:
                         logger.warning(f"Failed to write file {output_name}")
                         self.stats.add_stats.remote({"failed_writes": 1})
+                self.last_fname_next_index = 1
             case _:
                 # we have more then 1 table
                 table_sizes = 0
@@ -139,7 +155,9 @@ class TransformTableProcessor:
                     if TransformUtils.verify_no_duplicate_columns(table=out_tables[index], file=output_name):
                         output_name_indexed = f"{output_file_name}_{index}.parquet"
                         table_sizes += out_tables[index].nbytes
-                        logger.debug(f"Writing transformed file {f_name}, {index + 1} of {count}  to {output_name_indexed}")
+                        logger.debug(
+                            f"Writing transformed file {f_name}, {index + 1} of {count}  to {output_name_indexed}"
+                        )
                         output_file_size, save_res = self.data_access.save_table(
                             path=output_name_indexed, table=out_tables[index]
                         )
@@ -147,6 +165,7 @@ class TransformTableProcessor:
                             logger.warning(f"Failed to write file {output_name_indexed}")
                             self.stats.add_stats.remote({"failed_writes": 1})
                             break
+                self.last_fname_next_index = count
                 if self.base_table_stats:
                     self.stats.add_stats.remote(
                         {
