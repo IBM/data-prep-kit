@@ -2,12 +2,13 @@ import os
 import sys
 from pathlib import Path
 
+from antivirus_local import check_clamd
 from antivirus_transform import AntivirusTransformConfiguration
-from data_processing.data_access.data_access_local import DataAccessLocal
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
 
 
+TEST_SOCKET = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".tmp", "clamd.ctl"))
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
@@ -18,7 +19,7 @@ local_conf = {
 antivirus_params = {
     "antivirus_input_column": "contents",
     "antivirus_output_column": "virus_detection",
-    "antivirus_clamd_socket": "../.tmp/clamd.ctl",
+    "antivirus_clamd_socket": TEST_SOCKET,
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
@@ -36,6 +37,7 @@ params = {
     "code_location": ParamsUtils.convert_to_ast(code_location),
 }
 if __name__ == "__main__":
+    check_clamd(TEST_SOCKET)
     # Here we show to run the transform in the ray launcher
     Path(output_folder).mkdir(parents=True, exist_ok=True)
     # Set the simulated command line args
