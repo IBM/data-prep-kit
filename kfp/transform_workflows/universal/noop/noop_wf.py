@@ -34,21 +34,26 @@ TASK_NAME: str = "noop"
     description="Pipeline for noop",
 )
 def noop(
+    # Ray cluster
     ray_name: str = "noop-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop-guf:0.0.1",\
             "image_pull_secret": "prod-all-icr-io"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
             "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop-guf:0.0.1"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
+    # data access
     data_lh_config: str = "None",
     data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/doc_annotation_test/input/noop_small/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_noop_guf/'}",
     data_s3_access_secret: str = "cos-access",
     data_max_files: int = -1,
     data_num_samples: int = -1,
+    # orchestrator
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    # noop listing parameters
     noop_sleep_sec: int = 10,
+    # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
