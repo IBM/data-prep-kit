@@ -122,7 +122,7 @@ def noop(
             exec_params={
                 "data_s3_config": data_s3_config,
                 "data_lh_config": data_lh_config,
-                "max_files": data_max_files,
+                "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
                 "num_workers": compute_exec_params.output,
                 "worker_options": actor_options,
