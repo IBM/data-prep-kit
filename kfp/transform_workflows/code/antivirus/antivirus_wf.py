@@ -34,22 +34,29 @@ TASK_NAME: str = "antivirus"
     description="Pipeline for antivirus",
 )
 def antivirus(
+    # Ray cluster
     ray_name: str = "antivirus-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/antivirus-guf:0.0.2",\
-             "image_pull_secret": "prod-all-icr-io"}',
+            "image_pull_secret": "prod-all-icr-io"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
             "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/antivirus-guf:0.0.2"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
-    lh_config: str = "None",
-    max_files: int = -1,
+    # data access
+    data_lh_config: str = "None",
+    data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input-antivirus/input/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_antivirus_guf/'}",
+    data_s3_access_secret: str = "cos-access",
+    data_max_files: int = -1,
+    data_num_samples: int = -1,
+    # orchestrator
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
-    s3_access_secret: str = "cos-access",
-    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input-antivirus/input/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_antivirus_guf/'}",
+    code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    # antivirus parameters
     antivirus_input_column: str = "contents",
     antivirus_output_column: str = "virus_detection",
     antivirus_clamd_socket: str = "/var/run/clamav/clamd.ctl",
+    # additional parameters
+    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
     Pipeline to execute antivirus transform
@@ -74,11 +81,12 @@ def antivirus(
         wait_cluster_up_tmout - time to wait for cluster up, sec
         wait_job_ready_tmout - time to wait for job ready, sec
         wait_print_tmout - time between prints, sec
-        http_retries - httpt retries for API server calls
-    :param lh_config - lake house configuration
-    :param s3_config - s3 configuration
-    :param s3_access_secret - s3 access secret
-    :param max_files - max files to process
+        http_retries - http retries for API server calls
+    :param data_lh_config - lake house configuration
+    :param data_s3_access_secret - s3 access secret
+    :param data_s3_config - s3 configuration
+    :param data_max_files - max files to process
+    :param data_num_samples - num samples to process
     :param actor_options - actor options
     :param pipeline_id - pipeline id
     :param antivirus_input_column - input column name
@@ -115,13 +123,15 @@ def antivirus(
             additional_params=additional_params,
             # note that the parameters below are specific for antivirus transform
             exec_params={
-                "s3_config": s3_config,
-                "lh_config": lh_config,
-                "max_files": max_files,
+                "data_s3_config": data_s3_config,
+                "data_lh_config": data_lh_config,
+                "data_max_files": data_max_files,
+                "data_num_samples": data_num_samples,
                 "num_workers": compute_exec_params.output,
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
                 "job_id": dsl.RUN_ID_PLACEHOLDER,
+                "code_location": code_location,
                 "antivirus_input_column": antivirus_input_column,
                 "antivirus_output_column": antivirus_output_column,
                 "antivirus_clamd_socket": antivirus_clamd_socket,
@@ -130,7 +140,7 @@ def antivirus(
             server_url=server_url,
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
-        ComponentUtils.set_s3_env_vars_to_component(execute_job, s3_access_secret)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
 
     # set image pull secrets

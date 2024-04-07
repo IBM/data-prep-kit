@@ -61,7 +61,6 @@ def filtering(
     filter_columns_to_drop: str = "['extra', 'cluster']",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
-
 ):
     """
     Pipeline to execute Filtering transform
