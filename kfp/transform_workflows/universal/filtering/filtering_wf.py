@@ -37,23 +37,31 @@ TASK_NAME: str = "filter"
     name=TASK_NAME + "-ray-pipeline",
     description="Pipeline for filtering task",
 )
-def filtering(
-    ray_name: str = "filter-kfp-ray",  # name of Ray cluster
+def filtering(    
+    # Ray cluster
+    ray_name: str = "noop-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/filtering-guf:0.0.1",\
-             "image_pull_secret": "prod-all-icr-io"}',
+            "image_pull_secret": "prod-all-icr-io"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
             "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/filtering-guf:0.0.1"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
-    lh_config: str = "None",
-    max_files: int = -1,
+    # data access
+    data_lh_config: str = "None",
+    data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/filtering-input/input/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_filtering_guf/'}",
+    data_s3_access_secret: str = "cos-access",
+    data_max_files: int = -1,
+    data_num_samples: int = -1,
+    # orchestrator
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
-    s3_access_secret: str = "cos-access",
-    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/filtering-input/input/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_filtering_guf/'}",
+    code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    # filtering listing parameters
     filter_criteria_list: str = "['docq_total_words > 100 AND docq_total_words < 200', 'ibmkenlm_docq_perplex_score < 230']",
     filter_logical_operator: str = "AND",
     filter_columns_to_drop: str = "['extra', 'cluster']",
+    # additional parameters
+    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
+
 ):
     """
     Pipeline to execute Filtering transform
@@ -119,9 +127,10 @@ def filtering(
             run_id=dsl.RUN_ID_PLACEHOLDER,
             additional_params=additional_params,
             exec_params={
-                "s3_config": s3_config,
-                "lh_config": lh_config,
-                "max_files": max_files,
+                "data_s3_config": data_s3_config,
+                "data_lh_config": data_lh_config,
+                "max_files": data_max_files,
+                "data_num_samples": data_num_samples,
                 "num_workers": compute_exec_params.output,
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
@@ -134,7 +143,7 @@ def filtering(
             server_url=server_url,
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
-        ComponentUtils.set_s3_env_vars_to_component(execute_job, s3_access_secret)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
 
         execute_job.after(ray_cluster)
 
