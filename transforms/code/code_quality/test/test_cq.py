@@ -1,3 +1,5 @@
+import os
+
 import pyarrow as pa
 import pyarrow.parquet as pq
 from cq_transform import CodeQualityTransform, CodeQualityTransformConfiguration
@@ -32,5 +34,8 @@ class TestCodeQualityTransform(AbstractTransformTest):
         ]
         return fixtures
 
-    input_table = pq.ParquetFile("../test-data/input/sample_1.parquet").read()
-    expected_output_table = pq.ParquetFile("../test-data/expected/sample_1.parquet").read()
+    test_src_dir = os.path.abspath(os.path.dirname(__file__))
+    input_file = os.path.abspath(os.path.join(test_src_dir, "../test-data/input/sample_1.parquet"))
+    input_table = pq.ParquetFile(input_file).read()
+    expected_file = os.path.abspath(os.path.join(test_src_dir, "../test-data/expected/sample_1.parquet"))
+    expected_output_table = pq.ParquetFile(expected_file).read()

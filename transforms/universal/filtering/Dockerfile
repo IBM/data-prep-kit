@@ -9,4 +9,14 @@ RUN pip install --no-cache-dir -r  requirements.txt
 RUN rm requirements.txt
 
 COPY ./src/filter_transform.py . 
+
+RUN pip install --no-cache-dir pytest
+COPY test/ test/
+COPY test-data/ test-data/
+
+USER root
+RUN chown -R ray /home/ray/test
+RUN chown -R ray /home/ray/test-data
+USER ray
+
 ENV PYTHONPATH /home/ray
