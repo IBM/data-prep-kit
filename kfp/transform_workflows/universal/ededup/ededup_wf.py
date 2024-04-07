@@ -78,7 +78,7 @@ def ededup(
         wait_cluster_up_tmout - time to wait for cluster up, sec
         wait_job_ready_tmout - time to wait for job ready, sec
         wait_print_tmout - time between prints, sec
-        http_retries - httpt retries for API server calls
+        http_retries - http retries for API server calls
     :param data_lh_config - lake house configuration
     :param data_s3_access_secret - s3 access secret
     :param data_s3_config - s3 configuration
