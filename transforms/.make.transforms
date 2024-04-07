@@ -152,12 +152,12 @@ help::
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest::
 	@# Help: Test an already-built image (use make image) running pytest on $(TRANSFORM_TEST_FILE) 
-	$(DOCKER) run -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) pytest -s $(TRANSFORM_TEST_FILE)
+	$(DOCKER) run -t --rm $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) pytest -s  $(TRANSFORM_TEST_FILE)
 
 .PHONY: .transforms.test-image-help
 .transforms.test-image-help::
 	@# Help: Test an already-built image (use make image) to be sure the --help option works
-	$(DOCKER) run -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) python $(TRANSFORM_SRC_FILE) --help
+	$(DOCKER) run -t --rm $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) python $(TRANSFORM_SRC_FILE) --help
 
 .PHONY: .transforms.test-local
 test-locals::
