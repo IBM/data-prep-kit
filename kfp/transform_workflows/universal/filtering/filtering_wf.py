@@ -39,7 +39,7 @@ TASK_NAME: str = "filter"
 )
 def filtering(    
     # Ray cluster
-    ray_name: str = "noop-kfp-ray",  # name of Ray cluster
+    ray_name: str = "filter-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/filtering-guf:0.0.1",\
             "image_pull_secret": "prod-all-icr-io"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
@@ -55,7 +55,7 @@ def filtering(
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # filtering listing parameters
+    # filtering parameters
     filter_criteria_list: str = "['docq_total_words > 100 AND docq_total_words < 200', 'ibmkenlm_docq_perplex_score < 230']",
     filter_logical_operator: str = "AND",
     filter_columns_to_drop: str = "['extra', 'cluster']",
@@ -86,13 +86,15 @@ def filtering(
         wait_cluster_up_tmout - time to wait for cluster up, sec
         wait_job_ready_tmout - time to wait for job ready, sec
         wait_print_tmout - time between prints, sec
-        http_retries - httpt retries for API server calls
-    :param lh_config - lake house configuration
-    :param s3_config - s3 configuration
-    :param s3_access_secret - s3 access secret
-    :param max_files - max files to process
+        http_retries - http retries for API server calls
+    :param data_lh_config - lake house configuration
+    :param data_s3_access_secret - s3 access secret
+    :param data_s3_config - s3 configuration
+    :param data_max_files - max files to process
+    :param data_num_samples - num samples to process
     :param actor_options - actor options
     :param pipeline_id - pipeline id
+    :param code_location - code location
     :param filter_criteria_list - list of filter criteria (in SQL WHERE clause format)
     :param filter_logical_operator - logical operator (AND or OR) that joins filter criteria
     :param filter_columns_to_drop - list of columns to drop after filtering

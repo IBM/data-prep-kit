@@ -51,7 +51,7 @@ def noop(
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # noop listing parameters
+    # noop parameters
     noop_sleep_sec: int = 10,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
