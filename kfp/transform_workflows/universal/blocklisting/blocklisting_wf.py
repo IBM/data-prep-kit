@@ -34,24 +34,31 @@ PREFIX: str = "blocklist"
     description="Pipeline for blocklisting",
 )
 def blocklisting(
+    # Ray cluster
     ray_name: str = "blocklisting-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/blocklist:guftest",\
              "image_pull_secret": "prod-all-icr-io"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
             "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/blocklist:guftest"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
-    lh_config: str = "None",
-    max_files: int = -1,
+    # data access
+    data_lh_config: str = "None",
+    data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklist_guf/'}",
+    data_s3_access_secret: str = "cos-access",
+    data_max_files: int = -1,
+    data_num_samples: int = -1,
+    data_checkpointing: bool = False,
+    # orchestrator
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
-    s3_access_secret: str = "cos-access",
-    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklist_guf/'}",
+    code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    # block listing parameters
     blocklist_annotation_column_name: str = "blocklisted",
     blocklist_source_url_column_name: str = "title",
     blocklist_blocked_domain_list_path: str = "cos-optimal-llm-pile/doc_annotation_test/domains",
-    blocklist_s3_config = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklist_guf/'}",
     blocklist_s3_access_secret: str = "cos-access",
+    # additional parameters
+    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ) -> None:
     """
     Pipeline to execute NOOP transform
@@ -77,16 +84,18 @@ def blocklisting(
         wait_job_ready_tmout - time to wait for job ready, sec
         wait_print_tmout - time between prints, sec
         http_retries - httpt retries for API server calls
-    :param lh_config - lake house configuration
-    :param s3_config - s3 configuration
-    :param s3_access_secret - s3 access secret
-    :param max_files - max files to process
+    :param data_lh_config - lake house configuration
+    :param data_s3_access_secret - s3 access secret
+    :param data_s3_config - s3 configuration
+    :param data_max_files - max files to process
+    :param data_num_samples - num samples to process
+    :param data_checkpointing - checkpointing flag
     :param actor_options - actor options
     :param pipeline_id - pipeline id
+    :param code_location - code location
     :param blocklist_annotation_column_name - name of blocklist annotation column
     :param blocklist_source_url_column_name - name of the source column containing URL
     :param blocklist_blocked_domain_list_path - block domain list path
-    :param blocklist_s3_config - block list s3 config (here we are assuming that blocklist info is in S3)
     :param blocklist_s3_access_secret - block list access secret
                     (here we are assuming that blocklist info is in S3, but potentially in the different bucket)
     :return: None
@@ -120,24 +129,26 @@ def blocklisting(
             additional_params=additional_params,
             # note that the parameters below are specific for NOOP transform
             exec_params={
-                "s3_config": s3_config,
-                "lh_config": lh_config,
-                "max_files": max_files,
+                "data_s3_config": data_s3_config,
+                "data_lh_config": data_lh_config,
+                "data_max_files": data_max_files,
+                "data_num_samples": data_num_samples,
+                "data_checkpointing": data_checkpointing,
                 "num_workers": compute_exec_params.output,
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
                 "job_id": dsl.RUN_ID_PLACEHOLDER,
+                "code_location": code_location,
                 "blocklist_annotation_column_name": blocklist_annotation_column_name,
                 "blocklist_source_url_column_name": blocklist_source_url_column_name,
                 "blocklist_blocked_domain_list_path": blocklist_blocked_domain_list_path,
-                "blocklist_s3_config": blocklist_s3_config,
            },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
             prefix=PREFIX,
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
-        ComponentUtils.set_s3_env_vars_to_component(execute_job, s3_access_secret)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, blocklist_s3_access_secret, prefix=PREFIX)
         execute_job.after(ray_cluster)
 
