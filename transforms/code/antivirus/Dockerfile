@@ -40,11 +40,13 @@ RUN pip install --no-cache-dir pytest
 COPY test/ test/
 COPY test-data/ test-data/
 COPY supervisord.conf /etc/supervisord.conf
+COPY supervisord.service /etc/systemd/system/supervisord.service
 
 USER root
-RUN apt -y update && apt install -y supervisor
+RUN apt -y update && apt install -y supervisor systemd
+RUN systemctl enable supervisord
 RUN chown -R ray /home/ray/test
 RUN chown -R ray /home/ray/test-data
 USER ray
 
-CMD ["/usr/bin/supervisord"]
+CMD ["systemd"]
