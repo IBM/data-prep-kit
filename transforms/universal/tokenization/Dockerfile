@@ -10,4 +10,14 @@ RUN rm requirements.txt
 
 COPY ./src/tokenization_transform.py .
 COPY ./src/tokenization_utils.py .
+
+RUN pip install --no-cache-dir pytest
+COPY test/ test/
+COPY test-data/ test-data/
+
+USER root
+RUN chown -R ray /home/ray/test
+RUN chown -R ray /home/ray/test-data
+USER ray
+
 ENV PYTHONPATH /home/ray
