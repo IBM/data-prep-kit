@@ -17,7 +17,7 @@ RUN freshclam \
 USER ray
 CMD ["/bin/bash", "-c", "clamd --debug --foreground"]
 
-FROM base AS antivirus
+FROM base AS antivirus-kfp
 
 ARG ARTIFACTORY_USER
 ARG ARTIFACTORY_API_KEY
@@ -34,12 +34,17 @@ RUN pip install --no-cache-dir -r requirements.txt \
 COPY src/*_transform.py  ./
 ENV PYTHONPATH /home/ray
 
-CMD ["/bin/bash", "-c", "clamd --foreground"]# Install code to enable testing on the image.
+FROM antivirus-kfp AS antivirus
+
 RUN pip install --no-cache-dir pytest
 COPY test/ test/
 COPY test-data/ test-data/
+COPY supervisord.conf /etc/supervisord.conf
 
 USER root
+RUN apt -y update && apt install -y supervisor
 RUN chown -R ray /home/ray/test
 RUN chown -R ray /home/ray/test-data
 USER ray
+
+CMD ["/usr/bin/supervisord"]
