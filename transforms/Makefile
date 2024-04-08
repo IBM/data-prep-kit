@@ -27,11 +27,7 @@ test::
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
-test-locals:: 
-	@# Help: Recursively make $@ in all subdirs 
-	@$(MAKE) RULE=$@ .recurse
-
-test-lib-src::
+test-src::
 	@# Help: Install the library source into the venv and test 
 	$(MAKE) RULE=$@ .recurse
 
