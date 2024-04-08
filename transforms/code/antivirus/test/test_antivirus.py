@@ -9,10 +9,9 @@ from data_processing.utils import get_logger
 from antivirus_transform import AntivirusTransform
 
 
-TEST_SOCKET = os.path.abspath(os.path.join(os.getcwd(), "..", ".tmp/clamd.ctl"))
 INIT_TIMEOUT_SEC=60
 logger = get_logger(__name__)
-cd = clamd.ClamdUnixSocket(TEST_SOCKET)
+cd = clamd.ClamdUnixSocket()
 check_end = time.time() + INIT_TIMEOUT_SEC
 while True:
     try:
@@ -51,8 +50,7 @@ class TestAntivirusTransform(AbstractTransformTest):
                 AntivirusTransform(
                     {
                         "antivirus_input_column": "contents", 
-                        "antivirus_output_column": "virus_detection",
-                        "antivirus_clamd_socket": TEST_SOCKET
+                        "antivirus_output_column": "virus_detection"
                     }
                 ),
                 [table],

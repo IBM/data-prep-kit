@@ -6,12 +6,11 @@ from antivirus_transform import AntivirusTransform
 from data_processing.data_access import DataAccessLocal
 from data_processing.utils import get_logger
 
-TEST_SOCKET = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".tmp", "clamd.ctl"))
 INIT_TIMEOUT_SEC=60
 
-def check_clamd(unix_socket):
+def check_clamd():
     logger = get_logger(__name__)
-    cd = clamd.ClamdUnixSocket(unix_socket)
+    cd = clamd.ClamdUnixSocket()
     check_end = time.time() + INIT_TIMEOUT_SEC
     while True:
         try:
@@ -31,10 +30,9 @@ input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "te
 antivirus_params = {
     "antivirus_input_column": "contents",
     "antivirus_output_column": "virus_detection",
-    "antivirus_clamd_socket": TEST_SOCKET,
 }
 if __name__ == "__main__":
-    check_clamd(TEST_SOCKET)
+    check_clamd()
     # Here we show how to run outside of ray
     # Create and configure the transform.
     transform = AntivirusTransform(antivirus_params)

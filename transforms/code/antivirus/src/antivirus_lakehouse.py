@@ -43,7 +43,6 @@ params = {
     # antivirus specific
     "antivirus_input_column": "contents",
     "antivirus_output_column": "virus_detection",
-    "antivirus_clamd_socket": "../.tmp/clamd.ctl",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

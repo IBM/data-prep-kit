@@ -19,7 +19,6 @@ local_conf = {
 antivirus_params = {
     "antivirus_input_column": "contents",
     "antivirus_output_column": "virus_detection",
-    "antivirus_clamd_socket": TEST_SOCKET,
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
@@ -37,7 +36,7 @@ params = {
     "code_location": ParamsUtils.convert_to_ast(code_location),
 }
 if __name__ == "__main__":
-    check_clamd(TEST_SOCKET)
+    check_clamd()
     # Here we show to run the transform in the ray launcher
     Path(output_folder).mkdir(parents=True, exist_ok=True)
     # Set the simulated command line args

@@ -17,10 +17,8 @@ logger = get_logger(__name__)
 
 INPUT_COLUMN_KEY = "antivirus_input_column"
 OUTPUT_COLUMN_KEY = "antivirus_output_column"
-CLAMD_SOCKET_KEY = "antivirus_clamd_socket"
 DEFAULT_INPUT_COLUMN = "contents"
 DEFAULT_OUTPUT_COLUMN = "virus_detection"
-DEFAULT_CLAMD_SOCKET = "/var/run/clamav/clamd.ctl"
 
 class AntivirusTransform(AbstractTableTransform):
     """
@@ -40,8 +38,6 @@ class AntivirusTransform(AbstractTableTransform):
         self.warning_issued = False
         self.input_column = config.get(INPUT_COLUMN_KEY, DEFAULT_INPUT_COLUMN)
         self.output_column = config.get(OUTPUT_COLUMN_KEY, DEFAULT_OUTPUT_COLUMN)
-        self.clamd_socket = config.get(CLAMD_SOCKET_KEY, DEFAULT_CLAMD_SOCKET)
-        logger.info(f"Using unix socket: {self.clamd_socket}")
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -54,7 +50,7 @@ class AntivirusTransform(AbstractTableTransform):
         
         logger.debug(f"Transforming one table with {len(table)} rows")
 
-        cd = clamd.ClamdUnixSocket(path=self.clamd_socket)
+        cd = clamd.ClamdUnixSocket()
         
         def _scan(content: str) -> str | None:
             if content is None:
@@ -107,12 +103,6 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
             default=DEFAULT_OUTPUT_COLUMN,
             help="output column name",
         )
-        parser.add_argument(
-            f"--{CLAMD_SOCKET_KEY}",
-            type=str,
-            default=DEFAULT_CLAMD_SOCKET,
-            help="local socket path for clamd"
-        )
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -122,7 +112,6 @@ class AntivirusTransformConfiguration(DefaultTableTransformConfiguration):
         """
         self.params[INPUT_COLUMN_KEY] = args.antivirus_input_column
         self.params[OUTPUT_COLUMN_KEY] = args.antivirus_output_column
-        self.params[CLAMD_SOCKET_KEY] = args.antivirus_clamd_socket
         logger.info(f"antivirus parameters are : {self.params}")
         return True
 

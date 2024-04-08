@@ -55,6 +55,12 @@ Example for manual set up for Mac:
     ```sh
     freshclam
     ```
+1. Edit `venv/bin/activate`, and add following lines to start `clamd` by `source venv/bin/activate`
+    ```sh
+    if [ ! -e /var/run/clamav/clamd.ctl ]; then
+        clamd --config-file=$(brew --prefix)/etc/clamav/clamd.conf
+    fi
+    ```
 
 ## Running
 You can run the [antivirus_local_ray.py](src/antivirus_local_ray.py) to
