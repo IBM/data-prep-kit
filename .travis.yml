@@ -57,7 +57,7 @@ script:
                    make -C data-processing-lib DOCKER=${DOCKER} venv test || travis_terminate 1
           ;;
           transform-src-test)
-                   make -C ${DIR} DOCKER=${DOCKER} venv test-lib-src test-locals || travis_terminate 1
+                   make -C ${DIR} DOCKER=${DOCKER} venv test-src || travis_terminate 1
           ;;
           transform-image-test)
                    make -C ${DIR} DOCKER=${DOCKER} image test-image || travis_terminate 1

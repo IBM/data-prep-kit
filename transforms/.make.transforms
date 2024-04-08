@@ -97,7 +97,8 @@ help::
 	pip install --upgrade pip;		\
 	pip install wheel;			\
 	pip install -r requirements.txt;	\
-	pip install pytest;			\
+	pip install pytest;			
+	$(MAKE) .transforms.install-lib-src
 
 .transforms.check_env::
 	@# Help: Make sure Artifactory credentials are in the environment variables. 
@@ -110,9 +111,17 @@ help::
 .transforms.image:: Dockerfile requirements.txt
 	$(MAKE) .transforms.check_env	# Put this first so we don't get its help
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
+	rm -rf data-processing-lib
+	mkdir data-processing-lib
+	ln -s $(REPOROOT)/../data-processing-lib/src data-processing-lib/src
+	ln -s $(REPOROOT)/../data-processing-lib/pyproject.toml data-processing-lib/pyproject.toml
 	$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
-	$(DOCKER) build --build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) --build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
-		-f $(DOCKER_FILE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) .
+	# tar -ch is used here so that the soft link created above is available in the docker context
+	tar -ch . | $(DOCKER) build --build-arg EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL) \
+		--build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) \
+		--build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
+		-t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) - 
+	rm -rf data-processing-lib
 
 .PHONY: .transforms.install-lib-src
 .transforms.install-lib-src::
@@ -138,8 +147,12 @@ help::
 	export PYTHONPATH=../src:.:$(ABS_REPOROOT)/data-processing-lib/src:$$PYTHONPATH;	\
 	cd test; $(PYTEST) . 
 
-.PHONY: .transforms.test # because there is a directory called tests in the projects
-.transforms.test::  
+.PHONY: .transforms.test 
+.transforms.test::  .transforms.test-src .transforms.test-image
+
+.transforms.test-src::  .transforms.test-lib-src .transforms.test-locals
+
+.transforms.test.old::  
 	@# Help: Run pytest on the test directory using the current venv
 	source venv/bin/activate;			\
 	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
@@ -159,13 +172,17 @@ help::
 	@# Help: Test an already-built image (use make image) to be sure the --help option works
 	$(DOCKER) run -t --rm $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) python $(TRANSFORM_SRC_FILE) --help
 
-.PHONY: .transforms.test-local
-test-locals::
+.PHONY: test-locals
+test-locals:: .transforms.test-locals
+
+.PHONY: .transforms.test-locals
+.transforms.test-locals::
 	@# Help: Run the *local*.py files in the src directory 
 	@source venv/bin/activate;		\
 	export PYTHONPATH=src;			\
 	files=$$(find src -name '*local*.py' );		\
 	for i in $$files; do			\
+	    echo Executing: python $$i;		\
 	    python $$i;				\
 	    if [ $$? -ne 0 ];	then		\
 		exit 1;				\
