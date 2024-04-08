@@ -684,7 +684,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             sum_removed_mem += r_memory
             replies = not_ready
         overall_hash_memory = self.sum_buckets_mem + self.sum_mh_mem + sum_docs_mem + sum_docs_mem + sum_removed_mem
-        dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 0))
+        dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 1))
         return {
             "number of buckets": self.sum_buckets,
             "number of docs": sum_docs,
