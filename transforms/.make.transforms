@@ -29,14 +29,15 @@
 include $(REPOROOT)/.make.defaults
 ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 
-DOCKER=podman
-DOCKER_FILE=Dockerfile
-DOCKER_REGISTRY=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
+DOCKER?=podman
+DOCKER_FILE?=Dockerfile
+DOCKER_REGISTRY?=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
 EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
 TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_transform.py
+TRANSFORM_TEST_FILE?=test/test_$(TRANSFORM_NAME).py
 
 # The following taken from https://stackoverflow.com/a/65243296/45375
 # Lists all targets and optional help text found in the target.
@@ -146,9 +147,17 @@ help::
 
 
 .PHONY: .transforms.test-image
-.transforms.test-image::
+.transforms.test-image:: .transforms.test-image-pytest
+
+.PHONY: .transforms.test-image-pytest
+.transforms.test-image-pytest::
+	@# Help: Test an already-built image (use make image) running pytest on $(TRANSFORM_TEST_FILE) 
+	$(DOCKER) run -t --rm $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) pytest -s  $(TRANSFORM_TEST_FILE)
+
+.PHONY: .transforms.test-image-help
+.transforms.test-image-help::
 	@# Help: Test an already-built image (use make image) to be sure the --help option works
-	$(DOCKER) run -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) python $(TRANSFORM_SRC_FILE) --help
+	$(DOCKER) run -t --rm $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) python $(TRANSFORM_SRC_FILE) --help
 
 .PHONY: .transforms.test-local
 test-locals::

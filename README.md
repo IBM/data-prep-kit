@@ -26,6 +26,12 @@ Topics to explore:
    * [Kind cluster support](kind/README.md)
    * [KFP support library](kfp/kfp_support_lib/README.md) and [its implementation](kfp/kfp_support_lib/doc/kfp_support_library.md)
 
+# Setup
+After cloning the repo, enable the pre-commit hooks.
+* Install [pre-commit](https://pre-commit.com/)
+* `cd fm-data-engineering`
+* `pre-commit install`
+
 # Repository structure
 * data_processing_lib - provides a library and framework supporting data transformations in a Ray cluster
 * kfp - Kubeflow pipeline support

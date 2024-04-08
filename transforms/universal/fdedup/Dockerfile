@@ -12,5 +12,14 @@ COPY ./src/fdedup_support.py .
 COPY ./src/text_normalizer.py . 
 COPY ./src/ja.sp.model . 
 
-ENV PYTHONPATH /home/ray
 
+RUN pip install --no-cache-dir pytest
+COPY test/ test/
+COPY test-data/ test-data/
+
+USER root
+RUN chown -R ray /home/ray/test
+RUN chown -R ray /home/ray/test-data
+USER ray
+
+ENV PYTHONPATH /home/ray
