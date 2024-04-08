@@ -20,7 +20,7 @@ venv::	.transforms.venv
 	@sudo mkdir -p /var/run/clamav && sudo chmod 777 /var/run/clamav
 	@$(DOCKER) build --target clamav-local -f Dockerfile -t clamav-local:latest .
 	@echo -e "$(DOCKER) run -d --name clamav -v /var/run/clamav:/var/run/clamav clamav-local:latest" >> ./venv/bin/activate
-	@echo -e "retry=0\nuntil python -c "import clamd; clamd.ClamdUnixSocket().ping()" > /dev/null 2>&1; do\n    sleep 3\n    retry=\$$((retry+1))\n    if [ \$$retry -gt 20 ]; then break; fi\ndone" >> ./venv/bin/activate
+	@echo -e "retry=0\nuntil python -c \"import clamd; clamd.ClamdUnixSocket().ping()\" > /dev/null 2>&1; do\n    sleep 3\n    retry=\$$((retry+1))\n    if [ \$$retry -gt 20 ]; then break; fi\ndone" >> ./venv/bin/activate
 	@sed -i -e "s/deactivate () {/deactivate () {\nfor c in \`$(DOCKER) ps -a | grep clamav | cut -f1 -d ' '\`; do $(DOCKER) rm -f -v \$$c; done/" ./venv/bin/activate
 endif
 
