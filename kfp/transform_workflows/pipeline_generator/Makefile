@@ -17,9 +17,7 @@ venv::
 	pip install pyyaml \
 	pip install pre-commit
 
-
-
-generate_pipeline:: venv
+generate_pipeline::
 	@# Help: Generate a new pipeline using the pipeline generator
 	$(call check_defined, PIPELINE_DIST_DIR)
 	$(call check_defined, PIPELINE_DEFINITION)
