@@ -1,7 +1,10 @@
-# Ray/Mutator runtime
+##############################################
+# If developing a transform outside of this repo, the following would be required, but within this
+# repo, we install the data-prep-lab library source separately into the venv and docker (see both the Makefile and Dockerfile).
 # The following url for fm-data-processing.  Contact David Wood, dawood@us.ibm.com, if you don't have pypi access
---extra-index-url https://${ARTIFACTORY_USER}:${ARTIFACTORY_API_KEY}@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
-fm-data-processing==0.2.0
+#--extra-index-url https://${ARTIFACTORY_USER}:${ARTIFACTORY_API_KEY}@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
+#fm-data-processing==0.3.0
+##############################################
 # TODO: pip install https://github.com/kpu/kenlm/archive/master.zip
 # TODO: Download pre-trained KenLM model for English language on Wikipedia
 #       through cc_net (https://github.com/facebookresearch/cc_net):
