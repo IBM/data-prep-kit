@@ -22,9 +22,6 @@ build:: .transforms.build
 # Use default rule inherited from makefile.common
 venv:: .transforms.venv
 
-# Use default rule inherited from makefile.common
-install-src:: .transforms.install-src
-
 test-src:: .transforms.test-src
 
 test-image:: .transforms.test-image
