@@ -9,7 +9,7 @@ from blocklist_transform import (
     source_url_column_name_cli_param,
 )
 from data_processing.ray import TransformLauncher
-from data_processing.utils import DPFConfig, ParamsUtils
+from data_processing.utils import DPLConfig, ParamsUtils
 
 
 print(os.environ)
@@ -33,8 +33,8 @@ block_list_params = {
 }
 
 s3_cred = {
-    "access_key": DPFConfig.S3_ACCESS_KEY,
-    "secret_key": DPFConfig.S3_SECRET_KEY,
+    "access_key": DPLConfig.S3_ACCESS_KEY,
+    "secret_key": DPLConfig.S3_SECRET_KEY,
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
@@ -46,7 +46,7 @@ lakehouse_config = {
     "input_version": "main",
     "output_table": "lh_test.bluepile_academic_doabooks_blocklist_test",
     "output_path": "lh-test/tables/lh_test/bluepile_academic_doabooks_blocklist_test",
-    "token": DPFConfig.LAKEHOUSE_TOKEN,
+    "token": DPLConfig.LAKEHOUSE_TOKEN,
 }
 
 worker_options = {"num_cpus": 0.5}

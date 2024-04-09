@@ -19,12 +19,14 @@ clean:: .transforms.clean
 
 image:: .transforms.image
 
-test-lib-src:: .transforms.test-lib-src
+test-src:: .transforms.test-src
 
 install-lib-src:: .transforms.install-lib-src
 
 
 setup:: .transforms.setup
 
-test-image:: .transforms.test-image
+test-image:: .transforms.test-image-help
+	@echo WARNING: Skipping pytest test until we have a test/test_fdedup.py file.
+
 

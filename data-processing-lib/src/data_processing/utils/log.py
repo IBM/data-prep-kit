@@ -1,16 +1,16 @@
 import logging
 import os
 
-from data_processing.utils import DPFConfig
+from data_processing.utils import DPLConfig
 
 
 def get_log_level(name: str = None):
     if name is None:
-        level_name = DPFConfig.DEFAULT_LOG_LEVEL
+        level_name = DPLConfig.DEFAULT_LOG_LEVEL
     else:
         name = name.upper()
-        name = "DPF_" + name + "_LOG_LEVEL"
-        level_name = os.environ.get(name, DPFConfig.DEFAULT_LOG_LEVEL)
+        name = "DPL_" + name + "_LOG_LEVEL"
+        level_name = os.environ.get(name, DPLConfig.DEFAULT_LOG_LEVEL)
     return level_name
 
 
