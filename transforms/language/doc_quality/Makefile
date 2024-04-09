@@ -36,11 +36,12 @@ clean:: .transforms.clean
 
 image:: lm_sp .transforms.image
 
-test-lib-src:: lm_sp .transforms.test-lib-src
 
-install-lib-src:: .transforms.install-lib-src
 
 setup:: .transforms.setup
 
 
 test-image:: .transforms.test-image
+
+
+test-src:: .transforms.test-src

@@ -35,8 +35,16 @@ COPY ./src/doc_c4_statistics.py .
 COPY ./src/doc_Gopher_statistics.py .
 COPY ./src/perplexity.py .
 
+
+RUN pip install --no-cache-dir pytest
+COPY test/ test/
+COPY test-data/ test-data/
+
+
 USER root
 RUN apt remove build-essential -y
+RUN chown -R ray /home/ray/test
+RUN chown -R ray /home/ray/test-data
 USER ray
 
 ENV PYTHONPATH /home/ray
