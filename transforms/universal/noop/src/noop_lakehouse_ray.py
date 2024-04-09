@@ -2,7 +2,7 @@ import os
 import sys
 
 from data_processing.ray import TransformLauncher
-from data_processing.utils import DPFConfig, ParamsUtils
+from data_processing.utils import DPLConfig, ParamsUtils
 from noop_transform import NOOPTransformConfiguration
 
 
@@ -25,7 +25,7 @@ lakehouse_config = {
     "input_version": "main",
     "output_table": "academic.ieee_ededup_test",
     "output_path": "lh-test/tables/academic/ieee_ededup_test",
-    "token": DPFConfig.LAKEHOUSE_TOKEN,
+    "token": DPLConfig.LAKEHOUSE_TOKEN,
 }
 
 worker_options = {"num_cpus": 0.5}

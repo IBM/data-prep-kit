@@ -2,7 +2,7 @@ import os
 import sys
 
 from data_processing.ray import TransformLauncher
-from data_processing.utils import DPFConfig, ParamsUtils
+from data_processing.utils import DPLConfig, ParamsUtils
 from resize_transform import ResizeTransformConfiguration
 
 
@@ -11,8 +11,8 @@ print(os.environ)
 launcher = TransformLauncher(transform_runtime_config=ResizeTransformConfiguration())
 # create parameters
 s3_cred = {
-    "access_key": "ba9b25bd8ca746cf9c7d77dc5bd02f13",
-    "secret_key": "19bd3e7bdbd809859284d03513f49546f80660b39f15f038",
+    "access_key": DPLConfig.S3_ACCESS_KEY,
+    "secret_key": DPLConfig.S3_SECRET_KEY,
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 

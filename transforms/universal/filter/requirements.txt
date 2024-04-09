@@ -6,3 +6,4 @@
 #fm-data-processing==0.3.0
 ##############################################
 # Transform requirements except data-prep-lab (see above)
+duckdb==0.10.1
