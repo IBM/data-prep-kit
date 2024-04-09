@@ -13,7 +13,7 @@ TRANSFORM_NAME=doc_quality
 DOCKER_IMAGE_VERSION=0.1.0
 
 
-venv::	.transforms.venv
+venv:: .transforms.venv
 	source venv/bin/activate;pip install https://github.com/kpu/kenlm/archive/master.zip
 
 cc_net:
@@ -28,7 +28,7 @@ lm_sp: cc_net
 	
 build::	.transforms.build
 
-test::	lm_sp .transforms.test
+test:: lm_sp .transforms.test
 
 clean:: .transforms.clean
 	rm -rf cc_net
@@ -38,6 +38,6 @@ image:: lm_sp .transforms.image
 
 setup:: .transforms.setup
 
-test-image:: lm_sp .transforms.test-image
+test-image:: .transforms.test-image
 
 test-src:: lm_sp .transforms.test-src
