@@ -1,12 +1,12 @@
 import pytest
 from data_processing.data_access import DataAccessLakeHouse
-from data_processing.utils import DPFConfig
+from data_processing.utils import DPLConfig
 
 
 s3_cred = {
     # Running these tests requires the credentials to be provided in the env vars.
-    "access_key": DPFConfig.S3_ACCESS_KEY,
-    "secret_key": DPFConfig.S3_SECRET_KEY,
+    "access_key": DPLConfig.S3_ACCESS_KEY,
+    "secret_key": DPLConfig.S3_SECRET_KEY,
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
@@ -19,12 +19,12 @@ lakehouse_config = {
     "output_table": "academic.ieee.lh_unittest",
     "output_path": "lh-test/tables/academic/ieee/lh_unittest",
     # Running these tests requires the credentials to be provided in the env vars.
-    "token": DPFConfig.LAKEHOUSE_TOKEN,
+    "token": DPLConfig.LAKEHOUSE_TOKEN,
 }
 
 
 @pytest.mark.skipif(
-    DPFConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
+    DPLConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
 )
 def test_table_read_write():
     """
@@ -63,7 +63,7 @@ def test_table_read_write():
 
 
 @pytest.mark.skipif(
-    DPFConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
+    DPLConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
 )
 def test_get_folder():
     """
@@ -81,7 +81,7 @@ def test_get_folder():
 
 
 @pytest.mark.skipif(
-    DPFConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
+    DPLConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
 )
 def test_get_todo_list():
     """
@@ -98,7 +98,7 @@ def test_get_todo_list():
 
 
 @pytest.mark.skipif(
-    DPFConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
+    DPLConfig.LAKEHOUSE_TOKEN is None, reason="LAKEHOUSE_TOKEN needs to be set, generally via env vars"
 )
 def test_files_to_process():
     """

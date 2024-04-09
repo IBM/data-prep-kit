@@ -1,3 +1,5 @@
+import os
+
 import pyarrow as pa
 from data_processing.ray.transform_runtime import get_transform_config
 from data_processing.test_support.transform import AbstractTransformTest
@@ -19,12 +21,16 @@ class TestLangSelectorTransform(AbstractTransformTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
+        test_src_dir = os.path.abspath(os.path.dirname(__file__))
+        lang_allowed_file = os.path.abspath(
+            os.path.join(test_src_dir, "../test-data/languages/allowed-code-languages.txt")
+        )
         cli = [
             # When running outside the Ray orchestrator and its DataAccess/Factory, there is
             # no Runtime class to load the domains and the Transform must do it itself using
             # the lang_select_local_config for this test.
             f"--{lang_allowed_langs_file_key}",
-            "../test-data/languages/allowed-code-languages.txt",
+            lang_allowed_file,
             f"--{lang_lang_column_key}",
             "language",
             f"--{lang_output_column_key}",
@@ -32,9 +38,7 @@ class TestLangSelectorTransform(AbstractTransformTest):
             f"--{lang_known_selector}",
             "True",
             "--lang_select_local_config",
-            ParamsUtils.convert_to_ast(
-                {"input_folder": "/tmp", "output_folder": "/tmp"}
-            ),
+            ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
         ]
 
         # Use the LangSelectorTransformConfiguration to compute the config parameters
@@ -69,9 +73,7 @@ class TestLangSelectorTransform(AbstractTransformTest):
             True,
         ],
     )
-    expected_output_df = pa.Table.from_arrays(
-        [languages, outa], names=["language", "allowed"]
-    )
+    expected_output_df = pa.Table.from_arrays([languages, outa], names=["language", "allowed"])
     expected_metadata_list = [
         {
             "supported languages": 2,

@@ -21,6 +21,7 @@ FROM base AS antivirus
 
 ARG ARTIFACTORY_USER
 ARG ARTIFACTORY_API_KEY
+ARG EXTRA_ARTIFACTORY_URL
 
 COPY --from=clamav-local --chown=ray:users /var/lib/clamav/ /var/lib/clamav/
 COPY --from=clamav-local --chown=ray:users /etc/clamav/clamd.conf /etc/clamav/clamd.conf
@@ -30,8 +31,24 @@ COPY requirements.txt requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt \
     && rm -rf requirements.txt .cache/pip
+# Copy in the data processing framework source/project and install it
+# This is expected to be placed in the docker context before this is run (see the make image).
+COPY data-processing-lib/ data-processing-lib/
+USER root
+RUN chown -R ray /home/ray/data-processing-lib
+USER ray
+RUN pip install --no-cache-dir --extra-index-url ${EXTRA_ARTIFACTORY_URL} --no-cache-dir -e data-processing-lib
+
 
 COPY src/*_transform.py  ./
 ENV PYTHONPATH /home/ray
 
-CMD ["/bin/bash", "-c", "clamd --foreground"]
+CMD ["/bin/bash", "-c", "clamd --foreground"]# Install code to enable testing on the image.
+RUN pip install --no-cache-dir pytest
+COPY test/ test/
+COPY test-data/ test-data/
+
+USER root
+RUN chown -R ray /home/ray/test
+RUN chown -R ray /home/ray/test-data
+USER ray

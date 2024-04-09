@@ -11,6 +11,7 @@ TRANSFORM_NAME=blocklist
 DOCKER_IMAGE_VERSION=0.1.0
 
 
+
 venv::	.transforms.venv
 
 build::	.transforms.build
@@ -21,12 +22,10 @@ clean:: .transforms.clean
 
 image:: .transforms.image
 
-test-lib-src:: .transforms.test-lib-src
+test-src:: .transforms.test-src
 
 install-lib-src:: .transforms.install-lib-src
 
 setup:: .transforms.setup
 
-
 test-image:: .transforms.test-image
-

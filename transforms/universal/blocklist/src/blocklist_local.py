@@ -8,6 +8,7 @@ from blocklist_transform import (
 )
 from data_processing.data_access import DataAccessLocal
 
+
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
