@@ -11,7 +11,7 @@ from kubernetes import client as k8s_client
 task_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing/noop:0.0.2"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "transformer_launcher.py"
+EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
 base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.4"

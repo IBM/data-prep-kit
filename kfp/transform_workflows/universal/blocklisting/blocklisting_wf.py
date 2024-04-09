@@ -10,7 +10,7 @@ from kubernetes import client as k8s_client
 
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "transformer_launcher.py"
+EXEC_SCRIPT_NAME: str = "blocklist_transform.py"
 
 task_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing/blocklist:0.0.2"
 
