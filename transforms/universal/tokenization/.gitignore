@@ -1,5 +1,6 @@
 test-data/output
 output/*
+data-processing-lib/
 src/run_*.py
 tokenizers
 qtest
