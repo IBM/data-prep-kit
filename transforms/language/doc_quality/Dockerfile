@@ -2,23 +2,31 @@ FROM docker.io/rayproject/ray:2.9.3-py310
 
 ARG ARTIFACTORY_USER
 ARG ARTIFACTORY_API_KEY
+ARG EXTRA_ARTIFACTORY_URL
 
+# Add packages needed to install kenlm
 USER root
-RUN apt update && \
-    apt install cmake -y
+RUN apt-get update
+RUN apt-get install -y software-properties-common
+RUN apt-get install -y build-essential
 USER ray
+RUN pip install --no-cache-dir https://github.com/kpu/kenlm/archive/master.zip
+
+# Copy in the data processing framework source/project and install it
+# This is expected to be placed in the docker context before this is run (see the make image).
+COPY data-processing-lib/ data-processing-lib/
+USER root
+RUN chown -R ray /home/ray/data-processing-lib
+USER ray
+RUN pip install --no-cache-dir --extra-index-url ${EXTRA_ARTIFACTORY_URL} --no-cache-dir -e data-processing-lib
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
-RUN pip install --no-cache-dir https://github.com/kpu/kenlm/archive/master.zip
-# remove credentials-containing file
-RUN rm requirements.txt
 
 # Copy the model files into the "lm_sp" directory
-RUN mkdir lm_sp
-COPY lm_sp/ /lm_sp/
+COPY lm_sp/  lm_sp/
 
-COPY ldnoobw/ /ldnoobw/
+COPY ldnoobw/ ldnoobw/
 
 COPY ./src/doc_quality_transform.py .
 COPY ./src/doc_quality_utils.py .
@@ -28,7 +36,7 @@ COPY ./src/doc_Gopher_statistics.py .
 COPY ./src/perplexity.py .
 
 USER root
-RUN apt remove cmake -y
+RUN apt remove build-essential -y
 USER ray
 
 ENV PYTHONPATH /home/ray
