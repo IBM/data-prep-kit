@@ -64,6 +64,12 @@ def fdedup(
     shingles_size: int = 5,
     japanese_data: bool = False,
     delimiters: str = " ",
+    # Random delay between reads
+    random_delay_limit: int = 5,
+    # snapshotting
+    snapshot_delay: int = 1,
+    use_doc_snapshot: bool = False,
+    use_bucket_snapshot: bool = False,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
@@ -110,6 +116,11 @@ def fdedup(
     :param shingles_size - number of words in shingle
     :param japanese_data - japanese data indicator
     :param delimiters - delimiter for splitting document
+    :param random_delay_limit - delay between reads to reduce S3 load.
+                                A random number between 0 and random_delay_limit is used
+    :param snapshot_delay - delay between restoring individual actors
+    :param use_bucket_snapshot - flag to skip buckets building and start from existing snapshots
+    :param use_doc_snapshot - flag to skip documents building and start from existing snapshots
     :return: None
     """
     # create clean_up task
@@ -169,6 +180,10 @@ def fdedup(
                 "shingles_size": shingles_size,
                 "japanese_data": japanese_data,
                 "delimiters": delimiters,
+                "random_delay_limit": random_delay_limit,
+                "snapshot_delay": snapshot_delay,
+                "use_doc_snapshot": use_doc_snapshot,
+                "use_bucket_snapshot": use_bucket_snapshot,
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
