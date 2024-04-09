@@ -13,12 +13,12 @@ RUN pip install --no-cache-dir https://github.com/kpu/kenlm/archive/master.zip
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
+RUN pip install --no-cache-dir https://github.com/kpu/kenlm/archive/master.zip
 # remove credentials-containing file
 RUN rm requirements.txt
 
 # Copy the model files into the "lm_sp" directory
-RUN mkdir lm_sp
-COPY lm_sp/ lm_sp/
+COPY lm_sp/  lm_sp/
 
 COPY ldnoobw/ ldnoobw/
 

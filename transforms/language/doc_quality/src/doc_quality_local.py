@@ -14,6 +14,15 @@ local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
+
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+docq_params = {
+    "docq_text_lang": "en",
+    "docq_doc_content_column": "contents",
+    "docq_bad_word_filepath": basedir + "/ldnoobw/en",
+    "docq_kenLM_model": basedir + "/lm_sp/",
+}
+
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
@@ -30,23 +39,9 @@ params = {
 }
 
 if __name__ == "__main__":
-    # Here we show how to run outside of ray
-    # docquality transform needs a DataAccess to ready the kenLM model.
-    data_access = DataAccessLocal(local_conf)
-    params["data_access"] = data_access
 
-    # Create and configure the transform.
-    transform = DocQualityTransform(params)
-    # Use the local data access to read a parquet table.
-    table = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
-    print(f"input table: {table}")
-    # Transform the table
-    table_list, metadata = transform.transform(table)
-    print(f"\noutput table: {table_list}")
-    print(f"output metadata : {metadata}")
-
-    # sys.argv = ParamsUtils.dict_to_req(d=params)
-    # # create launcher
-    # launcher = TransformLauncher(transform_runtime_config=DocQualityTransformConfiguration())
-    # # Launch the ray actor(s) to process the input
-    # launcher.launch()
+    sys.argv = ParamsUtils.dict_to_req(d=params | docq_params)
+    # create launcher
+    launcher = TransformLauncher(transform_runtime_config=DocQualityTransformConfiguration())
+    # Launch the ray actor(s) to process the input
+    launcher.launch()
