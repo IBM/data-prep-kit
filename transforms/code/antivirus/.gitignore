@@ -1,5 +1,6 @@
 **/output
 .tmp
+data-processing-lib/
 
 
 # Byte-compiled / optimized / DLL files
