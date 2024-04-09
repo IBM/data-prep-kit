@@ -20,6 +20,7 @@ cc_net:
 	git clone https://github.com/facebookresearch/cc_net
 
 lm_sp: cc_net
+	rm -rf lm_sp
 	mkdir lm_sp
 	cd cc_net/;$(MAKE) lang=en dl_lm
 	cp cc_net/data/lm_sp/* lm_sp
