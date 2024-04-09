@@ -13,8 +13,10 @@ from src.ededup_compute_execution_params import ededup_compute_execution_params
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "ededup_transform.py"
 
+task_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing/ededup:0.0.2"
+
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.3"
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.4"
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(func=ededup_compute_execution_params, base_image=base_kfp_image)
 # create Ray cluster
@@ -34,14 +36,14 @@ TASK_NAME: str = "ededup"
 def ededup(
     # Ray cluster
     ray_name: str = "ededup-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/ededup-guf:0.0.1",\
-             "image_pull_secret": "prod-all-icr-io"}',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
+             "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/ededup-guf:0.0.1"}',
+            "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access. checkpointing is not supported by dedup
     data_lh_config: str = "None",
-    data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklist_guf/'}",
+    data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_ededup/'}",
     data_s3_access_secret: str = "cos-access",
     data_max_files: int = -1,
     data_num_samples: int = -1,

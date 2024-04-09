@@ -35,7 +35,7 @@ clean::
 %.yaml: %.py
 	make .compile-pipeline WF_NAME=$(shell (basename $< .py)) DIR=$(shell (dirname $<))
 
-.reconcile-requirement::
+reconcile-requirement::
 	@for file in $(PYTHON_WF); do \
 		sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}\"/" $$file; \
 	done
@@ -43,7 +43,7 @@ clean::
 build:: venv
 	@# Help: Compile the pipelines
 	${PYTHON} -m pip install --upgrade build
-	make .reconcile-requirement
+	make reconcile-requirement
 	make ${YAML_WF}
 
 publish:: .check-env

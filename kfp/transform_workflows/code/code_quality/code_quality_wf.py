@@ -15,8 +15,10 @@ from kubernetes import client as k8s_client
 EXEC_SCRIPT_NAME: str = "transform/cq_transform.py"
 PREFIX: str = ""
 
+task_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing/code-quality:0.0.2"
+
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.1"
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.4"
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, insted of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
@@ -40,10 +42,10 @@ TASK_NAME: str = "code_quality"
 def code_quality(
     # Ray cluster
     ray_name: str = "code_quality-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/code-quality-guf:0.0.1",\
-            "image_pull_secret": "prod-all-icr-io"}',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
+            "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/code-quality-guf:0.0.1"}',
+            "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_lh_config: str = "None",

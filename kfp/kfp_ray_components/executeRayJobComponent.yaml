@@ -12,7 +12,7 @@ inputs:
 
 implementation:
     container:
-        image: us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.3
+        image: us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.4
         # command is a list of strings (command-line arguments).
         # The YAML language has two syntaxes for lists and you can use either of them.
         # Here we use the "flow syntax" - comma-separated strings inside square brackets.

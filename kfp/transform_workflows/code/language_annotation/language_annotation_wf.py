@@ -12,8 +12,10 @@ from kubernetes import client as k8s_client
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "transform/lang_annotator_transform.py"
 
+task_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing/lang_annotator:0.0.2"
+
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.3"
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.4"
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, insted of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
@@ -35,10 +37,10 @@ PREFIX: str = "lang_select"
 )
 def lang_select(
     ray_name: str = "select-lang-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/select-lang-guf:0.0.1",\
-             "image_pull_secret": "prod-all-icr-io"}',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
+             "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/select-lang-guf:0.0.1"}',
+            "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
     lh_config: str = "None",

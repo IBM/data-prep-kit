@@ -12,8 +12,10 @@ from kubernetes import client as k8s_client
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "lang_id_transform.py"
 
+task_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing/lang_id:0.0.2"
+
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.3"
+base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.4"
 # compute execution parameters. Use default one for now.
 compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
@@ -35,10 +37,10 @@ TASK_NAME: str = "lang_id"
 def lang_id(
     # Ray cluster
     ray_name: str = "langid-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/langid-guf:0.0.1",\
-            "image_pull_secret": "prod-all-icr-io"}',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
+            "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/langid-guf:0.0.1"}',
+            "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_lh_config: str = "None",

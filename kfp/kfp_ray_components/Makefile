@@ -31,14 +31,14 @@ IMG ?= ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_TAGNAM
 		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . --no-cache
 
 image:: .kfp_comp.image
+	make .reconcile-requirements
 
 .reconcile-requirements::
 	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}/" executeRayJobComponent.yaml
 	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}/" createRayComponent.yaml
 	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}/" cleanupRayComponent.yaml
 
-build:: .kfp_comp.image
-	make .reconcile-requirements
+build:: image
 
 publish::
 	$(DOCKER) push ${IMG}
