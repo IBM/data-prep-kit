@@ -92,9 +92,9 @@ if __name__ == "__main__":
     # Create data access factory and data access
     data_factory = DataAccessFactory()
     data_factory.apply_input_params(args={
-        "data_s3_config": s3_config_dict,
-        "data_lh_config": lh_config_dict,
-        "data_s3_cred": {"access_key": access_key, "secret_key": secret_key, "url": url}
+        "s3_config": s3_config_dict,
+        "lh_config": lh_config_dict,
+        "s3_cred": {"access_key": access_key, "secret_key": secret_key, "url": url}
     })
     data_access = data_factory.create_data_access()
     # extra credentials
