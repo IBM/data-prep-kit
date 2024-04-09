@@ -1,5 +1,7 @@
 from io import BytesIO
 from argparse import ArgumentParser, Namespace
+import subprocess
+import time
 import traceback
 from typing import Any
 
@@ -19,6 +21,7 @@ INPUT_COLUMN_KEY = "antivirus_input_column"
 OUTPUT_COLUMN_KEY = "antivirus_output_column"
 DEFAULT_INPUT_COLUMN = "contents"
 DEFAULT_OUTPUT_COLUMN = "virus_detection"
+CLAMD_TIMEOUT_SEC = 180
 
 class AntivirusTransform(AbstractTableTransform):
     """
@@ -61,7 +64,29 @@ class AntivirusTransform(AbstractTableTransform):
                 return description or 'UNKNOWN'
             return None
 
-        virus_detection = pa.array(list(map(_scan, table[self.input_column].to_pylist())), type=pa.string())
+        def _scan_with_timeout(content: str) -> str | None:
+            timeout = time.time() + CLAMD_TIMEOUT_SEC
+            while True:
+                try:
+                    return _scan(content)
+                except clamd.ConnectionError as err:
+                    if time.time() < timeout:
+                        logger.debug('Clamd is not ready. Retry after 5 seconds.')
+                        time.sleep(5)
+                    else:
+                        logger.error(f"clamd didn't become ready in {CLAMD_TIMEOUT_SEC} seconds.")
+                        raise err
+
+        def _start_clamd_and_scan(content: str) -> str | None:
+            try:
+                return _scan(content)
+            except clamd.ConnectionError:
+                logger.info("Clamd process is not running. Start clamd process.")
+                subprocess.Popen('clamd', shell=True)
+                logger.info(f"Started clamd process. Retry to scan.")
+                return _scan_with_timeout(content)
+
+        virus_detection = pa.array(list(map(_start_clamd_and_scan, table[self.input_column].to_pylist())), type=pa.string())
 
         nrows = table.num_rows
         clean = virus_detection.null_count
