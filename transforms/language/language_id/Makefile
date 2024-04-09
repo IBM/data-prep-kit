@@ -21,8 +21,6 @@ image:: .transforms.image
 
 test-src:: .transforms.test-src
 
-install-lib-src:: .transforms.install-lib-src
-
 setup:: .transforms.setup
 
 test-image:: .transforms.test-image

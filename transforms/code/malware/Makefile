@@ -33,8 +33,6 @@ image:: .transforms.image
 
 test-src:: .transforms.test-src
 
-install-lib-src:: .transforms.install-lib-src
-
 test-image:: .transforms.test-image-help
 	@echo WARNING: Skipping pytest test until it passes
 
