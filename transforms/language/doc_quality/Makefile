@@ -41,7 +41,7 @@ image:: lm_sp .transforms.image
 setup:: .transforms.setup
 
 
-test-image:: .transforms.test-image
+test-image:: lm_sp .transforms.test-image
 
 
 test-src:: .transforms.test-src
