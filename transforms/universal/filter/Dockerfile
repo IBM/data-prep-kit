@@ -1,4 +1,4 @@
-FROM docker.io/rayproject/ray:2.9.1-py310
+FROM docker.io/rayproject/ray:2.9.3-py310
 
 ARG ARTIFACTORY_USER
 ARG ARTIFACTORY_API_KEY
@@ -15,7 +15,7 @@ RUN chown -R ray /home/ray/data-processing-lib
 USER ray
 RUN pip install --no-cache-dir --extra-index-url ${EXTRA_ARTIFACTORY_URL} --no-cache-dir -e data-processing-lib
 
-COPY src/lang_annotator_transform.py .
+COPY ./src/filter_transform.py . 
 
 # Install pytest so we can test the image later
 RUN pip install --no-cache-dir pytest

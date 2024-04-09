@@ -1,7 +1,7 @@
 import sys
 
 from data_processing.ray import TransformLauncher
-from data_processing.utils import DPFConfig, ParamsUtils
+from data_processing.utils import DPLConfig, ParamsUtils
 from lang_id_transform import (
     PARAM_MODEL_CREDENTIAL,
     PARAM_MODEL_KIND,
@@ -16,8 +16,8 @@ launcher = TransformLauncher(transform_runtime_config=LangIdentificationTableTra
 # create parameters
 
 s3_cred = {
-    "access_key": DPFConfig.S3_ACCESS_KEY,
-    "secret_key": DPFConfig.S3_SECRET_KEY,
+    "access_key": DPLConfig.S3_ACCESS_KEY,
+    "secret_key": DPLConfig.S3_SECRET_KEY,
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
@@ -29,7 +29,7 @@ lakehouse_config = {
     "input_version": "main",
     "output_table": "academic.ieee_lang_id_0304_02",
     "output_path": "lh-test/tables/academic/ieee_lang_id_0304_02",
-    "token": DPFConfig.LAKEHOUSE_TOKEN,
+    "token": DPLConfig.LAKEHOUSE_TOKEN,
 }
 
 worker_options = {"num_cpus": 1}
@@ -37,7 +37,7 @@ code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 langid_config = {
     PARAM_MODEL_KIND: KIND_FASTTEXT,
     PARAM_MODEL_URL: "facebook/fasttext-language-identification",
-    PARAM_MODEL_CREDENTIAL: DPFConfig.HUGGING_FACE_TOKEN,
+    PARAM_MODEL_CREDENTIAL: DPLConfig.HUGGING_FACE_TOKEN,
 }
 params = {
     "run_locally": True,

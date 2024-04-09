@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 from data_processing.ray import TransformLauncher
-from data_processing.utils import DPFConfig, ParamsUtils
+from data_processing.utils import DPLConfig, ParamsUtils
 from lang_annotator_transform import (
     LangSelectorTransformConfiguration,
     lang_allowed_langs_file_key,
@@ -14,21 +14,15 @@ from lang_annotator_transform import (
 
 
 # create launcher
-launcher = TransformLauncher(
-    transform_runtime_config=LangSelectorTransformConfiguration()
-)
+launcher = TransformLauncher(transform_runtime_config=LangSelectorTransformConfiguration())
 # create parameters
 language_column_name = "language"
 annotated_column_name = "lang_selected"
 
 selected_languages_file = os.path.abspath(
-    os.path.join(
-        os.path.dirname(__file__), "../test-data/languages/allowed-code-languages.txt"
-    )
+    os.path.join(os.path.dirname(__file__), "../test-data/languages/allowed-code-languages.txt")
 )
-input_folder = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "../test-data/input")
-)
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
 local_conf = {
     "input_folder": input_folder,
@@ -36,8 +30,8 @@ local_conf = {
 }
 
 s3_cred = {
-    "access_key": DPFConfig.S3_ACCESS_KEY,
-    "secret_key": DPFConfig.S3_SECRET_KEY,
+    "access_key": DPLConfig.S3_ACCESS_KEY,
+    "secret_key": DPLConfig.S3_SECRET_KEY,
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 # Configure lakehouse unit test tables
@@ -48,7 +42,7 @@ lakehouse_config = {
     "input_version": "main",
     "output_table": "code.ready_for_token_langselect_test",
     "output_path": "lh-test/tables/code/ready_for_token_langselect_test",
-    "token": DPFConfig.LAKEHOUSE_TOKEN,
+    "token": DPLConfig.LAKEHOUSE_TOKEN,
 }
 
 worker_options = {"num_cpus": 0.8}
