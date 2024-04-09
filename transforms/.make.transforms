@@ -108,19 +108,20 @@ help::
 	fi
 
 # Create the docker image making sure the preloaded models are available to copy into the image
+# We copy the library/framework source here so it can be installed into the docker image and
+# pip installed inside the Dockerfile
 .transforms.image:: Dockerfile requirements.txt
 	$(MAKE) .transforms.check_env	# Put this first so we don't get its help
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
 	rm -rf data-processing-lib
 	mkdir data-processing-lib
-	ln -s $(REPOROOT)/../data-processing-lib/src data-processing-lib/src
-	ln -s $(REPOROOT)/../data-processing-lib/pyproject.toml data-processing-lib/pyproject.toml
+	cp -R $(REPOROOT)/data-processing-lib/src data-processing-lib
+	cp    $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
 	$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
-	# tar -ch is used here so that the soft link created above is available in the docker context
-	tar -ch . | $(DOCKER) build --build-arg EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL) \
+	$(DOCKER) build --build-arg EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL) \
 		--build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) \
 		--build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
-		-t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) - 
+		-t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) . 
 	rm -rf data-processing-lib
 
 .PHONY: .transforms.install-lib-src
