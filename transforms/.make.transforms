@@ -31,7 +31,6 @@ ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 
 DOCKER?=podman
 DOCKER_FILE?=Dockerfile
-DOCKER_REGISTRY?=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
 EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
@@ -117,7 +116,8 @@ help::
 	mkdir data-processing-lib
 	cp -R $(REPOROOT)/data-processing-lib/src data-processing-lib
 	cp    $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
-	$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
+	#$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
+	$(DOCKER) login $(DOCKER_REGISTRY) -u $(DOCKER_REGISTRY_USER) -p '$(DOCKER_REGISTRY_KEY)'
 	$(DOCKER) build --build-arg EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL) \
 		--build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) \
 		--build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
@@ -190,3 +190,13 @@ test-locals:: .transforms.test-locals
 	    fi;					\
 	done	
 	
+
+REGISTRY_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
+
+.PHONY: .transforms.publish
+.transforms.publish::
+	@# Help: Publish the docker image to a container registry
+	$(DOCKER) tag $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) $(REGISTRY_IMAGE) 
+	$(DOCKER) logout $(DOCKER_REGISTRY) 
+	$(DOCKER) login $(DOCKER_REGISTRY) -u $(DOCKER_REGISTRY_USER) -p '$(DOCKER_REGISTRY_KEY)'
+	$(DOCKER) push  $(REGISTRY_IMAGE) 

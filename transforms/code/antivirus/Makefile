@@ -34,5 +34,6 @@ image:: .transforms.image
 test-src:: .transforms.test-src
 
 test-image:: .transforms.test-image-help
-	@echo WARNING: Skipping pytest test until it passes
 
+publish:: .transforms.publish
+	@echo WARNING: Skipping pytest test until it passes
