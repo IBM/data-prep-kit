@@ -1,3 +1,4 @@
+import ast
 import os
 import sys
 from pathlib import Path
@@ -19,7 +20,8 @@ if __name__ == "__main__":
         "output_folder": output_folder,
     }
     params = {
-        "local_config": ParamsUtils.convert_to_ast(local_conf),
+        "data_local_config": ParamsUtils.convert_to_ast(local_conf),
+        "data_files_to_use": ast.literal_eval("['.zip']"),
         "detect_programming_lang": True,
         "snapshot": "github",
         "domain": "code",
