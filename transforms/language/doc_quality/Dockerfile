@@ -4,6 +4,7 @@ ARG ARTIFACTORY_USER
 ARG ARTIFACTORY_API_KEY
 ARG EXTRA_ARTIFACTORY_URL
 
+
 # Add packages needed to install kenlm
 USER root
 RUN apt-get update
