@@ -50,7 +50,7 @@ def zip_to_table(data_access: DataAccess, file_path, detect_prog_lang: Any) -> p
                             }
                             if detect_prog_lang:
                                 lang = detect_prog_lang.get_lang_from_ext(ext)
-                                row_data["lang"] = lang
+                                row_data["programming_language"] = lang
 
                             data.append(row_data)
                         else:

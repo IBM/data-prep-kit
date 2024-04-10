@@ -56,7 +56,7 @@ class TestZipToTable(unittest.TestCase):
                     "hash",
                     "size",
                     "date_acquired",
-                    "lang",
+                    "programming_language",
                 ],
             ),
         ]
@@ -81,7 +81,7 @@ class TestZipToTable(unittest.TestCase):
         self.assertEqual(table.schema.field("hash").type, pa.string())
         self.assertEqual(table.schema.field("size").type, pa.int64())
         self.assertEqual(table.schema.field("date_acquired").type, pa.string())
-        self.assertEqual(table.schema.field("lang").type, pa.string())
+        self.assertEqual(table.schema.field("programming_language").type, pa.string())
         self.assertEqual(len(table), len(file_names))
 
         with patch(
