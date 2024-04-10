@@ -7,32 +7,6 @@ After cloning the repo, enable the pre-commit hooks.
 * `cd fm-data-engineering`
 * `pre-commit install`
 
-# Build
-The repository uses Makefiles to manage the build processes.
-For example, to build and publish the all transform images
-```
-cd transforms
-make image publish
-```
-This recursively applies the make targets through the sub-directory tree of transforms to create and publish all transform images.
-
-
-# Repository structure
-* data_processing_lib - provides a library and framework supporting data transformations in a Ray cluster
-* kfp - Kubeflow pipeline support
-* kind - kind
-* transform
-    * universal
-        * ededup 
-        * fdedup 
-        * ...
-    * code
-        * select_language
-        * ...
-    * language
-        * language_id
-        * ...
-
 # Build and Makefiles
 Makefiles are used for operations performed across all projects in the directory tree.
 Using specific rules from the top of the repository tree will recurse their execution
@@ -51,3 +25,39 @@ Standard rules include the following:
 * test
 * publish
 * ... 
+
+If you'd like to build each component separately, you can move into the
+sub-directories as desired.  
+
+## Data Prep Lab Library 
+To build the wheel for the data processing library and publish it to a pypi... 
+```shell
+cd data-processing-lib 
+make build publish 
+```
+
+## Transforms
+To create all transform images and publish them (by default to quay.io)
+```shell
+cd transforms
+make image publish
+```
+
+
+
+# Repository structure
+* data_processing_lib - provides a library and framework supporting data transformations in a Ray cluster
+* kfp - Kubeflow pipeline support
+* kind - kind
+* transform
+    * universal
+        * ededup 
+        * fdedup 
+        * ...
+    * code
+        * select_language
+        * ...
+    * language
+        * language_id
+        * ...
+
