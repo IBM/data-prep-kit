@@ -13,7 +13,7 @@ from src.ededup_compute_execution_params import ededup_compute_execution_params
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "ededup_transform.py"
 
-task_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing/ededup:0.0.2"
+task_image = "quay.io/dataprep1/data-prep-lab/ededup:0.1.0"
 
 # components
 base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.4"
@@ -36,7 +36,7 @@ TASK_NAME: str = "ededup"
 def ededup(
     # Ray cluster
     ray_name: str = "ededup-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
              "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
             "image": "' + task_image + '" }',

@@ -12,7 +12,7 @@ from kubernetes import client as k8s_client
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "blocklist_transform.py"
 
-task_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing/blocklist:0.0.2"
+task_image = "quay.io/dataprep1/data-prep-lab/blocklist:0.1.0"
 
 # components
 base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.4"
@@ -38,7 +38,7 @@ PREFIX: str = "blocklist"
 def blocklisting(
     # Ray cluster
     ray_name: str = "blocklisting-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
              "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
             "image": "' + task_image + '" }',
@@ -63,7 +63,7 @@ def blocklisting(
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ) -> None:
     """
-    Pipeline to execute NOOP transform
+    Pipeline to execute block-listing transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
