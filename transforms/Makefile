@@ -19,6 +19,10 @@ image::
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
+publish:: 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
 test-image:: 
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
