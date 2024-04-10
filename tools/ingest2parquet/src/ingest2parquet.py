@@ -186,7 +186,9 @@ def run():
     data_access = data_access_factory.create_data_access()
 
     # Retrieves file paths of files from the input folder.
-    file_paths = data_access.get_folder_files(data_access.input_folder, ["zip"], False)
+    file_paths = data_access.get_folder_files(
+        data_access.input_folder, args.data_files_to_use, False
+    )
 
     if len(file_paths) != 0:
         print(f"Number of files is {len(file_paths)} ")

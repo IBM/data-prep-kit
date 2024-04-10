@@ -1,3 +1,4 @@
+import ast
 import sys
 
 from data_processing.utils import DPFConfig, ParamsUtils
@@ -15,8 +16,9 @@ s3_conf = {
     "output_folder": "code-datasets/test-saptha/raw_to_parquet_guf_out",
 }
 params = {
-    "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
+    "data_s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    "data_files_to_use": ast.literal_eval("['.zip']"),
     "detect_programming_lang": True,
     "snapshot": "github",
     "domain": "code",
