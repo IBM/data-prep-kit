@@ -44,10 +44,14 @@ class DocQualityTransform(AbstractTableTransform):
         self.docq_doc_id_column = config.get("docq_doc_id_column", "document_id")
 
         self.docq_bad_word_filepath = config.get("docq_bad_word_filepath")
+        if self.docq_bad_word_filepath is None:
+            raise ValueError("missing docq_bad_word_filepath")
 
         self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.docq_text_lang, file_path=self.docq_bad_word_filepath)
 
         self.docq_kenLM_model = config.get("docq_kenLM_model")
+        if self.docq_kenLM_model is None:
+            raise ValueError("missing docq_kenLM_model")
 
         strip_accent = True
         self.klm = KenLMModel.from_pretrained(
