@@ -67,10 +67,19 @@ help::
 .PHONY: .transforms.check_required_macros
 .transforms.check_required_macros::
 	@if [ -z "$(DOCKER_IMAGE_NAME)" ]; then		\
-	    echo ERROR: DOCKER_IMAGE_NAME is must be defined.;	\
+	    echo ERROR: DOCKER_IMAGE_NAME must be defined.;	\
 	fi
 	@if [ -z "$(DOCKER_IMAGE_VERSION)" ]; then	\
-	    echo ERROR: DOCKER_IMAGE_VERSION is must be defined.;	\
+	    echo ERROR: DOCKER_IMAGE_VERSION must be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_REGISTRY_USER)" ]; then	\
+	    echo ERROR: DOCKER_REGISTRY_USER must be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_REGISTRY_KEY)" ]; then	\
+	    echo ERROR: DOCKER_REGISTRY_USER must be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_REGISTRY)" ]; then	\
+	    echo ERROR: DOCKER_REGISTRY must be defined.;	\
 	fi			
 
 .PHONY: .transforms.clean
