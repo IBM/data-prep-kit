@@ -50,7 +50,7 @@ def zip_to_table(data_access: DataAccess, file_path, detect_prog_lang: Any) -> p
                             }
                             if detect_prog_lang:
                                 lang = detect_prog_lang.get_lang_from_ext(ext)
-                                row_data["lang"] = lang
+                                row_data["programming_language"] = lang
 
                             data.append(row_data)
                         else:
@@ -172,7 +172,7 @@ def run():
         "-domain",
         "--domain",
         type=str,
-        help="To identify whether data is code or nl",
+        help="To identify whether data is code or natural language",
         default="",
     )
 
@@ -186,7 +186,9 @@ def run():
     data_access = data_access_factory.create_data_access()
 
     # Retrieves file paths of files from the input folder.
-    file_paths = data_access.get_folder_files(data_access.input_folder, ["zip"], False)
+    file_paths = data_access.get_folder_files(
+        data_access.input_folder, args.data_files_to_use, False
+    )
 
     if len(file_paths) != 0:
         print(f"Number of files is {len(file_paths)} ")
@@ -219,3 +221,7 @@ def run():
 
         # Saves the processing statistics
         print("Metadata file stored - response:", data_access.save_job_metadata(stats))
+
+
+if __name__ == "__main__":
+    run()

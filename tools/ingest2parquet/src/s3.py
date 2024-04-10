@@ -1,3 +1,4 @@
+import ast
 import sys
 
 from data_processing.utils import DPLConfig, ParamsUtils
@@ -11,12 +12,13 @@ s3_cred = {
     "url": "https://s3.us-south.cloud-object-storage.appdomain.cloud",
 }
 s3_conf = {
-    "input_folder": "code-datasets/test-saptha/raw_to_parquet_guf",
-    "output_folder": "code-datasets/test-saptha/raw_to_parquet_guf_out",
+    "input_folder": "code-datasets/test-ingest2parquet/raw_to_parquet_guf",
+    "output_folder": "code-datasets/test-ingest2parquet/raw_to_parquet_guf_out",
 }
 params = {
-    "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
+    "data_s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    "data_files_to_use": ast.literal_eval("['.zip']"),
     "detect_programming_lang": True,
     "snapshot": "github",
     "domain": "code",

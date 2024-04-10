@@ -17,9 +17,9 @@ env:
         - OPERATION=transform-src-test   DIR=transforms/code DOCKER=docker
         - OPERATION=transform-src-test   DIR=transforms/language DOCKER=docker
         - OPERATION=transform-src-test   DIR=transforms/universal DOCKER=docker
-        - OPERATION=transform-image-test DIR=transforms/code DOCKER=docker
-        - OPERATION=transform-image-test DIR=transforms/language DOCKER=docker
-        - OPERATION=transform-image-test DIR=transforms/universal DOCKER=docker
+        - OPERATION=transform-image DIR=transforms/code DOCKER=docker
+        - OPERATION=transform-image DIR=transforms/language DOCKER=docker
+        - OPERATION=transform-image DIR=transforms/universal DOCKER=docker
         - OPERATION=kfp-lib-test
         - OPERATION=kfp-compile
         - OPERATION=tools-test
@@ -59,8 +59,8 @@ script:
           transform-src-test)
                    make -C ${DIR} DOCKER=${DOCKER} venv test-src || travis_terminate 1
           ;;
-          transform-image-test)
-                   make -C ${DIR} DOCKER=${DOCKER} image test-image || travis_terminate 1
+          transform-image)
+                   make -C ${DIR} DOCKER=${DOCKER} image test-image publish || travis_terminate 1
           ;;
           tools-test)
                    make -C tools DOCKER=${DOCKER} venv test-lib-src || travis_terminate 1
