@@ -43,7 +43,7 @@ class AntivirusTransform(AbstractTableTransform):
         self.input_column = config.get(INPUT_COLUMN_KEY, DEFAULT_INPUT_COLUMN)
         self.output_column = config.get(OUTPUT_COLUMN_KEY, DEFAULT_OUTPUT_COLUMN)
         # Check local clamd process is running
-        cd = clamd.ClamdUnixSocket(path=self.clamd_socket)
+        cd = clamd.ClamdUnixSocket()
         try:
             cd.ping()
         except clamd.ConnectionError:
