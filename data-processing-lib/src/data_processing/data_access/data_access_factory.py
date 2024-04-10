@@ -11,7 +11,7 @@ from data_processing.data_access import (
 )
 from data_processing.utils import (
     CLIArgumentProvider,
-    DPFConfig,
+    DPLConfig,
     ParamsUtils,
     get_logger,
     str2bool,

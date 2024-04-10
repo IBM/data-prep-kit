@@ -130,8 +130,8 @@ This script is designed to process data stored on an S3 bucket. It sets up neces
 Before running, ensure to set up S3 credentials used in s3.py script as environment variables. 
 Eg:
 ```
-export DPF_S3_ACCESS_KEY="xxx"
-export DPF_S3_SECRET_KEY="xxx"
+export DPL_S3_ACCESS_KEY="xxx"
+export DPL_S3_SECRET_KEY="xxx"
 ```
 
 Run the script without any command-line arguments.

@@ -20,10 +20,9 @@ clean:: .transforms.clean
 
 image:: .transforms.image
 
-test-lib-src:: .transforms.test-lib-src
+test-src:: .transforms.test-src
 
-install-lib-src:: .transforms.install-lib-src
-
+setup:: .transforms.setup
 
 test-image:: .transforms.test-image
 

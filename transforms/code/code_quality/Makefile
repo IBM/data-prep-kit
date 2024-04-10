@@ -22,11 +22,7 @@ build:: .transforms.build
 # Use default rule inherited from makefile.common
 venv:: .transforms.venv
 
-# Use default rule inherited from makefile.common
-install-lib-src:: .transforms.install-lib-src
-
-test-lib-src:: .transforms.install-lib-src
-
+test-src:: .transforms.test-src
 
 test-image:: .transforms.test-image
 

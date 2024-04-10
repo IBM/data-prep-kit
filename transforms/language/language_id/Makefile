@@ -19,9 +19,7 @@ clean:: .transforms.clean
 
 image:: .transforms.image
 
-test-lib-src:: .transforms.test-lib-src
-
-install-lib-src:: .transforms.install-lib-src
+test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 

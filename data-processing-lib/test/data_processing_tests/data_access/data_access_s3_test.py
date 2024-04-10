@@ -1,12 +1,12 @@
 import pytest
 from data_processing.data_access import DataAccessS3
-from data_processing.utils import DPFConfig
+from data_processing.utils import DPLConfig
 
 
 s3_cred = {
     # Running these tests requires the credentials to be provided in the env vars.
-    "access_key": DPFConfig.S3_ACCESS_KEY,
-    "secret_key": DPFConfig.S3_SECRET_KEY,
+    "access_key": DPLConfig.S3_ACCESS_KEY,
+    "secret_key": DPLConfig.S3_SECRET_KEY,
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
@@ -17,7 +17,7 @@ s3_conf = {
 
 
 @pytest.mark.skipif(
-    DPFConfig.S3_ACCESS_KEY is None or DPFConfig.S3_SECRET_KEY is None,
+    DPLConfig.S3_ACCESS_KEY is None or DPLConfig.S3_SECRET_KEY is None,
     reason="S3_ACCESS_KEY and S3_SECRET_KEY need to be set, generally via env vars",
 )
 def test_table_read_write():
@@ -56,7 +56,7 @@ def test_table_read_write():
 
 
 @pytest.mark.skipif(
-    DPFConfig.S3_ACCESS_KEY is None or DPFConfig.S3_SECRET_KEY is None,
+    DPLConfig.S3_ACCESS_KEY is None or DPLConfig.S3_SECRET_KEY is None,
     reason="S3_ACCESS_KEY and S3_SECRET_KEY need to be set, generally via env vars",
 )
 def test_get_folder():
@@ -74,7 +74,7 @@ def test_get_folder():
 
 
 @pytest.mark.skipif(
-    DPFConfig.S3_ACCESS_KEY is None or DPFConfig.S3_SECRET_KEY is None,
+    DPLConfig.S3_ACCESS_KEY is None or DPLConfig.S3_SECRET_KEY is None,
     reason="S3_ACCESS_KEY and S3_SECRET_KEY need to be set, generally via env vars",
 )
 def test_files_to_process():

@@ -2,7 +2,7 @@ import os
 import sys
 
 from data_processing.ray import TransformLauncher
-from data_processing.utils import DPFConfig, ParamsUtils
+from data_processing.utils import DPLConfig, ParamsUtils
 from fdedup_transform import FdedupTableTransformConfiguration
 
 
@@ -10,8 +10,8 @@ from fdedup_transform import FdedupTableTransformConfiguration
 launcher = TransformLauncher(transform_runtime_config=FdedupTableTransformConfiguration())
 # create parameters
 s3_cred = {
-    "access_key": DPFConfig.S3_ACCESS_KEY,
-    "secret_key": DPFConfig.S3_SECRET_KEY,
+    "access_key": DPLConfig.S3_ACCESS_KEY,
+    "secret_key": DPLConfig.S3_SECRET_KEY,
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 
@@ -23,7 +23,7 @@ lakehouse_config = {
     "input_version": "main",
     "output_table": "academic.ieee_fdedup_test",
     "output_path": "lh-test/tables/academic/ieee_fdedup_test",
-    "token": DPFConfig.LAKEHOUSE_TOKEN,
+    "token": DPLConfig.LAKEHOUSE_TOKEN,
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
