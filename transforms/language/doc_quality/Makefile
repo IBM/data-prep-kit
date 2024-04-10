@@ -38,6 +38,10 @@ image:: lm_sp .transforms.image
 
 setup:: .transforms.setup
 
-test-image:: .transforms.test-image
+
+#test-image:: .transforms.test-image
+# The following is temporary to get an inital PR in before the repo split.
+test-image:: .transforms.test-image-help
 
 test-src:: lm_sp .transforms.test-src
+
