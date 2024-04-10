@@ -14,7 +14,7 @@ task_image = "quay.io/dataprep1/data-prep-lab/noop:0.1.0"
 EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.4"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.4"
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
@@ -39,7 +39,7 @@ def noop(
     ray_name: str = "noop-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
              "image": "' + task_image + '" }',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
             "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
@@ -139,8 +139,6 @@ def noop(
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
 
-    # set image pull secrets
-    dsl.get_pipeline_conf().set_image_pull_secrets([k8s_client.V1ObjectReference(name="prod-all-icr-io")])
     # Configure the pipeline level to one week (in seconds)
     dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 

@@ -11,8 +11,8 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed '
 include makeenv
 DOCKER=docker
 DOCKER_FILE=Dockerfile
-DOCKER_HOSTNAME ?= us.icr.io
-DOCKER_NAMESPACE ?= cil15-shared-registry/preprocessing-pipelines
+DOCKER_HOSTNAME ?= quay.io
+DOCKER_NAMESPACE ?= dataprep1/data-prep-lab
 DOCKER_NAME ?= kfp-data-processing
 IMG ?= ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_TAGNAME}
 
