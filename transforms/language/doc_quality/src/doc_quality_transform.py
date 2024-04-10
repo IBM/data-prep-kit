@@ -197,21 +197,6 @@ class DocQualityTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        if args.docq_kenLM_model is None:
-            logger.error(
-                f"Parameter --docq_kenLM_model must be a valid kenLM model for calculating perplexity, you specified {args.docq_kenLM_model}"
-            )
-            return False
-
-        if args.docq_bad_word_filepath is None:
-            logger.error(
-                f"Parameter --docq_bad_word_filepath must be a valid path to bad_word file, you specified {args.docq_bad_word_filepath}"
-            )
-            return False
-
-        if args.docq_doc_content_column is None:
-            logger.error(f"Value for `--docq_doc_content_column` must be provided")
-            return False
 
         # For MVP1: only support english text:
         if args.docq_text_lang != "en":
