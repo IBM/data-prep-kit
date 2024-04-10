@@ -221,3 +221,7 @@ def run():
 
         # Saves the processing statistics
         print("Metadata file stored - response:", data_access.save_job_metadata(stats))
+
+
+if __name__ == "__main__":
+    run()

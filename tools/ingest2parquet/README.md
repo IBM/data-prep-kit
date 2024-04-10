@@ -49,10 +49,10 @@ Each file contained within the ZIP is transformed into a distinct row within the
 - **Description:** Name indicating which dataset it belong to.
 - **Example:** `"snapshot": "github"`
 
-**lang:** (optional)
+**programming_language:** (optional)
 
 - **Description:** Programming language detected using the file extension.
-- **Example:** `"lang": "Java"`
+- **Example:** `"programming_language": "Java"`
 
 **domain:** (optional)
 
@@ -67,7 +67,7 @@ The set of dictionary keys holding [ingest2parquet](src/ingest2parquet.py)
 configuration for values are as follows:
 ```
   --detect_programming_lang DETECT_PROGRAMMING_LANG
-                        generate programming lang
+                        generate programming language from the file extension
   --snapshot SNAPSHOT
                         Name the dataset
   --domain DOMAIN
@@ -118,13 +118,24 @@ We provide several demos of the script usage for different data storage options:
 #[local file system](src/local.py)
 This script processes data stored locally on the system. It sets up parameters for local file paths and invokes the run() function from ingest2parquet.py to convert raw data files to Parquet format.
 
-Run the script without any command-line arguments.
+**Run the script without any command-line arguments.**
 
 ```
 make venv
 source venv/bin/activate
 cd src
 python local.py
+```
+
+**Run the script via command-line** 
+
+```
+python ingest2parquet.py \
+    --detect_programming_lang True \
+    --snapshot github \
+    --domain code \
+    --data_local_config '{"input_folder": "../test-data/input", "output_folder": "../test-data/output"}' \
+    --data_files_to_use '[".zip"]'
 ```
 
 
@@ -139,13 +150,25 @@ export DPF_S3_ACCESS_KEY="xxx"
 export DPF_S3_SECRET_KEY="xxx"
 ```
 
-Run the script without any command-line arguments.
+**Run the script without any command-line arguments.**
 
 ```
 make venv
 source venv/bin/activate
 cd src
 python s3.py
+```
+
+**Run the script via command-line** 
+
+```
+python ingest2parquet.py \
+    --detect_programming_lang True \
+    --snapshot github \
+    --domain code \
+    --data_s3_cred '{"access_key": "YOUR_ACCESS_KEY", "secret_key": "YOUR_SECRET_KEY", "url": "YOUR_S3_URL"}' \
+    --data_s3_config '{"input_folder": "code-datasets/test_ingeat2parquet/raw_to_parquet_guf", "output_folder": "code-datasets/test_ingeat2parquet/raw_to_parquet_guf_out"}' \
+    --data_files_to_use '[".zip"]'
 ```
 
 The output directory will contain both the new
