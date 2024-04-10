@@ -172,7 +172,7 @@ def run():
         "-domain",
         "--domain",
         type=str,
-        help="To identify whether data is code or nl",
+        help="To identify whether data is code or natural language",
         default="",
     )
 
