@@ -35,12 +35,34 @@ class AntivirusTransform(AbstractTableTransform):
         by the companion runtime, AntivirusTransformRuntime.  If running inside the RayMutatingDriver,
         these will be provided by that class with help from the RayMutatingDriver.
         """
+        import clamd
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of AntivirusTransformConfiguration class
         super().__init__(config)
         self.warning_issued = False
         self.input_column = config.get(INPUT_COLUMN_KEY, DEFAULT_INPUT_COLUMN)
         self.output_column = config.get(OUTPUT_COLUMN_KEY, DEFAULT_OUTPUT_COLUMN)
+        # Check local clamd process is running
+        cd = clamd.ClamdUnixSocket(path=self.clamd_socket)
+        try:
+            cd.ping()
+        except clamd.ConnectionError:
+            logger.info("Clamd process is not running. Start clamd process.")
+            subprocess.Popen('clamd', shell=True)
+            # Wait for starting up clamd
+            timeout = time.time() + CLAMD_TIMEOUT_SEC
+            while True:
+                try:
+                    cd.ping()
+                    break
+                except clamd.ConnectionError as err:
+                    if time.time() < timeout:
+                        logger.debug('Clamd is not ready. Retry after 5 seconds.')
+                        time.sleep(5)
+                    else:
+                        logger.error(f"Clamd didn't become ready in {CLAMD_TIMEOUT_SEC} seconds.")
+                        raise err
+        del cd
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -64,29 +86,7 @@ class AntivirusTransform(AbstractTableTransform):
                 return description or 'UNKNOWN'
             return None
 
-        def _scan_with_timeout(content: str) -> str | None:
-            timeout = time.time() + CLAMD_TIMEOUT_SEC
-            while True:
-                try:
-                    return _scan(content)
-                except clamd.ConnectionError as err:
-                    if time.time() < timeout:
-                        logger.debug('Clamd is not ready. Retry after 5 seconds.')
-                        time.sleep(5)
-                    else:
-                        logger.error(f"clamd didn't become ready in {CLAMD_TIMEOUT_SEC} seconds.")
-                        raise err
-
-        def _start_clamd_and_scan(content: str) -> str | None:
-            try:
-                return _scan(content)
-            except clamd.ConnectionError:
-                logger.info("Clamd process is not running. Start clamd process.")
-                subprocess.Popen('clamd', shell=True)
-                logger.info(f"Started clamd process. Retry to scan.")
-                return _scan_with_timeout(content)
-
-        virus_detection = pa.array(list(map(_start_clamd_and_scan, table[self.input_column].to_pylist())), type=pa.string())
+        virus_detection = pa.array(list(map(_scan, table[self.input_column].to_pylist())), type=pa.string())
 
         nrows = table.num_rows
         clean = virus_detection.null_count
