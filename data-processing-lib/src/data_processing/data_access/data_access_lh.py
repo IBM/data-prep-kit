@@ -141,9 +141,8 @@ class DataAccessLakeHouse(DataAccess):
             field = table.field(index)
             fields.append(field.with_metadata({"PARQUET:field_id": f"{index + 1}"}))
             tbl_metadata[columns[index]] = json.dumps({"PARQUET:field_id": f"{index + 1}"}).encode()
-        # Rebuild schema
+        # Rebuild schema and table
         schema = pyarrow.schema(fields, metadata=tbl_metadata)
-        # Rebuild table with new schema
         return pyarrow.Table.from_arrays(arrays=list(table.itercolumns()), schema=schema)
 
     def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
