@@ -3,6 +3,8 @@ REPOROOT=../
 include ../.make.defaults
 
 setup::
+	@# Help: Recursively make $@ all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
 clean::
 	@# Help: Recursively make $@ all subdirs 
@@ -32,6 +34,6 @@ test::
 	@$(MAKE) RULE=$@ .recurse
 
 test-src::
-	@# Help: Install the library source into the venv and test 
+	@# Help: Recursively make $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
