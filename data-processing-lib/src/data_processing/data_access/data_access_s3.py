@@ -242,27 +242,6 @@ class DataAccessS3(DataAccess):
         """
         return self.arrS3.save_table(key=path, table=table)
 
-    def save_table_with_schema(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
-        """
-        Save table to a given location fixing schema, required for lakehouse
-        :param path: location to save table
-        :param table: table
-        :return: size of table in memory and a dictionary as
-        defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
-        """
-        # update schema to ensure part ids to be there
-        fields = []
-        columns = table.column_names
-        tbl_metadata = table.schema.metadata
-        for index in range(len(table.column_names)):
-            field = table.field(index)
-            fields.append(field.with_metadata({"PARQUET:field_id": f"{index + 1}"}))
-            tbl_metadata[columns[index]] = json.dumps({"PARQUET:field_id": f"{index + 1}"}).encode()
-        schema = pyarrow.schema(fields, metadata=tbl_metadata)
-        tbl = pyarrow.Table.from_arrays(arrays=list(table.itercolumns()), schema=schema)
-        return self.arrS3.save_table(key=path, table=tbl)
-
     def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
         """
         Save metadata

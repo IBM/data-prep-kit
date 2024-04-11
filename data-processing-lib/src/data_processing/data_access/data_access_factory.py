@@ -240,7 +240,7 @@ class DataAccessFactory(CLIArgumentProvider):
                     f"output_folder - {self.local_config['output_folder']}"
                 )
         elif s3_cred is not None:
-            if not self.__validate_s3_cred(s3_credentials=self.s3_cred):
+            if not self.__validate_s3_cred(s3_credentials=s3_cred):
                 return False
             self.s3_cred = s3_cred
             logger.info(f"data factory {self.cli_arg_prefix} " "Using s3 configuration without input/output path")
