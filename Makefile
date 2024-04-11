@@ -38,7 +38,7 @@ build::
 	$(MAKE) RULE=$@ .recurse
 
 test::  
-	@# Help: Recursively $@ in in all subdirs 
+	@# Help: Recursively $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
 
