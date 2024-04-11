@@ -134,12 +134,16 @@ class DataAccessLakeHouse(DataAccess):
         columns = table.column_names
         tbl_metadata = table.schema.metadata
         if tbl_metadata is None:
+            # If the table does not have metadata, create the empty one
             tbl_metadata = {}
+        # Add column Ids to the metadata
         for index in range(len(table.column_names)):
             field = table.field(index)
             fields.append(field.with_metadata({"PARQUET:field_id": f"{index + 1}"}))
             tbl_metadata[columns[index]] = json.dumps({"PARQUET:field_id": f"{index + 1}"}).encode()
+        # Rebuild schema
         schema = pyarrow.schema(fields, metadata=tbl_metadata)
+        # Rebuild table with new schema
         return pyarrow.Table.from_arrays(arrays=list(table.itercolumns()), schema=schema)
 
     def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
@@ -154,7 +158,9 @@ class DataAccessLakeHouse(DataAccess):
         if self.output_folder is None:
             logger.error("Saving table. Lake house is not configured, operation skipped")
             return 0, None
+        # Add metadata to the table
         table_with_metadata = self._add_table_metadata(table=table)
+        # Save table to S3
         l, repl = self.S3.save_table(path=path, table=table_with_metadata)
         if repl is None:
             return l, {}
