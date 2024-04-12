@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
@@ -29,6 +41,7 @@ cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/clea
 TASK_NAME: str = "blocklist"
 PREFIX: str = "blocklist"
 
+
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
     description="Pipeline for blocklisting",
@@ -36,9 +49,9 @@ PREFIX: str = "blocklist"
 def blocklisting(
     ray_name: str = "blocklisting-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/blocklist:guftest",\
-             "image_pull_secret": "prod-all-icr-io"}',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/blocklist:guftest"}',
+             "image_pull_secret": "prod-all-icr-io"}',  # pragma: allowlist secret
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, \
+            "image_pull_secret": "prod-all-icr-io", "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/blocklist:guftest"}',  # pragma: allowlist secret
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
     lh_config: str = "None",
@@ -50,7 +63,7 @@ def blocklisting(
     blocklist_annotation_column_name: str = "blocklisted",
     blocklist_source_url_column_name: str = "title",
     blocklist_blocked_domain_list_path: str = "cos-optimal-llm-pile/doc_annotation_test/domains",
-    blocklist_s3_config = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklist_guf/'}",
+    blocklist_s3_config="{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklist_guf/'}",
     blocklist_s3_access_secret: str = "cos-access",
 ) -> None:
     """
@@ -131,7 +144,7 @@ def blocklisting(
                 "blocklist_source_url_column_name": blocklist_source_url_column_name,
                 "blocklist_blocked_domain_list_path": blocklist_blocked_domain_list_path,
                 "blocklist_s3_config": blocklist_s3_config,
-           },
+            },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
             prefix=PREFIX,

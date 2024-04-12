@@ -1,14 +1,30 @@
-from data_processing.utils import get_logger
-import os, sys
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
 
+import os
 import re
+import sys
+
+from data_processing.utils import get_logger
+
 
 logger = get_logger(__name__)
 
 # local_tokenizer = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tokenizers", "gpt2_based"))
 
-from transformers import AutoTokenizer
 import re
+
+from transformers import AutoTokenizer
+
 
 def split_text(text: str, chunk_size: int, text_lang: str) -> str:
     """
@@ -25,17 +41,17 @@ def split_text(text: str, chunk_size: int, text_lang: str) -> str:
     """
 
     # Additional languages without spaces among words can be added, and each language may receive distinct treatment in word splitting.
-    if text_lang in ['ja', 'zh']:
+    if text_lang in ["ja", "zh"]:
         return _split_text_wout_word_space(text, chunk_size)
     else:
         return _split_text_with_word_space(text, chunk_size)
 
 
 def _split_text_with_word_space(text: str, chunk_size: int) -> str:
-    '''
+    """
     Split text into chunks for languages with spaces between words.
     For input/output, please refer to the split_text() function
-    '''
+    """
     index = 0
     while index < len(text):
         # last chunk:
@@ -43,38 +59,38 @@ def _split_text_with_word_space(text: str, chunk_size: int) -> str:
             yield text[index:]
             break
 
-        if text[index + chunk_size - 1] != ' ':
-            '''
+        if text[index + chunk_size - 1] != " ":
+            """
             if the last character of the chunk is not a space,
             search index of the last space in the chunk:
-            '''
-            last_space_index = text.rfind(' ', index, index + chunk_size)
+            """
+            last_space_index = text.rfind(" ", index, index + chunk_size)
 
             if last_space_index != -1:  # s[last_space_index] = ' '
                 # If found, return the chunk up to and include such space:
-                yield text[index:last_space_index + 1]
+                yield text[index : last_space_index + 1]
                 index = last_space_index + 1
             else:
                 # If not, force cutting up to chunk_size:
-                yield text[index:index + chunk_size]
+                yield text[index : index + chunk_size]
                 index += chunk_size
         else:
-            yield text[index:index + chunk_size]
+            yield text[index : index + chunk_size]
             index += chunk_size
 
 
 def _split_text_wout_word_space(text: str, chunk_size: int, reserve_consecutive_linebreaks: bool = True) -> str:
-    '''
+    """
     Split the text into multiple chunks for some particular languages having no spaces between words.
     This version is preliminary and necessitates further development for each individual language (eg, japanese, chinese, etc).
     For input/output, please refer to the split_text() function
-    '''
+    """
 
-    lines = text.split('\n')
-    current_chunk = ''
+    lines = text.split("\n")
+    current_chunk = ""
     for i, line in enumerate(lines):
         # extract words, non-word characters (eg, punctuation), and newline characters:
-        words = re.findall(r'\w+|[^\w\s]+|\n+', line, re.UNICODE)
+        words = re.findall(r"\w+|[^\w\s]+|\n+", line, re.UNICODE)
         for j, word in enumerate(words):
             if len(current_chunk) + len(word) <= chunk_size:
                 current_chunk += word
@@ -84,42 +100,42 @@ def _split_text_wout_word_space(text: str, chunk_size: int, reserve_consecutive_
 
         if len(current_chunk) < chunk_size:
             if reserve_consecutive_linebreaks:
-                current_chunk+="\n"
+                current_chunk += "\n"
             continue
         else:
             # reaching `chunk_size`, yield the chunk:
             yield current_chunk
-            current_chunk = ''
+            current_chunk = ""
 
     # Yield last chunk:
     if current_chunk:
         yield current_chunk
 
 
-
 def string_to_kwargs(string):
-    '''
+    """
     Convert a given string into kwargs dictionary
 
     :param string: a string of key_value parameters, for example:
          string = "cache_dir=/tmp/hf,use_auth_token=Your_HF_authentication_token"
     :return:
          kwargs_dict: a dictionary of key:value pairs
-    '''
+    """
 
     # Split string by commas to separate key-value pairs
-    pairs = string.split(',')
+    pairs = string.split(",")
 
     kwargs_dict = {}
     for pair in pairs:
         # Split by '=' to get key and value to be added to kwargs_dict:
-        key, value = pair.split('=')
+        key, value = pair.split("=")
         kwargs_dict[key.strip()] = value.strip()
 
     return kwargs_dict
 
-def load_tokenizer(tokenizer_name: str,tokenizer_args:dict):
-    '''
+
+def load_tokenizer(tokenizer_name: str, tokenizer_args: dict):
+    """
      Load and return a tokenizer specified in `tokenizer_name`
     This function is designed to accommodate the loading of any tokenizer compatible with
     the Huggingface `AutoTokenizer` library, such as `bigcode/starcoder`, `Rocketknight1/falcon-rw-1b`, and others.
@@ -129,7 +145,7 @@ def load_tokenizer(tokenizer_name: str,tokenizer_args:dict):
     :param kwargs: None or a dictionary of key:value pairs to specify parameters for the tokenizer
     :return: a tokenizer
 
-    '''
+    """
     try:
         if tokenizer_args is not None:
             logger.debug(f"Load tokenizer `{tokenizer_name}` with arguments `{tokenizer_args}`...")
@@ -143,7 +159,8 @@ def load_tokenizer(tokenizer_name: str,tokenizer_args:dict):
 
     return tokenizer
 
-def is_valid_argument_string(s:str) -> bool:
+
+def is_valid_argument_string(s: str) -> bool:
     """
     This is to initially check whether a given string contains valid key=value pairs
     for arguments of a tokenizer.
@@ -153,16 +170,16 @@ def is_valid_argument_string(s:str) -> bool:
     :return: boolean indicating whether s is valid string for arguments
     """
 
-    pattern = r'^\s*\w+\s*=\s*\S+\s*$'
+    pattern = r"^\s*\w+\s*=\s*\S+\s*$"
 
     # split s into pairs based on comma:
-    pairs = s.split(',')
+    pairs = s.split(",")
 
     # check valid of key=value pair:
     for pair in pairs:
         if not re.match(pattern, pair):
             return False
         # Additional check for consecutive equal signs:
-        if '==' in pair:
+        if "==" in pair:
             return False
     return True

@@ -1,8 +1,21 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import json
 from typing import Any
 
 import pyarrow
 from data_processing.data_access import DataAccess, DataAccessS3
+from data_processing.utils import get_logger
 from lakehouse import (
     CosCredentials,
     Datasource,
@@ -11,7 +24,6 @@ from lakehouse import (
     LakehouseForProcessingTask,
     SourceCodeDetails,
 )
-from data_processing.utils import get_logger
 
 
 logger = get_logger(__name__)
@@ -23,14 +35,14 @@ class DataAccessLakeHouse(DataAccess):
     """
 
     def __init__(
-            self,
-            s3_credentials: dict[str, str],
-            lakehouse_config: dict[str, str] = None,
-            d_sets: list[str] = None,
-            checkpoint: bool = False,
-            m_files: int = -1,
-            n_samples: int = 1,
-            files_to_use: list[str] = ['.parquet'],
+        self,
+        s3_credentials: dict[str, str],
+        lakehouse_config: dict[str, str] = None,
+        d_sets: list[str] = None,
+        checkpoint: bool = False,
+        m_files: int = -1,
+        n_samples: int = 1,
+        files_to_use: list[str] = [".parquet"],
     ):
         """
         Create data access class for lake house based configuration
@@ -72,7 +84,7 @@ class DataAccessLakeHouse(DataAccess):
             checkpoint=checkpoint,
             m_files=m_files,
             n_samples=n_samples,
-            files_to_use=files_to_use
+            files_to_use=files_to_use,
         )
         self.n_samples = n_samples
 

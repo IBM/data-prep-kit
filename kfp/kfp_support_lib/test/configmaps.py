@@ -1,4 +1,17 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 from kubernetes import client, config
+
 
 CMAP_VALUE = """
 import ray
@@ -37,6 +50,7 @@ class ConfigmapsManager:
     """
     Simple support class to manage config maps. Assumes local access to Kubectl
     """
+
     def __init__(self):
         config.load_kube_config()
         self.api_instance = client.CoreV1Api()
@@ -56,4 +70,3 @@ class ConfigmapsManager:
             self.api_instance.delete_namespaced_config_map(name="ray-job-code-sample", namespace="default")
         except Exception as e:
             print("config map ray-job-code-sample does not exist")
-

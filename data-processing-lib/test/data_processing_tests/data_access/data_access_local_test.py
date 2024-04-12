@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import gzip
 import json
 import os
@@ -7,7 +19,7 @@ from unittest.mock import patch
 import pyarrow
 import pytest
 from data_processing.data_access import DataAccessLocal
-from data_processing.utils import get_logger, GB, MB, KB
+from data_processing.utils import GB, KB, MB, get_logger
 
 
 logger = get_logger(__name__)
@@ -278,7 +290,7 @@ class TestGetFilesToProcess(TestInit):
         return result, in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
 
     def multiple_missing_files_cleanup(
-            self, in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
+        self, in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
     ):
         files_to_remove = in_files_1 + in_files_2 + [out_file_2]
         directories_to_remove = [in_path_1, out_path_1, in_path_2, out_path_2]
@@ -494,9 +506,9 @@ class TestSaveJobMetadata(TestInit):
         )
         assert metadata_file_path == os.path.join(self.dal.output_folder, "metadata.json")
         assert (
-                len(metadata_dict) == 8
-                and metadata_dict.get("source", {}).get("name", "") == self.dal.input_folder
-                and metadata_dict.get("target", {}).get("name", "") == self.dal.output_folder
+            len(metadata_dict) == 8
+            and metadata_dict.get("source", {}).get("name", "") == self.dal.input_folder
+            and metadata_dict.get("target", {}).get("name", "") == self.dal.output_folder
         )
 
 

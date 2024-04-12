@@ -1,11 +1,34 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import time
 
-from kfp_support.api_server_client.params import (TolerationEffect, TolerationOperation, Toleration, Template,
-                                                  EnvironmentVariables, ServiceType, HeadNodeSpec, WorkerNodeSpec,
-                                                  ClusterSpec, Cluster, ConfigMapVolume, DEFAULT_WORKER_START_PARAMS,
-                                                  RayJobRequest)
-from kfp_support.api_server_client import KubeRayAPIs
 from configmaps import ConfigmapsManager
+from kfp_support.api_server_client import KubeRayAPIs
+from kfp_support.api_server_client.params import (
+    DEFAULT_WORKER_START_PARAMS,
+    Cluster,
+    ClusterSpec,
+    ConfigMapVolume,
+    EnvironmentVariables,
+    HeadNodeSpec,
+    RayJobRequest,
+    ServiceType,
+    Template,
+    Toleration,
+    TolerationEffect,
+    TolerationOperation,
+    WorkerNodeSpec,
+)
 
 
 def test_templates():
@@ -72,18 +95,39 @@ def test_cluster():
     assert status == 200
     assert error is None
     # cluster
-    volume = ConfigMapVolume(name="code-sample", mount_path="/home/ray/samples", source="ray-job-code-sample",
-                             items={"sample_code.py": "sample_code.py"})
+    volume = ConfigMapVolume(
+        name="code-sample",
+        mount_path="/home/ray/samples",
+        source="ray-job-code-sample",
+        items={"sample_code.py": "sample_code.py"},
+    )
     environment = EnvironmentVariables(key_value={"key": "value"})
-    head = HeadNodeSpec(compute_template="default-template",
-                        ray_start_params={"metrics-export-port": "8080", "num-cpus": "0"},
-                        image="rayproject/ray:2.9.0-py310", service_type=ServiceType.ClusterIP,
-                        volumes=[volume], environment=environment)
-    worker = WorkerNodeSpec(group_name="small", compute_template="default-template", replicas=1,
-                            min_replicas=1, max_replicas=1, ray_start_params=DEFAULT_WORKER_START_PARAMS,
-                            image="rayproject/ray:2.9.0-py310", volumes=[volume], environment=environment)
-    t_cluster = Cluster(name="test", namespace="default", user="boris", version="2.9.0",
-                        cluster_spec=ClusterSpec(head_node=head, worker_groups=[worker]))
+    head = HeadNodeSpec(
+        compute_template="default-template",
+        ray_start_params={"metrics-export-port": "8080", "num-cpus": "0"},
+        image="rayproject/ray:2.9.0-py310",
+        service_type=ServiceType.ClusterIP,
+        volumes=[volume],
+        environment=environment,
+    )
+    worker = WorkerNodeSpec(
+        group_name="small",
+        compute_template="default-template",
+        replicas=1,
+        min_replicas=1,
+        max_replicas=1,
+        ray_start_params=DEFAULT_WORKER_START_PARAMS,
+        image="rayproject/ray:2.9.0-py310",
+        volumes=[volume],
+        environment=environment,
+    )
+    t_cluster = Cluster(
+        name="test",
+        namespace="default",
+        user="boris",
+        version="2.9.0",
+        cluster_spec=ClusterSpec(head_node=head, worker_groups=[worker]),
+    )
     # create
     status, error = apis.create_cluster(t_cluster)
     assert status == 200
@@ -132,7 +176,7 @@ def test_cluster():
 def test_job_submission():
     """
     Test job submission
-    :return: 
+    :return:
     """
     # create API server
     apis = KubeRayAPIs(server_url="http://localhost:8080/ray")
@@ -149,18 +193,39 @@ def test_job_submission():
     assert status == 200
     assert error is None
     # cluster
-    volume = ConfigMapVolume(name="code-sample", mount_path="/home/ray/samples", source="ray-job-code-sample",
-                             items={"sample_code.py": "sample_code.py"})
+    volume = ConfigMapVolume(
+        name="code-sample",
+        mount_path="/home/ray/samples",
+        source="ray-job-code-sample",
+        items={"sample_code.py": "sample_code.py"},
+    )
     environment = EnvironmentVariables(key_value={"key": "value"})
-    head = HeadNodeSpec(compute_template="default-template",
-                        ray_start_params={"metrics-export-port": "8080", "num-cpus": "0"},
-                        image="rayproject/ray:2.9.0-py310", service_type=ServiceType.ClusterIP,
-                        volumes=[volume], environment=environment)
-    worker = WorkerNodeSpec(group_name="small", compute_template="default-template", replicas=1,
-                            min_replicas=1, max_replicas=1, ray_start_params=DEFAULT_WORKER_START_PARAMS,
-                            image="rayproject/ray:2.9.0-py310", volumes=[volume], environment=environment)
-    t_cluster = Cluster(name="test-job", namespace="default", user="boris", version="2.9.0",
-                        cluster_spec=ClusterSpec(head_node=head, worker_groups=[worker]))
+    head = HeadNodeSpec(
+        compute_template="default-template",
+        ray_start_params={"metrics-export-port": "8080", "num-cpus": "0"},
+        image="rayproject/ray:2.9.0-py310",
+        service_type=ServiceType.ClusterIP,
+        volumes=[volume],
+        environment=environment,
+    )
+    worker = WorkerNodeSpec(
+        group_name="small",
+        compute_template="default-template",
+        replicas=1,
+        min_replicas=1,
+        max_replicas=1,
+        ray_start_params=DEFAULT_WORKER_START_PARAMS,
+        image="rayproject/ray:2.9.0-py310",
+        volumes=[volume],
+        environment=environment,
+    )
+    t_cluster = Cluster(
+        name="test-job",
+        namespace="default",
+        user="boris",
+        version="2.9.0",
+        cluster_spec=ClusterSpec(head_node=head, worker_groups=[worker]),
+    )
     # create
     status, error = apis.create_cluster(t_cluster)
     assert status == 200
@@ -177,8 +242,9 @@ def test_job_submission():
     env_vars:
       counter_name: test_counter    
     """
-    job_request = RayJobRequest(entrypoint="python /home/ray/samples/sample_code.py",
-                                runtime_env=resource_yaml, num_cpu=.5)
+    job_request = RayJobRequest(
+        entrypoint="python /home/ray/samples/sample_code.py", runtime_env=resource_yaml, num_cpu=0.5
+    )
     status, error, sid = apis.submit_job(ns="default", name="test-job", job_request=job_request)
     assert status == 200
     assert error is None

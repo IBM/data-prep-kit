@@ -1,16 +1,28 @@
-from scipy.integrate import quad as integrate
-import numpy as np
-from typing import Any, Iterator, Union
-import ray
-from ray import cloudpickle
-from ray.util.metrics import Counter
-from ray.actor import ActorHandle
-from ray.util import ActorPool
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
 
 import time
-from data_processing.ray import RayUtils
-from data_processing.utils import TransformUtils, RANDOM_SEED, GB, get_logger
+from typing import Any, Iterator, Union
+
+import numpy as np
+import ray
 from data_processing.data_access import DataAccess
+from data_processing.ray import RayUtils
+from data_processing.utils import GB, RANDOM_SEED, TransformUtils, get_logger
+from ray import cloudpickle
+from ray.actor import ActorHandle
+from ray.util import ActorPool
+from ray.util.metrics import Counter
+from scipy.integrate import quad as integrate
 
 
 NO_SIMILARITY = -1
@@ -28,6 +40,7 @@ def find(s: str, ch: str) -> list[int]:
     """
     return [i for i, ltr in enumerate(s) if ltr == ch]
 
+
 def get_snapshot_folder(data_access: DataAccess) -> str:
     """
     Get output folder from data access
@@ -39,11 +52,12 @@ def get_snapshot_folder(data_access: DataAccess) -> str:
         output_folder += "/"
     return f"{output_folder}snapshot/"
 
+
 def fuzzy_optimal_param(
-        threshold: float,
-        num_perm: int,
-        false_positive_weight: float,
-        false_negative_weight: float,
+    threshold: float,
+    num_perm: int,
+    false_positive_weight: float,
+    false_negative_weight: float,
 ) -> tuple[int, int]:
     """
     Computes parameters for fuzzy dedup
@@ -53,6 +67,7 @@ def fuzzy_optimal_param(
     :param false_negative_weight: false negative weight
     :return: number of buckets and bucket length
     """
+
     def _false_positive_probability(ths: float, b: int, r: int) -> float:
         """
         Compute false positive probability
@@ -130,6 +145,7 @@ class DocCollector:
     """
     An actor collecting de duped document IDs
     """
+
     def __init__(self, params: dict[str, Any]):
         """
         Initializer
@@ -192,7 +208,8 @@ class DocCollector:
         try:
             b_doc = cloudpickle.dumps(self.ids)
             self.data_access.save_file(
-                f"{get_snapshot_folder(self.data_access)}docs/doc_collector_{self.actor_id}", b_doc)
+                f"{get_snapshot_folder(self.data_access)}docs/doc_collector_{self.actor_id}", b_doc
+            )
         except Exception as e:
             self.logger.warning(f"Failed to snapshot doc collector {self.actor_id} with exception {e}")
             raise e
@@ -202,8 +219,12 @@ class DocCollector:
         get sizes
         :return: number of ids, its memory utilization, number of removed, its memory utilization
         """
-        return (len(self.ids), TransformUtils.deep_get_size(self.ids) / GB,
-                len(self.removed), TransformUtils.deep_get_size(self.removed) / GB)
+        return (
+            len(self.ids),
+            TransformUtils.deep_get_size(self.ids) / GB,
+            len(self.removed),
+            TransformUtils.deep_get_size(self.removed) / GB,
+        )
 
 
 @ray.remote(scheduling_strategy="SPREAD")
@@ -211,6 +232,7 @@ class DocsMinHash:
     """
     An actor storing min hashes for a doc id
     """
+
     def __init__(self, params: dict[str, Any]):
         """
         Initialize
@@ -260,7 +282,8 @@ class DocsMinHash:
         try:
             b_doc = cloudpickle.dumps(self.docs)
             self.data_access.save_file(
-                f"{get_snapshot_folder(self.data_access)}minhash/minhash_collector_{self.actor_id}", b_doc)
+                f"{get_snapshot_folder(self.data_access)}minhash/minhash_collector_{self.actor_id}", b_doc
+            )
         except Exception as e:
             self.logger.warning(f"Failed to snapshot minhash collector {self.actor_id} with exception {e}")
             raise e
@@ -278,6 +301,7 @@ class BucketsHash:
     """
     Actor storing buckets information
     """
+
     def __init__(self, params: dict[str, Any]):
         """
         Initialization
@@ -359,8 +383,10 @@ class BucketsHash:
             if len(bucket) > 2 * LONG_BUCKET:
                 # For very long buckets, split them
                 self.logger.info(f"Splitting bucket of length len(bucket) into chunks")
-                smaller_bucket = [bucket[i * LONG_BUCKET:(i + 1) * LONG_BUCKET]
-                                  for i in range((len(bucket) + LONG_BUCKET - 1) // LONG_BUCKET)]
+                smaller_bucket = [
+                    bucket[i * LONG_BUCKET : (i + 1) * LONG_BUCKET]
+                    for i in range((len(bucket) + LONG_BUCKET - 1) // LONG_BUCKET)
+                ]
                 for b in smaller_bucket:
                     ray.get(self.submitter.submit_for_processing.remote([b]))
                     self.long_bucket_submit_counter.inc(1)
@@ -370,7 +396,7 @@ class BucketsHash:
         self.logger.info("Done submitting long buckets")
 
         # And now the rest of buckets
-        bucket_chunks = [short_buckets[i * 100:(i + 1) * 100] for i in range((len(short_buckets) + 99) // 100)]
+        bucket_chunks = [short_buckets[i * 100 : (i + 1) * 100] for i in range((len(short_buckets) + 99) // 100)]
         for b in bucket_chunks:
             ray.get(self.submitter.submit_for_processing.remote(b))
             self.short_bucket_submit_counter.inc(len(b))
@@ -382,7 +408,8 @@ class BucketsHash:
         try:
             b_buckets = cloudpickle.dumps(self.buckets)
             self.data_access.save_file(
-                f"{get_snapshot_folder(self.data_access)}buckets/buckets_collector_{self.actor_id}", b_buckets)
+                f"{get_snapshot_folder(self.data_access)}buckets/buckets_collector_{self.actor_id}", b_buckets
+            )
         except Exception as e:
             self.logger.warning(f"Failed to snapshot buckets collector {self.actor_id} with exception {e}")
             raise e
@@ -400,6 +427,7 @@ class BucketsHashProcessor:
     """
     Actor for processing buckets
     """
+
     def __init__(self, params: dict[str, Any]):
         """
         Init method
@@ -564,6 +592,7 @@ class BucketsHashProcessorInvoker(object):
     """
     Bucket hash processing coordinator (singleton)
     """
+
     def __init__(self, bucket_processors: list[ActorHandle]) -> None:
         self.n_processors = len(bucket_processors)
         self.pool = ActorPool(bucket_processors)

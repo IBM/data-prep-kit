@@ -1,11 +1,24 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import gzip
 import json
-from typing import Any
 import os
+from typing import Any
 
 import pyarrow
 from data_processing.data_access import ArrowS3, DataAccess
 from data_processing.utils import GB, MB, TransformUtils, get_logger
+
 
 logger = get_logger(__name__)
 
@@ -16,14 +29,14 @@ class DataAccessS3(DataAccess):
     """
 
     def __init__(
-            self,
-            s3_credentials: dict[str, str],
-            s3_config: dict[str, str] = None,
-            d_sets: list[str] = None,
-            checkpoint: bool = False,
-            m_files: int = -1,
-            n_samples: int = -1,
-            files_to_use: list[str] = ['.parquet'],
+        self,
+        s3_credentials: dict[str, str],
+        s3_config: dict[str, str] = None,
+        d_sets: list[str] = None,
+        checkpoint: bool = False,
+        m_files: int = -1,
+        n_samples: int = -1,
+        files_to_use: list[str] = [".parquet"],
     ):
         """
         Create data access class for folder based configuration
@@ -67,7 +80,7 @@ class DataAccessS3(DataAccess):
         return self.output_folder
 
     def _get_files_folder(
-            self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
+        self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
     ) -> tuple[list[str], dict[str, float]]:
         """
         Support method to get list input files and their profile
@@ -106,12 +119,12 @@ class DataAccessS3(DataAccess):
         )
 
     def _get_input_files(
-            self,
-            input_path: str,
-            output_path: str,
-            cm_files: int,
-            max_file_size: int = 0,
-            min_file_size: int = MB * GB,
+        self,
+        input_path: str,
+        output_path: str,
+        cm_files: int,
+        max_file_size: int = 0,
+        min_file_size: int = MB * GB,
     ) -> tuple[list[str], dict[str, float]]:
         """
         Get list and size of files from input path, that do not exist in the output path
@@ -290,6 +303,7 @@ class DataAccessS3(DataAccess):
                             directory is returned (False)
         :return: A dictionary of file names/binary content will be returned
         """
+
         def _get_file_content(name: str, dt: bool) -> bytes:
             """
             return file content
