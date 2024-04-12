@@ -74,8 +74,10 @@ generally contains the following:
 5. A generic `Dockerfile` is available that should be sufficient for most transforms.  
 6. `Makefile` is used for most common operations
     * venv - builds the python virtual environment for CLI and IDE use
-    * test - runs the test in the `test` directory.
     * image - creates the docker image
+    * test-src - sets up the virtual environment and runs test in the test directory.
+    * test-image - runs the tests from within the image. 
+    * test - runs both test-src and test-image tests.
     * help - shows all targets and help text
 The `Makefile` also defines a number of macros/variables that can be set, including the name and version of the docker image, 
 python executable and more.
@@ -99,7 +101,7 @@ strongly recommended.
 ### Building the docker image
 Generally to build a docker image, one uses the `make image` command, which uses
 the `Dockerfile`, which in turn uses the `src` and `requirements.txt` to build the image. 
-Note that the `Makefile` defines the DOCKER_IMAGE_NAME and DOCKER_IMAGE_VERSION
+Note that the `Makefile` defines the TRANSFORM_NAME and DOCKER_IMAGE_VERSION
 and should be redefined if copying from another transform project.
 
 ### IDE Setup

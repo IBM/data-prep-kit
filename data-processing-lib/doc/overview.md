@@ -21,5 +21,5 @@ To learn more consider the following:
 * [Transform Tutorials](transform-tutorials.md)
 * [Library Configuration](library-config.md)
 * [Architecture Deep Dive](architecture.md)
-* [Transform Development Environment](transform-dev-env.md)
+* [Transform project root readme](../../transforms/README.md)
 
