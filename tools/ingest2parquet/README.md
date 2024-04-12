@@ -115,7 +115,7 @@ configuration for values are as follows:
 We provide several demos of the script usage for different data storage options: 
 
 
-#[local file system](src/local.py)
+#[local file system](src/ingest2parquet_local.py)
 This script processes data stored locally on the system. It sets up parameters for local file paths and invokes the run() function from ingest2parquet.py to convert raw data files to Parquet format.
 
 **Run the script without any command-line arguments.**
@@ -124,7 +124,7 @@ This script processes data stored locally on the system. It sets up parameters f
 make venv
 source venv/bin/activate
 cd src
-python local.py
+python ingest2parquet_local.py
 ```
 
 **Run the script via command-line** 
@@ -174,6 +174,8 @@ python ingest2parquet.py \
 The output directory will contain both the new
 genrated parquet files  and the `metadata.json` file.
 
+## Metadata Fields
+
 The metadata.json file contains following essential information regarding the processing of raw data files to Parquet format:
 
 `total_files_given`: Total number of raw data files provided for processing.
@@ -183,7 +185,10 @@ The metadata.json file contains following essential information regarding the pr
 `total_bytes_in_memory`: Total memory usage in bytes for all processed data files.
 `failure_details`: Information about files that failed processing, including their paths and error messages.
 
-
+## Building the Docker Image
+```
+% make image 
+```
 
 In addition, there are some useful `make` targets (see conventions above):
 * `make venv` - creates the virtual environment.
