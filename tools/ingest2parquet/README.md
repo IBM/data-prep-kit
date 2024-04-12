@@ -174,6 +174,8 @@ python ingest2parquet.py \
 The output directory will contain both the new
 genrated parquet files  and the `metadata.json` file.
 
+## Metadata Fields
+
 The metadata.json file contains following essential information regarding the processing of raw data files to Parquet format:
 
 `total_files_given`: Total number of raw data files provided for processing.
@@ -182,7 +184,6 @@ The metadata.json file contains following essential information regarding the pr
 `total_no_of_rows`: Aggregate count of rows across all successfully processed files.
 `total_bytes_in_memory`: Total memory usage in bytes for all processed data files.
 `failure_details`: Information about files that failed processing, including their paths and error messages.
-
 
 
 In addition, there are some useful `make` targets (see conventions above):
