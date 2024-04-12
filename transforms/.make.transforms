@@ -33,6 +33,7 @@ DOCKER?=podman
 DOCKER_FILE?=Dockerfile
 EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
+DOCKER_IMAGE=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
 TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_transform.py
@@ -63,7 +64,7 @@ help::
 
 .PHONY: .transforms.setup
 .transforms.setup::
-	@# Help:  Do nothing, since nothing to setup by default. 
+	@# Help: Do nothing, since nothing to setup by default. 
  
 
 .PHONY: .transforms.check_required_macros
@@ -110,6 +111,7 @@ help::
 	pip install pytest;			
 	$(MAKE) .transforms.install-lib-src
 
+.PHONY: .transforms.check_env
 .transforms.check_env::
 	@# Help: Make sure Artifactory credentials are in the environment variables. 
 	@if [ -z "$(ARTIFACTORY_USER)" -o -z "$(ARTIFACTORY_API_KEY)" ]; then \
@@ -120,9 +122,10 @@ help::
 # Create the docker image making sure the preloaded models are available to copy into the image
 # We copy the library/framework source here so it can be installed into the docker image and
 # pip installed inside the Dockerfile
+.PHONY: .transforms.image
 .transforms.image:: Dockerfile requirements.txt
 	$(MAKE) .transforms.check_env	# Put this first so we don't get its help
-	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
+	@# Help: Build the docker image, $(DOCKER_IMAGE), using the $(DOCKER_FILE) and requirements.txt 
 	rm -rf data-processing-lib
 	mkdir data-processing-lib
 	cp -R $(REPOROOT)/data-processing-lib/src data-processing-lib
@@ -132,7 +135,7 @@ help::
 	$(DOCKER) build --build-arg EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL) \
 		--build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) \
 		--build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
-		-t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) . 
+		-t $(DOCKER_IMAGE) . 
 	rm -rf data-processing-lib
 
 .PHONY: .transforms.install-lib-src
@@ -150,7 +153,9 @@ help::
 		echo ERROR installing source into `which $(PYTHON)`;	\
 	fi
 
+.PHONY: .transforms.build
 .transforms.build:: .transforms.venv .transforms.image	
+	@# Help: Create the venv and build the transform image 
 
 .PHONY: .transforms.test-lib-src
 .transforms.test-lib-src::
@@ -161,15 +166,11 @@ help::
 
 .PHONY: .transforms.test 
 .transforms.test::  .transforms.test-src .transforms.test-image
+	@# Help: Run both source and image level tests. 
 
+.PHONY: .transforms.test-src
 .transforms.test-src::  .transforms.test-lib-src .transforms.test-locals
-
-.transforms.test.old::  
-	@# Help: Run pytest on the test directory using the current venv
-	source venv/bin/activate;			\
-	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
-	cd test; $(PYTEST) . 
-
+	@# Help: Run the transform's tests and any '*local' .py files
 
 .PHONY: .transforms.test-image
 .transforms.test-image:: .transforms.test-image-pytest
@@ -177,12 +178,12 @@ help::
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest::
 	@# Help: Test an already-built image (use make image) running pytest on $(TRANSFORM_TEST_FILE) 
-	$(DOCKER) run -t --rm $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) pytest -s  $(TRANSFORM_TEST_FILE)
+	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s  $(TRANSFORM_TEST_FILE)
 
 .PHONY: .transforms.test-image-help
 .transforms.test-image-help::
 	@# Help: Test an already-built image (use make image) to be sure the --help option works
-	$(DOCKER) run -t --rm $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) python $(TRANSFORM_SRC_FILE) --help
+	$(DOCKER) run -t --rm $(DOCKER_IMAGE) python $(TRANSFORM_SRC_FILE) --help
 
 .PHONY: test-locals
 test-locals:: .transforms.test-locals
@@ -202,12 +203,12 @@ test-locals:: .transforms.test-locals
 	done	
 	
 
-REGISTRY_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
+REGISTRY_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE)
 
 .PHONY: .transforms.publish
 .transforms.publish::
-	@# Help: Publish the docker image to a container registry
-	$(DOCKER) tag $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) $(REGISTRY_IMAGE) 
+	@# Help: Publish the docker image to $(DOCKER_REGISTRY) container registry 
+	$(DOCKER) tag $(DOCKER_IMAGE) $(REGISTRY_IMAGE) 
 	$(DOCKER) logout $(DOCKER_REGISTRY) 
 	$(DOCKER) login $(DOCKER_REGISTRY) -u $(DOCKER_REGISTRY_USER) -p '$(DOCKER_REGISTRY_KEY)'
 	$(DOCKER) push  $(REGISTRY_IMAGE) 
