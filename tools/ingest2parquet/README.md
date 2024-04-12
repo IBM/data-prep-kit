@@ -185,6 +185,10 @@ The metadata.json file contains following essential information regarding the pr
 `total_bytes_in_memory`: Total memory usage in bytes for all processed data files.
 `failure_details`: Information about files that failed processing, including their paths and error messages.
 
+## Building the Docker Image
+```
+% make image 
+```
 
 In addition, there are some useful `make` targets (see conventions above):
 * `make venv` - creates the virtual environment.
