@@ -19,10 +19,28 @@ The framework allows simple 1:1 transformation of parquet files, but also enable
 more complex transformations requiring coordination among transforming nodes.
 This might include operations such as de-duplication, merging, and splitting.
 
-Topics to explore:
+### Getting started
+The following are required
+1. python 3.10 or 3.11
+2. Ray 2.9.3
+4. [pre-commit](https://pre-commit.com/)
+5. twine (pip install twine)
+    * but on Mac you may have to include a dir in your PATH, such as   
+        `export PATH=$PATH:/Library/Frameworks/Python.framework/Versions/3.10/bin`
+
+Then clone the repo and set up the pre-commit hooks.
+```shell
+git clone git@github.ibm.com:ai-models-data/fm-data-engineering.git
+cd fm-data-engineering
+pre-commit install
+```
+Next, review the additional topics 
+
    * [Repository structure and use](doc/repo.md)
    * [Data schema and processing](doc/data-processing.md)
    * [Available Transforms](transforms/README.md)
    * [Core library](data-processing-lib/README.md) and [its documentation](data-processing-lib/doc/overview.md)
    * [Kind cluster support](kind/README.md)
    * [KFP support library](kfp/kfp_support_lib/README.md) and [its implementation](kfp/kfp_support_lib/doc/kfp_support_library.md)
+
+
