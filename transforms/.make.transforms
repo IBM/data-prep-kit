@@ -31,7 +31,6 @@ ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 
 DOCKER?=podman
 DOCKER_FILE?=Dockerfile
-DOCKER_REGISTRY?=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
 EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
@@ -48,15 +47,17 @@ help::
 	@echo DOCKER - the name of the docker executable to use.  DOCKER=$(DOCKER)
 	@echo DOCKER_FILE - the name of the docker file to use.  DOCKER_FILE=$(DOCKER_FILE)
 	@echo DOCKER_REGISTRY - the name of the docker registry to use.  DOCKER_REGISTRY=$(DOCKER_REGISTRY)
+	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
+	@echo DOCKER_REGISTRY_KEY - the docker password to use.  DOCKER_REGISTRY_KEY=secret
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
 	@echo EXTRA_ARTIFACTORY_URL - the url of an additional artifactory to satisfy dependencies.  EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL)
 	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
-	@echo TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_transform.py)
+	@echo "TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_transform.py)"
 	@echo ""
 	@echo Macros that require definition in the including Makefile
-	@echo REPOROOT defines root directory of this repository (such as ../../..) 
-	@echo TRANSFORM_NAME defines the name of the transform and is used to 
-	@echo     define default values of DOCKER_IMAGE_NAME and TRANSFORM_SRC_FILE.  For, example 'noop'
+	@echo "REPOROOT defines the root directory of this repository (such as ../../..)" 
+	@echo TRANSFORM_NAME defines the name of the transform and is used to define defaults for...
+	@echo "    DOCKER_IMAGE_NAME and TRANSFORM_SRC_FILE.  For, example 'noop'"
 	@echo DOCKER_IMAGE_VERSION - the version of the docker image to produce.  DOCKER_IMAGE_VERSION=$(DOCKER_IMAGE_VERSION)
 	@$(MAKE) .transforms.check_required_macros
 
@@ -67,11 +68,20 @@ help::
 
 .PHONY: .transforms.check_required_macros
 .transforms.check_required_macros::
-	@if [ -z "$(DOCKER_IMAGE_NAME)" ]; then		\
-	    echo ERROR: DOCKER_IMAGE_NAME is must be defined.;	\
-	fi
+	@if [ -z "$(TRANSFORM_NAME)" ]; then	\
+	    echo ERROR: TRANSFORM_NAME must be defined.;	\
+	fi			
 	@if [ -z "$(DOCKER_IMAGE_VERSION)" ]; then	\
-	    echo ERROR: DOCKER_IMAGE_VERSION is must be defined.;	\
+	    echo ERROR: DOCKER_IMAGE_VERSION must be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_REGISTRY_USER)" ]; then	\
+	    echo ERROR: DOCKER_REGISTRY_USER must be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_REGISTRY_KEY)" ]; then	\
+	    echo ERROR: DOCKER_REGISTRY_KEYmust be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_REGISTRY)" ]; then	\
+	    echo ERROR: DOCKER_REGISTRY must be defined.;	\
 	fi			
 
 .PHONY: .transforms.clean
@@ -117,7 +127,8 @@ help::
 	mkdir data-processing-lib
 	cp -R $(REPOROOT)/data-processing-lib/src data-processing-lib
 	cp    $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
-	$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
+	#$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
+	$(DOCKER) login $(DOCKER_REGISTRY) -u $(DOCKER_REGISTRY_USER) -p '$(DOCKER_REGISTRY_KEY)'
 	$(DOCKER) build --build-arg EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL) \
 		--build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) \
 		--build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
@@ -190,3 +201,13 @@ test-locals:: .transforms.test-locals
 	    fi;					\
 	done	
 	
+
+REGISTRY_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
+
+.PHONY: .transforms.publish
+.transforms.publish::
+	@# Help: Publish the docker image to a container registry
+	$(DOCKER) tag $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) $(REGISTRY_IMAGE) 
+	$(DOCKER) logout $(DOCKER_REGISTRY) 
+	$(DOCKER) login $(DOCKER_REGISTRY) -u $(DOCKER_REGISTRY_USER) -p '$(DOCKER_REGISTRY_KEY)'
+	$(DOCKER) push  $(REGISTRY_IMAGE) 

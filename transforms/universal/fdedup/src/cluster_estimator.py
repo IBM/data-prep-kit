@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import math
 
 from data_processing.utils import GB
@@ -25,8 +37,8 @@ n_workers = 1200
 ray_node_cpu = 50
 # cpu sizes fo actors
 processor_cpu = 1.0
-bucket_cpu = .75
-minhash_cpu = .75
+bucket_cpu = 0.75
+minhash_cpu = 0.75
 doc_cpu = 0.75
 # Experimental values, do not change
 bucket_actor_memory = 3.0
@@ -54,10 +66,9 @@ print(f"Required minhash actors {minhash_actors} with cpu {minhash_cpu}")
 print(f"Required bucket actors {bucket_actors} with cpu {bucket_cpu}")
 
 
-
 execution_required_cpus = math.ceil(
-    (processor_cpu * n_workers + bucket_actors * bucket_cpu + minhash_actors * minhash_cpu +
-     document_actors * doc_cpu) / 0.85
+    (processor_cpu * n_workers + bucket_actors * bucket_cpu + minhash_actors * minhash_cpu + document_actors * doc_cpu)
+    / 0.85
 )
 
 print(f"required cpu: {execution_required_cpus}")
@@ -65,8 +76,13 @@ n_ray_nodes = math.ceil(execution_required_cpus / ray_node_cpu)
 print(f"Required for execution ray nodes with {ray_node_cpu} cpus is {n_ray_nodes}")
 
 execution_required_memory = math.ceil(
-    (n_workers * processor_memory + bucket_actors * bucket_actor_memory + minhash_actors * minhash_actor_memory +
-     document_actors * document_actor_memory) / 0.6
+    (
+        n_workers * processor_memory
+        + bucket_actors * bucket_actor_memory
+        + minhash_actors * minhash_actor_memory
+        + document_actors * document_actor_memory
+    )
+    / 0.6
 )
 
 n_actors = int((0.85 * execution_required_memory - document_actors * doc_cpu) / processor_cpu)
@@ -77,5 +93,7 @@ print(f"number of workers {n_actors}")
 
 
 print(f"required execution memory : {execution_required_memory}")
-print(f"Minimal required memory per ray node is {math.ceil(execution_required_memory / n_ray_nodes)} GB. "
-      f"Practically use the larger number")
+print(
+    f"Minimal required memory per ray node is {math.ceil(execution_required_memory / n_ray_nodes)} GB. "
+    f"Practically use the larger number"
+)

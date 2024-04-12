@@ -1,8 +1,25 @@
-from typing import Any
-import enum
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
 
-from kfp_support.api_server_client.params import (BaseVolume, EnvironmentVariables,
-                                                  volume_decoder, environment_variables_decoder)
+import enum
+from typing import Any
+
+from kfp_support.api_server_client.params import (
+    BaseVolume,
+    EnvironmentVariables,
+    environment_variables_decoder,
+    volume_decoder,
+)
+
 
 DEFAULT_HEAD_START_PARAMS = {"dashboard-host": "0.0.0.0", "metrics-export-port": "8080", "num-cpus": "0"}
 
@@ -11,9 +28,10 @@ class ServiceType(enum.Enum):
     """
     Enumeration of head node service types
     """
-    ClusterIP = "ClusterIP"         # cluster IP
-    NodePort = "NodePort"           # node port
-    LoadBalancer = "LoadBalancer"   # load balancer
+
+    ClusterIP = "ClusterIP"  # cluster IP
+    NodePort = "NodePort"  # node port
+    LoadBalancer = "LoadBalancer"  # load balancer
 
 
 class HeadNodeSpec:
@@ -35,11 +53,21 @@ class HeadNodeSpec:
         annotations - optional, annotations for head node
         labels - optional, labels for head node
     """
-    def __init__(self, compute_template: str, image: str, ray_start_params: dict[str, str] = DEFAULT_HEAD_START_PARAMS,
-                 service_type: ServiceType = ServiceType.ClusterIP, enable_ingress: bool = False,
-                 volumes: list[BaseVolume] = None, service_account: str = None, image_pull_secret: str = None,
-                 environment: EnvironmentVariables = None, annotations: dict[str, str] = None,
-                 labels: dict[str, str] = None):
+
+    def __init__(
+        self,
+        compute_template: str,
+        image: str,
+        ray_start_params: dict[str, str] = DEFAULT_HEAD_START_PARAMS,
+        service_type: ServiceType = ServiceType.ClusterIP,
+        enable_ingress: bool = False,
+        volumes: list[BaseVolume] = None,
+        service_account: str = None,
+        image_pull_secret: str = None,
+        environment: EnvironmentVariables = None,
+        annotations: dict[str, str] = None,
+        labels: dict[str, str] = None,
+    ):
         """
         Initialization
         :param compute_template: compute template
@@ -150,10 +178,16 @@ def head_node_spec_decoder(dct: dict[str, Any]) -> HeadNodeSpec:
     environments = None
     if "environment" in dct and len(dct.get("environment")) > 0:
         environments = environment_variables_decoder(dct.get("environment"))
-    return HeadNodeSpec(compute_template=dct.get("computeTemplate"), ray_start_params=dct.get("rayStartParams"),
-                        image=dct.get("image"), service_type=service_type,
-                        enable_ingress=dct.get("enableIngress", False),
-                        volumes=volumes, service_account=dct.get("service_account"),
-                        image_pull_secret=dct.get("image_pull_secret"),
-                        environment=environments, annotations=dct.get("annotations"),
-                        labels=dct.get("labels"))
+    return HeadNodeSpec(
+        compute_template=dct.get("computeTemplate"),
+        ray_start_params=dct.get("rayStartParams"),
+        image=dct.get("image"),
+        service_type=service_type,
+        enable_ingress=dct.get("enableIngress", False),
+        volumes=volumes,
+        service_account=dct.get("service_account"),
+        image_pull_secret=dct.get("image_pull_secret"),
+        environment=environments,
+        annotations=dct.get("annotations"),
+        labels=dct.get("labels"),
+    )

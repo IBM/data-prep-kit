@@ -26,3 +26,5 @@ test-src:: .transforms.test-src
 
 test-image:: .transforms.test-image
 
+publish:: .transforms.publish
+

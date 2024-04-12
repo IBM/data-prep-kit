@@ -1,10 +1,30 @@
-import requests
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import time
 
-from kfp_support.api_server_client.params import (Template, Cluster, RayJobRequest, RayJobInfo,
-                                                  template_decoder, templates_decoder, cluster_decoder,
-                                                  clusters_decoder)
+import requests
 from data_processing.utils import get_logger
+from kfp_support.api_server_client.params import (
+    Cluster,
+    RayJobInfo,
+    RayJobRequest,
+    Template,
+    cluster_decoder,
+    clusters_decoder,
+    template_decoder,
+    templates_decoder,
+)
+
 
 logger = get_logger(__name__)
 
@@ -14,13 +34,19 @@ _headers = {"Content-Type": "application/json", "accept": "application/json"}
 
 class KubeRayAPIs:
     """
-        This class implements KubeRay APIs based on the API server.
-        To create a class, the following parameters are required:
-            base - the URL of the API server (default is set to the standalone API server)
-            wait interval - the amount of sec to wait between checking for cluster ready
+    This class implements KubeRay APIs based on the API server.
+    To create a class, the following parameters are required:
+        base - the URL of the API server (default is set to the standalone API server)
+        wait interval - the amount of sec to wait between checking for cluster ready
     """
-    def __init__(self, server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-                 token: str = None, http_retries: int = 5, wait_interval: int = 2):
+
+    def __init__(
+        self,
+        server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
+        token: str = None,
+        http_retries: int = 5,
+        wait_interval: int = 2,
+    ):
         """
         Initializer
         :param server_url: API server url - default assuming running it inside the cluster
@@ -82,7 +108,9 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, templates_decoder(response.json())
                 else:
-                    logger.warning(f"Failed to list compute templates for namespace {ns}, status : {response.status_code}")
+                    logger.warning(
+                        f"Failed to list compute templates for namespace {ns}, status : {response.status_code}"
+                    )
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
@@ -112,7 +140,9 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, template_decoder(response.json())
                 else:
-                    logger.warning(f"Failed to get compute template {name} for namespace {ns}, status : {response.status_code}")
+                    logger.warning(
+                        f"Failed to get compute template {name} for namespace {ns}, status : {response.status_code}"
+                    )
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
@@ -415,8 +445,10 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, response.json()["submissionId"]
                 else:
-                    logger.warning(f"Failed to submit job to the cluster {name} in namespace {ns}, "
-                          f"status : {response.status_code}")
+                    logger.warning(
+                        f"Failed to submit job to the cluster {name} in namespace {ns}, "
+                        f"status : {response.status_code}"
+                    )
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
@@ -447,8 +479,10 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, RayJobInfo(response.json())
                 else:
-                    logger.warning(f"Failed to get job {sid} from the cluster {name} in namespace {ns}, "
-                          f"status : {response.status_code}")
+                    logger.warning(
+                        f"Failed to get job {sid} from the cluster {name} in namespace {ns}, "
+                        f"status : {response.status_code}"
+                    )
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
@@ -479,8 +513,10 @@ class KubeRayAPIs:
                     job_info_array = response.json().get("submissions", None)
                     return response.status_code, None, [RayJobInfo(i) for i in job_info_array]
                 else:
-                    logger.warning(f"Failed to list jobs from the cluster {name} in namespace {ns}, "
-                          f"status : {response.status_code}")
+                    logger.warning(
+                        f"Failed to list jobs from the cluster {name} in namespace {ns}, "
+                        f"status : {response.status_code}"
+                    )
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
@@ -511,12 +547,16 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None, response.json().get("log", "")
                 else:
-                    logger.warning(f"Failed to get log for jobs {sid} from the cluster {name} in namespace {ns}, "
-                          f"status : {response.status_code}")
+                    logger.warning(
+                        f"Failed to get log for jobs {sid} from the cluster {name} in namespace {ns}, "
+                        f"status : {response.status_code}"
+                    )
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
-                logger.warning(f"Failed to get log for jobs {sid} from the cluster {name} in namespace {ns}, exception : {e}")
+                logger.warning(
+                    f"Failed to get log for jobs {sid} from the cluster {name} in namespace {ns}, exception : {e}"
+                )
                 status = 500
                 message = str(e)
             time.sleep(1)
@@ -542,8 +582,10 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 else:
-                    logger.warning(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, "
-                          f"status : {response.status_code}")
+                    logger.warning(
+                        f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, "
+                        f"status : {response.status_code}"
+                    )
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:
@@ -573,8 +615,10 @@ class KubeRayAPIs:
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 else:
-                    logger.warning(f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, "
-                          f"status : {response.status_code}")
+                    logger.warning(
+                        f"Failed to stop job {sid} from the cluster {name} in namespace {ns}, "
+                        f"status : {response.status_code}"
+                    )
                     status = response.status_code
                     message = response.json()["message"]
             except Exception as e:

@@ -1,8 +1,21 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import json
 from typing import Any
 
 import pyarrow
 from data_processing.data_access import DataAccess, DataAccessS3
+from data_processing.utils import get_logger
 from lakehouse import (
     CosCredentials,
     Datasource,
@@ -11,7 +24,6 @@ from lakehouse import (
     LakehouseForProcessingTask,
     SourceCodeDetails,
 )
-from data_processing.utils import get_logger
 
 
 logger = get_logger(__name__)
@@ -23,14 +35,14 @@ class DataAccessLakeHouse(DataAccess):
     """
 
     def __init__(
-            self,
-            s3_credentials: dict[str, str],
-            lakehouse_config: dict[str, str] = None,
-            d_sets: list[str] = None,
-            checkpoint: bool = False,
-            m_files: int = -1,
-            n_samples: int = 1,
-            files_to_use: list[str] = ['.parquet'],
+        self,
+        s3_credentials: dict[str, str],
+        lakehouse_config: dict[str, str] = None,
+        d_sets: list[str] = None,
+        checkpoint: bool = False,
+        m_files: int = -1,
+        n_samples: int = 1,
+        files_to_use: list[str] = [".parquet"],
     ):
         """
         Create data access class for lake house based configuration
@@ -72,7 +84,7 @@ class DataAccessLakeHouse(DataAccess):
             checkpoint=checkpoint,
             m_files=m_files,
             n_samples=n_samples,
-            files_to_use=files_to_use
+            files_to_use=files_to_use,
         )
         self.n_samples = n_samples
 
@@ -120,6 +132,31 @@ class DataAccessLakeHouse(DataAccess):
             return None
         return self.lh.get_output_file_path_from(file_path=path)
 
+    @staticmethod
+    def _add_table_metadata(table: pyarrow.Table) -> pyarrow.Table:
+        """
+        Save table to a given location fixing schema, required for lakehouse
+        :param table: table
+        :return: size of table in memory and a dictionary as
+        defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
+        in the case of failure dict is None
+        """
+        # update schema to ensure part ids to be there
+        fields = []
+        columns = table.column_names
+        tbl_metadata = table.schema.metadata
+        if tbl_metadata is None:
+            # If the table does not have metadata, create the empty one
+            tbl_metadata = {}
+        # Add column Ids to the metadata
+        for index in range(len(table.column_names)):
+            field = table.field(index)
+            fields.append(field.with_metadata({"PARQUET:field_id": f"{index + 1}"}))
+            tbl_metadata[columns[index]] = json.dumps({"PARQUET:field_id": f"{index + 1}"}).encode()
+        # Rebuild schema and table
+        schema = pyarrow.schema(fields, metadata=tbl_metadata)
+        return pyarrow.Table.from_arrays(arrays=list(table.itercolumns()), schema=schema)
+
     def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
         """
         Save table to a given location
@@ -132,7 +169,10 @@ class DataAccessLakeHouse(DataAccess):
         if self.output_folder is None:
             logger.error("Saving table. Lake house is not configured, operation skipped")
             return 0, None
-        l, repl = self.S3.save_table_with_schema(path=path, table=table)
+        # Add metadata to the table
+        table_with_metadata = self._add_table_metadata(table=table)
+        # Save table to S3
+        l, repl = self.S3.save_table(path=path, table=table_with_metadata)
         if repl is None:
             return l, {}
 

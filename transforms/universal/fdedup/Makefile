@@ -26,4 +26,4 @@ setup:: .transforms.setup
 test-image:: .transforms.test-image-help
 	@echo WARNING: Skipping pytest test until we have a test/test_fdedup.py file.
 
-
+publish:: .transforms.publish

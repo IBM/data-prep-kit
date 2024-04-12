@@ -1,25 +1,45 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
+import datetime
 import json
 import os
 import re
 import sys
-
-import datetime
-import kfp.dsl as dsl
 import time
-from typing import Optional, Any
-from ray.job_submission import JobStatus
+from typing import Any, Optional
 
-from kfp_server_api import models
-from kfp import Client
-from kubernetes import client as k8s_client
-
-from kfp_support.api_server_client import KubeRayAPIs
-from kfp_support.api_server_client.params import (Template, DEFAULT_HEAD_START_PARAMS, DEFAULT_WORKER_START_PARAMS,
-                                                  volume_decoder, HeadNodeSpec, WorkerNodeSpec, ClusterSpec, Cluster,
-                                                  RayJobRequest, environment_variables_decoder)
-
+import kfp.dsl as dsl
 from data_processing.data_access import DataAccess
 from data_processing.utils import get_logger
+from kfp_server_api import models
+from kfp_support.api_server_client import KubeRayAPIs
+from kfp_support.api_server_client.params import (
+    DEFAULT_HEAD_START_PARAMS,
+    DEFAULT_WORKER_START_PARAMS,
+    Cluster,
+    ClusterSpec,
+    HeadNodeSpec,
+    RayJobRequest,
+    Template,
+    WorkerNodeSpec,
+    environment_variables_decoder,
+    volume_decoder,
+)
+from kubernetes import client as k8s_client
+from ray.job_submission import JobStatus
+
+from kfp import Client
+
 
 logger = get_logger(__name__)
 
@@ -32,9 +52,11 @@ class KFPUtils:
     """
     Helper utilities for KFP implementations
     """
+
     @staticmethod
-    def credentials(access_key: str = "S3_KEY", secret_key: str = "S3_SECRET", endpoint: str = "ENDPOINT") \
-            -> tuple[str, str, str]:
+    def credentials(
+        access_key: str = "S3_KEY", secret_key: str = "S3_SECRET", endpoint: str = "ENDPOINT"
+    ) -> tuple[str, str, str]:
         """
         Get credentials from the environment
         :param access_key: environment variable for access key
@@ -59,8 +81,9 @@ class KFPUtils:
         try:
             file = open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r")
         except Exception as e:
-            logger.warning(f"Failed to open /var/run/secrets/kubernetes.io/serviceaccount/namespace file, "
-                           f"exception {e}")
+            logger.warning(
+                f"Failed to open /var/run/secrets/kubernetes.io/serviceaccount/namespace file, " f"exception {e}"
+            )
         else:
             with file:
                 ns = file.read()
@@ -112,6 +135,7 @@ class PipelinesUtils:
     """
     Helper class for pipeline management
     """
+
     def __init__(self, host: str = "http://localhost:8080"):
         """
         Initialization
@@ -120,10 +144,10 @@ class PipelinesUtils:
         self.kfp_client = Client(host=host)
 
     def start_pipeline(
-            self,
-            pipeline: models.api_pipeline.ApiPipeline,
-            experiment: models.api_experiment.ApiExperiment,
-            params: Optional[dict[str, Any]],
+        self,
+        pipeline: models.api_pipeline.ApiPipeline,
+        experiment: models.api_experiment.ApiExperiment,
+        params: Optional[dict[str, Any]],
     ) -> str:
         """
         Start a specified pipeline.
@@ -134,8 +158,9 @@ class PipelinesUtils:
         """
         job_name = pipeline.name + " " + datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
         try:
-            run_id = self.kfp_client.run_pipeline(experiment_id=experiment.id, job_name=job_name,
-                                                  pipeline_id=pipeline.id, params=params)
+            run_id = self.kfp_client.run_pipeline(
+                experiment_id=experiment.id, job_name=job_name, pipeline_id=pipeline.id, params=params
+            )
             logger.info("Pipeline submitted")
             return run_id.id
         except Exception as e:
@@ -211,10 +236,16 @@ class RayRemoteJobs:
     """
     class supporting Ray remote jobs
     """
+
     ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 
-    def __init__(self, server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-                 default_image: str = "rayproject/ray:2.9.3-py310", http_retries: int = 5, wait_interval: int = 2):
+    def __init__(
+        self,
+        server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
+        default_image: str = "rayproject/ray:2.9.3-py310",
+        http_retries: int = 5,
+        wait_interval: int = 2,
+    ):
         """
         Initialization
         :param server_url: API server URL. Default value is assuming running inside the cluster
@@ -222,12 +253,19 @@ class RayRemoteJobs:
         :param wait_interval: wait interval
         :param http_retries: http retries
         """
-        self.api_server_client = KubeRayAPIs(server_url=server_url, http_retries=http_retries,
-                                             wait_interval=wait_interval)
+        self.api_server_client = KubeRayAPIs(
+            server_url=server_url, http_retries=http_retries, wait_interval=wait_interval
+        )
         self.default_image = default_image
 
-    def create_ray_cluster(self, name: str, namespace: str, head_node: dict[str, Any],
-                           worker_nodes: list[dict[str, Any]], wait_cluster_ready: int = -1) -> tuple[int, str]:
+    def create_ray_cluster(
+        self,
+        name: str,
+        namespace: str,
+        head_node: dict[str, Any],
+        worker_nodes: list[dict[str, Any]],
+        wait_cluster_ready: int = -1,
+    ) -> tuple[int, str]:
         """
         Create Ray cluster
         :param name: name, _ are not allowed in the name
@@ -279,8 +317,14 @@ class RayRemoteJobs:
         accelerator = head_node.get("gpu_accelerator", None)
         head_node_template_name = f"{name}-head-template"
         _, _ = self.api_server_client.delete_compute_template(ns=namespace, name=head_node_template_name)
-        head_template = Template(name=head_node_template_name, namespace=namespace, cpu=cpus, memory=memory,
-                                 gpu=gpus, gpu_accelerator=accelerator)
+        head_template = Template(
+            name=head_node_template_name,
+            namespace=namespace,
+            cpu=cpus,
+            memory=memory,
+            gpu=gpus,
+            gpu_accelerator=accelerator,
+        )
         status, error = self.api_server_client.create_compute_template(head_template)
         if status != 200:
             return status, error
@@ -294,8 +338,14 @@ class RayRemoteJobs:
             accelerator = worker_node.get("gpu_accelerator", None)
             worker_node_template_name = f"{name}-worker-template-{index}"
             _, _ = self.api_server_client.delete_compute_template(ns=namespace, name=worker_node_template_name)
-            worker_template = Template(name=worker_node_template_name, namespace=namespace, cpu=cpus, memory=memory,
-                                       gpu=gpus, gpu_accelerator=accelerator)
+            worker_template = Template(
+                name=worker_node_template_name,
+                namespace=namespace,
+                cpu=cpus,
+                memory=memory,
+                gpu=gpus,
+                gpu_accelerator=accelerator,
+            )
             status, error = self.api_server_client.create_compute_template(worker_template)
             if status != 200:
                 return status, error
@@ -318,10 +368,17 @@ class RayRemoteJobs:
             environment = None
         else:
             environment = environment_variables_decoder(environment_dict)
-        head_node_spec = HeadNodeSpec(compute_template=head_node_template_name, image=image,
-                                      ray_start_params=ray_start_params, volumes=volumes,
-                                      service_account=service_account, image_pull_secret=image_pull_secret,
-                                      environment=environment, annotations=annotations, labels=labels)
+        head_node_spec = HeadNodeSpec(
+            compute_template=head_node_template_name,
+            image=image,
+            ray_start_params=ray_start_params,
+            volumes=volumes,
+            service_account=service_account,
+            image_pull_secret=image_pull_secret,
+            environment=environment,
+            annotations=annotations,
+            labels=labels,
+        )
         # build worker nodes
         worker_groups = []
         index = 0
@@ -345,13 +402,23 @@ class RayRemoteJobs:
                 environment = None
             else:
                 environment = environment_variables_decoder(environment_dict)
-            worker_groups.append(WorkerNodeSpec(group_name=f"worker-group-{index}",
-                                                compute_template=worker_template_names[index], image=image,
-                                                max_replicas=max_replicas, replicas=replicas,
-                                                min_replicas=min_replicas, ray_start_params=ray_start_params,
-                                                volumes=volumes, service_account=service_account,
-                                                image_pull_secret=image_pull_secret, environment=environment,
-                                                annotations=annotations, labels=labels))
+            worker_groups.append(
+                WorkerNodeSpec(
+                    group_name=f"worker-group-{index}",
+                    compute_template=worker_template_names[index],
+                    image=image,
+                    max_replicas=max_replicas,
+                    replicas=replicas,
+                    min_replicas=min_replicas,
+                    ray_start_params=ray_start_params,
+                    volumes=volumes,
+                    service_account=service_account,
+                    image_pull_secret=image_pull_secret,
+                    environment=environment,
+                    annotations=annotations,
+                    labels=labels,
+                )
+            )
             index += 1
         # Build cluster spec
         cluster_spec = ClusterSpec(head_node=head_node_spec, worker_groups=worker_groups)
@@ -387,8 +454,14 @@ class RayRemoteJobs:
                     return status, error
         return status, error
 
-    def submit_job(self, name: str, namespace: str, request: dict[str, Any], runtime_env: str = None,
-                   executor: str = "transformer_launcher.py") -> tuple[int, str, str]:
+    def submit_job(
+        self,
+        name: str,
+        namespace: str,
+        request: dict[str, Any],
+        runtime_env: str = None,
+        executor: str = "transformer_launcher.py",
+    ) -> tuple[int, str, str]:
         """
         Submit job for execution
         :param name: cluster name
@@ -437,8 +510,15 @@ class RayRemoteJobs:
             l_to_print = RayRemoteJobs.ansi_escape.sub("", l_to_print)
             print(l_to_print)
 
-    def follow_execution(self, name: str, namespace: str, submission_id: str, data_access: DataAccess = None,
-                         job_ready_timeout: int = 600, print_timeout: int = 120) -> None:
+    def follow_execution(
+        self,
+        name: str,
+        namespace: str,
+        submission_id: str,
+        data_access: DataAccess = None,
+        job_ready_timeout: int = 600,
+        print_timeout: int = 120,
+    ) -> None:
         """
         Follow remote job execution
         :param name: cluster name
@@ -452,8 +532,9 @@ class RayRemoteJobs:
         # Wait for job to start running
         job_status = JobStatus.PENDING
         while job_status != JobStatus.RUNNING and job_ready_timeout > 0:
-            status, error, job_status = self._get_job_status(name=name, namespace=namespace,
-                                                             submission_id=submission_id)
+            status, error, job_status = self._get_job_status(
+                name=name, namespace=namespace, submission_id=submission_id
+            )
             if status // 100 != 2:
                 sys.exit(1)
             if job_status in {JobStatus.STOPPED, JobStatus.SUCCEEDED, JobStatus.FAILED, JobStatus.RUNNING}:
@@ -480,8 +561,9 @@ class RayRemoteJobs:
                 sys.exit(1)
             self._print_log(log=log, previous_log_len=previous_log_len)
             previous_log_len = len(log)
-            status, error, job_status = self._get_job_status(name=name, namespace=namespace,
-                                                             submission_id=submission_id)
+            status, error, job_status = self._get_job_status(
+                name=name, namespace=namespace, submission_id=submission_id
+            )
             if status // 100 != 2:
                 sys.exit(1)
         # Print the final log and execution status
@@ -534,10 +616,14 @@ class ComponentUtils:
 
     @staticmethod
     def set_s3_env_vars_to_component(
-            component: dsl.ContainerOp,
-            secret: str,
-            env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"},
-            prefix: str = None,
+        component: dsl.ContainerOp,
+        secret: str,
+        env2key: dict[str, str] = {
+            "S3_KEY": "s3-key",
+            "S3_SECRET": "s3-secret",  # pragma: allowlist secret
+            "ENDPOINT": "s3-endpoint",
+        },
+        prefix: str = None,
     ) -> None:
         """
         Set S3 env variables to KFP component
@@ -560,8 +646,8 @@ class ComponentUtils:
 
     @staticmethod
     def default_compute_execution_params(
-            worker_options: str,  # ray worker configuration
-            actor_options: str,  # cpus per actor
+        worker_options: str,  # ray worker configuration
+        actor_options: str,  # cpus per actor
     ) -> str:
         """
         This is the most simplistic transform execution parameters computation
@@ -570,8 +656,9 @@ class ComponentUtils:
         :return: number of actors
         """
         import sys
-        from kfp_support.workflow_support.utils import KFPUtils
+
         from data_processing.utils import get_logger
+        from kfp_support.workflow_support.utils import KFPUtils
 
         logger = get_logger(__name__)
 
@@ -581,10 +668,10 @@ class ComponentUtils:
         # Compute available cluster resources
         cluster_cpu = w_options["replicas"] * w_options["cpu"]
         cluster_mem = w_options["replicas"] * w_options["memory"]
-        cluster_gpu = w_options["replicas"] * w_options.get("gpu", 0.)
+        cluster_gpu = w_options["replicas"] * w_options.get("gpu", 0.0)
         logger.info(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}, GPUs {cluster_gpu}")
         # compute number of actors
-        n_actors_cpu = int(cluster_cpu * 0.85 / a_options.get("num_cpus", .5))
+        n_actors_cpu = int(cluster_cpu * 0.85 / a_options.get("num_cpus", 0.5))
         n_actors_memory = int(cluster_mem * 0.85 / a_options.get("memory", 1))
         n_actors = min(n_actors_cpu, n_actors_memory)
         # Check if we need gpu calculations as well
@@ -594,11 +681,12 @@ class ComponentUtils:
             n_actors = min(n_actors, n_actors_gpu)
         logger.info(f"Number of actors - {n_actors}")
         if n_actors < 1:
-            logger.warning(f"Not enough cpu/gpu/memory to run transform, "
-                           f"required cpu {a_options.get('num_cpus', .5)}, available {cluster_cpu}, "
-                           f"required memory {a_options.get('memory', 1)}, available {cluster_mem}, "
-                           f"required cpu {actor_gpu}, available {cluster_gpu}"
-                          )
+            logger.warning(
+                f"Not enough cpu/gpu/memory to run transform, "
+                f"required cpu {a_options.get('num_cpus', .5)}, available {cluster_cpu}, "
+                f"required memory {a_options.get('memory', 1)}, available {cluster_mem}, "
+                f"required cpu {actor_gpu}, available {cluster_gpu}"
+            )
             sys.exit(1)
 
         return str(n_actors)
