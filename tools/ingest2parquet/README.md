@@ -115,7 +115,7 @@ configuration for values are as follows:
 We provide several demos of the script usage for different data storage options: 
 
 
-#[local file system](src/local.py)
+#[local file system](src/ingest2parquet_local.py)
 This script processes data stored locally on the system. It sets up parameters for local file paths and invokes the run() function from ingest2parquet.py to convert raw data files to Parquet format.
 
 **Run the script without any command-line arguments.**
@@ -124,7 +124,7 @@ This script processes data stored locally on the system. It sets up parameters f
 make venv
 source venv/bin/activate
 cd src
-python local.py
+python ingest2parquet_local.py
 ```
 
 **Run the script via command-line** 
