@@ -1,15 +1,55 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import json
-from kfp_support.api_server_client.params import (Template, template_decoder, Toleration, TolerationEffect,
-                                                  TolerationOperation, toleration_decoder, HostPath, HostPathVolume,
-                                                  MountPropagationMode, PVCVolume, EphemeralVolume, EmptyDirVolume,
-                                                  AccessMode, ConfigMapVolume, SecretVolume, volume_decoder,
-                                                  EnvVarSource, EnvVarFrom, EnvironmentVariables, env_var_from_decoder,
-                                                  environment_variables_decoder, HeadNodeSpec,
-                                                  DEFAULT_HEAD_START_PARAMS, ServiceType, head_node_spec_decoder,
-                                                  WorkerNodeSpec, DEFAULT_WORKER_START_PARAMS,
-                                                  worker_node_spec_decoder, Environment, ClusterSpec, ClusterEvent,
-                                                  Cluster, cluster_spec_decoder, cluster_decoder, RayJobInfo,
-                                                  RayJobRequest)
+
+from kfp_support.api_server_client.params import (
+    DEFAULT_HEAD_START_PARAMS,
+    DEFAULT_WORKER_START_PARAMS,
+    AccessMode,
+    Cluster,
+    ClusterEvent,
+    ClusterSpec,
+    ConfigMapVolume,
+    EmptyDirVolume,
+    Environment,
+    EnvironmentVariables,
+    EnvVarFrom,
+    EnvVarSource,
+    EphemeralVolume,
+    HeadNodeSpec,
+    HostPath,
+    HostPathVolume,
+    MountPropagationMode,
+    PVCVolume,
+    RayJobInfo,
+    RayJobRequest,
+    SecretVolume,
+    ServiceType,
+    Template,
+    Toleration,
+    TolerationEffect,
+    TolerationOperation,
+    WorkerNodeSpec,
+    cluster_decoder,
+    cluster_spec_decoder,
+    env_var_from_decoder,
+    environment_variables_decoder,
+    head_node_spec_decoder,
+    template_decoder,
+    toleration_decoder,
+    volume_decoder,
+    worker_node_spec_decoder,
+)
 
 
 def test_toleration():
@@ -19,8 +59,9 @@ def test_toleration():
     t1_json = json.dumps(tol1.to_dict())
     print(f"toleration 1 JSON: {t1_json}")
 
-    tol2 = Toleration(key="blah2", operator=TolerationOperation.Exists, effect=TolerationEffect.NoExecute,
-                      value="value")
+    tol2 = Toleration(
+        key="blah2", operator=TolerationOperation.Exists, effect=TolerationEffect.NoExecute, value="value"
+    )
     print(f"toleration 2: {tol2.to_string()}")
     t2_json = json.dumps(tol2.to_dict())
     print(f"toleration 2 JSON: {t2_json}")
@@ -32,8 +73,9 @@ def test_toleration():
 def test_templates():
 
     tol1 = Toleration(key="blah1", operator=TolerationOperation.Exists, effect=TolerationEffect.NoExecute)
-    tol2 = Toleration(key="blah2", operator=TolerationOperation.Exists, effect=TolerationEffect.NoExecute,
-                      value="value")
+    tol2 = Toleration(
+        key="blah2", operator=TolerationOperation.Exists, effect=TolerationEffect.NoExecute, value="value"
+    )
 
     temp1 = Template(name="template1", namespace="namespace", cpu=1, memory=4, tolerations=[tol1, tol2])
     print(f"\ntemplate 1: {temp1.to_string()}")
@@ -52,22 +94,33 @@ def test_templates():
 def test_volumes():
 
     # hostPath
-    vol = HostPathVolume(name="hostPath", mount_path="tmp/hostPath", source="source",
-                         host_path_type=HostPath.FILE, mount_propagation=MountPropagationMode.NONE)
+    vol = HostPathVolume(
+        name="hostPath",
+        mount_path="tmp/hostPath",
+        source="source",
+        host_path_type=HostPath.FILE,
+        mount_propagation=MountPropagationMode.NONE,
+    )
     print(f"\nhostPath volume: {vol.to_string()}")
     vol_json = json.dumps(vol.to_dict())
     print(f"host path volume json: {vol_json}")
     assert volume_decoder(json.loads(vol_json)).to_string() == vol.to_string()
 
-    vol = PVCVolume(name="pvc", mount_path="tmp/pvc", source="claim", read_only=True,
-                    mount_propagation=MountPropagationMode.BIDIRECTIONAL)
+    vol = PVCVolume(
+        name="pvc",
+        mount_path="tmp/pvc",
+        source="claim",
+        read_only=True,
+        mount_propagation=MountPropagationMode.BIDIRECTIONAL,
+    )
     print(f"PVC volume: {vol.to_string()}")
     vol_json = json.dumps(vol.to_dict())
     print(f"PVC volume json: {vol_json}")
     assert volume_decoder(json.loads(vol_json)).to_string() == vol.to_string()
 
-    vol = EphemeralVolume(name="ephemeral", mount_path="tmp/ephemeral", storage="5Gi", storage_class="blah",
-                          access_mode=AccessMode.RWX)
+    vol = EphemeralVolume(
+        name="ephemeral", mount_path="tmp/ephemeral", storage="5Gi", storage_class="blah", access_mode=AccessMode.RWX
+    )
     print(f"Ephemeral volume: {vol.to_string()}")
     vol_json = json.dumps(vol.to_dict())
     print(f"Ephemeral volume json: {vol_json}")
@@ -79,8 +132,9 @@ def test_volumes():
     print(f"Empty dir volume json: {vol_json}")
     assert volume_decoder(json.loads(vol_json)).to_string() == vol.to_string()
 
-    vol = ConfigMapVolume(name="confmap", mount_path="tmp/confmap", source="my-map",
-                          items={"sample_code.py": "sample_code.py"})
+    vol = ConfigMapVolume(
+        name="confmap", mount_path="tmp/confmap", source="my-map", items={"sample_code.py": "sample_code.py"}
+    )
     print(f"config map volume: {vol.to_string()}")
     vol_json = json.dumps(vol.to_dict())
     print(f"config map volume json: {vol_json}")
@@ -124,14 +178,26 @@ def test_head_node_spec():
 
     env_v = EnvVarFrom(source=EnvVarSource.SECRET, name="my-secret", key="key")
     env_s = EnvironmentVariables(key_value={"key": "val"}, from_ref={"key_ref": env_v})
-    volumes = [PVCVolume(name="pvc", mount_path="tmp/pvc", source="claim", read_only=True,
-                         mount_propagation=MountPropagationMode.BIDIRECTIONAL),
-               EmptyDirVolume(name="emptyDir", mount_path="tmp/emptyDir")]
+    volumes = [
+        PVCVolume(
+            name="pvc",
+            mount_path="tmp/pvc",
+            source="claim",
+            read_only=True,
+            mount_propagation=MountPropagationMode.BIDIRECTIONAL,
+        ),
+        EmptyDirVolume(name="emptyDir", mount_path="tmp/emptyDir"),
+    ]
 
-    head = HeadNodeSpec(compute_template="template", image="rayproject/ray:2.9.0-py310",
-                        ray_start_params=DEFAULT_HEAD_START_PARAMS, enable_ingress=True,
-                        service_type=ServiceType.ClusterIP, volumes=volumes,
-                        environment=env_s)
+    head = HeadNodeSpec(
+        compute_template="template",
+        image="rayproject/ray:2.9.0-py310",
+        ray_start_params=DEFAULT_HEAD_START_PARAMS,
+        enable_ingress=True,
+        service_type=ServiceType.ClusterIP,
+        volumes=volumes,
+        environment=env_s,
+    )
     print(f"\nhead node: {head.to_string()}")
     head_json = json.dumps(head.to_dict())
     print(f"head node JSON: {head_json}")
@@ -142,13 +208,29 @@ def test_worker_node_spec():
 
     env_v = EnvVarFrom(source=EnvVarSource.SECRET, name="my-secret", key="key")
     env_s = EnvironmentVariables(key_value={"key": "val"}, from_ref={"key_ref": env_v})
-    volumes = [PVCVolume(name="pvc", mount_path="tmp/pvc", source="claim", read_only=True,
-                         mount_propagation=MountPropagationMode.BIDIRECTIONAL),
-               EmptyDirVolume(name="emptyDir", mount_path="tmp/emptyDir")]
+    volumes = [
+        PVCVolume(
+            name="pvc",
+            mount_path="tmp/pvc",
+            source="claim",
+            read_only=True,
+            mount_propagation=MountPropagationMode.BIDIRECTIONAL,
+        ),
+        EmptyDirVolume(name="emptyDir", mount_path="tmp/emptyDir"),
+    ]
 
-    worker = WorkerNodeSpec(group_name="group", compute_template="template", image="rayproject/ray:2.9.0-py310",
-                            replicas=2, min_replicas=2, max_replicas=2, volumes=volumes,
-                            ray_start_params=DEFAULT_WORKER_START_PARAMS, environment=env_s, labels={"key": "value"})
+    worker = WorkerNodeSpec(
+        group_name="group",
+        compute_template="template",
+        image="rayproject/ray:2.9.0-py310",
+        replicas=2,
+        min_replicas=2,
+        max_replicas=2,
+        volumes=volumes,
+        ray_start_params=DEFAULT_WORKER_START_PARAMS,
+        environment=env_s,
+        labels={"key": "value"},
+    )
     print(f"\nworker node: {worker.to_string()}")
     worker_json = json.dumps(worker.to_dict())
     print(f"worker node JSON: {worker_json}")
@@ -156,24 +238,57 @@ def test_worker_node_spec():
 
 
 def test_cluster_spec():
-    env_s = EnvironmentVariables(key_value={"key": "val"},
-                                 from_ref={"key_ref": EnvVarFrom(source=EnvVarSource.SECRET,
-                                                                 name="my-secret", key="key")})
-    volumes = [PVCVolume(name="pvc", mount_path="tmp/pvc", source="claim", read_only=True,
-                         mount_propagation=MountPropagationMode.BIDIRECTIONAL),
-               EmptyDirVolume(name="emptyDir", mount_path="tmp/emptyDir")]
-    spec = ClusterSpec(head_node=HeadNodeSpec(compute_template="template", image="rayproject/ray:2.9.0-py310",
-                                              ray_start_params=DEFAULT_HEAD_START_PARAMS, volumes=volumes,
-                                              enable_ingress=True, service_type=ServiceType.ClusterIP,
-                                              environment=env_s),
-                       worker_groups=[WorkerNodeSpec(group_name="group", compute_template="template", replicas=2,
-                                                     min_replicas=2, max_replicas=2, image="rayproject/ray:2.9.0-py310",
-                                                     ray_start_params=DEFAULT_WORKER_START_PARAMS, volumes=volumes,
-                                                     environment=env_s, labels={"key": "value"}),
-                                      WorkerNodeSpec(group_name="group1", compute_template="template1", replicas=2,
-                                                     min_replicas=2, max_replicas=2, image="rayproject/ray:2.9.0-py310",
-                                                     ray_start_params=DEFAULT_WORKER_START_PARAMS, volumes=volumes,
-                                                     environment=env_s, labels={"key": "value"})])
+    env_s = EnvironmentVariables(
+        key_value={"key": "val"},
+        from_ref={"key_ref": EnvVarFrom(source=EnvVarSource.SECRET, name="my-secret", key="key")},
+    )
+    volumes = [
+        PVCVolume(
+            name="pvc",
+            mount_path="tmp/pvc",
+            source="claim",
+            read_only=True,
+            mount_propagation=MountPropagationMode.BIDIRECTIONAL,
+        ),
+        EmptyDirVolume(name="emptyDir", mount_path="tmp/emptyDir"),
+    ]
+    spec = ClusterSpec(
+        head_node=HeadNodeSpec(
+            compute_template="template",
+            image="rayproject/ray:2.9.0-py310",
+            ray_start_params=DEFAULT_HEAD_START_PARAMS,
+            volumes=volumes,
+            enable_ingress=True,
+            service_type=ServiceType.ClusterIP,
+            environment=env_s,
+        ),
+        worker_groups=[
+            WorkerNodeSpec(
+                group_name="group",
+                compute_template="template",
+                replicas=2,
+                min_replicas=2,
+                max_replicas=2,
+                image="rayproject/ray:2.9.0-py310",
+                ray_start_params=DEFAULT_WORKER_START_PARAMS,
+                volumes=volumes,
+                environment=env_s,
+                labels={"key": "value"},
+            ),
+            WorkerNodeSpec(
+                group_name="group1",
+                compute_template="template1",
+                replicas=2,
+                min_replicas=2,
+                max_replicas=2,
+                image="rayproject/ray:2.9.0-py310",
+                ray_start_params=DEFAULT_WORKER_START_PARAMS,
+                volumes=volumes,
+                environment=env_s,
+                labels={"key": "value"},
+            ),
+        ],
+    )
     print(f"\ncluster spec: {spec.to_string()}")
     spec_json = json.dumps(spec.to_dict())
     print(f"cluster spec JSON: {spec_json}")
@@ -182,29 +297,79 @@ def test_cluster_spec():
 
 def test_cluster():
 
-    event = {"id": "id", "name": "name", "created_at": "ts", "first_timestamp": "ts", "last_timestamp": "ts",
-             "reason": "reason", "message": "message", "type": "warning", "count": "1"}
+    event = {
+        "id": "id",
+        "name": "name",
+        "created_at": "ts",
+        "first_timestamp": "ts",
+        "last_timestamp": "ts",
+        "reason": "reason",
+        "message": "message",
+        "type": "warning",
+        "count": "1",
+    }
     print(f"\ncluster event: {ClusterEvent(event).to_string()}")
-    env_s = EnvironmentVariables(key_value={"key": "val"},
-                                 from_ref={"key_ref": EnvVarFrom(source=EnvVarSource.SECRET, name="my-secret",
-                                                                 key="key")})
-    volumes = [PVCVolume(name="pvc", mount_path="tmp/pvc", source="claim", read_only=True,
-                         mount_propagation=MountPropagationMode.BIDIRECTIONAL),
-               EmptyDirVolume(name="emptyDir", mount_path="tmp/emptyDir")]
-    spec = ClusterSpec(head_node=HeadNodeSpec(compute_template="template", ray_start_params=DEFAULT_HEAD_START_PARAMS,
-                                              enable_ingress=True, service_type=ServiceType.ClusterIP, volumes=volumes,
-                                              environment=env_s, annotations={"a_key": "a_val"},
-                                              image="rayproject/ray:2.9.0-py310",),
-                       worker_groups=[WorkerNodeSpec(group_name="group", compute_template="template", replicas=2,
-                                                     min_replicas=2, max_replicas=2, image="rayproject/ray:2.9.0-py310",
-                                                     ray_start_params=DEFAULT_WORKER_START_PARAMS, volumes=volumes,
-                                                     environment=env_s, labels={"key": "value"}),
-                                      WorkerNodeSpec(group_name="group1", compute_template="template1", replicas=2,
-                                                     min_replicas=2, max_replicas=2, image="rayproject/ray:2.9.0-py310",
-                                                     ray_start_params=DEFAULT_WORKER_START_PARAMS, volumes=volumes,
-                                                     environment=env_s, labels={"key": "value"})])
-    cluster = Cluster(name="test", namespace="default", user="boris", version="2.9.0", cluster_spec=spec,
-                      deployment_environment=Environment.DEV, cluster_environment=env_s)
+    env_s = EnvironmentVariables(
+        key_value={"key": "val"},
+        from_ref={"key_ref": EnvVarFrom(source=EnvVarSource.SECRET, name="my-secret", key="key")},
+    )
+    volumes = [
+        PVCVolume(
+            name="pvc",
+            mount_path="tmp/pvc",
+            source="claim",
+            read_only=True,
+            mount_propagation=MountPropagationMode.BIDIRECTIONAL,
+        ),
+        EmptyDirVolume(name="emptyDir", mount_path="tmp/emptyDir"),
+    ]
+    spec = ClusterSpec(
+        head_node=HeadNodeSpec(
+            compute_template="template",
+            ray_start_params=DEFAULT_HEAD_START_PARAMS,
+            enable_ingress=True,
+            service_type=ServiceType.ClusterIP,
+            volumes=volumes,
+            environment=env_s,
+            annotations={"a_key": "a_val"},
+            image="rayproject/ray:2.9.0-py310",
+        ),
+        worker_groups=[
+            WorkerNodeSpec(
+                group_name="group",
+                compute_template="template",
+                replicas=2,
+                min_replicas=2,
+                max_replicas=2,
+                image="rayproject/ray:2.9.0-py310",
+                ray_start_params=DEFAULT_WORKER_START_PARAMS,
+                volumes=volumes,
+                environment=env_s,
+                labels={"key": "value"},
+            ),
+            WorkerNodeSpec(
+                group_name="group1",
+                compute_template="template1",
+                replicas=2,
+                min_replicas=2,
+                max_replicas=2,
+                image="rayproject/ray:2.9.0-py310",
+                ray_start_params=DEFAULT_WORKER_START_PARAMS,
+                volumes=volumes,
+                environment=env_s,
+                labels={"key": "value"},
+            ),
+        ],
+    )
+    cluster = Cluster(
+        name="test",
+        namespace="default",
+        user="boris",
+        version="2.9.0",
+        cluster_spec=spec,
+        deployment_environment=Environment.DEV,
+        cluster_environment=env_s,
+    )
     print(f"cluster: {cluster.to_string()}")
     cluster_json = json.dumps(cluster.to_dict())
     print(f"cluster JSON: {cluster_json}")
@@ -225,8 +390,7 @@ def test_submission():
     env_vars:
       counter_name: test_counter    
     """
-    request = RayJobRequest(entrypoint="python /home/ray/samples/sample_code.py",
-                            runtime_env=yaml, num_cpu=.5)
+    request = RayJobRequest(entrypoint="python /home/ray/samples/sample_code.py", runtime_env=yaml, num_cpu=0.5)
     print(f"job request: {request.to_string()}")
     request_json = json.dumps(request.to_dict())
     print(f"request JSON: {request_json}")

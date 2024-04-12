@@ -1,18 +1,36 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import enum
 from typing import Any
 
-from kfp_support.api_server_client.params import (HeadNodeSpec, WorkerNodeSpec, EnvironmentVariables,
-                                                  head_node_spec_decoder, worker_node_spec_decoder,
-                                                  environment_variables_decoder)
+from kfp_support.api_server_client.params import (
+    EnvironmentVariables,
+    HeadNodeSpec,
+    WorkerNodeSpec,
+    environment_variables_decoder,
+    head_node_spec_decoder,
+    worker_node_spec_decoder,
+)
 
 
 class Environment(enum.Enum):
     """
     Environment definitions
     """
-    DEV = 0         # development
-    TESTING = 1     # testing
-    STAGING = 2     # staging
+
+    DEV = 0  # development
+    TESTING = 1  # testing
+    STAGING = 2  # staging
     PRODUCTION = 3  # production
 
 
@@ -28,6 +46,7 @@ class ClusterSpec:
     - to_string() -> str: convert toleration to string for printing
     - to_dict() -> dict[str, Any] convert to dict
     """
+
     def __init__(self, head_node: HeadNodeSpec, worker_groups: list[WorkerNodeSpec] = None):
         """
         Initialization
@@ -77,6 +96,7 @@ class ClusterEvent:
         type - type of this event (Normal, Warning), new types could be added in the future
         count - number of times this event has occurred
     """
+
     def __init__(self, dst: dict[str, Any]):
         """
         Initialization from dictionary
@@ -97,9 +117,11 @@ class ClusterEvent:
         Convert to string
         :return: string representation of cluster event
         """
-        return (f"id = {self.id}, name = {self.name}, created_at = {self.created_at}, "
-                f"first_timestamp = {self.first_timestamp}, last_timestamp = {self.last_timestamp},"
-                f"reason = {self.reason}, message = {self.message}, type = {self.type}, count = {self.count}")
+        return (
+            f"id = {self.id}, name = {self.name}, created_at = {self.created_at}, "
+            f"first_timestamp = {self.first_timestamp}, last_timestamp = {self.last_timestamp},"
+            f"reason = {self.reason}, message = {self.message}, type = {self.type}, count = {self.count}"
+        )
 
 
 class Cluster:
@@ -125,11 +147,23 @@ class Cluster:
     - to_string() -> str: convert toleration to string for printing
     - to_dict() -> dict[str, Any] convert to dict
     """
-    def __init__(self, name: str, namespace: str, user: str, version: str, cluster_spec: ClusterSpec,
-                 deployment_environment: Environment = None, annotations: dict[str, str] = None,
-                 cluster_environment: EnvironmentVariables = None, created_at: str = None,
-                 deleted_at: str = None, cluster_status: str = None, events: list[ClusterEvent] = None,
-                 service_endpoint: dict[str, str] = None):
+
+    def __init__(
+        self,
+        name: str,
+        namespace: str,
+        user: str,
+        version: str,
+        cluster_spec: ClusterSpec,
+        deployment_environment: Environment = None,
+        annotations: dict[str, str] = None,
+        cluster_environment: EnvironmentVariables = None,
+        created_at: str = None,
+        deleted_at: str = None,
+        cluster_status: str = None,
+        events: list[ClusterEvent] = None,
+        service_endpoint: dict[str, str] = None,
+    ):
         """
         Initialization
         :param name: cluster name
@@ -165,8 +199,10 @@ class Cluster:
         convert to string representation
         :return: string representation of cluster
         """
-        val = (f"name: {self.name}, namespace = {self.namespace}, user = {self.user}, version = {self.version} "
-               f"cluster_spec = {self.cluster_spec.to_string()}")
+        val = (
+            f"name: {self.name}, namespace = {self.namespace}, user = {self.user}, version = {self.version} "
+            f"cluster_spec = {self.cluster_spec.to_string()}"
+        )
         if self.environment is not None:
             val += f"deployment environment = {self.environment.name}"
         if self.annotations is not None:
@@ -200,8 +236,13 @@ class Cluster:
         :return: dictionary representation of cluster
         """
         # only convert input variables
-        dst = {"name": self.name, "namespace": self.namespace, "user": self.user, "version": self.version,
-               "clusterSpec": self.cluster_spec.to_dict()}
+        dst = {
+            "name": self.name,
+            "namespace": self.namespace,
+            "user": self.user,
+            "version": self.version,
+            "clusterSpec": self.cluster_spec.to_dict(),
+        }
         if self.environment is not None:
             dst["environment"] = self.environment.value
         if self.annotations is not None:
@@ -244,12 +285,21 @@ def cluster_decoder(dct: dict[str, Any]) -> Cluster:
     envs = None
     if "envs" in dct:
         envs = environment_variables_decoder(dct.get("envs"))
-    return Cluster(name=dct.get("name", ""), namespace=dct.get("namespace", ""), user=dct.get("user", ""),
-                   version=dct.get("version", ""), cluster_spec=cluster_spec_decoder(dct.get("clusterSpec")),
-                   deployment_environment=environment, annotations=dct.get("annotations"),
-                   cluster_environment=envs, created_at=dct.get("createdAt"), deleted_at=dct.get("deletedAt"),
-                   cluster_status=dct.get("clusterState"), events=events,
-                   service_endpoint=dct.get("serviceEndpoint"))
+    return Cluster(
+        name=dct.get("name", ""),
+        namespace=dct.get("namespace", ""),
+        user=dct.get("user", ""),
+        version=dct.get("version", ""),
+        cluster_spec=cluster_spec_decoder(dct.get("clusterSpec")),
+        deployment_environment=environment,
+        annotations=dct.get("annotations"),
+        cluster_environment=envs,
+        created_at=dct.get("createdAt"),
+        deleted_at=dct.get("deletedAt"),
+        cluster_status=dct.get("clusterState"),
+        events=events,
+        service_endpoint=dct.get("serviceEndpoint"),
+    )
 
 
 def clusters_decoder(dct: dict[str, any]) -> list[Cluster]:

@@ -1,7 +1,24 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 from typing import Any
 
-from kfp_support.api_server_client.params import (BaseVolume, EnvironmentVariables,
-                                                  volume_decoder, environment_variables_decoder)
+from kfp_support.api_server_client.params import (
+    BaseVolume,
+    EnvironmentVariables,
+    environment_variables_decoder,
+    volume_decoder,
+)
+
 
 DEFAULT_WORKER_START_PARAMS = {"node-ip-address": "$MY_POD_IP"}
 
@@ -27,12 +44,23 @@ class WorkerNodeSpec:
         annotations - optional, annotations for head node
         labels - optional, labels for head node
     """
-    def __init__(self, group_name: str, compute_template: str, image: str, max_replicas: int,
-                 replicas: int = 1, min_replicas: int = 0,
-                 ray_start_params: dict[str, str] = DEFAULT_WORKER_START_PARAMS,
-                 volumes: list[BaseVolume] = None, service_account: str = None, image_pull_secret: str = None,
-                 environment: EnvironmentVariables = None, annotations: dict[str, str] = None,
-                 labels: dict[str, str] = None):
+
+    def __init__(
+        self,
+        group_name: str,
+        compute_template: str,
+        image: str,
+        max_replicas: int,
+        replicas: int = 1,
+        min_replicas: int = 0,
+        ray_start_params: dict[str, str] = DEFAULT_WORKER_START_PARAMS,
+        volumes: list[BaseVolume] = None,
+        service_account: str = None,
+        image_pull_secret: str = None,
+        environment: EnvironmentVariables = None,
+        annotations: dict[str, str] = None,
+        labels: dict[str, str] = None,
+    ):
         """
         Initialization
         :param group_name: name
@@ -75,9 +103,11 @@ class WorkerNodeSpec:
         Convert to string
         :return: string representation of worker node spec
         """
-        val = (f"group_name = {self.group_name},  compute template = {self.compute_template}, "
-               f"replicas = {self.replicas}, min_replicas = {self.min_replicas}, "
-               f"max_replicas = {self.max_replicas}, ray start params = {str(self.ray_start_params)}")
+        val = (
+            f"group_name = {self.group_name},  compute template = {self.compute_template}, "
+            f"replicas = {self.replicas}, min_replicas = {self.min_replicas}, "
+            f"max_replicas = {self.max_replicas}, ray start params = {str(self.ray_start_params)}"
+        )
         if self.image is not None:
             val += f", image = {self.image}"
         if self.service_account is not None:
@@ -107,9 +137,14 @@ class WorkerNodeSpec:
         Convert to dictionary
         :return: dictionary representation of worker node spec
         """
-        dct = {"groupName": self.group_name, "computeTemplate": self.compute_template,
-               "replicas": self.replicas, "minReplicas": self.min_replicas, "maxReplicas": self.max_replicas,
-               "rayStartParams": self.ray_start_params}
+        dct = {
+            "groupName": self.group_name,
+            "computeTemplate": self.compute_template,
+            "replicas": self.replicas,
+            "minReplicas": self.min_replicas,
+            "maxReplicas": self.max_replicas,
+            "rayStartParams": self.ray_start_params,
+        }
         if self.image is not None:
             dct["image"] = self.image
         if self.service_account is not None:
@@ -145,9 +180,18 @@ def worker_node_spec_decoder(dct: dict[str, Any]) -> WorkerNodeSpec:
     environments = None
     if "environment" in dct and len(dct.get("environment")) > 0:
         environments = environment_variables_decoder(dct.get("environment"))
-    return WorkerNodeSpec(group_name=dct.get("groupName"), compute_template=dct.get("computeTemplate"),
-                          replicas=dct.get("replicas", 0), min_replicas=dct.get("minReplicas", 0),
-                          max_replicas=dct.get("maxReplicas", 0), ray_start_params=dct.get("rayStartParams"),
-                          image=dct.get("image"), volumes=volumes, service_account=dct.get("service_account"),
-                          image_pull_secret=dct.get("imagePullSecret"), environment=environments,
-                          annotations=dct.get("annotations"), labels=dct.get("labels"))
+    return WorkerNodeSpec(
+        group_name=dct.get("groupName"),
+        compute_template=dct.get("computeTemplate"),
+        replicas=dct.get("replicas", 0),
+        min_replicas=dct.get("minReplicas", 0),
+        max_replicas=dct.get("maxReplicas", 0),
+        ray_start_params=dct.get("rayStartParams"),
+        image=dct.get("image"),
+        volumes=volumes,
+        service_account=dct.get("service_account"),
+        image_pull_secret=dct.get("imagePullSecret"),
+        environment=environments,
+        annotations=dct.get("annotations"),
+        labels=dct.get("labels"),
+    )

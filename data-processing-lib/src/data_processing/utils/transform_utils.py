@@ -1,11 +1,25 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
+import hashlib
 import os
 import string
 import sys
 from typing import Any
-import pyarrow as pa
+
 import mmh3
-import hashlib
+import pyarrow as pa
 from data_processing.utils import get_logger
+
 
 logger = get_logger(__name__)
 
@@ -64,9 +78,9 @@ class TransformUtils:
         :return: int hash
         """
         return mmh3.hash(s, seed=RANDOM_SEED, signed=False)
-    
+
     @staticmethod
-    def decode_content(content_bytes:bytes, encoding:str="utf-8")->str:
+    def decode_content(content_bytes: bytes, encoding: str = "utf-8") -> str:
         """
         Decode the given bytes content using the specified encoding.
         :param content_bytes: The bytes content to decode
@@ -79,7 +93,7 @@ class TransformUtils:
         except Exception as e:
             print(f"Error -> {e}")
             return ""
-        
+
     @staticmethod
     def get_file_extension(file_path) -> str:
         """
@@ -178,5 +192,3 @@ class TransformUtils:
         if return_path[-1] != "/":
             return_path += "/"
         return return_path
-
-

@@ -1,11 +1,23 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import io
 import unittest
 import zipfile
 from unittest.mock import MagicMock, patch
 
 import pyarrow as pa
-from parameterized import parameterized
 from ingest2parquet import generate_stats, raw_to_parquet, zip_to_table
+from parameterized import parameterized
 from utils import detect_language
 
 
@@ -35,9 +47,7 @@ class TestZipToTable(unittest.TestCase):
         self.mock_instance = self.mock_data_access.return_value
         self.addCleanup(self.mock_data_access_patcher.stop)
 
-        self.mock_detect_lang_patcher = patch(
-            "utils.detect_langauge.Detect_Programming_Lang"
-        )
+        self.mock_detect_lang_patcher = patch("utils.detect_langauge.Detect_Programming_Lang")
         self.mock_detect_lang = self.mock_data_access_patcher.start()
         self.mock_detect_lang_instance = self.mock_detect_lang.return_value
         self.addCleanup(self.mock_detect_lang_patcher.stop)
@@ -66,9 +76,7 @@ class TestZipToTable(unittest.TestCase):
         self.mock_instance.get_file.return_value = create_test_zip(file_names, contents)
         self.mock_detect_lang_instance.get_lang_from_ext.return_value = "unknown"
 
-        table = zip_to_table(
-            self.mock_instance, test_file_path, self.mock_detect_lang_instance
-        )
+        table = zip_to_table(self.mock_instance, test_file_path, self.mock_detect_lang_instance)
 
         # Assertions
         self.assertTrue(table)
@@ -84,9 +92,7 @@ class TestZipToTable(unittest.TestCase):
         self.assertEqual(table.schema.field("programming_language").type, pa.string())
         self.assertEqual(len(table), len(file_names))
 
-        with patch(
-            "data_processing.utils.TransformUtils.decode_content"
-        ) as mock_decode_content:
+        with patch("data_processing.utils.TransformUtils.decode_content") as mock_decode_content:
             mock_decode_content.side_effect = Exception("Decoding failed")
             table = zip_to_table(self.mock_instance, test_file_path, True)
             self.assertEqual(len(table), 0)
@@ -103,50 +109,36 @@ class TestZipToTable(unittest.TestCase):
 
 class TestRawToParquet(unittest.TestCase):
     def setUp(self):
-        self.mock_data_access_factory_patcher = patch(
-            "data_processing.data_access.DataAccessFactory"
-        )
+        self.mock_data_access_factory_patcher = patch("data_processing.data_access.DataAccessFactory")
         self.mock_data_access_factory = self.mock_data_access_factory_patcher.start()
-        self.mock_data_access_factory_instance = (
-            self.mock_data_access_factory.return_value
-        )
+        self.mock_data_access_factory_instance = self.mock_data_access_factory.return_value
         self.addCleanup(self.mock_data_access_factory_patcher.stop)
 
         self.mock_data_access_instance = MagicMock()
-        self.mock_data_access_factory_instance.create_data_access.return_value = (
-            self.mock_data_access_instance
-        )
+        self.mock_data_access_factory_instance.create_data_access.return_value = self.mock_data_access_instance
 
     def test_process_zip_sucessfully(self):
-        with patch(
-            "data_processing.utils.TransformUtils.add_column"
-        ) as mock_add_column:
+        with patch("data_processing.utils.TransformUtils.add_column") as mock_add_column:
             with patch("ingest2parquet.zip_to_table") as mock_zip_to_table:
                 mock_zip_to_table.return_value = pa.Table.from_pylist([])
                 mock_add_column.return_value = pa.Table.from_pylist([])
                 self.mock_data_access_instance.save_table.return_value = (0, {"k", "v"})
-                self.mock_data_access_instance.get_output_location.return_value = (
-                    "output_file.parquet"
-                )
+                self.mock_data_access_instance.get_output_location.return_value = "output_file.parquet"
 
-                result = raw_to_parquet(
-                    self.mock_data_access_factory_instance, "test.zip", True, "github","code"
-                )
+                result = raw_to_parquet(self.mock_data_access_factory_instance, "test.zip", True, "github", "code")
 
                 # Assertions
                 self.assertEqual(
                     result,
                     (True, {"path": "test.zip", "bytes_in_memory": 0, "row_count": 0}),
                 )
-                self.mock_data_access_instance.get_output_location.assert_called_once_with(
-                    "test.zip"
-                )
+                self.mock_data_access_instance.get_output_location.assert_called_once_with("test.zip")
                 self.mock_data_access_instance.save_table.assert_called_once_with(
                     "output_file.parquet", pa.Table.from_pylist([])
                 )
 
     def test_unsupported_file_type(self):
-        result = raw_to_parquet(self.mock_data_access_factory, "test.txt", True, "github","code")
+        result = raw_to_parquet(self.mock_data_access_factory, "test.txt", True, "github", "code")
 
         self.assertEqual(
             result,
@@ -158,29 +150,19 @@ class TestRawToParquet(unittest.TestCase):
             mock_zip_to_table.return_value = pa.Table.from_pylist([])
             self.mock_data_access_instance.save_table.return_value = (0, {})
 
-            result = raw_to_parquet(
-                self.mock_data_access_factory_instance, "test.zip", True, "github", "code"
-            )
+            result = raw_to_parquet(self.mock_data_access_factory_instance, "test.zip", True, "github", "code")
 
             # Assertions
-            self.assertEqual(
-                result, (False, {"path": "test.zip", "error": "Failed to upload"})
-            )
+            self.assertEqual(result, (False, {"path": "test.zip", "error": "Failed to upload"}))
 
     def test_exception_handling(self):
         with patch("ingest2parquet.zip_to_table") as mock_zip_to_table:
             mock_zip_to_table.return_value = pa.Table.from_pylist([])
-            self.mock_data_access_instance.save_table.side_effect = Exception(
-                "Test exception"
-            )
+            self.mock_data_access_instance.save_table.side_effect = Exception("Test exception")
 
-            result = raw_to_parquet(
-                self.mock_data_access_factory_instance, "test.zip", True, "githib", "NL"
-            )
+            result = raw_to_parquet(self.mock_data_access_factory_instance, "test.zip", True, "githib", "NL")
 
-            self.assertEqual(
-                result, (False, {"path": "test.zip", "error": "Test exception"})
-            )
+            self.assertEqual(result, (False, {"path": "test.zip", "error": "Test exception"}))
 
 
 class TestGenerateStats(unittest.TestCase):

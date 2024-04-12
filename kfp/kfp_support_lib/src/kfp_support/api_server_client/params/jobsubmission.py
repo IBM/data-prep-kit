@@ -1,5 +1,16 @@
-import datetime
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
 
+import datetime
 from typing import Any
 
 
@@ -18,9 +29,17 @@ class RayJobRequest:
         num_gpus - optional, number of gpus for job execution
         resources - optional, dictionary of the resources for job execution
     """
-    def __init__(self, entrypoint: str, submission_id: str = None, runtime_env: str = None,
-                 metadata: dict[str, str] = None, num_cpu: float = -1., num_gpu: float = -1.,
-                 resources: dict[str, str] = None):
+
+    def __init__(
+        self,
+        entrypoint: str,
+        submission_id: str = None,
+        runtime_env: str = None,
+        metadata: dict[str, str] = None,
+        num_cpu: float = -1.0,
+        num_gpu: float = -1.0,
+        resources: dict[str, str] = None,
+    ):
         """
         Initialization see https://docs.ray.io/en/latest/cluster/running-applications/job-submission/api.html
         :param entrypoint: entrypoint
@@ -98,6 +117,7 @@ class RayJobInfo:
         error_type - type of error
         metadata - optional, dictionary of the submission metadata
     """
+
     def __init__(self, dct: dict[str, Any]):
         """
         Initialize from dictionary
@@ -119,16 +139,21 @@ class RayJobInfo:
         Convert to string
         :return: string representation of Ray job info
         """
-        val = (f"entrypoint = {self.entrypoint}, job id {self.job_id}, submission id = {self.submission_id},"
-               f" status = {self.status}")
+        val = (
+            f"entrypoint = {self.entrypoint}, job id {self.job_id}, submission id = {self.submission_id},"
+            f" status = {self.status}"
+        )
         if self.message is not None:
             val += f" message = {self.message}"
         if self.start_time > 0:
-            val += (f" start time = "
-                    f"{datetime.datetime.fromtimestamp(self.start_time /1.e3).strftime('%Y-%m-%d %H:%M:%S')}")
+            val += (
+                f" start time = "
+                f"{datetime.datetime.fromtimestamp(self.start_time /1.e3).strftime('%Y-%m-%d %H:%M:%S')}"
+            )
         if self.end_time > 0:
-            val += (f" end time = "
-                    f"{datetime.datetime.fromtimestamp(self.end_time / 1e3).strftime('%Y-%m-%d %H:%M:%S')}")
+            val += (
+                f" end time = " f"{datetime.datetime.fromtimestamp(self.end_time / 1e3).strftime('%Y-%m-%d %H:%M:%S')}"
+            )
         if self.error_type is not None:
             val += f" error type = {self.error_type}"
         if self.runtime_env is not None:
