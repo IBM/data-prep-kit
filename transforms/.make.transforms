@@ -27,12 +27,15 @@
 #
 #######################################################################################
 include $(REPOROOT)/.make.defaults
-ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
+ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd)
+
+IGNORE := $(shell bash -c "sed -n /=/p ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' >> makeenv")
+
+include makeenv
 
 DOCKER?=podman
 DOCKER_FILE?=Dockerfile
 DOCKER_REGISTRY?=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
-EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
@@ -49,7 +52,6 @@ help::
 	@echo DOCKER_FILE - the name of the docker file to use.  DOCKER_FILE=$(DOCKER_FILE)
 	@echo DOCKER_REGISTRY - the name of the docker registry to use.  DOCKER_REGISTRY=$(DOCKER_REGISTRY)
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
-	@echo EXTRA_ARTIFACTORY_URL - the url of an additional artifactory to satisfy dependencies.  EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL)
 	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
 	@echo TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_transform.py)
 	@echo ""
@@ -86,13 +88,8 @@ help::
 # they will end up installing into that PYTHON and NOT the venv.
 .PHONY: .transforms.venv
 .transforms.venv::	requirements.txt .check_python_version
-	@$(MAKE) .transforms.check_env	# Put this first so we don't get its help
 	@# Help: Create the virtual environment using requirements.txt
 	$(PYTHON) -m venv venv
-	@if [ ! -z "$(EXTRA_ARTIFACTORY_URL)" ]; then				\
-	    echo '[global]' > venv/pip.conf;					\
-	    echo "extra-index-url = $(EXTRA_ARTIFACTORY_URL)" >> venv/pip.conf;	\
-	fi
 	@source venv/bin/activate;		\
 	pip install --upgrade pip;		\
 	pip install wheel;			\
@@ -100,27 +97,16 @@ help::
 	pip install pytest;			
 	$(MAKE) .transforms.install-lib-src
 
-.transforms.check_env::
-	@# Help: Make sure Artifactory credentials are in the environment variables. 
-	@if [ -z "$(ARTIFACTORY_USER)" -o -z "$(ARTIFACTORY_API_KEY)" ]; then \
-		echo "You must set ARTIFACTORY_USER and ARTIFACTORY_API_KEY env vars";\
-		exit;									\
-	fi
-
 # Create the docker image making sure the preloaded models are available to copy into the image
 # We copy the library/framework source here so it can be installed into the docker image and
 # pip installed inside the Dockerfile
 .transforms.image:: Dockerfile requirements.txt
-	$(MAKE) .transforms.check_env	# Put this first so we don't get its help
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
 	rm -rf data-processing-lib
 	mkdir data-processing-lib
-	cp -R $(REPOROOT)/data-processing-lib/src data-processing-lib
-	cp    $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
-	$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
-	$(DOCKER) build --build-arg EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL) \
-		--build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) \
-		--build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
+	$(DOCKER) build --build-arg DATA_PREP_LAB=${DATA_PREP_LAB} \
+                --build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
+                --build-arg GIT_COMMIT=$(shell git log -1 --format=%h) \
 		-t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) . 
 	rm -rf data-processing-lib
 
