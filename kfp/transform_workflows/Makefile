@@ -26,7 +26,7 @@ clean::
 .check-env:: .check_python_version
 	$(call check_defined, ARTIFACTORY_USER)
 	$(call check_defined, ARTIFACTORY_API_KEY)
-	$(call check_defined, FM_DATA_PROCESSING_KFP)
+	$(call check_defined, DATA_PREP_LAB_KFP)
 	@echo "Checks passed"
 
 .compile-pipeline::
@@ -52,12 +52,11 @@ publish:: .check-env
 
 venv::	.check-env
 	@# Help: Create the virtual environment
-	sed -i.back "s/fm-data-processing==[0-9].*/fm-data-processing==${FM_DATA_PROCESSING}/" ../kfp_ray_components/requirements.txt
 	rm -rf venv	
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE}; 	\
 	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple \
-	pip install -r ../kfp_ray_components/requirements.txt \
-	pip install -i https://test.pypi.org/simple/ fm-data-processing-kfp==${FM_DATA_PROCESSING_KFP}
+	pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple data-prep-lab==${DATA_PREP_LAB} \
+	pip install -i https://test.pypi.org/simple/ fm-data-processing-kfp==${DATA_PREP_LAB_KFP}
 
 test::

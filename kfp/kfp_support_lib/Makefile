@@ -26,15 +26,13 @@ clean::
 	rm makeenv || true
 
 .check-env:: .check_python_version
-	$(call check_defined, FM_DATA_PROCESSING_KFP)
-	$(call check_defined, ARTIFACTORY_USER)
-	$(call check_defined, ARTIFACTORY_API_KEY)
+	$(call check_defined, DATA_PREP_LAB_KFP)
 	@echo "Checks passed"
 
 update-toml:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml
-	sed -i.back 's/^version[ ]*=.*/version = "'${FM_DATA_PROCESSING_KFP}'"/' pyproject.toml
-	sed -i.back 's/fm_data_processing==[0-9].*/fm_data_processing==${FM_DATA_PROCESSING}",/' pyproject.toml
+	sed -i.back 's/^version[ ]*=.*/version = "'${DATA_PREP_LAB_KFP}'"/' pyproject.toml
+	sed -i.back 's/fm_data_processing==[0-9].*/fm_data_processing==${DATA_PREP_LAB}",/' pyproject.toml
 	sed -i.back 's/kfp==[0-9].*/kfp==${KFP}",/' pyproject.toml
 
 build:: clean update-toml venv
@@ -49,11 +47,10 @@ publish::
 
 venv::	pyproject.toml .check-env
 	@# Help: Create the virtual environment using pyproject.toml 
-	sed -i.back "s/fm-data-processing==[0-9].*/fm-data-processing==${FM_DATA_PROCESSING}/" ../kfp_ray_components/requirements.txt
 	rm -rf venv
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
-        pip install -r ../kfp_ray_components/requirements.txt ;\
+	pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple data-prep-lab==${DATA_PREP_LAB} \
 	pip install -e .;		\
 	pip install ray==${RAY} \
 	pip install pytest pytest-cov 
