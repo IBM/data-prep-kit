@@ -42,7 +42,6 @@ def ededup(
             "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access. checkpointing is not supported by dedup
-    data_lh_config: str = "None",
     data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_ededup/'}",
     data_s3_access_secret: str = "cos-access",
     data_max_files: int = -1,
@@ -81,7 +80,6 @@ def ededup(
         wait_job_ready_tmout - time to wait for job ready, sec
         wait_print_tmout - time between prints, sec
         http_retries - http retries for API server calls
-    :param data_lh_config - lake house configuration
     :param data_s3_access_secret - s3 access secret
     :param data_s3_config - s3 configuration
     :param data_max_files - max files to process
@@ -125,7 +123,6 @@ def ededup(
             additional_params=additional_params,
             exec_params={
                 "data_s3_config": data_s3_config,
-                "data_lh_config": data_lh_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
                 "doc_column": doc_column,

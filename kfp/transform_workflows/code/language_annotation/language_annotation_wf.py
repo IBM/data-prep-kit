@@ -43,7 +43,6 @@ def lang_select(
             "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_lh_config: str = "None",
     data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input-select-lang/input/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_select_lang/'}",
     data_s3_access_secret: str = "cos-access",
     data_max_files: int = -1,
@@ -56,7 +55,6 @@ def lang_select(
     lang_select_allowed_langs_file: str = "cos-optimal-llm-pile/sanity-test/input-select-lang/languages/allowed-code-languages.txt",
     lang_select_language_column: str = "language",
     lang_select_return_known: bool = True,
-    lang_select_lh_config: str = "None",
     lang_select_local_config: str = "None",
     lang_select_s3_access_secret: str = "cos-access",
     # additional parameters
@@ -86,7 +84,6 @@ def lang_select(
         wait_job_ready_tmout - time to wait for job ready, sec
         wait_print_tmout - time between prints, sec
         http_retries - httpt retries for API server calls
-    :param data_lh_config - lake house configuration
     :param data_s3_access_secret - s3 access secret
     :param data_s3_config - s3 configuration
     :param data_max_files - max files to process
@@ -97,7 +94,6 @@ def lang_select(
     :param lang_select_allowed_langs_file - file to store allowed languages
     :param lang_select_language_column - name of select language annotation column
     :param lang_select_return_known - Flag to return docs with known languages (True) or unknown (False).
-    :param lang_select_lh_config - lang select lakehouse config
     :param lang_select_local_config - lang select local config
     :param lang_select_s3_access_secret - 
                     (here we are assuming that select language info is in S3, but potentially in the different bucket)
@@ -133,7 +129,6 @@ def lang_select(
             # note that the parameters below are specific for NOOP transform
             exec_params={
                 "data_s3_config": data_s3_config,
-                "data_lh_config": data_lh_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
                 "num_workers": compute_exec_params.output,
@@ -144,7 +139,6 @@ def lang_select(
                 "lang_select_allowed_langs_file": lang_select_allowed_langs_file,
                 "lang_select_language_column": lang_select_language_column,
                 "lang_select_return_known": lang_select_return_known,
-                "lang_select_lh_config": lang_select_lh_config,
                 "lang_select_local_config": lang_select_local_config,
            },
             exec_script_name=EXEC_SCRIPT_NAME,
