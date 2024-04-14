@@ -1,21 +1,30 @@
 FROM docker.io/rayproject/ray:2.9.3-py310
 
-ARG DATA_PREP_LAB
-ARG BUILD_DATE
-ARG GIT_COMMIT
+ARG ARTIFACTORY_USER
+ARG ARTIFACTORY_API_KEY
+ARG EXTRA_ARTIFACTORY_URL
 
-LABEL build-date=$BUILD_DATE
-LABEL git-commit=$GIT_COMMIT
-LABEL data-prep-lab=${DATA_PREP_LAB}
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r  requirements.txt
+RUN rm requirements.txt
 
-RUN pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple data-prep-lab==${DATA_PREP_LAB}
-# Update to fix security
-RUN pip install pillow==10.2.0
-RUN pip install fastapi==0.109.1
-RUN pip install aiohttp==3.9.2
-#cryptography==42.0.4
-### For blocklist
-RUN pip install pygtrie>=2.5.0
+# Copy in the data processing framework source/project and install it
+# This is expected to be placed in the docker context before this is run (see the make image).
+COPY data-processing-lib/ data-processing-lib/
+USER root
+RUN chown -R ray /home/ray/data-processing-lib
+USER ray
+RUN pip install --no-cache-dir --extra-index-url ${EXTRA_ARTIFACTORY_URL} --no-cache-dir -e data-processing-lib
 
 COPY ./src/blocklist_transform.py . 
+
+RUN pip install --no-cache-dir pytest
+COPY test/ test/
+COPY test-data/ test-data/
+
+USER root
+RUN chown -R ray /home/ray/test
+RUN chown -R ray /home/ray/test-data
+USER ray
+
 ENV PYTHONPATH /home/ray

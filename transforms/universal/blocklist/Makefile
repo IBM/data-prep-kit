@@ -8,7 +8,7 @@ REPOROOT=../../..
 include ../../.make.transforms
 
 TRANSFORM_NAME=blocklist
-DOCKER_IMAGE_VERSION=0.1.3
+DOCKER_IMAGE_VERSION=0.1.0
 
 
 
