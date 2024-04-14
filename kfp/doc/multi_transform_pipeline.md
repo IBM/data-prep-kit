@@ -24,10 +24,3 @@ in the list of input parameters we can also find `s3_config` input parameter. In
 
 
 **Note** In the next release we are going to provide an automation for this scenario which will be a `super pipeline` that each of its steps is a separate transform.
-
-
-
-
-
-
- that this command has to run from the project kind subdirectory
