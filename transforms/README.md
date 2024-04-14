@@ -6,8 +6,9 @@ and read as [pyarrow tables](https://arrow.apache.org/docs/python/index.html).
 
 Transforms are written to process the [table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
 to, for example:
-    * Annotate the tables to add additional data such as document quality score, language, etc.
-    * Filter the table to remove or edit rows and/or columns, for example to remove rows from blocked domain. 
+
+* Annotate the tables to add additional data such as document quality score, language, etc.
+* Filter the table to remove or edit rows and/or columns, for example to remove rows from blocked domain. 
 
 While these transformation modules were originally built for pre-training, they are also useful for fine-tuning data preparation.
 
@@ -16,19 +17,18 @@ Annotating transforms examine 1 or more columns of data, typically a _content_ c
 to be annotated.  The content is often spoken/text or programming language, generally to build
 a large language model (LLM).  Examples of annotation might include:
 
-    * Language identification - an additional string column is added to identify the language of the document content. 
-    * Document quality - an additional float column is added to associated a quality score with the document. 
-    * Block listing - an addtional boolean column is added that indicates if the content source url 
+* Language identification - an additional string column is added to identify the language of the document content. 
+* Document quality - an additional float column is added to associated a quality score with the document. 
+* Block listing - an addtional boolean column is added that indicates if the content source url 
       (in one of the columns) is from a blocked domain. 
 
 ## Filtering Transforms
 Filtering transforms modify the rows and/or columns, usually based on associated column values.  
 For example,
 
-    * Language selection - remove rows that do not match the desired language 
-    * Document quality threshold - remove rows that do not meet a minimum document quality value. 
-    * Block listing - remove rows that have been flagged as having been sourced from undesirable domains. 
-
+* Language selection - remove rows that do not match the desired language 
+* Document quality threshold - remove rows that do not meet a minimum document quality value. 
+* Block listing - remove rows that have been flagged as having been sourced from undesirable domains. 
 
 ## Transform Organization
 This directory hierarchy of transforms is organized as follows:
