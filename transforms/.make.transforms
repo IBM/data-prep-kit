@@ -212,3 +212,37 @@ REGISTRY_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE)
 	$(DOCKER) logout $(DOCKER_REGISTRY) 
 	$(DOCKER) login $(DOCKER_REGISTRY) -u $(DOCKER_REGISTRY_USER) -p '$(DOCKER_REGISTRY_KEY)'
 	$(DOCKER) push  $(REGISTRY_IMAGE) 
+
+.PHONY: .transforms-check-exists
+.transforms-check-exists:
+	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
+	if  [ -z "$$exists" ]; then				\
+	    echo Expected $(CHECK_FILE_NAME) in directory $(CHECK_DIR); 	\
+	    exit 1;						\
+	fi
+
+.PHONY: .transforms-check-target 
+.transforms-check-target:
+	@exists=$$(grep $(CHECK_TARGET) Makefile);		\
+	if  [ -z "$$exists" ]; then				\
+	    echo Missing makefile target $(CHECK_TARGET); 	\
+	    exit 1;						\
+	fi
+
+.PHONY: check-conventions 
+conventions:
+	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_ray.py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_launch.py .transforms-check-exists
+	@$(MAKE) CHECK_TARGET=build .transforms-check-target
+	@$(MAKE) CHECK_TARGET=clean .transforms-check-target
+	@$(MAKE) CHECK_TARGET=image .transforms-check-target
+	@$(MAKE) CHECK_TARGET=publish .transforms-check-target
+	@$(MAKE) CHECK_TARGET=setup .transforms-check-target
+	@$(MAKE) CHECK_TARGET=test .transforms-check-target
+	@$(MAKE) CHECK_TARGET=test-src .transforms-check-target
+	@$(MAKE) CHECK_TARGET=test-image .transforms-check-target
+	@$(MAKE) CHECK_TARGET=venv .transforms-check-target
+	@echo Project conventions for transform $(TRANSFORM_NAME) are statisfied
+
