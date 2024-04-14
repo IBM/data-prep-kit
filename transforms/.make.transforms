@@ -223,7 +223,7 @@ REGISTRY_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE)
 
 .PHONY: .transforms-check-target 
 .transforms-check-target:
-	@exists=$$(grep $(CHECK_TARGET) Makefile);		\
+	@exists=$$(grep "^$(CHECK_TARGET):" Makefile);		\
 	if  [ -z "$$exists" ]; then				\
 	    echo Missing makefile target $(CHECK_TARGET); 	\
 	    exit 1;						\
