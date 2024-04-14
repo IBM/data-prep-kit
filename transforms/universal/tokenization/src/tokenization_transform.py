@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 """
 Libraries need to be added to venv:
     transformers==4.35.0
@@ -14,17 +26,20 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-
 from data_processing.utils import get_logger
+
+
 logger = get_logger(__name__)
 
-from tokenization_utils import split_text, load_tokenizer, is_valid_argument_string
+from tokenization_utils import is_valid_argument_string, load_tokenizer, split_text
+
 
 CHUNK_CHECKPOINT_INTERVAL = 100
 
+
 class TokenizationTransform(AbstractTableTransform):
-    """
-    """
+    """ """
+
     def __init__(self, config: dict[str, Any]):
         """
         This class is used to transform an input table to an output table utilizing a tokenizer.
@@ -36,7 +51,7 @@ class TokenizationTransform(AbstractTableTransform):
         # of TokenizationTransformConfiguration class
 
         super().__init__(config)
-        self.tokenizer = config.get("tokenizer","hf-internal-testing/llama-tokenizer")
+        self.tokenizer = config.get("tokenizer", "hf-internal-testing/llama-tokenizer")
         self.tokenizer_args = config.get("tokenizer_args", None)
         self.doc_id_column = config.get("doc_id_column", "document_id")
         self.doc_content_column = config.get("doc_content_column", "contents")
@@ -44,13 +59,11 @@ class TokenizationTransform(AbstractTableTransform):
         self.text_lang = config.get("text_lang", "en")
 
         logger.debug(f"\n*** `config` to run:")
-        for k,v in config.items():
+        for k, v in config.items():
             logger.debug(f"{k:20s}: {v}")
 
         # overwrite tokenizer:
-        self.tokenizer = load_tokenizer(tokenizer_name=self.tokenizer,
-                                        tokenizer_args=self.tokenizer_args)
-
+        self.tokenizer = load_tokenizer(tokenizer_name=self.tokenizer, tokenizer_args=self.tokenizer_args)
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -90,17 +103,19 @@ class TokenizationTransform(AbstractTableTransform):
                     start_time = time.time()
                     token_line = []
                     doc_len_so_far = 0
-                    for chunk_idx,chunk in enumerate(split_text(doc_content,self.chunk_size, self.text_lang)):
+                    for chunk_idx, chunk in enumerate(split_text(doc_content, self.chunk_size, self.text_lang)):
                         token_line.extend(self.tokenizer(chunk)["input_ids"])
                         doc_len_so_far += len(chunk)
 
-                        if (chunk_idx+1)%CHUNK_CHECKPOINT_INTERVAL==0 or (doc_len_so_far == doc_length):
+                        if (chunk_idx + 1) % CHUNK_CHECKPOINT_INTERVAL == 0 or (doc_len_so_far == doc_length):
                             elapse_time = int(time.time() - start_time)
-                            logger.info(f"row_idx: {idx:5,} "
-                                        f"(doc_id: {doc_id}) "
-                                        f"chunk_idx: {chunk_idx:6,} ({doc_len_so_far:11,}/{doc_length:11,} {100*doc_len_so_far/doc_length:5.1f}%) "
-                                        f"#tokens: {len(token_line):9,} "
-                                        f"elapse_time:{elapse_time: .1f}(s)")
+                            logger.info(
+                                f"row_idx: {idx:5,} "
+                                f"(doc_id: {doc_id}) "
+                                f"chunk_idx: {chunk_idx:6,} ({doc_len_so_far:11,}/{doc_length:11,} {100*doc_len_so_far/doc_length:5.1f}%) "
+                                f"#tokens: {len(token_line):9,} "
+                                f"elapse_time:{elapse_time: .1f}(s)"
+                            )
                 else:
                     token_line = self.tokenizer(doc_content)["input_ids"]
             except Exception as e:
@@ -120,20 +135,24 @@ class TokenizationTransform(AbstractTableTransform):
                 processed_doc_ids.append(doc_id)
                 token_count.append(num_tokens)
 
-
-        out_table = pa.table({"tokens": doc_tokens,
-                              self.doc_id_column: processed_doc_ids,
-                              "document_length": doc_lengths,
-                              "token_count": token_count})
+        out_table = pa.table(
+            {
+                "tokens": doc_tokens,
+                self.doc_id_column: processed_doc_ids,
+                "document_length": doc_lengths,
+                "token_count": token_count,
+            }
+        )
         logger.debug(f"Done with the transformed table with {table.num_rows:,} rows")
 
-        metadata = {"num_files": 1,
-                    "num_rows": table.num_rows,
-                    "num_tokenized_rows": out_table.num_rows,
-                    "num_empty_rows": len(empty_doc_ids),
-                    "num_tokens": sum(token_count),
-                    "num_chars": sum(doc_lengths),
-                    }
+        metadata = {
+            "num_files": 1,
+            "num_rows": table.num_rows,
+            "num_tokenized_rows": out_table.num_rows,
+            "num_empty_rows": len(empty_doc_ids),
+            "num_tokens": sum(token_count),
+            "num_chars": sum(doc_lengths),
+        }
 
         return [out_table], metadata
 
@@ -159,7 +178,7 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
             "--tkn_tokenizer",
             type=str,
             default="hf-internal-testing/llama-tokenizer",
-            help="Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, `hf-internal-testing/llama-tokenizer` from HuggingFace is used" ,
+            help="Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, `hf-internal-testing/llama-tokenizer` from HuggingFace is used",
         )
 
         parser.add_argument(
@@ -172,14 +191,14 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
         parser.add_argument(
             "--tkn_doc_id_column",
             type=str,
-            default='document_id',
+            default="document_id",
             help="Column contains document id which values should be unique across dataset",
         )
 
         parser.add_argument(
             "--tkn_doc_content_column",
             type=str,
-            default='contents',
+            default="contents",
             help="Column contains document content",
         )
 
@@ -198,7 +217,6 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
             help="Specify >0 value to tokenize each row/text in chunks of characters (rounded in words)",
         )
 
-
     def apply_input_params(self, args: Namespace) -> bool:
         """
         Validate and apply the arguments that have been parsed
@@ -206,29 +224,32 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         if args.tkn_tokenizer is None:
-            logger.error(f"Parameter --tkn_tokenizer must be a valid tokenizer for tokenization, you specified {args.tkn_tokenizer}")
+            logger.error(
+                f"Parameter --tkn_tokenizer must be a valid tokenizer for tokenization, you specified {args.tkn_tokenizer}"
+            )
             return False
 
         # set arguments for tokenizer to None if it is an empty string (supporting KFP):
-        if args.tkn_tokenizer_args=="":
-            args.tkn_tokenizer_args=None
+        if args.tkn_tokenizer_args == "":
+            args.tkn_tokenizer_args = None
 
         if args.tkn_tokenizer_args is not None:
             if not is_valid_argument_string(args.tkn_tokenizer_args):
                 logger.error(
-                    f"Parameter --tkn_tokenizer_args must be a valid argument string of `key1=value1,key2=value2`, you specified {args.tkn_tokenizer_args}")
+                    f"Parameter --tkn_tokenizer_args must be a valid argument string of `key1=value1,key2=value2`, you specified {args.tkn_tokenizer_args}"
+                )
                 return False
-
 
         if args.tkn_doc_id_column is None or args.tkn_doc_content_column is None:
             logger.error(f"Values for `--tkn_doc_id_column` and `--tkn_doc_content_column` must be provided")
             return False
 
         # For MVP1: only support english text:
-        if args.tkn_text_lang !='en':
-            logger.error(f"This version has not supported languages other than `en` yet, you specified {args.tkn_text_lang}")
+        if args.tkn_text_lang != "en":
+            logger.error(
+                f"This version has not supported languages other than `en` yet, you specified {args.tkn_text_lang}"
+            )
             return False
-
 
         self.params["tokenizer"] = args.tkn_tokenizer
         self.params["tokenizer_args"] = args.tkn_tokenizer_args

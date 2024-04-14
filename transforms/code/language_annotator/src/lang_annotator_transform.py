@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import argparse
 from typing import Any
 
@@ -45,49 +57,33 @@ class LangSelectorTransform(AbstractTableTransform):
 
         super().__init__(config)
         self.lang_column = config.get(lang_lang_column_key, "")
-        self.output_column = config.get(
-            lang_output_column_key, lang_default_output_column
-        )
+        self.output_column = config.get(lang_output_column_key, lang_default_output_column)
         self.known = config.get(lang_known_selector, True)
         languages_include_ref = config.get(lang_allowed_languages, None)
         if languages_include_ref is None:
             path = config.get(lang_allowed_langs_file_key, None)
             if path is None:
-                raise RuntimeError(
-                    f"Missing configuration value for key {lang_allowed_langs_file_key}"
-                )
+                raise RuntimeError(f"Missing configuration value for key {lang_allowed_langs_file_key}")
             daf = config.get(lang_data_factory_key, None)
             if daf is None:
-                raise RuntimeError(
-                    f"Missing configuration value for key {lang_data_factory_key}"
-                )
-            self.languages_include = _get_supported_languages(
-                lang_file=path, data_access=daf.create_data_access()
-            )
+                raise RuntimeError(f"Missing configuration value for key {lang_data_factory_key}")
+            self.languages_include = _get_supported_languages(lang_file=path, data_access=daf.create_data_access())
         else:
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
             try:
-                logger.info(
-                    f"Loading languages to include from Ray storage under reference {languages_include_ref}"
-                )
+                logger.info(f"Loading languages to include from Ray storage under reference {languages_include_ref}")
                 self.languages_include = ray.get(languages_include_ref)
             except Exception as e:
-                logger.info(
-                    f"Exception loading languages list from ray object storage {e}"
-                )
-                raise RuntimeError(
-                    f"exception loading from object storage for key {languages_include_ref}"
-                )
+                logger.info(f"Exception loading languages list from ray object storage {e}")
+                raise RuntimeError(f"exception loading from object storage for key {languages_include_ref}")
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
         """
         Select the rows for which the column `self.lang_column` has a value in the list `self.languages_include`.
         """
         # Ensure that the column exists
-        if not TransformUtils.validate_columns(
-            table=table, required=[self.lang_column]
-        ):
+        if not TransformUtils.validate_columns(table=table, required=[self.lang_column]):
             return [], {}
 
         mask_known = [False] * table.num_rows
@@ -101,9 +97,7 @@ class LangSelectorTransform(AbstractTableTransform):
             index += 1
         unknown_count = table.num_rows - known_count
         # pick the table to return
-        out_table = TransformUtils.add_column(
-            table, self.output_column, pa.array(mask_known)
-        )
+        out_table = TransformUtils.add_column(table, self.output_column, pa.array(mask_known))
         return [out_table], {
             "supported languages": known_count,
             "unsupported languages": unknown_count,
@@ -140,9 +134,7 @@ class LangSelectorRuntime(DefaultTableTransformRuntime):
         """
         lang_file = self.params.get(lang_allowed_langs_file_key, None)
         if lang_file is None:
-            raise RuntimeError(
-                f"Missing configuration key {lang_allowed_langs_file_key}"
-            )
+            raise RuntimeError(f"Missing configuration key {lang_allowed_langs_file_key}")
         lang_data_access_factory = self.params.get(lang_data_factory_key, None)
         if lang_data_access_factory is None:
             raise RuntimeError(f"Missing configuration key {lang_data_factory_key}")
@@ -151,9 +143,7 @@ class LangSelectorRuntime(DefaultTableTransformRuntime):
             data_access=lang_data_access_factory.create_data_access(),
         )
         lang_refs = ray.put(list(lang_list))
-        logger.info(
-            f"Placed language list into Ray object storage under reference{lang_refs}"
-        )
+        logger.info(f"Placed language list into Ray object storage under reference{lang_refs}")
         return {lang_allowed_languages: lang_refs} | self.params
 
 
@@ -239,7 +229,5 @@ class LangSelectorTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(
-        transform_runtime_config=LangSelectorTransformConfiguration()
-    )
+    launcher = TransformLauncher(transform_runtime_config=LangSelectorTransformConfiguration())
     launcher.launch()

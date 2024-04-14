@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
@@ -15,7 +27,7 @@ EXEC_SCRIPT_NAME: str = "lang_annotator_transform.py"
 task_image = "quay.io/dataprep1/data-prep-lab/lang_annotator:0.1.0"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.4"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.6"
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, insted of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
@@ -30,6 +42,7 @@ cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/clea
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
 TASK_NAME: str = "lang_select"
 PREFIX: str = "lang_select"
+
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
@@ -95,7 +108,12 @@ def lang_select(
     :param lang_select_language_column - name of select language annotation column
     :param lang_select_return_known - Flag to return docs with known languages (True) or unknown (False).
     :param lang_select_local_config - lang select local config
+<<<<<<< HEAD:kfp/transform_workflows/code/language_annotation/language_annotation_wf.py
     :param lang_select_s3_access_secret - 
+=======
+    :param lang_select_s3_config - lang select s3 config
+    :param lang_select_s3_access_secret -
+>>>>>>> dev:kfp/transform_workflows/code/language_filtering/language_filtering_wf.py
                     (here we are assuming that select language info is in S3, but potentially in the different bucket)
     :return: None
     """

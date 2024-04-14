@@ -1,5 +1,16 @@
-import enum
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
 
+import enum
 from typing import Any
 
 
@@ -7,17 +18,19 @@ class TolerationOperation(enum.Enum):
     """
     Toleration operation types
     """
-    Exists = "Exists"   # exists
-    Equal = "Equal"     # equal
+
+    Exists = "Exists"  # exists
+    Equal = "Equal"  # equal
 
 
 class TolerationEffect(enum.Enum):
     """
     Toleration effect
     """
-    NoSchedule = "NoSchedule"               # not schedule
-    PreferNoSchedule = "PreferNoSchedule"   # prefer not schedule
-    NoExecute = "NoExecute"                 # not execute
+
+    NoSchedule = "NoSchedule"  # not schedule
+    PreferNoSchedule = "PreferNoSchedule"  # prefer not schedule
+    NoExecute = "NoExecute"  # not execute
 
 
 class Toleration:
@@ -35,8 +48,7 @@ class Toleration:
     - to_dict() -> dict[str, Any] convert to dict
     """
 
-    def __init__(self, key: str, operator: TolerationOperation, effect: TolerationEffect,
-                 value: str = None):
+    def __init__(self, key: str, operator: TolerationOperation, effect: TolerationEffect, value: str = None):
         """
         Initialization
         :param key: key
@@ -97,8 +109,17 @@ class Template:
     - to_dict() -> dict[str, Any] convert to dict
     - to_json() -> str convert to json string
     """
-    def __init__(self, name: str, namespace: str, cpu: int, memory: int, gpu: int = 0,
-                 gpu_accelerator: str = None, tolerations: list[Toleration] = None):
+
+    def __init__(
+        self,
+        name: str,
+        namespace: str,
+        cpu: int,
+        memory: int,
+        gpu: int = 0,
+        gpu_accelerator: str = None,
+        tolerations: list[Toleration] = None,
+    ):
         """
         Initialization
         :param name: name
@@ -166,8 +187,12 @@ def toleration_decoder(dct: dict[str, Any]) -> Toleration:
     :param dct: dictionary representation of toleration
     :return: toleration
     """
-    return Toleration(key=dct.get("key"), operator=TolerationOperation(dct.get("operator", "Exists")),
-                      effect=TolerationEffect(dct.get("effect", "NoSchedule")), value=dct.get("value"))
+    return Toleration(
+        key=dct.get("key"),
+        operator=TolerationOperation(dct.get("operator", "Exists")),
+        effect=TolerationEffect(dct.get("effect", "NoSchedule")),
+        value=dct.get("value"),
+    )
 
 
 def template_decoder(dct: dict[str, Any]) -> Template:
@@ -179,9 +204,15 @@ def template_decoder(dct: dict[str, Any]) -> Template:
     tolerations = None
     if "tolerations" in dct:
         tolerations = [toleration_decoder(d) for d in dct["tolerations"]]
-    return Template(name=dct.get("name"), namespace=dct.get("namespace"), cpu=int(dct.get("cpu", "0")),
-                    memory=int(dct.get("memory", "0")), gpu=int(dct.get("gpu", "0")),
-                    gpu_accelerator=dct.get("gpu_accelerator"), tolerations=tolerations)
+    return Template(
+        name=dct.get("name"),
+        namespace=dct.get("namespace"),
+        cpu=int(dct.get("cpu", "0")),
+        memory=int(dct.get("memory", "0")),
+        gpu=int(dct.get("gpu", "0")),
+        gpu_accelerator=dct.get("gpu_accelerator"),
+        tolerations=tolerations,
+    )
 
 
 def templates_decoder(dct: dict[str, Any]) -> list[Template]:

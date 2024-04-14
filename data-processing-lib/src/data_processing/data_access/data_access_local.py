@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import gzip
 import json
 import os
@@ -19,13 +31,13 @@ class DataAccessLocal(DataAccess):
     """
 
     def __init__(
-            self,
-            path_config: dict[str, str] = None,
-            d_sets: list[str] = None,
-            checkpoint: bool = False,
-            m_files: int = -1,
-            n_samples: int = -1,
-            files_to_use: list[str] = ['.parquet'],
+        self,
+        path_config: dict[str, str] = None,
+        d_sets: list[str] = None,
+        checkpoint: bool = False,
+        m_files: int = -1,
+        n_samples: int = -1,
+        files_to_use: list[str] = [".parquet"],
     ):
         """
         Create data access class for folder based configuration
@@ -80,7 +92,7 @@ class DataAccessLocal(DataAccess):
         return files
 
     def _get_files_folder(
-            self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
+        self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
     ) -> tuple[list[str], dict[str, float]]:
         """
         Support method.  Lists all parquet files in a directory and their sizes.
@@ -115,12 +127,12 @@ class DataAccessLocal(DataAccess):
         )
 
     def _get_input_files(
-            self,
-            input_path: str,
-            output_path: str,
-            cm_files: int,
-            max_file_size: int = 0,
-            min_file_size: int = MB * GB,
+        self,
+        input_path: str,
+        output_path: str,
+        cm_files: int,
+        max_file_size: int = 0,
+        min_file_size: int = MB * GB,
     ) -> tuple[list[str], dict[str, float]]:
         """
         Get list and size of files from input path, that do not exist in the output path

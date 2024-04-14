@@ -1,3 +1,17 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
+import os
+
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
@@ -9,17 +23,16 @@ from kfp_support.workflow_support.utils import (
 from kubernetes import client as k8s_client
 from src.fdedup_compute_execution_params import fdedup_compute_execution_params
 
+
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "fdedup_transform.py"
 
 task_image = "quay.io/dataprep1/data-prep-lab/fdedup:0.1.4"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.5"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.6"
 # compute execution parameters
-compute_exec_params_op = comp.func_to_container_op(
-    func=fdedup_compute_execution_params, base_image=base_kfp_image
-)
+compute_exec_params_op = comp.func_to_container_op(func=fdedup_compute_execution_params, base_image=base_kfp_image)
 # create Ray cluster
 create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
 # execute job
@@ -54,7 +67,7 @@ def fdedup(
     # columns used
     doc_column: str = "contents",
     id_column: str = "int_id_column",
-    cluster_column: str =  "cluster",
+    cluster_column: str = "cluster",
     # infrastructure
     bucket_cpu: float = 0.5,
     doc_cpu: float = 0.5,
