@@ -13,6 +13,7 @@ LABEL data-prep-lab=${DATA_PREP_LAB}
 LABEL data-prep-lab-kfp=${DATA_PREP_LAB_KFP}
 
 RUN pip install --no-cache-dir scipy==1.13.0
+RUN pip install --no-cache-dir "ray[default]"==2.9.3
 RUN pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple data-prep-lab==${DATA_PREP_LAB}
 RUN pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple data-prep-lab-kfp==${DATA_PREP_LAB_KFP}
 

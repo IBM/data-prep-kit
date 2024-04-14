@@ -17,8 +17,7 @@ DOCKER_NAME ?= kfp-data-processing
 IMG ?= ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_TAGNAME}
 
 # Create the docker image making sure the preloaded models are available to copy into the image
-.kfp_comp.image:: Dockerfile requirements.txt
-	$(call check_defined, DOCKER_HOSTNAME)
+.kfp_comp.image:: Dockerfile
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
 	$(DOCKER) build -t ${IMG} \
 		--build-arg DATA_PREP_LAB=${DATA_PREP_LAB} \

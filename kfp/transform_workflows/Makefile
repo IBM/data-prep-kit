@@ -24,8 +24,6 @@ clean::
 	find . -iname "*_wf.yaml" |  xargs rm -f || true
 
 .check-env:: .check_python_version
-	$(call check_defined, ARTIFACTORY_USER)
-	$(call check_defined, ARTIFACTORY_API_KEY)
 	$(call check_defined, DATA_PREP_LAB_KFP)
 	@echo "Checks passed"
 
@@ -57,6 +55,6 @@ venv::	.check-env
 	. ${VENV_ACTIVATE}; 	\
 	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple \
 	pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple data-prep-lab==${DATA_PREP_LAB} \
-	pip install -i https://test.pypi.org/simple/ fm-data-processing-kfp==${DATA_PREP_LAB_KFP}
+	pip install --no-cache-dir -i https://test.pypi.org/simple/ data-prep-lab-kfp==${DATA_PREP_LAB_KFP}
 
 test::
