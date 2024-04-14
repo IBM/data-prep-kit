@@ -17,7 +17,7 @@ It comprises 2 main modules
 ### Git
 Simple clone the repo and set up the pre-commit hooks.
 ```shell
-git clone git@github.ibm.com:ai-models-data/fm-data-engineering.git
+git clone git@github.com:IBM/data-prep-lab.git
 cd kfp/kfp_support_lib
 pre-commit install
 ```
