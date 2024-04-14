@@ -34,13 +34,7 @@ For example,
 This directory hierarchy of transforms is organized as follows:
 
 * `universal` - transforms applicable across code and language model data include
-    * Doc id addition 
-    * Deduplicatifation - both exact and fuzzy
-    * Coalesce/split
-    * Blocklisting
 * `language` - spoken language model specific transforms
-    * Document quality
-    * Language Identification
 * `code` - programming language specific transforms.
 
 Each of the `universal`, `language` and `code`  directories contains a directory for a specific transform.
