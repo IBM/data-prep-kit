@@ -239,8 +239,8 @@ REGISTRY_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE)
 
 .PHONY: .transforms-check-dir-size
 .transforms-check-dir-size:
-	@mb=$$(du -sm $(CHECK_DIR) | awk '{print $1}');	\
-	if  [[ $$mb > 15 ]]; then				\
+	@mb=$$(du -sm $(CHECK_DIR) | awk '{print $$1}');	\
+	if  [ $$mb -gt 15 ]; then				\
 	    echo Directory $(CHECK_DIR) is too large;		\
 	    exit 1;						\
 	fi
