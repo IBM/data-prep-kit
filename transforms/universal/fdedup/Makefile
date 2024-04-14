@@ -7,7 +7,7 @@ REPOROOT=../../..
 include ../../.make.transforms
 
 TRANSFORM_NAME=fdedup
-DOCKER_IMAGE_VERSION=0.1
+DOCKER_IMAGE_VERSION=0.1.4
 
 venv::	.transforms.venv
 
