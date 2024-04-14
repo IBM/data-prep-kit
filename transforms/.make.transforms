@@ -245,7 +245,7 @@ REGISTRY_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE)
 	    exit 1;						\
 	fi
 
-.PHONY: check-conventions 
+.PHONY: conventions 
 conventions:
 	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  .transforms-check-not-exists
 	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists
