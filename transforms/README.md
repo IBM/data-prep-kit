@@ -49,25 +49,34 @@ As such they each have their own virtual environments for development.
 
 ## Transform Project Conventions
 
-The transform projects all try to use a common set of conventions include code layout, build, documentation and IDE recommendations.
+The transform projects all try to use a common set of conventions include code layout,
+build, documentation and IDE recommendations.  For a transformed named `xyz`, it is 
+expected to have its project located under on of 
+`transforms/code/xyz`
+`transforms/language/xyz`, OR
+`transforms/universal/xyz`
  
 ### Project Organization
-1. `src` directory contain python source for the transform.  `xyz_transform.py` 
-generally contains the following:
-    * `XYZTransform` class
-    * `XYXTransformConfiguration` class
-    * `XYZTransformRuntime` class, if needed.
-    * main() to start the `TransformLauncher` with the above.
+1. `src` directory contain python source for the transform with the following naming conventions/requirements.
+   * `xyz_transform.py` generally contains the following:
+        * `XYZTransform` class
+        * `XYXTransformConfiguration` class
+        * `XYZTransformRuntime` class, if needed.
+        * main() to start the `TransformLauncher` with the above.
+   * `xyz_local.py` - runs the transform on input to produce output w/o ray
+   * `xyz_local_ray.py` - runs the transform in ray on data in `test-data/input` directory using the `TransformLauncher`
 1. `test` directory contains pytest test sources 
-    * `test_xyz.py` - a standalone (non-ray lauched) transform test.  This is best for initial debugging.
+    * `test_xyz.py` - a standalone (non-ray launched) transform test.  This is best for initial debugging.
         * Inherits from an abstract test class so that to test one needs only to provide test data.
     * `test_xyz_launch.py` - runs ray via launcher. 
         * Again, inherits from an abstract test class so that to test one needs only to provide test data.
-    * They are expected to be run from **within** the `test` directory.
-        * From the command line, `make test` sets up the virtual environment and PYTHONPATH to include `src`
-        * From the IDE, you **must** add the `src` directory to the project's Sources Root (see below).
-        * Do **not** add `sys.path.append(...)` in the test python code.
-        * All test data should be referenced as `../test-data`.
+        
+    These are expected to be run from anywhere and so need to use 
+    `__file__` location to create absolute directory paths to the data in the `../test-data` directory.
+    From the command line, `make test` sets up the virtual environment and PYTHONPATH to include `src`
+    From the IDE, you **must** add the `src` directory to the project's Sources Root (see below).
+    Do **not** add `sys.path.append(...)` in the test python code.
+    All test data should be referenced as `../test-data`.
 2. `test-data` contains any data file used by your tests.  Please don't put files over 5 MB here unless you really need to.
 3. `requirements.txt` - used to create both the `venv` directory and docker image
 4. A virtual environment (created in `venv` directory using `make venv`) is used for development and testing.
@@ -88,15 +97,13 @@ control its operation.  For example, the size of a table, the location
 of a model, etc. These are set either explicitly in dictionaries
 (e.g. during testing) or from the command line when run from a Ray launcher.
 
-When specified on the command line, they are specified by prefixing with
-`--` (dash dash).  For example, `--mytransform_some_cfg somevalue` sets 
-the value for the `mytransform_some_cfg` configuration key value to `somevalue`. 
+When specified on the command line, transform `xyz` should use an `xyz` prefix with
+`--xyz_` (dash dash) to define its command line options.
+For example, `--xyz_some_cfg somevalue` sets 
+the value for the `xyz_some_cfg` configuration key value to `somevalue`. 
 To avoid potential collisions with options for the Ray launcher, Data Access Factory and others, 
-it is strongly encouraged to not use single dash options with a single or small number of characters (e.g. -n).
-
-In general, a common prefix (i.e. `mytransform_`) is used to help distinguish these keys, primarily
-for ease-of-use/readability command line use, logging, etc.  This is not required, but
-strongly recommended.
+it is strongly encouraged to not use single dash options with a single
+or small number of characters (e.g. -n).
 
 ### Building the docker image
 Generally to build a docker image, one uses the `make image` command, which uses
