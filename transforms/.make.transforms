@@ -235,6 +235,7 @@ conventions:
 	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_ray.py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_launch.py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=. CHECK_FILE_NAME=.dockerignore  .transforms-check-exists
 	@$(MAKE) CHECK_TARGET=build .transforms-check-target
 	@$(MAKE) CHECK_TARGET=clean .transforms-check-target
 	@$(MAKE) CHECK_TARGET=image .transforms-check-target
