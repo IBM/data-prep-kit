@@ -51,7 +51,7 @@ venv::	pyproject.toml .check-env
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
 	pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple data-prep-lab==${DATA_PREP_LAB} \
-	pip install -e .;		\
+	pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple data-prep-lab-kfp==${DATA_PREP_LAB_KFP} ;\
 	pip install ray==${RAY} \
 	pip install pytest pytest-cov 
 
