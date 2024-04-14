@@ -81,14 +81,17 @@ expected to have its project located under on of
 3. `requirements.txt` - used to create both the `venv` directory and docker image
 4. A virtual environment (created in `venv` directory using `make venv`) is used for development and testing.
 5. A generic `Dockerfile` is available that should be sufficient for most transforms.  
-6. `Makefile` is used for most common operations
-    * venv - builds the python virtual environment for CLI and IDE use
-    * image - creates the docker image
-    * test-src - sets up the virtual environment and runs test in the test directory.
-    * test-image - runs the tests from within the image. 
-    * test - runs both test-src and test-image tests.
-    * help - shows all targets and help text
-The `Makefile` also defines a number of macros/variables that can be set, including the name and version of the docker image, 
+6. `Makefile` is used for most common operations.
+    * Should define `TRANSFORM_NAME=xyz` (see 1 above) - allows automation to reference correct files defined above.
+    * Generally, defines the following targets for easy of operation.
+        * help - shows all targets and help text
+        * venv - builds the python virtual environment for CLI and IDE use
+        * image - creates the docker image
+        * test-src - sets up the virtual environment and runs test in the test directory.
+        * test-image - runs the tests from within the image. 
+        * test - runs both test-src and test-image tests.
+        
+    The `Makefile` also defines a number of macros/variables that can be set, including the version of the docker image, 
 python executable and more.
 
 ### Configuration and command line options
