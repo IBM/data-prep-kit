@@ -108,12 +108,7 @@ def lang_select(
     :param lang_select_language_column - name of select language annotation column
     :param lang_select_return_known - Flag to return docs with known languages (True) or unknown (False).
     :param lang_select_local_config - lang select local config
-<<<<<<< HEAD:kfp/transform_workflows/code/language_annotation/language_annotation_wf.py
-    :param lang_select_s3_access_secret - 
-=======
-    :param lang_select_s3_config - lang select s3 config
-    :param lang_select_s3_access_secret -
->>>>>>> dev:kfp/transform_workflows/code/language_filtering/language_filtering_wf.py
+    :param lang_select_s3_access_secret - block list access secret 
                     (here we are assuming that select language info is in S3, but potentially in the different bucket)
     :return: None
     """
