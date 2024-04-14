@@ -221,6 +221,14 @@ REGISTRY_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE)
 	    exit 1;						\
 	fi
 
+.PHONY: .transforms-check-not-exists
+.transforms-check-not-exists:
+	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
+	if  [ ! -z "$$exists" ]; then				\
+	    echo Unexpected file $(CHECK_FILE_NAME) in directory $(CHECK_DIR); 	\
+	    exit 1;						\
+	fi
+
 .PHONY: .transforms-check-target 
 .transforms-check-target:
 	@exists=$$(grep "^$(CHECK_TARGET):" Makefile);		\
@@ -229,13 +237,23 @@ REGISTRY_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE)
 	    exit 1;						\
 	fi
 
+.PHONY: .transforms-check-dir-size
+.transforms-check-dir-size:
+	@mb=$$(du -sm $(CHECK_DIR) | awk '{print $1}');	\
+	if  [[ $$mb > 15 ]]; then				\
+	    echo Directory $(CHECK_DIR) is too large;		\
+	    exit 1;						\
+	fi
+
 .PHONY: check-conventions 
 conventions:
+	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  .transforms-check-not-exists
 	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_ray.py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_launch.py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=. CHECK_FILE_NAME=.dockerignore  .transforms-check-exists
+	@$(MAKE) CHECK_DIR=test-data .transforms-check-dir-size
 	@$(MAKE) CHECK_TARGET=build .transforms-check-target
 	@$(MAKE) CHECK_TARGET=clean .transforms-check-target
 	@$(MAKE) CHECK_TARGET=image .transforms-check-target
