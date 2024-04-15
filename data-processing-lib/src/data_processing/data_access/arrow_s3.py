@@ -30,13 +30,20 @@ class ArrowS3:
     """
 
     def __init__(
-        self, access_key: str, secret_key: str, endpoint: str, s3_retries: int = 10, s3_max_attempts=10
+        self,
+        access_key: str,
+        secret_key: str,
+        endpoint: str = None,
+        region: str = None,
+        s3_retries: int = 10,
+        s3_max_attempts=10,
     ) -> None:
         """
         Initialization
         :param access_key: s3 access key
         :param secret_key: s3 secret key
         :param endpoint: s3 endpoint
+        :param region: s3 region
         :param s3_retries: number of S3 retries - default 10
         :param s3_max_attempts - boto s3 client internal retries - default 10
         """
@@ -46,6 +53,7 @@ class ArrowS3:
             aws_access_key_id=access_key,
             aws_secret_access_key=secret_key,
             endpoint_url=endpoint,
+            region_name=region,
             config=Config(retries={"max_attempts": s3_max_attempts, "mode": "standard"}),
         )
         self.retries = s3_retries

@@ -1,8 +1,10 @@
 [project]
-name = "fm_data_processing"
-version = "0.3.0"
+name = "data_prep_lab"
+version = "0.0.1.dev5"
 requires-python = ">=3.10"
-description = "Data Processing Library"
+description = "Data Preparation Laboratory Library"
+license = {text = "Apache-2.0"}
+readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     { name = "David Wood", email = "dawood@us.ibm.com" },
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
@@ -13,12 +15,9 @@ dependencies = [
     "boto3==1.28.60",
     # The version of urllib fixes a whitesource-identified security issue - dawood 10/19/2023,
     "urllib3>=1.26.18",
-    "dmf-lib==1.2.5",
     "argparse",
     "mmh3"
 ]
-
-
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
@@ -33,6 +32,8 @@ dev = [
     "pre-commit>=3.3.2",
     "pytest-cov>=4.1.0",
     "pytest-mock>=3.10.0",
+    "moto==5.0.5",
+    "markupsafe==2.0.1",
 ]
 
 [options]

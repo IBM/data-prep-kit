@@ -10,8 +10,6 @@
 # limitations under the License.
 ################################################################################
 
-import os
-
 import pyarrow as pa
 from blocklist_transform import (
     BlockListTransform,
@@ -34,13 +32,12 @@ class TestBlockListTransform(AbstractTransformTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        test_src_dir = os.path.abspath(os.path.dirname(__file__))
         cli = [
             # When running outside the Ray orchestrator and its DataAccess/Factory, there is
             # no Runtime class to load the domains and the Transform must do it itself using
             # the blocklist_local_config for this test.
             f"--{blocked_domain_list_path_cli_param}",
-            os.path.abspath(os.path.join(test_src_dir, "../test-data/domains/arjel")),
+            "../test-data/domains/arjel",
             f"--{annotation_column_name_cli_param}",
             annotation_column_name_default,
             f"--{source_url_column_name_cli_param}",

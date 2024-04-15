@@ -12,8 +12,7 @@
 
 import os
 
-import pyarrow as pa
-from cq_transform import CodeQualityTransformConfiguration
+from code_quality_transform import CodeQualityTransformConfiguration
 from data_processing.test_support.ray import AbstractTransformLauncherTest
 
 

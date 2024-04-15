@@ -14,7 +14,7 @@ import os
 import sys
 
 from data_processing.ray import TransformLauncher
-from data_processing.utils import DPLConfig, ParamsUtils
+from data_processing.utils import ParamsUtils
 from tokenization_transform import TokenizationTransformConfiguration
 
 
@@ -23,9 +23,13 @@ print(os.environ)
 launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfiguration())
 # create parameters
 s3_cred = {
-    "access_key": DPLConfig.S3_ACCESS_KEY,
-    "secret_key": DPLConfig.S3_SECRET_KEY,
-    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
+    "access_key": "localminioaccesskey",
+    "secret_key": "localminiosecretkey",
+    "url": "http://localhost:9000",
+}
+s3_conf = {
+    "input_folder": "test/tokenization/ds01/input",
+    "output_folder": "test/tokenization/ds01/output",
 }
 tkn_params = {
     "tkn_tokenizer": "hf-internal-testing/llama-tokenizer",
@@ -33,10 +37,6 @@ tkn_params = {
     "tkn_doc_content_column": "contents",
     "tkn_text_lang": "en",
     "tkn_chunk_size": 0,
-}
-s3_conf = {
-    "input_folder": "cos-optimal-llm-pile/bluepile-processing/xh/opensource/input/",
-    "output_folder": "cos-optimal-llm-pile/bluepile-processing/xh/opensource/output/",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}

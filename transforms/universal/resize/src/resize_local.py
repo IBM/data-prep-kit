@@ -13,7 +13,6 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-from data_processing.utils import ParamsUtils
 from resize_transform import ResizeTransform
 
 

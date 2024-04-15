@@ -28,15 +28,13 @@ launcher = TransformLauncher(transform_runtime_config=LangIdentificationTableTra
 # create parameters
 
 s3_cred = {
-    "access_key": DPLConfig.S3_ACCESS_KEY,
-    "secret_key": DPLConfig.S3_SECRET_KEY,
-    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
+    "access_key": "localminioaccesskey",
+    "secret_key": "localminiosecretkey",
+    "url": "http://localhost:9000",
 }
-
-# Configure s3 folders
 s3_conf = {
-    "input_folder": "lh-test/tables/academic/ieee_lh_unittest",
-    "output_folder": "lh-test/tables/academic/ieee_lang_id_0311_02/",
+    "input_folder": "test/language_id/input",
+    "output_folder": "test/language_id/output",
 }
 
 worker_options = {"num_cpus": 1}

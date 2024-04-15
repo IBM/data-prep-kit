@@ -1,10 +1,9 @@
 # Use make help, to see the available rules
 include ../.make.defaults
 
-VERSION=0.3.0
+VERSION=0.0.1.dev5
 TAG := "v${VERSION}"
-LIBNAME=fm_data_processing
-ARTIFACTORY_DESTINATION=https://na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local
+
 
 clean::
 	@# Help: Clean up the distribution build and the venv 
@@ -13,7 +12,6 @@ clean::
 
 .check-env::
 	@if [ -z "$(VERSION)" ]; then echo "You must provide VERSION"; false; fi
-	@if [ -z "$(ARTIFACTORY_USER)" ] || [ -z "$(ARTIFACTORY_API_KEY)" ]; then echo "You must set ARTIFACTORY_USER and ARTIFACTORY_API_KEY env vars"; false ; fi
 	@echo "Checks passed"
 
 update-toml:: .check-env
@@ -26,29 +24,27 @@ setup::
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
 	${PIP} install --upgrade build
+	if [ -d "dist"]; then rm -r dist; fi
 	${PYTHON} -m build
 
-publish:: .check-env
-	@# Help: Publish the wheel to and pypi 
-	@twine upload --verbose --non-interactive --skip-existing \
-		--repository-url ${ARTIFACTORY_DESTINATION}	\
-		-u ${ARTIFACTORY_USER} \
-		-p ${ARTIFACTORY_API_KEY} \
-		dist/${LIBNAME}-${VERSION}-py3-none-any.whl
+publish:: .check-env update-toml
+	@# Help: Publish project to pypi
+	${PYTHON} -m twine upload --verbose --repository testpypi dist/*
 	#@echo "create a git tag to reference published version"
 	#@git tag ${TAG}
 	#@git push origin ${TAG}
 
-venv::	pyproject.toml .check-env
+venv::	pyproject.toml
 	@# Help: Create the virtual environment using pyproject.toml 
 	rm -rf venv	
 	$(PYTHON) -m venv venv
 	echo '[global]' > venv/pip.conf
-	echo "extra-index-url = https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple" >> venv/pip.conf
+	echo "extra-index-url = https://test.pypi.org/simple" >> venv/pip.conf
 	source venv/bin/activate; 	\
 	pip install --upgrade pip;	\
 	pip install -e .;		\
-	pip install pytest pytest-cov 
+	pip install pytest pytest-cov moto==5.0.5
+
 
 # Here we run each test directory of tests and each ray launched test separately, because
 # it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.

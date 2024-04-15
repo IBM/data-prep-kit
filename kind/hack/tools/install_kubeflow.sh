@@ -29,8 +29,6 @@ deploy() {
 		echo "Kubeflow deployment unsuccessful."
 		exit 1
 	fi
-
-       # FIXME: avoid using cluster-admin role
 	kubectl create clusterrolebinding pipeline-runner-extend --clusterrole cluster-admin --serviceaccount=kubeflow:pipeline-runner
 	echo "Finished Kubeflow deployment."
 	rm -rf $TEMP_DIR

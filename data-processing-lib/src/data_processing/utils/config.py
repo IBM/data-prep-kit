@@ -25,17 +25,10 @@ class DPLConfig:
         # print(f"Did not find any of the following env vars {env_var_list}")
         return None
 
-    S3_ACCESS_KEY = _get_first_env_var(["DPL_S3_ACCESS_KEY", "AWS_ACCESS_KEY_ID", "COS_ACCESS_KEY"])
-    """ Set from DPL_S3_ACCESS_KEY, AWS_ACCESS_KEY_ID or COS_ACCESS_KEY env vars """
-    S3_SECRET_KEY = _get_first_env_var(["DPL_S3_SECRET_KEY", "AWS_SECRET_ACCESS_KEY", "COS_SECRET_KEY"])
-    """ Set from DPL_S3_SECRET_KEY, AWS_SECRET_ACCESS_KEY or COS_SECRET_KEY env vars """
-    LAKEHOUSE_TOKEN = _get_first_env_var(["DPL_LAKEHOUSE_TOKEN", "LAKEHOUSE_TOKEN"])
-    """ Set from DPL_LAKEHOUSE_TOKEN or LAKEHOUSE_TOKEN env vars """
     HUGGING_FACE_TOKEN = _get_first_env_var(["DPL_HUGGING_FACE_TOKEN"])
     """ Set from DPL_HUGGING_FACE_TOKEN env var(s) """
-
     DEFAULT_LOG_LEVEL = os.environ.get("DPL_LOG_LEVEL", "INFO")
-
+    """ Set from DPL_LOG_LEVEL env var(s) """
 
 def add_if_missing(config: dict[str, Any], key: str, dflt: Any):
     """

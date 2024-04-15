@@ -4,7 +4,7 @@
 REPOROOT=../../..
 include ../../.make.transforms
 
-TRANSFORM_NAME=cq
+TRANSFORM_NAME=code_quality
 DOCKER_IMAGE_VERSION=0.1.0
 
 # Use default rule inherited from makefile.common

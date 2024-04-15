@@ -134,7 +134,7 @@ def orchestrate(
             "execution_stats": resources,
             "job_output_stats": stats,
         }
-        logger.info(f"Saved job metadata: {metadata}.")
+        logger.debug(f"Saved job metadata: {metadata}.")
         data_access.save_job_metadata(metadata)
         logger.debug("Saved job metadata.")
         return 0

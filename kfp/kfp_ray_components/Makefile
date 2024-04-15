@@ -11,15 +11,13 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed '
 include makeenv
 DOCKER=docker
 DOCKER_FILE=Dockerfile
-DOCKER_HOSTNAME ?= us.icr.io
-DOCKER_NAMESPACE ?= cil15-shared-registry/preprocessing-pipelines
+DOCKER_HOSTNAME ?=  quay.io
+DOCKER_NAMESPACE ?= dataprep1
 DOCKER_NAME ?= kfp-data-processing
 IMG ?= ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_TAGNAME}
 
 # Create the docker image making sure the preloaded models are available to copy into the image
 .kfp_comp.image:: Dockerfile requirements.txt
-	$(call check_defined, ARTIFACTORY_USER)
-	$(call check_defined, ARTIFACTORY_API_KEY)
 	$(call check_defined, DOCKER_HOSTNAME)
 	sed -i.back "s/fm-data-processing==[0-9].*/fm-data-processing==${FM_DATA_PROCESSING}/" requirements.txt
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
