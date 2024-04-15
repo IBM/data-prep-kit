@@ -39,6 +39,6 @@ configuration for values are as follows:
 ## Running
 
 We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/lang_id_local_ray.py) and [s3](src/lang_id_s3.py)
+[local file system](src/lang_id_local.py) and [s3](src/lang_id_s3.py)
 
 # Release notes
