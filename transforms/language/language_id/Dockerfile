@@ -23,7 +23,7 @@ USER ray
 COPY ./src/lang_id_transform.py .
 COPY ./src/lang_models.py .
 COPY ./src/nlp.py .
-COPY src/lang_id_local.py local/
+COPY src/lang_id_local_ray.py local/
 # Install pytest so we can test the image later
 RUN pip install --no-cache-dir pytest
 COPY test/ test/
