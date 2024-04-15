@@ -48,4 +48,6 @@ if __name__ == "__main__":
     print(f"\noutput table: {table}")
     print(f"output metadata : {metadata}")
     print(f"language column : {table['ft_lang']}")
+
     print(f"score column : {table['ft_score']}")
+
