@@ -2,7 +2,7 @@
 
 In a common scenario, users want to run a pipeline or a series of several transforms one after the other. Here we can show how to execute several transforms.
 
-Let's assume that the input folder path is `path/to/input` and the user want to save the output of the data after several transforms in `path/to/output`. Let's assume also that a user want to apply the transform `A` then the transform `B` on his data.
+Let's assume that the input folder path is `path/to/input` and a user wants to save the output of the data after several transforms in `path/to/output`. Let's assume also that the user wants to apply the transform `A` then the transform `B` on his data.
 
 In [Executing pipeline and watching execution results](simple_transform_pipeline.md#executing-pipeline-and-watching-execution-results) you can learn how to run a KFP pipeline of one transform. We want to use the same method to combine several transform pipelines together.
 
