@@ -16,7 +16,7 @@ PYTEST=pytest -s
 PYTHON_VERSION=$(shell $(PYTHON) --version)
 VENV_ACTIVATE=venv/bin/activate
 
-DEPLOY_KUBEFLOW ?= 1
+DEPLOY_KUBEFLOW ?=0
 
 clean::
 	@# Help: Clean up the distribution build and the venv 
@@ -52,6 +52,8 @@ venv::	pyproject.toml .check-env
 	rm -rf venv
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
+		echo '[global]' > venv/pip.conf;					\
+	    echo "extra-index-url = https://test.pypi.org/simple/" >> venv/pip.conf;	\
         pip install -r ../kfp_ray_components/requirements.txt ;\
 	pip install -e .;		\
 	pip install ray==${RAY} \
@@ -60,8 +62,8 @@ venv::	pyproject.toml .check-env
 test:: 	
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) api_params_test.py;
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) kuberay_api_test.py;
 ifeq ($(DEPLOY_KUBEFLOW),1)
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) pipeline_utils_test.py;
-endif
+	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) kuberay_api_test.py;
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) ray_remote_jobs_test.py;
+endif

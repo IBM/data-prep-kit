@@ -14,7 +14,7 @@ authors = [
 dependencies = [
     "kfp==1.8.22",
     "requests",
-    "-data-prep-lab==0.0.1.dev5",
+    "data-prep-lab==0.0.1.dev5",
 ]
 
 [build-system]
