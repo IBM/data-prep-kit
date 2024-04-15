@@ -55,8 +55,8 @@ def lang_id(
             "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_langid_guf/'}",
-    data_s3_access_secret: str = "cos-access",
+    data_s3_config: str = "{'input_folder': 'test/lang_id/output/', 'output_folder': 'test/lang_id/output/'}",
+    data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator

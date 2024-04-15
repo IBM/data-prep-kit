@@ -56,8 +56,8 @@ def fdedup(
             "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access. checkpointing is not supported by dedup
-    data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=fuzzy_dedup/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_fdedup/'}",
-    data_s3_access_secret: str = "cos-access",
+    data_s3_config: str = "{'input_folder': 'test/fdedup/input/', 'output_folder': 'test/fdedup/output/'}",
+    data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator

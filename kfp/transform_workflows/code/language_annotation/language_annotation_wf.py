@@ -56,8 +56,8 @@ def lang_select(
             "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input-select-lang/input/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_select_lang/'}",
-    data_s3_access_secret: str = "cos-access",
+    data_s3_config: str = "{'input_folder': 'test/lang_annotator/input/', 'output_folder': 'test/lang_annotator/output/'}",
+    data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
@@ -65,11 +65,11 @@ def lang_select(
     pipeline_id: str = "pipeline_id",
     code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
     # Language Annotation parameters
-    lang_select_allowed_langs_file: str = "cos-optimal-llm-pile/sanity-test/input-select-lang/languages/allowed-code-languages.txt",
+    lang_select_allowed_langs_file: str = "test/lang_annotator/languages/allowed-code-languages.txt",
     lang_select_language_column: str = "language",
     lang_select_return_known: bool = True,
     lang_select_local_config: str = "None",
-    lang_select_s3_access_secret: str = "cos-access",
+    lang_select_s3_access_secret: str = "s3-secret",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ) -> None:

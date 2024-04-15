@@ -57,8 +57,8 @@ def blocklisting(
             "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=text/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_blocklist_guf/'}",
-    data_s3_access_secret: str = "cos-access",
+    data_s3_config: str = "{'input_folder': 'test/blocklist/input/', 'output_folder': 'test/blocklist/input/'}",
+    data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
     data_checkpointing: bool = False,
@@ -69,8 +69,8 @@ def blocklisting(
     # block listing parameters
     blocklist_annotation_column_name: str = "blocklisted",
     blocklist_source_url_column_name: str = "title",
-    blocklist_blocked_domain_list_path: str = "cos-optimal-llm-pile/doc_annotation_test/domains",
-    blocklist_s3_access_secret: str = "cos-access",
+    blocklist_blocked_domain_list_path: str = "test/blocklist/domains",
+    blocklist_s3_access_secret: str = "s3-secret",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ) -> None:
