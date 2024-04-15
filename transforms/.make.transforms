@@ -38,7 +38,8 @@ DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
 DOCKER_IMAGE=${DOCKER_IMAGE_PREFIX}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
-TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_local_ray.py
+TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_transform.py
+TRANSFORM_LOCAL_RAY?=$(TRANSFORM_NAME)_local_ray.py
 TRANSFORM_TEST_FILE?=test/test_$(TRANSFORM_NAME).py
 
 # The following taken from https://stackoverflow.com/a/65243296/45375

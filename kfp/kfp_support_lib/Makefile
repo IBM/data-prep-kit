@@ -26,8 +26,6 @@ clean::
 
 .check-env:: .check_python_version
 	$(call check_defined, DATA_PREP_LAB_KFP)
-	$(call check_defined, ARTIFACTORY_USER)
-	$(call check_defined, ARTIFACTORY_API_KEY)
 	@echo "Checks passed"
 
 update-toml:: .check-env
