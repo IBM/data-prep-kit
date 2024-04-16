@@ -9,7 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy in the data processing framework source/project and install it
 # This is expected to be placed in the docker context before this is run (see the make image).
-COPY --chown=ray data-processing-lib/ data-processing-lib/
+COPY --chown=ray:ray data-processing-lib/ data-processing-lib/
 # install data processing
 RUN cd data-processing-lib && pip install --no-cache-dir -e .
 # remove gcc

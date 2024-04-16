@@ -110,11 +110,6 @@ help::
 
 .PHONY: .transforms.check_env
 .transforms.check_env::
-	@# Help: Make sure Artifactory credentials are in the environment variables. 
-	@if [ -z "$(ARTIFACTORY_USER)" -o -z "$(ARTIFACTORY_API_KEY)" ]; then \
-		echo "You must set ARTIFACTORY_USER and ARTIFACTORY_API_KEY env vars";\
-		exit;									\
-	fi
 
 # Create the docker image making sure the preloaded models are available to copy into the image
 # We copy the library/framework source here so it can be installed into the docker image and
