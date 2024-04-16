@@ -200,14 +200,14 @@ test-locals:: .transforms.test-locals
 .transforms-check-exists:
 	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
 	if  [ -z "$$exists" ]; then				\
-	    echo Expected $(CHECK_FILE_NAME) in directory $(CHECK_DIR); 	\
+	    echo Recommend creating $(CHECK_FILE_NAME) in directory $(CHECK_DIR); 	\
 	fi
 
 .PHONY: .transforms-check-not-exists
 .transforms-check-not-exists:
 	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
 	if  [ ! -z "$$exists" ]; then				\
-	    echo Unexpected file $(CHECK_FILE_NAME) in directory $(CHECK_DIR); 	\
+	    echo Recommend removing file $(CHECK_FILE_NAME) from directory $(CHECK_DIR); 	\
 	fi
 
 .PHONY: .transforms-check-target
@@ -221,7 +221,7 @@ test-locals:: .transforms.test-locals
 .transforms-check-dir-size:
 	@mb=$$(du -sm $(CHECK_DIR) | awk '{print $$1}');	\
 	if  [ $$mb -gt 15 ]; then				\
-	    echo Directory $(CHECK_DIR) is too large;		\
+	    echo Directory $(CHECK_DIR) is very large;		\
 	fi
 
 .PHONY: check-conventions
