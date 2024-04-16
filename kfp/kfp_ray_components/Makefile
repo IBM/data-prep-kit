@@ -9,7 +9,6 @@ include ../../.make.defaults
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
 
 include makeenv
-DOCKER=docker
 DOCKER_FILE=Dockerfile
 DOCKER_HOSTNAME ?=  quay.io
 DOCKER_NAMESPACE ?= dataprep1

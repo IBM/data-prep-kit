@@ -29,9 +29,7 @@
 include $(REPOROOT)/.make.defaults
 ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 
-DOCKER?=podman
 DOCKER_FILE?=Dockerfile
-DOCKER_REGISTRY?=quay.io
 
 DOCKER_IMAGE_PREFIX?=quay.io/dataprep1/data-prep-lab
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
