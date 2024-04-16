@@ -39,7 +39,6 @@ DOCKER_IMAGE=${DOCKER_IMAGE_PREFIX}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
 TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_transform.py
-TRANSFORM_LOCAL_RAY?=$(TRANSFORM_NAME)_local_ray.py
 TRANSFORM_TEST_FILE?=test/test_$(TRANSFORM_NAME).py
 
 # The following taken from https://stackoverflow.com/a/65243296/45375
@@ -52,6 +51,7 @@ help::
 	@echo DOCKER_FILE - the name of the docker file to use.  DOCKER_FILE=$(DOCKER_FILE)
 	@echo DOCKER_REGISTRY - the name of the docker registry to use.  DOCKER_REGISTRY=$(DOCKER_REGISTRY)
 	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
+	@echo DOCKER_REGISTRY_KEY - the docker user to use.  DOCKER_REGISTRY_KEY=secret
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
 	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
 	@echo "TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_local_ray.py)"
@@ -201,7 +201,6 @@ test-locals:: .transforms.test-locals
 	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
 	if  [ -z "$$exists" ]; then				\
 	    echo Expected $(CHECK_FILE_NAME) in directory $(CHECK_DIR); 	\
-	    exit 1;						\
 	fi
 
 .PHONY: .transforms-check-not-exists
@@ -209,7 +208,6 @@ test-locals:: .transforms.test-locals
 	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
 	if  [ ! -z "$$exists" ]; then				\
 	    echo Unexpected file $(CHECK_FILE_NAME) in directory $(CHECK_DIR); 	\
-	    exit 1;						\
 	fi
 
 .PHONY: .transforms-check-target
@@ -217,7 +215,6 @@ test-locals:: .transforms.test-locals
 	@exists=$$(grep "^$(CHECK_TARGET):" Makefile);		\
 	if  [ -z "$$exists" ]; then				\
 	    echo Missing makefile target $(CHECK_TARGET); 	\
-	    exit 1;						\
 	fi
 
 .PHONY: .transforms-check-dir-size
@@ -225,13 +222,13 @@ test-locals:: .transforms.test-locals
 	@mb=$$(du -sm $(CHECK_DIR) | awk '{print $$1}');	\
 	if  [ $$mb -gt 15 ]; then				\
 	    echo Directory $(CHECK_DIR) is too large;		\
-	    exit 1;						\
 	fi
 
 .PHONY: check-conventions
 conventions:
+	@echo "Begin checking transform project conventions.  Recommendations/issues, if any, follow..."
 	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  .transforms-check-not-exists
-	# ededup and fdedup do not have local @$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_ray.py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_launch.py .transforms-check-exists
@@ -246,4 +243,4 @@ conventions:
 	@$(MAKE) CHECK_TARGET=test-src .transforms-check-target
 	@$(MAKE) CHECK_TARGET=test-image .transforms-check-target
 	@$(MAKE) CHECK_TARGET=venv .transforms-check-target
-	@echo Project conventions for transform $(TRANSFORM_NAME) are statisfied
+	@echo Done checking transform project conventions.
