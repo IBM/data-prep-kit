@@ -243,4 +243,8 @@ conventions:
 	@$(MAKE) CHECK_TARGET=test-src .transforms-check-target
 	@$(MAKE) CHECK_TARGET=test-image .transforms-check-target
 	@$(MAKE) CHECK_TARGET=venv .transforms-check-target
+	@z=$$(echo $(TRANSFORM_NAME) | grep annotator);				\
+	if [ ! -z "$$z" ]; then	 					\
+		echo "Recommend not using 'annotator' in your transform name";	\
+	fi
 	@echo Done checking transform project conventions.
