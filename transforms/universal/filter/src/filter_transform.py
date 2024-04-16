@@ -13,7 +13,6 @@
 import argparse
 import ast
 import json
-from typing import Any
 
 import duckdb
 import pyarrow as pa

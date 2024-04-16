@@ -14,7 +14,7 @@ import os
 import sys
 
 from data_processing.ray import TransformLauncher
-from data_processing.utils import DPLConfig, ParamsUtils
+from data_processing.utils import ParamsUtils
 from resize_transform import ResizeTransformConfiguration
 
 
@@ -23,14 +23,13 @@ print(os.environ)
 launcher = TransformLauncher(transform_runtime_config=ResizeTransformConfiguration())
 # create parameters
 s3_cred = {
-    "access_key": DPLConfig.S3_ACCESS_KEY,
-    "secret_key": DPLConfig.S3_SECRET_KEY,
-    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
+    "access_key": "localminioaccesskey",
+    "secret_key": "localminiosecretkey",
+    "url": "http://localhost:9000",
 }
-
 s3_conf = {
-    "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=big/",
-    "output_folder": "cos-optimal-llm-pile/boris-da-test/",
+    "input_folder": "test/resize/input",
+    "output_folder": "test/resize/output",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}

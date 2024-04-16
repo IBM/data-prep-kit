@@ -1,16 +1,11 @@
-##############################################
-# If developing a transform outside of this repo, the following would be required, but within this
-# repo, we install the data-prep-lab library source separately into the venv and docker (see both the Makefile and Dockerfile).
-# The following url for fm-data-processing.  Contact David Wood, dawood@us.ibm.com, if you don't have pypi access
-#--extra-index-url https://${ARTIFACTORY_USER}:${ARTIFACTORY_API_KEY}@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
-#fm-data-processing==0.3.0
-##############################################
-# TODO: pip install https://github.com/kpu/kenlm/archive/master.zip
-# TODO: Download pre-trained KenLM model for English language on Wikipedia
-#       through cc_net (https://github.com/facebookresearch/cc_net):
-#       git clone https://github.com/facebookresearch/cc_net
-#       cd cc_net/
-#       make lang=en dl_lm
+# transform runtime
+#--extra-index-url https://test.pypi.org/simple/
+#data-prep-lab==0.0.1.dev5
+# Update to fix security
+pillow==10.2.0
+#cryptography==42.0.4
+fastapi==0.109.1
+aiohttp==3.9.2
 ### For docquality
 numpy==1.24.1
 pandas==1.5.3

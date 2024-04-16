@@ -10,9 +10,7 @@
 # limitations under the License.
 ################################################################################
 
-import os
 import sys
-from pathlib import Path
 
 from blocklist_transform import (
     BlockListTransformConfiguration,
@@ -21,58 +19,40 @@ from blocklist_transform import (
     source_url_column_name_cli_param,
 )
 from data_processing.ray import TransformLauncher
-from data_processing.utils import DPLConfig, ParamsUtils
+from data_processing.utils import ParamsUtils
 
 
-print(os.environ)
-# create launcher
-launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
 # create parameters
-blocklist_conf_url = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/domains"))
+s3_cred = {
+    "access_key": "localminioaccesskey",
+    "secret_key": "localminiosecretkey",
+    "url": "http://localhost:9000",
+}
+s3_conf = {
+    "input_folder": "test/blocklist/input",
+    "output_folder": "test/blocklist/output",
+}
+
 blocklist_annotation_column_name = "blocklisted"
 blocklist_doc_source_url_column = "title"
 
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
-local_conf = {
-    "input_folder": input_folder,
-    "output_folder": output_folder,
-}
 block_list_params = {
-    blocked_domain_list_path_cli_param: blocklist_conf_url,
+    blocked_domain_list_path_cli_param: "test/blocklist/domains",
+    "blocklist_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
     annotation_column_name_cli_param: blocklist_annotation_column_name,
     source_url_column_name_cli_param: blocklist_doc_source_url_column,
 }
-
-s3_cred = {
-    "access_key": DPLConfig.S3_ACCESS_KEY,
-    "secret_key": DPLConfig.S3_SECRET_KEY,
-    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
-}
-
-# Configure lakehouse unit test tables
-lakehouse_config = {
-    "lh_environment": "STAGING",
-    "input_table": "bluepile.academic.doabooks",
-    "input_dataset": "",
-    "input_version": "main",
-    "output_table": "lh_test.bluepile_academic_doabooks_blocklist_test",
-    "output_path": "lh-test/tables/lh_test/bluepile_academic_doabooks_blocklist_test",
-    "token": DPLConfig.LAKEHOUSE_TOKEN,
-}
-
-worker_options = {"num_cpus": 0.5}
+worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 launcher_params = {
     # where to run
     "run_locally": True,
     # Data access. Only required parameters are specified
-    "data_lh_config": ParamsUtils.convert_to_ast(lakehouse_config),
     "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
+    "data_s3_config": ParamsUtils.convert_to_ast(s3_conf),
     # orchestrator
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "num_workers": 2,
+    "num_workers": 5,
     "pipeline_id": "pipeline_id",
     "job_id": "job_id",
     "creation_delay": 0,
@@ -81,9 +61,10 @@ launcher_params = {
 
 # launch
 if __name__ == "__main__":
-    Path(output_folder).mkdir(parents=True, exist_ok=True)
-    # create launcher
+    # Run the transform inside Ray
+    # Create the CLI args as will be parsed by the launcher
     sys.argv = ParamsUtils.dict_to_req(launcher_params | block_list_params)
+    # Create the longer to launch with the blocklist transform.
     launcher = TransformLauncher(transform_runtime_config=BlockListTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

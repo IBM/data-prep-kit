@@ -59,6 +59,6 @@ We also provide an [estimate](src/cluster_estimator.py) to roughly determine clu
 ## Running
 
 We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/ededup_local.py), [s3](src/ededup_s3.py) and [lakehouse](src/ededup_lakehouse.py)
+[local file system](src/ededup_local_ray.py) and [s3](src/ededup_s3.py)
 
 # Release notes

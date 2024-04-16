@@ -19,8 +19,7 @@ import mmh3
 import numpy as np
 import pyarrow as pa
 import ray
-import sentencepiece
-from data_processing.data_access import DataAccess, DataAccessFactory
+from data_processing.data_access import DataAccessFactory
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
@@ -45,7 +44,6 @@ from fdedup_support import (
 from ray.actor import ActorHandle
 from ray.util import ActorPool
 from ray.util.metrics import Gauge
-from text_normalizer import normalize as text_normalize
 
 
 logger = get_logger(__name__)
@@ -68,7 +66,6 @@ class FdedupTransform(AbstractTableTransform):
             length_band band length
             remote_buckets - bucket actors
             remote_minhashes - minhash actors
-            is_japanese - japanese flag
             delimiter - delimiter
             random_delay_limit - random delay limit
         """
@@ -82,10 +79,6 @@ class FdedupTransform(AbstractTableTransform):
         self.length_band = config.get("length_band", 1)
         self.buckets = config.get("remote_buckets", [])
         self.minhashes = config.get("remote_minhashes", [])
-        self.is_japanese = config.get("is_japanese", False)
-        if self.is_japanese:
-            self.sp = sentencepiece.SentencePieceProcessor()
-            self.sp.load("./ja.sp.model")
         self.random_delay_limit = config.get("random_delay_limit", 10)
 
     def _generate_word_shingles(self, text: str) -> list[str]:
@@ -94,28 +87,14 @@ class FdedupTransform(AbstractTableTransform):
         :param text: document
         :return: list of shingles
         """
-        if self.is_japanese:
-            # We are using special shingles generation for japanese text
-            shingles = []
-            try:
-                words = self.sp.encode_as_pieces(text_normalize(text))
-                word_count = len(words)
-                for i in range(0, max(1, word_count - self.word_shingle_size + 1)):
-                    shingles.append(self.delimiter.join(words[i : i + self.word_shingle_size]))
-            except Exception as e:
-                logger.info(f"Exception during japanese shingle building {e}")
-                self.is_japanese = False
-            return shingles
-        else:
-            # for all other languages
-            separators = find(text, self.delimiter)
-            if len(separators) + 1 <= self.word_shingle_size:
-                return [text]
-            bounds = [-1] + separators + [len(text)]
-            return [
-                text[bounds[i] + 1 : bounds[i + self.word_shingle_size]]
-                for i in range(0, len(bounds) - self.word_shingle_size)
-            ]
+        separators = find(text, self.delimiter)
+        if len(separators) + 1 <= self.word_shingle_size:
+            return [text]
+        bounds = [-1] + separators + [len(text)]
+        return [
+            text[bounds[i] + 1 : bounds[i + self.word_shingle_size]]
+            for i in range(0, len(bounds) - self.word_shingle_size)
+        ]
 
     def _generate_minhashes(self, shingles: list[str]) -> np.array:
         """
@@ -333,7 +312,6 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             num_permutations - number of permutations
             threshold - threshold
             world_shingle_size - word shingles size
-            is_japanese - japanese data flag
             delimiters - delimiter
         """
         super().__init__(params)
@@ -647,7 +625,6 @@ class FdedupRuntime(DefaultTableTransformRuntime):
                 "length_band": length_bucket,
                 "remote_buckets": bucket_collectors,
                 "remote_minhashes": minhash_collectors,
-                "is_japanese": self.params.get("is_japanese", False),
                 "delimiter": self.params.get("delimiter", " "),
                 "random_delay_limit": random_delay_limit,
             },
@@ -755,9 +732,6 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         parser.add_argument("--threshold", type=float, default=0.8, help="threshold")
         parser.add_argument("--shingles_size", type=int, default=5, help="number of words in shingle")
         parser.add_argument("--delimiters", type=str, default=" ", help="delimiter for splitting document")
-        parser.add_argument(
-            "--japanese_data", type=lambda x: bool(str2bool(x)), default=False, help="japanese data indicator"
-        )
         parser.add_argument("--snapshot_delay", type=int, default=1, help="snapshot delay time")
         parser.add_argument(
             "--use_bucket_snapshot",
@@ -796,7 +770,6 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         self.params["num_permutations"] = args.num_permutations
         self.params["threshold"] = args.threshold
         self.params["world_shingle_size"] = args.shingles_size
-        self.params["is_japanese"] = args.japanese_data
         self.params["delimiters"] = args.delimiters
         self.params["random_delay_limit"] = args.random_delay_limit
         # snapshots

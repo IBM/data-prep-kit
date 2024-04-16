@@ -49,9 +49,10 @@ class DataAccessS3(DataAccess):
         :param files_to_use: files extensions of files to include
         """
         self.arrS3 = ArrowS3(
-            access_key=s3_credentials["access_key"],
-            secret_key=s3_credentials["secret_key"],
-            endpoint=s3_credentials["url"],
+            access_key=s3_credentials.get("access_key", ""),
+            secret_key=s3_credentials.get("secret_key", ""),
+            endpoint=s3_credentials.get("url", None),
+            region=s3_credentials.get("region", None),
         )
         if s3_config is None:
             self.input_folder = None

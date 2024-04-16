@@ -1,30 +1,20 @@
 FROM docker.io/rayproject/ray:2.9.1-py310
 
-ARG ARTIFACTORY_USER
-ARG ARTIFACTORY_API_KEY
-ARG EXTRA_ARTIFACTORY_URL
-
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
 # Copy in the data processing framework source/project and install it
 # This is expected to be placed in the docker context before this is run (see the make image).
-COPY data-processing-lib/ data-processing-lib/
-USER root
-RUN chown -R ray /home/ray/data-processing-lib
-USER ray
-RUN pip install --no-cache-dir --extra-index-url ${EXTRA_ARTIFACTORY_URL} --no-cache-dir -e data-processing-lib
-
-COPY ./src/cq_transform.py . 
-
-# Install pytest so we can test the image later
-RUN pip install --no-cache-dir pytest
+COPY --chown=ray:users data-processing-lib/ data-processing-lib/
+# copy source data
+COPY src/code_quality_transform.py .
+COPY src/code_quality_local_ray.py local/
+# copy test
 COPY test/ test/
 COPY test-data/ test-data/
-
-USER root
-RUN chown -R ray /home/ray/test
-RUN chown -R ray /home/ray/test-data
-USER ray
-
+# install pytest
+RUN pip install --no-cache-dir pytest
+# install data processing
+RUN cd data-processing-lib && pip install --no-cache-dir -e .
+# Set environment
 ENV PYTHONPATH /home/ray

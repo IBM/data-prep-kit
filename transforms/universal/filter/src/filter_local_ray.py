@@ -10,7 +10,6 @@
 # limitations under the License.
 ################################################################################
 
-import json
 import os
 import sys
 

@@ -172,7 +172,7 @@ adds their handles to the transform parameters
 ```
 Inputs to this method includes a set of parameters, that moght not be needed for this transformer, but 
 rather a superset of all parameters that can be used by different implementations of transform runtime (
-see for example [block listing](../../transforms/universal/blocklisting), 
+see for example [block listing](../../transforms/universal/blocklist), 
 [fuzzy dedup](../../transforms/universal/fdedup), etc).
 The return of this function is a dictionary information for transformer initialization. In this
 implementation we add additional parameters to the input dictionary, but in general, it can be a completely
@@ -276,7 +276,7 @@ in COS as follows:
 python ededup_transform.py --hash_cpu 0.5 --num_hashes 2 --doc_column "contents" \
   --run_locally True  \
   --s3_cred "{'access_key': 'KEY', 'secret_key': 'SECRET', 'cos_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}" \
-  --s3_config "{'input_folder': 'cos-optimal-llm-pile/test/david/input/', 'output_folder': 'cos-optimal-llm-pile/test/david/output/'}"
+  --s3_config "{'input_folder': 'input_folder', 'output_folder': 'output_folder'}"
 ```
 This is a minimal set of options to run locally.
 See the [launcher options](launcher-options.md) for a complete list of

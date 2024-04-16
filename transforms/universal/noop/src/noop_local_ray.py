@@ -13,10 +13,9 @@
 import os
 import sys
 
-from data_processing.data_access import DataAccessLocal
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from noop_transform import NOOPTransform, NOOPTransformConfiguration
+from noop_transform import NOOPTransformConfiguration
 
 
 # create parameters

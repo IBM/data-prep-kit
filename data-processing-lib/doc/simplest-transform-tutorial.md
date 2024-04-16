@@ -186,8 +186,8 @@ in COS as follows:
 ```shell
 python noop_main.py --noop_sleep_msec 2 \
   --run_locally True  \
-  --s3_cred "{'access_key': 'KEY', 'secret_key': 'SECRET', 'cos_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}" \
-  --s3_config "{'input_folder': 'cos-optimal-llm-pile/test/david/input/', 'output_folder': 'cos-optimal-llm-pile/test/david/output/'}"
+  --s3_cred "{'access_key': 'access', 'secret_key': 'secret', 'url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}" \
+  --s3_config "{'input_folder': 'input_folder', 'output_folder': 'output_folder'}"
 ```
 This is a minimal set of options to run locally.
 See the [launcher options](launcher-options.md) for a complete list of

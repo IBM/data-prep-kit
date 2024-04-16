@@ -72,7 +72,7 @@ class DataAccessLocal(DataAccess):
     @staticmethod
     def _get_all_files_ext(path: str, extensions: list[str]) -> list[str]:
         """
-        Get files with the given extension for a given folder and all subfolders
+        Get files with the given extension for a given folder and all sub folders
         :param path: starting path
         :param extensions: List of extensions, None - all
         :return: List of files
@@ -312,7 +312,7 @@ class DataAccessLocal(DataAccess):
         in the case of failure dict is None
         """
         if self.output_folder is None:
-            logger.error("local configuration is not defined, csn't save metadata")
+            logger.error("local configuration is not defined, can't save metadata")
             return None
         metadata["source"] = {"name": self.input_folder, "type": "path"}
         metadata["target"] = {"name": self.output_folder, "type": "path"}

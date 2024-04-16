@@ -13,7 +13,7 @@
 import sys
 
 from data_processing.ray import TransformLauncher
-from data_processing.utils import DPLConfig, ParamsUtils
+from data_processing.utils import ParamsUtils
 from fdedup_transform import FdedupTableTransformConfiguration
 
 
@@ -21,13 +21,14 @@ from fdedup_transform import FdedupTableTransformConfiguration
 launcher = TransformLauncher(transform_runtime_config=FdedupTableTransformConfiguration())
 # create parameters
 s3_cred = {
-    "access_key": DPLConfig.S3_ACCESS_KEY,
-    "secret_key": DPLConfig.S3_SECRET_KEY,
-    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
+    "access_key": "localminioaccesskey",
+    "secret_key": "localminiosecretkey",
+    "url": "http://localhost:9000",
 }
+
 s3_conf = {
-    "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=fuzzy_dedup/",
-    "output_folder": "cos-optimal-llm-pile/boris-da-test/",
+    "input_folder": "test/fdedup/input",
+    "output_folder": "test/fdedup/output",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
@@ -60,7 +61,6 @@ params = {
     "num_permutations": 64,
     "threshold": 0.8,
     "shingles_size": 5,
-    "japanese_data": False,
     "delimiters": " ",
     # Random delay between reads
     "random_delay_limit": 5,

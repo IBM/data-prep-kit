@@ -19,7 +19,7 @@ from unittest.mock import patch
 import pyarrow
 import pytest
 from data_processing.data_access import DataAccessLocal
-from data_processing.utils import GB, KB, MB, get_logger
+from data_processing.utils import GB, MB, get_logger
 
 
 logger = get_logger(__name__)
@@ -404,7 +404,7 @@ class TestReadPyarrowTable(TestInit):
     schema = pyarrow.schema([pyarrow.field("col1", pyarrow.int32()), pyarrow.field("col2", pyarrow.string())])
 
     # Create PyArrow table
-    table = pyarrow.Table.from_pydict(data, schema=schema)
+    table = pyarrow.Table.from_pydict(mapping=data, schema=schema)
 
     # Write the table to a parquet file
     pq_file_path = os.path.join(os.sep, "tmp", "test_file.parquet")
@@ -441,7 +441,7 @@ class TestGetOutputLocation(TestInit):
 class TestSavePyarrowTable(TestInit):
 
     # Create a simple PyArrow table
-    table = pyarrow.Table.from_pydict({"a": [1, 2], "b": ["string1", "string2"]})
+    table = pyarrow.Table.from_pydict(mapping={"a": [1, 2], "b": ["string1", "string2"]})
 
     # path to save parquet tables
     pq_file_path = os.path.join(os.sep, "tmp", "output.parquet")

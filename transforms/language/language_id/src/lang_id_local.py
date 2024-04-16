@@ -11,7 +11,6 @@
 ################################################################################
 
 import os
-import sys
 
 from data_processing.data_access import DataAccessLocal
 from data_processing.utils import DPLConfig, ParamsUtils
@@ -49,4 +48,6 @@ if __name__ == "__main__":
     print(f"\noutput table: {table}")
     print(f"output metadata : {metadata}")
     print(f"language column : {table['ft_lang']}")
+
     print(f"score column : {table['ft_score']}")
+

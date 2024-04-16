@@ -1,4 +1,6 @@
-output/
+test-data/output
+output/*
+/output/
 data-processing-lib/
 
 # Byte-compiled / optimized / DLL files

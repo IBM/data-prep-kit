@@ -14,37 +14,46 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from malware_transform import MalwareTransformConfiguration
+from filter_transform import (
+    FilterTransformConfiguration,
+    filter_columns_to_drop_cli_param,
+    filter_criteria_cli_param,
+    filter_logical_operator_cli_param,
+)
 
 
-# create launcher
-launcher = TransformLauncher(transform_runtime_config=MalwareTransformConfiguration())
 # create parameters
 s3_cred = {
-    "access_key": "YOUR KEY",
-    "secret_key": "YOUR SECRET KEY",
-    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
+    "access_key": "localminioaccesskey",
+    "secret_key": "localminiosecretkey",
+    "url": "http://localhost:9000",
+}
+s3_conf = {
+    "input_folder": "test/filter/input",
+    "output_folder": "test/filter/output",
 }
 
-# Configure lakehouse unit test tables
-lakehouse_config = {
-    "lh_environment": "STAGING",
-    "input_table": "code.cobol",
-    "input_dataset": "",
-    "input_version": "main",
-    "output_table": "code.cobol_malware_test",
-    "output_path": "lh-test/tables/code/cobol_malware_test",
-    "token": "YOUR LAKEHOUSE TOKEN",
+filter_criteria = [
+    "docq_total_words > 100 AND docq_total_words < 200",
+    "ibmkenlm_docq_perplex_score < 230",
+]
+filter_logical_operator = "AND"
+filter_columns_to_drop = ["extra", "cluster"]
+
+filter_params = {
+    filter_criteria_cli_param: filter_criteria,
+    filter_columns_to_drop_cli_param: filter_columns_to_drop,
+    filter_logical_operator_cli_param: filter_logical_operator,
 }
 
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
-params = {
+launcher_params = {
     # where to run
     "run_locally": True,
     # Data access. Only required parameters are specified
     "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "data_lh_config": ParamsUtils.convert_to_ast(lakehouse_config),
+    "data_s3_config": ParamsUtils.convert_to_ast(s3_conf),
     # orchestrator
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "num_workers": 5,
@@ -52,11 +61,14 @@ params = {
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
-    # malware specific
-    "malware_input_column": "contents",
-    "malware_output_column": "virus_detection",
 }
-sys.argv = ParamsUtils.dict_to_req(d=params)
 
 # launch
-launcher.launch()
+if __name__ == "__main__":
+    # Run the transform inside Ray
+    # Create the CLI args as will be parsed by the launcher
+    sys.argv = ParamsUtils.dict_to_req(launcher_params | filter_params)
+    # Create the longer to launch with the blocklist transform.
+    launcher = TransformLauncher(transform_runtime_config=FilterTransformConfiguration())
+    # Launch the ray actor(s) to process the input
+    launcher.launch()
