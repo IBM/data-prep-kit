@@ -25,7 +25,7 @@ class DataAccessFactoryBase(CLIArgumentProvider):
     This class has to be serializable, so that we can pass it to the actors
     """
 
-    def __init__(self, cli_arg_prefix: str = "data"):
+    def __init__(self, cli_arg_prefix: str = "data_"):
         """
         Create the factory to parse a set of args that will then define the type of DataAccess object
         to be created by the create_data_access() method.
