@@ -1,11 +1,7 @@
+test-data/output
 output/*
-lm_sp/*
-cc_net/
+/output/
 data-processing-lib/
-
-output/
-data-processing-lib/
-
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

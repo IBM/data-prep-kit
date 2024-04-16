@@ -7,8 +7,7 @@ RUN rm requirements.txt
 
 # Copy in the data processing framework source/project and install it
 # This is expected to be placed in the docker context before this is run (see the make image).
-COPY data-processing-lib/ data-processing-lib/
-RUN sudo chown -R ray /home/ray/data-processing-lib
+COPY --chown=ray data-processing-lib/ data-processing-lib/
 # copy source data
 COPY ./src/filter_transform.py .
 COPY src/filter_local_ray.py local/
