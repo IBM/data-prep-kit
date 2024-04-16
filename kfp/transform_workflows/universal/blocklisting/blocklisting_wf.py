@@ -24,7 +24,7 @@ from kubernetes import client as k8s_client
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "blocklist_transform.py"
 
-task_image = "quay.io/dataprep1/data-prep-lab/blocklist:0.1.3"
+task_image = "quay.io/dataprep1/data-prep-lab/blocklist:0.1.0"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.6"
@@ -57,7 +57,7 @@ def blocklisting(
             "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'test/blocklist/input/', 'output_folder': 'test/blocklist/input/'}",
+    data_s3_config: str = "{'input_folder': 'test/blocklist/input/', 'output_folder': 'test/blocklist/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,

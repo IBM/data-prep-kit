@@ -20,7 +20,7 @@ from kfp_support.workflow_support.utils import (
 )
 from kubernetes import client as k8s_client
 
-task_image = "quay.io/dataprep1/data-prep-lab/noop:0.1.0"
+task_image = "quay.io/dataprep1/data-prep-lab/noop:0.6"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "noop_transform.py"

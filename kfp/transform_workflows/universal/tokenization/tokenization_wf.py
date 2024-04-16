@@ -55,7 +55,7 @@ def tokenization(
              "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'test/tokenization/input/', 'output_folder': 'test/tokenization/output/'}",
+    data_s3_config: str = "{'input_folder': 'test/tokenization/ds01/input/', 'output_folder': 'test/tokenization/ds01/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,

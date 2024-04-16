@@ -27,7 +27,7 @@ from src.fdedup_compute_execution_params import fdedup_compute_execution_params
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "fdedup_transform.py"
 
-task_image = "quay.io/dataprep1/data-prep-lab/fdedup:0.1.4"
+task_image = "quay.io/dataprep1/data-prep-lab/fdedup:0.1"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.6"
@@ -76,7 +76,6 @@ def fdedup(
     num_permutations: int = 64,
     threshold: float = 0.8,
     shingles_size: int = 5,
-    japanese_data: bool = False,
     delimiters: str = " ",
     # Random delay between reads
     random_delay_limit: int = 5,
@@ -127,7 +126,6 @@ def fdedup(
     :param num_permutations - number of permutations
     :param threshold - threshold
     :param shingles_size - number of words in shingle
-    :param japanese_data - japanese data indicator
     :param delimiters - delimiter for splitting document
     :param random_delay_limit - delay between reads to reduce S3 load.
                                 A random number between 0 and random_delay_limit is used
@@ -190,7 +188,6 @@ def fdedup(
                 "num_permutations": num_permutations,
                 "threshold": threshold,
                 "shingles_size": shingles_size,
-                "japanese_data": japanese_data,
                 "delimiters": delimiters,
                 "random_delay_limit": random_delay_limit,
                 "snapshot_delay": snapshot_delay,
