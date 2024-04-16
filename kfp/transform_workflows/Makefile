@@ -24,9 +24,7 @@ clean::
 	find . -iname "*_wf.yaml" |  xargs rm -f || true
 
 .check-env:: .check_python_version
-	$(call check_defined, ARTIFACTORY_USER)
-	$(call check_defined, ARTIFACTORY_API_KEY)
-	$(call check_defined, FM_DATA_PROCESSING_KFP)
+	$(call check_defined, DATA_PREP_LAB_KFP)
 	@echo "Checks passed"
 
 .compile-pipeline::
@@ -58,6 +56,6 @@ venv::	.check-env
 	. ${VENV_ACTIVATE}; 	\
 	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple \
 	pip install -r ../kfp_ray_components/requirements.txt \
-	pip install -i https://test.pypi.org/simple/ fm-data-processing-kfp==${FM_DATA_PROCESSING_KFP}
+	pip install -i https://test.pypi.org/simple/data-prep-lab-kfp==${DATA_PREP_LAB_KFP}
 
 test::
