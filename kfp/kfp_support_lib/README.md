@@ -57,8 +57,8 @@ make test
 
 ### Cleanup
 
-It is advisable to execute the following command prior to running `make test` once more.
-This will ensure that any previous test runs resources are removed before starting new tests.
+It is advisable to execute the following command prior to running `make test` once more. This will ensure that any 
+previous test runs resources are removed before starting new tests.
 
 ```bash
 kubectl delete workflows -n kubeflow --all
