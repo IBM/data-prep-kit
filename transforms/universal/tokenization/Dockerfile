@@ -7,7 +7,7 @@ RUN rm requirements.txt
 
 # Copy in the data processing framework source/project and install it
 # This is expected to be placed in the docker context before this is run (see the make image).
-COPY --chown=ray:ray data-processing-lib/ data-processing-lib/
+COPY --chown=ray:users data-processing-lib/ data-processing-lib/
 # copy source data
 COPY ./src/tokenization_transform.py .
 COPY ./src/tokenization_utils.py .
