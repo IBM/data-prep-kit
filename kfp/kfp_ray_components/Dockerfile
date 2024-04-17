@@ -1,6 +1,4 @@
-# Base image for KFP.
-
-FROM python:3.10-slim-bullseye
+FROM docker.io/rayproject/ray:2.9.3-py310
 
 ARG DATA_PREP_LAB
 ARG DATA_PREP_LAB_KFP
