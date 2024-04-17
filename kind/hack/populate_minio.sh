@@ -5,7 +5,7 @@ mc alias set kfp http://localhost:8080 minio minio123
 echo "creating test bucket"
 mc mb kfp/test
 echo "copying data"
-# code
+# code modules
 mc cp --recursive ${ROOT_DIR}/../transforms/code/code_quality/test-data/input/ kfp/test/code_quality/input
 mc cp --recursive ${ROOT_DIR}/../transforms/code/language_annotator/test-data/input/ kfp/test/language_annotator/input
 mc cp --recursive ${ROOT_DIR}/../transforms/code/language_annotator/test-data/languages/ kfp/test/lang_annotator/languages
