@@ -115,6 +115,7 @@ help::
 
 .PHONY: .transforms.check_env
 .transforms.check_env::
+	@true
 
 # Create the docker image making sure the preloaded models are available to copy into the image
 # We copy the library/framework source here so it can be installed into the docker image and

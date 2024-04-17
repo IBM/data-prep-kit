@@ -6,9 +6,9 @@ REPOROOT=../../..
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-TRANSFORM_NAME=language_annotator
+TRANSFORM_NAME=proglang_match
 # transforms.versions file contains the versions
-DOCKER_IMAGE_VERSION=${LANG_ANNOTATOR_VERSION}
+DOCKER_IMAGE_VERSION=${PROLANG_MATCH_VERSION}
 
 venv::	.transforms.venv
 

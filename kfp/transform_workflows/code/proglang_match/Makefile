@@ -6,6 +6,6 @@ REPOROOT=../../../..
 # to override/redefine the rules below. 
 include ../../.make.transforms_workflows
 
-DOCKER_IMAGE_NAME=language_annotator
+DOCKER_IMAGE_NAME=proglang_match
 # transforms.versions file contains the versions
-DOCKER_IMAGE_VERSION=${LANG_ANNOTATOR_VERSION}
+DOCKER_IMAGE_VERSION=${PROLANG_MATCH_VERSION}
