@@ -33,7 +33,7 @@ clean::
 %.yaml: %.py
 	make .compile-pipeline WF_NAME=$(shell (basename $< .py)) DIR=$(shell (dirname $<))
 
-.reconcile-requirement::
+reconcile-requirement::
 	@for file in $(PYTHON_WF); do \
 		sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}\"/" $$file; \
 	done
@@ -41,7 +41,7 @@ clean::
 build:: venv
 	@# Help: Compile the pipelines
 	${PYTHON} -m pip install --upgrade build
-	make .reconcile-requirement
+	make reconcile-requirement
 	make ${YAML_WF}
 
 publish:: .check-env
@@ -50,7 +50,8 @@ publish:: .check-env
 
 venv::	.check-env
 	@# Help: Create the virtual environment
-	sed -i.back "s/fm-data-processing==[0-9].*/fm-data-processing==${FM_DATA_PROCESSING}/" ../kfp_ray_components/requirements.txt
+	make reconcile-requirement
+	sed -i.back "s/data-prep-lab-kfp==[0-9].*/data-prep-lab-kfp==${DATA_PREP_LAB_KFP}/" ../kfp_ray_components/requirements.txt
 	rm -rf venv	
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE}; 	\
