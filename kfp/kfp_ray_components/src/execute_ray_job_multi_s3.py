@@ -55,7 +55,7 @@ def execute_ray_jobs(
         print(f"Failed to submit job - status: {status}, error: {error}, submission id {submission}")
         exit(1)
 
-    print(f"submitted job successfully, submission id {submission}")
+    print(f"submit job - status: {status}, error: {error}, submission id {submission}")
     # print execution log
     remote_jobs.follow_execution(
         name=name,
@@ -103,10 +103,12 @@ if __name__ == "__main__":
     access_key, secret_key, url = KFPUtils.credentials()
     # Create data access factory and data access
     data_factory = DataAccessFactory()
-    data_factory.apply_input_params(args={
-        "data_s3_config": s3_config_dict,
-        "data_s3_cred": {"access_key": access_key, "secret_key": secret_key, "url": url}
-    })
+    data_factory.apply_input_params(
+        args={
+            "data_s3_config": s3_config_dict,
+            "data_s3_cred": {"access_key": access_key, "secret_key": secret_key, "url": url},
+        }
+    )
     data_access = data_factory.create_data_access()
     # extra credentials
     prefix = args.prefix
@@ -115,7 +117,7 @@ if __name__ == "__main__":
     )
     # enhance exec params
     exec_params["data_s3_cred"] = (
-            "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
+        "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
     )
     exec_params[f"{prefix}_s3_cred"] = (
         "{'access_key': '"

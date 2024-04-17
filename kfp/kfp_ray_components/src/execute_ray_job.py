@@ -92,24 +92,20 @@ if __name__ == "__main__":
         s3_config_dict = None
     else:
         s3_config_dict = KFPUtils.load_from_json(s3_config.replace("'", '"'))
-    # convert lh config to proper dictionary to use for data access factory
-    lh_config = exec_params.get("data_lh_config", "None")
-    if lh_config == "None" or lh_config == "":
-        lh_config_dict = None
-    else:
-        lh_config_dict = KFPUtils.load_from_json(lh_config.replace("'", '"'))
     # get and build S3 credentials
     access_key, secret_key, url = KFPUtils.credentials()
     # Create data access factory and data access
     data_factory = DataAccessFactory()
-    data_factory.apply_input_params(args={
-        "data_s3_config": s3_config_dict,
-        "data_s3_cred": {"access_key": access_key, "secret_key": secret_key, "url": url}
-    })
+    data_factory.apply_input_params(
+        args={
+            "data_s3_config": s3_config_dict,
+            "data_s3_cred": {"access_key": access_key, "secret_key": secret_key, "url": url},
+        }
+    )
     data_access = data_factory.create_data_access()
     # restore and enhance exec params
     exec_params["data_s3_cred"] = (
-            "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
+        "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
     )
     # Execute Ray jobs
     execute_ray_jobs(

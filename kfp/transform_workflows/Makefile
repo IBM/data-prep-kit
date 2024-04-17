@@ -50,11 +50,13 @@ publish:: .check-env
 
 venv::	.check-env
 	@# Help: Create the virtual environment
+	make reconcile-requirement
+	sed -i.back "s/data-prep-lab-kfp==[0-9].*/data-prep-lab-kfp==${DATA_PREP_LAB_KFP}/" ../kfp_ray_components/requirements.txt
 	rm -rf venv	
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE}; 	\
 	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple \
-	pip install --no-cache-dir -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple data-prep-lab==${DATA_PREP_LAB} \
-	pip install --no-cache-dir -i https://test.pypi.org/simple/ data-prep-lab-kfp==${DATA_PREP_LAB_KFP}
+	pip install -r ../kfp_ray_components/requirements.txt \
+	pip install -i https://test.pypi.org/simple/data-prep-lab-kfp==${DATA_PREP_LAB_KFP}
 
 test::

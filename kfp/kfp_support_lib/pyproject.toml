@@ -1,6 +1,6 @@
 [project]
-name = "fm_data_processing_kfp"
-version = "0.0.3.dev27"
+name = "data_prep_lab_kfp"
+version = "0.0.1.dev2"
 requires-python = ">=3.10"
 description = "FM Data Processing Library. KFP support"
 authors = [
@@ -11,7 +11,7 @@ authors = [
 dependencies = [
     "kfp==1.8.22",
     "requests",
-    "data-prep-lab==0.0.1.dev2",
+    "data-prep-lab==0.0.1.dev3",
 ]
 
 [build-system]
