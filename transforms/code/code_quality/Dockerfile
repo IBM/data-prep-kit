@@ -1,4 +1,4 @@
-FROM docker.io/rayproject/ray:2.9.1-py310
+FROM docker.io/rayproject/ray:2.9.3-py310
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
