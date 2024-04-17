@@ -12,11 +12,7 @@ include makeenv
 DOCKER ?= docker
 DOCKER_FILE=Dockerfile
 DOCKER_HOSTNAME ?=  quay.io
-<<<<<<< HEAD
 DOCKER_NAMESPACE ?= dataprep1/data-prep-lab
-=======
-DOCKER_NAMESPACE ?= dataprep1
->>>>>>> dev
 DOCKER_NAME ?= kfp-data-processing
 IMG ?= ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_TAGNAME}
 
