@@ -3,6 +3,11 @@ FROM docker.io/rayproject/ray:2.9.3-py310 AS base
 # Install pytest so we can test the image later
 RUN pip install --no-cache-dir pytest
 
+# This needs to go before requirements.txt and its fasttext
+USER root 
+RUN sudo apt update && sudo apt install gcc g++ -y
+USER ray 
+
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -11,10 +16,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=ray:users data-processing-lib/ data-processing-lib/
 # install data processing
 RUN cd data-processing-lib && pip install --no-cache-dir -e .
-
-USER root 
-RUN sudo apt update && sudo apt install gcc g++ -y
-USER ray 
 
 # remove gcc
 USER root 
