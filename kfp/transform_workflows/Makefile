@@ -42,7 +42,6 @@ clean::
 
 build:: 
 	@# Help: Compile the pipelines
-	find . -iname "*_wf.yaml" |  xargs rm -f || true
 	${PYTHON} -m pip install --upgrade build
 	make ${YAML_WF}
 
