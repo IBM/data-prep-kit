@@ -2,14 +2,15 @@
 
 FROM python:3.10-slim-bullseye
 
-ARG FM_DATA_PROCESSING_KFP
+ARG DATA_PREP_LAB
+ARG DATA_PREP_LAB_KFP
 ARG BUILD_DATE
 ARG GIT_COMMIT
 
 LABEL build-date=$BUILD_DATE
 LABEL git-commit=$GIT_COMMIT
-LABEL fm-data-processing=${FM_DATA_PROCESSING}
-LABEL fm-data-processing-kfp=${FM_DATA_PROCESSING_KFP}
+LABEL data-prep-lab=${DATA_PREP_LAB}
+LABEL data-prep-lab-kfp=${DATA_PREP_LAB_KFP}
 
 # install libraries
 COPY requirements.txt requirements.txt
