@@ -27,6 +27,9 @@
 #
 #######################################################################################
 include $(REPOROOT)/.make.defaults
+
+include $(REPOROOT)/transforms/transforms.versions
+
 ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 
 DOCKER_FILE?=Dockerfile

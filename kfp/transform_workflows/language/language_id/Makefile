@@ -6,8 +6,6 @@ REPOROOT=../../../..
 # to override/redefine the rules below. 
 include ../../.make.transforms_workflows
 
-IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
-include makeenv
-
 DOCKER_IMAGE_NAME=lang_id
-DOCKER_IMAGE_VERSION ?= ${LANG_ID}
+# transforms.versions file contains the versions
+DOCKER_IMAGE_VERSION=${LANG_ID_VERSION}

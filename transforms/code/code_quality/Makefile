@@ -4,11 +4,8 @@
 REPOROOT=../../..
 include ../../.make.transforms
 
-# import the transforms versions which are located in requirements.env file.
-IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
-include makeenv
-
 TRANSFORM_NAME=code_quality
+# transforms.versions file contains the versions
 DOCKER_IMAGE_VERSION=${CODE_QUALITY_VERSION}
 
 # Use default rule inherited from makefile.common
