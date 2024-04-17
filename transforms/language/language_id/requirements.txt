@@ -1,10 +1,11 @@
-##############################################
-# If developing a transform outside of this repo, the following would be required, but within this
-# repo, we install the data-prep-lab library source separately into the venv and docker (see both the Makefile and Dockerfile).
-# The following url for fm-data-processing.  Contact David Wood, dawood@us.ibm.com, if you don't have pypi access
-#--extra-index-url https://${ARTIFACTORY_USER}:${ARTIFACTORY_API_KEY}@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
-#fm-data-processing==0.3.0
-##############################################
+# transform runtime
+#--extra-index-url https://test.pypi.org/simple/
+#data-prep-lab==0.0.1.dev5
+# Update to fix security
+pillow==10.2.0
+#cryptography==42.0.4
+fastapi==0.109.1
+aiohttp==3.9.2
 # Transform requirements except data-prep-lab (see above)
 fasttext==0.9.2
 langcodes==3.3.0

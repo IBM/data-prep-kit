@@ -10,11 +10,13 @@
 # limitations under the License.
 ################################################################################
 
+import os
 import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import DPLConfig, ParamsUtils
 from lang_id_transform import (
+    PARAM_CONTENT_COLUMN_NAME,
     PARAM_MODEL_CREDENTIAL,
     PARAM_MODEL_KIND,
     PARAM_MODEL_URL,
@@ -27,21 +29,12 @@ from lang_models import KIND_FASTTEXT
 launcher = TransformLauncher(transform_runtime_config=LangIdentificationTableTransformConfiguration())
 # create parameters
 
-s3_cred = {
-    "access_key": DPLConfig.S3_ACCESS_KEY,
-    "secret_key": DPLConfig.S3_SECRET_KEY,
-    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
-}
-
-# Configure lakehouse unit test tables
-lakehouse_config = {
-    "lh_environment": "STAGING",
-    "input_table": "academic.ieee_lh_unittest",
-    "input_dataset": "",
-    "input_version": "main",
-    "output_table": "academic.ieee_lang_id_0304_02",
-    "output_path": "lh-test/tables/academic/ieee_lang_id_0304_02",
-    "token": DPLConfig.LAKEHOUSE_TOKEN,
+# Configure local folders
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
+local_conf = {
+    "input_folder": input_folder,
+    "output_folder": output_folder,
 }
 
 worker_options = {"num_cpus": 1}
@@ -50,22 +43,25 @@ langid_config = {
     PARAM_MODEL_KIND: KIND_FASTTEXT,
     PARAM_MODEL_URL: "facebook/fasttext-language-identification",
     PARAM_MODEL_CREDENTIAL: DPLConfig.HUGGING_FACE_TOKEN,
+    PARAM_CONTENT_COLUMN_NAME: "text",
 }
 params = {
+    # where to run
     "run_locally": True,
-    "max_files": -1,
-    "s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "lh_config": ParamsUtils.convert_to_ast(lakehouse_config),
+    # Data access. Only required parameters are specified
+    "data_local_config": ParamsUtils.convert_to_ast(local_conf),
+    # orchestrator
     "worker_options": ParamsUtils.convert_to_ast(worker_options),
     "num_workers": 2,
-    "checkpointing": False,
     "pipeline_id": "pipeline_id",
     "job_id": "job_id",
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
+    # lang_id specific
     **langid_config,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 
 # launch
 launcher.launch()
+

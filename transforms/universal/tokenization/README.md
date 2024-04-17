@@ -31,7 +31,7 @@ The default value for `--tkn_chunk_size` is `0` which tokenizes each document as
 
 
 ## Running
-You can run the [tokenization_local.py](src/tokenization_local.py) to
+You can run the [tokenization_local.py](src/tokenization_local_ray.py) to
 transform all parquet files (some are in sub-directories) in [test input data](test-data/ds01/input) 
 to [output](output) directory. This directory will contain both sub-directories and the transformed (tokenized)
 parquet files and the `metadata.json` file. It will skip empty parquet files in folder [dataset=empty](test-data/ds01/input/lang=en/dataset=empty) 
@@ -40,25 +40,26 @@ parquet files and the `metadata.json` file. It will skip empty parquet files in 
 % source venv/bin/activate
 (venv) % cd src
 (venv) % python tokenization_local.py
-17:07:48 INFO - Running locally
-17:07:48 INFO - Using local configuration with: input_folder - /src/transforms/universal/tokenization/test-data/input output_folder - /src/transforms/universal/tokenization/output
-17:07:48 INFO - Not using data sets, checkpointing False, max files -1
-17:07:48 INFO - number of workers 5 worker options {'num_cpus': 0.8}
-17:07:48 INFO - pipeline id pipeline_id; number workers 5
-17:07:48 INFO - job details {'job category': 'preprocessing', 'job name': 'Tokenization', 'job type': 'ray', 'job id': 'job_id'}
-17:07:48 INFO - code location {'github': 'github', 'commit_hash': '12345', 'path': 'path'}
-17:07:48 INFO - actor creation delay 0
-2024-03-20 17:07:50,700	INFO worker.py:1715 -- Started a local Ray instance. View the dashboard at 127.0.0.1:8265
-(orchestrate pid=91756) None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used.
-(orchestrate pid=91756) 17:07:51 INFO - orchestrator started at 2024-03-20 17:07:51
-(orchestrate pid=91756) 17:07:51 INFO - Number of files is 3, source profile {'max_file_size': 0.0026502609252929688, 'min_file_size': 0.0024614334106445312, 'total_file_size': 0.007695198059082031}
-(orchestrate pid=91756) 17:07:51 INFO - Cluster resources: {'cpus': 10, 'gpus': 0, 'memory': 40.44677734375, 'object_store': 2.0}
-(orchestrate pid=91756) 17:07:51 INFO - Number of workers - 5 with {'num_cpus': 0.8} each
-(orchestrate pid=91756) 17:07:51 INFO - Completed 0 files in 4.398822784423828e-06 min. Waiting for completion
-17:07:53 INFO - Completed orchestrator
-(orchestrate pid=91756) 17:07:53 INFO - Completed processing in 0.022802833716074625 min
-17:08:03 INFO - Completed execution in 0.237752366065979 min, execution result 0
-(TransformTableProcessor pid=91764) None of PyTorch, TensorFlow >= 2.0, or Flax have been found. Models won't be available and only tokenizers, configuration and file/data utilities can be used. [repeated 5x across cluster] (Ray deduplicates logs by default. Set RAY_DEDUP_LOGS=0 to disable log deduplication, or see https://docs.ray.io/en/master/ray-observability/ray-logging.html#log-deduplication for more options.)
+11:31:23 INFO - Running locally
+11:31:23 INFO - data factory data_ is using local data accessinput_folder - /Users/boris/Projects/data-prep-lab-inner/transforms/universal/tokenization/test-data/ds01/input output_folder - /Users/boris/Projects/data-prep-lab-inner/transforms/universal/tokenization/output/ds01
+11:31:23 INFO - data factory data_ max_files -1, n_sample -1
+11:31:23 INFO - data factory data_ Not using data sets, checkpointing False, max files -1, random samples -1, files to use ['.parquet']
+11:31:23 INFO - number of workers 5 worker options {'num_cpus': 0.8}
+11:31:23 INFO - pipeline id pipeline_id; number workers 5
+11:31:23 INFO - job details {'job category': 'preprocessing', 'job name': 'Tokenization', 'job type': 'ray', 'job id': 'job_id'}
+11:31:23 INFO - code location {'github': 'github', 'commit_hash': '12345', 'path': 'path'}
+11:31:23 INFO - actor creation delay 0
+2024-04-14 11:31:28,051	INFO worker.py:1715 -- Started a local Ray instance. View the dashboard at 127.0.0.1:8265 
+(orchestrate pid=66179) 11:31:34 INFO - orchestrator started at 2024-04-14 11:31:34
+(orchestrate pid=66179) 11:31:34 INFO - Number of files is 5, source profile {'max_file_size': 0.011751174926757812, 'min_file_size': 0.0024614334106445312, 'total_file_size': 0.031197547912597656}
+(orchestrate pid=66179) 11:31:34 INFO - Cluster resources: {'cpus': 16, 'gpus': 0, 'memory': 12.310983276925981, 'object_store': 2.0}
+(orchestrate pid=66179) 11:31:34 INFO - Number of workers - 5 with {'num_cpus': 0.8} each
+(orchestrate pid=66179) 11:31:34 INFO - Completed 0 files in 6.432930628458659e-05 min. Waiting for completion
+(orchestrate pid=66179) 11:31:40 INFO - Completed processing in 0.09031039873758952 min
+(orchestrate pid=66179) 11:31:40 INFO - done flushing in 0.002071857452392578 sec
+(TransformTableProcessor pid=66188) 11:31:40 INFO - table: /Users/boris/Projects/data-prep-lab-inner/transforms/universal/tokenization/test-data/ds01/input/lang=en/dataset=empty/dpv08_cc01.snappy.parquet is empty, skipping processing
+11:31:50 INFO - Completed execution in 0.4469521840413411 min, execution result 0
+(TransformTableProcessor pid=66187) 11:31:40 INFO - table: /Users/boris/Projects/data-prep-lab-inner/transforms/universal/tokenization/test-data/ds01/input/lang=en/dataset=empty/dpv08_cc02.snappy.parquet is empty, skipping processing
 (venv) % deactivate
 % ls -R ../output
 lang=en		metadata.json	pq03.parquet
@@ -89,27 +90,28 @@ the following command line arguments are available in addition to
                         Specify language used in the text content for better text splitting if needed
   --tkn_chunk_size TKN_CHUNK_SIZE
                         Specify >0 value to tokenize each row/doc in chunks of characters (rounded in words)
-  --s3_cred S3_CRED     AST string of options for cos credentials. Only required for COS or Lakehouse.
+  --data_ s3_cred S3_CRED     
+                        AST string of options for cos credentials. Only required for s3 or Lakehouse.
                         access_key: access key help text
                         secret_key: secret key help text
                         url: S3 url
                         Example: { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/bucket_name/test/' }
-  --s3_config S3_CONFIG
+  --data_s3_config S3_CONFIG
                         AST string containing input/output paths.
                         input_path: Path to input folder of files to be processed
                         output_path: Path to output folder of processed files
                         Example: { 'input_path': '/bucket_name/input', 'output_path': '/bucket_name/output' }
  
-  --local_config LOCAL_CONFIG
+  --data_local_config LOCAL_CONFIG
                         ast string containing input/output folders using local fs.
                         input_folder: Path to input folder of files to be processed
                         output_folder: Path to output folder of processed files
                         Example: { 'input_folder': './input', 'output_folder': '/tmp/output' }
-  --max_files MAX_FILES
+  --data_max_files MAX_FILES
                         Max amount of files to process
-  --checkpointing CHECKPOINTING
+  --data_checkpointing CHECKPOINTING
                         checkpointing flag
-  --data_sets DATA_SETS
+  --data_data_sets DATA_SETS
                         List of data sets
   --num_workers NUM_WORKERS
                         number of workers

@@ -32,8 +32,6 @@ def get_logger(name: str, level=None, file=None):
         level = get_log_level(name)
     logger.setLevel(level)
     c_handler = logging.StreamHandler()
-    # msgfmt = '[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'
-    # msgfmt = '%(asctime)s p%(process)s %(levelname)s %(filename)s:%(lineno)d - %(message)s'
     if level == "DEBUG":
         # When debugging, include the source link that pycharm understands.
         msgfmt = '%(asctime)s %(levelname)s - %(message)s at "%(pathname)s:%(lineno)d"'

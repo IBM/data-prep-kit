@@ -15,7 +15,7 @@ import sys
 import time
 
 import ray
-from data_processing.data_access import DataAccessFactory
+from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     TransformOrchestratorConfiguration,
@@ -35,11 +35,10 @@ class TransformLauncher:
     def __init__(
         self,
         transform_runtime_config: DefaultTableTransformConfiguration,
-        data_access_factory: DataAccessFactory = DataAccessFactory(),
+        data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """
         Creates driver
-        :param name: name of the application
         :param transform_runtime_config: transform runtime factory
         :param data_access_factory: the factory to create DataAccess instances.
         """

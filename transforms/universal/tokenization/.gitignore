@@ -1,11 +1,7 @@
 test-data/output
 output/*
+/output/
 data-processing-lib/
-src/run_*.py
-tokenizers
-qtest
-.vscode
-
 
 
 # Byte-compiled / optimized / DLL files

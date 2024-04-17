@@ -9,7 +9,6 @@ inputs:
     - { name: server_url, type: String, default: "", description: "url of api server" }
     - { name: additional_params, type: String, default: "{}", description: "additional parameters" }
 
-
 implementation:
     container:
         image: quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.2

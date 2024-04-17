@@ -43,7 +43,6 @@ class TestRayBlocklistTransform(AbstractTransformLauncherTest):
             # fuzzy parameters
             "threshold": 0.8,
             "shingles_size": 5,
-            "japanese_data": False,
             "delimiters": " ",
             # Random delay between reads
             "random_delay_limit": 5,

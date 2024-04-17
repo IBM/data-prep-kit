@@ -2,16 +2,19 @@
 name = "data_prep_lab_kfp"
 version = "0.0.1.dev2"
 requires-python = ">=3.10"
-description = "FM Data Processing Library. KFP support"
+description = "Data Preparation Laboratory Library. KFP support"
+license = {text = "Apache-2.0"}
+readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
-    { name = "David Wood", email = "dawood@us.ibm.com" },
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
     { name = "Alexey Roytman", email = "roytman@il.ibm.com" },
+    { name = "Mohammad Nassar", email = "Mohammad.Nassar@ibm.com" },
+    { name = "Revital Eres", email = "eres@il.ibm.com" },
 ]
 dependencies = [
     "kfp==1.8.22",
     "requests",
-    "data-prep-lab==0.0.1.dev3",
+    "data-prep-lab==0.0.1.dev5",
 ]
 
 [build-system]

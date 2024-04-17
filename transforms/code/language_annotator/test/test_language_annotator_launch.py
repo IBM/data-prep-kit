@@ -14,7 +14,7 @@ import os
 
 from data_processing.test_support.ray import AbstractTransformLauncherTest
 from data_processing.utils import ParamsUtils
-from lang_annotator_transform import (
+from language_annotator_transform import (
     LangSelectorTransformConfiguration,
     lang_allowed_langs_file_key,
     lang_known_selector,

@@ -10,9 +10,6 @@
 # limitations under the License.
 ################################################################################
 
-# This helps to be able to run the test from within an IDE which seems to use the location of the
-# file as the working directory.
-
 import os
 
 import pyarrow as pa

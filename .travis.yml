@@ -47,7 +47,7 @@ script:
               curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
               chmod 777 /tmp/kubectl
               export DEPLOY_KUBEFLOW=0
-              make -C kind setup || travis_terminate 1
+              # kind setup now relies on mc, which is not installed make -C kind setup || travis_terminate 1
               make -C kfp/kfp_support_lib build test || travis_terminate 1
           ;;
           kfp-compile)

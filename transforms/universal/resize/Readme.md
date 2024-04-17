@@ -37,7 +37,7 @@ Only one of the _max_rows_per_table_ and _max_mbytes_per_table_ may be used.
 ## Running
 
 We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/resize_local_ray.py), [s3](src/resize_s3.py) and [lakehouse](src/resize_lakehouse.py)
+[local file system](src/resize_local_ray.py) and [s3](src/resize_s3.py)
 
 
 ### Launched Command Line Options 

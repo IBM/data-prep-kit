@@ -11,12 +11,9 @@
 ################################################################################
 
 import os
-import sys
 
 from data_processing.data_access import DataAccessLocal
-from data_processing.ray import TransformLauncher
-from data_processing.utils import ParamsUtils
-from doc_id_transform import DocIDTransform, DocIDTransformConfiguration
+from doc_id_transform import DocIDTransform
 
 
 # create parameters

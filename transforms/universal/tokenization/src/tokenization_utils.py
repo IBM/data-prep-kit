@@ -10,23 +10,17 @@
 # limitations under the License.
 ################################################################################
 
-import os
 import re
-import sys
+from typing import Any
 
 from data_processing.utils import get_logger
+from transformers import AutoTokenizer
 
 
 logger = get_logger(__name__)
 
-# local_tokenizer = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "tokenizers", "gpt2_based"))
 
-import re
-
-from transformers import AutoTokenizer
-
-
-def split_text(text: str, chunk_size: int, text_lang: str) -> str:
+def split_text(text: str, chunk_size: int) -> str:
     """
     This function splits a given text into chunks and returns them one by one through yielding.
     It can be beneficial for tokenizing a very long text (comprising tens of thousands of words)
@@ -36,15 +30,12 @@ def split_text(text: str, chunk_size: int, text_lang: str) -> str:
     :param chunk_size: specified as the number of characters,
             although chunks are rounded by words, ensuring that
             the last word in a chunk remains intact and is not split into halves.
-    :param text_lang: a standard acronym for each language, eg, `en`, `vi`, `ja`, etc.
     :return: yielding a chunk of text each time.
     """
 
-    # Additional languages without spaces among words can be added, and each language may receive distinct treatment in word splitting.
-    if text_lang in ["ja", "zh"]:
-        return _split_text_wout_word_space(text, chunk_size)
-    else:
-        return _split_text_with_word_space(text, chunk_size)
+    # Additional languages without spaces among words can be added,
+    # and each language may receive distinct treatment in word splitting.
+    return _split_text_with_word_space(text, chunk_size)
 
 
 def _split_text_with_word_space(text: str, chunk_size: int) -> str:
@@ -79,39 +70,6 @@ def _split_text_with_word_space(text: str, chunk_size: int) -> str:
             index += chunk_size
 
 
-def _split_text_wout_word_space(text: str, chunk_size: int, reserve_consecutive_linebreaks: bool = True) -> str:
-    """
-    Split the text into multiple chunks for some particular languages having no spaces between words.
-    This version is preliminary and necessitates further development for each individual language (eg, japanese, chinese, etc).
-    For input/output, please refer to the split_text() function
-    """
-
-    lines = text.split("\n")
-    current_chunk = ""
-    for i, line in enumerate(lines):
-        # extract words, non-word characters (eg, punctuation), and newline characters:
-        words = re.findall(r"\w+|[^\w\s]+|\n+", line, re.UNICODE)
-        for j, word in enumerate(words):
-            if len(current_chunk) + len(word) <= chunk_size:
-                current_chunk += word
-            else:
-                yield current_chunk
-                current_chunk = word
-
-        if len(current_chunk) < chunk_size:
-            if reserve_consecutive_linebreaks:
-                current_chunk += "\n"
-            continue
-        else:
-            # reaching `chunk_size`, yield the chunk:
-            yield current_chunk
-            current_chunk = ""
-
-    # Yield last chunk:
-    if current_chunk:
-        yield current_chunk
-
-
 def string_to_kwargs(string):
     """
     Convert a given string into kwargs dictionary
@@ -134,17 +92,17 @@ def string_to_kwargs(string):
     return kwargs_dict
 
 
-def load_tokenizer(tokenizer_name: str, tokenizer_args: dict):
+def load_tokenizer(tokenizer_name: str, tokenizer_args: dict) -> Any:
     """
      Load and return a tokenizer specified in `tokenizer_name`
     This function is designed to accommodate the loading of any tokenizer compatible with
     the Huggingface `AutoTokenizer` library, such as `bigcode/starcoder`, `Rocketknight1/falcon-rw-1b`, and others.
 
     Extending this function to support other customized tokenizers is straightforward.
-    :param tokenizer_name: name of tokenizer. It can be one downloadable from HuggingFace or from a locally specified folder.
-    :param kwargs: None or a dictionary of key:value pairs to specify parameters for the tokenizer
+    :param tokenizer_name: name of tokenizer. It can be one downloadable from HuggingFace or from
+                          a locally specified folder.
+    :param tokenizer_args: Arguments for creating tokenizer
     :return: a tokenizer
-
     """
     try:
         if tokenizer_args is not None:

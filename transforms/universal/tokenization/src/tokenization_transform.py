@@ -20,11 +20,7 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.ray import (
-    DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
-    TransformLauncher,
-)
+from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import get_logger
 
@@ -103,7 +99,7 @@ class TokenizationTransform(AbstractTableTransform):
                     start_time = time.time()
                     token_line = []
                     doc_len_so_far = 0
-                    for chunk_idx, chunk in enumerate(split_text(doc_content, self.chunk_size, self.text_lang)):
+                    for chunk_idx, chunk in enumerate(split_text(doc_content, self.chunk_size)):
                         token_line.extend(self.tokenizer(chunk)["input_ids"])
                         doc_len_so_far += len(chunk)
 
