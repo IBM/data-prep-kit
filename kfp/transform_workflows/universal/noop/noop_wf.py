@@ -26,7 +26,7 @@ task_image = "quay.io/dataprep1/data-prep-lab/noop:0.6"
 EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.2"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.3"
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
