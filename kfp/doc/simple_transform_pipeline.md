@@ -2,6 +2,7 @@
 
 In this example, we implement a pipeline to automate execution of the simple 
 [noop transform](../../data-processing-lib/doc/simplest-transform-tutorial.md)
+
 In this tutorial, we will show the following:
 
 * How to write the `noop` transform automation pipeline, leveraging [KFP components](../kfp_ray_components/README.md).
