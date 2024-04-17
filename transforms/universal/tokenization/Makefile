@@ -11,7 +11,7 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env 
 include makeenv
 
 TRANSFORM_NAME=tokenization
-DOCKER_IMAGE_VERSION=${TOKENIZER}
+DOCKER_IMAGE_VERSION=${TOKENIZER_VERSION}
 
 
 venv::	.transforms.venv

@@ -9,7 +9,7 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env 
 include makeenv
 
 TRANSFORM_NAME=code_quality
-DOCKER_IMAGE_VERSION=${CODE_QUALITY}
+DOCKER_IMAGE_VERSION=${CODE_QUALITY_VERSION}
 
 # Use default rule inherited from makefile.common
 clean:: .transforms.clean

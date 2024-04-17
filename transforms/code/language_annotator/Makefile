@@ -11,7 +11,7 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env 
 include makeenv
 
 TRANSFORM_NAME=language_annotator
-DOCKER_IMAGE_VERSION=${LANG_ANNOTATOR}
+DOCKER_IMAGE_VERSION=${LANG_ANNOTATOR_VERSION}
 
 venv::	.transforms.venv
 

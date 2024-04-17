@@ -10,4 +10,4 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env 
 include makeenv
 
 DOCKER_IMAGE_NAME = blocklist
-DOCKER_IMAGE_VERSION=${BLOCKLIST}
+DOCKER_IMAGE_VERSION=${BLOCKLIST_VERSION}

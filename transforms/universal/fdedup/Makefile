@@ -11,7 +11,7 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env 
 include makeenv
 
 TRANSFORM_NAME=fdedup
-DOCKER_IMAGE_VERSION=${FDEDUP}
+DOCKER_IMAGE_VERSION=${FDEDUP_VERSION}
 
 venv::	.transforms.venv
 

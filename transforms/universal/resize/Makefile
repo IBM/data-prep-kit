@@ -11,7 +11,7 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env 
 include makeenv
 
 TRANSFORM_NAME=resize
-DOCKER_IMAGE_VERSION=${RESIZE}
+DOCKER_IMAGE_VERSION=${RESIZE_VERSION}
 
 venv::	.transforms.venv
 

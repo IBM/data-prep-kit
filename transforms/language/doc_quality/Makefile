@@ -14,7 +14,7 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env 
 include makeenv
 
 TRANSFORM_NAME=doc_quality
-DOCKER_IMAGE_VERSION=${DOC_QUALITY}
+DOCKER_IMAGE_VERSION=${DOC_QUALITY_VERSION}
 
 
 venv:: .transforms.venv

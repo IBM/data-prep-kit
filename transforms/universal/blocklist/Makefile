@@ -12,9 +12,7 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env 
 include makeenv
 
 TRANSFORM_NAME=blocklist
-DOCKER_IMAGE_VERSION=${BLOCKLIST}
-
-
+DOCKER_IMAGE_VERSION=${BLOCKLIST_VERSION}
 
 venv::	.transforms.venv
 

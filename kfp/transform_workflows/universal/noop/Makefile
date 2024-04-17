@@ -10,4 +10,4 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env 
 include makeenv
 
 DOCKER_IMAGE_NAME=noop
-DOCKER_IMAGE_VERSION=${NOOP}
+DOCKER_IMAGE_VERSION=${NOOP_VERSION}

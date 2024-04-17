@@ -11,7 +11,7 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env 
 include makeenv
 
 TRANSFORM_NAME=doc_id
-DOCKER_IMAGE_VERSION=${DOC_ID}
+DOCKER_IMAGE_VERSION=${DOC_ID_VERSION}
 
 venv::	.transforms.venv
 
