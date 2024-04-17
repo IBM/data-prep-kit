@@ -17,9 +17,9 @@ env:
         - OPERATION=transform-src-test   DIR=transforms/code DOCKER=docker
         - OPERATION=transform-src-test   DIR=transforms/language DOCKER=docker
         - OPERATION=transform-src-test   DIR=transforms/universal DOCKER=docker
-        - OPERATION=transform-image-test DIR=transforms/code DOCKER=docker
-        - OPERATION=transform-image-test DIR=transforms/language DOCKER=docker
-        - OPERATION=transform-image-test DIR=transforms/universal DOCKER=docker
+        - OPERATION=transform-image DIR=transforms/code DOCKER=docker
+        - OPERATION=transform-image DIR=transforms/language DOCKER=docker
+        - OPERATION=transform-image DIR=transforms/universal DOCKER=docker
         - OPERATION=kfp-lib-test
         - OPERATION=kfp-compile
         - OPERATION=tools-test
@@ -47,7 +47,7 @@ script:
               curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
               chmod 777 /tmp/kubectl
               export DEPLOY_KUBEFLOW=0
-              make -C kind setup || travis_terminate 1
+              # kind setup now relies on mc, which is not installed make -C kind setup || travis_terminate 1
               make -C kfp/kfp_support_lib build test || travis_terminate 1
           ;;
           kfp-compile)
@@ -59,7 +59,9 @@ script:
           transform-src-test)
                    make -C ${DIR} DOCKER=${DOCKER} venv test-src || travis_terminate 1
           ;;
-          transform-image-test)
+          transform-image)
+                   # Turn of publishing to public quay.io repo until we split the repos
+                   #make -C ${DIR} DOCKER=${DOCKER} image test-image publish || travis_terminate 1
                    make -C ${DIR} DOCKER=${DOCKER} image test-image || travis_terminate 1
           ;;
           tools-test)

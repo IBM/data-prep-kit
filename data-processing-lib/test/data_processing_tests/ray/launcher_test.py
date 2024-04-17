@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import os
 import sys
 
@@ -15,22 +27,13 @@ from data_processing.utils import ParamsUtils
  to run test using argparse we can simply overwrite sys.argv to supply required arguments
 """
 s3_cred = {
-    "access_key": "key",
+    "access_key": "access",
     "secret_key": "secret",
     "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
 s3_conf = {
-    "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=text/",
-    "output_folder": "cos-optimal-llm-pile/boris-test/",
-}
-lakehouse_conf = {
-    "input_table": "foo",
-    "input_dataset": "dataset",
-    "input_version": "version",
-    "output_table": "blah",
-    "output_path": "path",
-    "token": "token",
-    "lh_environment": "PROD",
+    "input_folder": "input_folder",
+    "output_folder": "output_folder",
 }
 local_conf = {
     "input_folder": os.path.join(os.sep, "tmp", "input"),
@@ -59,16 +62,16 @@ class TestLauncher(TransformLauncher):
 def test_launcher():
     params = {
         "run_locally": True,
+        "data_max_files": -1,
+        "data_checkpointing": False,
         "worker_options": ParamsUtils.convert_to_ast(worker_options),
         "num_workers": 5,
         "pipeline_id": "pipeline_id",
         "job_id": "job_id",
         "creation_delay": 0,
         "code_location": ParamsUtils.convert_to_ast(code_location),
-        "data_max_files": -1,
-        "data_checkpointing": False,
     }
-    # cos not defined
+    # s3 not defined
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=DefaultTableTransformConfiguration(
@@ -94,15 +97,6 @@ def test_launcher():
         ),
     ).launch()
     assert 0 == res
-    # Add lake house
-    params["data_lh_config"] = ParamsUtils.convert_to_ast(lakehouse_conf)
-    sys.argv = ParamsUtils.dict_to_req(d=params)
-    res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
-        ),
-    ).launch()
-    assert 1 == res
     # Add local config, should fail because now three different configs exist
     params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf)
     sys.argv = ParamsUtils.dict_to_req(d=params)
@@ -120,18 +114,7 @@ def test_launcher():
             name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
-    assert 1 == res
-
-    # remove s3 config, now it should work
-    del params["data_s3_config"]
-    sys.argv = ParamsUtils.dict_to_req(d=params)
-    res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
-        ),
-    ).launch()
     assert 0 == res
-    sys.argv = []
 
 
 def test_local_config():
@@ -198,7 +181,7 @@ def test_local_config_validate():
             name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
         ),
     ).launch()
-    assert 1 == res  
+    assert 1 == res
     params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(

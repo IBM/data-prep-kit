@@ -31,9 +31,11 @@ ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 
 DOCKER?=podman
 DOCKER_FILE?=Dockerfile
-DOCKER_REGISTRY?=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual
-EXTRA_ARTIFACTORY_URL=https://$$ARTIFACTORY_USER:$$ARTIFACTORY_API_KEY@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
+DOCKER_REGISTRY?=quay.io
+
+DOCKER_IMAGE_PREFIX?=quay.io/dataprep1/data-prep-lab
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
+DOCKER_IMAGE=${DOCKER_IMAGE_PREFIX}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
 TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_transform.py
@@ -48,30 +50,40 @@ help::
 	@echo DOCKER - the name of the docker executable to use.  DOCKER=$(DOCKER)
 	@echo DOCKER_FILE - the name of the docker file to use.  DOCKER_FILE=$(DOCKER_FILE)
 	@echo DOCKER_REGISTRY - the name of the docker registry to use.  DOCKER_REGISTRY=$(DOCKER_REGISTRY)
+	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
+	@echo DOCKER_REGISTRY_KEY - the docker user to use.  DOCKER_REGISTRY_KEY=secret
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
-	@echo EXTRA_ARTIFACTORY_URL - the url of an additional artifactory to satisfy dependencies.  EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL)
 	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
-	@echo TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_transform.py)
+	@echo "TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_local_ray.py)"
 	@echo ""
 	@echo Macros that require definition in the including Makefile
-	@echo REPOROOT defines root directory of this repository (such as ../../..) 
-	@echo TRANSFORM_NAME defines the name of the transform and is used to 
-	@echo     define default values of DOCKER_IMAGE_NAME and TRANSFORM_SRC_FILE.  For, example 'noop'
+	@echo "REPOROOT defines the root directory of this repository (such as ../../..)" 
+	@echo TRANSFORM_NAME defines the name of the transform and is used to define defaults for...
+	@echo "    DOCKER_IMAGE_NAME and TRANSFORM_SRC_FILE.  For, example 'noop'"
 	@echo DOCKER_IMAGE_VERSION - the version of the docker image to produce.  DOCKER_IMAGE_VERSION=$(DOCKER_IMAGE_VERSION)
 	@$(MAKE) .transforms.check_required_macros
 
 .PHONY: .transforms.setup
 .transforms.setup::
-	@# Help:  Do nothing, since nothing to setup by default. 
+	@# Help: Do nothing, since nothing to setup by default. 
  
 
 .PHONY: .transforms.check_required_macros
 .transforms.check_required_macros::
-	@if [ -z "$(DOCKER_IMAGE_NAME)" ]; then		\
-	    echo ERROR: DOCKER_IMAGE_NAME is must be defined.;	\
-	fi
+	@if [ -z "$(TRANSFORM_NAME)" ]; then	\
+	    echo ERROR: TRANSFORM_NAME must be defined.;	\
+	fi			
 	@if [ -z "$(DOCKER_IMAGE_VERSION)" ]; then	\
-	    echo ERROR: DOCKER_IMAGE_VERSION is must be defined.;	\
+	    echo ERROR: DOCKER_IMAGE_VERSION must be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_REGISTRY_USER)" ]; then	\
+	    echo ERROR: DOCKER_REGISTRY_USER must be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_REGISTRY_KEY)" ]; then	\
+	    echo ERROR: DOCKER_REGISTRY_KEYmust be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_REGISTRY)" ]; then	\
+	    echo ERROR: DOCKER_REGISTRY must be defined.;	\
 	fi			
 
 .PHONY: .transforms.clean
@@ -89,10 +101,6 @@ help::
 	@$(MAKE) .transforms.check_env	# Put this first so we don't get its help
 	@# Help: Create the virtual environment using requirements.txt
 	$(PYTHON) -m venv venv
-	@if [ ! -z "$(EXTRA_ARTIFACTORY_URL)" ]; then				\
-	    echo '[global]' > venv/pip.conf;					\
-	    echo "extra-index-url = $(EXTRA_ARTIFACTORY_URL)" >> venv/pip.conf;	\
-	fi
 	@source venv/bin/activate;		\
 	pip install --upgrade pip;		\
 	pip install wheel;			\
@@ -100,28 +108,22 @@ help::
 	pip install pytest;			
 	$(MAKE) .transforms.install-lib-src
 
+.PHONY: .transforms.check_env
 .transforms.check_env::
-	@# Help: Make sure Artifactory credentials are in the environment variables. 
-	@if [ -z "$(ARTIFACTORY_USER)" -o -z "$(ARTIFACTORY_API_KEY)" ]; then \
-		echo "You must set ARTIFACTORY_USER and ARTIFACTORY_API_KEY env vars";\
-		exit;									\
-	fi
 
 # Create the docker image making sure the preloaded models are available to copy into the image
 # We copy the library/framework source here so it can be installed into the docker image and
 # pip installed inside the Dockerfile
+.PHONY: .transforms.image
 .transforms.image:: Dockerfile requirements.txt
 	$(MAKE) .transforms.check_env	# Put this first so we don't get its help
-	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
+	@# Help: Build the docker image, $(DOCKER_IMAGE), using the $(DOCKER_FILE) and requirements.txt 
 	rm -rf data-processing-lib
 	mkdir data-processing-lib
 	cp -R $(REPOROOT)/data-processing-lib/src data-processing-lib
-	cp    $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
-	$(DOCKER) login $(DOCKER_REGISTRY) -u $(ARTIFACTORY_USER) -p $(ARTIFACTORY_API_KEY)
-	$(DOCKER) build --build-arg EXTRA_ARTIFACTORY_URL=$(EXTRA_ARTIFACTORY_URL) \
-		--build-arg ARTIFACTORY_USER=$(ARTIFACTORY_USER) \
-		--build-arg ARTIFACTORY_API_KEY=$(ARTIFACTORY_API_KEY) \
-		-t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) . 
+	cp  $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
+	cp  $(REPOROOT)/data-processing-lib/README.md data-processing-lib
+	$(DOCKER) build -t $(DOCKER_IMAGE) .
 	rm -rf data-processing-lib
 
 .PHONY: .transforms.install-lib-src
@@ -129,9 +131,8 @@ help::
 	@# Help: Install the source from the data processing library for $(PYTHON) 
 	@echo Installing source from data processing library for venv 
 	@source venv/bin/activate;					\
-	pip uninstall -y fm-data-processing;			\
+	pip uninstall -y data-prep-lab;			\
 	pip install 						\
-		--extra-index-url $(EXTRA_ARTIFACTORY_URL)		\
 		-e $(REPOROOT)/data-processing-lib/;			\
 	if [ $$? -eq 0 ]; then	\
 		echo Installed source from data processing library for `which $(PYTHON)`;	\
@@ -139,7 +140,9 @@ help::
 		echo ERROR installing source into `which $(PYTHON)`;	\
 	fi
 
+.PHONY: .transforms.build
 .transforms.build:: .transforms.venv .transforms.image	
+	@# Help: Create the venv and build the transform image 
 
 .PHONY: .transforms.test-lib-src
 .transforms.test-lib-src::
@@ -150,28 +153,24 @@ help::
 
 .PHONY: .transforms.test 
 .transforms.test::  .transforms.test-src .transforms.test-image
+	@# Help: Run both source and image level tests.
 
+.PHONY: .transforms.test-src
 .transforms.test-src::  .transforms.test-lib-src .transforms.test-locals
-
-.transforms.test.old::  
-	@# Help: Run pytest on the test directory using the current venv
-	source venv/bin/activate;			\
-	export PYTHONPATH=../src:.:$$PYTHONPATH;	\
-	cd test; $(PYTEST) . 
-
+	@# Help: Run the transform's tests and any '*local' .py files
 
 .PHONY: .transforms.test-image
-.transforms.test-image:: .transforms.test-image-pytest
+.transforms.test-image:: .transforms.image .transforms.test-image-pytest
 
 .PHONY: .transforms.test-image-pytest
-.transforms.test-image-pytest::
+.transforms.test-image-pytest:: .transforms.image
 	@# Help: Test an already-built image (use make image) running pytest on $(TRANSFORM_TEST_FILE) 
-	$(DOCKER) run -t --rm $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) pytest -s  $(TRANSFORM_TEST_FILE)
+	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s  $(TRANSFORM_TEST_FILE)
 
 .PHONY: .transforms.test-image-help
 .transforms.test-image-help::
 	@# Help: Test an already-built image (use make image) to be sure the --help option works
-	$(DOCKER) run -t --rm $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) python $(TRANSFORM_SRC_FILE) --help
+	$(DOCKER) run -t --rm $(DOCKER_IMAGE) python $(TRANSFORM_SRC_FILE) --help
 
 .PHONY: test-locals
 test-locals:: .transforms.test-locals
@@ -189,4 +188,59 @@ test-locals:: .transforms.test-locals
 		exit 1;				\
 	    fi;					\
 	done	
-	
+
+.PHONY: .transforms.publish
+.transforms.publish:: .transforms.image
+	@# Help: Publish the docker image to $(DOCKER_REGISTRY) container registry 
+	$(DOCKER) logout $(DOCKER_REGISTRY)
+	$(DOCKER) login $(DOCKER_REGISTRY) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
+	$(DOCKER) push  $(DOCKER_IMAGE)
+
+.PHONY: .transforms-check-exists
+.transforms-check-exists:
+	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
+	if  [ -z "$$exists" ]; then				\
+	    echo Recommend creating $(CHECK_FILE_NAME) in directory $(CHECK_DIR); 	\
+	fi
+
+.PHONY: .transforms-check-not-exists
+.transforms-check-not-exists:
+	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
+	if  [ ! -z "$$exists" ]; then				\
+	    echo Recommend removing file $(CHECK_FILE_NAME) from directory $(CHECK_DIR); 	\
+	fi
+
+.PHONY: .transforms-check-target
+.transforms-check-target:
+	@exists=$$(grep "^$(CHECK_TARGET):" Makefile);		\
+	if  [ -z "$$exists" ]; then				\
+	    echo Missing makefile target $(CHECK_TARGET); 	\
+	fi
+
+.PHONY: .transforms-check-dir-size
+.transforms-check-dir-size:
+	@mb=$$(du -sm $(CHECK_DIR) | awk '{print $$1}');	\
+	if  [ $$mb -gt 15 ]; then				\
+	    echo Directory $(CHECK_DIR) is very large;		\
+	fi
+
+.PHONY: check-conventions
+conventions:
+	@echo "Begin checking transform project conventions.  Recommendations/issues, if any, follow..."
+	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  .transforms-check-not-exists
+	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_ray.py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_launch.py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=. CHECK_FILE_NAME=.dockerignore  .transforms-check-exists
+	@$(MAKE) CHECK_DIR=test-data .transforms-check-dir-size
+	@$(MAKE) CHECK_TARGET=build .transforms-check-target
+	@$(MAKE) CHECK_TARGET=clean .transforms-check-target
+	@$(MAKE) CHECK_TARGET=image .transforms-check-target
+	@$(MAKE) CHECK_TARGET=publish .transforms-check-target
+	@$(MAKE) CHECK_TARGET=setup .transforms-check-target
+	@$(MAKE) CHECK_TARGET=test .transforms-check-target
+	@$(MAKE) CHECK_TARGET=test-src .transforms-check-target
+	@$(MAKE) CHECK_TARGET=test-image .transforms-check-target
+	@$(MAKE) CHECK_TARGET=venv .transforms-check-target
+	@echo Done checking transform project conventions.

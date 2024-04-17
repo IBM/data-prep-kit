@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 from typing import Any
 
 
@@ -105,15 +117,15 @@ class ParamsUtils:
         allows a list of examples.
         Example:
             help_example_dict = {
-                'access_key': ["AFDSASDFASDFDSF ", 'access key help text'],
-                'secret_key': ["XSDFYZZZ", 'secret key help text'],
-                'url': ['s3:/cos-optimal-llm-pile/test/', "COS url"]
+                'access_key': ["access", 'access key help text'],
+                'secret_key': ["secret", 'secret key help text'],
+                'url': ['https://s3.us-east.cloud-object-storage.appdomain.cloud', "s3 url"]
             }
             parser.add_argument(
                 "--s3_cred",
                 type=ast.literal_eval,
                 default=None,
-                help="ast string of options for cos credentials\n" +
+                help="ast string of options for s3 credentials\n" +
                      ParamsUtils.get_ast_help_text(help_example_dict)
             )
         :return:  a string to be included in help text, usually concantentated with the general

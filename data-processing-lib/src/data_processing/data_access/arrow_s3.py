@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 from typing import Any
 
 import boto3
@@ -5,6 +17,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from botocore.config import Config
 from data_processing.utils import get_logger
+
 
 logger = get_logger(__name__)
 
@@ -17,13 +30,20 @@ class ArrowS3:
     """
 
     def __init__(
-        self, access_key: str, secret_key: str, endpoint: str, s3_retries: int = 10, s3_max_attempts=10
+        self,
+        access_key: str,
+        secret_key: str,
+        endpoint: str = None,
+        region: str = None,
+        s3_retries: int = 10,
+        s3_max_attempts=10,
     ) -> None:
         """
         Initialization
         :param access_key: s3 access key
         :param secret_key: s3 secret key
         :param endpoint: s3 endpoint
+        :param region: s3 region
         :param s3_retries: number of S3 retries - default 10
         :param s3_max_attempts - boto s3 client internal retries - default 10
         """
@@ -33,6 +53,7 @@ class ArrowS3:
             aws_access_key_id=access_key,
             aws_secret_access_key=secret_key,
             endpoint_url=endpoint,
+            region_name=region,
             config=Config(retries={"max_attempts": s3_max_attempts, "mode": "standard"}),
         )
         self.retries = s3_retries

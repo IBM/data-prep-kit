@@ -5,6 +5,9 @@ include ../../transforms/.make.transforms
 
 
 DOCKER_IMAGE_NAME=ingest2parquet
+TRANSFORM_NAME=raw_to_parquet
+DOCKER_IMAGE_VERSION=0.1
+
 DOCKER_IMAGE_VERSION=0.1
 
 venv::	.transforms.venv

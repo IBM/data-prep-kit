@@ -49,10 +49,10 @@ Each file contained within the ZIP is transformed into a distinct row within the
 - **Description:** Name indicating which dataset it belong to.
 - **Example:** `"snapshot": "github"`
 
-**lang:** (optional)
+**programming_language:** (optional)
 
 - **Description:** Programming language detected using the file extension.
-- **Example:** `"lang": "Java"`
+- **Example:** `"programming_language": "Java"`
 
 **domain:** (optional)
 
@@ -65,24 +65,25 @@ Each file contained within the ZIP is transformed into a distinct row within the
 
 The set of dictionary keys holding [ingest2parquet](src/ingest2parquet.py) 
 configuration for values are as follows:
-
--detect_programming_lang DETECT_PROGRAMMING_LANG, --detect_programming_lang DETECT_PROGRAMMING_LANG
-                        generate programming lang
-  -snapshot SNAPSHOT, --snapshot SNAPSHOT
+```
+  --detect_programming_lang DETECT_PROGRAMMING_LANG
+                        generate programming language from the file extension
+  --snapshot SNAPSHOT
                         Name the dataset
-  -domain DOMAIN, --domain DOMAIN
-                        To identify whether data is code or nl
-  --s3_cred S3_CRED     AST string of options for cos credentials. Only required for COS or Lakehouse.
+  --domain DOMAIN
+                        To identify whether data is code or natural language
+  --data_s3_cred DATA_S3_CRED
+                        AST string of options for cos credentials. Only required for COS or Lakehouse.
                         access_key: access key help text secret_key: secret key help text url: S3 url Example:
                         { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/cos-optimal-
                         llm-pile/test/' }
-  --s3_config S3_CONFIG
+  --data_s3_config DATA_S3_CONFIG
                         AST string containing input/output paths. input_path: Path to input folder of files to
                         be processed output_path: Path to output folder of processed files Example: {
                         'input_path': '/cos-optimal-llm-pile/bluepile-
                         processing/rel0_8/cc15_30_preproc_ededup', 'output_path': '/cos-optimal-llm-
                         pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed' }
-  --lh_config LH_CONFIG
+  --data_lh_config DATA_LH_CONFIG
                         AST string containing input/output using lakehouse. input_table: Path to input folder
                         of files to be processed input_dataset: Path to outpu folder of processed files
                         input_version: Version number to be associated with the input. output_table: Name of
@@ -92,34 +93,49 @@ configuration for values are as follows:
                         pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'input_dataset': '/cos-
                         optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed',
                         'input_version': '1.0', 'output_table': 'ededup', 'output_path': '/cos-optimal-llm-
-                        pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'token': 'AASDFZDF',
-                        'lh_environment': 'STAGING' }
-  --local_config LOCAL_CONFIG
+                        pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'token':
+                        'AASDFZDF', 'lh_environment': 'STAGING' }
+  --data_local_config DATA_LOCAL_CONFIG
                         ast string containing input/output folders using local fs. input_folder: Path to input
-                        folder of files to be processed output_folder: Path to output folder of processed files
-                        Example: { 'input_folder': './input', 'output_folder': '/tmp/output' }
-  --max_files MAX_FILES
+                        folder of files to be processed output_folder: Path to output folder of processed
+                        files Example: { 'input_folder': './input', 'output_folder': '/tmp/output' }
+  --data_max_files DATA_MAX_FILES
                         Max amount of files to process
-  --checkpointing CHECKPOINTING
+  --data_checkpointing DATA_CHECKPOINTING
                         checkpointing flag
-  --data_sets DATA_SETS
+  --data_data_sets DATA_DATA_SETS
                         List of data sets
-
+  --data_files_to_use DATA_FILES_TO_USE
+                        list of files extensions to choose
+  --data_num_samples DATA_NUM_SAMPLES
+                        number of random files to process
+```
 ## Running
 
 We provide several demos of the script usage for different data storage options: 
 
 
-#[local file system](src/local.py)
+#[local file system](src/ingest2parquet_local.py)
 This script processes data stored locally on the system. It sets up parameters for local file paths and invokes the run() function from ingest2parquet.py to convert raw data files to Parquet format.
 
-Run the script without any command-line arguments.
+**Run the script without any command-line arguments.**
 
 ```
 make venv
 source venv/bin/activate
 cd src
-python local.py
+python ingest2parquet_local.py
+```
+
+**Run the script via command-line** 
+
+```
+python ingest2parquet.py \
+    --detect_programming_lang True \
+    --snapshot github \
+    --domain code \
+    --data_local_config '{"input_folder": "../test-data/input", "output_folder": "../test-data/output"}' \
+    --data_files_to_use '[".zip"]'
 ```
 
 
@@ -134,7 +150,7 @@ export DPL_S3_ACCESS_KEY="xxx"
 export DPL_S3_SECRET_KEY="xxx"
 ```
 
-Run the script without any command-line arguments.
+**Run the script without any command-line arguments.**
 
 ```
 make venv
@@ -143,8 +159,22 @@ cd src
 python s3.py
 ```
 
+**Run the script via command-line** 
+
+```
+python ingest2parquet.py \
+    --detect_programming_lang True \
+    --snapshot github \
+    --domain code \
+    --data_s3_cred '{"access_key": "YOUR_ACCESS_KEY", "secret_key": "YOUR_SECRET_KEY", "url": "YOUR_S3_URL"}' \
+    --data_s3_config '{"input_folder": "code-datasets/test_ingeat2parquet/raw_to_parquet_guf", "output_folder": "code-datasets/test_ingeat2parquet/raw_to_parquet_guf_out"}' \
+    --data_files_to_use '[".zip"]'
+```
+
 The output directory will contain both the new
 genrated parquet files  and the `metadata.json` file.
+
+## Metadata Fields
 
 The metadata.json file contains following essential information regarding the processing of raw data files to Parquet format:
 
@@ -155,7 +185,10 @@ The metadata.json file contains following essential information regarding the pr
 `total_bytes_in_memory`: Total memory usage in bytes for all processed data files.
 `failure_details`: Information about files that failed processing, including their paths and error messages.
 
-
+## Building the Docker Image
+```
+% make image 
+```
 
 In addition, there are some useful `make` targets (see conventions above):
 * `make venv` - creates the virtual environment.

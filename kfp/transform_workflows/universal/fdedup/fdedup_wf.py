@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import os
 
 import kfp.compiler as compiler
@@ -11,15 +23,14 @@ from kfp_support.workflow_support.utils import (
 from kubernetes import client as k8s_client
 from src.fdedup_compute_execution_params import fdedup_compute_execution_params
 
+
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "fdedup_transform.py"
 
 # components
 base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.3"
 # compute execution parameters
-compute_exec_params_op = comp.func_to_container_op(
-    func=fdedup_compute_execution_params, base_image=base_kfp_image
-)
+compute_exec_params_op = comp.func_to_container_op(func=fdedup_compute_execution_params, base_image=base_kfp_image)
 # create Ray cluster
 create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
 # execute job
@@ -37,9 +48,9 @@ TASK_NAME: str = "fdedup"
 def fdedup(
     ray_name: str = "fdedup-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/fdedup:guftest",\
-             "image_pull_secret": "prod-all-icr-io"}',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/fdedup:guftest"}',
+             "image_pull_secret": "prod-all-icr-io"}',  # pragma: allowlist secret
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, \
+            "image_pull_secret": "prod-all-icr-io", "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/fdedup:guftest"}',  # pragma: allowlist secret
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
     lh_config: str = "None",
@@ -51,7 +62,7 @@ def fdedup(
     # columns used
     doc_column: str = "contents",
     id_column: str = "int_id_column",
-    cluster_column: str =  "cluster",
+    cluster_column: str = "cluster",
     # infrastructure
     bucket_cpu: float = 0.5,
     doc_cpu: float = 0.5,
@@ -123,7 +134,14 @@ def fdedup(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=actor_options,
-            params={"threshold": threshold, "num_permutations": num_permutations, "s3_config": s3_config, "bucket_cpu": bucket_cpu, "doc_cpu": doc_cpu, "minhash_cpu": mhash_cpu}
+            params={
+                "threshold": threshold,
+                "num_permutations": num_permutations,
+                "s3_config": s3_config,
+                "bucket_cpu": bucket_cpu,
+                "doc_cpu": doc_cpu,
+                "minhash_cpu": mhash_cpu,
+            },
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, s3_access_secret)

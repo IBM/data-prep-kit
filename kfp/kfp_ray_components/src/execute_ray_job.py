@@ -1,7 +1,20 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import sys
-from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
-from data_processing.data_access import DataAccess, DataAccessFactory
 from typing import Any
+
+from data_processing.data_access import DataAccess, DataAccessFactory
+from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
 
 
 def execute_ray_jobs(
@@ -74,30 +87,25 @@ if __name__ == "__main__":
     # convert exec params to dictionary
     exec_params = KFPUtils.load_from_json(args.exec_params)
     # convert s3 config to proper dictionary to use for data access factory
-    s3_config = exec_params.get("s3_config", "None")
+    s3_config = exec_params.get("data_s3_config", "None")
     if s3_config == "None" or s3_config == "":
         s3_config_dict = None
     else:
         s3_config_dict = KFPUtils.load_from_json(s3_config.replace("'", '"'))
-    # convert lh config to proper dictionary to use for data access factory
-    lh_config = exec_params.get("lh_config", "None")
-    if lh_config == "None" or lh_config == "":
-        lh_config_dict = None
-    else:
-        lh_config_dict = KFPUtils.load_from_json(lh_config.replace("'", '"'))
     # get and build S3 credentials
     access_key, secret_key, url = KFPUtils.credentials()
     # Create data access factory and data access
     data_factory = DataAccessFactory()
-    data_factory.apply_input_params(args={
-        "s3_config": s3_config_dict,
-        "lh_config": lh_config_dict,
-        "s3_cred": {"access_key": access_key, "secret_key": secret_key, "url": url}
-    })
+    data_factory.apply_input_params(
+        args={
+            "data_s3_config": s3_config_dict,
+            "data_s3_cred": {"access_key": access_key, "secret_key": secret_key, "url": url},
+        }
+    )
     data_access = data_factory.create_data_access()
     # restore and enhance exec params
-    exec_params["s3_cred"] = (
-            "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
+    exec_params["data_s3_cred"] = (
+        "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
     )
     # Execute Ray jobs
     execute_ray_jobs(

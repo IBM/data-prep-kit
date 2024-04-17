@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
@@ -35,9 +47,9 @@ TASK_NAME: str = "tokenization"
 def tokenization(
     ray_name: str = "tkn-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/tokenization-guf:0.1.0",\
-             "image_pull_secret": "prod-all-icr-io"}',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "prod-all-icr-io",\
-            "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/tokenization-guf:0.1.0"}',
+             "image_pull_secret": "prod-all-icr-io"}',  # pragma: allowlist secret
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, \
+            "image_pull_secret": "prod-all-icr-io", "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/tokenization-guf:0.1.0"}',  # pragma: allowlist secret
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
     lh_config: str = "None",

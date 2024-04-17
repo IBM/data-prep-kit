@@ -17,7 +17,7 @@ It comprises 2 main modules
 ### Git
 Simple clone the repo and set up the pre-commit hooks.
 ```shell
-git clone git@github.ibm.com:ai-models-data/fm-data-engineering.git
+git clone git@github.com:IBM/data-prep-lab.git
 cd kfp/kfp_support_lib
 pre-commit install
 ```
@@ -31,13 +31,6 @@ cd to the package directory.
 
 update the version in [requirements.env](../requirements.env) file.
 
-Set the Python Artifactory details as environment variables by executing the following commands:
-
-```bash
-export ARTIFACTORY_USER=<artifactory-user>
-export ARTIFACTORY_API_KEY=<artifactory-key>
-```
-
 run `make build` and `make publish`.
 
 ## Testing
@@ -50,11 +43,9 @@ To begin with, establish a Kind cluster and deploy all required components by ex
 make setup
 ```
 
-The next step is to deploy the `fm_data_processing_kfp` package locally within a Python virtual environment. To do this, "set the artifactory credentials, if you have not set it before:
+The next step is to deploy the `data-prep-lab-kfp` package locally within a Python virtual environment.
 
 ```bash
-export ARTIFACTORY_USER=<artifactory-user>
-export ARTIFACTORY_API_KEY=<artifactory-key>
 make  build
 ```
 
@@ -66,8 +57,8 @@ make test
 
 ### Cleanup
 
-It is advisable to execute the following command prior to running `make test` once more.
-This will ensure that any previous test runs resources are removed before starting new tests.
+It is advisable to execute the following command prior to running `make test` once more. This will ensure that any 
+previous test runs resources are removed before starting new tests.
 
 ```bash
 kubectl delete workflows -n kubeflow --all

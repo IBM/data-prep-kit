@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import argparse
 import re
 from typing import Any
@@ -34,7 +46,7 @@ def _get_domain_list(domain_list_url: str, data_access: DataAccess) -> set[str]:
         domains = file_contents.decode("utf-8").split("\n")
         domain_list_from_file = [domain.strip() for domain in domains if not domain.startswith("#")]
         domain_list.update(domain_list_from_file)
-    logger.info(f"Added {len(domain_list)} domains to domain list")
+    logger.info(f"Added {len(domain_list)} domains to domain list {domain_list}")
     return domain_list
 
 
@@ -97,6 +109,7 @@ class BlockListTransform(AbstractTableTransform):
         if runtime_provided_domain_ref is None:
             # this is only useful during local debugging without Ray
             url = config.get(blocked_domain_list_path_key, None)
+            logger.info(f"blocklisted data url {url}")
             if url is None:
                 raise RuntimeError(f"Missing configuration value for key {blocked_domain_list_path_key}")
             data_access = config.get(block_data_access_key, None)

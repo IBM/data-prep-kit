@@ -1,6 +1,19 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import os
-from fdedup_transform import FdedupTableTransformConfiguration
+
 from data_processing.test_support.ray import AbstractTransformLauncherTest
+from fdedup_transform import FdedupTableTransformConfiguration
 
 
 class TestRayBlocklistTransform(AbstractTransformLauncherTest):
@@ -30,7 +43,6 @@ class TestRayBlocklistTransform(AbstractTransformLauncherTest):
             # fuzzy parameters
             "threshold": 0.8,
             "shingles_size": 5,
-            "japanese_data": False,
             "delimiters": " ",
             # Random delay between reads
             "random_delay_limit": 5,

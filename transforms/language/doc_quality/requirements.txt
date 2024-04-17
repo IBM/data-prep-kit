@@ -1,0 +1,14 @@
+# transform runtime
+#--extra-index-url https://test.pypi.org/simple/
+#data-prep-lab==0.0.1.dev5
+# Update to fix security
+pillow==10.2.0
+#cryptography==42.0.4
+fastapi==0.109.1
+aiohttp==3.9.2
+### For docquality
+numpy==1.24.1
+pandas==1.5.3
+sentencepiece
+packaging
+binpacking

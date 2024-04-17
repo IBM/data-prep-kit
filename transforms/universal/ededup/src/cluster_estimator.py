@@ -1,4 +1,17 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import math
+
 from data_processing.utils import GB
 
 
@@ -40,5 +53,7 @@ print(f"Required ray nodes with {ray_node_cpu} cpus is {n_ray_nodes}")
 
 execution_required_memory = math.ceil((n_workers * av_table_size * 4 / GB + required_hash_cpu) / 0.6)
 print(f"required memory for execution: {execution_required_memory}")
-print(f"Minimal required memory per ray pod is {math.ceil(execution_required_memory / n_ray_nodes)} GB. "
-      f"Practically use the larger number")
+print(
+    f"Minimal required memory per ray pod is {math.ceil(execution_required_memory / n_ray_nodes)} GB. "
+    f"Practically use the larger number"
+)

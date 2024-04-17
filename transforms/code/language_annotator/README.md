@@ -22,7 +22,7 @@ The set of dictionary keys holding configuration for values are as follows:
 
 ## Running
 
-We provide a demo of the transform usage for [local file system](src/lang_annotator_local.py)
+We provide a demo of the transform usage for [local file system](src/language_annotator_local_ray.py)
 
 # Release notes
 

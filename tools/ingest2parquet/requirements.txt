@@ -1,3 +1,5 @@
---extra-index-url https://${ARTIFACTORY_USER}:${ARTIFACTORY_API_KEY}@na.artifactory.swg-devops.com/artifactory/api/pypi/res-data-engineering-team-pypi-local/simple
-fm-data-processing==0.2.0
+# transform runtime
+--extra-index-url https://test.pypi.org/simple/
+data-prep-lab==0.0.1.dev5
 parameterized
+pandas

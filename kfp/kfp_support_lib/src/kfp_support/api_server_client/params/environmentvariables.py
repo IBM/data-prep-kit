@@ -1,5 +1,16 @@
-import enum
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
 
+import enum
 from typing import Any
 
 
@@ -7,10 +18,11 @@ class EnvVarSource(enum.Enum):
     """
     Enumeration of environment sources
     """
-    CONFIGMAP = 0       # config map
-    SECRET = 1          # secret
+
+    CONFIGMAP = 0  # config map
+    SECRET = 1  # secret
     RESOURCE_FIELD = 2  # resource field
-    FIELD = 3           # field
+    FIELD = 3  # field
 
 
 class EnvVarFrom:
@@ -26,6 +38,7 @@ class EnvVarFrom:
     - to_string() -> str: convert toleration to string for printing
     - to_dict() -> dict[str, Any] convert to dict
     """
+
     def __init__(self, source: EnvVarSource, name: str, key: str):
         """
         Initialize
@@ -64,6 +77,7 @@ class EnvironmentVariables:
     - to_string() -> str: convert toleration to string for printing
     - to_dict() -> dict[str, Any] convert to dict
     """
+
     def __init__(self, key_value: dict[str, str] = None, from_ref: dict[str, EnvVarFrom] = None):
         """
         Initialization

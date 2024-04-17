@@ -26,7 +26,7 @@ you may choose not to use the DataAccessFactory and might have your own mechanis
 resource (for example, to load a hugging face model).  In this case you will define CLI arguments
 that allow you to configure where the resources is located.
 The implementation using DataAccessFactory looks as follows (the code here is from
-[block listing](../../transforms/universal/blocklisting/src/blocklist_transform.py)):
+[block listing](../../transforms/universal/blocklist/src/blocklist_transform.py)):
 
 ```python
 class BlockListTransformConfiguration(DefaultTransformConfiguration):
@@ -126,7 +126,7 @@ Next we show how to load resources using both approaches.
 If you decide to implement resource loading in the transform itself,
 you can do this in the init method of the transform class. 
 Let's look at the implementation, based on
-[block listing](../../transforms/universal/blocklisting/src/blocklist_transform.py)) example. The code below demonstrates loading of data.
+[block listing](../../transforms/universal/blocklist/src/blocklist_transform.py)) example. The code below demonstrates loading of data.
 
 ```python
     # Get the DataAccessFactory we created above in the configuration
@@ -149,7 +149,7 @@ If you decide to implement resource loading in the transform runtime,
 you must implement a custom transform runtime class, in particular, to 
 implement the `get_transform_config()` method that produces the configuration
 for the transform an in this example, load the domain list and store a Ray reference in the configuration. 
-Let's look at the implementation, based on the [block listing](../../transforms/universal/blocklisting/src/blocklist_transform.py)) transform. 
+Let's look at the implementation, based on the [block listing](../../transforms/universal/blocklist/src/blocklist_transform.py)) transform. 
 First define the initializer() which must accept a dictionary of parameters as generally
 will be defined by the configuration and its CLI parameters.
 

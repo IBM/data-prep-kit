@@ -1,11 +1,24 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import gzip
 import json
-from typing import Any
 import os
+from typing import Any
 
 import pyarrow
 from data_processing.data_access import ArrowS3, DataAccess
 from data_processing.utils import GB, MB, TransformUtils, get_logger
+
 
 logger = get_logger(__name__)
 
@@ -16,14 +29,14 @@ class DataAccessS3(DataAccess):
     """
 
     def __init__(
-            self,
-            s3_credentials: dict[str, str],
-            s3_config: dict[str, str] = None,
-            d_sets: list[str] = None,
-            checkpoint: bool = False,
-            m_files: int = -1,
-            n_samples: int = -1,
-            files_to_use: list[str] = ['.parquet'],
+        self,
+        s3_credentials: dict[str, str],
+        s3_config: dict[str, str] = None,
+        d_sets: list[str] = None,
+        checkpoint: bool = False,
+        m_files: int = -1,
+        n_samples: int = -1,
+        files_to_use: list[str] = [".parquet"],
     ):
         """
         Create data access class for folder based configuration
@@ -36,9 +49,10 @@ class DataAccessS3(DataAccess):
         :param files_to_use: files extensions of files to include
         """
         self.arrS3 = ArrowS3(
-            access_key=s3_credentials["access_key"],
-            secret_key=s3_credentials["secret_key"],
-            endpoint=s3_credentials["url"],
+            access_key=s3_credentials.get("access_key", ""),
+            secret_key=s3_credentials.get("secret_key", ""),
+            endpoint=s3_credentials.get("url", None),
+            region=s3_credentials.get("region", None),
         )
         if s3_config is None:
             self.input_folder = None
@@ -67,7 +81,7 @@ class DataAccessS3(DataAccess):
         return self.output_folder
 
     def _get_files_folder(
-            self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
+        self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
     ) -> tuple[list[str], dict[str, float]]:
         """
         Support method to get list input files and their profile
@@ -106,12 +120,12 @@ class DataAccessS3(DataAccess):
         )
 
     def _get_input_files(
-            self,
-            input_path: str,
-            output_path: str,
-            cm_files: int,
-            max_file_size: int = 0,
-            min_file_size: int = MB * GB,
+        self,
+        input_path: str,
+        output_path: str,
+        cm_files: int,
+        max_file_size: int = 0,
+        min_file_size: int = MB * GB,
     ) -> tuple[list[str], dict[str, float]]:
         """
         Get list and size of files from input path, that do not exist in the output path
@@ -242,27 +256,6 @@ class DataAccessS3(DataAccess):
         """
         return self.arrS3.save_table(key=path, table=table)
 
-    def save_table_with_schema(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
-        """
-        Save table to a given location fixing schema, required for lakehouse
-        :param path: location to save table
-        :param table: table
-        :return: size of table in memory and a dictionary as
-        defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
-        """
-        # update schema to ensure part ids to be there
-        fields = []
-        columns = table.column_names
-        tbl_metadata = table.schema.metadata
-        for index in range(len(table.column_names)):
-            field = table.field(index)
-            fields.append(field.with_metadata({"PARQUET:field_id": f"{index + 1}"}))
-            tbl_metadata[columns[index]] = json.dumps({"PARQUET:field_id": f"{index + 1}"}).encode()
-        schema = pyarrow.schema(fields, metadata=tbl_metadata)
-        tbl = pyarrow.Table.from_arrays(arrays=list(table.itercolumns()), schema=schema)
-        return self.arrS3.save_table(key=path, table=tbl)
-
     def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
         """
         Save metadata
@@ -311,6 +304,7 @@ class DataAccessS3(DataAccess):
                             directory is returned (False)
         :return: A dictionary of file names/binary content will be returned
         """
+
         def _get_file_content(name: str, dt: bool) -> bytes:
             """
             return file content
