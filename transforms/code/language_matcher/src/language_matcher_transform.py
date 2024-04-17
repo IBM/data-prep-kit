@@ -15,7 +15,7 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccess, DataAccessFactory
+from data_processing.data_access import DataAccess, DataAccessFactory, DataAccessLocal
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
@@ -28,12 +28,14 @@ from ray.actor import ActorHandle
 
 logger = get_logger(__name__)
 
-lang_allowed_langs_file_key = "lang_select_allowed_langs_file"
-lang_lang_column_key = "lang_select_language_column"
-lang_known_selector = "lang_select_return_known"
-lang_allowed_languages = "lang_select_allowed_languages"
-lang_data_factory_key = "lang_select_data_factory"
-lang_output_column_key = "lang_select_output_column"
+shortname = "lang_matcher"
+cli_prefix = f"{shortname}_"
+lang_allowed_langs_file_key = f"{shortname}_allowed_langs_file"
+lang_lang_column_key = f"{shortname}_language_column"
+lang_known_selector = f"{shortname}_return_known"
+lang_allowed_languages = f"{shortname}_allowed_languages"
+lang_data_factory_key = f"{shortname}_data_factory"
+lang_output_column_key = f"{shortname}_output_column"
 lang_default_output_column = "allowed_language"
 
 
@@ -44,7 +46,7 @@ def _get_supported_languages(lang_file: str, data_access: DataAccess) -> list[st
     return lang_list
 
 
-class LangSelectorTransform(AbstractTableTransform):
+class LanguageMatcherTransform(AbstractTableTransform):
     """ """
 
     def __init__(self, config: dict):
@@ -65,9 +67,8 @@ class LangSelectorTransform(AbstractTableTransform):
             if path is None:
                 raise RuntimeError(f"Missing configuration value for key {lang_allowed_langs_file_key}")
             daf = config.get(lang_data_factory_key, None)
-            if daf is None:
-                raise RuntimeError(f"Missing configuration value for key {lang_data_factory_key}")
-            self.languages_include = _get_supported_languages(lang_file=path, data_access=daf.create_data_access())
+            data_access = daf.create_data_access()
+            self.languages_include = _get_supported_languages(lang_file=path, data_access=data_access)
         else:
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
@@ -104,7 +105,7 @@ class LangSelectorTransform(AbstractTableTransform):
         }
 
 
-class LangSelectorRuntime(DefaultTableTransformRuntime):
+class LanguageMatcherRuntime(DefaultTableTransformRuntime):
     """
     Language selector runtime support
     """
@@ -147,7 +148,7 @@ class LangSelectorRuntime(DefaultTableTransformRuntime):
         return {lang_allowed_languages: lang_refs} | self.params
 
 
-class LangSelectorTransformConfiguration(DefaultTableTransformConfiguration):
+class LanguageMatcherTransformConfiguration(DefaultTableTransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -155,9 +156,9 @@ class LangSelectorTransformConfiguration(DefaultTableTransformConfiguration):
 
     def __init__(self):
         super().__init__(
-            name="lang_select",
-            transform_class=LangSelectorTransform,
-            runtime_class=LangSelectorRuntime,
+            name=shortname,
+            transform_class=LanguageMatcherTransform,
+            runtime_class=LanguageMatcherRuntime,
         )
         self.params = {}
         self.daf = None
@@ -165,7 +166,7 @@ class LangSelectorTransformConfiguration(DefaultTableTransformConfiguration):
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given parser.
-        This will be included in a dictionary used to initialize the LangSelectorTransform.
+        This will be included in a dictionary used to initialize the LanguageMatcherTransform.
         By convention a common prefix should be used for all mutator-specific CLI args
         (e.g, noop_, pii_, etc.)
         """
@@ -198,7 +199,7 @@ class LangSelectorTransformConfiguration(DefaultTableTransformConfiguration):
             help="Flag to return docs with known languages (True) or unknown {False}.",
         )
         # Create the DataAccessFactor to use CLI args
-        self.daf = DataAccessFactory(f"{self.name}_")
+        self.daf = DataAccessFactory(cli_prefix, False)
         # Add the DataAccessFactory parameters to the transform's configuration parameters.
         self.daf.add_input_params(parser)
 
@@ -229,5 +230,5 @@ class LangSelectorTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=LangSelectorTransformConfiguration())
+    launcher = TransformLauncher(transform_runtime_config=LanguageMatcherTransformConfiguration())
     launcher.launch()

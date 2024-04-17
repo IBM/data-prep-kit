@@ -7,8 +7,8 @@ RUN pip install --no-cache-dir -r  requirements.txt
 # This is expected to be placed in the docker context before this is run (see the make image).
 COPY --chown=ray:users data-processing-lib/ data-processing-lib/
 # copy source data
-COPY src/language_annotator_transform.py .
-COPY src/language_annotator_local_ray.py local/
+COPY src/language_matcher_transform.py .
+COPY src/language_matcher_local_ray.py local/
 # copy test
 COPY test/ test/
 COPY test-data/ test-data/
