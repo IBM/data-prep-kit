@@ -1,32 +1,13 @@
 # Define the root of the local git clone for the common rules to be able 
 # know where they are running from.
-REPOROOT=../../..
+REPOROOT=../../../..
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
-include ../../.make.transforms
+include ../../.make.transforms_workflows
 
-# import the transforms versions which are located in requirements.env file.
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
 include makeenv
 
-TRANSFORM_NAME=noop
+DOCKER_IMAGE_NAME=noop
 DOCKER_IMAGE_VERSION=${NOOP}
-
-venv::	.transforms.venv
-
-build::	.transforms.build
-
-test::	.transforms.test
-
-clean:: .transforms.clean
-
-image:: .transforms.image
-
-test-src:: .transforms.test-src
-
-setup:: .transforms.setup
-
-test-image:: .transforms.test-image
-
-publish:: .transforms.publish

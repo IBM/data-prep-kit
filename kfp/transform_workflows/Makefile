@@ -2,7 +2,10 @@
 # know where they are running from.
 REPOROOT=../..
 
+CURR_DIR := ${CURDIR}
+
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
+IGNORE := $(shell bash -c "sed -n /=/p ${REPOROOT}/transforms/requirements.env | sed 's/=/:=/' | sed 's/^/export /' >> makeenv")
 
 include makeenv
 # Include the common rules.
@@ -31,17 +34,13 @@ clean::
 	. ${VENV_ACTIVATE} && cd ${DIR} && ${PYTHON} ${WF_NAME}.py
 
 %.yaml: %.py
+	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}\"/" $<
+	make -C $(shell (dirname $<)) .reconcile-requirement PIPELINE_FILE=${CURR_DIR}/$<
 	make .compile-pipeline WF_NAME=$(shell (basename $< .py)) DIR=$(shell (dirname $<))
 
-.reconcile-requirement::
-	@for file in $(PYTHON_WF); do \
-		sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}\"/" $$file; \
-	done
-
-build:: venv
+build:: 
 	@# Help: Compile the pipelines
 	${PYTHON} -m pip install --upgrade build
-	make .reconcile-requirement
 	make ${YAML_WF}
 
 publish:: .check-env

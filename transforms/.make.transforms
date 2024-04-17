@@ -123,7 +123,9 @@ help::
 	cp -R $(REPOROOT)/data-processing-lib/src data-processing-lib
 	cp  $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
 	cp  $(REPOROOT)/data-processing-lib/README.md data-processing-lib
-	$(DOCKER) build -t $(DOCKER_IMAGE) .
+	$(DOCKER) build -t $(DOCKER_IMAGE) \
+		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
+                --build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . 
 	rm -rf data-processing-lib
 
 .PHONY: .transforms.install-lib-src

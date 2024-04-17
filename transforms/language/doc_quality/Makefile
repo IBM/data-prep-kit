@@ -9,8 +9,12 @@ REPOROOT=../../..
 # to override/redefine the rules below.
 include ../../.make.transforms
 
+# import the transforms versions which are located in requirements.env file.
+IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/transforms/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
+include makeenv
+
 TRANSFORM_NAME=doc_quality
-DOCKER_IMAGE_VERSION=0.1.0
+DOCKER_IMAGE_VERSION=${DOC_QUALITY}
 
 
 venv:: .transforms.venv
@@ -54,3 +58,4 @@ test-src:: lm_sp .transforms.test-src
 #publish:: .transforms.publish
 publish:: 
 	@echo Skipping publish until we have split the repos
+

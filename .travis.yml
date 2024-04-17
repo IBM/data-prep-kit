@@ -51,7 +51,7 @@ script:
               make -C kfp/kfp_support_lib build test || travis_terminate 1
           ;;
           kfp-compile)
-                   make -C kfp/transform_workflows build || travis_terminate 1
+                   make -C kfp/transform_workflows venv build || travis_terminate 1
           ;;
           data-lib-test)
                    make -C data-processing-lib DOCKER=${DOCKER} venv test || travis_terminate 1
