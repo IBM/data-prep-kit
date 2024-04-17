@@ -3,6 +3,9 @@ FROM docker.io/rayproject/ray:2.9.3-py310
 # Install pytest so we can test the image later
 RUN pip install --no-cache-dir pytest
 
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r  requirements.txt
+
 # Copy in the data processing framework source/project and install it
 # This is expected to be placed in the docker context before this is run (see the make image).
 COPY --chown=ray:users data-processing-lib/ data-processing-lib/
@@ -20,9 +23,6 @@ RUN pip install --no-cache-dir https://github.com/kpu/kenlm/archive/master.zip
 # Copy the model files into the "lm_sp" directory
 COPY lm_sp/  lm_sp/
 COPY ldnoobw/ ldnoobw/
-
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source
 COPY ./src/doc_quality_transform.py .
