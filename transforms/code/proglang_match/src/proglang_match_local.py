@@ -13,11 +13,10 @@
 import os
 
 from data_processing.data_access import DataAccessFactory, DataAccessLocal
-from language_matcher_transform import (
-    LanguageMatcherTransform,
+from proglang_match_transform import (
+    ProgLangMatchTransform,
     lang_allowed_langs_file_key,
     lang_data_factory_key,
-    lang_known_selector,
     lang_lang_column_key,
     lang_output_column_key,
 )
@@ -37,13 +36,12 @@ params = {
     lang_allowed_langs_file_key: selected_languages_file,
     lang_lang_column_key: language_column_name,
     lang_output_column_key: annotated_column_name,
-    lang_known_selector: True,
     lang_data_factory_key: DataAccessFactory(),  # Expect to create DataAccessLocal
 }
 if __name__ == "__main__":
     # Here we show how to run outside of ray
     # Create and configure the transform.
-    transform = LanguageMatcherTransform(params)
+    transform = ProgLangMatchTransform(params)
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
     table = data_access.get_table(os.path.join(input_folder, "test1.parquet"))

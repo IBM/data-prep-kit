@@ -15,17 +15,16 @@ import sys
 
 from data_processing.ray import TransformLauncher
 from data_processing.utils import ParamsUtils
-from language_matcher_transform import (
-    LanguageMatcherTransformConfiguration,
+from proglang_match_transform import (
+    ProgLangMatchTransformConfiguration,
     lang_allowed_langs_file_key,
-    lang_known_selector,
     lang_lang_column_key,
     lang_output_column_key,
 )
 
 
 # create launcher
-launcher = TransformLauncher(transform_runtime_config=LanguageMatcherTransformConfiguration())
+launcher = TransformLauncher(transform_runtime_config=ProgLangMatchTransformConfiguration())
 # create parameters
 language_column_name = "language"
 annotated_column_name = "lang_selected"
@@ -45,7 +44,6 @@ langselect_config = {
     lang_allowed_langs_file_key: selected_languages_file,
     lang_lang_column_key: language_column_name,
     lang_output_column_key: annotated_column_name,
-    lang_known_selector: True,
 }
 params = {
     # where to run

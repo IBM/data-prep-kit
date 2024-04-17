@@ -28,11 +28,10 @@ from ray.actor import ActorHandle
 
 logger = get_logger(__name__)
 
-shortname = "lang_matcher"
+shortname = "proglang_match"
 cli_prefix = f"{shortname}_"
 lang_allowed_langs_file_key = f"{shortname}_allowed_langs_file"
 lang_lang_column_key = f"{shortname}_language_column"
-lang_known_selector = f"{shortname}_return_known"
 lang_allowed_languages = f"{shortname}_allowed_languages"
 lang_data_factory_key = f"{shortname}_data_factory"
 lang_output_column_key = f"{shortname}_output_column"
@@ -46,7 +45,7 @@ def _get_supported_languages(lang_file: str, data_access: DataAccess) -> list[st
     return lang_list
 
 
-class LanguageMatcherTransform(AbstractTableTransform):
+class ProgLangMatchTransform(AbstractTableTransform):
     """ """
 
     def __init__(self, config: dict):
@@ -60,7 +59,6 @@ class LanguageMatcherTransform(AbstractTableTransform):
         super().__init__(config)
         self.lang_column = config.get(lang_lang_column_key, "")
         self.output_column = config.get(lang_output_column_key, lang_default_output_column)
-        self.known = config.get(lang_known_selector, True)
         languages_include_ref = config.get(lang_allowed_languages, None)
         if languages_include_ref is None:
             path = config.get(lang_allowed_langs_file_key, None)
@@ -105,7 +103,7 @@ class LanguageMatcherTransform(AbstractTableTransform):
         }
 
 
-class LanguageMatcherRuntime(DefaultTableTransformRuntime):
+class ProgLangMatchRuntime(DefaultTableTransformRuntime):
     """
     Language selector runtime support
     """
@@ -148,7 +146,7 @@ class LanguageMatcherRuntime(DefaultTableTransformRuntime):
         return {lang_allowed_languages: lang_refs} | self.params
 
 
-class LanguageMatcherTransformConfiguration(DefaultTableTransformConfiguration):
+class ProgLangMatchTransformConfiguration(DefaultTableTransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -157,8 +155,8 @@ class LanguageMatcherTransformConfiguration(DefaultTableTransformConfiguration):
     def __init__(self):
         super().__init__(
             name=shortname,
-            transform_class=LanguageMatcherTransform,
-            runtime_class=LanguageMatcherRuntime,
+            transform_class=ProgLangMatchTransform,
+            runtime_class=ProgLangMatchRuntime,
         )
         self.params = {}
         self.daf = None
@@ -166,7 +164,7 @@ class LanguageMatcherTransformConfiguration(DefaultTableTransformConfiguration):
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given parser.
-        This will be included in a dictionary used to initialize the LanguageMatcherTransform.
+        This will be included in a dictionary used to initialize the ProgLangMatchTransform.
         By convention a common prefix should be used for all mutator-specific CLI args
         (e.g, noop_, pii_, etc.)
         """
@@ -175,28 +173,21 @@ class LanguageMatcherTransformConfiguration(DefaultTableTransformConfiguration):
             type=str,
             required=False,
             default=None,
-            help="Directory to store unknown language files.",
+            help="Path to file containing the list of languages to be matched.",
         )
         parser.add_argument(
             f"--{lang_lang_column_key}",
             type=str,
             required=False,
             default="language_column",
-            help="Directory to store unknown language files.",
+            help="The column name holding the name of the programming language assigned to the document",
         )
         parser.add_argument(
             f"--{lang_output_column_key}",
             type=str,
             required=False,
             default=lang_default_output_column,
-            help="Additional column to be added to output.",
-        )
-        parser.add_argument(
-            f"--{lang_known_selector}",
-            type=lambda x: bool(str2bool(x)),
-            required=False,
-            default=True,
-            help="Flag to return docs with known languages (True) or unknown {False}.",
+            help="The column name to add and that contains the matching information",
         )
         # Create the DataAccessFactor to use CLI args
         self.daf = DataAccessFactory(cli_prefix, False)
@@ -219,7 +210,6 @@ class LanguageMatcherTransformConfiguration(DefaultTableTransformConfiguration):
         self.params = {
             lang_lang_column_key: dargs.get(lang_lang_column_key, None),
             lang_allowed_langs_file_key: dargs.get(lang_allowed_langs_file_key, None),
-            lang_known_selector: dargs.get(lang_known_selector, True),
             lang_data_factory_key: self.daf,
             lang_output_column_key: dargs.get(lang_output_column_key, None),
         }
@@ -230,5 +220,5 @@ class LanguageMatcherTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=LanguageMatcherTransformConfiguration())
+    launcher = TransformLauncher(transform_runtime_config=ProgLangMatchTransformConfiguration())
     launcher.launch()
