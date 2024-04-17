@@ -1,3 +1,12 @@
+<p align="Left"> Distributed tokenization module for data sets using any Hugging Face compatible tokenizer.
+    <br> 
+</p>
+
+## 📝 Table of Contents
+- [Summary](#Summary)
+- [Running](#Running)
+- [CLI Options](#cli_options)
+
 # Data Tokenization
 Please see the set of
 [transform project conventions](../../README.md)
@@ -12,7 +21,7 @@ its corresponding document content.
 
 A pre-trained tokenizer must be specified through the `--tkn_tokenizer` parameter,
 which can be the name of a ready-for-download tokenizer
-from HuggingFace such as `hf-internal-testing/llama-tokenizer`, `bigcode/starcoder` or any others that can loaded by the Huggingface `AutoTokenizer` library.
+from Hugging Face such as `hf-internal-testing/llama-tokenizer`, `bigcode/starcoder` or any others that can loaded by the Hugging Face `AutoTokenizer` library.
 The `--tkn_tokenizer_args` parameter can be further used to specify extra arguments for the corresponding tokenizer. For example,
 `use_auth_token=<your token>` could be used when loading HuggingFace tokenizers like `bigcode/starcoder`, that require an access token to be provided.
 
@@ -24,8 +33,7 @@ The tokenizer will skip empty rows/documents in the input table or rows returnin
 The count of such rows will be stored in the `num_empty_rows` of the `metadata` file.
 
 For some tokenizers, their tokenization process could be slow for long documents with millions of characters.
-In such case, parameter `--tkn_chunk_size` should be used to specify the length to spit a document into chunks
-(for `en` text, this parameter should be set to `20000`, equivalently to 15 pages).
+In such cases, the `--tkn_chunk_size` parameter can be used to specify the maximum length of chunks to tokenize at one time. For `en` text, this parameter should be set to `20000`, equivalently to 15 pages.
 The tokenizer will tokenize each chunk individually and concatenate their returned token_ids. 
 The default value for `--tkn_chunk_size` is `0` which tokenizes each document as a whole no matter how long it is. 
 
@@ -71,7 +79,7 @@ pq01.parquet	pq02.parquet
 
 
 
-### Launched Command Line Options 
+### CLI Options
 When running the transform with the Ray launcher,
 the following command line arguments are available in addition to 
 [the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
