@@ -43,6 +43,7 @@ publish:: .check-env
 publish::
 	@# Help: Publish the wheel to testpypi
 	if [ -d "dist"]; then rm -r dist; fi
+	${PYTHON} -m pip install --upgrade build
 	${PYTHON} -m build
 	@${PYTHON} -m twine upload --verbose --non-interactive --skip-existing --repository testpypi dist/*
 
