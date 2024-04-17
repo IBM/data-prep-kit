@@ -9,11 +9,8 @@ include ../../.make.defaults
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
 
 include makeenv
-DOCKER ?= docker
 DOCKER_FILE=Dockerfile
-DOCKER_HOSTNAME ?=  quay.io
-DOCKER_NAMESPACE ?= dataprep1/data-prep-lab
-DOCKER_NAME ?= kfp-data-processing
+DOCKER_NAME ?= data-prep-lab/kfp-data-processing
 IMG ?= ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_TAGNAME}
 
 # Create the docker image making sure the preloaded models are available to copy into the image

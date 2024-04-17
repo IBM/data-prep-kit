@@ -29,13 +29,12 @@
 include $(REPOROOT)/.make.defaults
 ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 
-DOCKER?=podman
 DOCKER_FILE?=Dockerfile
-DOCKER_REGISTRY?=quay.io
 
-DOCKER_IMAGE_PREFIX?=quay.io/dataprep1/data-prep-lab
+DOCKER_NAME=data-prep-lab
+DOCKER_REGISTRY_ENDPOINT=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)/$(DOCKER_NAME)
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
-DOCKER_IMAGE=${DOCKER_IMAGE_PREFIX}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
+DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
 TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_transform.py
@@ -49,7 +48,10 @@ help::
 	@echo Overridable macro values include the following:
 	@echo DOCKER - the name of the docker executable to use.  DOCKER=$(DOCKER)
 	@echo DOCKER_FILE - the name of the docker file to use.  DOCKER_FILE=$(DOCKER_FILE)
+	@echo DOCKER_REGISTRY_ENDPOINT - the docker registry location to publish images.  DOCKER_REGISTRY_ENDPOINT=$(DOCKER_REGISTRY_ENDPOINT)
 	@echo DOCKER_REGISTRY - the name of the docker registry to use.  DOCKER_REGISTRY=$(DOCKER_REGISTRY)
+	@echo DOCKER_NAMESPACE - the name space to use in the registry.  DOCKER_NAMESPACE=$(DOCKER_NAMESPACE)
+	@echo DOCKER_NAME - the name under the name space where images are publishes.  DOCKER_NAME=$(DOCKER_NAME)
 	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
 	@echo DOCKER_REGISTRY_KEY - the docker user to use.  DOCKER_REGISTRY_KEY=secret
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
@@ -233,7 +235,7 @@ conventions:
 	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_ray.py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py .transforms-check-exists
-	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_launch.py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_ray.py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=. CHECK_FILE_NAME=.dockerignore  .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test-data .transforms-check-dir-size
 	@$(MAKE) CHECK_TARGET=build .transforms-check-target
@@ -245,4 +247,8 @@ conventions:
 	@$(MAKE) CHECK_TARGET=test-src .transforms-check-target
 	@$(MAKE) CHECK_TARGET=test-image .transforms-check-target
 	@$(MAKE) CHECK_TARGET=venv .transforms-check-target
+	@z=$$(echo $(TRANSFORM_NAME) | grep annotator);				\
+	if [ ! -z "$$z" ]; then	 					\
+		echo "Recommend not using 'annotator' in your transform name";	\
+	fi
 	@echo Done checking transform project conventions.
