@@ -30,7 +30,7 @@ EXEC_SCRIPT_NAME: str = "fdedup_transform.py"
 task_image = "quay.io/dataprep1/data-prep-lab/fdedup:0.1"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.2"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.3"
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(func=fdedup_compute_execution_params, base_image=base_kfp_image)
 # create Ray cluster

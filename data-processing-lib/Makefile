@@ -1,7 +1,7 @@
 # Use make help, to see the available rules
 include ../.make.defaults
 
-VERSION=0.0.1.dev5
+VERSION=0.0.1.dev6
 TAG := "v${VERSION}"
 
 
