@@ -14,16 +14,15 @@ import os
 
 from data_processing.test_support.ray import AbstractTransformLauncherTest
 from data_processing.utils import ParamsUtils
-from language_annotator_transform import (
-    LangSelectorTransformConfiguration,
+from proglang_match_transform import (
+    ProgLangMatchTransformConfiguration,
     lang_allowed_langs_file_key,
-    lang_known_selector,
     lang_lang_column_key,
     lang_output_column_key,
 )
 
 
-class TestRayLangSelectorTransform(AbstractTransformLauncherTest):
+class TestRayProgLangMatchTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -40,15 +39,13 @@ class TestRayLangSelectorTransform(AbstractTransformLauncherTest):
         config = {
             # When running in ray, our Runtime's get_transform_config() method  will load the domains using
             # the orchestrator's DataAccess/Factory. So we don't need to provide the lang_select_local_config configuration.
-            "lang_select_local_config": ParamsUtils.convert_to_ast({"input_folder": "/tmp", "output_folder": "/tmp"}),
             lang_allowed_langs_file_key: languages_file,
             lang_lang_column_key: "language",
             lang_output_column_key: "allowed_languages",
-            lang_known_selector: True,
         }
         fixtures = [
             (
-                LangSelectorTransformConfiguration(),
+                ProgLangMatchTransformConfiguration(),
                 config,
                 basedir + "/input",
                 basedir + "/expected",
