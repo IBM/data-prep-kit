@@ -27,8 +27,10 @@ from src.fdedup_compute_execution_params import fdedup_compute_execution_params
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "fdedup_transform.py"
 
+task_image = "quay.io/dataprep1/data-prep-lab/fdedup:0.1"
+
 # components
-base_kfp_image = "us.icr.io/cil15-shared-registry/preprocessing-pipelines/kfp-data-processing:0.0.3"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.2"
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(func=fdedup_compute_execution_params, base_image=base_kfp_image)
 # create Ray cluster
@@ -46,19 +48,22 @@ TASK_NAME: str = "fdedup"
     description="Pipeline for fdedup",
 )
 def fdedup(
+    # Ray cluster
     ray_name: str = "fdedup-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/fdedup:guftest",\
-             "image_pull_secret": "prod-all-icr-io"}',  # pragma: allowlist secret
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, \
-            "image_pull_secret": "prod-all-icr-io", "image": "us.icr.io/cil15-shared-registry/preprocessing-pipelines/fdedup:guftest"}',  # pragma: allowlist secret
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
+             "image": "' + task_image + '" }',
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
+            "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
-    lh_config: str = "None",
-    max_files: int = -1,
+    # data access. checkpointing is not supported by dedup
+    data_s3_config: str = "{'input_folder': 'test/fdedup/input/', 'output_folder': 'test/fdedup/output/'}",
+    data_s3_access_secret: str = "s3-secret",
+    data_max_files: int = -1,
+    data_num_samples: int = -1,
+    # orchestrator
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
-    s3_access_secret: str = "cos-access",
-    s3_config: str = "{'input_folder': 'cos-optimal-llm-pile/sanity-test/input/dataset=fuzzy_dedup/', 'output_folder': 'cos-optimal-llm-pile/doc_annotation_test/output_fdedup_guf/'}",
+    code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
     # columns used
     doc_column: str = "contents",
     id_column: str = "int_id_column",
@@ -67,16 +72,19 @@ def fdedup(
     bucket_cpu: float = 0.5,
     doc_cpu: float = 0.5,
     mhash_cpu: float = 0.5,
-    num_doc_actors: int = 1,
-    num_bucket_actors: int = 1,
-    num_minhash_actors: int = 1,
-    num_preprocessors: int = 2,
     # fuzzy parameters
     num_permutations: int = 64,
     threshold: float = 0.8,
     shingles_size: int = 5,
-    japanese_data: bool = False,
     delimiters: str = " ",
+    # Random delay between reads
+    random_delay_limit: int = 5,
+    # snapshotting
+    snapshot_delay: int = 1,
+    use_doc_snapshot: bool = False,
+    use_bucket_snapshot: bool = False,
+    # additional parameters
+    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
     Pipeline to execute FDEDUP transform
@@ -101,28 +109,29 @@ def fdedup(
         wait_cluster_up_tmout - time to wait for cluster up, sec
         wait_job_ready_tmout - time to wait for job ready, sec
         wait_print_tmout - time between prints, sec
-        http_retries - httpt retries for API server calls
-    :param lh_config - lake house configuration
-    :param s3_config - s3 configuration
-    :param s3_access_secret - s3 access secret
-    :param max_files - max files to process
+        http_retries - http retries for API server calls
+    :param data_s3_access_secret - s3 access secret
+    :param data_s3_config - s3 configuration
+    :param data_max_files - max files to process
+    :param data_num_samples - num samples to process
     :param actor_options - actor options
     :param pipeline_id - pipeline id
+    :param code_location - code location
     :param doc_column - document column name
     :param id_column - integer document id column name
     :param cluster_column - cluster column name
     :param bucket_cpu - number of CPUs per bucket hash
     :param doc_cpu - number of CPUs per doc hash
     :param mhash_cpu - number of CPUs per minhash hash
-    :param num_doc_actors - number of doc actors to use
-    :param num_bucket_actors - number of bucket actors to use
-    :param num_minhash_actors - number of minhash actors to use
-    :param num_preprocessors - number of preprocessors to use
     :param num_permutations - number of permutations
     :param threshold - threshold
     :param shingles_size - number of words in shingle
-    :param japanese_data - japanese data indicator
     :param delimiters - delimiter for splitting document
+    :param random_delay_limit - delay between reads to reduce S3 load.
+                                A random number between 0 and random_delay_limit is used
+    :param snapshot_delay - delay between restoring individual actors
+    :param use_bucket_snapshot - flag to skip buckets building and start from existing snapshots
+    :param use_doc_snapshot - flag to skip documents building and start from existing snapshots
     :return: None
     """
     # create clean_up task
@@ -134,17 +143,12 @@ def fdedup(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=actor_options,
-            params={
-                "threshold": threshold,
-                "num_permutations": num_permutations,
-                "s3_config": s3_config,
-                "bucket_cpu": bucket_cpu,
-                "doc_cpu": doc_cpu,
-                "minhash_cpu": mhash_cpu,
-            },
+            params={"threshold": threshold, "num_permutations": num_permutations,
+                    "s3_config": data_s3_config, "bucket_cpu": bucket_cpu,
+                    "doc_cpu": doc_cpu, "minhash_cpu": mhash_cpu}
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
-        ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, s3_access_secret)
+        ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
 
         # start Ray cluster
         ray_cluster = create_ray_op(
@@ -163,14 +167,14 @@ def fdedup(
             run_id=dsl.RUN_ID_PLACEHOLDER,
             additional_params=additional_params,
             exec_params={
-                "s3_config": s3_config,
-                "doc_column": doc_column,
-                "lh_config": lh_config,
-                "max_files": max_files,
+                "data_s3_config": data_s3_config,
+                "data_max_files": data_max_files,
+                "data_num_samples": data_num_samples,
                 "num_workers": compute_exec_params.outputs["workers"],
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
                 "job_id": dsl.RUN_ID_PLACEHOLDER,
+                "code_location": code_location,
                 "doc_column": doc_column,
                 "id_column": id_column,
                 "cluster_column": cluster_column,
@@ -184,18 +188,19 @@ def fdedup(
                 "num_permutations": num_permutations,
                 "threshold": threshold,
                 "shingles_size": shingles_size,
-                "japanese_data": japanese_data,
                 "delimiters": delimiters,
+                "random_delay_limit": random_delay_limit,
+                "snapshot_delay": snapshot_delay,
+                "use_doc_snapshot": use_doc_snapshot,
+                "use_bucket_snapshot": use_bucket_snapshot,
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
-        ComponentUtils.set_s3_env_vars_to_component(execute_job, s3_access_secret)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
 
-    # set image pull secrets
-    dsl.get_pipeline_conf().set_image_pull_secrets([k8s_client.V1ObjectReference(name="prod-all-icr-io")])
     # Configure the pipeline level to one week (in seconds)
     dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 

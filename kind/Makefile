@@ -30,6 +30,7 @@ cluster-deploy::
 	@# Help: Deploy all required tools on existing cluster
 	$(MAKE) .cluster-prepare
 	$(MAKE) .cluster-prepare-wait
+	cd hack && ./ingress.sh deploy
 
 clean::
 	@# Help: Deleting the kind cluster

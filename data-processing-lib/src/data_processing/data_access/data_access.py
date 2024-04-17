@@ -54,11 +54,12 @@ class DataAccess:
         else:
             # use all existing files
             files_set = range(len(files))
-        logger.info(f"Using files {files} to sample data")
         result = [""] * len(files_set)
         index = 0
         for f in files_set:
             result[index] = files[f]
+            index += 1
+        logger.info(f"Using files {result} to sample data")
         return result
 
     def get_files_to_process(self) -> tuple[list[str], dict[str, float]]:
