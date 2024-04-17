@@ -185,7 +185,9 @@ The final thing that we need to do is set some pipeline global configuration:
 ## Compiling pipeline and deploying it to KFP
 
 To compile pipeline execute Python with this [file](../transform_workflows/universal/noop/noop_wf.py), which will 
-produce file `noop_wf.yaml` in the same directory. Now create a kind cluster with all required software installed 
+produce file `noop_wf.yaml` in the same directory. Alternatively, `make venv && make build` Makefile rule can be executed under
+`../transform_workflows` directory (`make venv` can be executed once or after each dependency change).
+Now create a kind cluster with all required software installed
 using the following command: 
 
 ````shell
