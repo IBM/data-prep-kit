@@ -10,8 +10,6 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed '
 
 include makeenv
 DOCKER_FILE=Dockerfile
-DOCKER_HOSTNAME ?=  quay.io
-DOCKER_NAMESPACE ?= dataprep1
 DOCKER_NAME ?= kfp-data-processing
 IMG ?= ${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_TAGNAME}
 

@@ -5,17 +5,12 @@ PIP=$(PYTHON) -m pip
 # Command to run pytest
 PYTEST=pytest -s
 PYTHON_VERSION=$(shell $(PYTHON) --version)
-# For legacy, previous to publishing transform images. 
-#DOCKER_REGISTRY?=docker-na.artifactory.swg-devops.com/wcp-ai-foundation-team-docker-virtual # While on internal
-#DOCKER_REGISTRY_USER?=$(ARTIFACTORY_USER)
-#DOCKER_REGISTRY_KEY?=$(ARTIFACTORY_KEY)
 # For when we move to quay 
-DOCKER=docker
-DOCKER_REGISTRY?=quay.io
+DOCKER?=docker
+DOCKER_HOSTNAME?=quay.io
+DOCKER_NAMESPACE ?= dataprep1
 DOCKER_REGISTRY_USER?=$(DPL_DOCKER_REGISTRY_USER)
 DOCKER_REGISTRY_KEY?=$(DPL_DOCKER_REGISTRY_KEY)
-
-DOCKER_REGISTRY_ENDPOINT=$(DOCKER_REGISTRY)/$(DOCKER_REGISTRY_USER)/data-prep-lab
 
 #######################################################################################
 # Lists all targets and optional help text found in the target.
