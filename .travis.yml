@@ -46,8 +46,11 @@ script:
               chmod 777 /tmp/kind
               curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
               chmod 777 /tmp/kubectl
+              curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/minio-binaries/mc
+              chmod +x /tmp/minio-binaries/mc
+              export PATH=$PATH:/tmp/minio-binaries/
               export DEPLOY_KUBEFLOW=0
-              # kind setup now relies on mc, which is not installed make -C kind setup || travis_terminate 1
+              make -C kind setup || travis_terminate 1
               make -C kfp/kfp_support_lib build test || travis_terminate 1
           ;;
           kfp-compile)
