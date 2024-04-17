@@ -2,7 +2,7 @@
 
 This is a manual build instruction. As an alternative, you can execute the `make setup` makefile rule in the project 
 root directory instead. This command does everything including, creation of the cluster, installing required 
-software, and creating ingresses and secrets.
+software, creating ingresses and secrets and loading local data to Minio.
 
 # Before you begin
 
@@ -138,6 +138,8 @@ mc cp --recursive ../transforms/universal/resize/test-data/input/ kfp/test/resiz
 mc cp --recursive ../transforms/universal/tokenization/test-data/ds01/input/ kfp/test/tokenization/ds01/input
 mc cp --recursive ../transforms/universal/tokenization/test-data/ds02/input/ kfp/test/tokenization/ds02/input
 ```
+
+If you need to load additional data, please load it using additional `mc` commands, similar to the above
 
 Finally, note, that kfp version of Minio, is using a username (`minio`) as an access key and password ('minio123')
 as the secret. The secret to use for Minio access is located in `kubeflow` ns with the name `s3-secret`
