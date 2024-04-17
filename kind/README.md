@@ -12,6 +12,7 @@ Ensure that you have the following:
 - [Kind](https://kind.sigs.k8s.io/) tool for running local Kubernetes clusters 0.14.0 or newer must be installed on your machine.
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) 1.26 or newer must be installed on your machine.
 - [wget](https://www.gnu.org/software/wget/) 1.21 must be installed on your machine. 
+- [MinIO Client (mc)](https://min.io/docs/minio/linux/reference/minio-mc.html#quickstart) must be installed on your machine.
 
 
 ## Create cluster
@@ -22,7 +23,7 @@ Run the following command to create the cluster:
 cd /tmp
 git clone git@github.ibm.com:ai-models-data/fm-data-engineering.git
 cd fm-data-engineering
-ROOT_DIR=$PWD/kind/cluster/
+ROOT_DIR=$PWD/kind/
 kind create cluster --name goofy --config ${ROOT_DIR}/hack/kind-cluster-config.yaml
 ```
 
@@ -102,7 +103,7 @@ You can work with a real S3 storage, but for testing you can use the Mino server
 installation. In order to work with it, you will need the Minio CLI. See
 [install mc instructions](https://min.io/docs/minio/linux/reference/minio-mc.html#quickstart)
 
-When you install kind cluster all next steps are done automatically.
+When installing kind cluster with `make setup` Makefile rule all next steps are done automatically.
 
 ## Copy test data
 
