@@ -24,7 +24,7 @@ Now you can start Minio server using the following command:
 minio server start
 ```
 
-When it starts you can connect to the server UI using the following address: `https://localhost:9000`
+When it starts you can connect to the server UI using the following address: `http://localhost:9000`
 The default user name/password is `minioadmin|minioadmin`
 
 ## Populating Minio with testing data
@@ -49,10 +49,10 @@ mc admin info local
 To copy the data to Minio, you first need to create a bucket:
 
 ```shell
-mc mb loca/test
+mc mb local/test
 ```
 
-Once the bucket is created, you can copy files, using:
+Once the bucket is created, you can copy files (assuming you are in the transforms directory), using:
 
 ```shell
 mc cp --recursive code/code_quality/test-data/input/ local/test/code_quality/input
