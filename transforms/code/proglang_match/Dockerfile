@@ -13,8 +13,8 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY src/language_annotator_transform.py .
-COPY src/language_annotator_local_ray.py local/
+COPY src/proglang_match_transform.py .
+COPY src/proglang_match_local_ray.py local/
 
 # copy test
 COPY test/ test/

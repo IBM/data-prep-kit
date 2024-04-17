@@ -6,7 +6,7 @@ REPOROOT=../../..
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-TRANSFORM_NAME=language_annotator
+TRANSFORM_NAME=proglang_match
 DOCKER_IMAGE_VERSION=0.1.0
 
 venv::	.transforms.venv
