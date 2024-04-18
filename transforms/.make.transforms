@@ -168,7 +168,7 @@ help::
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest:: .transforms.image
 	@# Help: Test an already-built image (use make image) running pytest on $(TRANSFORM_TEST_FILE) 
-	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s  $(TRANSFORM_TEST_FILE)
+	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s test 
 
 .PHONY: .transforms.test-image-help
 .transforms.test-image-help::
