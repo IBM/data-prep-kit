@@ -60,7 +60,7 @@ def ededup(
     data_s3_config: str = "{'input_folder': 'test/ededup/input/', 'output_folder': 'test/ededup/output'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
-    data_num_samples: int = -1,
+    data_num_samples: int = 10,
     # orchestrator
     doc_column: str = "contents",
     actor_options: str = "{'num_cpus': 0.8}",
@@ -116,6 +116,7 @@ def ededup(
             worker_options=ray_worker_options,
             actor_options=actor_options,
             params={"s3_config": data_s3_config, "hash_cpu": hash_cpu},
+            n_samples = data_num_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
