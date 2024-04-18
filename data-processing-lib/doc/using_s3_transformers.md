@@ -32,6 +32,7 @@ The default user name/password is `minioadmin|minioadmin`
 Populating Minio server with test data can be done using `mc`. First configure mc to work with the local
 Minio server:
 
+
 ```shell
 mc alias set local http://127.0.0.1:9000 minioadmin minioadmin
 ```
