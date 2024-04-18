@@ -12,12 +12,9 @@ RUN cd data-processing-lib && pip install --no-cache-dir -e .
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r  requirements.txt
-
 # copy source data
-COPY src/proglang_match_transform.py .
-COPY src/proglang_match_local_ray.py local/
+COPY src/proglang_select_transform.py .
+COPY src/proglang_select_local_ray.py local/
 
 # copy test
 COPY test/ test/
