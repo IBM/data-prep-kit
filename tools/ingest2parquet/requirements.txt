@@ -1,5 +1,4 @@
 # transform runtime
---extra-index-url https://test.pypi.org/simple/
-data-prep-lab==0.0.1.dev5
+data-prep-lab==0.1.0
 parameterized
 pandas
