@@ -115,6 +115,6 @@ Above you see both parameters and their values for small runs (tens of files). W
 ## Running
 
 We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/fdedup_local_ray.py) and [s3](src/fdedup_s3.py)
+[local file system](src/fdedup_local_ray.py) and [s3](src/fdedup_s3_ray.py)
 
 # Release notes
