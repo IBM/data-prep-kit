@@ -39,6 +39,9 @@ class KubeRayAPIs:
         base - the URL of the API server (default is set to the standalone API server)
         wait interval - the amount of sec to wait between checking for cluster ready
     """
+    CONNECT_TIMEOUT = 50
+    READ_TIMEOUT = 50
+    TIMEOUT = (CONNECT_TIMEOUT, READ_TIMEOUT)
 
     def __init__(
         self,
@@ -75,7 +78,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + "compute_templates"
         for i in range(self.http_retries):
             try:
-                response = requests.get(url, headers=_headers, timeout=(10, 10))
+                response = requests.get(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None, templates_decoder(response.json())
                 else:
@@ -104,7 +107,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{ns}/compute_templates"
         for i in range(self.http_retries):
             try:
-                response = requests.get(url, headers=_headers, timeout=(10, 10))
+                response = requests.get(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None, templates_decoder(response.json())
                 else:
@@ -136,7 +139,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{ns}/compute_templates/{name}"
         for i in range(self.http_retries):
             try:
-                response = requests.get(url, headers=_headers, timeout=(10, 10))
+                response = requests.get(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None, template_decoder(response.json())
                 else:
@@ -166,7 +169,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{template.namespace}/compute_templates"
         for i in range(self.http_retries):
             try:
-                response = requests.post(url, json=template.to_dict(), headers=_headers, timeout=(10, 10))
+                response = requests.post(url, json=template.to_dict(), headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 else:
@@ -195,7 +198,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{ns}/compute_templates/{name}"
         for i in range(self.http_retries):
             try:
-                response = requests.delete(url, headers=_headers, timeout=(10, 10))
+                response = requests.delete(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 elif response.status_code == 404:
@@ -226,7 +229,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + "clusters"
         for i in range(self.http_retries):
             try:
-                response = requests.get(url, headers=_headers, timeout=None)
+                response = requests.get(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None, clusters_decoder(response.json())
                 else:
@@ -255,7 +258,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{ns}/clusters"
         for i in range(self.http_retries):
             try:
-                response = requests.get(url, headers=_headers, timeout=(10, 10))
+                response = requests.get(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None, clusters_decoder(response.json())
                 else:
@@ -285,7 +288,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{ns}/clusters/{name}"
         for i in range(self.http_retries):
             try:
-                response = requests.get(url, headers=_headers, timeout=(10, 10))
+                response = requests.get(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None, cluster_decoder(response.json())
                 else:
@@ -313,7 +316,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{cluster.namespace}/clusters"
         for i in range(self.http_retries):
             try:
-                response = requests.post(url, json=cluster.to_dict(), headers=_headers, timeout=(10, 10))
+                response = requests.post(url, json=cluster.to_dict(), headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 else:
@@ -441,7 +444,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}"
         for i in range(self.http_retries):
             try:
-                response = requests.post(url, json=job_request.to_dict(), headers=_headers, timeout=(10, 10))
+                response = requests.post(url, json=job_request.to_dict(), headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None, response.json()["submissionId"]
                 else:
@@ -475,7 +478,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}/{sid}"
         for i in range(self.http_retries):
             try:
-                response = requests.get(url, headers=_headers, timeout=(10, 10))
+                response = requests.get(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None, RayJobInfo(response.json())
                 else:
@@ -508,7 +511,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}"
         for i in range(self.http_retries):
             try:
-                response = requests.get(url, headers=_headers, timeout=(10, 10))
+                response = requests.get(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     job_info_array = response.json().get("submissions", None)
                     return response.status_code, None, [RayJobInfo(i) for i in job_info_array]
@@ -543,7 +546,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}/log/{sid}"
         for i in range(self.http_retries):
             try:
-                response = requests.get(url, headers=_headers, timeout=(10, 10))
+                response = requests.get(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None, response.json().get("log", "")
                 else:
@@ -578,7 +581,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}/{sid}"
         for i in range(self.http_retries):
             try:
-                response = requests.post(url, headers=_headers, timeout=(10, 10))
+                response = requests.post(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 else:
@@ -611,7 +614,7 @@ class KubeRayAPIs:
         url = self.server_url + self.api_base + f"namespaces/{ns}/jobsubmissions/{name}/{sid}"
         for i in range(self.http_retries):
             try:
-                response = requests.delete(url, headers=_headers, timeout=(10, 10))
+                response = requests.delete(url, headers=_headers, timeout=self.TIMEOUT)
                 if response.status_code // 100 == 2:
                     return response.status_code, None
                 else:
