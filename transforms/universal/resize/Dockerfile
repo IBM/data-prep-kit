@@ -1,5 +1,4 @@
 FROM docker.io/rayproject/ray:2.9.3-py310
-
 # install pytest
 RUN pip install --no-cache-dir pytest
 
@@ -22,3 +21,9 @@ COPY test-data/ test-data/
 
 # Set environment
 ENV PYTHONPATH /home/ray
+
+# Put these at the end since they seem to upset the docker cache.
+ARG BUILD_DATE
+ARG GIT_COMMIT
+LABEL build-date=$BUILD_DATE
+LABEL git-commit=$GIT_COMMIT

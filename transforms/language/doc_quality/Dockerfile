@@ -43,3 +43,9 @@ RUN chown -R ray /home/ray/test-data
 USER ray
 
 ENV PYTHONPATH /home/ray
+
+# Put these at the end since they seem to upset the docker cache.
+ARG BUILD_DATE
+ARG GIT_COMMIT
+LABEL build-date=$BUILD_DATE
+LABEL git-commit=$GIT_COMMIT

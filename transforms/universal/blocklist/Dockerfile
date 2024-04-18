@@ -12,7 +12,6 @@ RUN cd data-processing-lib && pip install --no-cache-dir -e .
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
-
 # copy source data
 COPY ./src/blocklist_transform.py .
 COPY src/blocklist_local_ray.py local/
@@ -23,3 +22,9 @@ COPY test-data/ test-data/
 
 # Set environment
 ENV PYTHONPATH /home/ray
+
+# Put these at the end since they seem to upset the docker cache.
+ARG BUILD_DATE
+ARG GIT_COMMIT
+LABEL build-date=$BUILD_DATE
+LABEL git-commit=$GIT_COMMIT
