@@ -7,7 +7,8 @@ REPOROOT=../../..
 include ../../.make.transforms
 
 TRANSFORM_NAME=doc_id
-DOCKER_IMAGE_VERSION=0.1
+# transforms.versions file contains the versions
+DOCKER_IMAGE_VERSION=${DOC_ID_VERSION}
 
 venv::	.transforms.venv
 
