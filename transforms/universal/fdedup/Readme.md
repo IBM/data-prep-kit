@@ -7,7 +7,7 @@ testing and IDE set up.
 
 ## Summary
 
-The basic implementation of the fuzzy de dup is based on [MinHash](https://en.wikipedia.org/wiki/MinHash). Also see
+The basic implementation of the fuzzy dedup is based on [MinHash](https://en.wikipedia.org/wiki/MinHash). Also see
 [here](http://infolab.stanford.edu/~ullman/mmds/ch3n.pdf) for more details. The architecture of the implementation is presented here:
 
 ![](images/fuzzy.png)
@@ -20,7 +20,7 @@ while a transform model is a single pass. The solution to this mismatch is to us
 first path and use the native transform pipeline to implement filtering.
 
 ## Transform runtime
-The [transform runtime](src/fdedup_transform.py) is implementing complete first path of the fuzzy de duping:
+The [transform runtime](src/fdedup_transform.py) is implementing complete first path of the fuzzy deduping:
 * creates bucket and minhash collectors
 * implements initial file processing to populate bucket and minhash caches
 * creates doc collectors 
