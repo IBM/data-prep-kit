@@ -34,9 +34,10 @@ update-toml:: .check-env
 	sed -i.back 's/data-prep-lab==[0-9].*/data-prep-lab==${DATA_PREP_LAB}",/' pyproject.toml
 	sed -i.back 's/kfp==[0-9].*/kfp==${KFP}",/' pyproject.toml
 
-build:: clean update-toml venv
+build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
 	${PYTHON} -m pip install --upgrade build
+	if [ -d "dist"]; then rm -r dist; fi
 	${PYTHON} -m build
 
 publish:: .check-env
@@ -44,8 +45,8 @@ publish::
 	@# Help: Publish the wheel to testpypi
 	if [ -d "dist"]; then rm -r dist; fi
 	${PYTHON} -m pip install --upgrade build
-	${PYTHON} -m build
-	@${PYTHON} -m twine upload --verbose --non-interactive --skip-existing --repository testpypi dist/*
+	${PYTHON} -m twine check dist/*
+	${PYTHON} -m twine upload --verbose --non-interactive dist/*
 
 venv::	pyproject.toml .check-env
 	@# Help: Create the virtual environment using pyproject.toml 
@@ -53,8 +54,6 @@ venv::	pyproject.toml .check-env
 	rm -rf venv
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
-		echo '[global]' > venv/pip.conf;					\
-	    echo "extra-index-url = https://test.pypi.org/simple/" >> venv/pip.conf;	\
         pip install -r ../kfp_ray_components/requirements.txt ;\
 	pip install -e .;		\
 	pip install ray==${RAY} \
