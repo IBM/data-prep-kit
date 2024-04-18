@@ -102,11 +102,21 @@ To avoid potential collisions with options for the Ray launcher, Data Access Fac
 it is strongly encouraged to not use single dash options with a single
 or small number of characters (e.g. -n).
 
+## Release process
+The transform versions are managed in a central file named [`transforms.versions`](./transforms.versions).
+This file is where the versions are automatically propagated to the Makefile rules when building and pushing the transform images.
+When a new transform version is created, the tag of the transform should be updated in this file.
+If there is no entry for the transform in the file yet, create a new one and add a reference to it in the transform Makefile,
+ following the format used for other transforms.
+
 ### Building the docker image
 Generally to build a docker image, one uses the `make image` command, which uses
 the `Dockerfile`, which in turn uses the `src` and `requirements.txt` to build the image.
 Note that the `Makefile` defines the TRANSFORM_NAME and DOCKER_IMAGE_VERSION
 and should be redefined if copying from another transform project.
+
+To build individual transform image use `make -C <path to transform directory>`, for example: `make -C universal/fdedup image`.
+To push all the images run `make push`, or `make -C <path to transform directory> push` for individual transform.
 
 ### IDE Setup
 When running in an IDE, such as PyCharm, the following are generally required:

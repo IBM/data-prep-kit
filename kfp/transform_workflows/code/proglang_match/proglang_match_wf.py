@@ -22,12 +22,13 @@ from kubernetes import client as k8s_client
 
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "lang_annotator_transform.py"
+EXEC_SCRIPT_NAME: str = "proglang_match_transform.py"
 
-task_image = "quay.io/dataprep1/data-prep-lab/lang_annotator:0.1.0"
+task_image = "quay.io/dataprep1/data-prep-lab/proglang_match:0.2.0"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.3"
+
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, insted of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
@@ -40,8 +41,8 @@ execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components
 # clean up Ray
 cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "lang_select"
-PREFIX: str = "lang_select"
+TASK_NAME: str = "proglang_match"
+PREFIX: str = "proglang_match"
 
 
 @dsl.pipeline(
@@ -49,14 +50,14 @@ PREFIX: str = "lang_select"
     description="Pipeline for select language",
 )
 def lang_select(
-    ray_name: str = "select-lang-kfp-ray",  # name of Ray cluster
+    ray_name: str = "proglang-match-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
              "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
             "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'test/lang_annotator/input/', 'output_folder': 'test/lang_annotator/output/'}",
+    data_s3_config: str = "{'input_folder': 'test/proglang_match/input/', 'output_folder': 'test/proglang_match/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
@@ -64,12 +65,10 @@ def lang_select(
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # Language Annotation parameters
-    lang_select_allowed_langs_file: str = "test/lang_annotator/languages/allowed-code-languages.txt",
-    lang_select_language_column: str = "language",
-    lang_select_return_known: bool = True,
-    lang_select_local_config: str = "None",
-    lang_select_s3_access_secret: str = "s3-secret",
+    # Proglang match parameters
+    proglang_match_allowed_langs_file: str = "test/proglang_match/languages/allowed-code-languages.txt",
+    proglang_match_language_column: str = "language",
+    proglang_match_s3_access_secret: str = "s3-secret",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ) -> None:
@@ -104,11 +103,9 @@ def lang_select(
     :param actor_options - actor options
     :param pipeline_id - pipeline id
     :param code_location - code location
-    :param lang_select_allowed_langs_file - file to store allowed languages
-    :param lang_select_language_column - name of select language annotation column
-    :param lang_select_return_known - Flag to return docs with known languages (True) or unknown (False).
-    :param lang_select_local_config - lang select local config
-    :param lang_select_s3_access_secret - block list access secret 
+    :param proglang_match_allowed_langs_file - file to store allowed languages
+    :param proglang_match_language_column - name of select language annotation column
+    :param proglang_match_s3_access_secret - block list access secret 
                     (here we are assuming that select language info is in S3, but potentially in the different bucket)
     :return: None
     """
@@ -149,10 +146,8 @@ def lang_select(
                 "pipeline_id": pipeline_id,
                 "job_id": dsl.RUN_ID_PLACEHOLDER,
                 "code_location": code_location,
-                "lang_select_allowed_langs_file": lang_select_allowed_langs_file,
-                "lang_select_language_column": lang_select_language_column,
-                "lang_select_return_known": lang_select_return_known,
-                "lang_select_local_config": lang_select_local_config,
+                "proglang_match_allowed_langs_file": proglang_match_allowed_langs_file,
+                "proglang_match_language_column": proglang_match_language_column,
            },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
@@ -160,7 +155,7 @@ def lang_select(
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
-        ComponentUtils.set_s3_env_vars_to_component(execute_job, lang_select_s3_access_secret, prefix=PREFIX)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, proglang_match_s3_access_secret, prefix=PREFIX)
         execute_job.after(ray_cluster)
 
     # Configure the pipeline level to one week (in seconds)

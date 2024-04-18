@@ -27,10 +27,11 @@ from src.fdedup_compute_execution_params import fdedup_compute_execution_params
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "fdedup_transform.py"
 
-task_image = "quay.io/dataprep1/data-prep-lab/fdedup:0.1"
+task_image = "quay.io/dataprep1/data-prep-lab/fdedup:0.2"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.3"
+
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(func=fdedup_compute_execution_params, base_image=base_kfp_image)
 # create Ray cluster
@@ -59,7 +60,7 @@ def fdedup(
     data_s3_config: str = "{'input_folder': 'test/fdedup/input/', 'output_folder': 'test/fdedup/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
-    data_num_samples: int = -1,
+    data_num_samples: int = 10,
     # orchestrator
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
@@ -145,7 +146,8 @@ def fdedup(
             actor_options=actor_options,
             params={"threshold": threshold, "num_permutations": num_permutations,
                     "s3_config": data_s3_config, "bucket_cpu": bucket_cpu,
-                    "doc_cpu": doc_cpu, "minhash_cpu": mhash_cpu}
+                    "doc_cpu": doc_cpu, "minhash_cpu": mhash_cpu},
+            n_samples = data_num_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
