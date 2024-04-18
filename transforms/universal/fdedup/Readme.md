@@ -171,24 +171,41 @@ the following command line arguments are available in addition to
 [the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
 
 ```shell
---doc_column DOC_COLUMN
---id_column ID_COLUMN 
---cluster_column CLUSTER_COLUMN
---bucket_cpu BUCKET_CPU 
---mhash_cpu MHASH_CPU
---doc_cpu DOC_CPU 
---num_doc_actors NUM_DOC_ACTORS
---num_minhash_actors NUM_MINHASH_ACTORS
---num_bucket_actors NUM_BUCKET_ACTORS
---num_preprocessors NUM_PREPROCESSORS
---num_permutations NUM_PERMUTATIONS 
---threshold THRESHOLD
---shingles_size SHINGLES_SIZE 
---delimiters DELIMITERS
---snapshot_delay SNAPSHOT_DELAY
---use_bucket_snapshot USE_BUCKET_SNAPSHOT
---use_doc_snapshot USE_DOC_SNAPSHOT
---random_delay_limit RANDOM_DELAY_LIMIT
-```
+  --doc_column DOC_COLUMN
+                        document column name
+  --id_column ID_COLUMN
+                        integer document id column name
+  --cluster_column CLUSTER_COLUMN
+                        cluster column name
+  --bucket_cpu BUCKET_CPU
+                        number of CPUs per bucket hash
+  --mhash_cpu MHASH_CPU
+                        number of CPUs per minhash hash
+  --doc_cpu DOC_CPU     number of CPUs per doc hash
+  --num_doc_actors NUM_DOC_ACTORS
+                        number of doc actors to use
+  --num_minhash_actors NUM_MINHASH_ACTORS
+                        number of minhash actors to use
+  --num_bucket_actors NUM_BUCKET_ACTORS
+                        number of bucket actors to use
+  --num_preprocessors NUM_PREPROCESSORS
+                        number of preprocessors to use
+  --num_permutations NUM_PERMUTATIONS
+                        number of permutations
+  --threshold THRESHOLD
+                        threshold
+  --shingles_size SHINGLES_SIZE
+                        number of words in shingle
+  --delimiters DELIMITERS
+                        delimiter for splitting document
+  --snapshot_delay SNAPSHOT_DELAY
+                        snapshot delay time
+  --use_bucket_snapshot USE_BUCKET_SNAPSHOT
+                        flag to continue with bucket snapshot
+  --use_doc_snapshot USE_DOC_SNAPSHOT
+                        flag to continue with doc snapshot
+  --random_delay_limit RANDOM_DELAY_LIMIT
+                        maximum delay between read
+ ```
 
 These correspond to the configuration keys described above.

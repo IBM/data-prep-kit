@@ -92,9 +92,11 @@ the following command line arguments are available in addition to
 [the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
 
 ```shell
---hash_cpu HASH_CPU
---num_hashes NUM_HASHES 
---doc_column DOC_COLUMN
+--hash_cpu HASH_CPU   number of CPUs per hash
+ --num_hashes NUM_HASHES
+                        number of hash actors to use
+ --doc_column DOC_COLUMN
+                        key for accessing data
 ```
 
 These correspond to the configuration keys described above.
