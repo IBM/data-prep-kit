@@ -1,7 +1,7 @@
 # Use make help, to see the available rules
 include ../.make.defaults
 
-VERSION=0.0.1.dev6
+VERSION=0.1.0
 TAG := "v${VERSION}"
 
 
@@ -29,7 +29,8 @@ build:: update-toml venv
 
 publish:: .check-env update-toml
 	@# Help: Publish project to pypi
-	${PYTHON} -m twine upload --verbose --repository testpypi dist/*
+	${PYTHON} -m twine check dist/*
+	${PYTHON} -m twine upload --verbose --non-interactive dist/*
 	#@echo "create a git tag to reference published version"
 	#@git tag ${TAG}
 	#@git push origin ${TAG}
@@ -38,8 +39,6 @@ venv::	pyproject.toml
 	@# Help: Create the virtual environment using pyproject.toml 
 	rm -rf venv	
 	$(PYTHON) -m venv venv
-	echo '[global]' > venv/pip.conf
-	echo "extra-index-url = https://test.pypi.org/simple" >> venv/pip.conf
 	source venv/bin/activate; 	\
 	pip install --upgrade pip;	\
 	pip install -e .;		\
