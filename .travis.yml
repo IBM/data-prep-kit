@@ -67,7 +67,7 @@ script:
                    make -C ${DIR} DOCKER=${DOCKER} image test-image || travis_terminate 1
           ;;
           tools-test)
-                   make -C tools DOCKER=${DOCKER} venv test-lib-src || travis_terminate 1
+                   make -C tools DOCKER=${DOCKER} venv test || travis_terminate 1
           ;;
           *)
               echo Unrecogognized operation "'"$OPERATION"'"
