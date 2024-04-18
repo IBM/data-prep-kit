@@ -27,6 +27,9 @@
 #
 #######################################################################################
 include $(REPOROOT)/.make.defaults
+
+include $(REPOROOT)/transforms/transforms.versions
+
 ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 
 DOCKER_FILE?=Dockerfile
@@ -126,7 +129,9 @@ help::
 	cp -R $(REPOROOT)/data-processing-lib/src data-processing-lib
 	cp  $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
 	cp  $(REPOROOT)/data-processing-lib/README.md data-processing-lib
-	$(DOCKER) build -t $(DOCKER_IMAGE) .
+	$(DOCKER) build -t $(DOCKER_IMAGE) \
+		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
+                --build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . 
 	rm -rf data-processing-lib
 
 .PHONY: .transforms.install-lib-src
@@ -168,7 +173,7 @@ help::
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest:: .transforms.image
 	@# Help: Test an already-built image (use make image) running pytest on $(TRANSFORM_TEST_FILE) 
-	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s  $(TRANSFORM_TEST_FILE)
+	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s test 
 
 .PHONY: .transforms.test-image-help
 .transforms.test-image-help::

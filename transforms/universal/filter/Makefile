@@ -8,8 +8,8 @@ REPOROOT=../../..
 include ../../.make.transforms
 
 TRANSFORM_NAME=filter
-DOCKER_IMAGE_VERSION=0.1.0
-
+# transforms.versions file contains the versions
+DOCKER_IMAGE_VERSION=${FILTER_VERSION}
 
 venv::	.transforms.venv
 

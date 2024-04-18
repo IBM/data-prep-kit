@@ -10,7 +10,8 @@ REPOROOT=../../..
 include ../../.make.transforms
 
 TRANSFORM_NAME=doc_quality
-DOCKER_IMAGE_VERSION=0.1.0
+# transforms.versions file contains the versions
+DOCKER_IMAGE_VERSION=${DOC_QUALITY_VERSION}
 
 
 venv:: .transforms.venv
@@ -54,3 +55,4 @@ test-src:: lm_sp .transforms.test-src
 #publish:: .transforms.publish
 publish:: 
 	@echo Skipping publish until we have split the repos
+

@@ -2,12 +2,17 @@
 # know where they are running from.
 REPOROOT=../..
 
+CURR_DIR := ${CURDIR}
+
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
+
 
 include makeenv
 # Include the common rules.
 # Use "make help" to see them.
 include ../../.make.defaults
+
+include .make.transforms_workflows
 
 PYTHON=python3
 PYTEST=pytest
@@ -31,17 +36,14 @@ clean::
 	. ${VENV_ACTIVATE} && cd ${DIR} && ${PYTHON} ${WF_NAME}.py
 
 %.yaml: %.py
+	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}\"/" $<
+	make -C $(shell (dirname $<)) .reconcile-requirement PIPELINE_FILE=${CURR_DIR}/$<
 	make .compile-pipeline WF_NAME=$(shell (basename $< .py)) DIR=$(shell (dirname $<))
 
-reconcile-requirement::
-	@for file in $(PYTHON_WF); do \
-		sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}\"/" $$file; \
-	done
-
-build:: venv
+build::
+	find . -iname "*_wf.yaml" |  xargs rm -f || true
 	@# Help: Compile the pipelines
 	${PYTHON} -m pip install --upgrade build
-	make reconcile-requirement
 	make ${YAML_WF}
 
 publish:: .check-env
@@ -50,13 +52,11 @@ publish:: .check-env
 
 venv::	.check-env
 	@# Help: Create the virtual environment
-	make reconcile-requirement
 	sed -i.back "s/data-prep-lab-kfp==[0-9].*/data-prep-lab-kfp==${DATA_PREP_LAB_KFP}/" ../kfp_ray_components/requirements.txt
 	rm -rf venv	
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE}; 	\
 	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple \
-	pip install -r ../kfp_ray_components/requirements.txt \
-	pip install -i https://test.pypi.org/simple/data-prep-lab-kfp==${DATA_PREP_LAB_KFP}
+	pip install -r ../kfp_ray_components/requirements.txt
 
 test::

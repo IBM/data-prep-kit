@@ -1,5 +1,11 @@
 FROM docker.io/rayproject/ray:2.9.3-py310 AS base
 
+ARG BUILD_DATE
+ARG GIT_COMMIT
+
+LABEL build-date=$BUILD_DATE
+LABEL git-commit=$GIT_COMMIT
+
 USER root 
 RUN sudo apt update && sudo apt install gcc g++ -y
 USER ray 
