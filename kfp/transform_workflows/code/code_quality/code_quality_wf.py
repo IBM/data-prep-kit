@@ -27,7 +27,7 @@ from kubernetes import client as k8s_client
 EXEC_SCRIPT_NAME: str = "cq_transform.py"
 PREFIX: str = ""
 
-task_image = "quay.io/dataprep1/data-prep-lab/code_quality:0.1.0"
+task_image = "quay.io/dataprep1/data-prep-lab/code_quality:0.2.0"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.3"
