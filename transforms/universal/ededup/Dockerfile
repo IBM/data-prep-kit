@@ -1,5 +1,11 @@
 FROM docker.io/rayproject/ray:2.9.3-py310
 
+ARG BUILD_DATE
+ARG GIT_COMMIT
+
+LABEL build-date=$BUILD_DATE
+LABEL git-commit=$GIT_COMMIT
+
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
