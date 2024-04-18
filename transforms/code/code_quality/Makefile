@@ -28,3 +28,5 @@ test-image:: .transforms.test-image
 
 publish:: .transforms.publish
 
+setup:: .transforms.setup
+
