@@ -1,4 +1,5 @@
-# Data Schema and Processing
+# Data Processing Using Multiple Transforms
+
 The transformation framework is designed to operate on rows of columnar data, generally contained
 in [parquet](https://arrow.apache.org/docs/python/parquet.html) files 
 and read as [pyarrow tables](https://arrow.apache.org/docs/python/index.html).
