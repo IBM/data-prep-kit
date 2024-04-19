@@ -23,27 +23,13 @@ The following might be an example sequence of transforms.
 
 The ordering of the transforms can change depending on the requirements on the training data. 
 
-Each transform is generally run on a set of input files (think terabytes) to produce a set
-of output files.   
-The transforms are generally sequenced, each accepting the completed set of output files from a
-previous the previous transform in the sequence. 
-To address scalability, a transform is generally run in a dedicated Ray cluster
-deployed into a kubernetes cluster.  
+Each transform is generally run on a set of input files to produce a set of output files.
+The transforms are generally sequenced/stitched together, 
+each accepting the completed set of output files from a
+previous transform in the sequence. 
 
 ![Data Transformation Flow](data-flow.jpg)
 
-Below is another example with the following steps for language:
-1. Removes duplicate documents by remove rows from the input tables 
-2. Adds a column annotation identifying the document's language
-3. Filters documents matchine an chosen language 
-4. Scores each document with a quality score
-5. Filters documents for a minimum quality score (not shown below)
-6. ,,,
-7. ,,,
-8. Tokenizes each document, placing tokens in a new column.
+To address scalability, a transform is generally run in a dedicated Ray cluster
+deployed into a kubernetes cluster.  
 
-![Data Transformation Flow](data-flow-example.jpg)
-
-The result is a set of documents that are ready for LLM training.
-
- 
