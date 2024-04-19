@@ -16,16 +16,16 @@ import pyarrow as pa
 from data_processing.ray.transform_runtime import get_transform_config
 from data_processing.test_support.transform import AbstractTransformTest
 from data_processing.utils import ParamsUtils
-from proglang_match_transform import (
-    ProgLangMatchTransform,
-    ProgLangMatchTransformConfiguration,
+from proglang_select_transform import (
+    ProgLangSelectTransform,
+    ProgLangSelectTransformConfiguration,
     lang_allowed_langs_file_key,
     lang_lang_column_key,
     lang_output_column_key,
 )
 
 
-class TestProgLangMatchTransform(AbstractTransformTest):
+class TestProgLangSelectTransform(AbstractTransformTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -49,12 +49,12 @@ class TestProgLangMatchTransform(AbstractTransformTest):
         ]
 
         # Use the ProgLangMatchTransformConfiguration to compute the config parameters
-        lstc = ProgLangMatchTransformConfiguration()
+        lstc = ProgLangSelectTransformConfiguration()
         config = get_transform_config(lstc, cli)
 
         fixtures = [
             (
-                ProgLangMatchTransform(config),
+                ProgLangSelectTransform(config),
                 [self.input_df],
                 [self.expected_output_df],
                 self.expected_metadata_list,
@@ -91,4 +91,4 @@ class TestProgLangMatchTransform(AbstractTransformTest):
 
 
 if __name__ == "__main__":
-    t = TestProgLangMatchTransform()
+    t = TestProgLangSelectTransform()

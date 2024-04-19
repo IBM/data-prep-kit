@@ -14,15 +14,15 @@ import os
 
 from data_processing.test_support.ray import AbstractTransformLauncherTest
 from data_processing.utils import ParamsUtils
-from proglang_match_transform import (
-    ProgLangMatchTransformConfiguration,
+from proglang_select_transform import (
+    ProgLangSelectTransformConfiguration,
     lang_allowed_langs_file_key,
     lang_lang_column_key,
     lang_output_column_key,
 )
 
 
-class TestRayProgLangMatchTransform(AbstractTransformLauncherTest):
+class TestRayProgLangSelectTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -45,7 +45,7 @@ class TestRayProgLangMatchTransform(AbstractTransformLauncherTest):
         }
         fixtures = [
             (
-                ProgLangMatchTransformConfiguration(),
+                ProgLangSelectTransformConfiguration(),
                 config,
                 basedir + "/input",
                 basedir + "/expected",
