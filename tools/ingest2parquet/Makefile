@@ -17,8 +17,8 @@ test: test-src test-image
 
 clean: .defaults.clean
 
-image: .defaults.image
+image: .defaults.lib-src-image
 
 test-src: .defaults.test-src
 
-test-image: .defaults.test-image-pytest
+test-image: image .defaults.test-image-pytest

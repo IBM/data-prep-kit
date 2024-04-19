@@ -94,7 +94,7 @@ help::
 	@if [ -e .make.subdirs ]; then		\
 	    SUB_MAKE_DIRS=$$(cat .make.subdirs | sed -e 's/^#.*//' -e 's/ //g') ;	\
 	    if [ -z "$$SUB_MAKE_DIRS" ]; then	\
-	        SUB_MAKE_DIRS=$$(echo */ | sort);	\
+		SUB_MAKE_DIRS=$$(echo */ | sort);	\
 	    fi;					\
 	else					\
 	    SUB_MAKE_DIRS=$$(echo */ | sort);	\
@@ -124,21 +124,21 @@ PWD=$(shell pwd)
 #######################################################################################
 
 check_defined = \
-        $(strip $(foreach 1,$1, \
-        $(call __check_defined,$1,$(strip $(value 2)))))
+	$(strip $(foreach 1,$1, \
+	$(call __check_defined,$1,$(strip $(value 2)))))
 __check_defined = \
-        $(if $(value $1),, \
-        $(error Undefined $1$(if $2, ($2))))
+	$(if $(value $1),, \
+	$(error Undefined $1$(if $2, ($2))))
 
 .PHONY: .check_python_version
 .check_python_version::
 	@version=$$(echo $(PYTHON_VERSION) | sed -e 's/Python[ ]*//');  \
-	major=$$(echo $$version | awk -F. '{print $$1}');               \
-	minor=$$(echo $$version | awk -F. '{print $$2}');               \
+	major=$$(echo $$version | awk -F. '{print $$1}');	       \
+	minor=$$(echo $$version | awk -F. '{print $$2}');	       \
 	if [ $$major -lt 3 -o $$minor -lt 10 -o $$minor -gt 11 ]; then  \
-		echo Python 3.10 or 3.11 is required, but got $$version;        \
+		echo Python 3.10 or 3.11 is required, but got $$version;	\
 		echo Try overriding PYTHON=$(PYTHON).  For example, "'"make PYTHON=python3.10" ...'";   \
-		exit 1;                                                 \
+		exit 1;						 \
 	fi
 
 
@@ -154,13 +154,26 @@ __check_defined = \
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
 		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . 
 
+.PHONY: .defaults.lib-src-image
+.defaults.lib-src-image:: # Must be called with a DOCKER_IMAGE= settings.
+	@# Help: Build the $(DOCKER_IMAGE) using the $(DOCKER_FILE), requirements.txt and install data-prep-lib source
+	rm -rf data-processing-lib
+	mkdir data-processing-lib	       
+	# Copy with -p so docker cachine works when copying this into the image
+	cp -p -R $(REPOROOT)/data-processing-lib/src data-processing-lib
+	cp -p  $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
+	cp -p  $(REPOROOT)/data-processing-lib/README.md data-processing-lib
+	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
+	rm -rf data-processing-lib
+
+
 .PHONY: .defaults.install-lib-src
 .defaults.install-lib-src::
 	@# Help: Install the source from the data processing library for $(PYTHON)
 	@echo Installing source from data processing library for venv
-	source venv/bin/activate;                                      \
-	pip uninstall -y data-prep-lab;                 		\
-	pip install  -e $(REPOROOT)/data-processing-lib/;               \
+	source venv/bin/activate;				      \
+	pip uninstall -y data-prep-lab;		 		\
+	pip install  -e $(REPOROOT)/data-processing-lib/;	       \
 	if [ $$? -eq 0 ]; then  					\
 		echo Installed source from data processing library for `which $(PYTHON)`;       \
 	else 								\
@@ -180,7 +193,7 @@ __check_defined = \
 	# Put this 2nd so its help showss up instead of .defaults.image help
 	@# Help: Test an $(DOCKER_IMAGE) use test source inside the image. 
 	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s test 
-        
+	
 .PHONY: .defaults.publish
 .defaults.publish:: .defaults.image	# Must be called with DOCKER_IMAGE set
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
