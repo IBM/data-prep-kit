@@ -107,9 +107,9 @@ the following command line arguments are available in addition to
                         Example: { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/cos-optimal-llm-pile/test/' }
   --s3_config S3_CONFIG
                         AST string containing input/output paths.
-                        input_path: Path to input folder of files to be processed
-                        output_path: Path to output folder of processed files
-                        Example: { 'input_path': 'cos-optimal-llm-pile/test/hajar/input/', 'output_path': 'cos-optimal-llm-pile/test/hajar/output/' }
+                        input_folder: Path to input folder of files to be processed
+                        output_folder: Path to output folder of processed files
+                        Example: { 'input_folder': 'cos-optimal-llm-pile/test/hajar/input/', 'output_folder': 'cos-optimal-llm-pile/test/hajar/output/' }
  
   --local_config LOCAL_CONFIG
                         ast string containing input/output folders using local fs.

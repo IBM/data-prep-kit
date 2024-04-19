@@ -78,10 +78,10 @@ configuration for values are as follows:
                         { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/cos-optimal-
                         llm-pile/test/' }
   --data_s3_config DATA_S3_CONFIG
-                        AST string containing input/output paths. input_path: Path to input folder of files to
-                        be processed output_path: Path to output folder of processed files Example: {
-                        'input_path': '/cos-optimal-llm-pile/bluepile-
-                        processing/rel0_8/cc15_30_preproc_ededup', 'output_path': '/cos-optimal-llm-
+                        AST string containing input/output paths. input_folder: Path to input folder of files to
+                        be processed output_folder: Path to output folder of processed files Example: {
+                        'input_folder': '/cos-optimal-llm-pile/bluepile-
+                        processing/rel0_8/cc15_30_preproc_ededup', 'output_folder': '/cos-optimal-llm-
                         pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed' }
 
   --data_local_config DATA_LOCAL_CONFIG

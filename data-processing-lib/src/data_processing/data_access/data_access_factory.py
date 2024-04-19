@@ -78,12 +78,12 @@ class DataAccessFactory(DataAccessFactoryBase):
 
     def __add_data_navigation_params(self, parser):
         help_example_dict = {
-            "input_path": [
-                "path_to_input_folder",
+            "input_folder": [
+                "s3-path/your-input-bucket",
                 "Path to input folder of files to be processed",
             ],
-            "output_path": [
-                "path_to_output_folder",
+            "output_folder": [
+                "s3-path/your-output-bucket",
                 "Path to output folder of processed files",
             ],
         }

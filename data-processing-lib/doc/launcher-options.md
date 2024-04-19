@@ -39,9 +39,9 @@ options:
                         Example: { 'access_key': 'access', 'secret_key': 'secret', 's3_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud' }
   --data_s3_config S3_CONFIG
                         AST string containing input/output paths.
-                        input_path: Path to input folder of files to be processed
-                        output_path: Path to outpu folder of processed files
-                        Example: { 'input_path': 'input_folder', 'output_path': 'output_folder' }
+                        input_folder: Path to input folder of files to be processed
+                        output_folder: Path to output folder of processed files
+                        Example: { 'input_folder': 'your input folder', 'output_folder ': 'your output folder' }
   --data_local_config LOCAL_CONFIG
                         ast string containing input/output folders using local fs.
                         input_folder: Path to input folder of files to be processed
