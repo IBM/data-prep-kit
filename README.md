@@ -22,43 +22,51 @@ Data Prep Lab is a cloud native ray based toolkit that allows a user to quickly 
 
 ## &#x1F4D6; About <a name = "about"></a>
 
-Data Prep LAB is an open source toolkit that enables a user to prepare their data for building LLM applications.
-This toolkit comes with a set of available modules (known as transforms hereafter) that the user can get started 
-with to easily build their data pipelines.
-This set of transforms is built on framework, known as the data processing library, 
-that allows a user to quickly build in their own new transforms.
-Using the data processing library, a user can bring in their logic for data transformation and use the available 
-framework to build a ray enabled scalable transform in a short period of time. 
-Additionally, the data processing library provides scalable Ray-based architecure enabling
-processing of large amounts of data across large clusters.
+Data Prep LAB is an toolkit that enables users to prepare their data for building LLM applications.
+This toolkit comes with a set of available modules (known as transforms) that the user can get started 
+with to easily build customized data pipelines.
+This set of transforms is built on a framework, known as the data processing library, 
+that allows a user to quickly build in their own new transforms and then scale them as needed.
+Users can incorporate their logic for custom data transformation and then use the included Ray-based
+distributed computing framework to scalably apply the transform to their data. 
 
 Features of the toolkit: 
 - Collection of [scalable transformations](transforms) to expedite user onboarding
-- [Data processing library](data-processing-lib) designed to facilitate effortless addition of new scalable transformations
-- Operate efficiently and seamlessly from laptop-scale to cluster-scale supportng data processing at any data size
-- [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) based automation 
+- [Data processing library](data-processing-lib) designed to facilitate effortless addition and deployment of new scalable transformations
+- Operate efficiently and seamlessly from laptop-scale to cluster-scale supporting data processing at any data size
+- [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp) of transforms.
 
-Data modalities supported: \
-Code Datasets (Release 0)  and Natural Language Datasets (Release 1)\
-We support the starting point for code datasets as downloaded github repos as .zip files. 
+Data modalities supported (release 0): 
+- Code - support for code datasets as downloaded .zip files of github repositories. 
+- Natural Language - bring your own [parquet](https://arrow.apache.org/docs/python/parquet.html) files. 
+
+Support for additional data formats are expected. 
 
 ### Toolkit Design: 
 The toolkit is a python-based library that has ready to use scalable ray based transforms. 
-We use the popular [parquet](https://arrow.apache.org/docs/python/parquet.html) format to store the data. 
+We use the popular point [parquet](https://arrow.apache.org/docs/python/parquet.html) format to store the data (code or language). 
 Every parquet file follows a set 
 [schema](tools/ingest2parquet/).
 Data is converted from raw form (eg zip files for github repositories) to parquet files by the
 [ingest2parquet](tools/ingest2parquet/) 
-tool that also adds the necessary fields in the schema.  A user can use one or more of the available transforms to process their data. 
+tool that also adds the necessary fields in the schema.  
+A user can use one or more of the [available transforms](transforms) to process their data. 
 
 #### Transform design: 
-A transform can follow one of the two patterns: filter or annotator-filter pattern. When a transform acts as a filter, it processes the data and outputs the transformed data (example exact deduplication). In the annotator filter design pattern, a transform annotates the result of the processing by adding one more column to the parquet file. Filtering can then be done by a specific filtering module, whose job is to remove rows or columns as specified by user intent expressed as a SQL query. The annotator filter design allows a user to verify the results of the processing before actual filtering of the data. For a new module to be added, a user can pick the right design based on the orign based on the processing to be applied. More details [here](transforms). 
+A transform can follow one of the two patterns: filter or annotator pattern.
+In the annotator design pattern, a transform adds information during the processing by adding one more column to the parquet file.
+The annotator design also allows a user to verify the results of the processing before actual filtering of the data.
+When a transform acts as a filter, it processes the data and outputs the transformed data (example exact deduplication).
+A general purpose [SQL-based filter transform](transforms/filter) enables a powerful mechanism for identifying columns and rows of interest for downstream processing. 
+For a new module to be added, a user can pick the right design based on the processing to be applied. More details [here](transforms). 
 
 #### Scaling of transforms: 
 The distributed infrastructure, based on [Ray](https://docs.ray.io/en/latest/index.html), is used to scale out the transformation process.
+A generalized workflow is shown [here](doc/data-processing.md).
 
 #### Bring Your Own Transform: 
-One can add new transforms by bringing in their own processing logic and using the framework to build scalable transforms. More details [here](data-processing-lib/doc/overview.md). 
+One can add new transforms by bringing in their own processing logic and using the framework to build scalable transforms.
+More details on the data processing library [here](data-processing-lib/doc/overview.md). 
 
 #### Automation: 
 The toolkit also supports transform execution automation based on 
@@ -67,8 +75,6 @@ tested on [Kind cluster](https://kind.sigs.k8s.io/). KFP implementation is based
 for creating and managing Ray cluster and [KubeRay API server](https://github.com/ray-project/kuberay/tree/master/apiserver)
 to interact with the KubeRay operator. An additional [framework](kfp/kfp_support_lib) along with the several
 [kfp components](kfp/kfp_ray_components) is used to simplify pipelines implementation.
-
-
 
 
 ## &#x2699; Setup <a name = "setup"></a>
@@ -105,7 +111,7 @@ Get started by running the noop transform that performs an identity operation by
 Get started by building a data pipeline with our example pipeline (link to be added) that can run on a laptop. 
 
 ### Build your own sequence of transforms
-Follow the documentation [here](doc/data-processing.md) to build your own pipelines. 
+Follow the documentation [here](doc/overview.md) to build your own pipelines. 
 
 ### Automate the pipeline
 Link to the KFP tutorial to be added
