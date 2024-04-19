@@ -1,3 +1,12 @@
+<p align="Left"> Distributed tokenization module for data sets using any Hugging Face compatible tokenizer.
+    <br> 
+</p>
+
+## 📝 Table of Contents
+- [Summary](#Summary)
+- [Running](#Running)
+- [CLI Options](#cli_options)
+
 # Data Tokenization
 Please see the set of
 [transform project conventions](../../README.md)
@@ -12,7 +21,7 @@ its corresponding document content.
 
 A pre-trained tokenizer must be specified through the `--tkn_tokenizer` parameter,
 which can be the name of a ready-for-download tokenizer
-from HuggingFace such as `hf-internal-testing/llama-tokenizer`, `bigcode/starcoder` or any others that can loaded by the Huggingface `AutoTokenizer` library.
+from Hugging Face such as `hf-internal-testing/llama-tokenizer`, `bigcode/starcoder` or any others that can loaded by the Hugging Face `AutoTokenizer` library.
 The `--tkn_tokenizer_args` parameter can be further used to specify extra arguments for the corresponding tokenizer. For example,
 `use_auth_token=<your token>` could be used when loading HuggingFace tokenizers like `bigcode/starcoder`, that require an access token to be provided.
 
@@ -24,8 +33,7 @@ The tokenizer will skip empty rows/documents in the input table or rows returnin
 The count of such rows will be stored in the `num_empty_rows` of the `metadata` file.
 
 For some tokenizers, their tokenization process could be slow for long documents with millions of characters.
-In such case, parameter `--tkn_chunk_size` should be used to specify the length to spit a document into chunks
-(for `en` text, this parameter should be set to `20000`, equivalently to 15 pages).
+In such cases, the `--tkn_chunk_size` parameter can be used to specify the maximum length of chunks to tokenize at one time. For `en` text, this parameter should be set to `20000`, equivalently to 15 pages.
 The tokenizer will tokenize each chunk individually and concatenate their returned token_ids. 
 The default value for `--tkn_chunk_size` is `0` which tokenizes each document as a whole no matter how long it is. 
 
@@ -71,13 +79,11 @@ pq01.parquet	pq02.parquet
 
 
 
-### Launched Command Line Options 
+### CLI Options
 When running the transform with the Ray launcher,
 the following command line arguments are available in addition to 
 [the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
 ```
-  --run_locally RUN_LOCALLY
-                        running ray local flag
   --tkn_tokenizer TKN_TOKENIZER
                         Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, `hf-internal-testing/llama-tokenizer` from HuggingFace is used
   --tkn_tokenizer_args TKN_TOKENIZER_ARGS
@@ -90,51 +96,4 @@ the following command line arguments are available in addition to
                         Specify language used in the text content for better text splitting if needed
   --tkn_chunk_size TKN_CHUNK_SIZE
                         Specify >0 value to tokenize each row/doc in chunks of characters (rounded in words)
-  --data_ s3_cred S3_CRED     
-                        AST string of options for cos credentials. Only required for s3 or Lakehouse.
-                        access_key: access key help text
-                        secret_key: secret key help text
-                        url: S3 url
-                        Example: { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/bucket_name/test/' }
-  --data_s3_config S3_CONFIG
-                        AST string containing input/output paths.
-                        input_path: Path to input folder of files to be processed
-                        output_path: Path to output folder of processed files
-                        Example: { 'input_path': '/bucket_name/input', 'output_path': '/bucket_name/output' }
- 
-  --data_local_config LOCAL_CONFIG
-                        ast string containing input/output folders using local fs.
-                        input_folder: Path to input folder of files to be processed
-                        output_folder: Path to output folder of processed files
-                        Example: { 'input_folder': './input', 'output_folder': '/tmp/output' }
-  --data_max_files MAX_FILES
-                        Max amount of files to process
-  --data_checkpointing CHECKPOINTING
-                        checkpointing flag
-  --data_data_sets DATA_SETS
-                        List of data sets
-  --num_workers NUM_WORKERS
-                        number of workers
-  --worker_options WORKER_OPTIONS
-                        AST string defining worker resource requirements.
-                        num_cpus: Required number of CPUs.
-                        num_gpus: Required number of GPUs
-                        resources: The complete list can be found at
-                                   https://docs.ray.io/en/latest/ray-core/api/doc/ray.remote_function.RemoteFunction.options.html#ray.remote_function.RemoteFunction.options
-                                   and contains accelerator_type, memory, name, num_cpus, num_gpus, object_store_memory, placement_group,
-                                   placement_group_bundle_index, placement_group_capture_child_tasks, resources, runtime_env,
-                                   scheduling_strategy, _metadata, concurrency_groups, lifetime, max_concurrency, max_restarts,
-                                   max_task_retries, max_pending_calls, namespace, get_if_exists
-                        Example: { 'num_cpus': '8', 'num_gpus': '1', 'resources': '{"special_hardware": 1, "custom_label": 1}' }
-  --pipeline_id PIPELINE_ID
-                        pipeline id
-  --job_id JOB_ID       job id
-  --creation_delay CREATION_DELAY
-                        delay between actor' creation
-  --code_location CODE_LOCATION
-                        AST string containing code location
-                        github: Github repository URL.
-                        commit_hash: github commit hash
-                        path: Path within the repository
-                        Example: { 'github': 'https://github.com/somerepo', 'commit_hash': '13241231asdfaed', 'path': 'transforms/universal/ededup' }
 ```
