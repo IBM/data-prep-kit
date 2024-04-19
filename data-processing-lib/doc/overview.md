@@ -6,7 +6,7 @@ scalable processing/transformation of virtually unlimited amounts of data.
 
 The framework allows simple 1:1 transformation of parquet files, but also enables
 more complex transformations requiring coordination among transforming nodes.
-This might include operations such as de-duplification, merging, and splitting.
+This might include operations such as de-duplication, merging, and splitting.
 The framework uses a plugin-model for the primary functions.  The key ones for
 developers of data transformation are:
 * [Transformation](../src/data_processing/transform/table_transform.py) - a simple, easily-implemented interface defines

@@ -1,4 +1,4 @@
-data-prep-lab-kfp==0.1.0
+data-prep-lab-kfp==0.1.1
 # for fdedup
 scipy==1.13.0
 
