@@ -225,7 +225,7 @@ class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name="ededup", runtime_class=EdedupRuntime, transform_class=EdedupTransform)
+        super().__init__(name=short_name, runtime_class=EdedupRuntime, transform_class=EdedupTransform)
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:

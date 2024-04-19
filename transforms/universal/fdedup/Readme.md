@@ -171,41 +171,42 @@ the following command line arguments are available in addition to
 [the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
 
 ```shell
-  --doc_column DOC_COLUMN
+  --fdedup_doc_column FDEDUP_DOC_COLUMN
                         document column name
-  --id_column ID_COLUMN
+  --fdedup_id_column FDEDUP_ID_COLUMN
                         integer document id column name
-  --cluster_column CLUSTER_COLUMN
+  --fdedup_cluster_column FDEDUP_CLUSTER_COLUMN
                         cluster column name
-  --bucket_cpu BUCKET_CPU
+  --fdedup_bucket_cpu FDEDUP_BUCKET_CPU
                         number of CPUs per bucket hash
-  --mhash_cpu MHASH_CPU
+  --fdedup_mhash_cpu FDEDUP_MHASH_CPU
                         number of CPUs per minhash hash
-  --doc_cpu DOC_CPU     number of CPUs per doc hash
-  --num_doc_actors NUM_DOC_ACTORS
+  --fdedup_doc_cpu FDEDUP_DOC_CPU
+                        number of CPUs per doc hash
+  --fdedup_num_doc_actors FDEDUP_NUM_DOC_ACTORS
                         number of doc actors to use
-  --num_minhash_actors NUM_MINHASH_ACTORS
+  --fdedup_num_minhash_actors FDEDUP_NUM_MINHASH_ACTORS
                         number of minhash actors to use
-  --num_bucket_actors NUM_BUCKET_ACTORS
+  --fdedup_num_bucket_actors FDEDUP_NUM_BUCKET_ACTORS
                         number of bucket actors to use
-  --num_preprocessors NUM_PREPROCESSORS
+  --fdedup_num_preprocessors FDEDUP_NUM_PREPROCESSORS
                         number of preprocessors to use
-  --num_permutations NUM_PERMUTATIONS
+  --fdedup_num_permutations FDEDUP_NUM_PERMUTATIONS
                         number of permutations
-  --threshold THRESHOLD
+  --fdedup_threshold FDEDUP_THRESHOLD
                         threshold
-  --shingles_size SHINGLES_SIZE
+  --fdedup_shingles_size FDEDUP_SHINGLES_SIZE
                         number of words in shingle
-  --delimiters DELIMITERS
+  --fdedup_delimiters FDEDUP_DELIMITERS
                         delimiter for splitting document
-  --snapshot_delay SNAPSHOT_DELAY
+  --fdedup_snapshot_delay FDEDUP_SNAPSHOT_DELAY
                         snapshot delay time
-  --use_bucket_snapshot USE_BUCKET_SNAPSHOT
+  --fdedup_use_bucket_snapshot FDEDUP_USE_BUCKET_SNAPSHOT
                         flag to continue with bucket snapshot
-  --use_doc_snapshot USE_DOC_SNAPSHOT
+  --fdedup_use_doc_snapshot FDEDUP_USE_DOC_SNAPSHOT
                         flag to continue with doc snapshot
-  --random_delay_limit RANDOM_DELAY_LIMIT
+  --fdedup_random_delay_limit FDEDUP_RANDOM_DELAY_LIMIT
                         maximum delay between read
- ```
+```
 
 These correspond to the configuration keys described above.
