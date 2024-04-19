@@ -11,7 +11,11 @@
 
 ---
 
-Data Prep Lab is a cloud native ray based toolkit that allows a user to quickly prepare their data for building LLM applications using set of available transforms. This toolkit gives the user flexibility to run data prep from laptop-scale to cluster-scale, and provides automation via KFP pipelines. Moreover, a user can add in their own data prep module and scale it using ray without having to worry about ray internals. 
+Data Prep Lab is a cloud native [Ray](https://docs.ray.io/en/latest/index.html)
+based toolkit that allows a user to quickly prepare their data for building LLM applications using a set of available transforms.
+This toolkit gives the user flexibility to run data prep from laptop-scale to cluster-scale, 
+and provides automation via KFP pipelines. Moreover, a user can add in their own data prep module and scale it 
+using Ray without having to worry about Ray internals. 
 
 ## 📝 Table of Contents
 - [About](#about)
@@ -43,7 +47,7 @@ Data modalities supported (release 0):
 Support for additional data formats are expected. 
 
 ### Toolkit Design: 
-The toolkit is a python-based library that has ready to use scalable ray based transforms. 
+The toolkit is a python-based library that has ready to use scalable Ray based transforms. 
 We use the popular point [parquet](https://arrow.apache.org/docs/python/parquet.html) format to store the data (code or language). 
 Every parquet file follows a set 
 [schema](tools/ingest2parquet/).
