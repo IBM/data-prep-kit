@@ -11,9 +11,7 @@
 
 ---
 
-<p align="center"> Data Prep Lab is a cloud native ray based toolkit that allows a user to quickly prepare their data for building LLM applications using set of available transforms. This toolkit gives the user flexibility to run data prep from laptop-scale to cluster-scale, and provides automation via KFP pipelines. Moreover, a user can add in their own data prep module and scale it using ray without having to worry about ray internals. 
-    <br> 
-</p>
+Data Prep Lab is a cloud native ray based toolkit that allows a user to quickly prepare their data for building LLM applications using set of available transforms. This toolkit gives the user flexibility to run data prep from laptop-scale to cluster-scale, and provides automation via KFP pipelines. Moreover, a user can add in their own data prep module and scale it using ray without having to worry about ray internals. 
 
 ## 📝 Table of Contents
 - [About](#about)
@@ -36,7 +34,7 @@ processing of large amounts of data across large clusters.
 
 Features of the toolkit: 
 - Collection of [scalable transformations](transforms) to expedite user onboarding
-- [Data processing library](data-processing-lib/README.md) designed to facilitate effortless addition of new scalable transformations
+- [Data processing library](data-processing-lib) designed to facilitate effortless addition of new scalable transformations
 - Operate efficiently and seamlessly from laptop-scale to cluster-scale supportng data processing at any data size
 - [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) based automation 
 
@@ -54,7 +52,7 @@ Data is converted from raw form (eg zip files for github repositories) to parque
 tool that also adds the necessary fields in the schema.  A user can use one or more of the available transforms to process their data. 
 
 #### Transform design: 
-A transform can follow one of the two patterns: filter or annotator-filter pattern. When a transform acts as a filter, it processes the data and outputs the transformed data (example exact deduplication). In the annotator filter design pattern, a transform annotates the result of the processing by adding one more column to the parquet file. Filtering can then be done by a specific filtering module, whose job is to remove rows or columns as specified by user intent expressed as a SQL query. The annotator filter design allows a user to verify the results of the processing before actual filtering of the data. For a new module to be added, a user can pick the right design based on the orign based on the processing to be applied. More details [here](transforms/README.md). 
+A transform can follow one of the two patterns: filter or annotator-filter pattern. When a transform acts as a filter, it processes the data and outputs the transformed data (example exact deduplication). In the annotator filter design pattern, a transform annotates the result of the processing by adding one more column to the parquet file. Filtering can then be done by a specific filtering module, whose job is to remove rows or columns as specified by user intent expressed as a SQL query. The annotator filter design allows a user to verify the results of the processing before actual filtering of the data. For a new module to be added, a user can pick the right design based on the orign based on the processing to be applied. More details [here](transforms). 
 
 #### Scaling of transforms: 
 The distributed infrastructure, based on [Ray](https://docs.ray.io/en/latest/index.html), is used to scale out the transformation process.
