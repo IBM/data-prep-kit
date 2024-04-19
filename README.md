@@ -14,7 +14,7 @@
 Data Prep Lab is a cloud native [Ray](https://docs.ray.io/en/latest/index.html)
 based toolkit that allows a user to quickly prepare their data for building LLM applications using a set of available transforms.
 This toolkit gives the user flexibility to run data prep from laptop-scale to cluster-scale, 
-and provides automation via KFP pipelines. Moreover, a user can add in their own data prep module and scale it 
+and provides automation via [KFP pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/). Moreover, a user can add in their own data prep module and scale it 
 using Ray without having to worry about Ray internals. 
 
 ## 📝 Table of Contents
