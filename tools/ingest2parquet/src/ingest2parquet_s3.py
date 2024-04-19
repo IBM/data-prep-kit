@@ -13,8 +13,8 @@
 import ast
 import sys
 
-from data_processing.utils import  ParamsUtils
-from ingest2parquet import run
+from data_processing.utils import ParamsUtils
+from ingest2parquet import ingest2parquet
 
 
 # create parameters
@@ -37,4 +37,4 @@ params = {
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 if __name__ == "__main__":
-    run()
+    ingest2parquet()

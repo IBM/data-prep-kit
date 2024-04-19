@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 from data_processing.utils import ParamsUtils
-from ingest2parquet import run
+from ingest2parquet import ingest2parquet
 
 
 if __name__ == "__main__":
@@ -36,4 +36,4 @@ if __name__ == "__main__":
     }
 
     sys.argv = ParamsUtils.dict_to_req(d=params)
-    run()
+    ingest2parquet()

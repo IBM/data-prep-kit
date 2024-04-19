@@ -162,6 +162,14 @@ def generate_stats(metadata: list) -> dict[str, Any]:
 
 
 def run():
+    """
+    Deprecated in favor of ingest2parquet().
+    """
+    print("Warning: run() method is deprecated in favor of ingest2parquet()")
+    return ingest2parquet()
+
+
+def ingest2parquet():
     parser = argparse.ArgumentParser(description="raw-data-to-parquet")
     parser.add_argument(
         "-detect_programming_lang",
@@ -220,4 +228,4 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    ingest2parquet()
