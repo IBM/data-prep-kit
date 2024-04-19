@@ -1,4 +1,5 @@
 FROM docker.io/rayproject/ray:2.9.3-py310
+
 # install pytest
 RUN pip install --no-cache-dir pytest
 
@@ -12,8 +13,8 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY ./src/resize_transform.py ./
-COPY src/resize_local_ray.py local/
+COPY src/proglang_select_transform.py .
+COPY src/proglang_select_local_ray.py local/
 
 # copy test
 COPY test/ test/

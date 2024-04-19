@@ -22,7 +22,7 @@ env:
         - OPERATION=transform-image DIR=transforms/universal DOCKER=docker
         - OPERATION=kfp-lib-test
         - OPERATION=kfp-compile
-        - OPERATION=tools-test
+        - OPERATION=tools-test DOCKER=docker
 
 # Enable/install podman
 #before_install:
@@ -53,7 +53,7 @@ script:
               make -C kfp/kfp_support_lib build test || travis_terminate 1
           ;;
           kfp-compile)
-                   make -C kfp/transform_workflows build || travis_terminate 1
+                   make -C kfp/transform_workflows venv build || travis_terminate 1
           ;;
           data-lib-test)
                    make -C data-processing-lib DOCKER=${DOCKER} venv test || travis_terminate 1
@@ -67,7 +67,7 @@ script:
                    make -C ${DIR} DOCKER=${DOCKER} image test-image || travis_terminate 1
           ;;
           tools-test)
-                   make -C tools DOCKER=${DOCKER} venv test-lib-src || travis_terminate 1
+                   make -C tools DOCKER=${DOCKER} venv test || travis_terminate 1
           ;;
           *)
               echo Unrecogognized operation "'"$OPERATION"'"

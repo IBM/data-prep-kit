@@ -1,3 +1,5 @@
+cc_net/
+lm_sp/
 test-data/output
 output/*
 /output/

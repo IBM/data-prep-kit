@@ -6,8 +6,9 @@ REPOROOT=../../..
 # to override/redefine the rules below. 
 include ../../.make.transforms
 
-TRANSFORM_NAME=proglang_match
-DOCKER_IMAGE_VERSION=0.1.0
+TRANSFORM_NAME=proglang_select
+# transforms.versions file contains the versions
+DOCKER_IMAGE_VERSION=${PROGLANG_SELECT_VERSION}
 
 venv::	.transforms.venv
 

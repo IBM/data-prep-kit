@@ -73,7 +73,7 @@ configuration for values are as follows:
   --domain DOMAIN
                         To identify whether data is code or natural language
   --data_s3_cred DATA_S3_CRED
-                        AST string of options for cos credentials. Only required for COS or Lakehouse.
+                        AST string of options for cos credentials. Only required for COS.
                         access_key: access key help text secret_key: secret key help text url: S3 url Example:
                         { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/cos-optimal-
                         llm-pile/test/' }
@@ -83,18 +83,7 @@ configuration for values are as follows:
                         'input_path': '/cos-optimal-llm-pile/bluepile-
                         processing/rel0_8/cc15_30_preproc_ededup', 'output_path': '/cos-optimal-llm-
                         pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed' }
-  --data_lh_config DATA_LH_CONFIG
-                        AST string containing input/output using lakehouse. input_table: Path to input folder
-                        of files to be processed input_dataset: Path to outpu folder of processed files
-                        input_version: Version number to be associated with the input. output_table: Name of
-                        table into which data is written output_path: Path to output folder of processed files
-                        token: The token to use for Lakehouse authentication lh_environment: Operational
-                        environment. One of STAGING or PROD Example: { 'input_table': '/cos-optimal-llm-
-                        pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup', 'input_dataset': '/cos-
-                        optimal-llm-pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed',
-                        'input_version': '1.0', 'output_table': 'ededup', 'output_path': '/cos-optimal-llm-
-                        pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed', 'token':
-                        'AASDFZDF', 'lh_environment': 'STAGING' }
+
   --data_local_config DATA_LOCAL_CONFIG
                         ast string containing input/output folders using local fs. input_folder: Path to input
                         folder of files to be processed output_folder: Path to output folder of processed
@@ -143,12 +132,7 @@ python ingest2parquet.py \
 #[s3](src/s3.py) 
 This script is designed to process data stored on an S3 bucket. It sets up necessary parameters for accessing the S3 bucket and invokes the run() function from ingest2parquet.py to convert raw data files to Parquet format.
 
-Before running, ensure to set up S3 credentials used in s3.py script as environment variables. 
-Eg:
-```
-export DPL_S3_ACCESS_KEY="xxx"
-export DPL_S3_SECRET_KEY="xxx"
-```
+To execute the script with S3 functionality, we utilize minio. Please consult the documentation on setting up minio for further guidance: [using_s3_transformers](../../data-processing-lib/doc/using_s3_transformers.md)
 
 **Run the script without any command-line arguments.**
 
@@ -189,13 +173,23 @@ The metadata.json file contains following essential information regarding the pr
 ```
 % make image 
 ```
+## Run using docker image
+
+```
+docker run -it -v $(pwd)/test-data/input:/test-data/input -v $(pwd)/test-data/output:/test-data/output quay.io/dataprep1/data-prep-lab/ingest2parquet:0.1 sh -c "python ingest2parquet.py \
+    --detect_programming_lang True \
+    --snapshot github \
+    --domain code \
+    --data_local_config '{\"input_folder\": \"/test-data/input\", \"output_folder\":\"/test-data/output\"}' \
+    --data_files_to_use '[\".zip\"]'"
+
+```
 
 In addition, there are some useful `make` targets (see conventions above):
 * `make venv` - creates the virtual environment.
 * `make test` - runs the tests in [test](test) directory
 * `make build` - to build the docker image
 * `make help` - displays the available `make` targets and help text.
-
 
 
 

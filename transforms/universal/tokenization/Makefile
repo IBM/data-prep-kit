@@ -7,7 +7,8 @@ REPOROOT=../../..
 include ../../.make.transforms
 
 TRANSFORM_NAME=tokenization
-DOCKER_IMAGE_VERSION=0.1.0
+# transforms.versions file contains the versions
+DOCKER_IMAGE_VERSION=${TOKENIZER_VERSION}
 
 
 venv::	.transforms.venv

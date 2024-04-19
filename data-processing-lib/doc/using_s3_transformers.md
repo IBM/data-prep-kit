@@ -32,6 +32,7 @@ The default user name/password is `minioadmin|minioadmin`
 Populating Minio server with test data can be done using `mc`. First configure mc to work with the local
 Minio server:
 
+
 ```shell
 mc alias set local http://127.0.0.1:9000 minioadmin minioadmin
 ```
@@ -55,6 +56,7 @@ mc mb local/test
 Once the bucket is created, you can copy files (assuming you are in the transforms directory), using:
 
 ```shell
+mc cp --recursive tools/ingest2parquet/test-data/input/ local/test/ingest2parquet/input
 mc cp --recursive code/code_quality/test-data/input/ local/test/code_quality/input
 mc cp --recursive code/language_annotator/test-data/input/ local/test/language_annotator/input
 mc cp --recursive code/language_annotator/test-data/languages/ local/test/lang_annotator/languages

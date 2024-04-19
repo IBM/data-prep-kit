@@ -13,19 +13,19 @@
 import ast
 import sys
 
-from data_processing.utils import DPLConfig, ParamsUtils
+from data_processing.utils import  ParamsUtils
 from ingest2parquet import run
 
 
 # create parameters
 s3_cred = {
-    "access_key": DPLConfig.S3_ACCESS_KEY,
-    "secret_key": DPLConfig.S3_SECRET_KEY,
-    "url": "https://s3.us-south.cloud-object-storage.appdomain.cloud",
+    "access_key": "localminioaccesskey",
+    "secret_key": "localminiosecretkey",
+    "url": "http://localhost:9000",
 }
 s3_conf = {
-    "input_folder": "code-datasets/test-ingest2parquet/raw_to_parquet_guf",
-    "output_folder": "code-datasets/test-ingest2parquet/raw_to_parquet_guf_out",
+    "input_folder": "test/ingest2parquet/input",
+    "output_folder": "test/ingest2parquet/output",
 }
 params = {
     "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
