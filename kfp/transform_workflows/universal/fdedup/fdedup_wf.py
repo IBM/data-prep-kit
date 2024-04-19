@@ -10,8 +10,6 @@
 # limitations under the License.
 ################################################################################
 
-import os
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
@@ -20,17 +18,16 @@ from kfp_support.workflow_support.utils import (
     ONE_WEEK_SEC,
     ComponentUtils,
 )
-from kubernetes import client as k8s_client
 from src.fdedup_compute_execution_params import fdedup_compute_execution_params
 
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "fdedup_transform.py"
 
-task_image = "quay.io/dataprep1/data-prep-lab/fdedup:0.2"
+task_image = "quay.io/dataprep1/data-prep-lab/fdedup:0.2.1"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.3"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.5"
 
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(func=fdedup_compute_execution_params, base_image=base_kfp_image)
@@ -70,24 +67,26 @@ def fdedup(
     pipeline_id: str = "pipeline_id",
     code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
     # columns used
-    doc_column: str = "contents",
-    id_column: str = "int_id_column",
-    cluster_column: str = "cluster",
+    fdedup_doc_column: str = "contents",
+    fdedup_id_column: str = "int_id_column",
+    fdedup_cluster_column: str = "cluster",
     # infrastructure
-    bucket_cpu: float = 0.5,
-    doc_cpu: float = 0.5,
-    mhash_cpu: float = 0.5,
+    fdedup_bucket_cpu: float = 0.5,
+    fdedup_doc_cpu: float = 0.5,
+    fdedup_mhash_cpu: float = 0.5,
     # fuzzy parameters
-    num_permutations: int = 64,
-    threshold: float = 0.8,
-    shingles_size: int = 5,
-    delimiters: str = " ",
+    fdedup_num_permutations: int = 64,
+    fdedup_threshold: float = 0.8,
+    fdedup_shingles_size: int = 5,
+    fdedup_delimiters: str = " ",
     # Random delay between reads
-    random_delay_limit: int = 5,
+    fdedup_random_delay_limit: int = 5,
     # snapshotting
-    snapshot_delay: int = 1,
-    use_doc_snapshot: bool = False,
-    use_bucket_snapshot: bool = False,
+    fdedup_snapshot_delay: int = 1,
+    fdedup_use_doc_snapshot: bool = False,
+    fdedup_use_bucket_snapshot: bool = False,
+    # data sampling
+    fdedup_n_samples: int = 10,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
@@ -122,21 +121,22 @@ def fdedup(
     :param actor_options - actor options
     :param pipeline_id - pipeline id
     :param code_location - code location
-    :param doc_column - document column name
-    :param id_column - integer document id column name
-    :param cluster_column - cluster column name
-    :param bucket_cpu - number of CPUs per bucket hash
-    :param doc_cpu - number of CPUs per doc hash
-    :param mhash_cpu - number of CPUs per minhash hash
-    :param num_permutations - number of permutations
-    :param threshold - threshold
-    :param shingles_size - number of words in shingle
-    :param delimiters - delimiter for splitting document
-    :param random_delay_limit - delay between reads to reduce S3 load.
+    :param fdedup_doc_column - document column name
+    :param fdedup_id_column - integer document id column name
+    :param fdedup_cluster_column - cluster column name
+    :param fdedup_bucket_cpu - number of CPUs per bucket hash
+    :param fdedup_doc_cpu - number of CPUs per doc hash
+    :param fdedup_mhash_cpu - number of CPUs per minhash hash
+    :param fdedup_num_permutations - number of permutations
+    :param fdedup_threshold - threshold
+    :param fdedup_shingles_size - number of words in shingle
+    :param fdedup_delimiters - delimiter for splitting document
+    :param fdedup_random_delay_limit - delay between reads to reduce S3 load.
                                 A random number between 0 and random_delay_limit is used
-    :param snapshot_delay - delay between restoring individual actors
-    :param use_bucket_snapshot - flag to skip buckets building and start from existing snapshots
-    :param use_doc_snapshot - flag to skip documents building and start from existing snapshots
+    :param fdedup_snapshot_delay - delay between restoring individual actors
+    :param fdedup_use_bucket_snapshot - flag to skip buckets building and start from existing snapshots
+    :param fdedup_use_doc_snapshot - flag to skip documents building and start from existing snapshots
+    :param fdedup_n_samples - number of samples for parameters computation
     :return: None
     """
     # create clean_up task
@@ -149,14 +149,14 @@ def fdedup(
             worker_options=ray_worker_options,
             actor_options=actor_options,
             params={
-                "threshold": threshold,
-                "num_permutations": num_permutations,
+                "threshold": fdedup_threshold,
+                "num_permutations": fdedup_num_permutations,
                 "s3_config": data_s3_config,
-                "bucket_cpu": bucket_cpu,
-                "doc_cpu": doc_cpu,
-                "minhash_cpu": mhash_cpu,
+                "bucket_cpu": fdedup_bucket_cpu,
+                "doc_cpu": fdedup_doc_cpu,
+                "minhash_cpu": fdedup_mhash_cpu,
             },
-            n_samples=data_num_samples,
+            n_samples=fdedup_n_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
@@ -186,24 +186,24 @@ def fdedup(
                 "pipeline_id": pipeline_id,
                 "job_id": dsl.RUN_ID_PLACEHOLDER,
                 "code_location": code_location,
-                "doc_column": doc_column,
-                "id_column": id_column,
-                "cluster_column": cluster_column,
-                "bucket_cpu": bucket_cpu,
-                "doc_cpu": doc_cpu,
-                "mhash_cpu": mhash_cpu,
-                "num_doc_actors": compute_exec_params.outputs["docs"],
-                "num_bucket_actors": compute_exec_params.outputs["buckets"],
-                "num_minhash_actors": compute_exec_params.outputs["min_hashes"],
-                "num_preprocessors": compute_exec_params.outputs["preprocessors"],
-                "num_permutations": num_permutations,
-                "threshold": threshold,
-                "shingles_size": shingles_size,
-                "delimiters": delimiters,
-                "random_delay_limit": random_delay_limit,
-                "snapshot_delay": snapshot_delay,
-                "use_doc_snapshot": use_doc_snapshot,
-                "use_bucket_snapshot": use_bucket_snapshot,
+                "fdedup_doc_column": fdedup_doc_column,
+                "fdedup_id_column": fdedup_id_column,
+                "fdedup_cluster_column": fdedup_cluster_column,
+                "fdedup_bucket_cpu": fdedup_bucket_cpu,
+                "fdedup_doc_cpu": fdedup_doc_cpu,
+                "fdedup_mhash_cpu": fdedup_mhash_cpu,
+                "fdedup_num_doc_actors": compute_exec_params.outputs["docs"],
+                "fdedup_num_bucket_actors": compute_exec_params.outputs["buckets"],
+                "fdedup_num_minhash_actors": compute_exec_params.outputs["min_hashes"],
+                "fdedup_num_preprocessors": compute_exec_params.outputs["preprocessors"],
+                "fdedup_num_permutations": fdedup_num_permutations,
+                "fdedup_threshold": fdedup_threshold,
+                "fdedup_shingles_size": fdedup_shingles_size,
+                "fdedup_delimiters": fdedup_delimiters,
+                "fdedup_random_delay_limit": fdedup_random_delay_limit,
+                "fdedup_snapshot_delay": fdedup_snapshot_delay,
+                "fdedup_use_doc_snapshot": fdedup_use_doc_snapshot,
+                "fdedup_use_bucket_snapshot": fdedup_use_bucket_snapshot,
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,

@@ -10,8 +10,6 @@
 # limitations under the License.
 ################################################################################
 
-import os
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
@@ -20,17 +18,16 @@ from kfp_support.workflow_support.utils import (
     ONE_WEEK_SEC,
     ComponentUtils,
 )
-from kubernetes import client as k8s_client
 from src.ededup_compute_execution_params import ededup_compute_execution_params
 
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "ededup_transform.py"
 
-task_image = "quay.io/dataprep1/data-prep-lab/ededup:0.2"
+task_image = "quay.io/dataprep1/data-prep-lab/ededup:0.2.1"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.3"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.5"
 
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(func=ededup_compute_execution_params, base_image=base_kfp_image)
@@ -66,12 +63,14 @@ def ededup(
     data_max_files: int = -1,
     data_num_samples: int = 10,
     # orchestrator
-    doc_column: str = "contents",
     actor_options: str = "{'num_cpus': 0.8}",
     pipeline_id: str = "pipeline_id",
     code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # fdedup
-    hash_cpu: float = 0.5,
+    # ededup
+    ededup_hash_cpu: float = 0.5,
+    ededup_doc_column: str = "contents",
+    # data sampling
+    ededup_n_samples: int = 10,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
@@ -106,8 +105,9 @@ def ededup(
     :param actor_options - actor options
     :param pipeline_id - pipeline id
     :param code_location - code location
-    :param hash_cpu - number of CPUs per hash
-    :param doc_column - key for accessing data
+    :param ededup_hash_cpu - number of CPUs per hash
+    :param ededup_doc_column - key for accessing data
+    :param ededup_n_samples - number of samples for parameters computation
     :return: None
     """
     # create clean_up task
@@ -119,8 +119,8 @@ def ededup(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=actor_options,
-            params={"s3_config": data_s3_config, "hash_cpu": hash_cpu},
-            n_samples=data_num_samples,
+            params={"s3_config": data_s3_config, "hash_cpu": ededup_hash_cpu},
+            n_samples=ededup_n_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
@@ -145,14 +145,14 @@ def ededup(
                 "data_s3_config": data_s3_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
-                "doc_column": doc_column,
                 "num_workers": compute_exec_params.outputs["workers"],
                 "worker_options": actor_options,
                 "pipeline_id": pipeline_id,
                 "job_id": dsl.RUN_ID_PLACEHOLDER,
                 "code_location": code_location,
-                "hash_cpu": hash_cpu,
-                "num_hashes": compute_exec_params.outputs["hashes"],
+                "ededup_doc_column": ededup_doc_column,
+                "ededup_hash_cpu": ededup_hash_cpu,
+                "ededup_num_hashes": compute_exec_params.outputs["hashes"],
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,

@@ -40,7 +40,6 @@ def fdedup_compute_execution_params(
         buckets - number of bucket actors
         min_hashes - number of minhash actors
     """
-    import json
     import math
     import sys
 
@@ -151,9 +150,6 @@ def fdedup_compute_execution_params(
         print(f"Required bucket actors {b_actors}, minhash actors {m_actors}, document actors {d_actors}")
         print("Try to increase the size of the cluster")
         sys.exit(1)
-    # Ensure that we do not overwhelm S3
-    if n_preprocessors > 1000:
-        n_preprocessors = 1000
     # compute the amount of workers
     n_workers = int((0.85 * cluster_cpu - d_actors * doc_cpu) / actor_cpu)
     # Ensure that we do not overwhelm S3
