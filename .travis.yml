@@ -22,7 +22,7 @@ env:
         - OPERATION=transform-image DIR=transforms/universal DOCKER=docker
         - OPERATION=kfp-lib-test
         - OPERATION=kfp-compile
-        - OPERATION=tools-test
+        - OPERATION=tools-test DOCKER=docker
 
 # Enable/install podman
 #before_install:
