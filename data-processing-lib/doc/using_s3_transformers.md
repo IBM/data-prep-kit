@@ -56,6 +56,7 @@ mc mb local/test
 Once the bucket is created, you can copy files (assuming you are in the transforms directory), using:
 
 ```shell
+mc cp --recursive tools/ingest2parquet/test-data/input/ local/test/ingest2parquet/input
 mc cp --recursive code/code_quality/test-data/input/ local/test/code_quality/input
 mc cp --recursive code/language_annotator/test-data/input/ local/test/language_annotator/input
 mc cp --recursive code/language_annotator/test-data/languages/ local/test/lang_annotator/languages
