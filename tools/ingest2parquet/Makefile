@@ -8,7 +8,7 @@ DOCKER_IMAGE_VERSION=0.1
 DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 
 
-venv:	.defaults.venv
+venv:	.defaults.lib-src-venv
 
 build:	 venv image
 
