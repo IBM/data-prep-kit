@@ -168,12 +168,13 @@ __check_defined = \
 
 
 .PHONY: .defaults.install-lib-src
-.defaults.install-lib-src::
+.defaults.lib-src-venv:: .defaults.venv
 	@# Help: Install the source from the data processing library for $(PYTHON)
 	@echo Installing source from data processing library for venv
-	source venv/bin/activate;				      \
-	pip uninstall -y data-prep-lab;		 		\
-	pip install  -e $(REPOROOT)/data-processing-lib/;	       \
+	source venv/bin/activate;				      	\
+	pip install pytest;						\
+	pip uninstall -y data-prep-lab;		 			\
+	pip install  -e $(REPOROOT)/data-processing-lib/;	       	\
 	if [ $$? -eq 0 ]; then  					\
 		echo Installed source from data processing library for `which $(PYTHON)`;       \
 	else 								\

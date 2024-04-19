@@ -94,11 +94,7 @@ help::
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
 .PHONY: .transforms.venv
-.transforms.venv:: .defaults.venv
-	@# Help: Create the virtual env and install the data-prep-lab source into it
-	@source venv/bin/activate;	\
-	pip install pytest
-	$(MAKE) .transforms.install-lib-src
+.transforms.venv:: .defaults.lib-src-venv
 
 .PHONY: .transforms.check_env
 .transforms.check_env::
@@ -108,25 +104,14 @@ help::
 # We copy the library/framework source here so it can be installed into the docker image and
 # pip installed inside the Dockerfile
 .PHONY: .transforms.image
-.transforms.image:: 
-	$(MAKE) .transforms.check_env	# Put this first so we don't get its help
-	@# Help: Build the docker image, $(DOCKER_IMAGE), using the $(DOCKER_FILE) and requirements.txt 
-	rm -rf data-processing-lib
-	mkdir data-processing-lib
-	# Copy with -p so docker cachine works when copying this into the image
-	cp -p -R $(REPOROOT)/data-processing-lib/src data-processing-lib
-	cp -p  $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
-	cp -p  $(REPOROOT)/data-processing-lib/README.md data-processing-lib
-	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
-	rm -rf data-processing-lib
+.transforms.image:: .defaults.lib-src-image
 
-.PHONY: .transforms.install-lib-src
-.transforms.install-lib-src:: .defaults.install-lib-src
+.PHONY: .transforms.lib-src-venv
+.transforms.lib-src-venv:: .defaults.lib-src-venv
 
 .PHONY: .transforms.build
 .transforms.build:: .transforms.venv .transforms.image	
 	@# Help: Create the venv and build the transform image 
-
 
 .PHONY: .transforms.test 
 .transforms.test::  .transforms.test-src .transforms.test-image
@@ -198,7 +183,7 @@ test-locals:: .transforms.test-locals
 
 .PHONY: conventions
 conventions:
-	@# Help: Check transform project conventions and make recommendations, if needed.
+	@ Help: Check transform project conventions and make recommendations, if needed.
 	@echo "Begin checking transform project conventions.  Recommendations/issues, if any, follow..."
 	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  .transforms-check-not-exists
 	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists
