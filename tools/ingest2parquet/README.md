@@ -150,8 +150,8 @@ python ingest2parquet.py \
     --detect_programming_lang True \
     --snapshot github \
     --domain code \
-    --data_s3_cred '{"access_key": "YOUR_ACCESS_KEY", "secret_key": "YOUR_SECRET_KEY", "url": "YOUR_S3_URL"}' \
-    --data_s3_config '{"input_folder": "code-datasets/test_ingeat2parquet/raw_to_parquet_guf", "output_folder": "code-datasets/test_ingeat2parquet/raw_to_parquet_guf_out"}' \
+    --data_s3_cred '{"access_key": "localminioaccesskey", "secret_key": "localminiosecretkey", "url": "http://localhost:9000"}' \
+    --data_s3_config '{"input_folder": "test/ingest2parquet/input", "output_folder": "test/ingest2parquet/output"}' \
     --data_files_to_use '[".zip"]'
 ```
 

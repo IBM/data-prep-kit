@@ -28,7 +28,13 @@ from data_processing.ray import (
     TransformTableProcessor,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import RANDOM_SEED, TransformUtils, get_logger, str2bool
+from data_processing.utils import (
+    RANDOM_SEED,
+    CLIArgumentProvider,
+    TransformUtils,
+    get_logger,
+    str2bool,
+)
 from fdedup_support import (
     REQUEST_LEN,
     BucketsHash,
@@ -47,6 +53,10 @@ from ray.util.metrics import Gauge
 
 
 logger = get_logger(__name__)
+
+
+short_name = "fdedup"
+cli_prefix = f"{short_name}_"
 
 
 class FdedupTransform(AbstractTableTransform):
@@ -300,9 +310,9 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             bucket_cpu - number of cpus for bucket actor
             doc_cpu - number of cpus for doc actor
             mhash_cpu - number of cpus for minhash actor
-            d_actors - number of document actors
-            b_actors - number of bucket actors
-            m_actors - number of minhash actors
+            num_doc_actors - number of document actors
+            num_bucket_actors - number of bucket actors
+            num_minhash_actors - number of minhash actors
             n_preprocessors - number of preprocessors
             snapshot_delay - delay (sec) in sending snapshot requests to actors
             use_bucket_snapshot - use bucket snapshot
@@ -429,14 +439,14 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         )
         logger.info(f"Fuzzy: num buckets {num_buckets}, bucket length {length_bucket}")
         # Build bucket and minhash collectors
-        bucket_collectors = [None] * self.params.get("b_actors", 1)
-        for i in range(self.params.get("b_actors", 1)):
+        bucket_collectors = [None] * self.params.get("num_bucket_actors", 1)
+        for i in range(self.params.get("num_bucket_actors", 1)):
             bucket_collectors[i] = BucketsHash.options(**{"num_cpus": self.params.get("bucket_cpu", 0.5)}).remote(
                 {"id": i, "data_access": data_access_factory}
             )
         logger.info(f"created {len(bucket_collectors)} bucket actors")
-        minhash_collectors = [None] * self.params.get("m_actors", 1)
-        for i in range(self.params.get("m_actors", 1)):
+        minhash_collectors = [None] * self.params.get("num_minhash_actors", 1)
+        for i in range(self.params.get("num_minhash_actors", 1)):
             minhash_collectors[i] = DocsMinHash.options(**{"num_cpus": self.params.get("mhash_cpu", 0.5)}).remote(
                 {"id": i, "data_access": data_access_factory}
             )
@@ -501,8 +511,8 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         :return: None
         """
         # Create document collectors
-        self.document_collectors = [None] * self.params.get("d_actors", 1)
-        for i in range(self.params.get("d_actors", 1)):
+        self.document_collectors = [None] * self.params.get("num_doc_actors", 1)
+        for i in range(self.params.get("num_doc_actors", 1)):
             self.document_collectors[i] = DocCollector.options(**{"num_cpus": self.params.get("doc_cpu", 0.5)}).remote(
                 {"id": i, "data_access": data_access_factory}
             )
@@ -605,11 +615,10 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         :return: None
         """
         worker_options = self.params.get("worker_options", None)
-        # At this point we do not need doc collectors, so we can increase the amount
-        # of preprocessors to improve performance
-        n_readers = self.params.get("n_preprocessors", 1) + int(
-            self.params.get("d_actors", 1) * self.params.get("doc_cpu", 1) / worker_options["num_cpus"]
-        )
+        # Here we are limiting the number of readers not to overwhelm COS
+        n_readers = self.params.get("n_preprocessors", 1)
+        if n_readers > 1000:
+            n_readers = 1000
         logger.info(f"Table preprocessing uses {n_readers} readers")
         # Create preprocessing actors
         processor_params = {
@@ -711,41 +720,57 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name="fdedup", runtime_class=FdedupRuntime, transform_class=FdedupFilter)
+        super().__init__(name=short_name, runtime_class=FdedupRuntime, transform_class=FdedupFilter)
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         """
-        parser.add_argument("--doc_column", type=str, default="contents", help="document column name")
-        parser.add_argument("--id_column", type=str, default="int_document_id", help="integer document id column name")
-        parser.add_argument("--cluster_column", type=str, default="cluster", help="cluster column name")
-        parser.add_argument("--bucket_cpu", type=float, default=0.5, help="number of CPUs per bucket hash")
-        parser.add_argument("--mhash_cpu", type=float, default=0.5, help="number of CPUs per minhash hash")
-        parser.add_argument("--doc_cpu", type=float, default=0.5, help="number of CPUs per doc hash")
-        parser.add_argument("--num_doc_actors", type=int, default=1, help="number of doc actors to use")
-        parser.add_argument("--num_minhash_actors", type=int, default=1, help="number of minhash actors to use")
-        parser.add_argument("--num_bucket_actors", type=int, default=1, help="number of bucket actors to use")
-        parser.add_argument("--num_preprocessors", type=int, default=1, help="number of preprocessors to use")
-        parser.add_argument("--num_permutations", type=int, default=64, help="number of permutations")
-        parser.add_argument("--threshold", type=float, default=0.8, help="threshold")
-        parser.add_argument("--shingles_size", type=int, default=5, help="number of words in shingle")
-        parser.add_argument("--delimiters", type=str, default=" ", help="delimiter for splitting document")
-        parser.add_argument("--snapshot_delay", type=int, default=1, help="snapshot delay time")
+        parser.add_argument(f"--{cli_prefix}doc_column", type=str, default="contents", help="document column name")
         parser.add_argument(
-            "--use_bucket_snapshot",
+            f"--{cli_prefix}id_column", type=str, default="int_document_id", help="integer document id column name"
+        )
+        parser.add_argument(f"--{cli_prefix}cluster_column", type=str, default="cluster", help="cluster column name")
+        parser.add_argument(
+            f"--{cli_prefix}bucket_cpu", type=float, default=0.5, help="number of CPUs per bucket hash"
+        )
+        parser.add_argument(
+            f"--{cli_prefix}mhash_cpu", type=float, default=0.5, help="number of CPUs per minhash hash"
+        )
+        parser.add_argument(f"--{cli_prefix}doc_cpu", type=float, default=0.5, help="number of CPUs per doc hash")
+        parser.add_argument(f"--{cli_prefix}num_doc_actors", type=int, default=1, help="number of doc actors to use")
+        parser.add_argument(
+            f"--{cli_prefix}num_minhash_actors", type=int, default=1, help="number of minhash actors to use"
+        )
+        parser.add_argument(
+            f"--{cli_prefix}num_bucket_actors", type=int, default=1, help="number of bucket actors to use"
+        )
+        parser.add_argument(
+            f"--{cli_prefix}num_preprocessors", type=int, default=1, help="number of preprocessors to use"
+        )
+        parser.add_argument(f"--{cli_prefix}num_permutations", type=int, default=64, help="number of permutations")
+        parser.add_argument(f"--{cli_prefix}threshold", type=float, default=0.8, help="threshold")
+        parser.add_argument(f"--{cli_prefix}shingles_size", type=int, default=5, help="number of words in shingle")
+        parser.add_argument(
+            f"--{cli_prefix}delimiters", type=str, default=" ", help="delimiter for splitting document"
+        )
+        parser.add_argument(f"--{cli_prefix}snapshot_delay", type=int, default=1, help="snapshot delay time")
+        parser.add_argument(
+            f"--{cli_prefix}use_bucket_snapshot",
             type=lambda x: bool(str2bool(x)),
             default=False,
             help="flag to continue with bucket snapshot",
         )
         parser.add_argument(
-            "--use_doc_snapshot",
+            f"--{cli_prefix}use_doc_snapshot",
             type=lambda x: bool(str2bool(x)),
             default=False,
             help="flag to continue with doc snapshot",
         )
-        parser.add_argument("--random_delay_limit", type=int, default=10, help="maximum delay between read")
+        parser.add_argument(
+            f"--{cli_prefix}random_delay_limit", type=int, default=10, help="maximum delay between read"
+        )
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -753,32 +778,12 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        # columns
-        self.params["doc_column"] = args.doc_column
-        self.params["id_column"] = args.id_column
-        self.params["cluster_column"] = args.cluster_column
-        # infrastructure
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        self.params = self.params | captured
         self.params["worker_options"] = args.worker_options
-        self.params["bucket_cpu"] = args.bucket_cpu
-        self.params["doc_cpu"] = args.doc_cpu
-        self.params["mhash_cpu"] = args.mhash_cpu
-        self.params["d_actors"] = args.num_doc_actors
-        self.params["b_actors"] = args.num_bucket_actors
-        self.params["m_actors"] = args.num_minhash_actors
-        self.params["n_preprocessors"] = args.num_preprocessors
-        # fuzzy specific parameters
-        self.params["num_permutations"] = args.num_permutations
-        self.params["threshold"] = args.threshold
-        self.params["world_shingle_size"] = args.shingles_size
-        self.params["delimiters"] = args.delimiters
-        self.params["random_delay_limit"] = args.random_delay_limit
-        # snapshots
-        self.params["snapshot_delay"] = args.snapshot_delay
-        if args.use_bucket_snapshot and args.use_doc_snapshot:
+        if self.params["use_bucket_snapshot"] and self.params["use_doc_snapshot"]:
             logger.warning("both bucket and doc snapshot are specified. Only one allowed")
             return False
-        self.params["use_bucket_snapshot"] = args.use_bucket_snapshot
-        self.params["use_doc_snapshot"] = args.use_doc_snapshot
 
         logger.info(f"fuzzy dedup params are {self.params}")
         return True

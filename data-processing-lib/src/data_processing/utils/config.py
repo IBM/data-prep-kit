@@ -30,6 +30,7 @@ class DPLConfig:
     DEFAULT_LOG_LEVEL = os.environ.get("DPL_LOG_LEVEL", "INFO")
     """ Set from DPL_LOG_LEVEL env var(s) """
 
+
 def add_if_missing(config: dict[str, Any], key: str, dflt: Any):
     """
     Add the given default key value if there no value for the key in the dictionary.

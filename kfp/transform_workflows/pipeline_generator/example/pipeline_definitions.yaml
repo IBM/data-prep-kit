@@ -15,7 +15,7 @@ pipeline_common_input_parameters_values:
     output_folder: "cos-optimal-llm-pile/doc_annotation_test/output_noop_guf/"
 
 pipeline_transform_input_parameters:
-   pipeline_arguments:
+    pipeline_arguments:
         - name: "noop_sleep_sec"
           type: "int"
           value: 10
