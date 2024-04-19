@@ -48,11 +48,8 @@ We support the starting point for code datasets as downloaded github repos as .z
 The toolkit is a python-based library that has ready to use scalable ray based transforms. 
 We use the popular [parquet](https://arrow.apache.org/docs/python/parquet.html) format to store the data. 
 Every parquet file follows a set 
-[schema](https://github.ibm.com/ai-models-data/fm-data-engineering/tree/dev/tools/ingest2parquet).
 [schema](tools/ingest2parquet/).
-Data is converted from raw form (eg zip files for github repositories) to parquet files by 
-[ingest2parquet](https://github.ibm.com/ai-models-data/fm-data-engineering/tree/dev/tools/ingest2parquet) 
-[ingest2parquet](tools/ingest2parquet/README.md) 
+Data is converted from raw form (eg zip files for github repositories) to parquet files by the
 [ingest2parquet](tools/ingest2parquet/) 
 tool that also adds the necessary fields in the schema.  A user can use one or more of the available transforms to process their data. 
 
@@ -90,7 +87,7 @@ Docker/Podman
 ### Installation Steps
 
 ```shell
-git clone git@github.ibm.com:ai-models-data/fm-data-engineering.git
+git clone git@github.ibm.com:ai-models-data/fm--data-engineering.git
 cd fm-data-engineering
 pip install pre-commit
 pip install twine
@@ -104,8 +101,7 @@ There are various entry points that one can choose based on their usecase. Below
 ### Run a single transform on local-ray
 Get started by running the noop transform that performs an identity operation by following the 
 [tutorial](data-processing-lib/doc/simplest-transform-tutorial.md) and associated 
-[code](https://github.ibm.com/ai-models-data/fm-data-engineering/tree/dev/transforms/universal/noop).
-[code](transforms/universal/noop). 
+[noop implementation](transforms/universal/noop). 
 
 ### Run a data pipeline on local-ray
 Get started by building a data pipeline with our example pipeline (link to be added) that can run on a laptop. 
