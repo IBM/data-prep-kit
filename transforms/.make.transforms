@@ -30,12 +30,6 @@ include $(REPOROOT)/.make.defaults
 
 include $(REPOROOT)/transforms/transforms.versions
 
-ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
-
-DOCKER_FILE?=Dockerfile
-
-DOCKER_NAME=data-prep-lab
-DOCKER_REGISTRY_ENDPOINT=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)/$(DOCKER_NAME)
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
 DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
@@ -92,9 +86,7 @@ help::
 	fi			
 
 .PHONY: .transforms.clean
-.transforms.clean:: 
-	@# Help: Clean up the virtual environment.
-	rm -rf venv
+.transforms.clean:: .defaults.clean
 
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
@@ -102,15 +94,10 @@ help::
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
 .PHONY: .transforms.venv
-.transforms.venv::	requirements.txt .check_python_version
-	@$(MAKE) .transforms.check_env	# Put this first so we don't get its help
-	@# Help: Create the virtual environment using requirements.txt
-	$(PYTHON) -m venv venv
-	@source venv/bin/activate;		\
-	pip install --upgrade pip;		\
-	pip install wheel;			\
-	pip install -r requirements.txt;	\
-	pip install pytest;			
+.transforms.venv:: .defaults.venv
+	@# Help: Create the virtual env and install the data-prep-lab source into it
+	@source venv/bin/activate;	\
+	pip install pytest
 	$(MAKE) .transforms.install-lib-src
 
 .PHONY: .transforms.check_env
@@ -121,7 +108,7 @@ help::
 # We copy the library/framework source here so it can be installed into the docker image and
 # pip installed inside the Dockerfile
 .PHONY: .transforms.image
-.transforms.image:: Dockerfile requirements.txt
+.transforms.image:: 
 	$(MAKE) .transforms.check_env	# Put this first so we don't get its help
 	@# Help: Build the docker image, $(DOCKER_IMAGE), using the $(DOCKER_FILE) and requirements.txt 
 	rm -rf data-processing-lib
@@ -130,51 +117,30 @@ help::
 	cp -p -R $(REPOROOT)/data-processing-lib/src data-processing-lib
 	cp -p  $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
 	cp -p  $(REPOROOT)/data-processing-lib/README.md data-processing-lib
-	$(DOCKER) build -t $(DOCKER_IMAGE) \
-		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
-                --build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . 
+	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
 	rm -rf data-processing-lib
 
 .PHONY: .transforms.install-lib-src
-.transforms.install-lib-src::
-	@# Help: Install the source from the data processing library for $(PYTHON) 
-	@echo Installing source from data processing library for venv 
-	@source venv/bin/activate;					\
-	pip uninstall -y data-prep-lab;			\
-	pip install 						\
-		-e $(REPOROOT)/data-processing-lib/;			\
-	if [ $$? -eq 0 ]; then	\
-		echo Installed source from data processing library for `which $(PYTHON)`;	\
-	else \
-		echo ERROR installing source into `which $(PYTHON)`;	\
-	fi
+.transforms.install-lib-src:: .defaults.install-lib-src
 
 .PHONY: .transforms.build
 .transforms.build:: .transforms.venv .transforms.image	
 	@# Help: Create the venv and build the transform image 
 
-.PHONY: .transforms.test-lib-src
-.transforms.test-lib-src::
-	@# Help: Run pytest on the test directory with data-processing-lib/src in PYTHONPATH 
-	source venv/bin/activate;			\
-	export PYTHONPATH=../src;	\
-	cd test; $(PYTEST) . 
 
 .PHONY: .transforms.test 
 .transforms.test::  .transforms.test-src .transforms.test-image
 	@# Help: Run both source and image level tests.
 
 .PHONY: .transforms.test-src
-.transforms.test-src::  .transforms.test-lib-src .transforms.test-locals
+.transforms.test-src::  .defaults.test-src .transforms.test-locals
 	@# Help: Run the transform's tests and any '*local' .py files
 
 .PHONY: .transforms.test-image
-.transforms.test-image:: .transforms.image .transforms.test-image-pytest
+.transforms.test-image:: .transforms.image .defaults.test-image-pytest 
 
 .PHONY: .transforms.test-image-pytest
-.transforms.test-image-pytest:: .transforms.image
-	@# Help: Test an already-built image (use make image) running pytest on $(TRANSFORM_TEST_FILE) 
-	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s test 
+.transforms.test-image-pytest:: .defaults.test-image-pytest 
 
 .PHONY: .transforms.test-image-help
 .transforms.test-image-help::
@@ -199,11 +165,8 @@ test-locals:: .transforms.test-locals
 	done	
 
 .PHONY: .transforms.publish
-.transforms.publish:: .transforms.image
-	@# Help: Publish the docker image to $(DOCKER_REGISTRY) container registry 
-	$(DOCKER) logout $(DOCKER_REGISTRY)
-	$(DOCKER) login $(DOCKER_REGISTRY) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
-	$(DOCKER) push  $(DOCKER_IMAGE)
+.transforms.publish:: .defaults.image
+
 
 .PHONY: .transforms-check-exists
 .transforms-check-exists:
@@ -233,8 +196,9 @@ test-locals:: .transforms.test-locals
 	    echo Directory $(CHECK_DIR) is very large;		\
 	fi
 
-.PHONY: check-conventions
+.PHONY: conventions
 conventions:
+	@# Help: Check transform project conventions and make recommendations, if needed.
 	@echo "Begin checking transform project conventions.  Recommendations/issues, if any, follow..."
 	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  .transforms-check-not-exists
 	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists

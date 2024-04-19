@@ -1,3 +1,21 @@
+#######################################################################################
+# Include this to get access to a common set of rules for reuse in transform projects.
+# include ../../.make.defaults
+#
+# Before including, the following must be defined:
+# REPOROOT points to the top of the git repository. 
+# 	For example REPOROOT=../../..
+
+# Targets defined here use double colon so can be overriden
+#
+# Reusable rules begin with '.'. To reuse without modification, for example,
+# define your local Makefile rule as follows:
+# clean: .clean
+# To augment the the clean rule
+# clean: .clean
+# 	rm -rf other-stuff
+#
+#######################################################################################
 SHELL=/bin/bash
 # Command to run python 
 PYTHON=python
@@ -5,12 +23,15 @@ PIP=$(PYTHON) -m pip
 # Command to run pytest
 PYTEST=pytest -s
 PYTHON_VERSION=$(shell $(PYTHON) --version)
-# For when we move to quay 
+ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
+DOCKER_FILE?=Dockerfile
+DOCKER_NAME=data-prep-lab
 DOCKER?=docker
 DOCKER_HOSTNAME?=quay.io
 DOCKER_NAMESPACE ?= dataprep1
 DOCKER_REGISTRY_USER?=$(DPL_DOCKER_REGISTRY_USER)
 DOCKER_REGISTRY_KEY?=$(DPL_DOCKER_REGISTRY_KEY)
+DOCKER_REGISTRY_ENDPOINT=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)/$(DOCKER_NAME)
 
 #######################################################################################
 # Lists all targets and optional help text found in the target.
@@ -61,8 +82,6 @@ help::
 # the rules will be applied/executed recursively in their sub-directories. By default, sub-directories
 # are traversed in lexigraphic order.  If you need to control the ordering, create a .make.subdirs
 # listing the sub-directories to process and their order.
-#
-#################################################################################################################
 
 # Rule to recurse into subdirectories.  
 # Usage: $(MAKE) RULE=yourrule .recurse
@@ -102,6 +121,7 @@ PWD=$(shell pwd)
 %:: .%-recurse
 	@echo Finished executing rule $@ recursively in $(PWD) > /dev/null	
 
+#######################################################################################
 
 check_defined = \
         $(strip $(foreach 1,$1, \
@@ -116,8 +136,71 @@ __check_defined = \
 	major=$$(echo $$version | awk -F. '{print $$1}');               \
 	minor=$$(echo $$version | awk -F. '{print $$2}');               \
 	if [ $$major -lt 3 -o $$minor -lt 10 -o $$minor -gt 11 ]; then  \
-        	echo Python 3.10 or 3.11 is required, but got $$version;        \
-        	echo Try overriding PYTHON=$(PYTHON).  For example, "'"make PYTHON=python3.10" ...'";   \
-        	exit 1;                                                 \
+		echo Python 3.10 or 3.11 is required, but got $$version;        \
+		echo Try overriding PYTHON=$(PYTHON).  For example, "'"make PYTHON=python3.10" ...'";   \
+		exit 1;                                                 \
 	fi
+
+
+.PHONY: .defaults.clean
+.defaults.clean:: 
+	@# Help: Clean up the virtual environment.
+	rm -rf venv
+
+.PHONY: .defaults.image
+.defaults.image:: # Must be called with a DOCKER_IMAGE= settings.
+	@# Help: Create the docker image $(DOCKER_IMAGE)
+	$(DOCKER) build -t $(DOCKER_IMAGE) \
+		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
+		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . 
+
+.PHONY: .defaults.install-lib-src
+.defaults.install-lib-src::
+	@# Help: Install the source from the data processing library for $(PYTHON)
+	@echo Installing source from data processing library for venv
+	source venv/bin/activate;                                      \
+	pip uninstall -y data-prep-lab;                 		\
+	pip install  -e $(REPOROOT)/data-processing-lib/;               \
+	if [ $$? -eq 0 ]; then  					\
+		echo Installed source from data processing library for `which $(PYTHON)`;       \
+	else 								\
+		echo ERROR installing source into `which $(PYTHON)`;    \
+	fi  
+
+.PHONY: .defaults.test-src
+.defaults.test-src:: 
+	@# Help: Run pytest on the test directory inside the venv 
+	source venv/bin/activate;       \
+	export PYTHONPATH=../src;       \
+	cd test; $(PYTEST) .
+
+# This is small convenience and the image itself must already be created.
+.PHONY: .defaults.test-image-pytest
+.defaults.test-image-pytest:: 
+	# Put this 2nd so its help showss up instead of .defaults.image help
+	@# Help: Test an $(DOCKER_IMAGE) use test source inside the image. 
+	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s test 
+        
+.PHONY: .defaults.publish
+.defaults.publish:: .defaults.image	# Must be called with DOCKER_IMAGE set
+	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
+	# Put this 2nd so its help showss up instead of .defaults.image help
+	@# Help: Publish the $(DOCKER_IMAGE) to $(DOCKER_REGISTRY) container registry
+	$(DOCKER) logout $(DOCKER_REGISTRY)
+	$(DOCKER) login $(DOCKER_REGISTRY) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
+	$(DOCKER) push  $(DOCKER_IMAGE)
+
+# Create the local virtual environment, assuming python is already installed and available
+# We upgrade pip as that seems to be required by watson_nlp
+# We install wheel, because it seems to be required for fasttext install on redhat.
+# We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
+# they will end up installing into that PYTHON and NOT the venv.
+.PHONY: .defaults.venv
+.defaults.venv::	requirements.txt .check_python_version
+	@# Help: Create the virtual environment using requirements.txt
+	$(PYTHON) -m venv venv
+	@source venv/bin/activate;		\
+	pip install --upgrade pip;		\
+	pip install wheel;			\
+	pip install -r requirements.txt;	\
 
