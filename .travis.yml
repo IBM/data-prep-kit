@@ -20,8 +20,8 @@ env:
         - OPERATION=transform-image DIR=transforms/code DOCKER=docker
         - OPERATION=transform-image DIR=transforms/language DOCKER=docker
         - OPERATION=transform-image DIR=transforms/universal DOCKER=docker
-        - OPERATION=kfp-lib-test
-        - OPERATION=kfp-compile
+        - OPERATION=kfp-lib-test DOCKER=docker
+        - OPERATION=kfp-compile DOCKER=docker
         - OPERATION=tools-test DOCKER=docker
 
 # Enable/install podman
