@@ -90,6 +90,9 @@ Get started by running the noop transform that performs an identity operation by
 ### Run a data pipeline on local-ray
 Get started by building a data pipeline with our example pipeline (link to be added) that can run on a laptop. 
 
+### Build your own sequence of transforms
+Follow the documentation [here](doc/data-processing.md) to build your own pipelines. 
+
 ### Automate the pipeline
 Link to the KFP tutorial to be added
 
