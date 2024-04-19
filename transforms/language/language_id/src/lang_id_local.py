@@ -50,4 +50,3 @@ if __name__ == "__main__":
     print(f"language column : {table['ft_lang']}")
 
     print(f"score column : {table['ft_score']}")
-

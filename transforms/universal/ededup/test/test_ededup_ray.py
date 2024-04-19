@@ -27,9 +27,9 @@ class TestRayBlocklistTransform(AbstractTransformLauncherTest):
         config = {
             # When running in ray, our Runtime's get_transform_config() method  will load the domains using
             # the orchestrator's DataAccess/Factory. So we don't need to provide the bl_local_config configuration.
-            "hash_cpu": 0.5,
-            "num_hashes": 2,
-            "doc_column": "contents",
+            "ededup_hash_cpu": 0.5,
+            "ededup_num_hashes": 2,
+            "ededup_doc_column": "contents",
         }
         fixtures = [(EdedupTableTransformConfiguration(), config, basedir + "/input", basedir + "/expected")]
         return fixtures

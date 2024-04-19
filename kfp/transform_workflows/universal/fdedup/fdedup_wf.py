@@ -52,9 +52,13 @@ def fdedup(
     # Ray cluster
     ray_name: str = "fdedup-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
-             "image": "' + task_image + '" }',
+             "image": "'
+    + task_image
+    + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
-            "image": "' + task_image + '"}',
+            "image": "'
+    + task_image
+    + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access. checkpointing is not supported by dedup
     data_s3_config: str = "{'input_folder': 'test/fdedup/input/', 'output_folder': 'test/fdedup/output/'}",
@@ -144,10 +148,15 @@ def fdedup(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=actor_options,
-            params={"threshold": threshold, "num_permutations": num_permutations,
-                    "s3_config": data_s3_config, "bucket_cpu": bucket_cpu,
-                    "doc_cpu": doc_cpu, "minhash_cpu": mhash_cpu},
-            n_samples = data_num_samples,
+            params={
+                "threshold": threshold,
+                "num_permutations": num_permutations,
+                "s3_config": data_s3_config,
+                "bucket_cpu": bucket_cpu,
+                "doc_cpu": doc_cpu,
+                "minhash_cpu": mhash_cpu,
+            },
+            n_samples=data_num_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)

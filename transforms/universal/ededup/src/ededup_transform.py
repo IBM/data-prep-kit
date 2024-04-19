@@ -23,12 +23,15 @@ from data_processing.ray import (
     TransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import GB, TransformUtils, get_logger
+from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
 
 logger = get_logger(__name__)
 REQUEST_LEN = 8192
+
+short_name = "ededup"
+cli_prefix = f"{short_name}_"
 
 
 @ray.remote(scheduling_strategy="SPREAD")
@@ -229,9 +232,9 @@ class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         """
         Add Transform-specific arguments to the given  parser.
         """
-        parser.add_argument("--hash_cpu", type=float, default=0.5, help="number of CPUs per hash")
-        parser.add_argument("--num_hashes", type=int, default=0, help="number of hash actors to use")
-        parser.add_argument("--doc_column", type=str, default="contents", help="key for accessing data")
+        parser.add_argument(f"--{cli_prefix}hash_cpu", type=float, default=0.5, help="number of CPUs per hash")
+        parser.add_argument(f"--{cli_prefix}num_hashes", type=int, default=0, help="number of hash actors to use")
+        parser.add_argument(f"--{cli_prefix}doc_column", type=str, default="contents", help="key for accessing data")
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -239,12 +242,11 @@ class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        if args.num_hashes <= 0:
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        self.params = self.params | captured
+        if self.params["num_hashes"] <= 0:
             logger.info(f"Number of hashes should be greater then zero, provided {args.num_hashes}")
             return False
-        self.params["doc_column"] = args.doc_column
-        self.params["hash_cpu"] = args.hash_cpu
-        self.params["num_hashes"] = args.num_hashes
         logger.info(f"exact dedup params are {self.params}")
         return True
 

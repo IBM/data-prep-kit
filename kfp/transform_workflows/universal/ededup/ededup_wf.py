@@ -52,9 +52,13 @@ def ededup(
     # Ray cluster
     ray_name: str = "ededup-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
-             "image": "' + task_image + '" }',
+             "image": "'
+    + task_image
+    + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
-            "image": "' + task_image + '" }',
+            "image": "'
+    + task_image
+    + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access. checkpointing is not supported by dedup
     data_s3_config: str = "{'input_folder': 'test/ededup/input/', 'output_folder': 'test/ededup/output'}",
@@ -116,7 +120,7 @@ def ededup(
             worker_options=ray_worker_options,
             actor_options=actor_options,
             params={"s3_config": data_s3_config, "hash_cpu": hash_cpu},
-            n_samples = data_num_samples,
+            n_samples=data_num_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
