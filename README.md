@@ -37,8 +37,8 @@ Features of the toolkit:
 - [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp) of transforms.
 
 Data modalities supported (release 0): 
-- Code - support for code datasets as downloaded .zip files of github repositories. 
-- Natural Language - bring your own [parquet](https://arrow.apache.org/docs/python/parquet.html) files. 
+* Code - support for code datasets as downloaded .zip files of github repositories. 
+* Natural Language - bring your own [parquet](https://arrow.apache.org/docs/python/parquet.html) files. 
 
 Support for additional data formats are expected. 
 
