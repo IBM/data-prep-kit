@@ -63,6 +63,7 @@ class ParamsUtils:
         if as_value:
             all_text = all_text + "{ "
         first = True
+        last_line = ""
         for key, value in dict_val.items():
             if isinstance(value, dict):
                 text = ParamsUtils.__dict_to_str(value, initial_indent + indent_per_level, indent_per_level, as_value)
@@ -73,13 +74,19 @@ class ParamsUtils:
                         value = "'" + value + "'"
                 text = initial_indent + key + ": " + str(value)
             if first:
-                sep = ""
+                new_text = ""
             elif as_value:
-                sep = ", "
+                new_text = ", "
             else:
-                sep = "\n"
-            all_text = all_text + sep + text
+                new_text = "\n"
+            if as_value and len(last_line) + len(text) > 60:
+                new_text = new_text + "\n"
+                last_line = ""
+            new_text = new_text + text
+            all_text = all_text + new_text
+            last_line = last_line + new_text
             first = False
+        all_text = all_text.strip()
         if as_value:
             all_text = all_text + " }"
         return all_text
