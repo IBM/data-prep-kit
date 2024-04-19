@@ -30,7 +30,12 @@ cluster-deploy::
 	@# Help: Deploy all required tools on existing cluster
 	$(MAKE) .cluster-prepare
 	$(MAKE) .cluster-prepare-wait
-	cd hack && ./ingress.sh deploy
+	cd $(TOOLS_DIR) && ./ingress.sh deploy
+ifeq ($(DEPLOY_KUBEFLOW)$(USE_KFP_MINIO),11)
+	cd $(TOOLS_DIR) && ./install_minio.sh deploy
+	cd $(TOOLS_DIR) && ./install_minio.sh deploy-wait
+	$(MAKE) populate-data
+endif
 
 clean::
 	@# Help: Deleting the kind cluster
@@ -49,9 +54,6 @@ test::
 	cd $(TOOLS_DIR) && ./install_kuberay.sh deploy
 ifeq ($(DEPLOY_KUBEFLOW),1)
 	cd $(TOOLS_DIR) && ./install_kubeflow.sh deploy
-ifeq ($(USE_KFP_MINIO),1)
-	cd $(TOOLS_DIR) && ./install_minio.sh deploy
-endif
 endif
 
 .cluster-prepare-wait::
@@ -59,8 +61,4 @@ endif
 	cd $(TOOLS_DIR) && ./install_kuberay.sh deploy-wait
 ifeq ($(DEPLOY_KUBEFLOW),1)
 	cd $(TOOLS_DIR) && ./install_kubeflow.sh deploy-wait
-ifeq ($(USE_KFP_MINIO),1)
-	cd $(TOOLS_DIR) && ./install_minio.sh deploy-wait
-	$(MAKE) populate-data
-endif
 endif

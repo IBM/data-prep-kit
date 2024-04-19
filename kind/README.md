@@ -127,6 +127,15 @@ mc mb kfp/test
 Once the bucket is created, you can copy files, using:
 
 ```shell
+# code modules
+mc cp --recursive ../transforms/code/code_quality/test-data/input/ kfp/test/code_quality/input
+mc cp --recursive ../transforms/code/language_annotator/test-data/input/ kfp/test/language_annotator/input
+mc cp --recursive ../transforms/code/language_annotator/test-data/languages/ kfp/test/lang_annotator/languages
+mc cp --recursive ../transforms/code/malware/test-data/input/ kfp/test/malware/input
+# language
+mc cp --recursive ../transforms/language/doc_quality/test-data/input/ kfp/test/doc_quality/input
+mc cp --recursive ../transforms/language/language_id/test-data/input/ kfp/test/lang_id/input
+# universal
 mc cp --recursive ../transforms/universal/blocklist/test-data/input/ kfp/test/blocklist/input
 mc cp --recursive ../transforms/universal/blocklist/test-data/domains/ kfp/test/blocklist/domains
 mc cp --recursive ../transforms/universal/doc_id/test-data/input/ kfp/test/doc_id/input
