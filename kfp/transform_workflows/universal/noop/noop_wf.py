@@ -20,6 +20,7 @@ from kfp_support.workflow_support.utils import (
 )
 from kubernetes import client as k8s_client
 
+
 task_image = "quay.io/dataprep1/data-prep-lab/noop:0.7"
 
 # the name of the job script
@@ -51,9 +52,13 @@ def noop(
     # Ray cluster
     ray_name: str = "noop-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
-             "image": "' + task_image + '" }',
+             "image": "'
+    + task_image
+    + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
-            "image": "' + task_image + '" }',
+            "image": "'
+    + task_image
+    + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/noop/input/', 'output_folder': 'test/noop/output/'}",
