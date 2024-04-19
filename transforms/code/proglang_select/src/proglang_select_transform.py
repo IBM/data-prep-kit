@@ -28,7 +28,7 @@ from ray.actor import ActorHandle
 
 logger = get_logger(__name__)
 
-shortname = "proglang_match"
+shortname = "proglang_select"
 cli_prefix = f"{shortname}_"
 lang_allowed_langs_file_key = f"{shortname}_allowed_langs_file"
 lang_lang_column_key = f"{shortname}_language_column"
@@ -45,7 +45,7 @@ def _get_supported_languages(lang_file: str, data_access: DataAccess) -> list[st
     return lang_list
 
 
-class ProgLangMatchTransform(AbstractTableTransform):
+class ProgLangSelectTransform(AbstractTableTransform):
     """ """
 
     def __init__(self, config: dict):
@@ -103,7 +103,7 @@ class ProgLangMatchTransform(AbstractTableTransform):
         }
 
 
-class ProgLangMatchRuntime(DefaultTableTransformRuntime):
+class ProgLangSelectRuntime(DefaultTableTransformRuntime):
     """
     Language selector runtime support
     """
@@ -146,7 +146,7 @@ class ProgLangMatchRuntime(DefaultTableTransformRuntime):
         return {lang_allowed_languages: lang_refs} | self.params
 
 
-class ProgLangMatchTransformConfiguration(DefaultTableTransformConfiguration):
+class ProgLangSelectTransformConfiguration(DefaultTableTransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -155,8 +155,8 @@ class ProgLangMatchTransformConfiguration(DefaultTableTransformConfiguration):
     def __init__(self):
         super().__init__(
             name=shortname,
-            transform_class=ProgLangMatchTransform,
-            runtime_class=ProgLangMatchRuntime,
+            transform_class=ProgLangSelectTransform,
+            runtime_class=ProgLangSelectRuntime,
         )
         self.params = {}
         self.daf = None
@@ -220,5 +220,5 @@ class ProgLangMatchTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=ProgLangMatchTransformConfiguration())
+    launcher = TransformLauncher(transform_runtime_config=ProgLangSelectTransformConfiguration())
     launcher.launch()
