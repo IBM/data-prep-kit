@@ -46,28 +46,28 @@ params = {
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
     # columns used
-    "doc_column": "contents",
-    "id_column": "int_id_column",
-    "cluster_column": "cluster",
+    "fdedup_doc_column": "contents",
+    "fdedup_id_column": "int_id_column",
+    "fdedup_cluster_column": "cluster",
     # infrastructure
-    "bucket_cpu": 0.5,
-    "doc_cpu": 0.5,
-    "mhash_cpu": 0.5,
-    "num_doc_actors": 2,
-    "num_bucket_actors": 1,
-    "num_minhash_actors": 1,
-    "num_preprocessors": 2,
+    "fdedup_bucket_cpu": 0.5,
+    "fdedup_doc_cpu": 0.5,
+    "fdedup_mhash_cpu": 0.5,
+    "fdedup_num_doc_actors": 2,
+    "fdedup_num_bucket_actors": 1,
+    "fdedup_num_minhash_actors": 1,
+    "fdedup_num_preprocessors": 2,
     # fuzzy parameters
-    "num_permutations": 64,
-    "threshold": 0.8,
-    "shingles_size": 5,
-    "delimiters": " ",
+    "fdedup_num_permutations": 64,
+    "fdedup_threshold": 0.8,
+    "fdedup_shingles_size": 5,
+    "fdedup_delimiters": " ",
     # Random delay between reads
-    "random_delay_limit": 5,
+    "fdedup_random_delay_limit": 5,
     # snapshotting
-    "snapshot_delay": 1,
-    "use_doc_snapshot": False,
-    "use_bucket_snapshot": False,
+    "fdedup_snapshot_delay": 1,
+    "fdedup_use_doc_snapshot": False,
+    "fdedup_use_bucket_snapshot": False,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

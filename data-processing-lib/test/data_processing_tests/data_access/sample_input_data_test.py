@@ -21,8 +21,9 @@ def test_table_sampling_data():
     :return: None
     """
 
-    input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                "../../../test-data/data_processing/input_multiple"))
+    input_folder = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../../../test-data/data_processing/input_multiple")
+    )
     output_folder = "/tmp"
     print(input_folder)
     data_access = DataAccessLocal({"input_folder": input_folder, "output_folder": output_folder})

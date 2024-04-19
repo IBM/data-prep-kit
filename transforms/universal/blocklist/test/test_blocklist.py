@@ -10,8 +10,9 @@
 # limitations under the License.
 ################################################################################
 
-import pyarrow as pa
 import os
+
+import pyarrow as pa
 from blocklist_transform import (
     BlockListTransform,
     BlockListTransformConfiguration,

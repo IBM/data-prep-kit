@@ -43,6 +43,7 @@ class KubeRayAPIs:
         base - the URL of the API server (default is set to the standalone API server)
         wait interval - the amount of sec to wait between checking for cluster ready
     """
+
     def __init__(
         self,
         server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",

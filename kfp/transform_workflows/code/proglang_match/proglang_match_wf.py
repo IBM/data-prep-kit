@@ -52,9 +52,13 @@ PREFIX: str = "proglang_match"
 def lang_select(
     ray_name: str = "proglang-match-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
-             "image": "' + task_image + '" }',
+             "image": "'
+    + task_image
+    + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
-            "image": "' + task_image + '" }',
+            "image": "'
+    + task_image
+    + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/proglang_match/input/', 'output_folder': 'test/proglang_match/output/'}",
@@ -105,7 +109,7 @@ def lang_select(
     :param code_location - code location
     :param proglang_match_allowed_langs_file - file to store allowed languages
     :param proglang_match_language_column - name of select language annotation column
-    :param proglang_match_s3_access_secret - block list access secret 
+    :param proglang_match_s3_access_secret - block list access secret
                     (here we are assuming that select language info is in S3, but potentially in the different bucket)
     :return: None
     """
@@ -148,7 +152,7 @@ def lang_select(
                 "code_location": code_location,
                 "proglang_match_allowed_langs_file": proglang_match_allowed_langs_file,
                 "proglang_match_language_column": proglang_match_language_column,
-           },
+            },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
             prefix=PREFIX,

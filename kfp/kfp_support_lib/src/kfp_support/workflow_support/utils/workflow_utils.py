@@ -542,7 +542,7 @@ class RayRemoteJobs:
             time.sleep(self.api_server_client.wait_interval)
             job_ready_timeout -= self.api_server_client.wait_interval
         logger.info(f"job status is {job_status}")
-        if job_ready_timeout < 0:
+        if job_ready_timeout <= 0:
             logger.warning("timed out waiting for job become ready, exiting")
             sys.exit(1)
         #  While job is running print log

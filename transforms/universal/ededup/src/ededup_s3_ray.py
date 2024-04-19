@@ -45,9 +45,9 @@ params = {
     "creation_delay": 0,
     "code_location": ParamsUtils.convert_to_ast(code_location),
     # ededup params
-    "hash_cpu": 0.5,
-    "num_hashes": 2,
-    "doc_column": "contents",
+    "ededup_hash_cpu": 0.5,
+    "ededup_num_hashes": 2,
+    "ededup_doc_column": "contents",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 
