@@ -22,6 +22,7 @@ Standard rules include the following:
 
 If you'd like to build each component separately, you can move into the
 sub-directories as desired.  
+If planning to develop and/or use on Apple Mac please see these [considerations](mac.md).
 
 ## Data Prep Lab Library 
 To build the wheel for the data processing library and publish it to a pypi... 
@@ -53,4 +54,5 @@ supporting data transformations in a Ray cluster
     * language
         * language_id
         * ...
+
 
