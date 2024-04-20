@@ -94,13 +94,16 @@ Get started by building a data pipeline with our example pipeline (link to be ad
 Follow the documentation [here](doc/data-processing.md) to build your own pipelines. 
 
 ### Automate the pipeline
-Link to the KFP tutorial to be added
+The data preprocessing can be automated by running it as a KubeFlow pipeline. See a simplest transform pipeline [tutorial](.kfp/doc/simple_transform_pipeline.md),
+and [multi-steps pipeline](https://github.ibm.com/ai-models-data/fm-data-engineering/blob/dev/kfp/doc/multi_transform_pipeline.md) 
+if you want to combine several data transformation steps.
 
-### How to navigate the repository
-See documentation on [repository structure and its use](doc/repo.md)
+### How to navigate and use  the repository
+See documentation on [repository structure and its use](doc/repo.md) and [Apple/Mac considerations](doc/mac.md).
 
 ## &#x1F91D; How to contribute <a name = "contribute_steps"></a>
 TBA
+
 
 ## &#x2B50; Acknowledgements <a name = "acknowledgement"></a>
 Thanks to [BigCode Project](https://github.com/bigcode-project) that has been used to build the code quality module. 
