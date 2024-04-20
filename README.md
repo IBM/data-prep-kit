@@ -111,8 +111,8 @@ requires a significant amount of memory. For this initial Data Prep LAB release,
 execution on Mac computers with Apple silicon. Instead, we suggest using a real Kubernetes cluster or a Linux virtual 
 machine with an Intel CPU. 
 
-### How to navigate the repository
-See documentation on [repository structure and its use](doc/repo.md)
+### How to navigate and use  the repository
+See documentation on [repository structure and its use](doc/repo.md) and [Apple/Mac considerations](doc/mac.md).
 
 ## &#x1F91D; How to contribute <a name = "contribute_steps"></a>
 TBA
