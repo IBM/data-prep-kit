@@ -1,10 +1,7 @@
 # transform runtime
-#--extra-index-url https://test.pypi.org/simple/
-#data-prep-lab==0.0.1.dev5
+#data-prep-lab==0.1.1
 # Update to fix security
 pillow==10.2.0
-#cryptography==42.0.4
 fastapi==0.109.1
-aiohttp==3.9.2
 # for downloading + loading tokenizers:
 transformers==4.35.0

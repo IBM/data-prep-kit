@@ -37,7 +37,9 @@ publish:: .check-env update-toml
 
 venv::	pyproject.toml
 	@# Help: Create the virtual environment using pyproject.toml 
-	rm -rf venv	
+	rm -r dist venv || true
+	rm -rf src/*egg-info || true
+	rm makeenv || true
 	$(PYTHON) -m venv venv
 	source venv/bin/activate; 	\
 	pip install --upgrade pip;	\

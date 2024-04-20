@@ -1,4 +1,8 @@
 # transform runtime
-data-prep-lab==0.1.0
+data-prep-lab==0.1.1
+# Update to fix security
+pillow==10.2.0
+fastapi==0.109.1
+ingest2Parquet
 parameterized
 pandas
