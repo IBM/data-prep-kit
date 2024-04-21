@@ -1,4 +1,5 @@
 # Use make help, to see the available rules
+REPOROOT=../
 include ../.make.defaults
 
 TAG := "v${DPL_LIB_VERSION}"
