@@ -8,5 +8,5 @@ include ../../.make.transforms_workflows
 
 
 DOCKER_IMAGE_NAME = tokenization
-# transforms.versions file contains the versions
+# $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${TOKENIZER_VERSION}

@@ -7,7 +7,7 @@ REPOROOT=../../..
 include ../../.make.transforms
 
 TRANSFORM_NAME=ededup
-# transforms.versions file contains the versions
+# $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${EDEDUP_VERSION}
 
 venv::	.transforms.venv

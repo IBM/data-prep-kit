@@ -1,0 +1,22 @@
+################################################################################
+# Here we attempt to capture/define all the version numbers used across the 
+# repository in Makefile format.
+################################################################################
+
+# Data prep lab wheel version
+DPL_LIB_VERSION=0.1.2
+
+# Begin transform versions/tags
+BLOCKLIST_VERSION=0.2.0
+DOC_ID_VERSION=0.2
+EDEDUP_VERSION=0.2.1
+FDEDUP_VERSION=0.2.1
+FILTER_VERSION=0.2.0
+NOOP_VERSION=0.7
+RESIZE_VERSION=0.2
+LANG_ID_VERSION=0.2
+TOKENIZER_VERSION=0.2.0
+MALWARE_VERSION=0.3
+PROGLANG_SELECT_VERSION=0.2.0
+CODE_QUALITY_VERSION=0.2.0
+DOC_QUALITY_VERSION=0.2.0

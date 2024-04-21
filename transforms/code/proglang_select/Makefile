@@ -7,7 +7,7 @@ REPOROOT=../../..
 include ../../.make.transforms
 
 TRANSFORM_NAME=proglang_select
-# transforms.versions file contains the versions
+# $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${PROGLANG_SELECT_VERSION}
 
 venv::	.transforms.venv

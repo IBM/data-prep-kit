@@ -28,8 +28,6 @@
 #######################################################################################
 include $(REPOROOT)/.make.defaults
 
-include $(REPOROOT)/transforms/transforms.versions
-
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
 DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform

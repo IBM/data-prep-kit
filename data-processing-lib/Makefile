@@ -1,8 +1,7 @@
 # Use make help, to see the available rules
 include ../.make.defaults
 
-VERSION=0.1.2
-TAG := "v${VERSION}"
+TAG := "v${DPL_LIB_VERSION}"
 
 
 clean::

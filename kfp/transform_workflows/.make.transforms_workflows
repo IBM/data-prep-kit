@@ -1,4 +1,4 @@
-include ${REPOROOT}/transforms/transforms.versions
+include ${REPOROOT}/.make.versions
 
 DOCKER_REPO ?= ""
 
