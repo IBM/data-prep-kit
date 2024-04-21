@@ -36,8 +36,9 @@ update-toml:: .check-env
 
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
+	rm -r dist || true
+	rm -rf src/*egg-info || true
 	${PYTHON} -m pip install --upgrade build
-	if [ -d "dist"]; then rm -r dist; fi
 	${PYTHON} -m build
 
 publish:: .check-env

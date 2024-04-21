@@ -1,8 +1,5 @@
 # transform runtime
-#data-prep-lab==0.1.1
-# Update to fix security
-pillow==10.2.0
-fastapi==0.109.1
+#data-prep-lab==0.1.2
 # Transform requirements except data-prep-lab (see above)
 bs4==0.0.2
 transformers==4.38.2

@@ -1,7 +1,7 @@
 # Use make help, to see the available rules
 include ../.make.defaults
 
-VERSION=0.1.0
+VERSION=0.1.2
 TAG := "v${VERSION}"
 
 
@@ -23,8 +23,9 @@ setup::
 
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
+	rm -r dist || true
+	rm -rf src/*egg-info || true
 	${PIP} install --upgrade build
-	if [ -d "dist"]; then rm -r dist; fi
 	${PYTHON} -m build
 
 publish:: .check-env update-toml
