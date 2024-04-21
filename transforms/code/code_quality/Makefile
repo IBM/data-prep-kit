@@ -5,7 +5,7 @@ REPOROOT=../../..
 include ../../.make.transforms
 
 TRANSFORM_NAME=code_quality
-# transforms.versions file contains the versions
+# $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${CODE_QUALITY_VERSION}
 
 # Use default rule inherited from makefile.common

@@ -1,4 +1,2 @@
-# transform runtime
-data-prep-lab==0.1.0
 parameterized
 pandas
