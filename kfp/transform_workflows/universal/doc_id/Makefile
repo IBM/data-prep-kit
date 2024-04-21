@@ -7,5 +7,5 @@ REPOROOT=../../../..
 include ../../.make.transforms_workflows
 
 DOCKER_IMAGE_NAME=doc_id
-# transforms.versions file contains the versions
+# $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${DOC_ID_VERSION}

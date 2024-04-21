@@ -8,5 +8,5 @@ REPOROOT=../../../..
 include ../../.make.transforms_workflows
 
 DOCKER_IMAGE_NAME=ededup
-# transforms.versions file contains the versions
+# $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${EDEDUP_VERSION}
