@@ -14,7 +14,8 @@ include ../.make.defaults
 export TOOLS_DIR=${ROOT_DIR}/hack/tools
 
 export DEPLOY_KUBEFLOW ?= 1
-export USE_KFP_MINIO ?=1
+export USE_KFP_MINIO ?= 1
+export POPULATE_TEST_DATA ?= 1
 
 setup::
 	@# Help: Building kind cluster with everything installed
@@ -34,7 +35,9 @@ cluster-deploy::
 ifeq ($(DEPLOY_KUBEFLOW)$(USE_KFP_MINIO),11)
 	cd $(TOOLS_DIR) && ./install_minio.sh deploy
 	cd $(TOOLS_DIR) && ./install_minio.sh deploy-wait
+ifeq ($(POPULATE_TEST_DATA), 1)
 	$(MAKE) populate-data
+endif
 endif
 
 clean::
