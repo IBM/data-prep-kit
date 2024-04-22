@@ -25,13 +25,13 @@ PYTEST=pytest -s
 PYTHON_VERSION=$(shell $(PYTHON) --version)
 ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 DOCKER_FILE?=Dockerfile
-DOCKER_NAME=data-prep-lab
+DOCKER_NAME?=data-prep-lab
 DOCKER?=docker
 DOCKER_HOSTNAME?=quay.io
 DOCKER_NAMESPACE ?= dataprep1
 DOCKER_REGISTRY_USER?=$(DPL_DOCKER_REGISTRY_USER)
 DOCKER_REGISTRY_KEY?=$(DPL_DOCKER_REGISTRY_KEY)
-DOCKER_REGISTRY_ENDPOINT=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)/$(DOCKER_NAME)
+DOCKER_REGISTRY_ENDPOINT?=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)/$(DOCKER_NAME)
 include $(REPOROOT)/.make.versions
 
 #######################################################################################

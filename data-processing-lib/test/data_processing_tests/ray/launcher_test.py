@@ -64,12 +64,12 @@ def test_launcher():
         "run_locally": True,
         "data_max_files": -1,
         "data_checkpointing": False,
-        "worker_options": ParamsUtils.convert_to_ast(worker_options),
-        "num_workers": 5,
-        "pipeline_id": "pipeline_id",
-        "job_id": "job_id",
-        "creation_delay": 0,
-        "code_location": ParamsUtils.convert_to_ast(code_location),
+        "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
+        "runtime_num_workers": 5,
+        "runtime_pipeline_id": "pipeline_id",
+        "runtime_job_id": "job_id",
+        "runtime_creation_delay": 0,
+        "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     }
     # s3 not defined
     sys.argv = ParamsUtils.dict_to_req(d=params)
@@ -124,12 +124,12 @@ def test_local_config():
         "data_local_config": ParamsUtils.convert_to_ast(local_conf),
         "data_max_files": -1,
         "data_checkpointing": False,
-        "worker_options": ParamsUtils.convert_to_ast(worker_options),
-        "num_workers": 5,
-        "pipeline_id": "pipeline_id",
-        "job_id": "job_id",
-        "creation_delay": 0,
-        "code_location": ParamsUtils.convert_to_ast(code_location),
+        "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
+        "runtime_num_workers": 5,
+        "runtime_pipeline_id": "pipeline_id",
+        "runtime_job_id": "job_id",
+        "runtime_creation_delay": 0,
+        "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     }
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
@@ -146,12 +146,12 @@ def test_local_config_validate():
         "run_locally": True,
         "data_max_files": -1,
         "data_checkpointing": False,
-        "worker_options": ParamsUtils.convert_to_ast(worker_options),
-        "num_workers": 5,
-        "pipeline_id": "pipeline_id",
-        "job_id": "job_id",
-        "creation_delay": 0,
-        "code_location": ParamsUtils.convert_to_ast(code_location),
+        "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
+        "runtime_num_workers": 5,
+        "runtime_pipeline_id": "pipeline_id",
+        "runtime_job_id": "job_id",
+        "runtime_creation_delay": 0,
+        "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     }
     # invalid local configurations, driver launch should fail with any of these
     local_conf_empty = {}
@@ -199,12 +199,12 @@ def test_s3_config_validate():
         "data_max_files": -1,
         "data_checkpointing": False,
         "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-        "worker_options": ParamsUtils.convert_to_ast(worker_options),
-        "num_workers": 5,
-        "pipeline_id": "pipeline_id",
-        "job_id": "job_id",
-        "creation_delay": 0,
-        "code_location": ParamsUtils.convert_to_ast(code_location),
+        "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
+        "runtime_num_workers": 5,
+        "runtime_pipeline_id": "pipeline_id",
+        "runtime_job_id": "job_id",
+        "runtime_creation_delay": 0,
+        "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     }
     # invalid local configurations, driver launch should fail with any of these
     s3_conf_empty = {}

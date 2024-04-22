@@ -780,7 +780,7 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         """
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         self.params = self.params | captured
-        self.params["worker_options"] = args.worker_options
+        self.params["worker_options"] = args.runtime_worker_options
         if self.params["use_bucket_snapshot"] and self.params["use_doc_snapshot"]:
             logger.warning("both bucket and doc snapshot are specified. Only one allowed")
             return False
