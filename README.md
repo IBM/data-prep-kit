@@ -118,7 +118,7 @@ Get started by building a data pipeline with our example pipeline (link to be ad
 Follow the documentation [here](doc/overview.md) to build your own pipelines. 
 
 ### Automate the pipeline
-The data preprocessing can be automated by running it as a KubeFlow pipeline. See a simplest transform pipeline [tutorial](.kfp/doc/simple_transform_pipeline.md),
+The data preprocessing can be automated by running it as a KubeFlow pipeline. See a simplest transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md),
 and [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
 if you want to combine several data transformation steps.
 
