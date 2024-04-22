@@ -18,7 +18,6 @@ from kfp_support.workflow_support.utils import (
     ONE_WEEK_SEC,
     ComponentUtils,
 )
-from kubernetes import client as k8s_client
 
 
 # the name of the job script
@@ -51,14 +50,9 @@ PREFIX: str = "proglang_match"
 )
 def lang_select(
     ray_name: str = "proglang-match-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
-             "image": "'
-    + task_image
-    + '" }',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
-            "image": "'
-    + task_image
-    + '" }',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
+    '"image_pull_secret": "", "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/proglang_match/input/', 'output_folder': 'test/proglang_match/output/'}",
@@ -66,9 +60,9 @@ def lang_select(
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
-    actor_options: str = "{'num_cpus': 0.8}",
-    pipeline_id: str = "pipeline_id",
-    code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    runtime_actor_options: str = "{'num_cpus': 0.8}",
+    runtime_pipeline_id: str = "pipeline_id",
+    runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
     # Proglang match parameters
     proglang_match_allowed_langs_file: str = "test/proglang_match/languages/allowed-code-languages.txt",
     proglang_match_language_column: str = "language",
@@ -104,9 +98,9 @@ def lang_select(
     :param data_s3_config - s3 configuration
     :param data_max_files - max files to process
     :param data_num_samples - num samples to process
-    :param actor_options - actor options
-    :param pipeline_id - pipeline id
-    :param code_location - code location
+    :param runtime_actor_options - actor options
+    :param runtime_pipeline_id - pipeline id
+    :param runtime_code_location - code location
     :param proglang_match_allowed_langs_file - file to store allowed languages
     :param proglang_match_language_column - name of select language annotation column
     :param proglang_match_s3_access_secret - block list access secret
@@ -121,7 +115,7 @@ def lang_select(
         # compute execution params
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
-            actor_options=actor_options,
+            actor_options=runtime_actor_options,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
@@ -145,11 +139,11 @@ def lang_select(
                 "data_s3_config": data_s3_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
-                "num_workers": compute_exec_params.output,
-                "worker_options": actor_options,
-                "pipeline_id": pipeline_id,
-                "job_id": dsl.RUN_ID_PLACEHOLDER,
-                "code_location": code_location,
+                "runtime_num_workers": compute_exec_params.output,
+                "runtime_worker_options": runtime_actor_options,
+                "runtime_pipeline_id": runtime_pipeline_id,
+                "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,
+                "runtime_code_location": runtime_code_location,
                 "proglang_match_allowed_langs_file": proglang_match_allowed_langs_file,
                 "proglang_match_language_column": proglang_match_language_column,
             },

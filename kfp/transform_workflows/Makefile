@@ -1,6 +1,7 @@
 # Define the root of the local git clone for the common rules to be able
 # know where they are running from.
 REPOROOT=../..
+include ${REPOROOT}/.make.versions
 
 CURR_DIR := ${CURDIR}
 
@@ -29,7 +30,6 @@ clean::
 	find . -iname "*_wf.yaml" |  xargs rm -f || true
 
 .check-env:: .check_python_version
-	$(call check_defined, DATA_PREP_LAB_KFP)
 	@echo "Checks passed"
 
 .compile-pipeline::
@@ -52,7 +52,7 @@ publish:: .check-env
 
 venv::	.check-env
 	@# Help: Create the virtual environment
-	sed -i.back "s/data-prep-lab-kfp==[0-9].*/data-prep-lab-kfp==${DATA_PREP_LAB_KFP}/" ../kfp_ray_components/requirements.txt
+	sed -i.back "s/data-prep-lab-kfp==[0-9].*/data-prep-lab-kfp==${DPL_LIB_KFP_VERSION}/" ../kfp_ray_components/requirements.txt
 	rm -rf venv	
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE}; 	\

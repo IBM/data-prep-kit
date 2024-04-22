@@ -48,24 +48,19 @@ TASK_NAME: str = "ededup"
 def ededup(
     # Ray cluster
     ray_name: str = "ededup-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
-             "image": "'
-    + task_image
-    + '" }',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
-            "image": "'
-    + task_image
-    + '" }',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
+    '"image_pull_secret": "", "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access. checkpointing is not supported by dedup
     data_s3_config: str = "{'input_folder': 'test/ededup/input/', 'output_folder': 'test/ededup/output'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
-    data_num_samples: int = 10,
+    data_num_samples: int = -1,
     # orchestrator
-    actor_options: str = "{'num_cpus': 0.8}",
-    pipeline_id: str = "pipeline_id",
-    code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    runtime_actor_options: str = "{'num_cpus': 0.8}",
+    runtime_pipeline_id: str = "pipeline_id",
+    runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
     # ededup
     ededup_hash_cpu: float = 0.5,
     ededup_doc_column: str = "contents",
@@ -102,9 +97,9 @@ def ededup(
     :param data_s3_config - s3 configuration
     :param data_max_files - max files to process
     :param data_num_samples - num samples to process
-    :param actor_options - actor options
-    :param pipeline_id - pipeline id
-    :param code_location - code location
+    :param runtime_actor_options - actor options
+    :param runtime_pipeline_id - pipeline id
+    :param runtime_code_location - code location
     :param ededup_hash_cpu - number of CPUs per hash
     :param ededup_doc_column - key for accessing data
     :param ededup_n_samples - number of samples for parameters computation
@@ -118,7 +113,7 @@ def ededup(
         # compute execution params
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
-            actor_options=actor_options,
+            actor_options=runtime_actor_options,
             params={"s3_config": data_s3_config, "hash_cpu": ededup_hash_cpu},
             n_samples=ededup_n_samples,
         )
@@ -145,11 +140,11 @@ def ededup(
                 "data_s3_config": data_s3_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
-                "num_workers": compute_exec_params.outputs["workers"],
-                "worker_options": actor_options,
-                "pipeline_id": pipeline_id,
-                "job_id": dsl.RUN_ID_PLACEHOLDER,
-                "code_location": code_location,
+                "runtime_num_workers": compute_exec_params.outputs["workers"],
+                "runtime_worker_options": runtime_actor_options,
+                "runtime_pipeline_id": runtime_pipeline_id,
+                "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,
+                "runtime_code_location": runtime_code_location,
                 "ededup_doc_column": ededup_doc_column,
                 "ededup_hash_cpu": ededup_hash_cpu,
                 "ededup_num_hashes": compute_exec_params.outputs["hashes"],
