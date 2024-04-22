@@ -47,7 +47,7 @@ parquet files and the `metadata.json` file. It will skip empty parquet files in 
 % make venv
 % source venv/bin/activate
 (venv) % cd src
-(venv) % python tokenization_local.py
+(venv) % python tokenization_local_ray.py
 11:31:23 INFO - Running locally
 11:31:23 INFO - data factory data_ is using local data accessinput_folder - /Users/boris/Projects/data-prep-lab-inner/transforms/universal/tokenization/test-data/ds01/input output_folder - /Users/boris/Projects/data-prep-lab-inner/transforms/universal/tokenization/output/ds01
 11:31:23 INFO - data factory data_ max_files -1, n_sample -1
