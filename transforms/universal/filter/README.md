@@ -212,6 +212,14 @@ metadata.json	test1.parquet
 %
 </pre>
 
+#### Passing parameters through command-line-interface
+
+When running filtering on a local terminal, double quotes need to be escaped accordingly. For example, to find documents that are written in Java or Python programming languages, a SQL query using the `IN` keyword is needed in the `filter_criteria_list` argument. The example below shows how to properly pass this argument to the filter app:
+```    
+python filter_transform.py --filter_criteria_list "[\"language IN ('Java', 'Python')\"]" ...
+```
+When filter runs from the command line, it needs to include the entire `filter_criteria_list` parameter within double quotes (`"`), so that the command line parser can determine where the parameter begins and ends. This, however, will conflict with the internal double quotes that are used to specify the conditions inside the list (`language IN ('Java', 'Python')`). To resolve this problem, the internal double quotes need to be escaped, as in the \"language IN ('Java', 'Python')\" notation.
+
 ### Filter Statistics
 As shown in the output of the local run of filtering, the metadata contains several statistics:
 * Global statistics:  
