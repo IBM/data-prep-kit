@@ -24,7 +24,7 @@ class TestRayResizeTransform(AbstractTransformLauncherTest):
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         # The following based on 3 identical input files of about 39kbytes, and 200 rows
-        common_config = {"num_workers": 1}  # to make the output files repeatable.
+        common_config = {"runtime_num_workers": 1}  # to make the output files repeatable.
         fixtures = []
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
 

@@ -20,6 +20,9 @@ from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger
 logger = get_logger(__name__)
 
 
+cli_prefix = "runtime_"
+
+
 class TransformOrchestratorConfiguration(CLIArgumentProvider):
     """
     A class specifying and validating Ray orchestrator configuration
@@ -43,7 +46,7 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
         :param parser: parser
         :return:
         """
-        parser.add_argument("--num_workers", type=int, default=1, help="number of workers")
+        parser.add_argument(f"--{cli_prefix}num_workers", type=int, default=1, help="number of workers")
 
         help_example_dict = {
             "num_cpus": ["8", "Required number of CPUs."],
@@ -59,15 +62,15 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
             ],
         }
         parser.add_argument(
-            "--worker_options",
+            f"--{cli_prefix}worker_options",
             type=ast.literal_eval,
             default="{'num_cpus': 0.8}",
             help="AST string defining worker resource requirements.\n"
             + ParamsUtils.get_ast_help_text(help_example_dict),
         )
-        parser.add_argument("--pipeline_id", type=str, default="pipeline_id", help="pipeline id")
-        parser.add_argument("--job_id", type=str, default="job_id", help="job id")
-        parser.add_argument("--creation_delay", type=int, default=0, help="delay between actor' creation")
+        parser.add_argument(f"--{cli_prefix}pipeline_id", type=str, default="pipeline_id", help="pipeline id")
+        parser.add_argument(f"--{cli_prefix}job_id", type=str, default="job_id", help="job id")
+        parser.add_argument(f"--{cli_prefix}creation_delay", type=int, default=0, help="delay between actor' creation")
 
         help_example_dict = {
             "github": ["https://github.com/somerepo", "Github repository URL."],
@@ -75,7 +78,7 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
             "path": ["transforms/universal/ededup", "Path within the repository"],
         }
         parser.add_argument(
-            "--code_location",
+            f"--{cli_prefix}code_location",
             type=ast.literal_eval,
             default=None,
             help="AST string containing code location\n" + ParamsUtils.get_ast_help_text(help_example_dict),
@@ -87,18 +90,19 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
         :param args: user defined arguments
         :return: True, if validate pass or False otherwise
         """
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         # store parameters locally
-        self.worker_options = args.worker_options
-        self.n_workers = args.num_workers
-        self.creation_delay = args.creation_delay
-        self.pipeline_id = args.pipeline_id
+        self.worker_options = captured["worker_options"]
+        self.n_workers = captured["num_workers"]
+        self.creation_delay = captured["creation_delay"]
+        self.pipeline_id = captured["pipeline_id"]
         self.job_details = {
             "job category": "preprocessing",
             "job name": self.name,
             "job type": "ray",
-            "job id": args.job_id,
+            "job id": captured["job_id"],
         }
-        self.code_location = args.code_location
+        self.code_location = captured["code_location"]
 
         # print them
         logger.info(f"number of workers {self.n_workers} worker options {self.worker_options}")
