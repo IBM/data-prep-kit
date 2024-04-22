@@ -120,7 +120,7 @@ We also provide several demos of the transform usage for different data storage 
 ```shell
 $ source venv/bin/activate
 (venv) $ export PYTHONPATH=src
-(venv) $ python src/ededup_local_ray.py
+(venv) $ python src/fdedup_local_ray.py
 15:12:17 INFO - Running locally
 15:12:17 INFO - fuzzy dedup params are {'doc_column': 'contents', 'id_column': 'int_id_column', 'cluster_column': 'cluster', 'worker_options': {'num_cpus': 0.8}, 'bucket_cpu': 0.5, 'doc_cpu': 0.5, 'mhash_cpu': 0.5, 'd_actors': 2, 'b_actors': 1, 'm_actors': 1, 'n_preprocessors': 2, 'num_permutations': 64, 'threshold': 0.8, 'world_shingle_size': 5, 'delimiters': ' ', 'random_delay_limit': 5, 'snapshot_delay': 1, 'use_bucket_snapshot': False, 'use_doc_snapshot': False}
 15:12:17 INFO - data factory data_ is using local data accessinput_folder - /Users/boris/Projects/fm-data-engineering/transforms/universal/fdedup/test-data/input output_folder - /Users/boris/Projects/fm-data-engineering/transforms/universal/fdedup/output
