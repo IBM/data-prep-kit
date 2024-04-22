@@ -45,7 +45,7 @@ venv::	pyproject.toml
 	source venv/bin/activate; 	\
 	pip install --upgrade pip;	\
 	pip install -e .;		\
-	pip install pytest pytest-cov moto==5.0.5
+	pip install pytest pytest-cov moto==5.0.5 markupsafe==2.0.1
 
 
 # Here we run each test directory of tests and each ray launched test separately, because
