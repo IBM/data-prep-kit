@@ -1,14 +1,14 @@
 FROM docker.io/rayproject/ray:2.9.3-py310
 
-ARG DATA_PREP_LAB
-ARG DATA_PREP_LAB_KFP
+ARG DPL_LIB_VERSION
+ARG DPL_LIB_KFP_VERSION
 ARG BUILD_DATE
 ARG GIT_COMMIT
 
 LABEL build-date=$BUILD_DATE
 LABEL git-commit=$GIT_COMMIT
-LABEL data-prep-lab=${DATA_PREP_LAB}
-LABEL data-prep-lab-kfp=${DATA_PREP_LAB_KFP}
+LABEL data-prep-lab=${DPL_LIB_VERSION}
+LABEL data-prep-lab-kfp=${DPL_LIB_KFP_VERSION}
 
 # install libraries
 COPY requirements.txt requirements.txt
