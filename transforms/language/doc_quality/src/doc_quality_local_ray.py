@@ -40,12 +40,13 @@ code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
     "run_locally": True,
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
-    "worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "num_workers": 5,
-    "pipeline_id": "pipeline_id",
-    "job_id": "job_id",
-    "creation_delay": 0,
-    "code_location": ParamsUtils.convert_to_ast(code_location),
+    # orchestration
+    "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
+    "runtime_num_workers": 3,
+    "runtime_pipeline_id": "pipeline_id",
+    "runtime_job_id": "job_id",
+    "runtime_creation_delay": 0,
+    "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
 }
 
 if __name__ == "__main__":

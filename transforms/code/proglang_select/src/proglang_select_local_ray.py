@@ -51,12 +51,12 @@ params = {
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # orchestrator
-    "worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "num_workers": 1,
-    "pipeline_id": "pipeline_id",
-    "job_id": "job_id",
-    "creation_delay": 0,
-    "code_location": ParamsUtils.convert_to_ast(code_location),
+    "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
+    "runtime_num_workers": 3,
+    "runtime_pipeline_id": "pipeline_id",
+    "runtime_job_id": "job_id",
+    "runtime_creation_delay": 0,
+    "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # lanuage selection specific parameters
     **langselect_config,
 }

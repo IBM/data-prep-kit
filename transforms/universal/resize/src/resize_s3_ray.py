@@ -40,12 +40,12 @@ params = {
     "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
     "data_s3_config": ParamsUtils.convert_to_ast(s3_conf),
     # orchestrator
-    "worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "num_workers": 3,
-    "pipeline_id": "pipeline_id",
-    "job_id": "job_id",
-    "creation_delay": 0,
-    "code_location": ParamsUtils.convert_to_ast(code_location),
+    "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
+    "runtime_num_workers": 3,
+    "runtime_pipeline_id": "pipeline_id",
+    "runtime_job_id": "job_id",
+    "runtime_creation_delay": 0,
+    "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # resize config
     "resize_max_mbytes_per_table": 1,
     #    "resize_max_rows_per_table": 150
