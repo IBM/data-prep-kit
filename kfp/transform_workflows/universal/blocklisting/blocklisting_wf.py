@@ -18,7 +18,6 @@ from kfp_support.workflow_support.utils import (
     ONE_WEEK_SEC,
     ComponentUtils,
 )
-from kubernetes import client as k8s_client
 
 
 # the name of the job script
@@ -51,14 +50,9 @@ PREFIX: str = "blocklist"
 def blocklisting(
     # Ray cluster
     ray_name: str = "blocklisting-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
-             "image": "'
-    + task_image
-    + '" }',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
-            "image": "'
-    + task_image
-    + '" }',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
+    '"image_pull_secret": "", "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/blocklist/input/', 'output_folder': 'test/blocklist/output/'}",
