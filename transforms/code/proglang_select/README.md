@@ -24,7 +24,7 @@ The set of dictionary keys holding configuration for values are as follows:
 
 ## Running
 
-We provide a demo of the transform usage for [local file system](src/language_annotator_local_ray.py)
+We provide a demo of the transform usage for [local file system](src/proglang_select_local_ray.py)
 
 ### Launched Command Line Options 
 When running the transform with the Ray launcher,
