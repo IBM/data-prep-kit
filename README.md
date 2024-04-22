@@ -119,7 +119,7 @@ Follow the documentation [here](doc/overview.md) to build your own pipelines.
 
 ### Automate the pipeline
 The data preprocessing can be automated by running it as a KubeFlow pipeline. See a simplest transform pipeline [tutorial](.kfp/doc/simple_transform_pipeline.md),
-and [multi-steps pipeline](https://github.ibm.com/ai-models-data/fm-data-engineering/blob/dev/kfp/doc/multi_transform_pipeline.md) 
+and [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
 if you want to combine several data transformation steps.
 
 ### How to navigate and use  the repository
