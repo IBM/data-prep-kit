@@ -269,14 +269,12 @@ A single method `launch()` is then invoked to run the transform in a Ray cluster
 
 ## Running
 
-Assuming the above `main()` is placed in `ededup_transform.py` we can run the transform on data
-in COS as follows:
+Assuming the above `main()` is placed in `ededup_transform.py` we can run the transform on local data as follows:
 
 ```shell
-python ededup_transform.py --hash_cpu 0.5 --num_hashes 2 --doc_column "contents" \
+python ededup_transform.py --ededup_hash_cpu 0.5 --ededup_num_hashes 2  --ededup_doc_column "contents" \
   --run_locally True  \
-  --s3_cred "{'access_key': 'KEY', 'secret_key': 'SECRET', 'cos_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}" \
-  --s3_config "{'input_folder': 'input_folder', 'output_folder': 'output_folder'}"
+  --data_local_config="{'input_folder': '<project location>/transforms/universal/ededup/test-data/input', 'output_folder': '<project location>/transforms/universal/ededup/output'}"
 ```
 This is a minimal set of options to run locally.
 See the [launcher options](launcher-options.md) for a complete list of

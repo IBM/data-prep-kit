@@ -1,5 +1,12 @@
 # Programming Language Select 
 
+Please see the set of
+[transform project conventions](../../README.md)
+for details on general project conventions, transform configuration,
+testing and IDE set up.
+
+## Summary
+
 This is a transform which can be used while preprocessing code data. It allows the
 user to specify the programming languages for which the data should be identifies as matching
 a defined set of programming languages.
@@ -22,9 +29,20 @@ The set of dictionary keys holding configuration for values are as follows:
 * _proglang_select_output_column_ - specifies the name of the annotation column appended to the parquet. 
 * _proglang_select_return_known_ - specifies whether to return supported or unsupported languages
 
-## Running
+
+#### Running as pure python Ray application
 
 We provide a demo of the transform usage for [local file system](src/proglang_select_local_ray.py)
+
+```shell
+% make venv
+% source venv/bin/activate
+(venv) % cd src
+(venv) % python proglang_select_local_ray.py
+...
+% ls ../output/
+
+```
 
 ### Launched Command Line Options 
 When running the transform with the Ray launcher,
