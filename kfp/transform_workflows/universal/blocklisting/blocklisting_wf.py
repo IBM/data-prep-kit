@@ -20,56 +20,60 @@ from kfp_support.workflow_support.utils import (
 )
 
 
-task_image = "quay.io/dataprep1/data-prep-lab/noop:0.7"
-
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "noop_transform.py"
+EXEC_SCRIPT_NAME: str = "blocklist_transform.py"
 
-# components
+task_image = "quay.io/dataprep1/data-prep-lab/blocklist:0.2.0"
+
 base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.5"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
-# a result, instead of creating a component we are creating it in place here.
+# a result, insted of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
 )
 # create Ray cluster
 create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
 # execute job
-execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayJobComponent.yaml")
+execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayJobComponent_multi_s3.yaml")
 # clean up Ray
 cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "noop"
+TASK_NAME: str = "blocklist"
+PREFIX: str = "blocklist"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for noop",
+    description="Pipeline for blocklisting",
 )
-def noop(
+def blocklisting(
     # Ray cluster
-    ray_name: str = "noop-kfp-ray",  # name of Ray cluster
+    ray_name: str = "blocklisting-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
     '"image_pull_secret": "", "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'test/noop/input/', 'output_folder': 'test/noop/output/'}",
+    data_s3_config: str = "{'input_folder': 'test/blocklist/input/', 'output_folder': 'test/blocklist/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
+    data_checkpointing: bool = False,
     # orchestrator
     runtime_actor_options: str = "{'num_cpus': 0.8}",
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # noop parameters
-    noop_sleep_sec: int = 10,
+    # block listing parameters
+    blocklist_annotation_column_name: str = "blocklisted",
+    blocklist_source_url_column_name: str = "title",
+    blocklist_blocked_domain_list_path: str = "test/blocklist/domains",
+    blocklist_s3_access_secret: str = "s3-secret",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
-):
+) -> None:
     """
-    Pipeline to execute NOOP transform
+    Pipeline to execute block-listing transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -96,10 +100,15 @@ def noop(
     :param data_s3_config - s3 configuration
     :param data_max_files - max files to process
     :param data_num_samples - num samples to process
+    :param data_checkpointing - checkpointing flag
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    :param noop_sleep_sec - noop sleep time
+    :param blocklist_annotation_column_name - name of blocklist annotation column
+    :param blocklist_source_url_column_name - name of the source column containing URL
+    :param blocklist_blocked_domain_list_path - block domain list path
+    :param blocklist_s3_access_secret - block list access secret
+                    (here we are assuming that blocklist info is in S3, but potentially in the different bucket)
     :return: None
     """
     # create clean_up task
@@ -134,18 +143,23 @@ def noop(
                 "data_s3_config": data_s3_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
+                "data_checkpointing": data_checkpointing,
                 "runtime_num_workers": compute_exec_params.output,
                 "runtime_worker_options": runtime_actor_options,
                 "runtime_pipeline_id": runtime_pipeline_id,
                 "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,
                 "runtime_code_location": runtime_code_location,
-                "noop_sleep_sec": noop_sleep_sec,
+                "blocklist_annotation_column_name": blocklist_annotation_column_name,
+                "blocklist_source_url_column_name": blocklist_source_url_column_name,
+                "blocklist_blocked_domain_list_path": blocklist_blocked_domain_list_path,
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
+            prefix=PREFIX,
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, blocklist_s3_access_secret, prefix=PREFIX)
         execute_job.after(ray_cluster)
 
     # Configure the pipeline level to one week (in seconds)
@@ -154,4 +168,4 @@ def noop(
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(noop, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(blocklisting, __file__.replace(".py", ".yaml"))

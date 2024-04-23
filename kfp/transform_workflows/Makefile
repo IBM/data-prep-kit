@@ -36,7 +36,7 @@ clean::
 	. ${VENV_ACTIVATE} && cd ${DIR} && ${PYTHON} ${WF_NAME}.py
 
 %.yaml: %.py
-	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_TAGNAME}\"/" $<
+	sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION}\"/" $<
 	make -C $(shell (dirname $<)) .reconcile-requirement PIPELINE_FILE=${CURR_DIR}/$<
 	make .compile-pipeline WF_NAME=$(shell (basename $< .py)) DIR=$(shell (dirname $<))
 
