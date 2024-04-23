@@ -1,7 +1,7 @@
 # Building Kind cluster with everything installed
 
 This is a manual build instruction. As an alternative, you can execute the `make setup` makefile rule in the project 
-root directory instead. This command does everything including, creation of the cluster, installing required 
+`kind` directory instead. This command does everything including, creation of the cluster, installing required 
 software, creating ingresses and secrets and loading local data to Minio.
 
 # Before you begin
