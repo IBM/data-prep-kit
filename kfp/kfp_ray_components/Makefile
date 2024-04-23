@@ -41,5 +41,5 @@ publish::
 test::
 
 clean::
-	$(DOCKER) image rm ${IMG}
+	$(DOCKER) image rm ${IMG} -i
 	-rm  makeenv

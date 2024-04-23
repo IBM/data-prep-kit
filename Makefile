@@ -18,6 +18,8 @@
 #
 #################################################################################################################
 
+REPOROOT=.
+
 # Get some common rules for the whole repo
 include .make.defaults
 
