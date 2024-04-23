@@ -25,7 +25,7 @@ EXEC_SCRIPT_NAME: str = "blocklist_transform.py"
 
 task_image = "quay.io/dataprep1/data-prep-lab/blocklist:0.2.0"
 
-base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.3"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.5"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, insted of creating a component we are creating it in place here.
