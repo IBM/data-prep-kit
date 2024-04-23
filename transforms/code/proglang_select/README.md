@@ -29,12 +29,10 @@ The set of dictionary keys holding configuration for values are as follows:
 * _proglang_select_output_column_ - specifies the name of the annotation column appended to the parquet. 
 * _proglang_select_return_known_ - specifies whether to return supported or unsupported languages
 
-## Running
+
+#### Running as pure python Ray application
 
 We provide a demo of the transform usage for [local file system](src/proglang_select_local_ray.py)
-
-
-#### Running as pure python application
 
 ```shell
 % make venv
