@@ -180,14 +180,13 @@ A single method `launch()` is then invoked to run the transform in a Ray cluster
 
 ## Running
 
-Assuming the above `main()` is placed in `noop_main.py` we can run the transform on data 
-in COS as follows:
+Assuming the above `main()` is placed in `noop_main.py` we can run the transform on local data as follows:
 
 ```shell
-python noop_main.py --noop_sleep_msec 2 \
-  --run_locally True  \
-  --s3_cred "{'access_key': 'access', 'secret_key': 'secret', 'url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}" \
-  --s3_config "{'input_folder': 'input_folder', 'output_folder': 'output_folder'}"
+python noop_transform.py \
+  --noop_sleep_sec 2  \
+  --run_locally=True  \
+  --data_local_config="{'input_folder': '<project location>/transforms/universal/noop/test-data/input', 'output_folder': '<project location>/transforms/universal/noop/output'}"
 ```
 This is a minimal set of options to run locally.
 See the [launcher options](launcher-options.md) for a complete list of
