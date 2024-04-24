@@ -20,7 +20,6 @@ This might include provisioning of shared memory objects or creation of addition
 To learn more consider the following:
 * [Transform Tutorials](transform-tutorials.md)
 * [Testing transformers with S3](using_s3_transformers.md)
-* [Library Configuration](library-config.md)
 * [Architecture Deep Dive](architecture.md)
 * [Transform project root readme](../../transforms/README.md)
 

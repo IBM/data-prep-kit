@@ -5,8 +5,6 @@ Map betweens transforms and KFP pipelines
 | code/malware                        |                  [antivirus_wf.py](./code/malware/malware_wf.py)                   |
 | code/code_quality                   |            [code_quality_wf.py](./code/code_quality/code_quality_wf.py)            |
 | code/programming language_annotator | [programming language_annotator_wf.py](./code/proglang_match/proglang_match_wf.py) |
-| language/language_id                |               [lang_id_wf.py](./language/language_id/lang_id_wf.py)                |
-| universal/blocklisting              |         [blocklisting_wf.py](./universal/blocklisting/blocklisting_wf.py)          |
 | universal/doc_id                    |                  [doc_id_wf.py](./universal/doc_id/doc_id_wf.py)                   |
 | universal/ededup                    |                  [ededup_wf.py](./universal/ededup/ededup_wf.py)                   |
 | universal/fdedup                    |                  [fdedup_wf.py](./universal/fdedup/fdedup_wf.py)                   |
