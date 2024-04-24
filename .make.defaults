@@ -200,9 +200,9 @@ __check_defined = \
 # This allows others to define their own image building prior to publishing.
 .PHONY: .defaults.publish
 .defaults.publish:: 
-	@# Help: Publish the $(DOCKER_IMAGE) to $(DOCKER_REGISTRY) container registry
-	$(DOCKER) logout $(DOCKER_REGISTRY)
-	$(DOCKER) login $(DOCKER_REGISTRY) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
+	@# Help: Publish the $(DOCKER_IMAGE) to $(DOCKER_HOSTNAME) container registry
+	$(DOCKER) logout $(DOCKER_HOSTNAME)
+	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
 	$(DOCKER) push  $(DOCKER_IMAGE)
 
 # Create the local virtual environment, assuming python is already installed and available
