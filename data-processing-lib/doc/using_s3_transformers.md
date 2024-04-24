@@ -58,8 +58,8 @@ Once the bucket is created, you can copy files (assuming you are in the transfor
 ```shell
 mc cp --recursive tools/ingest2parquet/test-data/input/ local/test/ingest2parquet/input
 mc cp --recursive code/code_quality/test-data/input/ local/test/code_quality/input
-mc cp --recursive code/language_annotator/test-data/input/ local/test/language_annotator/input
-mc cp --recursive code/language_annotator/test-data/languages/ local/test/lang_annotator/languages
+mc cp --recursive code/proglang_select/test-data/input/ local/test/proglang_select/input
+mc cp --recursive code/proglang_select/test-data/languages/ local/test/proglang_select/languages
 mc cp --recursive code/malware/test-data/input/ local/test/malware/input
 
 mc cp --recursive language/doc_quality/test-data/input/ local/test/doc_quality/input
