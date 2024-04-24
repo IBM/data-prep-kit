@@ -147,9 +147,9 @@ test-locals:: .transforms.test-locals
 	    fi;					\
 	done	
 
+# Build the image the transform way and then use the default publishing
 .PHONY: .transforms.publish
-.transforms.publish:: .defaults.image
-
+.transforms.publish:: .transforms.image .defaults.publish 
 
 .PHONY: .transforms-check-exists
 .transforms-check-exists:
@@ -181,7 +181,7 @@ test-locals:: .transforms.test-locals
 
 .PHONY: conventions
 conventions:
-	@ Help: Check transform project conventions and make recommendations, if needed.
+	@# Help: Check transform project conventions and make recommendations, if needed.
 	@echo "Begin checking transform project conventions.  Recommendations/issues, if any, follow..."
 	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  .transforms-check-not-exists
 	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists
