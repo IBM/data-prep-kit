@@ -98,8 +98,8 @@ class ProgLangSelectTransform(AbstractTableTransform):
         # pick the table to return
         out_table = TransformUtils.add_column(table, self.output_column, pa.array(mask_known))
         return [out_table], {
-            "supported languages": known_count,
-            "unsupported languages": unknown_count,
+            "documents with supported languages": known_count,
+            "documents with unsupported languages": unknown_count,
         }
 
 

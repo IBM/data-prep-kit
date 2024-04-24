@@ -38,8 +38,8 @@
         "result_files": 1,
         "result_size": 32,
         "table_processing": 0.017200946807861328,
-        "supported languages": 2,
-        "unsupported languages": 0
+        "documents with supported languages": 2,
+        "documents with unsupported languages": 0
     },
     "source": {
         "name": "/Users/boris/Projects/fm-data-engineering/transforms/code/select_language/test-data/input",
