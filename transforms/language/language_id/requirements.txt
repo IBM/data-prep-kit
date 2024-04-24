@@ -1,6 +1,0 @@
-# transform runtime
-#data-prep-lab==0.1.2
-# Transform requirements except data-prep-lab (see above)
-fasttext==0.9.2
-langcodes==3.3.0
-huggingface-hub==0.21.4
