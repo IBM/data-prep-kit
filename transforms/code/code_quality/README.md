@@ -31,6 +31,8 @@ This module adds the following fields into the output file:
        <li>is_html</li>
 </ul>
 
+It uses a tokenizer to collect metrics specific to token ratio.  It is designed to download the tokenizer from the [Huggingface](https://huggingface.co/) if the input tokenizer is not found in the local cache. By default, it uses [codeparrot/codeparrot](https://huggingface.co/codeparrot/codeparrot) tokenizer.
+
 ## Running
 
 #### Running as pure python application
@@ -39,7 +41,7 @@ This module adds the following fields into the output file:
 % make venv
 % source venv/bin/activate
 (venv) % cd src
-(venv) % python cq_local.py
+(venv) % python code_quality_transform.py
 04:36:21 INFO - Running locally
 04:36:21 INFO - Using local configuration with: input_folder - /root/codellm/repos/fm-data-engineering/transforms/code/code_quality/test-data/input output_folder - /root/codellm/repos/fm-data-engineering/transforms/code/code_quality/output
 04:36:21 INFO - Not using data sets, checkpointing False, max files -1
@@ -69,9 +71,9 @@ When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
 [the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
 
-* "--contents_column_name" - input the name of the column which holds the data to process. The default column name: `contents`
-* "--language_column_name" - input the name of the column containing the programming language data. The default column name: `language`
-* "--tokenizer" - input the tokenizer to use to split data into tokens, by default uses `codeparrot/codeparrot` tokenizer
-* "--hf_token" - input the Hugging Face auth token to use to access the tokenizer if other than the default tokenizer is used.
+* "--contents_column_name" - input a column name which contains data to process. The default column name: `contents`
+* "--language_column_name" - input a column name which contains programming language details. The default column name: `language`
+* "--tokenizer" - input a tokenizer to convert the data into tokens. The default tokenizer is `codeparrot/codeparrot`
+* "--hf_token" - input the Hugging Face auth token to download the tokenizer. This option is only required for the tokenizer's whose access is restricted in Hugging Face.
 
 
