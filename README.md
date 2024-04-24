@@ -83,6 +83,9 @@ to interact with the KubeRay operator. An additional [framework](kfp/kfp_support
 
 ## &#x2699; Setup <a name = "setup"></a>
 
+We tried the project on different hardware/software configurations(see [Apple/Mac considerations](doc/mac.md).)
+We recommend using a laptop with at least 16GB of memory and 8 CPUs for development without KFP, 
+and at least 32GB and preferably 16 CPUs if you plan to run KFP on Kind.
 
 ### Prerequisites
 
@@ -127,7 +130,7 @@ and [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md)
 if you want to combine several data transformation steps.
 
 ### How to navigate and use  the repository
-See documentation on [repository structure and its use](doc/repo.md) and [Apple/Mac considerations](doc/mac.md).
+See documentation on [repository structure and its use](doc/repo.md) 
 
 ## &#x1F91D; How to contribute <a name = "contribute_steps"></a>
 See [contribution guide](CONTRIBUTING.md)
