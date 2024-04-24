@@ -21,7 +21,6 @@ from bs4 import BeautifulSoup
 from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils
-from tqdm import tqdm
 from transformers import AutoTokenizer
 
 
@@ -229,7 +228,7 @@ class CodeQualityTransform(AbstractTableTransform):
         languages = table.column(self.code_quality["language_column_name"]).to_pylist()
 
         # loop over rows and compute filter stats
-        for i, c in tqdm(enumerate(contents)):
+        for i, c in enumerate(contents):
             # compute lines statistics
             stats = calculate_line_stats(c)
             line_mean_values.append(stats["line_mean"])

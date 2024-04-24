@@ -1,21 +1,25 @@
 # Building Kind cluster with everything installed
 
-This is a manual build instruction. As an alternative, you can execute the `make setup` makefile rule in the project 
-`kind` directory instead. This command does everything including, creation of the cluster, installing required 
-software, creating ingresses and secrets and loading local data to Minio.
-
-# Before you begin
+## Before you begin
 
 Ensure that you have the following:
 
 - [Helm](https://helm.sh/) 3.10.0 or greater must be installed and configured on your machine.
 - [Kind](https://kind.sigs.k8s.io/) tool for running local Kubernetes clusters 0.14.0 or newer must be installed on your machine.
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) 1.26 or newer must be installed on your machine.
-- [wget](https://www.gnu.org/software/wget/) 1.21 must be installed on your machine. 
+- [wget](https://www.gnu.org/software/wget/) 1.21 must be installed on your machine.
 - [MinIO Client (mc)](https://min.io/docs/minio/linux/reference/minio-mc.html#quickstart) must be installed on your machine.
+- ensure nothing is running on port 8080, which is used by KInd cluster ingress.
+
+## Preparing Kind cluster for testing
+
+This is a manual build instruction. As an alternative, you can execute the `make setup` makefile rule in 
+the project `kind` directory instead. `make setup` performs complete installation, including creation of 
+the cluster, installing required software (NGNIX, KubeRay and KFP), creating ingresses and secrets and 
+loading local data to Minio. 
 
 
-## Create cluster
+### Create cluster
 
 Run the following command to create the cluster:
 
@@ -30,7 +34,7 @@ kind create cluster --name goofy --config ${ROOT_DIR}/hack/kind-cluster-config.y
 Note that by default this will create a kind cluster with 2 worker nodes. If you would like a different
 amount of node, modify [cluster configuration](hack/kind-cluster-config.yaml)
 
-## Install KFP
+### Install KFP
 
 Install [Kubeflow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/installation/standalone-deployment/#deploying-kubeflow-pipelines) and wait for it to be ready:
 
@@ -51,7 +55,7 @@ Add permissions with RBAC role:
 kubectl create clusterrolebinding pipeline-runner-extend --clusterrole cluster-admin --serviceaccount=kubeflow:pipeline-runner
 ```
 
-## Install KubeRay
+### Install KubeRay
 
 Install Kuberay:
 
@@ -68,7 +72,7 @@ helm install -f ${ROOT_DIR}/hack/ray_api_server_values.yaml kuberay-apiserver ku
 kubectl wait --for=condition=ready --all pod -n kuberay --timeout=120s
 ```
 
-## Install NGNIX
+### Install NGNIX
 
 To access the API server and Kubeflow pipeline UI externally, we make use NGINX ingress.
 
@@ -98,57 +102,21 @@ Finally a secret need to be created for accessing Minio using the following comm
 kubectl apply -f $ROOT_DIR/hack/s3_secret.yaml
 ```
 
-## Working with a Minio server instead of S3 storage
+### Working with a Minio server instead of S3 storage
 You can work with a real S3 storage, but for testing you can use the Mino server which is deployed as part of the KFP 
-installation. In order to work with it, you will need the Minio CLI. See
-[install mc instructions](https://min.io/docs/minio/linux/reference/minio-mc.html#quickstart)
+installation.
 
-When installing kind cluster with `make setup` Makefile rule all next steps are done automatically.
+#### Copy test data
 
-## Copy test data
-
-Populating Minio server with test data can be done using `mc`. First configure mc to work with the local
-Minio server (`make populate data` automate the whole procedure):
+Populating Minio server with test data can be done using `mc`. Use the following command:
 
 ```shell
-mc alias set kfp http://127.0.0.1:8080 minio minio123
+./hack/populate_minio.sh
 ```
 
-This set an alias `kfp` to 'mc' connected to the local Minio server instance. Now we can use our
-mc instance to populate server using a set of
-[commands](https://min.io/docs/minio/linux/reference/minio-mc.html) provided by `mc`.
-
-To copy the data to Minio, you first need to create a bucket:
-
-```shell
-mc mb kfp/test
-```
-
-Once the bucket is created, you can copy files, using:
-
-```shell
-# code modules
-mc cp --recursive ../transforms/code/code_quality/test-data/input/ kfp/test/code_quality/input
-mc cp --recursive ../transforms/code/language_annotator/test-data/input/ kfp/test/language_annotator/input
-mc cp --recursive ../transforms/code/language_annotator/test-data/languages/ kfp/test/lang_annotator/languages
-mc cp --recursive ../transforms/code/malware/test-data/input/ kfp/test/malware/input
-# language
-mc cp --recursive ../transforms/language/doc_quality/test-data/input/ kfp/test/doc_quality/input
-mc cp --recursive ../transforms/language/language_id/test-data/input/ kfp/test/lang_id/input
-# universal
-mc cp --recursive ../transforms/universal/blocklist/test-data/input/ kfp/test/blocklist/input
-mc cp --recursive ../transforms/universal/blocklist/test-data/domains/ kfp/test/blocklist/domains
-mc cp --recursive ../transforms/universal/doc_id/test-data/input/ kfp/test/doc_id/input
-mc cp --recursive ../transforms/universal/ededup/test-data/input/ kfp/test/ededup/input
-mc cp --recursive ../transforms/universal/fdedup/test-data/input/ kfp/test/fdedup/input
-mc cp --recursive ../transforms/universal/filter/test-data/input/ kfp/test/filter/input
-mc cp --recursive ../transforms/universal/noop/test-data/input/ kfp/test/noop/input
-mc cp --recursive ../transforms/universal/resize/test-data/input/ kfp/test/resize/input
-mc cp --recursive ../transforms/universal/tokenization/test-data/ds01/input/ kfp/test/tokenization/ds01/input
-mc cp --recursive ../transforms/universal/tokenization/test-data/ds02/input/ kfp/test/tokenization/ds02/input
-```
-
-If you need to load additional data, please load it using additional `mc` commands, similar to the above
+This file create an mc alias, create the test bucket and copy local data to Minio. If you need 
+to load additional data, please load it using additional `mc` commands, similar to the ones being
+used by `populate_minio.sh`
 
 Finally, note, that kfp version of Minio, is using a username (`minio`) as an access key and password ('minio123')
 as the secret. The secret to use for Minio access is located in `kubeflow` ns with the name `s3-secret`

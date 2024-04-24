@@ -24,7 +24,7 @@ YAML_WF=$(patsubst %.py, %.yaml, ${PYTHON_WF})
 
 clean::
 	@# Help: Clean up the distribution build and the venv 
-	rm -r dist venv || true
+	rm -rf dist venv || true
 	rm -rf src/*egg-info || true
 	rm makeenv || true
 	find . -iname "*_wf.yaml" |  xargs rm -f || true

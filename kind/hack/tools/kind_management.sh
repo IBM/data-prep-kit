@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 op=$1; shift
-cluster_name="${1:-goofy}"
+cluster_name="${1:-dataprep}"
 
 source ../common.sh
 
