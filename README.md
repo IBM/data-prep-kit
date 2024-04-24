@@ -5,8 +5,8 @@
 <div align="center">
 
   [![Status](https://img.shields.io/badge/status-active-success.svg)]() 
-  [![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.ibm.com/ai-models-data/fm-data-engineering/issues)
-  [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.ibm.com/ai-models-data/fm-data-engineering/pulls)
+  [![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.ibm.com/ai-models-data/data-prep-lab/issues)
+  [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.ibm.com/ai-models-data/data-prep-lab/pulls)
 </div>
 
 ---
@@ -98,7 +98,7 @@ Docker/Podman
 
 ```shell
 git clone git@github.ibm.com:ai-models-data/fm--data-engineering.git
-cd fm-data-engineering
+cd data-prep-lab
 pip install pre-commit
 pip install twine
 pre-commit install

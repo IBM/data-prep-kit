@@ -180,7 +180,7 @@ You can run the [filter_local.py](src/filter_local.py) (python-only implementati
 ```
 (venv) cma:src$ python filter_local_ray.py
 12:48:01 INFO - Running locally
-12:48:01 INFO - Using local configuration with: input_folder - /home/cma/de/fm-data-engineering/transforms/universal/filtering/test-data/input output_folder - /home/cma/de/fm-data-engineering/transforms/universal/filtering/output
+12:48:01 INFO - Using local configuration with: input_folder - /home/cma/de/data-prep-lab/transforms/universal/filtering/test-data/input output_folder - /home/cma/de/data-prep-lab/transforms/universal/filtering/output
 12:48:01 INFO - Not using data sets, checkpointing False, max files -1
 12:48:01 INFO - number of workers 5 worker options {'num_cpus': 0.8}
 12:48:01 INFO - pipeline id pipeline_id; number workers 5
