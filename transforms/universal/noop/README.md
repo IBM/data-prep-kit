@@ -1,6 +1,6 @@
 # NOOP Transform 
 Please see the set of
-[transform project conventions](../../transform-conventions.md)
+[transform project conventions](../../README.md#transform-project-conventions)
 for details on general project conventions, transform configuration,
 testing and IDE set up.
 
@@ -31,7 +31,7 @@ annotated `test1.parquet` file and the `metadata.json` file.
 (venv) % python noop_local_ray.py
 18:36:22 INFO - Running locally
 noop parameters are : {'sleep': 5}
-18:36:22 INFO - Using local configuration with: input_folder - /Users/dawood/git/fm-data-engineering/transforms/universal/noop/test-data output_folder - /Users/dawood/git/fm-data-engineering/transforms/universal/noop/output
+18:36:22 INFO - Using local configuration with: input_folder - /Users/dawood/git/data-prep-lab/transforms/universal/noop/test-data output_folder - /Users/dawood/git/data-prep-lab/transforms/universal/noop/output
 18:36:22 INFO - Not using data sets, checkpointing False, max files -1
 number of workers 5 worker options {'num_cpus': 0.8}
 pipeline id pipeline_id; number workers 5

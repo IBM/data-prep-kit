@@ -67,7 +67,7 @@ $ source venv/bin/activate
 (venv) $ python src/ededup_local_ray.py
 14:56:26 INFO - Running locally
 14:56:26 INFO - exact dedup params are {'doc_column': 'contents', 'hash_cpu': 0.5, 'num_hashes': 2}
-14:56:26 INFO - data factory data_ is using local data accessinput_folder - /Users/boris/Projects/fm-data-engineering/transforms/universal/ededup/test-data/input output_folder - /Users/boris/Projects/fm-data-engineering/transforms/universal/ededup/output
+14:56:26 INFO - data factory data_ is using local data accessinput_folder - /Users/boris/Projects/data-prep-lab/transforms/universal/ededup/test-data/input output_folder - /Users/boris/Projects/data-prep-lab/transforms/universal/ededup/output
 14:56:26 INFO - data factory data_ max_files -1, n_sample -1
 14:56:26 INFO - data factory data_ Not using data sets, checkpointing False, max files -1, random samples -1, files to use ['.parquet']
 14:56:26 INFO - number of workers 3 worker options {'num_cpus': 0.8}

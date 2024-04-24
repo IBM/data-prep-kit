@@ -123,7 +123,7 @@ $ source venv/bin/activate
 (venv) $ python src/fdedup_local_ray.py
 15:12:17 INFO - Running locally
 15:12:17 INFO - fuzzy dedup params are {'doc_column': 'contents', 'id_column': 'int_id_column', 'cluster_column': 'cluster', 'worker_options': {'num_cpus': 0.8}, 'bucket_cpu': 0.5, 'doc_cpu': 0.5, 'mhash_cpu': 0.5, 'd_actors': 2, 'b_actors': 1, 'm_actors': 1, 'n_preprocessors': 2, 'num_permutations': 64, 'threshold': 0.8, 'world_shingle_size': 5, 'delimiters': ' ', 'random_delay_limit': 5, 'snapshot_delay': 1, 'use_bucket_snapshot': False, 'use_doc_snapshot': False}
-15:12:17 INFO - data factory data_ is using local data accessinput_folder - /Users/boris/Projects/fm-data-engineering/transforms/universal/fdedup/test-data/input output_folder - /Users/boris/Projects/fm-data-engineering/transforms/universal/fdedup/output
+15:12:17 INFO - data factory data_ is using local data accessinput_folder - /Users/boris/Projects/data-prep-lab/transforms/universal/fdedup/test-data/input output_folder - /Users/boris/Projects/data-prep-lab/transforms/universal/fdedup/output
 15:12:17 INFO - data factory data_ max_files -1, n_sample -1
 15:12:17 INFO - data factory data_ Not using data sets, checkpointing False, max files -1, random samples -1, files to use ['.parquet']
 15:12:17 INFO - number of workers 3 worker options {'num_cpus': 0.8}

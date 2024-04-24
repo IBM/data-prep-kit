@@ -25,8 +25,8 @@ Run the following command to create the cluster:
 
 ```shell
 cd /tmp
-git clone git@github.ibm.com:ai-models-data/fm-data-engineering.git
-cd fm-data-engineering
+git clone git@github.com:IBM/data-prep-lab.git
+cd data-prep-lab
 ROOT_DIR=$PWD/kind/
 kind create cluster --name goofy --config ${ROOT_DIR}/hack/kind-cluster-config.yaml
 ```

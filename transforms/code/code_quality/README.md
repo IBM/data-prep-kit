@@ -43,7 +43,7 @@ It uses a tokenizer to collect metrics specific to token ratio.  It is designed 
 (venv) % cd src
 (venv) % python code_quality_transform.py
 04:36:21 INFO - Running locally
-04:36:21 INFO - Using local configuration with: input_folder - /root/codellm/repos/fm-data-engineering/transforms/code/code_quality/test-data/input output_folder - /root/codellm/repos/fm-data-engineering/transforms/code/code_quality/output
+04:36:21 INFO - Using local configuration with: input_folder - /root/codellm/repos/data-prep-lab/transforms/code/code_quality/test-data/input output_folder - /root/codellm/repos/data-prep-lab/transforms/code/code_quality/output
 04:36:21 INFO - Not using data sets, checkpointing False, max files -1
 04:36:21 INFO - number of workers 1 worker options {'num_cpus': 0.8}
 04:36:21 INFO - pipeline id pipeline_id; number workers 1
