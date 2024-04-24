@@ -91,7 +91,6 @@ pre-commit\
 twine \
 Docker/Podman
 
-
 ### Installation Steps
 
 ```shell
@@ -101,10 +100,15 @@ pip install pre-commit
 pip install twine
 pre-commit install
 ```
+Additionally if you will be using local Minio for S3 testing you need to install `Minio` and `mc`.
+Refer to [Minio install instructions](data-processing-lib/doc/using_s3_transformers.md) for more details.
+
+Finally to work with Kind cluster and KFP you will need to install `Helm`, `kind`, `kubectl` and `wget`.
+Refer to [Kind installation](kind/README.md) for more details
 
 ## &#x1F680; Getting Started <a name = "getting_started"></a>
 
-There are various entry points that one can choose based on their usecase. Below are a few demos to get you started. 
+There are various entry points that one can choose based on their use case. Below are a few demos to get you started. 
 
 ### Run a single transform on local-ray
 Get started by running the noop transform that performs an identity operation by following the 
@@ -126,7 +130,7 @@ if you want to combine several data transformation steps.
 See documentation on [repository structure and its use](doc/repo.md) and [Apple/Mac considerations](doc/mac.md).
 
 ## &#x1F91D; How to contribute <a name = "contribute_steps"></a>
-TBA
+See [contribution guide](CONTRIBUTING.md)
 
 
 ## &#x2B50; Acknowledgements <a name = "acknowledgement"></a>
