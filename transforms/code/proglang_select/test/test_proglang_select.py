@@ -83,8 +83,8 @@ class TestProgLangSelectTransform(AbstractTransformTest):
     expected_output_df = pa.Table.from_arrays([languages, outa], names=["language", "allowed"])
     expected_metadata_list = [
         {
-            "supported languages": 2,
-            "unsupported languages": 1,
+            "documents with supported languages": 2,
+            "documents with unsupported languages": 1,
         },  # transform() metadata
         {},  # Empty flush() metadata
     ]
