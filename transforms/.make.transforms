@@ -44,7 +44,7 @@ help::
 	@echo DOCKER - the name of the docker executable to use.  DOCKER=$(DOCKER)
 	@echo DOCKER_FILE - the name of the docker file to use.  DOCKER_FILE=$(DOCKER_FILE)
 	@echo DOCKER_REGISTRY_ENDPOINT - the docker registry location to publish images.  DOCKER_REGISTRY_ENDPOINT=$(DOCKER_REGISTRY_ENDPOINT)
-	@echo DOCKER_REGISTRY - the name of the docker registry to use.  DOCKER_REGISTRY=$(DOCKER_REGISTRY)
+	@echo DOCKER_HOSTNAME - the name of the docker registry to use.  DOCKER_HOSTNAME=$(DOCKER_HOSTNAME)
 	@echo DOCKER_NAMESPACE - the name space to use in the registry.  DOCKER_NAMESPACE=$(DOCKER_NAMESPACE)
 	@echo DOCKER_NAME - the name under the name space where images are publishes.  DOCKER_NAME=$(DOCKER_NAME)
 	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
@@ -79,8 +79,8 @@ help::
 	@if [ -z "$(DOCKER_REGISTRY_KEY)" ]; then	\
 	    echo ERROR: DOCKER_REGISTRY_KEYmust be defined.;	\
 	fi			
-	@if [ -z "$(DOCKER_REGISTRY)" ]; then	\
-	    echo ERROR: DOCKER_REGISTRY must be defined.;	\
+	@if [ -z "$(DOCKER_HOSTNAME)" ]; then	\
+	    echo ERROR: DOCKER_HOSTNAME must be defined.;	\
 	fi			
 
 .PHONY: .transforms.clean
@@ -147,9 +147,9 @@ test-locals:: .transforms.test-locals
 	    fi;					\
 	done	
 
+# Build the image the transform way and then use the default publishing
 .PHONY: .transforms.publish
-.transforms.publish:: .defaults.image
-
+.transforms.publish:: .transforms.image .defaults.publish 
 
 .PHONY: .transforms-check-exists
 .transforms-check-exists:
@@ -181,7 +181,7 @@ test-locals:: .transforms.test-locals
 
 .PHONY: conventions
 conventions:
-	@ Help: Check transform project conventions and make recommendations, if needed.
+	@# Help: Check transform project conventions and make recommendations, if needed.
 	@echo "Begin checking transform project conventions.  Recommendations/issues, if any, follow..."
 	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  .transforms-check-not-exists
 	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists

@@ -196,13 +196,13 @@ __check_defined = \
 	@# Help: Test an $(DOCKER_IMAGE) use test source inside the image. 
 	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s test 
 	
+# This expects the image to already be built and so does not depending on .defaults.publish.
+# This allows others to define their own image building prior to publishing.
 .PHONY: .defaults.publish
-.defaults.publish:: .defaults.image	# Must be called with DOCKER_IMAGE set
-	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
-	# Put this 2nd so its help showss up instead of .defaults.image help
-	@# Help: Publish the $(DOCKER_IMAGE) to $(DOCKER_REGISTRY) container registry
-	$(DOCKER) logout $(DOCKER_REGISTRY)
-	$(DOCKER) login $(DOCKER_REGISTRY) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
+.defaults.publish:: 
+	@# Help: Publish the $(DOCKER_IMAGE) to $(DOCKER_HOSTNAME) container registry
+	$(DOCKER) logout $(DOCKER_HOSTNAME)
+	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
 	$(DOCKER) push  $(DOCKER_IMAGE)
 
 # Create the local virtual environment, assuming python is already installed and available
