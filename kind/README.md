@@ -18,6 +18,7 @@ The following programs should be manually installed:
 - [wget](https://www.gnu.org/software/wget/) 1.21 must be installed on your machine.
 - [lsof](https://formulae.brew.sh/formula/lsof) must be installed on your machine.
 - [MinIO Client (mc)](https://min.io/docs/minio/linux/reference/minio-mc.html#quickstart) must be installed on your machine.
+- [lsof](https://www.ionos.com/digitalguide/server/configuration/linux-lsof/) useally it is part of Linux or MacOS distribution.
 - Container agent such as [Docker](https://www.docker.com/) or [Podman](https://podman-desktop.io/)
 
 > **NOTE**: Additionally, ensure that nothing is running on port 8080, which is used by the Kind cluster ingress.
