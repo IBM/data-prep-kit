@@ -108,9 +108,6 @@ pre-commit install
 Additionally if you will be using local Minio for S3 testing you need to install `Minio` and `mc`.
 Refer to [Minio install instructions](data-processing-lib/doc/using_s3_transformers.md) for more details.
 
-Finally to work with Kind cluster and KFP you will need to install `Helm`, `kind`, `kubectl` and `wget`.
-Refer to [Kind installation](kind/README.md) for more details
-
 ## &#x1F680; Getting Started <a name = "getting_started"></a>
 
 There are various entry points that one can choose based on their use case. Below are a few demos to get you started. 
@@ -127,9 +124,25 @@ Get started by building a data pipeline with our example pipeline (link to be ad
 Follow the documentation [here](doc/overview.md) to build your own pipelines. 
 
 ### Automate the pipeline
-The data preprocessing can be automated by running it as a KubeFlow pipeline. See a simplest transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md),
-and [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
+The data preprocessing can be automated by running transformers as a KubeFlow pipeline (KFP). 
+See a simple transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md), and [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
 if you want to combine several data transformation steps.
+
+The project facilitates the creation of a local Kind cluster with all the required software and test data. 
+To work with the Kind cluster and KFP, you need to install several pre-required software packages. Please refer to 
+[Kind preinstalled software](./kind/README.md#preinstalled-software) for more details
+
+When you have all packages installed, you can execute 
+
+```bash
+make setup
+```
+from this main package directory or from the `kind` directory.
+
+Wnen you finish working with the cluster, you can destroy it by 
+```bash
+make clean
+```
 
 ### How to navigate and use  the repository
 See documentation on [repository structure and its use](doc/repo.md) 
