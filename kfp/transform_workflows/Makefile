@@ -40,7 +40,7 @@ clean::
 	make -C $(shell (dirname $<)) .reconcile-requirement PIPELINE_FILE=${CURR_DIR}/$<
 	make .compile-pipeline WF_NAME=$(shell (basename $< .py)) DIR=$(shell (dirname $<))
 
-build::
+build:: venv
 	find . -iname "*_wf.yaml" |  xargs rm -f || true
 	@# Help: Compile the pipelines
 	${PYTHON} -m pip install --upgrade build
