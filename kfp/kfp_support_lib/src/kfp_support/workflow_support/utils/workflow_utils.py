@@ -55,7 +55,7 @@ class KFPUtils:
 
     @staticmethod
     def credentials(
-        access_key: str = "S3_KEY", secret_key: str = "S3_SECRET", endpoint: str = "ENDPOINT"
+            access_key: str = "S3_KEY", secret_key: str = "S3_SECRET", endpoint: str = "ENDPOINT"
     ) -> tuple[str, str, str]:
         """
         Get credentials from the environment
@@ -144,10 +144,10 @@ class PipelinesUtils:
         self.kfp_client = Client(host=host)
 
     def start_pipeline(
-        self,
-        pipeline: models.api_pipeline.ApiPipeline,
-        experiment: models.api_experiment.ApiExperiment,
-        params: Optional[dict[str, Any]],
+            self,
+            pipeline: models.api_pipeline.ApiPipeline,
+            experiment: models.api_experiment.ApiExperiment,
+            params: Optional[dict[str, Any]],
     ) -> str:
         """
         Start a specified pipeline.
@@ -240,11 +240,11 @@ class RayRemoteJobs:
     ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 
     def __init__(
-        self,
-        server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-        default_image: str = "rayproject/ray:2.9.3-py310",
-        http_retries: int = 5,
-        wait_interval: int = 2,
+            self,
+            server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
+            default_image: str = "rayproject/ray:2.9.3-py310",
+            http_retries: int = 5,
+            wait_interval: int = 2,
     ):
         """
         Initialization
@@ -259,12 +259,12 @@ class RayRemoteJobs:
         self.default_image = default_image
 
     def create_ray_cluster(
-        self,
-        name: str,
-        namespace: str,
-        head_node: dict[str, Any],
-        worker_nodes: list[dict[str, Any]],
-        wait_cluster_ready: int = -1,
+            self,
+            name: str,
+            namespace: str,
+            head_node: dict[str, Any],
+            worker_nodes: list[dict[str, Any]],
+            wait_cluster_ready: int = -1,
     ) -> tuple[int, str]:
         """
         Create Ray cluster
@@ -423,7 +423,7 @@ class RayRemoteJobs:
         # Build cluster spec
         cluster_spec = ClusterSpec(head_node=head_node_spec, worker_groups=worker_groups)
         # Build cluster
-        cluster = Cluster(name=name, namespace=namespace, user="goofy", version="2.9.0", cluster_spec=cluster_spec)
+        cluster = Cluster(name=name, namespace=namespace, user="dataprep", version="2.9.3", cluster_spec=cluster_spec)
         status, error = self.api_server_client.create_cluster(cluster)
         if status != 200:
             return status, error
@@ -455,12 +455,12 @@ class RayRemoteJobs:
         return status, error
 
     def submit_job(
-        self,
-        name: str,
-        namespace: str,
-        request: dict[str, Any],
-        runtime_env: str = None,
-        executor: str = "transformer_launcher.py",
+            self,
+            name: str,
+            namespace: str,
+            request: dict[str, Any],
+            runtime_env: str = None,
+            executor: str = "transformer_launcher.py",
     ) -> tuple[int, str, str]:
         """
         Submit job for execution
@@ -511,13 +511,13 @@ class RayRemoteJobs:
             print(l_to_print)
 
     def follow_execution(
-        self,
-        name: str,
-        namespace: str,
-        submission_id: str,
-        data_access: DataAccess = None,
-        job_ready_timeout: int = 600,
-        print_timeout: int = 120,
+            self,
+            name: str,
+            namespace: str,
+            submission_id: str,
+            data_access: DataAccess = None,
+            job_ready_timeout: int = 600,
+            print_timeout: int = 120,
     ) -> None:
         """
         Follow remote job execution
@@ -595,10 +595,10 @@ class ComponentUtils:
 
     @staticmethod
     def add_settings_to_component(
-        component: dsl.ContainerOp,
-        timeout: int,
-        image_pull_policy: str = "Always",
-        cache_strategy: str = "P0D",
+            component: dsl.ContainerOp,
+            timeout: int,
+            image_pull_policy: str = "Always",
+            cache_strategy: str = "P0D",
     ) -> None:
         """
         Add settings to kfp component
@@ -616,10 +616,10 @@ class ComponentUtils:
 
     @staticmethod
     def set_s3_env_vars_to_component(
-        component: dsl.ContainerOp,
-        secret: str,
-        env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"},
-        prefix: str = None,
+            component: dsl.ContainerOp,
+            secret: str,
+            env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"},
+            prefix: str = None,
     ) -> None:
         """
         Set S3 env variables to KFP component
@@ -642,8 +642,8 @@ class ComponentUtils:
 
     @staticmethod
     def default_compute_execution_params(
-        worker_options: str,  # ray worker configuration
-        actor_options: str,  # cpus per actor
+            worker_options: str,  # ray worker configuration
+            actor_options: str,  # cpus per actor
     ) -> str:
         """
         This is the most simplistic transform execution parameters computation
