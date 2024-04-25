@@ -18,7 +18,7 @@ repos:
       hooks:
           - id: isort
     - repo: https://github.com/ibm/detect-secrets
-      rev: 0.13.1+ibm.60.dss
+      rev: 0.13.1+ibm.62.dss
       hooks:
           - id: detect-secrets # pragma: whitelist secret
             args: [--baseline, .secrets.baseline, --fail-on-unaudited]
