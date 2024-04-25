@@ -1,16 +1,31 @@
 # Building Kind cluster with everything installed
 
-## Before you begin
+## Pre-requirements
 
-Ensure that you have the following:
+### Supported platforms
+A Kind cluster is not intended for production purposes; it is only meant as a local execution example. However,
+running a Kind Kubernetes cluster with KubeFlow pipelines (KFP) and local data storage (Minio) requires significant
+memory. Therefore, we recommend deploying it on machines with at least 32 GB of RAM and 8-9 CPU cores.
+
+> **Note**: for MacOS users, see the following [comments](../doc/mac.md)
+
+### Preinstalled software
+The following programs should be manually installed:
 
 - [Helm](https://helm.sh/) 3.10.0 or greater must be installed and configured on your machine.
 - [Kind](https://kind.sigs.k8s.io/) tool for running local Kubernetes clusters 0.14.0 or newer must be installed on your machine.
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) 1.26 or newer must be installed on your machine.
 - [wget](https://www.gnu.org/software/wget/) 1.21 must be installed on your machine.
-- [lsof](https://formulae.brew.sh/formula/lsof) must be installed on your machine
+- [lsof](https://formulae.brew.sh/formula/lsof) must be installed on your machine.
 - [MinIO Client (mc)](https://min.io/docs/minio/linux/reference/minio-mc.html#quickstart) must be installed on your machine.
-- ensure nothing is running on port 8080, which is used by KInd cluster ingress.
+- Container agent such as [Docker](https://www.docker.com/) or [Podman](https://podman-desktop.io/)
+
+> **NOTE**: Additionally, ensure that nothing is running on port 8080, which is used by the Kind cluster ingress.
+
+If you do not want to upload the testing data into the local Minio, and reduce memory footprint, please set:
+```bash
+export POPULATE_TEST_DATA ?= 0
+```
 
 ## Preparing Kind cluster for testing
 
@@ -18,7 +33,6 @@ This is a manual build instruction. As an alternative, you can execute the `make
 the project `kind` directory instead. `make setup` performs complete installation, including validation that port
 8080 is available, creation of the cluster, installing required software (NGNIX, KubeRay and KFP), creating
 ingresses and secrets and loading local data to Minio.
-
 
 ### Create cluster
 

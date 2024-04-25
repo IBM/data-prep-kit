@@ -11,4 +11,5 @@ requires a significant amount of memory. For this initial Data Prep LAB release,
 execution on Mac computers with Apple silicon. Instead, we suggest using a real Kubernetes cluster or a Linux virtual
 machine with an Intel CPU.
 
-In addition to the considerations specific to Apple Silicon, we recommend using a Mac with at least 16GB of memory. Our testing shows that many of transforms, when applied to large input files, run "out of memory" on a machine with 8GB of memory. 
+> **Note**: the *current* release does not support building cross-platform images, therefore, please do not build images 
+on the Apple silicon. 
