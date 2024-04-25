@@ -63,6 +63,10 @@ In addition, there are some useful `make` targets (see conventions above):
 * `make help` - displays the available `make` targets and help text.
 
 
+## Executing S3 examples
+
+To execute S3 examples, please refer to this [document](../../../data-processing-lib/doc/using_s3_transformers.md)
+for setting up MinIO and mc prior to running the example
 
 
 

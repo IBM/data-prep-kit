@@ -80,6 +80,8 @@ mc cp --recursive universal/tokenization/test-data/ds02/input/ local/test/tokeni
 *Note*, that once the data is copied, Minio is storing it on the local file system, so you do not need to
 copy it again after cluster restart
 
+## Creating access and secret key for Minio access
+
 The last thing is to add Minio access and secret keys for accessing it. The following command:
 
 ```shell
