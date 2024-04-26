@@ -125,8 +125,9 @@ Follow the documentation [here](doc/overview.md) to build your own pipelines.
 
 ### Automate the pipeline
 The data preprocessing can be automated by running transformers as a KubeFlow pipeline (KFP). 
-See a simple transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md), and [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
-if you want to combine several data transformation steps.
+See a simple transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md). Next releases of Data Prep LAB will 
+demonstrate how several simple transform pipelines can be combined into a single KFP pipeline. Future releases of 
+Data Prep LAB will demonstrate how multiple simple transform pipelines can be combined into a single KFP pipeline.
 
 The project facilitates the creation of a local Kind cluster with all the required software and test data. 
 To work with the Kind cluster and KFP, you need to install several pre-required software packages. Please refer to 
