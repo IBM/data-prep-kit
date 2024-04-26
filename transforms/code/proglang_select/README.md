@@ -61,3 +61,10 @@ the following command line arguments are available in addition to
                         secret_key: secret key help text
                         url: optional s3 url
                         region: optional s3 region```
+```
+
+### Executing S3 examples
+
+To execute S3 examples, please refer to this [document](../../../data-processing-lib/doc/using_s3_transformers.md)
+for setting up MinIO and mc prior to running the example
+

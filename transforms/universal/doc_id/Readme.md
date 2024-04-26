@@ -91,3 +91,8 @@ the following command line arguments are available in addition to
                         Compute unique integer id and place in the given named column
 ```
 These correspond to the configuration keys described above.
+
+### Executing S3 examples
+
+To execute S3 examples, please refer to this [document](../../../data-processing-lib/doc/using_s3_transformers.md)
+for setting up MinIO and mc prior to running the example
