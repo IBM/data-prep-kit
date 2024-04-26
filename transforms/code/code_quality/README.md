@@ -76,4 +76,7 @@ the following command line arguments are available in addition to
 * "--tokenizer" - input a tokenizer to convert the data into tokens. The default tokenizer is `codeparrot/codeparrot`
 * "--hf_token" - input the Hugging Face auth token to download the tokenizer. This option is only required for the tokenizer's whose access is restricted in Hugging Face.
 
+## Executing S3 examples
 
+To execute S3 examples, please refer to this [document](../../../data-processing-lib/doc/using_s3_transformers.md) 
+for setting up MinIO and mc prior to running the example
