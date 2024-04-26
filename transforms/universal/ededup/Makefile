@@ -29,3 +29,18 @@ test-image:: .transforms.test-image-help
 
 
 publish:: .transforms.publish
+
+run-cli-sample: 
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+                RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
+                --ededup_num_hashes 2"	\
+                .transforms.run-src-file
+
+
+
+run-local-sample: .transforms.run-local-sample
+
+run-local-ray-sample: .transforms.run-local-ray-sample
+
+run-s3-ray-sample: .transforms.run-s3-ray-sample
+

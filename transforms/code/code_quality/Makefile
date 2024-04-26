@@ -31,3 +31,12 @@ publish:: .transforms.publish
 
 setup:: .transforms.setup
 
+
+run-cli-sample: .transforms.run-cli-sample
+
+run-local-sample: .transforms.run-local-sample
+
+run-local-ray-sample: .transforms.run-local-ray-sample
+
+run-s3-ray-sample: .transforms.run-s3-ray-sample
+
