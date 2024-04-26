@@ -13,7 +13,7 @@
 import argparse
 from typing import Any
 
-from data_processing.data_access import DataAccessFactory
+from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider
 from ray.actor import ActorHandle
@@ -32,7 +32,7 @@ class DefaultTableTransformRuntime:
         self.params = params
 
     def get_transform_config(
-        self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
+        self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
     ) -> dict[str, Any]:
         """
         Get the dictionary of configuration that will be provided to the transform's initializer.
