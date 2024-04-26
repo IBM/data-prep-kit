@@ -204,3 +204,44 @@ conventions:
 		echo "Recommend not using 'annotator' in your transform name";	\
 	fi
 	@echo Done checking transform project conventions.
+
+.PHONY: run-local-ray-sample
+run-local-ray-sample:
+	@# Help: Run the $(TRANSFORM_NAME)_local_ray.py file (if it exists).
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_local_ray.py .make.run-src-file
+
+.PHONY: run-s3-ray-sample
+run-s3-ray-sample:
+	@# Help: Run the $(TRANSFORM_NAME)_s3_ray.py file (if it exists).
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_s3_ray.py .make.run-src-file
+
+.PHONY: run-local-sample
+run-local-sample:
+	@# Help: Run the $(TRANSFORM_NAME)_local.py file (if it exists).
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_local.py .make.run-src-file
+
+# Expects RUN_FILE
+.PHONY: .make.run-src-file
+.make.run-src-file:
+	@if [ ! -e "src/$(RUN_FILE)" ];	then	\
+	    echo "";					\
+	    echo src/$(RUN_FILE) does not exist.;	\
+	    echo "";					\
+	    exit 1;					\
+	fi
+	@if [ ! -d "venv" ];	then			\
+	    echo "";					\
+	    echo "Please 'make venv' before running $(RUN_FILE).";		\
+	    echo "";					\
+	    exit 1;					\
+	fi
+	source venv/bin/activate;	\
+	cd src;				\
+	python $(RUN_FILE)
+
+minio-start:	
+	$(MAKE) .defaults.minio.start
+
+minio-load:	
+	$(MAKE) .defaults.minio.load-all
+
