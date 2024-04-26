@@ -34,7 +34,9 @@ setup:: .transforms.setup
 
 run-cli-sample: .transforms.run-cli-sample
 
-run-local-sample: .transforms.run-local-sample
+run-local-sample: #.transforms.run-local-sample
+	@# Help: Not implemented yet
+	@echo "No src/code_quality_local.py yet :("
 
 run-local-ray-sample: .transforms.run-local-ray-sample
 

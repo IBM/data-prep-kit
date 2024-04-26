@@ -35,7 +35,9 @@ run-cli-sample:
                 "  .transforms.run-src-file
 
 
-run-local-sample: .transforms.run-local-sample
+run-local-sample: #.transforms.run-local-sample
+	@# Help: Not implemented yet
+	@echo "No src/tokenization_local.py yet :("
 
 run-local-ray-sample: .transforms.run-local-ray-sample
 

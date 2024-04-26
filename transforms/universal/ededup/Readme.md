@@ -70,7 +70,6 @@ These correspond to the configuration keys described above.
 To run the samples, use the following `make` targets
 
 * `run-cli-sample` - runs src/ededup_transform.py using command line args
-* `run-local-sample` - runs src/ededup_local.py
 * `run-local-ray-sample` - runs src/ededup_local_ray.py
 * `run-s3-ray-sample` - runs src/ededup_s3_ray.py
 

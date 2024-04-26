@@ -63,7 +63,6 @@ the following command line arguments are available in addition to
 To run the samples, use the following `make` targets
 
 * `run-cli-sample` - runs src/tokenization_transform.py using command line args
-* `run-local-sample` - runs src/tokenization_local.py
 * `run-local-ray-sample` - runs src/tokenization_local_ray.py
 * `run-s3-ray-sample` - runs src/tokenization_s3_ray.py
 

@@ -50,7 +50,6 @@ the following command line arguments are available in addition to
 To run the samples, use the following `make` targets
 
 * `run-cli-sample` - runs src/code_quality_transform.py using command line args
-* `run-local-sample` - runs src/code_quality_local.py
 * `run-local-ray-sample` - runs src/code_quality_local_ray.py
 * `run-s3-ray-sample` - runs src/code_quality_s3_ray.py
 
