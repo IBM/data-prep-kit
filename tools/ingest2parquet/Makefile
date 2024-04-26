@@ -22,3 +22,9 @@ image: .defaults.lib-src-image
 test-src: .defaults.test-src
 
 test-image: image .defaults.test-image-pytest
+
+minio-load:
+	$(MAKE) MINIO_SRC=test-data/input MINIO_DEST=ingest2parquet/input .defaults.minio.load-test-data
+
+minio-start: .defaults.minio.start
+

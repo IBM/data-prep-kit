@@ -239,9 +239,16 @@ run-local-sample:
 	cd src;				\
 	python $(RUN_FILE)
 
+.PHONY: .transforms.load-minio
+.transforms.load-minio::
+	@#Help: Install the test-data/input files into minio for $(TRANSFORM_NAME)
+	dir=$$(find $(REPOROOT)/transforms -type d -name $(TRANSFORM_NAME));	\
+	$(MAKE) MINIO_SRC=$$dir/test-data/input MINIO_DEST=$(TRANSFORM_NAME)/input .defaults.minio.load-test-data
+
+
 minio-start:	
 	$(MAKE) .defaults.minio.start
 
 minio-load:	
-	$(MAKE) .defaults.minio.load-all
+	$(MAKE) .transforms.load-minio 
 

@@ -241,25 +241,10 @@ __check_defined = \
 	mc admin info local
 	mc alias set local http://127.0.0.1:9000 minioadmin minioadmin
 
-.PHONY: .defaults.minio.load-all
-.defaults.minio.load-all::
+.PHONY: .defaults.minio.load-test-data
+.defaults.minio.load-test-data::
 	$(MAKE) .defaults.minio.check
-	@# Help: Load the test data from across the repo into a local minio server 
+	@# Help: Load $(MINIO_SRC) into minio at local/test/$(MINIO_DEST) 
 	mc mb  local/test
-	mc cp --recursive $(REPOROOT)/tools/ingest2parquet/test-data/input/ local/test/ingest2parquet/input
-	mc cp --recursive $(REPOROOT)/transforms/code/code_quality/test-data/input/ local/test/code_quality/input
-	mc cp --recursive $(REPOROOT)/transforms/code/proglang_select/test-data/input/ local/test/proglang_select/input
-	mc cp --recursive $(REPOROOT)/transforms/code/proglang_select/test-data/languages/ local/test/proglang_select/languages
-	mc cp --recursive $(REPOROOT)/transforms/code/malware/test-data/input/ local/test/malware/input
-	mc cp --recursive $(REPOROOT)/transforms/language/doc_quality/test-data/input/ local/test/doc_quality/input
-	mc cp --recursive $(REPOROOT)/transforms/language/language_id/test-data/input/ local/test/language_id/input
-	mc cp --recursive $(REPOROOT)/transforms/universal/blocklist/test-data/input/ local/test/blocklist/input
-	mc cp --recursive $(REPOROOT)/transforms/universal/doc_id/test-data/input/ local/test/doc_id/input
-	mc cp --recursive $(REPOROOT)/transforms/universal/ededup/test-data/input/ local/test/ededup/input
-	mc cp --recursive $(REPOROOT)/transforms/universal/fdedup/test-data/input/ local/test/fdedup/input
-	mc cp --recursive $(REPOROOT)/transforms/universal/filter/test-data/input/ local/test/filter/input
-	mc cp --recursive $(REPOROOT)/transforms/universal/noop/test-data/input/ local/test/noop/input
-	mc cp --recursive $(REPOROOT)/transforms/universal/tokenization/test-data/ds01/input/ local/test/tokenization/ds01/input
-	mc cp --recursive $(REPOROOT)/transforms/universal/tokenization/test-data/ds02/input/ local/test/tokenization/ds02/input
-
+	mc cp --recursive $(MINIO_SRC) local/test/$(MINIO_DEST)
 
