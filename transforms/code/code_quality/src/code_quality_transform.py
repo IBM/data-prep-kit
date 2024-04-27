@@ -12,10 +12,8 @@
 
 import argparse
 import os
-import sys
 
 import numpy as np
-import pyarrow
 import pyarrow as pa
 from bs4 import BeautifulSoup
 from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher

@@ -15,7 +15,7 @@ import traceback
 from datetime import datetime
 
 import ray
-from data_processing.data_access import DataAccessFactory
+from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     RayUtils,
@@ -34,7 +34,7 @@ logger = get_logger(__name__)
 @ray.remote(num_cpus=1, scheduling_strategy="SPREAD")
 def orchestrate(
     preprocessing_params: TransformOrchestratorConfiguration,
-    data_access_factory: DataAccessFactory,
+    data_access_factory: DataAccessFactoryBase,
     transform_runtime_config: DefaultTableTransformConfiguration,
 ) -> int:
     """
