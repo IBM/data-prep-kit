@@ -42,7 +42,7 @@ At least one of _hash_column_ or _int_id_column_ must be specified.
 ## Running
 
 We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/doc_id_local_ray.py), [s3](src/doc_id_s3.py) 
+[local file system](src/doc_id_local_ray.py), [s3](src/doc_id_s3_ray.py) 
 
 ```shell
 $ source venv/bin/activate
