@@ -1,0 +1,24 @@
+site_name: "Data Prep LAB"
+docs_dir: 'doc'
+nav:
+  - Home: index_.md
+  - Overview: overview.md
+  - Tutorials:
+      - transform-tutorials.md
+      - Simple: simplest-transform-tutorial.md
+      - Advanced: advanced-transform-tutorial.md
+theme:
+  name: 'material'
+  favicon: 'favicon.ico'
+  logo: 'logo-ibm.png'
+  palette:
+    primary: black
+#  palette:
+#    primary: 'blue grey'
+  features:
+    - navigation.tabs
+plugins:
+- search
+- mkdocstrings
+- badges
+
