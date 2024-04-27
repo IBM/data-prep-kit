@@ -4,57 +4,57 @@
 This Python script is designed to convert raw data files, particularly ZIP files, into Parquet format. It is built to handle concurrent processing of multiple files using multiprocessing for efficient execution.
 Each file contained within the ZIP is transformed into a distinct row within the Parquet dataset, adhering to the below schema.
 
-**title:**
+**title:** (string)
 
 - **Description:** Path to the file within the ZIP archive.
 - **Example:** `"title": "data/file.txt"`
 
-**document:**
+**document:** (string)
 
 - **Description:** Name of the ZIP file containing the current file.
 - **Example:** `"document": "example.zip"`
 
-**contents:**
+**contents:** (string)
 
 - **Description:** Content of the file, converted to a string.
 - **Example:** `"contents": "This is the content of the file."`
 
-**document_id:**
+**document_id:** (string)
 
 - **Description:** Unique identifier generated for each file.
 - **Example:** `"document_id": "b1e4a879-41c5-4a6d-a4a8-0d7a53ec7e8f"`
 
-**ext:**
+**ext:** (string)
 
 - **Description:** File extension extracted from the file path.
 - **Example:** `"ext": ".txt"`
 
-**hash:**
+**hash:** (string)
 
 - **Description:** sha256 hash value computed from the file content string.
 - **Example:** `"hash": "a1b2c3d4"`
 
-**size:**
+**size:** (int64)
 
 - **Description:** Size of the file content in bytes.
 - **Example:** `"size": 1024`
 
-**date_acquired:**
+**date_acquired:** (string)
 
 - **Description:** Timestamp indicating when the file was processed.
 - **Example:** `"date_acquired": "2024-03-25T12:00:00"`
 
-**snapshot:** (optional)
+**snapshot:** (string)(optional)
 
 - **Description:** Name indicating which dataset it belong to.
 - **Example:** `"snapshot": "github"`
 
-**programming_language:** (optional)
+**programming_language:** (string)(optional)
 
 - **Description:** Programming language detected using the file extension.
 - **Example:** `"programming_language": "Java"`
 
-**domain:** (optional)
+**domain:** (string)(optional)
 
 - **Description:** Name indicating which domain it belong to, whether code, natural language etc..
 - **Example:** `"domain": "code"`
@@ -105,7 +105,7 @@ We provide several demos of the script usage for different data storage options:
 
 
 #[local file system](src/ingest2parquet_local.py)
-This script processes data stored locally on the system. It sets up parameters for local file paths and invokes the run() function from ingest2parquet.py to convert raw data files to Parquet format.
+This script processes data stored locally on the system. It sets up parameters for local file paths and invokes the ingest2parquet() function from ingest2parquet.py to convert raw data files to Parquet format.
 
 **Run the script without any command-line arguments.**
 
@@ -129,8 +129,8 @@ python ingest2parquet.py \
 
 
 
-#[s3](src/s3.py) 
-This script is designed to process data stored on an S3 bucket. It sets up necessary parameters for accessing the S3 bucket and invokes the run() function from ingest2parquet.py to convert raw data files to Parquet format.
+#[s3](src/ingest2parquet_s3.py) 
+This script is designed to process data stored on an S3 bucket. It sets up necessary parameters for accessing the S3 bucket and invokes the ingest2parquet() function from ingest2parquet.py to convert raw data files to Parquet format.
 
 To execute the script with S3 functionality, we utilize minio. Please consult the documentation on setting up minio for further guidance: [using_s3_transformers](../../data-processing-lib/doc/using_s3_transformers.md)
 
@@ -140,7 +140,7 @@ To execute the script with S3 functionality, we utilize minio. Please consult th
 make venv
 source venv/bin/activate
 cd src
-python s3.py
+python ingest2parquet_s3.py
 ```
 
 **Run the script via command-line** 
@@ -155,8 +155,7 @@ python ingest2parquet.py \
     --data_files_to_use '[".zip"]'
 ```
 
-The output directory will contain both the new
-genrated parquet files  and the `metadata.json` file.
+The output directory will contain both the new genrated parquet files  and the `metadata.json` file.
 
 ## Metadata Fields
 
