@@ -69,8 +69,7 @@ def zip_to_table(data_access: DataAccess, file_path, detect_prog_lang: Any) -> p
                             raise Exception("No contents decoded")
 
                     except Exception as e:
-                        print(f" skipping {member.filename} Error: {str(e)}")
-
+                        print(f" skipping {member.filename} {str(e)}")
     table = pa.Table.from_pylist(data)
     return table
 
@@ -98,30 +97,35 @@ def raw_to_parquet(
         ext = TransformUtils.get_file_extension(file_path)
         if ext == ".zip":
             table = zip_to_table(data_access, file_path, detect_prog_lang)
-
-            snapshot_column = [snapshot] * table.num_rows
-            table = TransformUtils.add_column(table=table, name="snapshot", content=snapshot_column)
-            domain_column = [domain] * table.num_rows
-            table = TransformUtils.add_column(table=table, name="domain", content=domain_column)
+            if table.num_rows > 0:
+                snapshot_column = [snapshot] * table.num_rows
+                table = TransformUtils.add_column(
+                    table=table, name="snapshot", content=snapshot_column
+                )
+                domain_column = [domain] * table.num_rows
+                table = TransformUtils.add_column(
+                    table=table, name="domain", content=domain_column
+                )
         else:
             raise Exception(f"Got {ext} file, not supported")
-
-        # Get the output file name for the Parquet file
-        output_file_name = data_access.get_output_location(file_path).replace(".zip", ".parquet")
-        # Save the PyArrow table as a Parquet file and get metadata
-        print("output_file_name", output_file_name)
-        metadata = data_access.save_table(output_file_name, table)
-        if metadata[1]:
-            return (
-                True,
-                {
-                    "path": file_path,
-                    "bytes_in_memory": metadata[0],
-                    "row_count": table.num_rows,
-                },
+        if table.num_rows > 0:
+            # Get the output file name for the Parquet file
+            output_file_name = data_access.get_output_location(file_path).replace(
+                ".zip", ".parquet"
             )
-        else:
-            raise Exception("Failed to upload")
+            # Save the PyArrow table as a Parquet file and get metadata
+            metadata = data_access.save_table(output_file_name, table)
+            if metadata[1]:
+                return (
+                    True,
+                    {
+                        "path": file_path,
+                        "bytes_in_memory": metadata[0],
+                        "row_count": table.num_rows,
+                    },
+                )
+            else:
+                raise Exception("Failed to upload")
 
     except Exception as e:
         return (False, {"path": file_path, "error": str(e)})
@@ -147,7 +151,9 @@ def generate_stats(metadata: list) -> dict[str, Any]:
             failure_details.append(m[1])
 
     # Create DataFrame from success details to calculate total bytes in memory
-    success_df = pd.DataFrame(sucess_details, columns=["path", "bytes_in_memory", "row_count"])
+    success_df = pd.DataFrame(
+        sucess_details, columns=["path", "bytes_in_memory", "row_count"]
+    )
     total_bytes_in_memory = success_df["bytes_in_memory"].sum()
     total_row_count = success_df["row_count"].sum()
 
@@ -177,7 +183,9 @@ def ingest2parquet():
         type=bool,
         help="generate programming lang",
     )
-    parser.add_argument("-snapshot", "--snapshot", type=str, help="Name the dataset", default="")
+    parser.add_argument(
+        "-snapshot", "--snapshot", type=str, help="Name the dataset", default=""
+    )
     parser.add_argument(
         "-domain",
         "--domain",
@@ -196,12 +204,18 @@ def ingest2parquet():
     data_access = data_access_factory.create_data_access()
 
     # Retrieves file paths of files from the input folder.
-    file_paths = data_access.get_folder_files(data_access.input_folder, args.data_files_to_use, False)
+    file_paths = data_access.get_folder_files(
+        data_access.input_folder, args.data_files_to_use, False
+    )
 
     if len(file_paths) != 0:
         print(f"Number of files is {len(file_paths)} ")
         metadata = []
-        detect_prog_lang = detect_language.Detect_Programming_Lang() if args.detect_programming_lang else None
+        detect_prog_lang = (
+            detect_language.Detect_Programming_Lang()
+            if args.detect_programming_lang
+            else None
+        )
 
         with Pool() as p:
             # Processes each file concurrently
