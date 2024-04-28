@@ -3,22 +3,27 @@ REPOROOT=../../
 
 include $(REPOROOT)/.make.defaults
 
-DOCKER_IMAGE_NAME=ingest2parquet
-DOCKER_IMAGE_VERSION=0.1
-DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
+include ../../transforms/.make.transforms
+include ../../.make.versions
+
+TRANSFORM_NAME=ingest2parquet
+DOCKER_IMAGE_VERSION=${INGEST_TO_PARQUET_VERSION}
 
 
-venv:	.defaults.lib-src-venv
+venv::	.transforms.venv
 
-build:	 venv image
+build::	.transforms.build
 
-test: test-src test-image	
-	@# Help: Test both the source and the docker image
+test::	.transforms.test
 
-clean: .defaults.clean
+clean:: .transforms.clean
 
-image: .defaults.lib-src-image
+image:: .transforms.image
 
-test-src: .defaults.test-src
+test-src:: .transforms.test-src
 
-test-image: image .defaults.test-image-pytest
+setup:: .transforms.setup
+
+test-image:: .transforms.test-image
+
+publish:: .transforms.publish
