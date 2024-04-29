@@ -18,55 +18,14 @@ jobs:
     - name: Build and Test Code Transforms
       run: |
          make -C transforms/code DOCKER=docker image test-image 
-  build-universal-doc_id:
+  build-universal:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Build and Test Universal Transforms
       run: |
-         #make -C transforms/universal/doc_id DOCKER=docker image test-image
-         echo "This is a placeholder."
-  build-universal-ededup:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Build and Test Universal Transforms
-      run: |
-         make -C transforms/universal/ededup DOCKER=docker image test-image
-  build-universal-fdedup:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Build and Test Universal Transforms
-      run: |
-         make -C transforms/universal/fdedup DOCKER=docker image test-image
-  build-universal-filter:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Build and Test Universal Transforms
-      run: |
-         make -C transforms/universal/filter DOCKER=docker image test-image
-  build-universal-noop:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Build and Test Universal Transforms
-      run: |
-         make -C transforms/universal/noop DOCKER=docker image test-image 
-  build-universal-tokenization:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Build and Test Universal Transforms
-      run: |
-         make -C transforms/universal/tokenization DOCKER=docker image test-image
+         make -C transforms/universal DOCKER=docker image test-image
   build-tools:
     runs-on: ubuntu-latest
     steps:
