@@ -18,6 +18,10 @@ is unique across all rows in all tables provided to the `transform()` method.
 To enable this annotation, set `int_id_column` to the name of the column, where you want 
 to store it. 
 
+Document IDs are generally useful for tracking annotations to specific documents. Additionally 
+[fuzzy deduping](../fdedup) relies on integer IDs to be present. If your dataset does not have
+document ID column(s), you can use this transform to create ones.
+
 ## Building
 
 A [docker file](Dockerfile) that can be used for building docker image. You can use
@@ -40,7 +44,6 @@ configuration for values are as follows:
 At least one of _hash_column_ or _int_id_column_ must be specified.
 
 ## Running
-
 
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
