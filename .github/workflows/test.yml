@@ -32,8 +32,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Test Universal Transforms
-      # disabled since it requires more resources
-      if: false
       run: |
          make -C transforms/universal/doc_id DOCKER=docker venv test-src
   test-universal-ededup:
