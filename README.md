@@ -35,12 +35,14 @@ Users can incorporate their logic for custom data transformation and then use th
 distributed computing framework to scalably apply the transform to their data. 
 
 Features of the toolkit: 
+
 - Collection of [scalable transformations](transforms) to expedite user onboarding
 - [Data processing library](data-processing-lib) designed to facilitate effortless addition and deployment of new scalable transformations
 - Operate efficiently and seamlessly from laptop-scale to cluster-scale supporting data processing at any data size
 - [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp) of transforms.
 
 Data modalities supported: 
+
 * Code - support for code datasets as downloaded .zip files of github repositories converted to . 
 [parquet](https://arrow.apache.org/docs/python/parquet.html) files. 
 * Language - Future releases will provide transforms specific to natural language, and like code transforms will operate on parquet files.

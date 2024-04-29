@@ -13,6 +13,7 @@ In support of this model the class
 [AbstractTableTransform](../src/data_processing/transform/table_transform.py) 
 is expected to be extended when implementing a transform.
 The following methods are defined:
+
 * ```__init__(self, config:dict)``` - an initializer through which the transform can be created 
 with implementation-specific configuration.  For example, the location of a model, maximum number of
 rows in a table, column(s) to use, etc. 
@@ -37,6 +38,7 @@ not need this feature, a default implementation is provided to return an empty l
 
 ### Running in Ray
 When a transform is run using the Ray-based framework a number of other capabilities are involved:
+
 * [Transform Runtime](../src/data_processing/ray/transform_runtime.py) - this provides the ability for the
 transform implementor to create additional Ray resources 
 and include them in the configuration used to create a transform
@@ -53,6 +55,7 @@ This also provide the ability to supplement the statics collected by
 implement `main()` that makes use of a Transform Configuration to start the Ray runtime and execute the transforms.
 
 Roughly speaking the following steps are completed to establish transforms in the RayWorkers
+
 1. Launcher parses the CLI parameters using an ArgumentParser configured with its own CLI parameters 
 along with those of the Transform Configuration, 
 2. Launcher passes the Transform Configuration and CLI parameters to the [RayOrchestrator](../src/data_processing/ray/transform_orchestrator.py)
@@ -171,6 +174,7 @@ With these basic concepts in mind, we start with a simple example and
 progress to more complex transforms. 
 Before getting started  you may want to consult the 
 [transform project root readme](../../transforms/README.md) documentation.
+
 * [Simplest transform](simplest-transform-tutorial.md) - 
 Here we will take a simple example to show the basics of creating a simple transform
 that takes a single input Table, and produces a single Table.
@@ -180,6 +184,7 @@ resources (models, configuration, etc) for a transform.
 * [Porting from GUF 0.1.6](transform-porting.md)
 
 Once a transform has been built, testing can be enabled with the testing framework:
+
 * [Transform Testing](testing-transforms.md) - shows how to test a transform
 independent of the Ray framework.
 * [End-to-End Testing](testing-e2e-transform.md) - shows how to test the

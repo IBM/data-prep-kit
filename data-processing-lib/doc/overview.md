@@ -9,6 +9,7 @@ more complex transformations requiring coordination among transforming nodes.
 This might include operations such as de-duplication, merging, and splitting.
 The framework uses a plugin-model for the primary functions.  The key ones for
 developers of data transformation are:
+
 * [Transformation](../src/data_processing/transform/table_transform.py) - a simple, easily-implemented interface defines
 the specifics of a given data transformation.
 * [Transform Configuration](../src/data_processing/ray/transform_runtime.py) - defines
@@ -18,6 +19,7 @@ command line arguments specific to transform, and the short name for the transfo
 This might include provisioning of shared memory objects or creation of additional actors.
 
 To learn more consider the following:
+
 * [Transform Tutorials](transform-tutorials.md)
 * [Testing transformers with S3](using_s3_transformers.md)
 * [Architecture Deep Dive](architecture.md)
