@@ -3,27 +3,40 @@ REPOROOT=../../
 
 include $(REPOROOT)/.make.defaults
 
-include ../../transforms/.make.transforms
 include ../../.make.versions
 
-TRANSFORM_NAME=ingest2parquet
 DOCKER_IMAGE_VERSION=${INGEST_TO_PARQUET_VERSION}
+DOCKER_IMAGE_NAME?=ingest2parquet
+DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 
 
-venv::	.transforms.venv
+venv::	.defaults.lib-src-venv
 
-build::	.transforms.build
+build::	venv image
 
-test::	.transforms.test
+test::	test-src test-image
 
-clean:: .transforms.clean
+clean:: .defaults.clean
 
-image:: .transforms.image
+image:: .defaults.lib-src-image
 
-test-src:: .transforms.test-src
+test-src:: .defaults.test-src test-local
 
-setup:: .transforms.setup
+test-image:: image .defaults.test-image-pytest
 
-test-image:: .transforms.test-image
+test-local::
+	@# Help: Run the *local*.py files in the src directory
+	@source venv/bin/activate;		\
+	export PYTHONPATH=src;			\
+	files=$$(find src -name '*local*.py' );		\
+	for i in $$files; do			\
+	    echo Executing: python $$i;		\
+	    python $$i;				\
+	    if [ $$? -ne 0 ];	then		\
+		exit 1;				\
+	    fi;					\
+	done
+
+
 
 publish:: .transforms.publish
