@@ -212,7 +212,12 @@ conventions:
 
 .PHONY: .transforms.run-s3-ray-sample
 .transforms.run-s3-ray-sample:
+	@echo ""
+	@echo "Please be sure you've started (make minio-start) and loaded (make minio-load) minio"
+	@echo ""
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_s3_ray.py .transforms.run-src-file
+	@# Help: Run $(TRANSFORM_NAME)_s3_ray.py file (if it exists).  Assumes minio has beens started.
+	
 
 .PHONY: .transforms.run-local-sample
 .transforms.run-local-sample:
@@ -244,15 +249,22 @@ conventions:
 	python $(RUN_FILE) $(RUN_ARGS)
 
 .PHONY: .transforms.load-minio
-.transforms.load-minio::
+.transforms.minio-load::
 	@#Help: Install the test-data/input files into minio for $(TRANSFORM_NAME)
 	dir=$$(find $(REPOROOT)/transforms -type d -name $(TRANSFORM_NAME));	\
 	$(MAKE) MINIO_SRC=$$dir/test-data/input MINIO_DEST=$(TRANSFORM_NAME)/input .defaults.minio.load-test-data
 
 
+.PHONY: minio-start
 minio-start:	
 	$(MAKE) .defaults.minio.start
 
+.PHONY: minio-stop
+minio-stop:	
+	$(MAKE) .defaults.minio.stop
+
+.PHONY: minio-load
 minio-load:	
-	$(MAKE) .transforms.load-minio 
+	$(MAKE) .transforms.minio-load
+
 
