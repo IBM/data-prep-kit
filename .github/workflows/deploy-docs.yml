@@ -15,8 +15,10 @@ jobs:
           python-version: 3.x
       - run: pip install mkdocs-material mkdocstrings[python] mkdocs-badges
       - run: |
-           cp README.md ./data-processing-lib/doc/index.md
            # remove badges 
-           cat README.md |sed  '/img\.shields\.io/d' > ./data-processing-lib/doc/index_.md 
+           cat README.md |sed  '/img\.shields\.io/d' > ./data-processing-lib/doc/index.md 
+           # copy repo docs to mkdocs `docs_dir`
            cp doc/* ./data-processing-lib/doc/
+           # copy kfp tutorials to mkdocs `docs_dir`
+           cp kfp/doc/* ./data-processing-lib/doc/
            cd data-processing-lib && mkdocs gh-deploy --force
