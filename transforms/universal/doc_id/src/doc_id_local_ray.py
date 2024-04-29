@@ -36,7 +36,7 @@ params = {
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # orchestrator
     "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "runtime_num_workers": 5,
+    "runtime_num_workers": 2,
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_creation_delay": 0,
