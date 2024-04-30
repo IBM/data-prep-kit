@@ -3,8 +3,6 @@ REPOROOT=../../
 
 include $(REPOROOT)/.make.defaults
 
-include ../../.make.versions
-
 DOCKER_IMAGE_VERSION=${INGEST_TO_PARQUET_VERSION}
 DOCKER_IMAGE_NAME?=ingest2parquet
 DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
@@ -14,7 +12,7 @@ venv::	.defaults.lib-src-venv
 
 build::	venv image
 
-test::	test-src test-image
+test::	venv test-src test-image
 
 clean:: .defaults.clean
 
@@ -37,6 +35,4 @@ test-local::
 	    fi;					\
 	done
 
-
-
-publish:: .transforms.publish
+publish:: image .defaults.publish
