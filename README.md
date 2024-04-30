@@ -1,13 +1,13 @@
 
 
-<h1 align="center">Data Prep LAB </h1>
+<h1 align="center">Data Prep Lab </h1>
 
-<div align="center">
+<div align="center"> 
 
-  [![Status](https://img.shields.io/badge/status-active-success.svg)]() 
-  [![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-lab/issues)
-  [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-lab/pulls)
-</div>
+<?  [![Status](https://img.shields.io/badge/status-active-success.svg)]() ?>
+<?  [![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-lab/issues) ?>
+<?  [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-lab/pulls) ?>
+</div> 
 
 ---
 
