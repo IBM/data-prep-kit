@@ -28,7 +28,7 @@ test-image:: .transforms.test-image
 
 publish:: .transforms.publish
 
-run-cli-sample: 
+run-cli-ray-sample: 
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
                 --doc_id_int True "	\

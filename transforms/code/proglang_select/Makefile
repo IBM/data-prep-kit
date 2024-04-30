@@ -29,7 +29,7 @@ test-image:: .transforms.test-image
 publish:: .transforms.publish
 
 
-run-cli-sample: .transforms.run-cli-sample
+run-cli-ray-sample: .transforms.run-cli-ray-sample
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
 		--proglang_select_language_column language							\

@@ -82,6 +82,9 @@ extra-help:
 
 .PHONY: .transforms.clean
 .transforms.clean:: .defaults.clean
+	$(MAKE) minio-stop 
+	@# Help: Normal cleanups plus stop minio server
+
 
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
@@ -220,8 +223,8 @@ conventions:
 .transforms.run-local-sample:
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_local.py .transforms.run-src-file
 
-.PHONY: .transforms.run-cli-sample 
-.transforms.run-cli-sample:
+.PHONY: .transforms.run-cli-ray-sample 
+.transforms.run-cli-ray-sample:
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
 		RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" " .transforms.run-src-file
 

@@ -28,7 +28,7 @@ test-image:: .transforms.test-image
 
 publish:: .transforms.publish
 
-run-cli-sample: .transforms.run-cli-sample
+run-cli-ray-sample: .transforms.run-cli-ray-sample
 
 run-local-sample: .transforms.run-local-sample
 
