@@ -115,7 +115,7 @@ Above you see both parameters and their values for small runs (tens of files). W
 ## Running
 
 In order to run this transform, you need to have an integer doc id in every row of data. [Test data](test-data/input)
-ALready has this column, but if you run on our own dataset, please use [doc_id transform](../doc_id) to create one.
+Already has this column, but if you run on our own dataset, please use [doc_id transform](../doc_id) to create one.
 
 We also provide several demos of the transform usage for different data storage options, including
 [local file system](src/fdedup_local_ray.py) and [s3](src/fdedup_s3_ray.py)
