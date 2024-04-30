@@ -39,7 +39,7 @@ Features of the toolkit:
 - Collection of [scalable transformations](transforms) to expedite user onboarding
 - [Data processing library](data-processing-lib) designed to facilitate effortless addition and deployment of new scalable transformations
 - Operate efficiently and seamlessly from laptop-scale to cluster-scale supporting data processing at any data size
-- [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp) of transforms.
+- [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp/transform_workflows/Readme.md) of transforms.
 
 Data modalities supported: 
 
@@ -64,7 +64,7 @@ A transform can follow one of the two patterns: filter or annotator pattern.
 In the annotator design pattern, a transform adds information during the processing by adding one more column to the parquet file.
 The annotator design also allows a user to verify the results of the processing before actual filtering of the data.
 When a transform acts as a filter, it processes the data and outputs the transformed data (example exact deduplication).
-A general purpose [SQL-based filter transform](transforms/filter) enables a powerful mechanism for identifying 
+A general purpose [SQL-based filter transform](transforms/universal/filter) enables a powerful mechanism for identifying 
 columns and rows of interest for downstream processing.
 For a new module to be added, a user can pick the right design based on the processing to be applied. More details [here](transforms). 
 
