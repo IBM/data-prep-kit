@@ -37,7 +37,7 @@ found [here](../../transforms/universal/ededup/src/ededup_transform.py)
 
 First, let's define the transform class.  To do this we extend
 the base abstract/interface class
-[AbstractTableTransform](../src/data_processing_ibm/transform/table_transform.py),
+[AbstractTableTransform](../src/data_processing/transform/table_transform.py),
 which requires definition of the following:
 * an initializer (i.e. `init()`) that accepts a dictionary of configuration
   data.  For this example, the configuration data will only be defined by
@@ -136,7 +136,7 @@ If there is no metadata then simply return an empty dictionary.
 
 First, let's define the transform runtime class.  To do this we extend
 the base abstract/interface class
-[DefaultTableTransformRuntime](../src/data_processing_ibm/ray/transform_runtime.py),
+[DefaultTableTransformRuntime](../src/data_processing/ray/transform_runtime.py),
 which requires definition of the following:
 * an initializer (i.e. `init()`) that accepts a dictionary of configuration
   data.  For this example, the configuration data will only be defined by
@@ -172,8 +172,7 @@ adds their handles to the transform parameters
 ```
 Inputs to this method includes a set of parameters, that moght not be needed for this transformer, but
 rather a superset of all parameters that can be used by different implementations of transform runtime (
-see for example [block listing](../../transforms/universal/blocklisting),
-[fuzzy dedup](../../transforms/universal/fdedup), etc).
+see for example [fuzzy dedup](../../transforms/universal/fdedup), etc).
 The return of this function is a dictionary information for transformer initialization. In this
 implementation we add additional parameters to the input dictionary, but in general, it can be a completely
 new dictionary build here
@@ -219,7 +218,7 @@ cli_prefix = f"{short_name}_"
 
 class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
     def __init__(self):
-        super().__init__(name=ededup, runtime_class=EdedupRuntime, transform_class=EdedupTransform)
+        super().__init__(name=short_name, runtime_class=EdedupRuntime, transform_class=EdedupTransform)
         self.params = {}
 ```
 
