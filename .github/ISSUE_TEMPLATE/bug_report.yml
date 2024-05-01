@@ -21,6 +21,30 @@ body:
                     issues.
                 required: true
 
+    - type: dropdown
+      attributes:
+          label: Component
+          description: |
+              To what component is the bug assigned.
+          multiple: true
+          options:
+              - Transforms/code/code_quality
+              - Transforms/code/proglang_select
+              - Transforms/code/malware
+              - Transforms/universal/doc_id
+              - Transforms/universal/ededup
+              - Transforms/universal/fdedup
+              - Transforms/universal/noop
+              - Transforms/universal/tokenization
+              - Transforms/Other
+              - kfp/ray
+              - Makefiles
+              - CI/CD
+              - Documentation
+              - Other
+      validations:
+          required: true
+
     - type: textarea
       attributes:
           label: What happened + What you expected to happen
@@ -55,30 +79,6 @@ body:
           placeholder: >
               How often does this problem occur? (Once? Every time? Only when certain conditions are met?)
               Any relevant logs to include? Are there other relevant issues?
-
-    - type: dropdown
-      attributes:
-          label: Component
-          description: |
-              To what component is the bug assigned.
-          multiple: true
-          options:
-              - Transforms/code/code_quality
-              - Transforms/code/proglang_select
-              - Transforms/code/malware
-              - Transforms/universal/doc_id
-              - Transforms/universal/ededup
-              - Transforms/universal/fdedup
-              - Transforms/universal/noop
-              - Transforms/universal/tokenization
-              - Transforms/Other
-              - kfp/ray
-              - Makefiles
-              - CI/CD
-              - Documentation
-              - Other
-      validations:
-          required: true
 
     - type: dropdown
       attributes:
