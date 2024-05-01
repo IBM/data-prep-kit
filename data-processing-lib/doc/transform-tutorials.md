@@ -181,7 +181,6 @@ that takes a single input Table, and produces a single Table.
 * [External resources transform](transform-external-resources.md) - shows how to load additional
 resources (models, configuration, etc) for a transform.
 * [Advanced transform](advanced-transform-tutorial.md)
-* [Porting from GUF 0.1.6](transform-porting.md)
 
 Once a transform has been built, testing can be enabled with the testing framework:
 
