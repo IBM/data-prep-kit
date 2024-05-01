@@ -1,4 +1,4 @@
-# Include the common rules.
+REPOROOT=../../../
 # Use "make help" to see them.
 include ../../../.make.defaults
 

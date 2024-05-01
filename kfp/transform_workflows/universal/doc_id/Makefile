@@ -1,7 +1,7 @@
-REPOROOT ?= ${CURDIR}/../../../../
+REPOROOT=${CURDIR}/../../../../
 # venv is common to all workflows
-VENV_ACTIVATE ?= ${REPOROOT}/kfp/transform_workflows/venv/bin/activate
-PYTHON ?= python3
+VENV_ACTIVATE=${REPOROOT}/kfp/transform_workflows/venv/bin/activate
+PYTHON ?= python
 
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free

@@ -14,15 +14,15 @@ endef
 .PHONY: .transforms_workflows.reconcile-requirement
 .transforms_workflows.reconcile-requirement:
 	sed -i.back "s%${DOCKER_IMAGE_NAME}:.*%${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}\"%" ${PIPELINE_FILE}
-	sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION}\"/" ${PIPELINE_FILE}
+	sed -i.back "s%kfp-data-processing:.*%kfp-data-processing:${KFP_DOCKER_VERSION}\"%" ${PIPELINE_FILE}
 
 .PHONY: .transforms_workflows.compile-pipeline
 .transforms_workflows.compile-pipeline:
 	. ${VENV_ACTIVATE} && ${PYTHON} ${WF_NAME}.py
 
 %.yaml: %.py ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env
-	make .transforms_workflows.reconcile-requirement PIPELINE_FILE=$<
-	make .transforms_workflows.compile-pipeline WF_NAME=$(shell (basename $< .py))
+	$(MAKE) .transforms_workflows.reconcile-requirement PIPELINE_FILE=$<
+	$(MAKE) .transforms_workflows.compile-pipeline WF_NAME=$(shell (basename $< .py))
 
 .PHONY: .transforms_workflows.test-pipeline
 .transforms_workflows.test-pipeline:
@@ -36,7 +36,6 @@ endef
 
 ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt
 	@# Help: Create the virtual environment common to all workflows
-	sed -i.back "s/data-prep-lab-kfp==[0-9].*/data-prep-lab-kfp==${DPL_LIB_KFP_VERSION}/" ${REPOROOT}/kfp/kfp_ray_components/requirements.txt
 	rm -rf ${REPOROOT}/kfp/transform_workflows/venv
 	$(PYTHON) -m venv ${REPOROOT}/kfp/transform_workflows/venv
 	. ${VENV_ACTIVATE}; 	\
