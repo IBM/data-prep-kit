@@ -32,6 +32,7 @@ endef
 	fi
 	cd ${TRANSFORM_SRC} && $(MAKE) image && $(MAKE) load-image
 	sed -i.back 's%imagePullPolicy: ifNotPresent%imagePullPolicy: Always%' ${CURDIR}/${PIPELINE_FILE}
+	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) image && $(MAKE) load-image
 	. ${VENV_ACTIVATE}  && ${PYTHON} ${REPOROOT}/kfp/transform_workflows/hack/test_pipeline.py -p ${CURDIR}/${PIPELINE_FILE}
 
 ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt
