@@ -5,7 +5,7 @@
 # REPOROOT points to the top of the git repository. 
 # 	For example REPOROOT=../../..
 # TRANSFORM_NAME defines the name of the transform and is used to derive
-#  	DOCKER_IMAGE_NAME and TRANSFORM_SRC_FILE if not already defined.
+#  	DOCKER_NAME  and TRANSFORM_SRC_FILE if not already defined.
 
 # Optional inputs (that have defaults)
 # TRANSFORM_SRC_FILE is the base name of the python source file containing the main()
@@ -13,7 +13,7 @@
 #       By convention this name defaults to $(TRANSFORM_NAME)_transform.py.
 #	This file is then assumed to be in the home dir of the docker image and
 #	can be run with "python $(TRANSFORM_SRC_FILE) --help"
-# DOCKER_IMAGE_NAME is the name of the docker image.  
+# DOCKER_NAME  is the name of the docker image.  
 #	By default its value is $(TRANSFORM_NAME).
 #
 # Targets defined here use double colon so can be overriden
@@ -28,8 +28,8 @@
 #######################################################################################
 include $(REPOROOT)/.make.defaults
 
-DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
-DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
+DOCKER_NAME?=$(TRANSFORM_NAME)
+#DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_NAME):$(DOCKER_IMAGE_VERSION)
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
 TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_transform.py
@@ -51,7 +51,6 @@ extra-help:
 	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
 	@echo DOCKER_REGISTRY_KEY - the docker user to use.  DOCKER_REGISTRY_KEY=secret
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
-	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
 	@echo "TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_local_ray.py)"
 	@echo ""
 
