@@ -123,7 +123,7 @@ Get started by running the noop transform that performs an identity operation by
 Get started by building a data pipeline with our example pipeline (link to be added) that can run on a laptop. 
 
 ### Build your own sequence of transforms
-Follow the documentation [here](doc/overview.md) to build your own pipelines. 
+Follow the documentation [here](data-processing-lib/doc/overview.md) to build your own pipelines. 
 
 ### Automate the pipeline
 The data preprocessing can be automated by running transformers as a KubeFlow pipeline (KFP). 
