@@ -39,7 +39,7 @@ ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${
 	$(PYTHON) -m venv ${REPOROOT}/kfp/transform_workflows/venv
 	. ${VENV_ACTIVATE}; 	\
 	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple \
-	pip install -e ${REPOROOT}/kfp/kfp_support_lib
+	pip install data_prep_lab_kfp==${DPL_LIB_KFP_VERSION}
 	
 .PHONY: .transforms_workflows.clean
 .transforms_workflows.clean:

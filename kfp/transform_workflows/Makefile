@@ -14,7 +14,7 @@ include ../../.make.defaults
 
 include .make.transforms_workflows
 
-export PYTHON=python3
+export PYTHON=python
 PYTEST=pytest
 export VENV_ACTIVATE := ${CURR_DIR}/venv/bin/activate
 
