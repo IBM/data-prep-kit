@@ -27,3 +27,12 @@ setup:: .transforms.setup
 test-image:: .transforms.test-image
 
 publish:: .transforms.publish
+
+run-cli-ray-sample: .transforms.run-cli-ray-sample
+
+run-local-sample: .transforms.run-local-sample
+
+run-local-ray-sample: .transforms.run-local-ray-sample
+
+run-s3-ray-sample: .transforms.run-s3-ray-sample
+

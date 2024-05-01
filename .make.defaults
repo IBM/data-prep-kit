@@ -198,6 +198,21 @@ __check_defined = \
 	@# Help: Test an $(DOCKER_IMAGE) use test source inside the image. 
 	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s test 
 	
+.PHONY: .defaults.test-locals
+.defaults.test-locals::
+	@# Help: Run the *local*.py files in the src directory
+	@source venv/bin/activate;              \
+	export PYTHONPATH=src;                  \
+	files=$$(find src -name '*local*.py' );         \
+	for i in $$files; do                    \
+	    echo Executing: python $$i;         \
+	    python $$i;                         \
+	    if [ $$? -ne 0 ];   then            \
+		exit 1;                         \
+	    fi;                                 \
+	done   
+
+
 # This expects the image to already be built and so does not depending on .defaults.publish.
 # This allows others to define their own image building prior to publishing.
 .PHONY: .defaults.publish
@@ -220,4 +235,68 @@ __check_defined = \
 	pip install --upgrade pip;		\
 	pip install wheel;			\
 	pip install -r requirements.txt;	\
+
+.PHONY: .defaults.check.installed
+.defaults.check.installed::
+	@installed=$$(which $(CHECK_RUNNABLE));		\
+	if [ -z "$$installed" ]; then			\
+	    echo $(CHECK_RUNNABLE) must be installed;	\
+	    exit 1;					\
+	fi
+
+.PHONY: .defaults.minio.check
+.defaults.minio.check::
+	@# Help: Check that minio and the mc CLI is installed. 
+	$(MAKE) CHECK_RUNNABLE=minio .defaults.check.installed
+	$(MAKE) CHECK_RUNNABLE=mc .defaults.check.installed
+
+MINIO_DIR=/tmp/data-prep-lab
+MINIO_ALIAS=local
+# These are the credentials used by samples.
+MINIO_ADMIN_USER=localminioaccesskey
+MINIO_ADMIN_PWD= localminiosecretkey
+
+.PHONY: .defaults.minio.verify-running
+.defaults.minio.verify-running:
+	@z=$$(ps -elf | grep minio | grep -v grep);	\
+	if [ -z "$$z" ]; then				\
+	    echo "";					\
+	    echo "Please start minio (see make help)";	\
+	    echo "";					\
+	    exit 1;					\
+	fi
+
+.PHONY: .defaults.minio.stop
+.defaults.minio.stop::
+	$(MAKE) .defaults.minio.check
+	@# Help: Stop the minio server used for S3-based samples
+	-mc admin service stop $(MINIO_ALIAS) > /dev/null 2>&1
+	-mc alias rm $(MINIO_ALIAS)  > /dev/null 2>&1
+
+.PHONY: .defaults.minio.start
+.defaults.minio.start::
+	$(MAKE) .defaults.minio.stop
+	@# Help: Stop, then start, the minio server used for S3-based samples
+	rm -rf $(MINIO_DIR) 
+	mkdir  $(MINIO_DIR) 
+	echo Starting minio server			
+	minio server $(MINIO_DIR) &
+	sleep 1
+	-mc alias rm $(MINIO_ALIAS)  > /dev/null 2>&1
+	mc alias set $(MINIO_ALIAS) http://127.0.0.1:9000 minioadmin minioadmin
+	mc admin user svcacct add --access-key "$(MINIO_ADMIN_USER)" --secret-key "$(MINIO_ADMIN_PWD)" $(MINIO_ALIAS) minioadmin
+	mc alias ls $(MINIO_ALIAS)
+	@echo "Test minio server started" 
+
+.PHONY: .defaults.minio.load-test-data
+.defaults.minio.load-test-data::
+	@# Help: Load the minio server with S3 sample data from $(MINIO_SRC) to $(MINIO_DEST) 
+	@if [ -z "$(MINIO_SRC)" -o -z "$(MINIO_DEST)" ]; then	\
+		echo MINIO_SRC and MINIO_DEST must be defined when use $? target;\
+		exit 1;						\
+	fi
+	$(MAKE) .defaults.minio.check
+	@# Help: Load $(MINIO_SRC) into minio at local/test/$(MINIO_DEST) 
+	-mc mb  local/test > /dev/null 2>&1	# Igore if it already exists
+	mc cp --recursive $(MINIO_SRC) local/test/$(MINIO_DEST)
 

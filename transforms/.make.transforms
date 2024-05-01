@@ -38,7 +38,8 @@ TRANSFORM_TEST_FILE?=test/test_$(TRANSFORM_NAME).py
 # The following taken from https://stackoverflow.com/a/65243296/45375
 # Lists all targets and optional help text found in the target.
 # :: rule means we first run the help from the main make.defaults.
-help::	
+extra-help:	
+	@# Help: Shows additional make macros that can be overridden/used. 
 	@echo ""
 	@echo Overridable macro values include the following:
 	@echo DOCKER - the name of the docker executable to use.  DOCKER=$(DOCKER)
@@ -53,12 +54,8 @@ help::
 	@echo DOCKER_IMAGE_NAME - the name of the docker image to produce.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
 	@echo "TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_local_ray.py)"
 	@echo ""
-	@echo Macros that require definition in the including Makefile
-	@echo "REPOROOT defines the root directory of this repository (such as ../../..)" 
-	@echo TRANSFORM_NAME defines the name of the transform and is used to define defaults for...
-	@echo "    DOCKER_IMAGE_NAME and TRANSFORM_SRC_FILE.  For, example 'noop'"
-	@echo DOCKER_IMAGE_VERSION - the version of the docker image to produce.  DOCKER_IMAGE_VERSION=$(DOCKER_IMAGE_VERSION)
-	@$(MAKE) .transforms.check_required_macros
+
+
 
 .PHONY: .transforms.setup
 .transforms.setup::
@@ -85,6 +82,9 @@ help::
 
 .PHONY: .transforms.clean
 .transforms.clean:: .defaults.clean
+	$(MAKE) minio-stop 
+	@# Help: Normal cleanups plus stop minio server
+
 
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
@@ -134,18 +134,7 @@ help::
 test-locals:: .transforms.test-locals
 
 .PHONY: .transforms.test-locals
-.transforms.test-locals::
-	@# Help: Run the *local*.py files in the src directory 
-	@source venv/bin/activate;		\
-	export PYTHONPATH=src;			\
-	files=$$(find src -name '*local*.py' );		\
-	for i in $$files; do			\
-	    echo Executing: python $$i;		\
-	    python $$i;				\
-	    if [ $$? -ne 0 ];	then		\
-		exit 1;				\
-	    fi;					\
-	done	
+.transforms.test-locals:: .defaults.test-locals
 
 # Build the image the transform way and then use the default publishing
 .PHONY: .transforms.publish
@@ -209,3 +198,67 @@ conventions:
 		echo "Recommend not using 'annotator' in your transform name";	\
 	fi
 	@echo Done checking transform project conventions.
+
+.PHONY: .transforms.run-local-ray-sample
+.transforms.run-local-ray-sample:
+	@# Help: Run the $(TRANSFORM_NAME)_local_ray.py file (if it exists).
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_local_ray.py .transforms.run-src-file
+
+.PHONY: .transforms.run-s3-ray-sample
+.transforms.run-s3-ray-sample:
+	$(MAKE) .defaults.minio.verify-running
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_s3_ray.py .transforms.run-src-file
+	@# Help: Run $(TRANSFORM_NAME)_s3_ray.py file (if it exists).  Assumes minio has beens started.
+	@echo ""
+	@echo "You may want to stop the minio server now (see make help)"
+	@echo ""
+	
+
+.PHONY: .transforms.run-local-sample
+.transforms.run-local-sample:
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_local.py .transforms.run-src-file
+
+.PHONY: .transforms.run-cli-ray-sample 
+.transforms.run-cli-ray-sample:
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+		RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" " .transforms.run-src-file
+
+# Expects RUN_FILE
+.PHONY: .transforms.run-src-file
+.transforms.run-src-file:
+	@# Help: Run $(RUN_FILE) (if it exists).
+	@if [ ! -e "src/$(RUN_FILE)" ];	then	\
+	    echo "";					\
+	    echo src/$(RUN_FILE) does not exist.;	\
+	    echo "";					\
+	    exit 1;					\
+	fi
+	@if [ ! -d "venv" ];	then			\
+	    echo "";					\
+	    echo "Please 'make venv' before running $(RUN_FILE).";		\
+	    echo "";					\
+	    exit 1;					\
+	fi
+	source venv/bin/activate;	\
+	cd src;				\
+	python $(RUN_FILE) $(RUN_ARGS)
+
+.PHONY: .transforms.load-minio
+.transforms.minio-load::
+	@# Help: Install the test-data/input files into minio for $(TRANSFORM_NAME)
+	dir=$$(find $(REPOROOT)/transforms -type d -name $(TRANSFORM_NAME));	\
+	$(MAKE) MINIO_SRC=$$dir/test-data/input MINIO_DEST=$(TRANSFORM_NAME)/input .defaults.minio.load-test-data
+
+
+.PHONY: minio-start
+minio-start:	
+	$(MAKE) .defaults.minio.start
+	$(MAKE) .transforms.minio-load
+	@# Help: Start and load the minio server with $(TRANSFORM_NAME) test data 
+
+.PHONY: minio-stop
+minio-stop:	
+	$(MAKE) .defaults.minio.stop
+
+
+
