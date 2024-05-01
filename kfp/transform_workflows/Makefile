@@ -11,7 +11,6 @@ PYTEST=pytest
 clean::
 	@# Help: Clean up the venv 
 	rm -rf venv || true
-	rm makeenv || true
 	$(MAKE) RULE=$@ .recurse
 
 setup::

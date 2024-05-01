@@ -2,29 +2,24 @@
 # know where they are running from.
 REPOROOT=../..
 include ${REPOROOT}/.make.versions
+include ${REPOROOT}/kfp/requirements.env
 
-
-IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
-
-include makeenv
 # Include the common rules.
 # Use "make help" to see them.
 include ../../.make.defaults
 
-PYTHON=python
 PIP=$(PYTHON) -m pip
 # Command to run pytest
 PYTEST=pytest -s
 PYTHON_VERSION=$(shell $(PYTHON) --version)
 VENV_ACTIVATE=venv/bin/activate
 
-DEPLOY_KUBEFLOW ?=0
+DEPLOY_KUBEFLOW ?= 0
 
 clean::
 	@# Help: Clean up the distribution build and the venv 
 	rm -r dist venv || true
 	rm -rf src/*egg-info || true
-	rm makeenv || true
 
 .check-env:: .check_python_version
 	@echo "Checks passed"
