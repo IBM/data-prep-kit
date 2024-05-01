@@ -254,6 +254,16 @@ MINIO_ALIAS=local
 MINIO_ADMIN_USER=localminioaccesskey
 MINIO_ADMIN_PWD= localminiosecretkey
 
+.PHONY: .defaults.minio.verify-running
+.defaults.minio.verify-running:
+	@z=$$(ps -elf | grep minio | grep -v grep);	\
+	if [ -z "$$z" ]; then				\
+	    echo "";					\
+	    echo "Please start minio (see make help)";	\
+	    echo "";					\
+	    exit 1;					\
+	fi
+
 .PHONY: .defaults.minio.stop
 .defaults.minio.stop::
 	$(MAKE) .defaults.minio.check
@@ -270,6 +280,7 @@ MINIO_ADMIN_PWD= localminiosecretkey
 	echo Starting minio server			
 	minio server $(MINIO_DIR) &
 	sleep 1
+	-mc alias rm $(MINIO_ALIAS)  > /dev/null 2>&1
 	mc alias set $(MINIO_ALIAS) http://127.0.0.1:9000 minioadmin minioadmin
 	mc admin user svcacct add --access-key "$(MINIO_ADMIN_USER)" --secret-key "$(MINIO_ADMIN_PWD)" $(MINIO_ALIAS) minioadmin
 	mc alias ls $(MINIO_ALIAS)
