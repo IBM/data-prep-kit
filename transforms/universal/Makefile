@@ -39,6 +39,6 @@ publish::
 	@$(MAKE) RULE=$@ .recurse
 
 load-image::
-	@# Help: Recursively make $@ in all subdirs 
-	$(KIND) load docker-image $(IMG) -n $(KIND_CLUSTER_NAME)
+	@# Help: Recursively make $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 

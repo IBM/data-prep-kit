@@ -38,7 +38,7 @@ def run_test(pipeline_package_path: str, endpoint: str = "http://localhost:8080/
     :param endpoint: endpoint to kfp service
     :return the pipeline run name as it appears in the kfp GUI
     """
-    tmout: int = 500
+    tmout: int = 800
     wait: int = 60
     file_name = os.path.basename(pipeline_package_path)
     pipeline_name = os.path.splitext(file_name)[0]

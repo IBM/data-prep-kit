@@ -182,7 +182,7 @@ test-locals:: .transforms.test-locals
 .PHONY: .transforms.load-image
 .transforms.load-image:
 	@# Help:  Load the api server image to the kind cluster created with setup-cluster.
-	$(KIND) load docker-image $(IMG) -n $(KIND_CLUSTER_NAME)
+	kind load docker-image $(DOCKER_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
 .PHONY: conventions
 conventions:
