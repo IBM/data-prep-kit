@@ -48,7 +48,7 @@ body:
       attributes:
           label: OS
           description: |
-              	What operating system
+              What operating system
           multiple: true
           options:
               - Ubuntu
@@ -62,7 +62,7 @@ body:
       attributes:
           label: Python
           description: |
-              	What version of python
+              What version of python
           multiple: true
           options:
               - 3.10
