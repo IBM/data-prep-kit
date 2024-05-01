@@ -19,8 +19,6 @@ IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_VERSION}
 	sed -i.back "s/data-prep-lab-kfp==[0-9].*/data-prep-lab-kfp==${DPL_LIB_KFP_VERSION}/" requirements.txt
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
 	$(DOCKER) build -t ${IMG} \
-		--build-arg DPL_LIB_VERSION=${DPL_LIB_VERSION} \
-		--build-arg DPL_LIB_KFP_VERSION=${DPL_LIB_KFP_VERSION} \
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
 		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . --no-cache
 

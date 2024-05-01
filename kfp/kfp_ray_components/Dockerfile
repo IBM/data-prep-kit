@@ -1,7 +1,5 @@
 FROM docker.io/rayproject/ray:2.9.3-py310
 
-ARG DPL_LIB_VERSION
-ARG DPL_LIB_KFP_VERSION
 ARG BUILD_DATE
 ARG GIT_COMMIT
 
@@ -15,6 +13,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 # remove credentials-containing file
 RUN rm requirements.txt
+
 
 
 COPY ./src /pipelines/component/src

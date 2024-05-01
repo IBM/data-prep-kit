@@ -3,22 +3,36 @@ REPOROOT=../../
 
 include $(REPOROOT)/.make.defaults
 
-DOCKER_IMAGE_NAME=ingest2parquet
-DOCKER_IMAGE_VERSION=0.1
+DOCKER_IMAGE_VERSION=${INGEST_TO_PARQUET_VERSION}
+DOCKER_IMAGE_NAME?=ingest2parquet
 DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 
 
-venv:	.defaults.lib-src-venv
+venv::	.defaults.lib-src-venv
 
-build:	 venv image
+build::	venv image
 
-test: test-src test-image	
-	@# Help: Test both the source and the docker image
+test::	venv test-src test-image
 
-clean: .defaults.clean
+clean:: .defaults.clean
 
-image: .defaults.lib-src-image
+image:: .defaults.lib-src-image
 
-test-src: .defaults.test-src
+test-src:: .defaults.test-src test-local
 
-test-image: image .defaults.test-image-pytest
+test-image:: image .defaults.test-image-pytest
+
+test-local::
+	@# Help: Run the *local*.py files in the src directory
+	@source venv/bin/activate;		\
+	export PYTHONPATH=src;			\
+	files=$$(find src -name '*local*.py' );		\
+	for i in $$files; do			\
+	    echo Executing: python $$i;		\
+	    python $$i;				\
+	    if [ $$? -ne 0 ];	then		\
+		exit 1;				\
+	    fi;					\
+	done
+
+publish:: image .defaults.publish
