@@ -28,15 +28,15 @@ body:
               To what component is the bug assigned.
           multiple: true
           options:
-              - Transforms
-                - code_quality
-                - doc_id
-                - ededup
-                - fdedup
-                - malware
-                - noop
-                - proglang_select
-                - tokenization
+              - Transforms/code/code_quality
+              - Transforms/code/proglang_select
+              - Transforms/code/malware
+              - Transforms/universal/doc_id
+              - Transforms/universal/ededup
+              - Transforms/universal/fdedup
+              - Transforms/universal/noop
+              - Transforms/universal/tokenization
+              - Transforms/Other
               - kfp/ray
               - Makefiles
               - CI/CD
