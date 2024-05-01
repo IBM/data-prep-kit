@@ -13,12 +13,9 @@ jobs:
             - uses: actions/setup-python@v2
               with:
                   python-version: 3.x
-            - run: pip install mkdocs-material mkdocstrings[python] mkdocs-badges
+            - run: pip install mkdocs-material mkdocstrings[python] mkdocs-badges mkdocs-same-dir
             - run: |
                   # remove badges 
-                  cat README.md |sed  '/img\.shields\.io/d' > ./data-processing-lib/doc/index.md 
-                  # copy repo docs to mkdocs `docs_dir`
-                  cp doc/* ./data-processing-lib/doc/
-                  # copy kfp tutorials to mkdocs `docs_dir`
-                  cp kfp/doc/* ./data-processing-lib/doc/
-                  cd data-processing-lib && mkdocs gh-deploy --force
+                  cat README.md |sed  '/img\.shields\.io/d' > README_.md
+                  mv README_.md README.md  
+                  mkdocs gh-deploy --force

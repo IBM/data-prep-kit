@@ -17,11 +17,11 @@ usage: noop_transform.py [-h]
                          [--data_max_files MAX_FILES]
                          [--data_files_to_use DATA_FILES_TO_USE]
                          [--data_num_samples DATA_NUM_SAMPLES]
-                         [--num_workers NUM_WORKERS] 
-                         [--worker_options WORKER_OPTIONS]
-                         [--pipeline_id PIPELINE_ID] [--job_id JOB_ID]
-                         [--creation_delay CREATION_DELAY]
-                         [--code_location CODE_LOCATION]
+                         [--runtime_num_workers NUM_WORKERS] 
+                         [--runtime_worker_options WORKER_OPTIONS]
+                         [--runtime_pipeline_id PIPELINE_ID] [--job_id JOB_ID]
+                         [--runtime_creation_delay CREATION_DELAY]
+                         [--runtime_code_location CODE_LOCATION]
 
 Driver for NOOP processing
 
@@ -57,9 +57,9 @@ options:
                         files extensions to use, default .parquet
   --data_num_samples DATA_NUM_SAMPLES
                         number of randomply picked files to use
-  --num_workers NUM_WORKERS
+  --runtime_num_workers NUM_WORKERS
                         number of workers
-  --worker_options WORKER_OPTIONS
+  --runtime_worker_options WORKER_OPTIONS
                         AST string defining worker resource requirements.
                         num_cpus: Required number of CPUs.
                         num_gpus: Required number of GPUs
@@ -70,12 +70,12 @@ options:
                                    scheduling_strategy, _metadata, concurrency_groups, lifetime, max_concurrency, max_restarts,
                                    max_task_retries, max_pending_calls, namespace, get_if_exists
                         Example: { 'num_cpus': '8', 'num_gpus': '1', 'resources': '{"special_hardware": 1, "custom_label": 1}' }
-  --pipeline_id PIPELINE_ID
+  --runtime_pipeline_id PIPELINE_ID
                         pipeline id
-  --job_id JOB_ID       job id
-  --creation_delay CREATION_DELAY
+  --runtime_job_id JOB_ID       job id
+  --runtime_creation_delay CREATION_DELAY
                         delay between actor' creation
-  --code_location CODE_LOCATION
+  --runtime_code_location CODE_LOCATION
                         AST string containing code location
                         github: Github repository URL.
                         commit_hash: github commit hash
