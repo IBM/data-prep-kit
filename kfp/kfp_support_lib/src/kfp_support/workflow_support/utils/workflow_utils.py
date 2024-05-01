@@ -142,6 +142,42 @@ class PipelinesUtils:
         :param host: host to connect to
         """
         self.kfp_client = Client(host=host)
+    
+    def upload_pipeline(
+        self,
+        pipeline_package_path: str = None,
+        pipeline_name: str = None,
+        description: str = None,
+    ) -> models.api_pipeline.ApiPipeline:
+        """
+        Uploads the pipeline
+        :param pipeline_package_path: Local path to the pipeline package.
+        :param pipeline_name: Optional. Name of the pipeline to be shown in the UI.
+        :param description: Optional. Description of the pipeline to be shown in the UI.
+        :return: Server response object containing pipleine id and other information.
+        """
+        try:
+            p = self.kfp_client.upload_pipeline(pipeline_package_path, pipeline_name, description)
+            logger.info("Pipeline uploaded")
+            return p
+        except Exception as e:
+            logger.warning(f"Exception uploading pipeline {e}")
+            return None
+
+    def delete_pipeline(self, pipeline_id):
+        """
+        Delete pipeline.
+
+        :param pipeline_id: id of the pipeline.
+        :return
+
+        Returns:
+          Object. If the method is called asynchronously, returns the request thread.
+
+        Raises:
+          kfp_server_api.ApiException: If pipeline is not found.
+        """
+        return self.kfp_client.delete_pipeline(pipeline_id)
 
     def start_pipeline(
             self,
