@@ -28,6 +28,12 @@ body:
               To what component is the bug assigned.
           multiple: true
           options:
+              - CI/CD
+              - Documentation
+              - KFP workflows
+              - Library/core
+              - Library/kfp
+              - Makefiles
               - Transforms/code/code_quality
               - Transforms/code/proglang_select
               - Transforms/code/malware
@@ -37,10 +43,6 @@ body:
               - Transforms/universal/noop
               - Transforms/universal/tokenization
               - Transforms/Other
-              - kfp/ray
-              - Makefiles
-              - CI/CD
-              - Documentation
               - Other
       validations:
           required: true
