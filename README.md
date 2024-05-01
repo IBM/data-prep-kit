@@ -19,7 +19,7 @@ As the variety of use cases grows, so does the need to support:
 - Large variety in the scale of data to be processed, laptop-scale to datacenter-scale
 
 Data Prep Lab offers implementations of commonly needed data transformations, called *modules*, for both Code and Language modalities.
-The goal is to offer high-level APIs for developers to quickly get started in working with their data without needing expertise in the underlying runtimes and frameworks.
+The goal is to offer high-level APIs for developers to quickly get started in working with their data, without needing expertise in the underlying runtimes and frameworks.
 
 ## 📝 Table of Contents
 - [About](#about)
@@ -30,7 +30,7 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 
 ## &#x1F4D6; About <a name = "about"></a>
 Data Prep Lab is a toolkit for streamlining data preparation for developers looking to build LLM-enabled applications via fine-tuning or instruction-tuning.
-Data Prep Lab contributes a set of available modules that the user can get started with to easily build data pipelines suitable for their use case.
+Data Prep Lab contributes a set of modules that the developer can get started with to easily build data pipelines suitable for their use case.
 These modules have been tested in producing pre-training datasets for the [Granite](https://huggingface.co/instructlab/granite-7b-lab) open models. 
 
 The modules are built on common frameworks (for Spark and Ray), called the *data processing library* that allows the developers to build new custom modules that readily scale across a variety of runtimes.
@@ -40,9 +40,11 @@ Eventually, Data Prep Lab will offer consistent APIs and configurations across t
 3. Spark runtime (local and distributed)
 4. [No-code pipelines with KFP](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) (local and distributed, wrapping Ray)
 
-Current support matrix for the above runtimes is shown in the table below.
+Current matrix for the combination of modules and supported runtimes is shown in the table below. 
+Contributors are welcome to add new modules as well as add runtime support for existing modules!
 
-|Transform                       | Python-only       | Ray              | Spark              | KFP on Ray             |
+
+|Modules                       | Python-only       | Ray              | Spark              | KFP on Ray             |
 |------------------------------  |-------------------|------------------|--------------------|------------------------|
 |No-op / template                |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
 |Doc ID annotation               |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
@@ -58,11 +60,13 @@ Current support matrix for the above runtimes is shown in the table below.
 
 Features of the toolkit: 
 - Aiming to accelerate unstructured data prep burden for the "long tail" of LLM use cases
-- Growing set of data transform implementations across multiple runtimes and scales of data
+- Growing set of module implementations across multiple runtimes and targeting laptop-scale to datacenter-scale processing
+- Growing set of sample pipelines developed for real enterprise use cases
 - [Data processing library](data-processing-lib) to enable contribution of new custom modules targeting new use cases
 - [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp) for no-code data prep
 
 Data modalities supported: 
+
 * Code - support for code datasets as downloaded .zip files of github repositories converted to . 
 [parquet](https://arrow.apache.org/docs/python/parquet.html) files. 
 * Language - Future releases will provide transforms specific to natural language, and like code transforms will operate on parquet files.
@@ -85,9 +89,8 @@ A transform can follow one of the two patterns: annotator or filter.
 - **Annotator** An anotator transform adds information during the processing by adding one more column to the parquet file.
 The annotator design also allows a user to verify the results of the processing before actual filtering of the data.
 
-- **Filter** A filter transform processes the data and outputs the transformed data (example exact deduplication).
-A general purpose [SQL-based filter transform](transforms/filter) enables a powerful mechanism for identifying 
-columns and rows of interest for downstream processing.
+- **Filter** A filter transform processes the data and outputs the transformed data, e.g., exact deduplication.
+A general purpose [SQL-based filter transform](transforms/universal/filter) enables a powerful mechanism for identifying  columns and rows of interest for downstream processing.
 For a new module to be added, a user can pick the right design based on the processing to be applied. More details [here](transforms). 
 
 #### Scaling of transforms: 
@@ -145,12 +148,13 @@ Get started by running the noop transform that performs an identity operation by
 Get started by building a data pipeline with our example pipeline (link to be added) that can run on a laptop. 
 
 ### Build your own sequence of transforms
-Follow the documentation [here](doc/overview.md) to build your own pipelines. 
+Follow the documentation [here](data-processing-lib/doc/overview.md) to build your own pipelines. 
 
 ### Automate the pipeline
 The data preprocessing can be automated by running transformers as a KubeFlow pipeline (KFP). 
-See a simple transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md), and [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
-if you want to combine several data transformation steps.
+See a simple transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md). Next releases of Data Prep LAB will 
+demonstrate how several simple transform pipelines can be combined into a single KFP pipeline. Future releases of 
+Data Prep LAB will demonstrate how multiple simple transform pipelines can be combined into a single KFP pipeline.
 
 The project facilitates the creation of a local Kind cluster with all the required software and test data. 
 To work with the Kind cluster and KFP, you need to install several pre-required software packages. Please refer to 
