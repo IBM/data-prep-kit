@@ -66,9 +66,9 @@ To run the samples, use the following `make` targets
 * `run-local-sample` - runs src/doc_id_local.py
 * `run-local-ray-sample` - runs src/doc_id_local_ray.py
 * `run-s3-ray-sample` - runs src/doc_id_s3_ray.py
-    * Requires prior invocation of `make minio-start minio-load` to load data into local minio for S3 access.
+    * Requires prior invocation of `make minio-start` to load data into local minio for S3 access.
 
-These targes will activate the virtual environment and set up any configuration needed.
+These targets will activate the virtual environment and set up any configuration needed.
 Use the `-n` option of `make` to see the detail of what is done to run the sample.
 
 For example, 
