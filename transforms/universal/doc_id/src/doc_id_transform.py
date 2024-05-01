@@ -15,7 +15,7 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccessFactory
+from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
@@ -128,7 +128,7 @@ class DocIDRuntime(DefaultTableTransformRuntime):
         super().__init__(params)
 
     def get_transform_config(
-        self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
+        self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
     ) -> dict[str, Any]:
         """
         Set environment for filter execution

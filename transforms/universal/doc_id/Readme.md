@@ -18,6 +18,10 @@ is unique across all rows in all tables provided to the `transform()` method.
 To enable this annotation, set `int_id_column` to the name of the column, where you want 
 to store it. 
 
+Document IDs are generally useful for tracking annotations to specific documents. Additionally 
+[fuzzy deduping](../fdedup) relies on integer IDs to be present. If your dataset does not have
+document ID column(s), you can use this transform to create ones.
+
 ## Building
 
 A [docker file](Dockerfile) that can be used for building docker image. You can use
@@ -41,43 +45,6 @@ At least one of _hash_column_ or _int_id_column_ must be specified.
 
 ## Running
 
-We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/doc_id_local_ray.py), [s3](src/doc_id_s3.py) 
-
-```shell
-$ source venv/bin/activate
-(venv) $ export PYTHONPATH=src
-(venv) $ python src/doc_id_local.py
-input table: pyarrow.Table
-Unnamed: 0.1: int64
-Unnamed: 0: int64
-document_id: string
-document: string
-title: string
-contents: string
-...
-output metadata : {}
-hashed column : [
-  [
-    "841...99b6",
-    "ebf...1777",
-    "79c...fa1e",
-    "79c...fa1e",
-    "ebf...1777"
-  ]
-]
-index column : [
-  [
-    0,
-    1,
-    2,
-    3,
-    4
-  ]
-]
-(venv) $
-```
-
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
@@ -92,7 +59,25 @@ the following command line arguments are available in addition to
 ```
 These correspond to the configuration keys described above.
 
-### Executing S3 examples
+### Running the samples
+To run the samples, use the following `make` targets
 
-To execute S3 examples, please refer to this [document](../../../data-processing-lib/doc/using_s3_transformers.md)
-for setting up MinIO and mc prior to running the example
+* `run-cli-ray-sample` - runs src/doc_id_transform.py using command line args
+* `run-local-sample` - runs src/doc_id_local.py
+* `run-local-ray-sample` - runs src/doc_id_local_ray.py
+* `run-s3-ray-sample` - runs src/doc_id_s3_ray.py
+    * Requires prior invocation of `make minio-start minio-load` to load data into local minio for S3 access.
+
+These targes will activate the virtual environment and set up any configuration needed.
+Use the `-n` option of `make` to see the detail of what is done to run the sample.
+
+For example, 
+```shell
+make run-cli-ray-sample
+...
+```
+Then 
+```shell
+ls output
+```
+To see results of the transform.

@@ -4,3 +4,4 @@ DOCKER_REPO ?= ""
 
 .reconcile-requirement::
 	sed -i.back "s%${DOCKER_IMAGE_NAME}:.*%${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}\"%" ${PIPELINE_FILE}
+	sed -i.back "s%kfp-data-processing:.*%kfp-data-processing:${KFP_DOCKER_VERSION}\"%" ${PIPELINE_FILE}

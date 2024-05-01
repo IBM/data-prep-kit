@@ -15,7 +15,7 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccess, DataAccessFactory, DataAccessLocal
+from data_processing.data_access import DataAccess, DataAccessFactoryBase, DataAccessFactory
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
@@ -120,7 +120,7 @@ class ProgLangSelectRuntime(DefaultTableTransformRuntime):
 
     def get_transform_config(
         self,
-        data_access_factory: DataAccessFactory,
+        data_access_factory: DataAccessFactoryBase,
         statistics: ActorHandle,
         files: list[str],
     ) -> dict[str, Any]:

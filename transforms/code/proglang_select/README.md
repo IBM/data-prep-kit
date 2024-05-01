@@ -29,20 +29,7 @@ The set of dictionary keys holding configuration for values are as follows:
 * _proglang_select_output_column_ - specifies the name of the annotation column appended to the parquet. 
 * _proglang_select_return_known_ - specifies whether to return supported or unsupported languages
 
-
-#### Running as pure python Ray application
-
-We provide a demo of the transform usage for [local file system](src/proglang_select_local_ray.py)
-
-```shell
-% make venv
-% source venv/bin/activate
-(venv) % cd src
-(venv) % python proglang_select_local_ray.py
-...
-% ls ../output/
-
-```
+## Running
 
 ### Launched Command Line Options 
 When running the transform with the Ray launcher,
@@ -63,8 +50,26 @@ the following command line arguments are available in addition to
                         region: optional s3 region```
 ```
 
-### Executing S3 examples
 
-To execute S3 examples, please refer to this [document](../../../data-processing-lib/doc/using_s3_transformers.md)
-for setting up MinIO and mc prior to running the example
+### Running the samples
+To run the samples, use the following `make` targets
 
+* `run-cli-ray-sample` - runs src/proglang_select_transform.py using command line args
+* `run-local-sample` - runs src/proglang_select_local.py
+* `run-local-ray-sample` - runs src/proglang_select_local_ray.py
+* `run-s3-ray-sample` - runs src/proglang_select_s3_ray.py
+    * Requires prior invocation of `make minio-start minio-load` to load data into local minio for S3 access.
+
+These targes will activate the virtual environment and set up any configuration needed.
+Use the `-n` option of `make` to see the detail of what is done to run the sample.
+
+For example, 
+```shell
+make run-cli-ray-sample
+...
+```
+Then 
+```shell
+ls output
+```
+To see results of the transform.
