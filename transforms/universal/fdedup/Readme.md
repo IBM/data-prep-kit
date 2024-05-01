@@ -114,59 +114,6 @@ Above you see both parameters and their values for small runs (tens of files). W
 
 ## Running
 
-In order to run this transform, you need to have an integer doc id in every row of data. [Test data](test-data/input)
-Already has this column, but if you run on our own dataset, please use [doc_id transform](../doc_id) to create one.
-
-We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/fdedup_local_ray.py) and [s3](src/fdedup_s3_ray.py)
-
-```shell
-$ source venv/bin/activate
-(venv) $ export PYTHONPATH=src
-(venv) $ python src/fdedup_local_ray.py
-15:12:17 INFO - Running locally
-15:12:17 INFO - fuzzy dedup params are {'doc_column': 'contents', 'id_column': 'int_id_column', 'cluster_column': 'cluster', 'worker_options': {'num_cpus': 0.8}, 'bucket_cpu': 0.5, 'doc_cpu': 0.5, 'mhash_cpu': 0.5, 'd_actors': 2, 'b_actors': 1, 'm_actors': 1, 'n_preprocessors': 2, 'num_permutations': 64, 'threshold': 0.8, 'world_shingle_size': 5, 'delimiters': ' ', 'random_delay_limit': 5, 'snapshot_delay': 1, 'use_bucket_snapshot': False, 'use_doc_snapshot': False}
-15:12:17 INFO - data factory data_ is using local data accessinput_folder - /Users/boris/Projects/data-prep-lab/transforms/universal/fdedup/test-data/input output_folder - /Users/boris/Projects/data-prep-lab/transforms/universal/fdedup/output
-15:12:17 INFO - data factory data_ max_files -1, n_sample -1
-15:12:17 INFO - data factory data_ Not using data sets, checkpointing False, max files -1, random samples -1, files to use ['.parquet']
-15:12:17 INFO - number of workers 3 worker options {'num_cpus': 0.8}
-15:12:17 INFO - pipeline id pipeline_id; number workers 3
-15:12:17 INFO - job details {'job category': 'preprocessing', 'job name': 'fdedup', 'job type': 'ray', 'job id': 'job_id'}
-15:12:17 INFO - code location {'github': 'github', 'commit_hash': '12345', 'path': 'path'}
-15:12:17 INFO - actor creation delay 0
-2024-04-18 15:12:19,864	INFO worker.py:1715 -- Started a local Ray instance. View the dashboard at 127.0.0.1:8265 
-(orchestrate pid=9410) 15:12:22 INFO - orchestrator started at 2024-04-18 15:12:22
-(orchestrate pid=9410) 15:12:22 INFO - Number of files is 1, source profile {'max_file_size': 0.03486919403076172, 'min_file_size': 0.03486919403076172, 'total_file_size': 0.03486919403076172}
-(orchestrate pid=9410) 15:12:22 INFO - Cluster resources: {'cpus': 16, 'gpus': 0, 'memory': 11.41860160883516, 'object_store': 2.0}
-(orchestrate pid=9410) 15:12:22 INFO - Number of workers - 3 with {'num_cpus': 0.8} each
-(orchestrate pid=9410) 15:12:22 INFO - starting run from the beginning
-(orchestrate pid=9410) 15:12:22 INFO - continuing from the very beginning
-(orchestrate pid=9410) 15:12:22 INFO - Fuzzy: num buckets 5, bucket length 11
-(orchestrate pid=9410) 15:12:22 INFO - created 1 bucket actors
-(orchestrate pid=9410) 15:12:22 INFO - created 1 minhash actors
-(orchestrate pid=9410) 15:12:22 INFO - Table preprocessing uses 3 readers
-(orchestrate pid=9410) 15:12:22 INFO - created 3 table processor actors
-(orchestrate pid=9410) 15:12:22 INFO - Completed 0 files in 6.620089213053385e-06 min. Waiting for completion
-(orchestrate pid=9410) 15:12:28 INFO - Completed processing in 0.1015137513478597 min
-(orchestrate pid=9410) 15:12:28 INFO - creating minhash snapshots
-(orchestrate pid=9410) 15:12:29 INFO - minhash snapshots created
-(orchestrate pid=9410) 15:12:29 INFO - creating bucket snapshots
-(orchestrate pid=9410) 15:12:30 INFO - bucket snapshots created
-(orchestrate pid=9410) 15:12:30 INFO - created 2 document actors
-(orchestrate pid=9410) 15:12:30 INFO - created 2 bucket processor actors
-(orchestrate pid=9410) 15:12:30 INFO - created bucket processor invoker
-(orchestrate pid=9410) 15:12:30 INFO - added invoker to bucket collectors
-(BucketsHash pid=9414) 15:12:30 INFO - processing buckets 0 long, 15 short
-(BucketsHash pid=9414) 15:12:30 INFO - Done submitting long buckets
-(BucketsHashProcessorInvoker pid=9423) 15:12:31 INFO - Waiting bucket processing completion
-(orchestrate pid=9410) 15:12:32 INFO - Done processing buckets in 0.024500517050425212 min
-(orchestrate pid=9410) 15:12:32 INFO - creating document snapshots
-(orchestrate pid=9410) 15:12:34 INFO - document snapshots created
-(orchestrate pid=9410) 15:12:34 INFO - Completed 0 files in 9.067853291829427e-06 min. Waiting for completion
-(orchestrate pid=9410) 15:12:37 INFO - Completed processing in 0.06522523562113444 min
-(orchestrate pid=9410) 15:12:37 INFO - done flushing in 0.002173900604248047 sec
-15:12:47 INFO - Completed execution in 0.5121301531791687 min, execution result 0
-````
 
 ### Launched Command Line Options
 When running the transform with the Ray launcher (i.e. TransformLauncher),
@@ -214,7 +161,24 @@ the following command line arguments are available in addition to
 
 These correspond to the configuration keys described above.
 
-### Executing S3 examples
+### Running the samples
+To run the samples, use the following `make` targets
 
-To execute S3 examples, please refer to this [document](../../../data-processing-lib/doc/using_s3_transformers.md)
-for setting up MinIO and mc prior to running the example
+* `run-cli-ray-sample` - runs src/fdedup_transform.py using command line args
+* `run-local-ray-sample` - runs src/fdedup_local_ray.py
+* `run-s3-ray-sample` - runs src/fdedup_s3_ray.py
+    * Requires prior invocation of `make minio-start minio-load` to load data into local minio for S3 access.
+
+These targes will activate the virtual environment and set up any configuration needed.
+Use the `-n` option of `make` to see the detail of what is done to run the sample.
+
+For example, 
+```shell
+make run-cli-ray-sample
+...
+```
+Then 
+```shell
+ls output
+```
+To see results of the transform.

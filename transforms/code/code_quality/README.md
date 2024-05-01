@@ -35,37 +35,7 @@ It uses a tokenizer to collect metrics specific to token ratio.  It is designed 
 
 ## Running
 
-#### Running as pure python application
-
-<pre>
-% make venv
-% source venv/bin/activate
-(venv) % cd src
-(venv) % python code_quality_transform.py
-04:36:21 INFO - Running locally
-04:36:21 INFO - Using local configuration with: input_folder - /root/codellm/repos/data-prep-lab/transforms/code/code_quality/test-data/input output_folder - /root/codellm/repos/data-prep-lab/transforms/code/code_quality/output
-04:36:21 INFO - Not using data sets, checkpointing False, max files -1
-04:36:21 INFO - number of workers 1 worker options {'num_cpus': 0.8}
-04:36:21 INFO - pipeline id pipeline_id; number workers 1
-04:36:21 INFO - job details {'job category': 'preprocessing', 'job name': 'code_quality', 'job type': 'ray', 'job id': 'job_id'}
-04:36:21 INFO - code location {'github': 'github', 'commit_hash': '12345', 'path': 'path'}
-04:36:21 INFO - actor creation delay 0
-2024-04-12 04:36:27,585	INFO worker.py:1715 -- Started a local Ray instance. View the dashboard at http://127.0.0.1:8265
-(orchestrate pid=5960) 04:36:32 INFO - orchestrator started at 2024-04-12 04:36:32
-(orchestrate pid=5960) 04:36:32 INFO - Number of files is 2, source profile {'max_file_size': 0.03258514404296875, 'min_file_size': 0.032202720642089844, 'total_file_size': 0.0647878646850586}
-(orchestrate pid=5960) 04:36:32 INFO - Cluster resources: {'cpus': 8, 'gpus': 0, 'memory': 8.38815994374454, 'object_store': 4.1940799709409475}
-(orchestrate pid=5960) 04:36:32 INFO - Number of workers - 1 with {'num_cpus': 0.8} each
-(orchestrate pid=5960) 04:36:37 INFO - Completed 1 files in 0.08397076924641927 min
-(orchestrate pid=5960) 04:36:37 INFO - Completed 1 files in 0.08398436307907105 min. Waiting for completion
-(orchestrate pid=5960) 04:36:37 INFO - Completed processing in 0.08446235656738281 min
-04:36:47 INFO - Completed execution in 0.4207143386205037 min, execution result 0
-(venv) % deactivate
-% ls ../output/
-metadata.json  sample_1.parquet  sample_2.parquet
-%
-</pre>
-
-## Launcher Command Line Options 
+### Launcher Command Line Options 
 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
@@ -76,7 +46,24 @@ the following command line arguments are available in addition to
 * "--tokenizer" - input a tokenizer to convert the data into tokens. The default tokenizer is `codeparrot/codeparrot`
 * "--hf_token" - input the Hugging Face auth token to download the tokenizer. This option is only required for the tokenizer's whose access is restricted in Hugging Face.
 
-## Executing S3 examples
+### Running the samples
+To run the samples, use the following `make` targets
 
-To execute S3 examples, please refer to this [document](../../../data-processing-lib/doc/using_s3_transformers.md) 
-for setting up MinIO and mc prior to running the example
+* `run-cli-ray-sample` - runs src/code_quality_transform.py using command line args
+* `run-local-ray-sample` - runs src/code_quality_local_ray.py
+* `run-s3-ray-sample` - runs src/code_quality_s3_ray.py
+    * Requires prior invocation of `make minio-start minio-load` to load data into local minio for S3 access.
+
+These targets will activate the virtual environment and set up any configuration needed.
+Use the `-n` option of `make` to see the detail of what is done to run the sample.
+
+For example, 
+```shell
+make run-cli-ray-sample
+...
+```
+Then 
+```shell
+ls output
+```
+To see results of the transform.
