@@ -196,6 +196,21 @@ __check_defined = \
 	@# Help: Test an $(DOCKER_IMAGE) use test source inside the image. 
 	$(DOCKER) run -t --rm $(DOCKER_IMAGE) pytest -s test 
 	
+.PHONY: .defaults.test-locals
+.defaults.test-locals::
+	@# Help: Run the *local*.py files in the src directory
+	@source venv/bin/activate;              \
+	export PYTHONPATH=src;                  \
+	files=$$(find src -name '*local*.py' );         \
+	for i in $$files; do                    \
+	    echo Executing: python $$i;         \
+	    python $$i;                         \
+	    if [ $$? -ne 0 ];   then            \
+		exit 1;                         \
+	    fi;                                 \
+	done   
+
+
 # This expects the image to already be built and so does not depending on .defaults.publish.
 # This allows others to define their own image building prior to publishing.
 .PHONY: .defaults.publish

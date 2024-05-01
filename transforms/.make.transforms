@@ -134,18 +134,7 @@ extra-help:
 test-locals:: .transforms.test-locals
 
 .PHONY: .transforms.test-locals
-.transforms.test-locals::
-	@# Help: Run the *local*.py files in the src directory 
-	@source venv/bin/activate;		\
-	export PYTHONPATH=src;			\
-	files=$$(find src -name '*local*.py' );		\
-	for i in $$files; do			\
-	    echo Executing: python $$i;		\
-	    python $$i;				\
-	    if [ $$? -ne 0 ];	then		\
-		exit 1;				\
-	    fi;					\
-	done	
+.transforms.test-locals:: .defaults.test-locals
 
 # Build the image the transform way and then use the default publishing
 .PHONY: .transforms.publish

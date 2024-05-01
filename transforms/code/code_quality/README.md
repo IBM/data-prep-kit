@@ -6,7 +6,7 @@ for details on general project conventions, transform configuration,
 testing and IDE set up.
 
 ## Summary
-This module captures code specific metrics of input data.  It includs the metrics discussed or highlighted in CodeParrot and Starcoder data preprocessing pipeline. In the current implementation, the module includes the following metrics & reports each metrics in individual column:
+This module captures code specific metrics of input data.  It is based on the work done in [CodeParrot](https://huggingface.co/blog/codeparrot) and [StarCoder](https://arxiv.org/abs/2305.06161) projects. In the current implementation, the module includes the following metrics & reports each metrics in individual column:
 
 * line specific metrics include mean & max line length
 * character and token ratio - uses the input tokenizer to tokenize the input data & measure the ratio between the characters and tokens
