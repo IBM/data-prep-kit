@@ -18,8 +18,20 @@ The set of dictionary keys holding [NOOPTransform](src/noop_transform.py)
 configuration for values are as follows:
 
 * _noop_sleep_sec_ - specifies the number of seconds to sleep during table transformation. 
+* _noop_pwd_ - specifies a dummy password not included in metadata. 
 
 ## Running
+
+### Launched Command Line Options 
+When running the transform with the Ray launcher (i.e. TransformLauncher),
+the following command line arguments are available in addition to 
+[the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
+```
+  --noop_sleep_sec NOOP_SLEEP_SEC
+                        Sleep actor for a number of seconds while processing the data frame, before writing the file to COS
+  --noop_pwd NOOP_PWD   A dummy password which should be filtered out of the metadata
+```
+These correspond to the configuration keys described above.
 
 ### Running the samples
 To run the samples, use the following `make` targets
@@ -28,9 +40,9 @@ To run the samples, use the following `make` targets
 * `run-local-sample` - runs src/noop_local.py
 * `run-local-ray-sample` - runs src/noop_local_ray.py
 * `run-s3-ray-sample` - runs src/noop_s3_ray.py
-    * Requires prior invocation of `make minio-start minio-load` to load data into local minio for S3 access.
+    * Requires prior invocation of `make minio-start` to load data into local minio for S3 access.
 
-These targes will activate the virtual environment and set up any configuration needed.
+These targets will activate the virtual environment and set up any configuration needed.
 Use the `-n` option of `make` to see the detail of what is done to run the sample.
 
 For example, 
