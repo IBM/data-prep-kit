@@ -46,10 +46,9 @@ Current support matrix for the above runtimes is shown in the table below.
 |------------------------------  |-------------------|------------------|--------------------|------------------------|
 |No-op / template                |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
 |Doc ID annotation               |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
-|Language annotation             |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
 |Programming language annnotation|:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      | 
-|Exact dedup                     |                   |:white_check_mark:|                    |:white_check_mark:      |
-|Fuzzy dedup                     |                   |:white_check_mark:|                    |:white_check_mark:      |
+|Exact dedup filter              |                   |:white_check_mark:|                    |:white_check_mark:      |
+|Fuzzy dedup filter              |                   |:white_check_mark:|                    |:white_check_mark:      |
 |Code quality annotation         |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
 |Malware annotation              |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
 |Filter on annotations           |:white_check_mark: |:white_check_mark:|:white_check_mark:  |:white_check_mark:      |
