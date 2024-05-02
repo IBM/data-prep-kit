@@ -14,6 +14,7 @@
 Data Prep Lab is a community project to democratize and accelerate unstructured data preparation for LLM app developers. 
 With the explosive growth of LLM-enabled use cases, developers are faced with the enormous challenge of preparing use case-specific unstructured data to fine-tune or instruct-tune the LLMs.
 As the variety of use cases grows, so does the need to support:
+
 - New modalities of data (code, language, speech, visual) 
 - New ways of transforming the data to optimize the performance of the resulting LLMs for each specific use case.
 - Large variety in the scale of data to be processed, from laptop-scale to datacenter-scale
@@ -35,6 +36,7 @@ These modules have been tested in producing pre-training datasets for the [Grani
 
 The modules are built on common frameworks (for Spark and Ray), called the *data processing library* that allows the developers to build new custom modules that readily scale across a variety of runtimes.
 Eventually, Data Prep Lab will offer consistent APIs and configurations across the following underlying runtimes.
+
 1. Python runtime
 2. Ray runtime (local and distributed)
 3. Spark runtime (local and distributed)
@@ -59,6 +61,7 @@ Contributors are welcome to add new modules as well as add runtime support for e
 
 
 Features of the toolkit: 
+
 - Aiming to accelerate unstructured data prep burden for the "long tail" of LLM use cases
 - Growing set of module implementations across multiple runtimes and targeting laptop-scale to datacenter-scale processing
 - A growing set of sample pipelines developed for real enterprise use cases
@@ -181,9 +184,6 @@ See [contribution guide](CONTRIBUTING.md)
 
 ## &#x2B50; Acknowledgements <a name = "acknowledgement"></a>
 Thanks to the [BigCode Project](https://github.com/bigcode-project) that has been used to build the code quality module. 
-
-
-
 
 
 
