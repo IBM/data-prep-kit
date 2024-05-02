@@ -20,19 +20,13 @@ image:: .defaults.lib-src-image
 
 test-src:: .defaults.test-src test-local
 
-test-image:: image .defaults.test-image-pytest
+test-image: image .defaults.test-image-pytest
 
-test-local::
-	@# Help: Run the *local*.py files in the src directory
-	@source venv/bin/activate;		\
-	export PYTHONPATH=src;			\
-	files=$$(find src -name '*local*.py' );		\
-	for i in $$files; do			\
-	    echo Executing: python $$i;		\
-	    python $$i;				\
-	    if [ $$? -ne 0 ];	then		\
-		exit 1;				\
-	    fi;					\
-	done
+minio-load:
+	$(MAKE) MINIO_SRC=test-data/input MINIO_DEST=ingest2parquet/input .defaults.minio.load-test-data
+
+minio-start: .defaults.minio.start
+
+test-local:: .defaults.test-locals
 
 publish:: image .defaults.publish

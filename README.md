@@ -1,6 +1,6 @@
 
 
-<h1 align="center">Data Prep LAB </h1>
+<h1 align="center">Data Prep Lab </h1>
 
 <div align="center">
 
@@ -11,11 +11,15 @@
 
 ---
 
-Data Prep Lab is a cloud native [Ray](https://docs.ray.io/en/latest/index.html)
-based toolkit that allows a user to quickly prepare their data for building LLM applications using a set of available transforms.
-This toolkit gives the user flexibility to run data prep from laptop-scale to cluster-scale, 
-and provides automation via [KFP pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/). Moreover, a user can add in their own data prep module and scale it 
-using Ray without having to worry about Ray internals. 
+Data Prep Lab is community project to democratize and accelerate unstructured data preparation for LLM app developers. 
+With the explosive growth of LLM-enabled use cases, developers are faced with the enormous challenge of preparing use case specific unstructured data to fine-tune or instruct-tune the LLMs.
+As the variety of use cases grows, so does the need to support:
+- New modalities of data (code, language, speech, visual) 
+- New ways of transforming the data to optimize the performance of the resulting LLMs for each specific use case.
+- Large variety in the scale of data to be processed, laptop-scale to datacenter-scale
+
+Data Prep Lab offers implementations of commonly needed data transformations, called *modules*, for both Code and Language modalities.
+The goal is to offer high-level APIs for developers to quickly get started in working with their data, without needing expertise in the underlying runtimes and frameworks.
 
 ## 📝 Table of Contents
 - [About](#about)
@@ -25,21 +29,41 @@ using Ray without having to worry about Ray internals.
 - [Acknowledgments](#acknowledgement)
 
 ## &#x1F4D6; About <a name = "about"></a>
+Data Prep Lab is a toolkit for streamlining data preparation for developers looking to build LLM-enabled applications via fine-tuning or instruction-tuning.
+Data Prep Lab contributes a set of modules that the developer can get started with to easily build data pipelines suitable for their use case.
+These modules have been tested in producing pre-training datasets for the [Granite](https://huggingface.co/instructlab/granite-7b-lab) open models. 
 
-Data Prep LAB is an toolkit that enables users to prepare their data for building LLM applications.
-This toolkit comes with a set of available modules (known as transforms) that the user can get started 
-with to easily build customized data pipelines.
-This set of transforms is built on a framework, known as the data processing library, 
-that allows a user to quickly build in their own new transforms and then scale them as needed.
-Users can incorporate their logic for custom data transformation and then use the included Ray-based
-distributed computing framework to scalably apply the transform to their data. 
+The modules are built on common frameworks (for Spark and Ray), called the *data processing library* that allows the developers to build new custom modules that readily scale across a variety of runtimes.
+Eventually, Data Prep Lab will offer consistent APIs and configurations across the following underlying runtimes.
+1. Python runtime
+2. Ray runtime (local and distributed)
+3. Spark runtime (local and distributed)
+4. [No-code pipelines with KFP](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) (local and distributed, wrapping Ray)
+
+Current matrix for the combination of modules and supported runtimes is shown in the table below. 
+Contributors are welcome to add new modules as well as add runtime support for existing modules!
+
+
+|Modules                       | Python-only       | Ray              | Spark              | KFP on Ray             |
+|------------------------------  |-------------------|------------------|--------------------|------------------------|
+|No-op / template                |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
+|Doc ID annotation               |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
+|Programming language annnotation|:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      | 
+|Exact dedup filter              |                   |:white_check_mark:|                    |:white_check_mark:      |
+|Fuzzy dedup filter              |                   |:white_check_mark:|                    |:white_check_mark:      |
+|Code quality annotation         |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
+|Malware annotation              |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
+|Filter on annotations           |:white_check_mark: |:white_check_mark:|:white_check_mark:  |:white_check_mark:      |
+|Tokenize                        |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
+
+
 
 Features of the toolkit: 
-
-- Collection of [scalable transformations](transforms) to expedite user onboarding
-- [Data processing library](data-processing-lib) designed to facilitate effortless addition and deployment of new scalable transformations
-- Operate efficiently and seamlessly from laptop-scale to cluster-scale supporting data processing at any data size
-- [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp/transform_workflows/Readme.md) of transforms.
+- Aiming to accelerate unstructured data prep burden for the "long tail" of LLM use cases
+- Growing set of module implementations across multiple runtimes and targeting laptop-scale to datacenter-scale processing
+- Growing set of sample pipelines developed for real enterprise use cases
+- [Data processing library](data-processing-lib) to enable contribution of new custom modules targeting new use cases
+- [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp) for no-code data prep
 
 Data modalities supported: 
 
@@ -47,10 +71,10 @@ Data modalities supported:
 [parquet](https://arrow.apache.org/docs/python/parquet.html) files. 
 * Language - Future releases will provide transforms specific to natural language, and like code transforms will operate on parquet files.
 
-Support for additional data formats are expected. 
+Support for additional data modalities is expected in the future.
 
-### Toolkit Design: 
-The toolkit is a python-based library that has ready to use scalable Ray based transforms. 
+### Data Processing Library: 
+Python-based library that has ready to use transforms that can be supported across a variety of runtimes.
 We use the popular point [parquet](https://arrow.apache.org/docs/python/parquet.html) format to store the data (code or language). 
 Every parquet file follows a set 
 [schema](tools/ingest2parquet/).
@@ -60,20 +84,21 @@ tool that also adds the necessary fields in the schema.
 A user can use one or more of the [available transforms](transforms) to process their data. 
 
 #### Transform design: 
-A transform can follow one of the two patterns: filter or annotator pattern.
-In the annotator design pattern, a transform adds information during the processing by adding one more column to the parquet file.
+A transform can follow one of the two patterns: annotator or filter.
+
+- **Annotator** An anotator transform adds information during the processing by adding one more column to the parquet file.
 The annotator design also allows a user to verify the results of the processing before actual filtering of the data.
-When a transform acts as a filter, it processes the data and outputs the transformed data (example exact deduplication).
-A general purpose [SQL-based filter transform](transforms/universal/filter) enables a powerful mechanism for identifying 
-columns and rows of interest for downstream processing.
+
+- **Filter** A filter transform processes the data and outputs the transformed data, e.g., exact deduplication.
+A general purpose [SQL-based filter transform](transforms/universal/filter) enables a powerful mechanism for identifying  columns and rows of interest for downstream processing.
 For a new module to be added, a user can pick the right design based on the processing to be applied. More details [here](transforms). 
 
 #### Scaling of transforms: 
-The distributed infrastructure, based on [Ray](https://docs.ray.io/en/latest/index.html), is used to scale out the transformation process.
+To enable processing large volumes of data leveraging multi-mode clusters, [Ray](https://docs.ray.io/en/latest/index.html) and [Spark](https://spark.apache.org) wrappers are provided, to readily scale-out the Python implementations.
 A generalized workflow is shown [here](doc/data-processing.md).
 
 #### Bring Your Own Transform: 
-One can add new transforms by bringing in their own processing logic and using the framework to build scalable transforms.
+One can add new transforms by bringing in their own Python-based processing logic and using the Data Processing Library to build and contribute transforms.
 More details on the data processing library [here](data-processing-lib/doc/overview.md). 
 
 #### Automation: 
