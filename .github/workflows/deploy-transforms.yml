@@ -11,17 +11,17 @@ jobs:
         name: Build and check images
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout 
+            - name: Checkout
               uses: actions/checkout@v4
               with:
                   # for setuptools-scm
                   fetch-depth: 0
-            - name: Build Package for pypi 
+            - name: Build Package for pypi
               run: |
-                make -C transforms image test-image
+                  make -C transforms image test-image
     publish-images:
         name: Publish packages to quay.io
-        # disabled 
+        # disabled
         if: false
         runs-on: ubuntu-latest
         needs: build-images
@@ -29,4 +29,4 @@ jobs:
         steps:
             - name: Push images to quay.io registry
               run: |
-                make -C transforms publish
+                  make -C transforms publish

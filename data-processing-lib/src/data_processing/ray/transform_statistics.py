@@ -13,21 +13,19 @@
 from typing import Any
 
 import ray
+from data_processing.transform import TransformStatistics
 from ray.util.metrics import Counter
 
 
 @ray.remote(num_cpus=0.25, scheduling_strategy="SPREAD")
-class TransformStatistics(object):
+class TransformStatisticsRay(TransformStatistics):
     """
     Basic statistics class collecting basic execution statistics.
     It can be extended for specific processors
     """
 
     def __init__(self, params: dict[str, Any]):
-        """
-        Init - setting up variables All of the statistics is collected in the dictionary
-        """
-        self.stats = {}
+        super().__init__()
         self.data_write_counter = Counter("data_written", "Total data written bytes")
         self.data_read_counter = Counter("data_read", "Total data read bytes")
         self.source_document_counter = Counter("source_files_processed", "Total source document processed")
@@ -60,10 +58,3 @@ class TransformStatistics(object):
                     self.failed_write_counter.inc(val)
                 if key == "transform execution exception":
                     self.transform_exceptions_counter.inc(val)
-
-    def get_execution_stats(self) -> dict[str, Any]:
-        """
-        Get execution statistics
-        :return:
-        """
-        return self.stats

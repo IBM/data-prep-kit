@@ -17,10 +17,10 @@ import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
-    DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
+    DefaultTableTransformRuntimeRay,
     RayUtils,
-    TransformLauncher,
+    TableTransformConfigurationRay,
+    TransformLauncherRay,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger
@@ -161,7 +161,7 @@ class EdedupTransform(AbstractTableTransform):
         return unique
 
 
-class EdedupRuntime(DefaultTableTransformRuntime):
+class EdedupRuntime(DefaultTableTransformRuntimeRay):
     """
     Exact dedup runtime support
     """
@@ -218,7 +218,7 @@ class EdedupRuntime(DefaultTableTransformRuntime):
         return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
 
 
-class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
+class EdedupTableTransformConfiguration(TableTransformConfigurationRay):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -253,5 +253,5 @@ class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
 
 if __name__ == "__main__":
 
-    launcher = TransformLauncher(transform_runtime_config=EdedupTableTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=EdedupTableTransformConfiguration())
     launcher.launch()

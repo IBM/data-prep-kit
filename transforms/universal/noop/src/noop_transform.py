@@ -15,14 +15,15 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
-from data_processing.transform import AbstractTableTransform
+from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
 logger = get_logger(__name__)
 
-cli_prefix = "noop_"
+short_name = "noop"
+cli_prefix = f"{short_name}_"
 sleep_key = "sleep_sec"
 pwd_key = "pwd"
 sleep_cli_param = f"{cli_prefix}{sleep_key}"
@@ -64,7 +65,7 @@ class NOOPTransform(AbstractTableTransform):
         return [table], metadata
 
 
-class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
+class NOOPTransformConfigurationBase:
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -72,7 +73,6 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name="NOOP", transform_class=NOOPTransform)
         self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -88,7 +88,8 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
             default=1,
             help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
         )
-        # An example of a command line option that we don't want included in the metadata collected by the Ray orchestrator
+        # An example of a command line option that we don't want included
+        # in the metadata collected by the Ray orchestrator
         # See below for remove_from_metadata addition so that it is not reported.
         parser.add_argument(
             f"--{pwd_cli_param}",
@@ -110,12 +111,40 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
 
         self.params = self.params | captured
         logger.info(f"noop parameters are : {self.params}")
-        # Don't publish this in the metadata produced by the ray orchestrator.
-        self.remove_from_metadata.append(pwd_key)
         return True
 
 
+class NOOPTransformConfigurationRay(TableTransformConfigurationRay):
+    def __init__(self):
+        super().__init__(name=short_name, transform_class=NOOPTransform, remove_from_metadata=[pwd_key])
+        self.base = NOOPTransformConfigurationBase()
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
+class NOOPTransformConfigurationPython(TransformConfiguration):
+    def __init__(self):
+        super().__init__(name=short_name, transform_class=NOOPTransform, remove_from_metadata=[pwd_key])
+        self.base = NOOPTransformConfigurationBase()
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=NOOPTransformConfigurationRay())
     logger.info("Launching noop transform")
     launcher.launch()

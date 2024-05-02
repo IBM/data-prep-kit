@@ -12,7 +12,7 @@
 
 import sys
 
-from data_processing.ray import TransformLauncher
+from data_processing.ray import TransformLauncherRay
 from data_processing.utils import ParamsUtils
 from filter_transform import (
     FilterTransformConfiguration,
@@ -69,6 +69,6 @@ if __name__ == "__main__":
     # Create the CLI args as will be parsed by the launcher
     sys.argv = ParamsUtils.dict_to_req(launcher_params | filter_params)
     # Create the longer to launch with the blocklist transform.
-    launcher = TransformLauncher(transform_runtime_config=FilterTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=FilterTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

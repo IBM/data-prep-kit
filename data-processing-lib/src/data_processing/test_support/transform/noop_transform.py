@@ -15,7 +15,7 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
+from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
 from data_processing.transform import AbstractTableTransform
 
 
@@ -52,7 +52,7 @@ class NOOPTransform(AbstractTableTransform):
         return [table], metadata
 
 
-class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
+class NOOPTransformConfiguration(TableTransformConfigurationRay):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -94,5 +94,5 @@ class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=NOOPTransformConfiguration())
     launcher.launch()

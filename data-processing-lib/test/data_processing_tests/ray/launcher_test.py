@@ -14,9 +14,9 @@ import os
 import sys
 
 from data_processing.ray import (
-    DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
-    TransformLauncher,
+    DefaultTableTransformRuntimeRay,
+    TableTransformConfigurationRay,
+    TransformLauncherRay,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import ParamsUtils
@@ -44,7 +44,7 @@ worker_options = {"num_cpu": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 
 
-class TestLauncher(TransformLauncher):
+class TestLauncher(TransformLauncherRay):
     """
     Test driver for validation of the functionality
     """
@@ -74,8 +74,8 @@ def test_launcher():
     # s3 not defined
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 0 == res
@@ -83,8 +83,8 @@ def test_launcher():
     params["data_s3_config"] = ParamsUtils.convert_to_ast(s3_conf)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
@@ -92,8 +92,8 @@ def test_launcher():
     params["data_s3_cred"] = ParamsUtils.convert_to_ast(s3_cred)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 0 == res
@@ -101,8 +101,8 @@ def test_launcher():
     params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
@@ -110,8 +110,8 @@ def test_launcher():
     del params["data_local_config"]
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 0 == res
@@ -133,8 +133,8 @@ def test_local_config():
     }
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 0 == res
@@ -161,32 +161,32 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     print(f"parameters {sys.argv}")
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
     params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf_no_input)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
     params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf_no_output)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
     params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 0 == res
@@ -214,32 +214,32 @@ def test_s3_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     print(f"parameters {sys.argv}")
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
     params["data_s3_config"] = ParamsUtils.convert_to_ast(s3_conf_no_input)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
     params["data_s3_config"] = ParamsUtils.convert_to_ast(s3_conf_no_output)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 1 == res
     params["data_s3_config"] = ParamsUtils.convert_to_ast(s3_conf)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
-        transform_runtime_config=DefaultTableTransformConfiguration(
-            name="test", runtime_class=DefaultTableTransformRuntime, transform_class=AbstractTableTransform
+        transform_runtime_config=TableTransformConfigurationRay(
+            name="test", runtime_class=DefaultTableTransformRuntimeRay, transform_class=AbstractTableTransform
         ),
     ).launch()
     assert 0 == res
