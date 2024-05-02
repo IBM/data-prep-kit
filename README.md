@@ -66,7 +66,7 @@ Features of the toolkit:
 - Growing set of module implementations across multiple runtimes and targeting laptop-scale to datacenter-scale processing
 - A growing set of sample pipelines developed for real enterprise use cases
 - [Data processing library](data-processing-lib) to enable contribution of new custom modules targeting new use cases
-- [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp) for no-code data prep
+- [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp/doc/simple_transform_pipeline.md) for no-code data prep
 
 Data modalities supported: 
 
