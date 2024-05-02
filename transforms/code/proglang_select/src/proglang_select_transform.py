@@ -161,6 +161,7 @@ class ProgLangSelectTransformConfiguration(TableTransformConfigurationRay):
             name=shortname,
             transform_class=ProgLangSelectTransform,
             runtime_class=ProgLangSelectRuntime,
+            remove_from_metadata=[lang_data_factory_key]
         )
         self.params = {}
         self.daf = None
@@ -217,8 +218,6 @@ class ProgLangSelectTransformConfiguration(TableTransformConfigurationRay):
             lang_data_factory_key: self.daf,
             lang_output_column_key: dargs.get(lang_output_column_key, None),
         }
-        # remove data access factory from metadata
-        self.remove_from_metadata.append(lang_data_factory_key)
         # Validate and populate the transform's DataAccessFactory
         return self.daf.apply_input_params(args)
 
