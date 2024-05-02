@@ -1,27 +1,31 @@
 site_name: "Data Prep LAB"
 docs_dir: .
 site_dir: ../site
+repo_url: https://github.com/IBM/data-prep-lab
 nav:
-  - Home: README.md
-  - Overview: data-processing-lib/doc/overview.md
-  - Tutorials:
-      - data-processing-lib/doc/transform-tutorials.md
-      - Simple: data-processing-lib/doc/simplest-transform-tutorial.md
-      - Advanced: data-processing-lib/doc/advanced-transform-tutorial.md
-      - KFP Pipeline: kfp/doc/simple_transform_pipeline.md
+    - Home: README.md
+    - Overview: data-processing-lib/doc/overview.md
+    - Tutorials:
+          - data-processing-lib/doc/transform-tutorials.md
+          - Simple: data-processing-lib/doc/simplest-transform-tutorial.md
+          - Advanced: data-processing-lib/doc/advanced-transform-tutorial.md
+          - KFP Pipeline: kfp/doc/simple_transform_pipeline.md
 theme:
-  name: 'material'
-  favicon: 'data-processing-lib/doc/favicon.ico'
-  logo: 'data-processing-lib/doc/logo-ibm.png'
-  palette:
-    primary: black
-#  palette:
-#    primary: 'blue grey'
-  features:
-    - navigation.tabs
+    name: "material"
+    favicon: "data-processing-lib/doc/favicon.ico"
+    logo: "data-processing-lib/doc/logo-ibm.png"
+    palette:
+        primary: black
+    #  palette:
+    #    primary: 'blue grey'
+    features:
+        - navigation.tabs
 plugins:
-- search
-- mkdocstrings
-- badges
-- same-dir
-
+    - search
+    - mkdocstrings
+    - badges
+    - same-dir
+markdown_extensions:
+    - pymdownx.emoji:
+          emoji_index: !!python/name:material.extensions.emoji.twemoji
+          emoji_generator: !!python/name:material.extensions.emoji.to_svg

@@ -11,12 +11,13 @@
 
 ---
 
-Data Prep Lab is community project to democratize and accelerate unstructured data preparation for LLM app developers. 
-With the explosive growth of LLM-enabled use cases, developers are faced with the enormous challenge of preparing use case specific unstructured data to fine-tune or instruct-tune the LLMs.
+Data Prep Lab is a community project to democratize and accelerate unstructured data preparation for LLM app developers. 
+With the explosive growth of LLM-enabled use cases, developers are faced with the enormous challenge of preparing use case-specific unstructured data to fine-tune or instruct-tune the LLMs.
 As the variety of use cases grows, so does the need to support:
+
 - New modalities of data (code, language, speech, visual) 
 - New ways of transforming the data to optimize the performance of the resulting LLMs for each specific use case.
-- Large variety in the scale of data to be processed, laptop-scale to datacenter-scale
+- Large variety in the scale of data to be processed, from laptop-scale to datacenter-scale
 
 Data Prep Lab offers implementations of commonly needed data transformations, called *modules*, for both Code and Language modalities.
 The goal is to offer high-level APIs for developers to quickly get started in working with their data, without needing expertise in the underlying runtimes and frameworks.
@@ -35,12 +36,13 @@ These modules have been tested in producing pre-training datasets for the [Grani
 
 The modules are built on common frameworks (for Spark and Ray), called the *data processing library* that allows the developers to build new custom modules that readily scale across a variety of runtimes.
 Eventually, Data Prep Lab will offer consistent APIs and configurations across the following underlying runtimes.
+
 1. Python runtime
 2. Ray runtime (local and distributed)
 3. Spark runtime (local and distributed)
 4. [No-code pipelines with KFP](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) (local and distributed, wrapping Ray)
 
-Current matrix for the combination of modules and supported runtimes is shown in the table below. 
+The current matrix for the combination of modules and supported runtimes is shown in the table below. 
 Contributors are welcome to add new modules as well as add runtime support for existing modules!
 
 
@@ -59,26 +61,27 @@ Contributors are welcome to add new modules as well as add runtime support for e
 
 
 Features of the toolkit: 
+
 - Aiming to accelerate unstructured data prep burden for the "long tail" of LLM use cases
 - Growing set of module implementations across multiple runtimes and targeting laptop-scale to datacenter-scale processing
-- Growing set of sample pipelines developed for real enterprise use cases
+- A growing set of sample pipelines developed for real enterprise use cases
 - [Data processing library](data-processing-lib) to enable contribution of new custom modules targeting new use cases
 - [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp) for no-code data prep
 
 Data modalities supported: 
 
-* Code - support for code datasets as downloaded .zip files of github repositories converted to . 
+* Code - support for code datasets as downloaded .zip files of GitHub repositories converted to .
 [parquet](https://arrow.apache.org/docs/python/parquet.html) files. 
 * Language - Future releases will provide transforms specific to natural language, and like code transforms will operate on parquet files.
 
 Support for additional data modalities is expected in the future.
 
 ### Data Processing Library: 
-Python-based library that has ready to use transforms that can be supported across a variety of runtimes.
+Python-based library that has ready-to-use transforms that can be supported across a variety of runtimes.
 We use the popular point [parquet](https://arrow.apache.org/docs/python/parquet.html) format to store the data (code or language). 
 Every parquet file follows a set 
 [schema](tools/ingest2parquet/).
-Data is converted from raw form (eg zip files for github repositories) to parquet files by the
+Data is converted from raw form (e.g., zip files for GitHub repositories) to parquet files by the
 [ingest2parquet](tools/ingest2parquet/) 
 tool that also adds the necessary fields in the schema.  
 A user can use one or more of the [available transforms](transforms) to process their data. 
@@ -86,28 +89,28 @@ A user can use one or more of the [available transforms](transforms) to process 
 #### Transform design: 
 A transform can follow one of the two patterns: annotator or filter.
 
-- **Annotator** An anotator transform adds information during the processing by adding one more column to the parquet file.
-The annotator design also allows a user to verify the results of the processing before actual filtering of the data.
+- **Annotator** An annotator transform adds information during the processing by adding one more column to the parquet file.
+The annotator design also allows a user to verify the results of the processing before the actual filtering of the data.
 
 - **Filter** A filter transform processes the data and outputs the transformed data, e.g., exact deduplication.
 A general purpose [SQL-based filter transform](transforms/universal/filter) enables a powerful mechanism for identifying  columns and rows of interest for downstream processing.
 For a new module to be added, a user can pick the right design based on the processing to be applied. More details [here](transforms). 
 
 #### Scaling of transforms: 
-To enable processing large volumes of data leveraging multi-mode clusters, [Ray](https://docs.ray.io/en/latest/index.html) and [Spark](https://spark.apache.org) wrappers are provided, to readily scale-out the Python implementations.
+To enable processing large volumes of data leveraging multi-mode clusters, [Ray](https://docs.ray.io/en/latest/index.html) and [Spark](https://spark.apache.org) wrappers are provided, to readily scale out the Python implementations.
 A generalized workflow is shown [here](doc/data-processing.md).
 
 #### Bring Your Own Transform: 
 One can add new transforms by bringing in their own Python-based processing logic and using the Data Processing Library to build and contribute transforms.
-More details on the data processing library [here](data-processing-lib/doc/overview.md). 
+More details on the data processing library are [here](data-processing-lib/doc/overview.md). 
 
 #### Automation: 
 The toolkit also supports transform execution automation based on 
 [Kubeflow pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)(KFP) and
-tested on [Kind cluster](https://kind.sigs.k8s.io/). KFP implementation is based on [KubeRay Operator](https://docs.ray.io/en/master/cluster/kubernetes/getting-started.html)
-for creating and managing Ray cluster and [KubeRay API server](https://github.com/ray-project/kuberay/tree/master/apiserver)
-to interact with the KubeRay operator. An additional [framework](kfp/kfp_support_lib) along with the several
-[kfp components](kfp/kfp_ray_components) is used to simplify pipelines implementation.
+tested on [Kind cluster](https://kind.sigs.k8s.io/). KFP implementation is based on the [KubeRay Operator](https://docs.ray.io/en/master/cluster/kubernetes/getting-started.html)
+for creating and managing the Ray cluster and [KubeRay API server](https://github.com/ray-project/kuberay/tree/master/apiserver)
+to interact with the KubeRay operator. An additional [framework](kfp/kfp_support_lib) along with several
+[kfp components](kfp/kfp_ray_components) is used to simplify pipeline implementation.
 
 
 ## &#x2699; Setup <a name = "setup"></a>
@@ -132,7 +135,7 @@ pip install pre-commit
 pip install twine
 pre-commit install
 ```
-Additionally if you will be using local Minio for S3 testing you need to install `Minio` and `mc`.
+Additionally, if you will be using local Minio for S3 testing you need to install `Minio` and `mc`.
 Refer to [Minio install instructions](data-processing-lib/doc/using_s3_transformers.md) for more details.
 
 ## &#x1F680; Getting Started <a name = "getting_started"></a>
@@ -167,7 +170,7 @@ make setup
 ```
 from this main package directory or from the `kind` directory.
 
-Wnen you finish working with the cluster, you can destroy it by 
+When you finish working with the cluster, you can destroy it by 
 ```bash
 make clean
 ```
@@ -180,10 +183,7 @@ See [contribution guide](CONTRIBUTING.md)
 
 
 ## &#x2B50; Acknowledgements <a name = "acknowledgement"></a>
-Thanks to [BigCode Project](https://github.com/bigcode-project) that has been used to build the code quality module. 
-
-
-
+Thanks to the [BigCode Project](https://github.com/bigcode-project) that has been used to build the code quality module. 
 
 
 
