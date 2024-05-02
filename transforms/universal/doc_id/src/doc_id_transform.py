@@ -17,9 +17,9 @@ import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
-    DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
-    TransformLauncher,
+    DefaultTableTransformRuntimeRay,
+    TableTransformConfigurationRay,
+    TransformLauncherRay,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
@@ -112,7 +112,7 @@ class DocIDTransform(AbstractTableTransform):
         return [table], {}
 
 
-class DocIDRuntime(DefaultTableTransformRuntime):
+class DocIDRuntime(DefaultTableTransformRuntimeRay):
     """
     Exact dedup runtime support
     """
@@ -141,7 +141,7 @@ class DocIDRuntime(DefaultTableTransformRuntime):
         return {_id_generator_key: IDGenerator.remote()} | self.params
 
 
-class DocIDTransformConfiguration(DefaultTableTransformConfiguration):
+class DocIDTransformConfiguration(TableTransformConfigurationRay):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -193,5 +193,5 @@ class DocIDTransformConfiguration(DefaultTableTransformConfiguration):
 
 if __name__ == "__main__":
 
-    launcher = TransformLauncher(transform_runtime_config=DocIDTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=DocIDTransformConfiguration())
     launcher.launch()

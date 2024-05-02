@@ -17,11 +17,11 @@ from datetime import datetime
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
-    DefaultTableTransformConfiguration,
     RayUtils,
+    TableTransformConfigurationRay,
     TransformOrchestratorConfiguration,
-    TransformStatistics,
-    TransformTableProcessor,
+    TransformStatisticsRay,
+    TransformTableProcessorRay,
 )
 from data_processing.utils import get_logger
 from ray.util import ActorPool
@@ -35,7 +35,7 @@ logger = get_logger(__name__)
 def orchestrate(
     preprocessing_params: TransformOrchestratorConfiguration,
     data_access_factory: DataAccessFactoryBase,
-    transform_runtime_config: DefaultTableTransformConfiguration,
+    transform_runtime_config: TableTransformConfigurationRay,
 ) -> int:
     """
     orchestrator for transformer execution
@@ -72,7 +72,7 @@ def orchestrate(
         # create transformer runtime
         runtime = transform_runtime_config.create_transform_runtime()
         # create statistics
-        statistics = TransformStatistics.remote({})
+        statistics = TransformStatisticsRay.remote({})
         # create executors
         processor_params = {
             "data_access_factory": data_access_factory,
@@ -84,7 +84,7 @@ def orchestrate(
         }
         logger.debug("Creating actors")
         processors = RayUtils.create_actors(
-            clazz=TransformTableProcessor,
+            clazz=TransformTableProcessorRay,
             params=processor_params,
             actor_options=preprocessing_params.worker_options,
             n_actors=preprocessing_params.n_workers,

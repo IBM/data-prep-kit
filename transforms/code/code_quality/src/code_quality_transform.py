@@ -24,7 +24,7 @@ import os
 import numpy as np
 import pyarrow as pa
 from bs4 import BeautifulSoup
-from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
+from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils
 from transformers import AutoTokenizer
@@ -32,7 +32,6 @@ from transformers import AutoTokenizer
 
 CODE_QUALITY_PARAMS = "code_quality_params"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
 
 
 def is_xml(data, lang):
@@ -283,7 +282,7 @@ class CodeQualityTransform(AbstractTableTransform):
         return [annotated_table], {}
 
 
-class CodeQualityTransformConfiguration(DefaultTableTransformConfiguration):
+class CodeQualityTransformConfiguration(TableTransformConfigurationRay):
     def __init__(self):
         super().__init__(name="code_quality", transform_class=CodeQualityTransform)
 
@@ -337,5 +336,5 @@ class CodeQualityTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=CodeQualityTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=CodeQualityTransformConfiguration())
     launcher.launch()

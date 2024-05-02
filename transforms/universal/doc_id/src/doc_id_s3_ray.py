@@ -12,13 +12,13 @@
 
 import sys
 
-from data_processing.ray import TransformLauncher
+from data_processing.ray import TransformLauncherRay
 from data_processing.utils import ParamsUtils
 from doc_id_transform import DocIDTransformConfiguration
 
 
 # create launcher
-launcher = TransformLauncher(transform_runtime_config=DocIDTransformConfiguration())
+launcher = TransformLauncherRay(transform_runtime_config=DocIDTransformConfiguration())
 # create parameters
 s3_cred = {
     "access_key": "localminioaccesskey",

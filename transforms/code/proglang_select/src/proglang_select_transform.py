@@ -15,11 +15,15 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccess, DataAccessFactoryBase, DataAccessFactory
+from data_processing.data_access import (
+    DataAccess,
+    DataAccessFactory,
+    DataAccessFactoryBase,
+)
 from data_processing.ray import (
-    DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
-    TransformLauncher,
+    DefaultTableTransformRuntimeRay,
+    TableTransformConfigurationRay,
+    TransformLauncherRay,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils, get_logger, str2bool
@@ -103,7 +107,7 @@ class ProgLangSelectTransform(AbstractTableTransform):
         }
 
 
-class ProgLangSelectRuntime(DefaultTableTransformRuntime):
+class ProgLangSelectRuntime(DefaultTableTransformRuntimeRay):
     """
     Language selector runtime support
     """
@@ -146,7 +150,7 @@ class ProgLangSelectRuntime(DefaultTableTransformRuntime):
         return {lang_allowed_languages: lang_refs} | self.params
 
 
-class ProgLangSelectTransformConfiguration(DefaultTableTransformConfiguration):
+class ProgLangSelectTransformConfiguration(TableTransformConfigurationRay):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -220,5 +224,5 @@ class ProgLangSelectTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=ProgLangSelectTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=ProgLangSelectTransformConfiguration())
     launcher.launch()

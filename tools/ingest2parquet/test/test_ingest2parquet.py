@@ -103,7 +103,7 @@ class TestZipToTable(unittest.TestCase):
         self.mock_instance.get_file.return_value = create_test_zip(file_names, contents)
 
         table = zip_to_table(self.mock_instance, test_file_path, True)
-        self.assertEqual(table.num_rows,0)
+        self.assertEqual(table.num_rows, 0)
 
 
 class TestRawToParquet(unittest.TestCase):
@@ -119,9 +119,39 @@ class TestRawToParquet(unittest.TestCase):
     def test_process_zip_sucessfully(self):
         with patch("data_processing.utils.TransformUtils.add_column") as mock_add_column:
             with patch("ingest2parquet.zip_to_table") as mock_zip_to_table:
-                mock_zip_to_table.return_value = pa.Table.from_pylist([{'title': 'file1.txt', 'document': 'test.zip', 'contents': 'content of file1', 'document_id': '297d7c07-8c00-4a1b-9235-555cb3a9ddd9', 'ext': '.txt', 'hash': '56ff3012a6bce1711715608340ebed7a2765fc4493354141b9a96259beeb1d68', 'size': 65, 'date_acquired': '2024-04-24T12:44:18.930550', 'programming_language': 'unknown'}])
-                table= pa.Table.from_pylist([{'title': 'file1.txt', 'document': 'test.zip', 'contents': 'content of file1', 'document_id': '297d7c07-8c00-4a1b-9235-555cb3a9ddd9', 'ext': '.txt', 'hash': '56ff3012a6bce1711715608340ebed7a2765fc4493354141b9a96259beeb1d68', 'size': 65, 'date_acquired': '2024-04-24T12:44:18.930550', 'programming_language': 'unknown','domain':'code','snapshot':'github'}])
-                mock_add_column.return_value =table
+                mock_zip_to_table.return_value = pa.Table.from_pylist(
+                    [
+                        {
+                            "title": "file1.txt",
+                            "document": "test.zip",
+                            "contents": "content of file1",
+                            "document_id": "297d7c07-8c00-4a1b-9235-555cb3a9ddd9",
+                            "ext": ".txt",
+                            "hash": "56ff3012a6bce1711715608340ebed7a2765fc4493354141b9a96259beeb1d68",
+                            "size": 65,
+                            "date_acquired": "2024-04-24T12:44:18.930550",
+                            "programming_language": "unknown",
+                        }
+                    ]
+                )
+                table = pa.Table.from_pylist(
+                    [
+                        {
+                            "title": "file1.txt",
+                            "document": "test.zip",
+                            "contents": "content of file1",
+                            "document_id": "297d7c07-8c00-4a1b-9235-555cb3a9ddd9",
+                            "ext": ".txt",
+                            "hash": "56ff3012a6bce1711715608340ebed7a2765fc4493354141b9a96259beeb1d68",
+                            "size": 65,
+                            "date_acquired": "2024-04-24T12:44:18.930550",
+                            "programming_language": "unknown",
+                            "domain": "code",
+                            "snapshot": "github",
+                        }
+                    ]
+                )
+                mock_add_column.return_value = table
                 self.mock_data_access_instance.save_table.return_value = (0, {"k", "v"})
                 self.mock_data_access_instance.get_output_location.return_value = "output_file.parquet"
 
@@ -133,9 +163,7 @@ class TestRawToParquet(unittest.TestCase):
                     (True, {"path": "test.zip", "bytes_in_memory": 0, "row_count": 1}),
                 )
                 self.mock_data_access_instance.get_output_location.assert_called_once_with("test.zip")
-                self.mock_data_access_instance.save_table.assert_called_once_with(
-                    "output_file.parquet", table
-                )
+                self.mock_data_access_instance.save_table.assert_called_once_with("output_file.parquet", table)
 
     def test_unsupported_file_type(self):
         result = raw_to_parquet(self.mock_data_access_factory, "test.txt", True, "github", "code")
@@ -157,7 +185,23 @@ class TestRawToParquet(unittest.TestCase):
 
     def test_exception_handling(self):
         with patch("ingest2parquet.zip_to_table") as mock_zip_to_table:
-            table = pa.Table.from_pylist([{'title': 'file1.txt', 'document': 'test.zip', 'contents': 'content of file1', 'document_id': '297d7c07-8c00-4a1b-9235-555cb3a9ddd9', 'ext': '.txt', 'hash': '56ff3012a6bce1711715608340ebed7a2765fc4493354141b9a96259beeb1d68', 'size': 65, 'date_acquired': '2024-04-24T12:44:18.930550', 'programming_language': 'unknown','domain':'code','snapshot':'github'}])
+            table = pa.Table.from_pylist(
+                [
+                    {
+                        "title": "file1.txt",
+                        "document": "test.zip",
+                        "contents": "content of file1",
+                        "document_id": "297d7c07-8c00-4a1b-9235-555cb3a9ddd9",
+                        "ext": ".txt",
+                        "hash": "56ff3012a6bce1711715608340ebed7a2765fc4493354141b9a96259beeb1d68",
+                        "size": 65,
+                        "date_acquired": "2024-04-24T12:44:18.930550",
+                        "programming_language": "unknown",
+                        "domain": "code",
+                        "snapshot": "github",
+                    }
+                ]
+            )
             mock_zip_to_table.return_value = table
             self.mock_data_access_instance.save_table.side_effect = Exception("Test exception")
 

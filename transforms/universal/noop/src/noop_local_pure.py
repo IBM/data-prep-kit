@@ -13,37 +13,29 @@
 import os
 import sys
 
-from data_processing.ray import TransformLauncherRay
+from data_processing.pure_python import TransformLauncher
 from data_processing.utils import ParamsUtils
-from tokenization_transform import TokenizationTransformConfiguration
+from noop_transform import NOOPTransformConfigurationPython
 
 
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "ds01", "input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "ds01"))
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
-worker_options = {"num_cpus": 0.8}
-code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
+noop_params = {"noop_sleep_sec": 1}
 params = {
-    # where to run
-    "run_locally": True,
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
-    # orchestrator
-    "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "runtime_num_workers": 3,
-    "runtime_pipeline_id": "pipeline_id",
-    "runtime_job_id": "job_id",
-    "runtime_creation_delay": 0,
-    "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
+    # noop params
+    "noop_sleep_sec": 1,
 }
 if __name__ == "__main__":
-
-    sys.argv = ParamsUtils.dict_to_req(d=params)
+    # Set the simulated command line args
+    sys.argv = ParamsUtils.dict_to_req(d=params | noop_params)
     # create launcher
-    launcher = TransformLauncherRay(transform_runtime_config=TokenizationTransformConfiguration())
+    launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfigurationPython())
     # Launch the ray actor(s) to process the input
     launcher.launch()

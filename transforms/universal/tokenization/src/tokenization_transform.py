@@ -20,7 +20,7 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
+from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import get_logger
 
@@ -153,7 +153,7 @@ class TokenizationTransform(AbstractTableTransform):
         return [out_table], metadata
 
 
-class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
+class TokenizationTransformConfiguration(TableTransformConfigurationRay):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -258,6 +258,6 @@ class TokenizationTransformConfiguration(DefaultTableTransformConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=TokenizationTransformConfiguration())
     logger.info("Launching Tokenization transform")
     launcher.launch()

@@ -21,11 +21,11 @@ import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
-    DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
+    DefaultTableTransformRuntimeRay,
     RayUtils,
-    TransformLauncher,
-    TransformTableProcessor,
+    TableTransformConfigurationRay,
+    TransformLauncherRay,
+    TransformTableProcessorRay,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import (
@@ -293,7 +293,7 @@ class FdedupFilter(AbstractTableTransform):
         return [out_table], stats
 
 
-class FdedupRuntime(DefaultTableTransformRuntime):
+class FdedupRuntime(DefaultTableTransformRuntimeRay):
     """
     Fuzzy dedup runtime support. Here we are using set environment to implement first two steps of fuzzy dedup
     processing - preprocessing and bucket hash processing
@@ -420,7 +420,11 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             )
 
     def _create_doc_actors_internal(
-        self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, mn_min_hash: MurmurMH, files: list[str]
+        self,
+        data_access_factory: DataAccessFactoryBase,
+        statistics: ActorHandle,
+        mn_min_hash: MurmurMH,
+        files: list[str],
     ) -> None:
         """
         Create document actors
@@ -640,7 +644,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             "base_table_stats": False,
         }
         processors_list = RayUtils.create_actors(
-            clazz=TransformTableProcessor,
+            clazz=TransformTableProcessorRay,
             params=processor_params,
             actor_options=worker_options,
             n_actors=n_readers,
@@ -713,7 +717,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         } | stats
 
 
-class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
+class FdedupTableTransformConfiguration(TableTransformConfigurationRay):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -791,5 +795,5 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
 
 if __name__ == "__main__":
 
-    launcher = TransformLauncher(transform_runtime_config=FdedupTableTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=FdedupTableTransformConfiguration())
     launcher.launch()

@@ -13,7 +13,7 @@
 import os
 import sys
 
-from data_processing.ray import TransformLauncher
+from data_processing.ray import TransformLauncherRay
 from data_processing.utils import ParamsUtils
 from proglang_select_transform import (
     ProgLangSelectTransformConfiguration,
@@ -24,7 +24,7 @@ from proglang_select_transform import (
 
 
 # create launcher
-launcher = TransformLauncher(transform_runtime_config=ProgLangSelectTransformConfiguration())
+launcher = TransformLauncherRay(transform_runtime_config=ProgLangSelectTransformConfiguration())
 # create parameters
 language_column_name = "language"
 annotated_column_name = "lang_selected"
