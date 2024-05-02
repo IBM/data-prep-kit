@@ -176,7 +176,7 @@ def fdedup(
                 "data_s3_config": data_s3_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
-                "num_workers": compute_exec_params.outputs["workers"],
+                "runtime_num_workers": compute_exec_params.outputs["workers"],
                 "runtime_worker_options": runtime_actor_options,
                 "runtime_pipeline_id": runtime_pipeline_id,
                 "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,
