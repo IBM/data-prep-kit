@@ -1,13 +1,6 @@
 ## Why are these changes needed?
 
 
-## Related issue number
+## Related issue number (if any).
 
 
-## Checks
-
-- [ ] I've made sure the tests are passing. 
-- Testing Strategy
-   - [ ] Unit tests
-   - [ ] Manual tests
-   - [ ] This PR is not tested :(
