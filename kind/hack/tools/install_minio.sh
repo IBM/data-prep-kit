@@ -8,47 +8,47 @@ SLEEP_TIME="${SLEEP_TIME:-50}"
 MAX_RETRIES="${MAX_RETRIES:-20}"
 EXIT_CODE=0
 
-deploy() {
-  kubectl apply -f ${ROOT_DIR}/hack/s3_secret.yaml
-	kubectl apply -f ${ROOT_DIR}/hack/minio_ingress.yaml
+deploy_minio() {
+  kubectl apply -f "${ROOT_DIR}/hack/s3_secret.yaml"
+  kubectl apply -f "${ROOT_DIR}/hack/minio_ingress.yaml"
 }
 
-wait(){
-	echo "Wait for minio server"
-	ns="kubeflow"
-	while [[ $(kubectl get ingress minio -n $ns -o jsonpath="{.status.loadBalancer.ingress[0].hostname}") != "localhost" ]]; do
-    echo "still waiting for minio ingress to get ready"
+wait_for_minio() {
+  echo "Waiting for Minio server"
+  ns="kubeflow"
+  while [[ $(kubectl get ingress minio -n "$ns" -o jsonpath="{.status.loadBalancer.ingress[0].hostname}") != "localhost" ]]; do
+    echo "Still waiting for Minio ingress to get ready"
     sleep 20
   done
-echo "ingress minio is ready"
+  echo "Ingress Minio is ready"
 }
 
-delete(){
-  kubectl delete -f ${ROOT_DIR}/hack/s3_secret.yaml
-	kubectl delete -f ${ROOT_DIR}/hack/minio_ingress.yaml
+delete_minio() {
+  kubectl delete -f "${ROOT_DIR}/hack/s3_secret.yaml"
+  kubectl delete -f "${ROOT_DIR}/hack/minio_ingress.yaml"
 }
 
-usage(){
-        cat <<EOF
-"Usage: ./install_minio.sh [cleanup|deploy-wait|deploy]"
+usage() {
+  cat <<EOF
+Usage: ./install_minio.sh [cleanup|deploy-wait|deploy]
 EOF
 }
 
 case "$op" in
-	cleanup)
-		header_text "Uninstalling Minio"
-		delete
-		;;
-	deploy-wait)
-		header_text "wait for Minio deployment"
-		wait
-		;;
-	deploy)
-		header_text "Installing Minio"
-		deploy
-		;;
-	*)
-		usage
-  	;;
+  cleanup)
+    header_text "Uninstalling Minio"
+    delete_minio || exit 1
+    ;;
+  deploy-wait)
+    header_text "Wait for Minio deployment"
+    wait_for_minio || exit 1
+    ;;
+  deploy)
+    header_text "Installing Minio"
+    deploy_minio || exit 1
+    ;;
+  *)
+    usage
+    exit 1
+    ;;
 esac
-
