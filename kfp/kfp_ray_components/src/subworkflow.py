@@ -1,7 +1,7 @@
 import sys
 
-from kfp_support.workflow_support.utils import KFPUtils, PipelinesUtils
 from data_processing.utils.params_utils import ParamsUtils
+from kfp_support.workflow_support.utils import KFPUtils, PipelinesUtils
 
 
 def invoke_sub_workflow(
@@ -37,12 +37,11 @@ def invoke_sub_workflow(
     def _get_workflow_params(prefix: str, params: str) -> dict:
         """
         Construct a dictionary containing the workflow parameters.
-        The workflow parameters are formed from the following:
-        - Super pipeline parameters that start with "p2_pipeline_" prefix,
-          which are common to all worklows.
-        - Parameters that are specific to the workflow (start with workflow arguments prefix).
-        - Any parameters from the workflow `additional params`.
-        Workflow parameters take precedence over common parameters.
+        The workflow parameters are composed based on the following, arranged by their order of precedence:
+        1.  Any parameter from the workflow `overriding_params`.
+        2.  Parameters that are specific to the workflow (start with workflow arguments prefix).
+        3.  Super pipeline parameters that start with "p2_pipeline_" prefix,
+            which are common to all worklows.
         :param prefix: workflow parameters prefix
         :param params: super workflow parameters
         :return: workflow parameters as a dictionary
@@ -64,33 +63,24 @@ def invoke_sub_workflow(
                 if dic[key] != "":
                     workflow_prms[arg] = dic[key]
 
-        _add_additional_params(dic, workflow_prms, prefix, common_params_prefix)
+        _add_overriding_params(dic, workflow_prms, prefix)
         return workflow_prms
 
-    def _add_additional_params(all_prms: dict, workflow_prms: dict, prefix: str, common_params_prefix: str) -> None:
+    def _add_overriding_params(all_prms: dict, workflow_prms: dict, prefix: str) -> None:
         """
-        Add workflow additional params to workflow params. In addition, common additional params are added
-        to the workflow additional params.
-        The value of the workflow additional parameters take precedence over common params values.
+        Add workflow overriding params to workflow params, overriding values of existing params.
         :param all_prms: all super workflow parameters
         :param workflow_prms: The constructed workflow parameters
         :param prefix: workflow parameters prefix
-        :param common_params_prefix: common parameters prefix
         """
-        common_additional_params = all_prms.get(common_params_prefix + "additional_params", {})
-        workflow_additional_params = all_prms.get(prefix + "additional_params", {})
-        # Add workflow additional params to workflow params.
-        for key, val in workflow_additional_params.items():
+        workflow_overriding_params = all_prms.get(prefix + "overriding_params", {})
+        for key, val in workflow_overriding_params.items():
             if isinstance(val, dict) and key in workflow_prms:
                 # merge the dictionary values
                 for k, v in val.items():
                     workflow_prms[key][k] = v
             else:
                 workflow_prms[key] = val
-            common_additional_params[key] = val
-
-        # Add common additional params to the workflow additional params.
-        workflow_prms["additional_params"] = common_additional_params
 
     def _remove_unused_params(d: dict[str, Any]) -> None:
         d.pop("input_parent_path", None)
@@ -98,6 +88,7 @@ def invoke_sub_workflow(
         d.pop("parent_path_suffix", None)
         d.pop("skip", None)
         d.pop("name", None)
+        d.pop("overriding_params", None)
         return
 
     def _skip_task(prms) -> bool:

@@ -62,4 +62,4 @@ There are several `groups` of input parameters for super pipelines, each group o
 
     - Skip parameter: if `True` then skip this step.
 
-    - Json string parameter of additional parameters that can be used to pass inputs to the step pipeline (parameters that don't appear as a separate input parameter). Note: if there are Boolean parameters it should be specified as a string value of `"True"` or `"False"` (with quotation mark).
+    - Json string parameter of additional parameters called `overriding_params` that can be used to pass inputs to the step pipeline (parameters that don't appear as a separate input parameter). Note: if there are Boolean parameters it should be specified as a string value of `"True"` or `"False"` (with quotation mark).

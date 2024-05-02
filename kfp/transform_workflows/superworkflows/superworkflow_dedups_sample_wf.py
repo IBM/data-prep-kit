@@ -1,9 +1,8 @@
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from kfp_support.workflow_support.utils import (
-    ONE_WEEK_SEC,
-)
+from kfp_support.workflow_support.utils import ONE_WEEK_SEC
+
 
 # Components
 # For every sub workflow we need a separate components, that knows about this subworkflow.
@@ -11,6 +10,9 @@ run_doc_id_op = comp.load_component_from_file("../../kfp_ray_components/executeS
 run_exact_dedup_op = comp.load_component_from_file("../../kfp_ray_components/executeSubWorkflowComponent.yaml")
 run_fuzzy_dedup_op = comp.load_component_from_file("../../kfp_ray_components/executeSubWorkflowComponent.yaml")
 
+doc_id_image = "quay.io/dataprep1/data-prep-lab/doc_id:0.2"
+ededup_image = "quay.io/dataprep1/data-prep-lab/ededup:0.2.1"
+fdedup_image = "quay.io/dataprep1/data-prep-lab/fdedup:0.2.1"
 
 # Pipeline to invoke execution on remote resource
 @dsl.pipeline(
@@ -22,7 +24,6 @@ def sample_ray_orchestrator(
     p1_orch_doc_id_name: str = "doc_id_wf",
     p1_orch_exact_dedup_name: str = "ededup_wf",
     p1_orch_fuzzy_dedup_name: str = "fdedup_wf",
-
     p2_pipeline_runtime_pipeline_id: str = "pipeline_id",
     p2_pipeline_ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": ""}',
     p2_pipeline_ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": ""}',
@@ -39,61 +40,58 @@ def sample_ray_orchestrator(
     # data access.
     p3_data_max_files: int = -1,
     p3_data_num_samples: int = -1,
-        # orchestrator
+    # orchestrator
     p3_runtime_actor_options: str = '{"num_cpus": 0.8}',
-        # doc id parameters
+    # doc id parameters
     p3_doc_id_doc_column: str = "contents",
     p3_doc_id_hash_column: str = "hash_column",
     p3_doc_id_int_column: str = "int_id_column",
-        # additional parameters
-    p3_additional_params: str = '{"ray_worker_options": {"image": "quay.io/dataprep1/data-prep-lab/doc_id:0.2"}, "ray_head_options": {"image": "quay.io/dataprep1/data-prep-lab/doc_id:0.2"}}',
-
-
+    # overriding parameters
+    p3_overriding_params: str = '{"ray_worker_options": {"image": "' + doc_id_image + '"}, "ray_head_options": {"image": "' + doc_id_image + '"}}',
     # Exact dedup step parameters
     p4_name: str = "ededup",
     p4_skip: bool = False,
     p4_ededup_doc_column: str = "contents",
     p4_ededup_hash_cpu: float = 0.5,
     p4_runtime_actor_options: str = '{"num_cpus": 0.8}',
-        # data access.
+    # data access.
     p4_data_max_files: int = -1,
     p4_data_num_samples: int = -1,
-        # data sampling
+    # data sampling
     p4_ededup_n_samples: int = 10,
-        # additional parameters
-    p4_additional_params: str = '{"ray_worker_options": {"image": "quay.io/dataprep1/data-prep-lab/ededup:0.2.1"}, "ray_head_options": {"image": "quay.io/dataprep1/data-prep-lab/ededup:0.2.1"}}',
-
+    # overriding parameters
+    p4_overriding_params: str = '{"ray_worker_options": {"image": "' + ededup_image + '"}, "ray_head_options": {"image": "' + ededup_image + '"}}',
     # Fuzzy dedup step parameters
     p5_name: str = "fdedup",
     p5_skip: bool = False,
-        # columns used
+    # columns used
     p5_fdedup_doc_column: str = "contents",
     p5_fdedup_id_column: str = "int_id_column",
     p5_fdedup_cluster_column: str = "cluster",
-        # orchestrator
+    # orchestrator
     p5_runtime_actor_options: str = '{"num_cpus": 0.8}',
-        # data access. checkpointing is not supported by dedup
+    # data access. checkpointing is not supported by dedup
     p5_data_num_samples: int = -1,
     p5_data_max_files: int = -1,
-        # infrastructure
+    # infrastructure
     p5_fdedup_bucket_cpu: float = 0.5,
     p5_fdedup_doc_cpu: float = 0.5,
     p5_fdedup_mhash_cpu: float = 0.5,
-        # fuzzy parameters
+    # fuzzy parameters
     p5_fdedup_num_permutations: int = 64,
     p5_fdedup_threshold: float = 0.8,
     p5_fdedup_shingles_size: int = 5,
     p5_fdedup_delimiters: str = " ",
-        # random delay between reads
+    # random delay between reads
     p5_fdedup_random_delay_limit: int = 5,
-        # snapshotting
+    # snapshotting
     p5_fdedup_snapshot_delay: int = 1,
     p5_fdedup_use_doc_snapshot: bool = False,
     p5_fdedup_use_bucket_snapshot: bool = False,
-        # data sampling
+    # data sampling
     p5_fdedup_n_samples: int = 10,
-        # additional parameters
-    p5_additional_params: str = '{"ray_worker_options": {"image": "quay.io/dataprep1/data-prep-lab/fdedup:0.2.1"}, "ray_head_options": {"image": "quay.io/dataprep1/data-prep-lab/fdedup:0.2.1"}}',
+    # overriding parameters
+    p5_overriding_params: str = '{"ray_worker_options": {"image": "' + fdedup_image + '"}, "ray_head_options": {"image": "' + fdedup_image + '"}}',
 ):
 
     # get all arguments
@@ -105,9 +103,7 @@ def sample_ray_orchestrator(
         op.set_display_name(displaied_name)
 
         # Add pod labels
-        op.add_pod_label("app", "ml-pipeline").add_pod_label(
-            "component", "data-science-pipelines"
-        )
+        op.add_pod_label("app", "ml-pipeline").add_pod_label("component", "data-science-pipelines")
         # No cashing
         op.execution_options.caching_strategy.max_cache_staleness = "P0D"
         # image pull policy
@@ -119,8 +115,7 @@ def sample_ray_orchestrator(
 
     # document ID
     doc_id = run_doc_id_op(
-        name=p1_orch_doc_id_name, prefix="p3_", params=args, host=orch_host,
-        input_folder=p2_pipeline_input_parent_path
+        name=p1_orch_doc_id_name, prefix="p3_", params=args, host=orch_host, input_folder=p2_pipeline_input_parent_path
     )
     _set_component(doc_id, "doc ID")
 
