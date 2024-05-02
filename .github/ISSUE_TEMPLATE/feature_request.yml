@@ -29,6 +29,7 @@ body:
               - KFP workflows
               - Library/core
               - Library/kfp
+              - Tools/ingest2parquet
               - Transforms/code/code_quality
               - Transforms/code/proglang_select
               - Transforms/code/malware
