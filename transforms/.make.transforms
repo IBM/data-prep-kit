@@ -245,8 +245,8 @@ conventions:
 	$(MAKE) MINIO_SRC=$$dir/test-data/input MINIO_DEST=$(TRANSFORM_NAME)/ .defaults.minio.load-test-data
 
 
-.PHONY: minio-start
-minio-start:	
+.PHONY: .minio-start
+.minio-start:	
 	$(MAKE) .defaults.minio.start
 	$(MAKE) .transforms.minio-load
 	@# Help: Start and load the minio server with $(TRANSFORM_NAME) test data 

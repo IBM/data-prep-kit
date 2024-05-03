@@ -43,3 +43,5 @@ run-local-ray-sample: .transforms.run-local-ray-sample
 
 run-s3-ray-sample: .transforms.run-s3-ray-sample
 
+minio-start:	.minio-start
+
