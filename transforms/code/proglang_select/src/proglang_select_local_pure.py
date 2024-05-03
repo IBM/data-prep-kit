@@ -13,37 +13,49 @@
 import os
 import sys
 
-from data_processing.ray import TransformLauncherRay
+from data_processing.pure_python import TransformLauncher
 from data_processing.utils import ParamsUtils
-from tokenization_transform import TokenizationTransformConfigurationRay
+from proglang_select_transform import (
+    ProgLangSelectTransformConfigurationRay,
+    lang_allowed_langs_file_key,
+    lang_lang_column_key,
+    lang_output_column_key,
+)
 
 
+# create launcher
+launcher = TransformLauncher(transform_runtime_config=ProgLangSelectTransformConfigurationRay())
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "ds01", "input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "ds01"))
+language_column_name = "language"
+annotated_column_name = "lang_selected"
+
+selected_languages_file = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../test-data/languages/allowed-code-languages.txt")
+)
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
-worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
+langselect_config = {
+    lang_allowed_langs_file_key: selected_languages_file,
+    lang_lang_column_key: language_column_name,
+    lang_output_column_key: annotated_column_name,
+}
 params = {
-    # where to run
-    "run_locally": True,
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # orchestrator
-    "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "runtime_num_workers": 3,
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
-    "runtime_creation_delay": 0,
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
+    # lanuage selection specific parameters
+    **langselect_config,
 }
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=params)
-    # create launcher
-    launcher = TransformLauncherRay(transform_runtime_config=TokenizationTransformConfigurationRay())
-    # Launch the ray actor(s) to process the input
+    # launch
     launcher.launch()

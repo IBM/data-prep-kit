@@ -21,14 +21,11 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
-from data_processing.transform import AbstractTableTransform
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import get_logger
-
-
-logger = get_logger(__name__)
-
 from tokenization_utils import is_valid_argument_string, load_tokenizer, split_text
 
+logger = get_logger(__name__)
 
 CHUNK_CHECKPOINT_INTERVAL = 100
 
@@ -153,17 +150,17 @@ class TokenizationTransform(AbstractTableTransform):
         return [out_table], metadata
 
 
-class TokenizationTransformConfiguration(TableTransformConfigurationRay):
+class TokenizationTransformConfigurationBase:
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__(name="Tokenization", transform_class=TokenizationTransform)
         self.params = {}
 
-    def add_input_params(self, parser: ArgumentParser) -> None:
+    @staticmethod
+    def add_input_params(parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         This will be included in a dictionary used to initialize the TokenizationTransform.
@@ -174,7 +171,7 @@ class TokenizationTransformConfiguration(TableTransformConfigurationRay):
             "--tkn_tokenizer",
             type=str,
             default="hf-internal-testing/llama-tokenizer",
-            help="Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, `hf-internal-testing/llama-tokenizer` from HuggingFace is used",
+            help="Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By default, `hf-internal-testing/llama-tokenizer` from HuggingFace is used",
         )
 
         parser.add_argument(
@@ -257,7 +254,47 @@ class TokenizationTransformConfiguration(TableTransformConfigurationRay):
         return True
 
 
+class TokenizationTransformConfigurationRay(TableTransformConfigurationRay):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(name="Tokenization", transform_class=TokenizationTransform)
+        self.base = TokenizationTransformConfigurationBase()
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
+class TokenizationTransformConfigurationPython(TransformConfiguration):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(name="Tokenization", transform_class=TokenizationTransform)
+        self.base = TokenizationTransformConfigurationBase()
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
 if __name__ == "__main__":
-    launcher = TransformLauncherRay(transform_runtime_config=TokenizationTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=TokenizationTransformConfigurationRay())
     logger.info("Launching Tokenization transform")
     launcher.launch()

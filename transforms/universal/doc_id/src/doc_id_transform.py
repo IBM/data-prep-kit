@@ -21,7 +21,7 @@ from data_processing.ray import (
     TableTransformConfigurationRay,
     TransformLauncherRay,
 )
-from data_processing.transform import AbstractTableTransform
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -52,7 +52,8 @@ class IDGenerator(object):
         return start_id
 
 
-cli_prefix = "doc_id_"
+short_name = "doc_id"
+cli_prefix = f"{short_name}_"
 doc_column_name_key = "doc_column"
 hash_column_name_key = "hash_column"
 int_column_name_key = "int_column"
@@ -141,7 +142,7 @@ class DocIDRuntime(DefaultTableTransformRuntimeRay):
         return {_id_generator_key: IDGenerator.remote()} | self.params
 
 
-class DocIDTransformConfiguration(TableTransformConfigurationRay):
+class DocIDTransformConfigurationBase:
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -149,10 +150,10 @@ class DocIDTransformConfiguration(TableTransformConfigurationRay):
     """
 
     def __init__(self):
-        super().__init__(name="DocID", runtime_class=DocIDRuntime, transform_class=DocIDTransform)
         self.params = {}
 
-    def add_input_params(self, parser: ArgumentParser) -> None:
+    @staticmethod
+    def add_input_params(parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         This will be included in a dictionary used to initialize the NOOPTransform.
@@ -191,7 +192,43 @@ class DocIDTransformConfiguration(TableTransformConfigurationRay):
         return True
 
 
+class DocIDTransformConfigurationRay(TableTransformConfigurationRay):
+
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(name="DocID", runtime_class=DocIDRuntime, transform_class=DocIDTransform)
+        self.base = DocIDTransformConfigurationBase()
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
+class DocIDTransformConfigurationPython(TransformConfiguration):
+    def __init__(self):
+        super().__init__(name=short_name, transform_class=DocIDTransform)
+        self.base = DocIDTransformConfigurationBase()
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
 if __name__ == "__main__":
 
-    launcher = TransformLauncherRay(transform_runtime_config=DocIDTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=DocIDTransformConfigurationRay())
     launcher.launch()

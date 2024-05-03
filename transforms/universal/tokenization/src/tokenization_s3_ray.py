@@ -15,12 +15,12 @@ import sys
 
 from data_processing.ray import TransformLauncherRay
 from data_processing.utils import ParamsUtils
-from tokenization_transform import TokenizationTransformConfiguration
+from tokenization_transform import TokenizationTransformConfigurationRay
 
 
 print(os.environ)
 # create launcher
-launcher = TransformLauncherRay(transform_runtime_config=TokenizationTransformConfiguration())
+launcher = TransformLauncherRay(transform_runtime_config=TokenizationTransformConfigurationRay())
 # create parameters
 s3_cred = {
     "access_key": "localminioaccesskey",
