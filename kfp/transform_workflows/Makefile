@@ -5,9 +5,6 @@ REPOROOT=../..
 # Use "make help" to see them.
 include ../../.make.defaults
 
-export PYTHON ?= python
-PYTEST=pytest
-
 clean::
 	@# Help: Clean up the venv 
 	rm -rf venv || true

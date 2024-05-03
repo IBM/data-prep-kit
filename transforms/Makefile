@@ -39,4 +39,4 @@ test-src::
 
 load-image::
 	@# Help: Recursively make $@ in all subdirs 
-	$(KIND) load docker-image $(IMG) -n $(KIND_CLUSTER_NAME)
+	$(MAKE) RULE=$@ .recurse

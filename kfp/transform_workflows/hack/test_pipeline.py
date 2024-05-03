@@ -66,7 +66,7 @@ def run_sanity_test(pipeline_package_path: str = "", endpoint: str = "http://loc
     """
     pipeline_run = run_test(pipeline_package_path, endpoint=endpoint)
     if pipeline_run is not None:
-        print(f"{pipeline_run} lunched")
+        print(f"{pipeline_run} run successfully launched")
 
 
 if __name__ == "__main__":
