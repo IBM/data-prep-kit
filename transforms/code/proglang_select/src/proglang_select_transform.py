@@ -10,7 +10,7 @@
 # limitations under the License.
 ################################################################################
 
-import argparse
+from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
@@ -25,7 +25,7 @@ from data_processing.ray import (
     TableTransformConfigurationRay,
     TransformLauncherRay,
 )
-from data_processing.transform import AbstractTableTransform
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -150,22 +150,17 @@ class ProgLangSelectRuntime(DefaultTableTransformRuntimeRay):
         return {lang_allowed_languages: lang_refs} | self.params
 
 
-class ProgLangSelectTransformConfiguration(TableTransformConfigurationRay):
+class ProgLangSelectTransformConfigurationBase:
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__(
-            name=shortname,
-            transform_class=ProgLangSelectTransform,
-            runtime_class=ProgLangSelectRuntime,
-            remove_from_metadata=[lang_data_factory_key]
-        )
         self.daf = None
+        self.params = {}
 
-    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+    def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given parser.
         This will be included in a dictionary used to initialize the ProgLangMatchTransform.
@@ -198,7 +193,7 @@ class ProgLangSelectTransformConfiguration(TableTransformConfigurationRay):
         # Add the DataAccessFactory parameters to the transform's configuration parameters.
         self.daf.add_input_params(parser)
 
-    def apply_input_params(self, args: argparse.Namespace) -> bool:
+    def apply_input_params(self, args: Namespace) -> bool:
         """
         Validate and apply the arguments that have been parsed
         :param args: user defined arguments.
@@ -221,6 +216,55 @@ class ProgLangSelectTransformConfiguration(TableTransformConfigurationRay):
         return self.daf.apply_input_params(args)
 
 
+class ProgLangSelectTransformConfigurationRay(TableTransformConfigurationRay):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(
+            name=shortname,
+            transform_class=ProgLangSelectTransform,
+            runtime_class=ProgLangSelectRuntime,
+            remove_from_metadata=[lang_data_factory_key]
+        )
+        self.base = ProgLangSelectTransformConfigurationBase()
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
+class ProgLangSelectTransformConfigurationPython(TransformConfiguration):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(
+            name=shortname,
+            transform_class=ProgLangSelectTransform,
+            remove_from_metadata=[lang_data_factory_key]
+        )
+        self.base = ProgLangSelectTransformConfigurationBase()
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
 if __name__ == "__main__":
-    launcher = TransformLauncherRay(transform_runtime_config=ProgLangSelectTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=ProgLangSelectTransformConfigurationRay())
     launcher.launch()

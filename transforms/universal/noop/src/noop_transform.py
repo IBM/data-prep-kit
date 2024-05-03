@@ -75,7 +75,8 @@ class NOOPTransformConfigurationBase:
     def __init__(self):
         self.params = {}
 
-    def add_input_params(self, parser: ArgumentParser) -> None:
+    @staticmethod
+    def add_input_params(parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         This will be included in a dictionary used to initialize the NOOPTransform.

@@ -17,7 +17,7 @@ import json
 import duckdb
 import pyarrow as pa
 from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
-from data_processing.transform import AbstractTableTransform
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -132,18 +132,17 @@ class FilterTransform(AbstractTableTransform):
         return [filtered_table_cols_dropped], metadata
 
 
-class FilterTransformConfiguration(TableTransformConfigurationRay):
+class FilterTransformConfigurationBase:
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        global short_name
-        super().__init__(name=short_name, transform_class=FilterTransform)
         self.params = {}
 
-    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+    @staticmethod
+    def add_input_params(parser: argparse.ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given parser.
         This will be included in a dictionary used to initialize the FilterTransform.
@@ -195,7 +194,69 @@ class FilterTransformConfiguration(TableTransformConfigurationRay):
         return True
 
 
+class FilterTransformConfigurationRay(TableTransformConfigurationRay):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(name=short_name, transform_class=FilterTransform)
+        self.base = FilterTransformConfigurationBase()
+
+    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+        """
+        Add Transform-specific arguments to the given parser.
+        This will be included in a dictionary used to initialize the FilterTransform.
+        By convention a common prefix should be used for all mutator-specific CLI args
+        (e.g, noop_, pii_, etc.)
+        """
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: argparse.Namespace) -> bool:
+        """
+        Validate and apply the arguments that have been parsed
+        :param args: user defined arguments.
+        :return: True, if validate pass or False otherwise
+        """
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
+class FilterTransformConfigurationPython(TransformConfiguration):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(name=short_name, transform_class=FilterTransform)
+        self.base = FilterTransformConfigurationBase()
+
+    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+        """
+        Add Transform-specific arguments to the given parser.
+        This will be included in a dictionary used to initialize the FilterTransform.
+        By convention a common prefix should be used for all mutator-specific CLI args
+        (e.g, noop_, pii_, etc.)
+        """
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: argparse.Namespace) -> bool:
+        """
+        Validate and apply the arguments that have been parsed
+        :param args: user defined arguments.
+        :return: True, if validate pass or False otherwise
+        """
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
 if __name__ == "__main__":
-    launcher = TransformLauncherRay(transform_runtime_config=FilterTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=FilterTransformConfigurationRay())
     logger.info("Launching filtering")
     launcher.launch()

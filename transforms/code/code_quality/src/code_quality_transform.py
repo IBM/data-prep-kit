@@ -18,14 +18,14 @@
 ################################################################################
 
 
-import argparse
+from argparse import ArgumentParser, Namespace
 import os
 
 import numpy as np
 import pyarrow as pa
 from bs4 import BeautifulSoup
 from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
-from data_processing.transform import AbstractTableTransform
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import TransformUtils
 from transformers import AutoTokenizer
 
@@ -118,7 +118,7 @@ def is_config_or_test(data, scan_width=5, coeff=0.2):
     """
     Check if file is a configuration file or a unit test by :
     1- looking for keywords in the first few lines of the file.
-    2- counting number of occurence of the words 'config' and 'test' with respect to number of lines.
+    2- counting number of occurrences of the words 'config' and 'test' with respect to number of lines.
     """
     keywords = ["unit tests", "test file", "configuration file"]
     lines = data.splitlines()
@@ -282,11 +282,12 @@ class CodeQualityTransform(AbstractTableTransform):
         return [annotated_table], {}
 
 
-class CodeQualityTransformConfiguration(TableTransformConfigurationRay):
+class CodeQualityTransformConfigurationBase:
     def __init__(self):
-        super().__init__(name="code_quality", transform_class=CodeQualityTransform)
+        self.params = {}
 
-    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+    @staticmethod
+    def add_input_params(parser: ArgumentParser) -> None:
         parser.add_argument(
             "--cq_contents_column_name",
             required=False,
@@ -320,7 +321,7 @@ class CodeQualityTransformConfiguration(TableTransformConfigurationRay):
             help="Huggingface auth token to download and use the tokenizer.",
         )
 
-    def apply_input_params(self, args: argparse.Namespace) -> bool:
+    def apply_input_params(self, args: Namespace) -> bool:
         dargs = vars(args)
 
         self.params = {
@@ -335,6 +336,36 @@ class CodeQualityTransformConfiguration(TableTransformConfigurationRay):
         return True
 
 
+class CodeQualityTransformConfigurationRay(TableTransformConfigurationRay):
+    def __init__(self):
+        super().__init__(name="code_quality", transform_class=CodeQualityTransform)
+        self.base = CodeQualityTransformConfigurationBase()
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
+class CodeQualityTransformConfigurationPython(TransformConfiguration):
+    def __init__(self):
+        super().__init__(name="code_quality", transform_class=CodeQualityTransform)
+        self.base = CodeQualityTransformConfigurationBase()
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
+
+
 if __name__ == "__main__":
-    launcher = TransformLauncherRay(transform_runtime_config=CodeQualityTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=CodeQualityTransformConfigurationRay())
     launcher.launch()
