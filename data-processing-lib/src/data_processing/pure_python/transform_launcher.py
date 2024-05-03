@@ -15,7 +15,7 @@ import time
 
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.pure_python import orchestrate
-from data_processing.transform import TransformConfiguration
+from data_processing.transform import TransformConfiguration, TransformExecutionConfiguration
 from data_processing.utils import get_logger
 
 
@@ -40,6 +40,7 @@ class TransformLauncher:
         self.name = transform_runtime_config.get_name()
         self.transform_runtime_config = transform_runtime_config
         self.data_access_factory = data_access_factory
+        self.execution_config = TransformExecutionConfiguration(name=transform_runtime_config.get_name())
 
     def __get_parameters(self) -> bool:
         """
@@ -56,14 +57,15 @@ class TransformLauncher:
         # add additional arguments
         self.transform_runtime_config.add_input_params(parser=parser)
         self.data_access_factory.add_input_params(parser=parser)
+        self.execution_config.add_input_params(parser=parser)
         args = parser.parse_args()
-        return self.transform_runtime_config.apply_input_params(
-            args=args
-        ) and self.data_access_factory.apply_input_params(args=args)
+        return (self.transform_runtime_config.apply_input_params(args=args)
+                and self.execution_config.apply_input_params(args=args)
+                and self.data_access_factory.apply_input_params(args=args))
 
     def _submit_for_execution(self) -> int:
         """
-        Submit for Ray execution
+        Submit for execution
         :return:
         """
         res = 1
@@ -73,11 +75,11 @@ class TransformLauncher:
             res = orchestrate(
                 data_access_factory=self.data_access_factory,
                 transform_config=self.transform_runtime_config,
+                execution_config=self.execution_config,
             )
             logger.debug("Completed orchestrator")
-            time.sleep(10)
         except Exception as e:
-            logger.info(f"Exception running ray remote orchestration\n{e}")
+            logger.info(f"Exception running orchestration\n{e}")
         finally:
             logger.info(f"Completed execution in {(time.time() - start)/60.} min, execution result {res}")
             return res

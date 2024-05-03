@@ -15,6 +15,7 @@ import ast
 from typing import Any
 
 from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger
+from data_processing.transform import TransformExecutionConfiguration
 
 
 logger = get_logger(__name__)
@@ -23,7 +24,7 @@ logger = get_logger(__name__)
 cli_prefix = "runtime_"
 
 
-class TransformOrchestratorConfiguration(CLIArgumentProvider):
+class TransformOrchestratorConfiguration(TransformExecutionConfiguration):
     """
     A class specifying and validating Ray orchestrator configuration
     """
@@ -32,13 +33,10 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
         """
         Initialization
         """
+        super().__init__(name=name, pp=False)
         self.worker_options = {}
         self.n_workers = 1
         self.creation_delay = 0
-        self.pipeline_id = ""
-        self.job_details = {}
-        self.code_location = {}
-        self.name = name
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
@@ -68,21 +66,8 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
             help="AST string defining worker resource requirements.\n"
             + ParamsUtils.get_ast_help_text(help_example_dict),
         )
-        parser.add_argument(f"--{cli_prefix}pipeline_id", type=str, default="pipeline_id", help="pipeline id")
-        parser.add_argument(f"--{cli_prefix}job_id", type=str, default="job_id", help="job id")
         parser.add_argument(f"--{cli_prefix}creation_delay", type=int, default=0, help="delay between actor' creation")
-
-        help_example_dict = {
-            "github": ["https://github.com/somerepo", "Github repository URL."],
-            "commit_hash": ["13241231asdfaed", "github commit hash"],
-            "path": ["transforms/universal/ededup", "Path within the repository"],
-        }
-        parser.add_argument(
-            f"--{cli_prefix}code_location",
-            type=ast.literal_eval,
-            default=None,
-            help="AST string containing code location\n" + ParamsUtils.get_ast_help_text(help_example_dict),
-        )
+        return TransformExecutionConfiguration.add_input_params(self, parser=parser)
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
@@ -90,19 +75,19 @@ class TransformOrchestratorConfiguration(CLIArgumentProvider):
         :param args: user defined arguments
         :return: True, if validate pass or False otherwise
         """
+        if not TransformExecutionConfiguration.apply_input_params(self, args=args):
+            return False
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         # store parameters locally
         self.worker_options = captured["worker_options"]
         self.n_workers = captured["num_workers"]
         self.creation_delay = captured["creation_delay"]
-        self.pipeline_id = captured["pipeline_id"]
         self.job_details = {
             "job category": "preprocessing",
             "job name": self.name,
             "job type": "ray",
             "job id": captured["job_id"],
         }
-        self.code_location = captured["code_location"]
 
         # print them
         logger.info(f"number of workers {self.n_workers} worker options {self.worker_options}")
