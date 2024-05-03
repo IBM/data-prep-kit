@@ -10,7 +10,7 @@ Let's start with transform A (in this example it is exact deduplication). After 
 
 ![ededup pipeline](create_run1.png)
 
-After clicking `create run` a list of input parameters is shown on the screen. In this document we want to deal with the `data_s3_config` input parameter. This parameter specifies the input folder path and outhput folder path. For the transform A we should have `input_folder = path/to/input` and the `output_folder=/path/to/<B>_input` which is an intermediate folder that we will use as an input for the next transform.
+After clicking `create run` a list of input parameters is shown on the screen. In this document we want to deal with the `data_s3_config` input parameter. This parameter specifies the input folder path and output folder path. For the transform A we should have `input_folder = path/to/input` and the `output_folder=/path/to/<B>_input` which is an intermediate folder that we will use as an input for the next transform.
 
 ![param list](param_list1.png)
 
@@ -39,7 +39,7 @@ There are several `groups` of input parameters for super pipelines, each group o
 
 "p2_" group:
 
-- parameters of the ray cluster (head and workers options).
+- parameters of the ray cluster (head and workers options) that are common to all tasks.
 
 - input/output paths: There are three parameters that specify the input and output paths for all the pipeline steps. The parameters are `p2_pipeline_input_parent_path`, `p2_pipeline_output_parent_path` `p2_pipeline_parent_path_suffix`.
 
@@ -62,4 +62,4 @@ There are several `groups` of input parameters for super pipelines, each group o
 
     - Skip parameter: if `True` then skip this step.
 
-    - Json string parameter of additional parameters called `overriding_params` that can be used to pass inputs to the step pipeline (parameters that don't appear as a separate input parameter). Note: if there are Boolean parameters it should be specified as a string value of `"True"` or `"False"` (with quotation mark).
+    - JSON string parameter named `overriding_params` that can be used to modify `p2_` prefixed input pipeline parameters and add additional inputs that are not listed as separate input parameters to the step pipeline.  Note: if there are Boolean parameters it should be specified as a string value of `"True"` or `"False"` (with quotation mark).
