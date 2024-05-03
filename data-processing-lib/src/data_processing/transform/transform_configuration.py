@@ -19,16 +19,12 @@ from data_processing.utils import CLIArgumentProvider
 
 class TransformConfiguration(CLIArgumentProvider):
     """
-    Provides support the configuration of a transformer running in the ray environment.
+    Provides support the configuration of a transformer runtime
     It holds the following:
-        1) The type of the concrete AbstractTransform class, that is created by a the ray worker with a
+        1) The type of the concrete AbstractTransform class, that is created by a the worker with a
             dictionary of parameters to perform that table transformations.
-        2) The type of the of DefaultTableTransformRuntime that supports operation of the transform
-            on the ray orchestrator side.  It is create with an initializer that takes the dictionary
-            of CLI arguments, optionally defined in this class.
     Sub-classes may extend this class to override the following:
-        1) add_input_params() to add CLI argument definitions used in creating both the AbstractTransform
-            and the DefaultTableTransformRuntime.
+        1) add_input_params() to add CLI argument definitions used in creating TransformRuntime.
     """
 
     def __init__(self, name: str, transform_class: type[AbstractTableTransform], remove_from_metadata: list[str] = []):
