@@ -8,7 +8,12 @@
 # DOCKER_NAME - defines the name of the docker image
 #	For example DOCKER_NAME=noop
 # EXTRA_INDEX_URL - can define an additional pipy index for use 
-#	in creating venv and images.
+#	in creating venv and images.  This will be used on pip installs
+#	when building the venv and will be made available as
+#	a docker build argument when building the docker image.
+#	This is useful when the repo is used in conjunction with an 
+#	inhouse or private pypi.
+#
 # Targets defined here use double colon so can be overriden
 #
 # Reusable rules begin with '.'. To reuse without modification, for example,
@@ -240,7 +245,10 @@ __check_defined = \
 	@source venv/bin/activate;		\
 	pip install --upgrade pip;		\
 	pip install wheel;			\
-	pip install --extra-index-url "$(EXTRA_INDEX_URL)" -r requirements.txt;	
+	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
+		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
+	fi;								\
+	pip install $$extra_url -r requirements.txt;	
 
 .PHONY: .defaults.check.installed
 .defaults.check.installed::
