@@ -26,7 +26,7 @@ from data_processing.ray import (
     TransformLauncherRay,
 )
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import TransformUtils, get_logger, str2bool
+from data_processing.utils import TransformUtils, get_logger
 from ray.actor import ActorHandle
 
 
@@ -163,7 +163,6 @@ class ProgLangSelectTransformConfiguration(TableTransformConfigurationRay):
             runtime_class=ProgLangSelectRuntime,
             remove_from_metadata=[lang_data_factory_key]
         )
-        self.params = {}
         self.daf = None
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:

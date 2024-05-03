@@ -16,7 +16,7 @@ from datetime import datetime
 
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.pure_python import TransformTableProcessor
-from data_processing.transform import TransformConfiguration, TransformStatistics
+from data_processing.transform import TransformConfiguration, TransformStatistics, TransformExecutionConfiguration
 from data_processing.utils import get_logger
 
 
@@ -26,6 +26,7 @@ logger = get_logger(__name__)
 def orchestrate(
     data_access_factory: DataAccessFactoryBase,
     transform_config: TransformConfiguration,
+    execution_config: TransformExecutionConfiguration,
 ) -> int:
     """
     orchestrator for transformer execution
@@ -34,7 +35,7 @@ def orchestrate(
     :return: 0 - success or 1 - failure
     """
     start_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    logger.info(f"orchestrator started at {start_ts}")
+    logger.info(f"orchestrator {transform_config.get_name()} started at {start_ts}")
     try:
         # create data access
         data_access = data_access_factory.create_data_access()
@@ -58,7 +59,7 @@ def orchestrate(
             data_access_factory=data_access_factory, statistics=statistics, params=transform_config
         )
         # process data
-        logger.debug("Begin processing files")
+        logger.debug(f"{transform_config.get_name()} Begin processing files")
         t_start = time.time()
         completed = 0
         for path in files:
@@ -78,11 +79,14 @@ def orchestrate(
         logger.debug("Building job metadata")
         input_params = transform_config.get_transform_metadata()
         metadata = {
-            "job details": {
-                "start_time": start_ts,
-                "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "status": "success",
-            },
+            "pipeline": execution_config.pipeline_id,
+            "job details": execution_config.job_details |
+                           {
+                               "start_time": start_ts,
+                               "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                               "status": "success",
+                            },
+            "code": execution_config.code_location,
             "job_input_params": input_params | data_access_factory.get_input_params(),
             "job_output_stats": stats,
         }
