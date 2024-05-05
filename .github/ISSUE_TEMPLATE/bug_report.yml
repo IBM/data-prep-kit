@@ -90,10 +90,12 @@ body:
               What operating system
           multiple: true
           options:
-              - Ubuntu
-              - Redhat
-              - Windows
-              - Other
+              - "Ubuntu"
+              - "Red Hat Enterprise Linux (RHEL)"
+              - "Fedora"
+              - "Windows WSL"
+              - "MacOS (limited support)"
+              - "Other"
       validations:
           required: true
 
@@ -104,9 +106,9 @@ body:
               What version of python
           multiple: true
           options:
-              - 3.10
-              - 3.11
-              - Other
+              - "3.10.x"
+              - "3.11.x"
+              - "Other"
       validations:
           required: true
 
