@@ -32,7 +32,7 @@ endef
 	fi
 	cd ${TRANSFORM_SRC} && $(MAKE) image && $(MAKE) load-image
 	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) image && $(MAKE) load-image
-	. ${VENV_ACTIVATE}  && ${PYTHON} -m kfp_support.workflow_utils.pipelines_tests_utils -p ${CURDIR}/${PIPELINE_FILE}
+	. ${VENV_ACTIVATE}  && ${PYTHON} -m kfp_support.workflow_support.utils.pipelines_tests_utils -c "sanity-test" -p ${CURDIR}/${PIPELINE_FILE}
 
 ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt
 	@# Help: Create the virtual environment common to all workflows
@@ -48,7 +48,7 @@ ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${
 	@if [ -z ${CLUSTER_EXISTS} ]; then \
 		cd ${REPOROOT} && make setup;  \
 	fi
-	. ${VENV_ACTIVATE}  && ${PYTHON} -m kfp_support.workflow_utils.pipelines_tests_utils -c "upload" -p ${CURDIR}/${PIPELINE_FILE}
+	. ${VENV_ACTIVATE}  && ${PYTHON} -m kfp_support.workflow_support.utils.pipelines_tests_utils -c "upload" -p ${CURDIR}/${PIPELINE_FILE}
 
 .PHONY: .transforms_workflows.clean
 .transforms_workflows.clean:

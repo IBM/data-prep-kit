@@ -45,11 +45,9 @@ publish::
 
 venv::	pyproject.toml .check-env
 	@# Help: Create the virtual environment using pyproject.toml 
-	sed -i.back "s/data-prep-lab-kfp==[0-9].*/data-prep-lab-kfp==${DPL_LIB_KFP_VERSION}/" ../kfp_ray_components/requirements.txt
 	rm -rf venv
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
-        pip install -r ../kfp_ray_components/requirements.txt ;\
 	pip install -e .;		\
 	pip install ray==${RAY} \
 	pip install pytest pytest-cov 

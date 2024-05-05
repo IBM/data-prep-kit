@@ -1,6 +1,6 @@
 import os
 
-from workflow_utils import PipelinesUtils
+from . import PipelinesUtils
 
 
 # Upload a pipeline. If the pipeline exists delete it and create a new one.
@@ -67,7 +67,7 @@ def run_test(pipeline_package_path: str, endpoint: str = "http://localhost:8080/
 
 def run_sanity_test(pipeline_package_path: str = "", endpoint: str = "http://localhost:8080/kfp"):
     """
-    Run sanity test: automatic upload and run pipelines.
+    Run sanity test: automatic upload and run a pipeline.
 
     :param pipeline_package_path: Local path to the pipeline package.
     :param endpoint: endpoint to kfp service
