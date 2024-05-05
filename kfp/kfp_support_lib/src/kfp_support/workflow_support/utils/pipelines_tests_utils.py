@@ -38,6 +38,7 @@ def upload_pipeline(
     print(f"Pipeline {pipeline.id} uploaded successfully")
     return pipeline
 
+
 def run_test(pipeline_package_path: str, endpoint: str = "http://localhost:8080/kfp"):
     """
     Upload and run a single pipeline
@@ -75,8 +76,8 @@ def run_sanity_test(pipeline_package_path: str = "", endpoint: str = "http://loc
     pipeline_run = run_test(pipeline_package_path, endpoint=endpoint)
     if pipeline_run is not None:
         print(f"{pipeline_run} run successfully launched")
-        
-        
+
+
 if __name__ == "__main__":
     import argparse
 
