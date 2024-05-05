@@ -94,7 +94,7 @@ def invoke_sub_workflow(
     def _skip_task(prms) -> bool:
         # if there is a skip parameter and it is True then skip the task
         if "skip" in prms:
-            if prms.get("skip", "False").lower() == "true":
+            if prms.get("skip", "False").lower() in ('true', 'yes'):
                 return True
         return False
 
