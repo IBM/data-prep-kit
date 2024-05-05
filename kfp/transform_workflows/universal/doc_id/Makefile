@@ -9,6 +9,8 @@ include ../../.make.transforms_workflows
 
 SRC_DIR=${REPOROOT}/transforms/universal/doc_id/
 
+YAML_FILE=doc_id_wf.yaml
+
 DOCKER_IMAGE_NAME=doc_id
 # $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${DOC_ID_VERSION}
@@ -18,8 +20,10 @@ venv:: .check_python_version ${VENV_ACTIVATE}
 clean:: transforms_workflows.clean
 
 build:: .check_python_version ${VENV_ACTIVATE}
-	$(MAKE) doc_id_wf.yaml
+	$(MAKE) ${YAML_FILE}
 
 test:: .check_python_version ${VENV_ACTIVATE}
-	$(MAKE) .transforms_workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=doc_id_wf.yaml
-	
+	$(MAKE) .transforms_workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=${YAML_FILE}
+
+upload::
+	$(MAKE) .transforms_workflows.upload-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=${YAML_FILE}

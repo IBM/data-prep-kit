@@ -1,11 +1,30 @@
-# Define the root of the local git clone for the common rules to be able 
-# know where they are running from.
-REPOROOT=../../../..
+REPOROOT=${CURDIR}/../../../../
+# venv is common to all workflows
+VENV_ACTIVATE=${REPOROOT}/kfp/transform_workflows/venv/bin/activate
+
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
-# to override/redefine the rules below. 
+# to override/redefine the rules below.
 include ../../.make.transforms_workflows
+
+SRC_DIR=${REPOROOT}/transforms/universal/code_quality/
+
+YAML_FILE=code_quality_wf.yaml
 
 DOCKER_IMAGE_NAME=code_quality
 # $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${CODE_QUALITY_VERSION}
+
+venv:: .check_python_version ${VENV_ACTIVATE}
+
+clean:: transforms_workflows.clean
+
+build:: .check_python_version ${VENV_ACTIVATE}
+        $(MAKE) ${YAML_FILE}
+
+test:: .check_python_version ${VENV_ACTIVATE}
+        $(MAKE) .transforms_workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=${YAML_FILE}
+
+upload::
+	$(MAKE) .transforms_workflows.upload-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=${YAML_FILE}
+

@@ -8,9 +8,7 @@ include ${REPOROOT}/kfp/requirements.env
 # Use "make help" to see them.
 include ../../.make.defaults
 
-PIP=$(PYTHON) -m pip
 # Command to run pytest
-PYTEST=pytest -s
 PYTHON_VERSION=$(shell $(PYTHON) --version)
 VENV_ACTIVATE=venv/bin/activate
 

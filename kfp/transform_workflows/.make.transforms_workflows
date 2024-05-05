@@ -13,8 +13,8 @@ endef
 
 .PHONY: .transforms_workflows.reconcile-requirement
 .transforms_workflows.reconcile-requirement:
-	sed -i.back "s%${DOCKER_IMAGE_NAME}:.*%${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}\"%" ${PIPELINE_FILE}
-	sed -i.back "s%kfp-data-processing:.*%kfp-data-processing:${KFP_DOCKER_VERSION}\"%" ${PIPELINE_FILE}
+	sed -i.back "s/${DOCKER_IMAGE_NAME}:.*/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}\"/" ${PIPELINE_FILE}
+	sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION}\"/" ${PIPELINE_FILE}
 
 .PHONY: .transforms_workflows.compile-pipeline
 .transforms_workflows.compile-pipeline:
@@ -32,16 +32,24 @@ endef
 	fi
 	cd ${TRANSFORM_SRC} && $(MAKE) image && $(MAKE) load-image
 	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) image && $(MAKE) load-image
-	. ${VENV_ACTIVATE}  && ${PYTHON} ${REPOROOT}/kfp/transform_workflows/hack/test_pipeline.py -p ${CURDIR}/${PIPELINE_FILE}
+	. ${VENV_ACTIVATE}  && ${PYTHON} -m kfp_support.workflow_utils.pipelines_tests_utils -p ${CURDIR}/${PIPELINE_FILE}
 
 ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt
 	@# Help: Create the virtual environment common to all workflows
 	rm -rf ${REPOROOT}/kfp/transform_workflows/venv
 	$(PYTHON) -m venv ${REPOROOT}/kfp/transform_workflows/venv
-	. ${VENV_ACTIVATE}; 	\
-	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple \
+	. ${VENV_ACTIVATE};     \
+	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple; \
 	pip install data_prep_lab_kfp==${DPL_LIB_KFP_VERSION}
 	
+.PHONY: .transforms_workflows.upload-pipeline
+.transforms_workflows.upload-pipeline:
+	$(call set_env_var, CLUSTER_EXISTS, $(shell kind get clusters | grep ${KIND_CLUSTER_NAME}))
+	@if [ -z ${CLUSTER_EXISTS} ]; then \
+		cd ${REPOROOT} && make setup;  \
+	fi
+	. ${VENV_ACTIVATE}  && ${PYTHON} -m kfp_support.workflow_utils.pipelines_tests_utils -c "upload" -p ${CURDIR}/${PIPELINE_FILE}
+
 .PHONY: .transforms_workflows.clean
 .transforms_workflows.clean:
 	rm -rf "*_wf.yaml" || true

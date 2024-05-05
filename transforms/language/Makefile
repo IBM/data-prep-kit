@@ -32,3 +32,8 @@ test-src::
 publish:: 
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
+
+
+load-image::
+	@# Help: Recursively make $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse

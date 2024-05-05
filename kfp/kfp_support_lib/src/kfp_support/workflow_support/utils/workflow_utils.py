@@ -267,7 +267,6 @@ class PipelinesUtils:
             logger.warning(f"Failed waiting pipeline completion {e}")
             return "failed", str(e)
 
-
 class RayRemoteJobs:
     """
     class supporting Ray remote jobs

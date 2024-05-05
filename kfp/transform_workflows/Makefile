@@ -25,3 +25,7 @@ build::
 test::
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
+
+upload::
+	@# Help: Recursively make $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
