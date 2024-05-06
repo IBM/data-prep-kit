@@ -30,6 +30,8 @@ publish:: .transforms.publish
 
 run-cli-ray-sample: .transforms.run-cli-ray-sample
 
+run-cli-python-sample: .transforms.run-cli-python-sample
+
 run-local-sample: .transforms.run-local-sample
 
 run-local-ray-sample: .transforms.run-local-ray-sample

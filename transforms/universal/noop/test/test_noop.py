@@ -12,7 +12,7 @@
 
 import pyarrow as pa
 from data_processing.test_support.transform.transform_test import AbstractTransformTest
-from noop_transform import NOOPTransform, sleep_key
+from noop_transform_ray import NOOPTransform, sleep_key
 
 
 table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})

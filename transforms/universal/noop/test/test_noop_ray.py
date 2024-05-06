@@ -15,7 +15,7 @@ import os
 import pyarrow as pa
 from data_processing.test_support.ray import AbstractTransformLauncherTest
 from data_processing.test_support.transform import NOOPTransformConfiguration
-from noop_transform import sleep_cli_param
+from noop_transform_ray import sleep_cli_param
 
 
 class TestRayNOOPTransform(AbstractTransformLauncherTest):

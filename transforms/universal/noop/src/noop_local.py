@@ -13,7 +13,7 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-from noop_transform import NOOPTransform
+from noop_transform_ray import NOOPTransform
 
 
 # create parameters

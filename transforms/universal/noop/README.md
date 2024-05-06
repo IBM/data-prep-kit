@@ -14,7 +14,7 @@ of the transform is implemented.
 
 ## Configuration and command line Options
 
-The set of dictionary keys holding [NOOPTransform](src/noop_transform.py) 
+The set of dictionary keys holding [NOOPTransform](src/noop_transform_ray.py) 
 configuration for values are as follows:
 
 * _noop_sleep_sec_ - specifies the number of seconds to sleep during table transformation. 
