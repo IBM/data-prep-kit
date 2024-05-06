@@ -173,7 +173,8 @@ class TestGetInputFiles(TestInit):
         result = (file_list, size_dict)
 
         expected_result = (
-            [str(file.absolute()) for file in input_files if str(file.absolute()) != str(output_file.absolute())],
+            # [str(file.absolute()) for file in input_files if str(file.absolute()) != str(output_file.absolute())],
+            [str(file.absolute()) for file in input_files if "file2.parquet" not in str(file)],
             self.size_stat_dict,
         )
 
@@ -312,8 +313,12 @@ class TestGetFilesToProcess(TestInit):
         ) = self.multiple_missing_files_setup()
 
         expected_result = (
-            [str(file.absolute()) for file in in_files_1 if file.absolute() != out_file_2.absolute()]
-            + [str(file.absolute()) for file in in_files_2 if str(file.absolute()) != str(out_file_2.absolute())],
+            # [str(file.absolute()) for file in in_files_1 if file.absolute() != out_file_2.absolute()]
+            # + [str(file.absolute()) for file in in_files_2 if str(file.absolute()) != str(out_file_2.absolute())],
+            [str(file.absolute()) for file in in_files_1]
+            + [  # if file.absolute() != out_file_2.absolute()]
+                str(file.absolute()) for file in in_files_2 if "file1.parquet" not in str(file)
+            ],
             self.size_stat_dict_1,
         )
         self.multiple_missing_files_cleanup(

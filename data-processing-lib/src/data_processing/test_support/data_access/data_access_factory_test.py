@@ -13,7 +13,7 @@ def _verify_files(rootdir, expected_files, found_files):
     assert len(expected_files) == len(found_files)
 
 
-class TestDataAccessFactory:
+class AbstractDataAccessFactoryTests:
     def test_get_all(self):
         params = {}
         expected_files = ["ds1/sample1.parquet", "ds1/sample2.parquet", "ds2/sample3.parquet"]
@@ -52,19 +52,7 @@ class TestDataAccessFactory:
             str : input folder path
             dict: cli parameters to configure the DataAccessFactory with
         """
-        params = {}
-        input_folder = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "../../../test-data", "data_processing", "daf", "input")
-        )
-        output_folder = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "../../../test-data", "data_processing", "daf", "output")
-        )
-        local_conf = {
-            "input_folder": input_folder,
-            "output_folder": output_folder,
-        }
-        params["data_local_config"] = ParamsUtils.convert_to_ast(local_conf)
-        return input_folder, params
+        raise ValueError("Must be implemented")
 
     def _run_test(self, params, expected_files):
         input_folder, io_params = self._get_io_params()
