@@ -3,7 +3,6 @@ import os
 from . import PipelinesUtils
 
 
-# Upload a pipeline. If the pipeline exists delete it and create a new one.
 def upload_pipeline(
     pipeline_name: str,
     pipeline_package_path: str,
