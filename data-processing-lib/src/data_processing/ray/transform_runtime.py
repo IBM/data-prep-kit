@@ -9,11 +9,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
+import argparse
 from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.transform.transform_configuration import (
+    TransformConfigurationProxy,
+)
 from ray.actor import ActorHandle
 
 
@@ -92,3 +95,41 @@ class TableTransformConfigurationRay(TransformConfiguration):
         :return: transform runtime object
         """
         return self.runtime_class(self.params)
+
+
+class TableTransformConfigurationRay2(TransformConfigurationProxy):
+    """
+    Provides support the configuration of a transformer running in the ray environment.
+    It uses the non-Ray TransformConfiguration as a starting point and sub-classes may extend
+    its functionality to, for example, add more ray-specific input parameters/configuration.
+    It holds the following:
+        1)  A pure python transform configuration, which provides most of the non-Ray configuration.
+        2) The type of the of DefaultTableTransformRuntime that supports operation of the transform
+            on the ray orchestrator side.  It is created with an initializer that takes the dictionary
+            of CLI arguments, optionally defined in the proxied TransformConfiguration
+    Sub-classes may extend this class to override the following:
+        1) add_input_params() to add CLI argument definitions used in creating both the AbstractTransform
+            and the DefaultTableTransformRuntime. In general, this should also call the proxied
+            TransformConfiguration's (i.e., the class's add_input_params() method).
+    """
+
+    def __init__(
+        self,
+        config: TransformConfiguration,
+        runtime_class: type[DefaultTableTransformRuntimeRay] = DefaultTableTransformRuntimeRay,
+    ):
+        super().__init__(config)
+        """
+        Initialization
+        :param config a python (non-ray) transform configuration to proxy/emulate.
+        :param remove_from_metadata: list of parameters to remove from metadata
+        :return:
+        """
+        self.runtime_class = runtime_class
+
+    def create_transform_runtime(self) -> DefaultTableTransformRuntimeRay:
+        """
+        Create transform runtime with the parameters captured during apply_input_params()
+        :return: transform runtime object
+        """
+        return self.runtime_class(self.proxied_config.params)

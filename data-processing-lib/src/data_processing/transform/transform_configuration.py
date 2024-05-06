@@ -9,7 +9,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
+import argparse
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
@@ -107,3 +107,29 @@ def get_transform_config(
     transform_configuration.apply_input_params(args)
     config = transform_configuration.get_input_params()  # This is the transform configuration, for this test.
     return dargs | config
+
+
+class TransformConfigurationProxy(TransformConfiguration):
+    def __init__(self, proxied: TransformConfiguration):
+        self.proxied_config = proxied
+
+    def get_transform_class(self) -> type[AbstractTableTransform]:
+        return self.proxied_config.get_transform_class()
+
+    def get_name(self):
+        return self.proxied_config.get_name()
+
+    def get_transform_metadata(self) -> dict[str, Any]:
+        return self.proxied_config.get_transform_metadata()
+
+    def get_transform_params(self) -> dict[str, Any]:
+        return self.proxied_config.get_transform_params()
+
+    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+        self.proxied_config.add_input_params(parser)
+
+    def apply_input_params(self, args: argparse.Namespace) -> bool:
+        return self.proxied_config.apply_input_params(args)
+
+    def get_input_params(self) -> dict[str, Any]:
+        return self.proxied_config.get_input_params()

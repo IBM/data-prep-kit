@@ -13,31 +13,18 @@
 from argparse import ArgumentParser, Namespace
 
 from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
+from data_processing.ray.transform_runtime import TableTransformConfigurationRay2
 from data_processing.utils import get_logger
-from noop_transform import (
-    NOOPTransform,
-    NOOPTransformConfigurationBase,
-    pwd_key,
-    short_name,
-)
+from noop_transform import NOOPTransformConfiguration
 
 
 logger = get_logger(__name__)
 
 
-class NOOPTransformConfigurationRay(TableTransformConfigurationRay):
+class NOOPTransformConfigurationRay(TableTransformConfigurationRay2):
     def __init__(self):
-        super().__init__(name=short_name, transform_class=NOOPTransform, remove_from_metadata=[pwd_key])
-        self.base = NOOPTransformConfigurationBase()
-
-    def add_input_params(self, parser: ArgumentParser) -> None:
-        return self.base.add_input_params(parser=parser)
-
-    def apply_input_params(self, args: Namespace) -> bool:
-        is_valid = self.base.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.base.params
-        return is_valid
+        params = {}
+        super().__init__(NOOPTransformConfiguration())
 
 
 if __name__ == "__main__":
