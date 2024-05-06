@@ -21,9 +21,9 @@ from kfp_support.workflow_support.utils import (
 
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "proglang_match_transform.py"
+EXEC_SCRIPT_NAME: str = "proglang_select_transform.py"
 
-task_image = "quay.io/dataprep1/data-prep-lab/proglang_match:0.2.0"
+task_image = "quay.io/dataprep1/data-prep-lab/proglang_select:0.2.0"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.6"
