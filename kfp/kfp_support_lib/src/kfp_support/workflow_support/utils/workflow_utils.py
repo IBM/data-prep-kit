@@ -197,7 +197,7 @@ class PipelinesUtils:
             run_id = self.kfp_client.run_pipeline(
                 experiment_id=experiment.id, job_name=job_name, pipeline_id=pipeline.id, params=params
             )
-            logger.info("Pipeline submitted")
+            logger.info(f"Pipeline run {job_name} submitted")
             return run_id.id
         except Exception as e:
             logger.warning(f"Exception starting pipeline {e}")
@@ -266,6 +266,7 @@ class PipelinesUtils:
         except Exception as e:
             logger.warning(f"Failed waiting pipeline completion {e}")
             return "failed", str(e)
+
 
 class RayRemoteJobs:
     """
@@ -632,7 +633,7 @@ class ComponentUtils:
     def add_settings_to_component(
             component: dsl.ContainerOp,
             timeout: int,
-            image_pull_policy: str = "ifNotPresent",
+            image_pull_policy: str = "IfNotPresent",
             cache_strategy: str = "P0D",
     ) -> None:
         """
