@@ -1,1 +1,1 @@
-from data_access_factory_test import AbstractDataAccessFactoryTests
+from .data_access_factory_test import AbstractDataAccessFactoryTests
