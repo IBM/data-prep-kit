@@ -113,15 +113,20 @@ class DataAccessFactory(DataAccessFactoryBase):
             default=False,
             help="checkpointing flag",
         )
-        parser.add_argument(f"--{self.cli_arg_prefix}data_sets", type=str, default=None, help="List of data sets")
+        parser.add_argument(
+            f"--{self.cli_arg_prefix}data_sets",
+            type=ast.literal_eval,
+            default=None,
+            help="List of sub-directories of input directory to use for input. For example, ['dir1', 'dir2']",
+        )
         parser.add_argument(
             f"--{self.cli_arg_prefix}files_to_use",
             type=ast.literal_eval,
             default=ast.literal_eval("['.parquet']"),
-            help="list of files extensions to choose",
+            help="list of file extensions to choose for input.",
         )
         parser.add_argument(
-            f"--{self.cli_arg_prefix}num_samples", type=int, default=-1, help="number of random files to process"
+            f"--{self.cli_arg_prefix}num_samples", type=int, default=-1, help="number of random input files to process"
         )
 
     def apply_input_params(self, args: Union[dict, argparse.Namespace]) -> bool:
@@ -204,6 +209,7 @@ class DataAccessFactory(DataAccessFactoryBase):
         self.max_files = max_files
         self.n_samples = n_samples
         self.files_to_use = files_to_use
+        self.dsets = data_sets
         if data_sets is None or len(data_sets) < 1:
             self.logger.info(
                 f"data factory {self.cli_arg_prefix} "
@@ -211,7 +217,6 @@ class DataAccessFactory(DataAccessFactoryBase):
                 f"random samples {self.n_samples}, files to use {self.files_to_use}"
             )
         else:
-            self.dsets = data_sets.split(",")
             self.logger.info(
                 f"data factory {self.cli_arg_prefix} "
                 f"Using data sets {self.dsets}, checkpointing {self.checkpointing}, max files {self.max_files}, "
