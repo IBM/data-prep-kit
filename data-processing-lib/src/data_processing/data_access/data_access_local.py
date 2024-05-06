@@ -70,7 +70,7 @@ class DataAccessLocal(DataAccess):
         return self.output_folder
 
     @staticmethod
-    def _get_all_files_ext(path: str, extensions: list[str]) -> list[str]:
+    def _get_all_files_ext(path: str, extensions: list[str], absolute_paths: bool = True) -> list[str]:
         """
         Get files with the given extension for a given folder and all sub folders
         :param path: starting path
@@ -80,11 +80,14 @@ class DataAccessLocal(DataAccess):
         files = []
         for c_path in sorted(Path(path).rglob("*")):
             # for every file
+            if c_path.is_dir():
+                continue
             s_path = str(c_path.absolute())
-            if extensions is None:
-                if c_path.is_dir():
-                    continue
-            else:
+            if not absolute_paths:
+                s_path = s_path.replace(path, "")
+                if s_path.startswith(os.sep):
+                    s_path = s_path[1:]
+            if extensions is not None:
                 _, extension = os.path.splitext(s_path)
                 if extension not in extensions:
                     continue
@@ -145,8 +148,10 @@ class DataAccessLocal(DataAccess):
                 path=input_path, cm_files=cm_files, min_file_size=min_file_size, max_file_size=max_file_size
             )
 
-        input_files = set(self._get_all_files_ext(path=input_path, extensions=self.files_to_use))
-        output_files = set(self._get_all_files_ext(path=output_path, extensions=self.files_to_use))
+        input_files = set(self._get_all_files_ext(path=input_path, extensions=self.files_to_use, absolute_paths=False))
+        output_files = set(
+            self._get_all_files_ext(path=output_path, extensions=self.files_to_use, absolute_paths=False)
+        )
         input_only_files = input_files - output_files
 
         total_input_file_size = 0
@@ -155,8 +160,9 @@ class DataAccessLocal(DataAccess):
         for filename in sorted(input_only_files):
             if i >= cm_files > 0:
                 break
+            filename = os.path.join(input_path, filename)
             output_files.append(filename)
-            size = os.path.getsize(os.path.join(input_path, filename))
+            size = os.path.getsize(filename)
             total_input_file_size += size
             if min_file_size > size:
                 min_file_size = size
