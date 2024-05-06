@@ -52,7 +52,7 @@ def run_test(pipeline_package_path: str, endpoint: str = "http://localhost:8080/
     file_name = os.path.basename(pipeline_package_path)
     pipeline_name = os.path.splitext(file_name)[0]
     utils = PipelinesUtils(host=endpoint)
-    pipeline = upload_pipeline(utils, pipeline_package_path=pipeline_package_path, pipeline_name=pipeline_name)
+    pipeline = upload_pipeline(utils=utils, pipeline_package_path=pipeline_package_path, pipeline_name=pipeline_name)
     if pipeline is None:
         return None
     experiment = utils.get_experiment_by_name()
