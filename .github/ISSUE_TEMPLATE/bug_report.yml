@@ -65,7 +65,7 @@ body:
       attributes:
           label: Reproduction script
           description: >
-              Please provide a reproducible script, including location in the repo if relevant.. Providing a narrow 
+              Please provide a reproducible script, including location in the repo if relevant. Providing a narrow 
               reproduction (minimal / no external dependencies) will help us triage and address issues in the timely manner!
           placeholder: >
               Please provide a short code snippet (less than 50 lines if possible) that can be copy-pasted to
