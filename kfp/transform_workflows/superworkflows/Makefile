@@ -12,12 +12,8 @@ YAML_WF=$(patsubst %.py, %.yaml, ${PYTHON_WF})
 
 venv:: .check_python_version ${VENV_ACTIVATE}
 
-clean:: transforms_workflows.clean
+clean:: .transforms_workflows.clean
 
-.reconcile-requirement::
-	sed -i.back "s/${DOCKER_IMAGE_NAME}:.*/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}\"/" ${PIPELINE_FILE}
-
-# TODO handle reconcile-requirement of sub workflows 
 build:: 
 	@for file in $(YAML_WF); do \
 		$(MAKE) $$file;       \

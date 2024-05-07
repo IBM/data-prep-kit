@@ -18,7 +18,7 @@ DOCKER_IMAGE_VERSION ?= ${FILTER_VERSION}
 
 venv:: .check_python_version ${VENV_ACTIVATE}
 
-clean:: transforms_workflows.clean
+clean:: .transforms_workflows.clean
 
 build:: .check_python_version ${VENV_ACTIVATE}
 	$(MAKE) ${YAML_FILE}
