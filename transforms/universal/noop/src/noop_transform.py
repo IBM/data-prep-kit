@@ -15,8 +15,13 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.pure_python import TransformLauncher
+from data_processing.ray import TransformConfigurationRay
+from data_processing.transform import (
+    AbstractTableTransform,
+    TransformConfiguration,
+    TransformConfigurationBase,
+)
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -65,7 +70,7 @@ class NOOPTransform(AbstractTableTransform):
         return [table], metadata
 
 
-class NOOPTransformConfigurationBase:
+class NOOPTransformConfigurationBase(TransformConfigurationBase):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -73,7 +78,7 @@ class NOOPTransformConfigurationBase:
     """
 
     def __init__(self):
-        self.params = {}
+        super().__init__()
 
     @staticmethod
     def add_input_params(parser: ArgumentParser) -> None:
@@ -115,37 +120,27 @@ class NOOPTransformConfigurationBase:
         return True
 
 
-class NOOPTransformConfigurationRay(TableTransformConfigurationRay):
+class NOOPTransformConfigurationRay(TransformConfigurationRay):
     def __init__(self):
-        super().__init__(name=short_name, transform_class=NOOPTransform, remove_from_metadata=[pwd_key])
-        self.base = NOOPTransformConfigurationBase()
-
-    def add_input_params(self, parser: ArgumentParser) -> None:
-        return self.base.add_input_params(parser=parser)
-
-    def apply_input_params(self, args: Namespace) -> bool:
-        is_valid = self.base.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.base.params
-        return is_valid
+        super().__init__(
+            name=short_name,
+            transform_class=NOOPTransform,
+            base_configuration=NOOPTransformConfigurationBase(),
+            remove_from_metadata=[pwd_key],
+        )
 
 
 class NOOPTransformConfigurationPython(TransformConfiguration):
     def __init__(self):
-        super().__init__(name=short_name, transform_class=NOOPTransform, remove_from_metadata=[pwd_key])
-        self.base = NOOPTransformConfigurationBase()
-
-    def add_input_params(self, parser: ArgumentParser) -> None:
-        return self.base.add_input_params(parser=parser)
-
-    def apply_input_params(self, args: Namespace) -> bool:
-        is_valid = self.base.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.base.params
-        return is_valid
+        super().__init__(
+            name=short_name,
+            transform_class=NOOPTransform,
+            base_configuration=NOOPTransformConfigurationBase(),
+            remove_from_metadata=[pwd_key],
+        )
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncherRay(transform_runtime_config=NOOPTransformConfigurationRay())
+    launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfigurationPython())
     logger.info("Launching noop transform")
     launcher.launch()

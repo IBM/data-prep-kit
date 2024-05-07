@@ -20,10 +20,16 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.pure_python import TransformLauncher
+from data_processing.ray import TransformConfigurationRay
+from data_processing.transform import (
+    AbstractTableTransform,
+    TransformConfiguration,
+    TransformConfigurationBase,
+)
 from data_processing.utils import get_logger
 from tokenization_utils import is_valid_argument_string, load_tokenizer, split_text
+
 
 logger = get_logger(__name__)
 
@@ -150,14 +156,14 @@ class TokenizationTransform(AbstractTableTransform):
         return [out_table], metadata
 
 
-class TokenizationTransformConfigurationBase:
+class TokenizationTransformConfigurationBase(TransformConfigurationBase):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        self.params = {}
+        super().__init__()
 
     @staticmethod
     def add_input_params(parser: ArgumentParser) -> None:
@@ -254,24 +260,18 @@ class TokenizationTransformConfigurationBase:
         return True
 
 
-class TokenizationTransformConfigurationRay(TableTransformConfigurationRay):
+class TokenizationTransformConfigurationRay(TransformConfigurationRay):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__(name="Tokenization", transform_class=TokenizationTransform)
-        self.base = TokenizationTransformConfigurationBase()
-
-    def add_input_params(self, parser: ArgumentParser) -> None:
-        return self.base.add_input_params(parser=parser)
-
-    def apply_input_params(self, args: Namespace) -> bool:
-        is_valid = self.base.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.base.params
-        return is_valid
+        super().__init__(
+            name="Tokenization",
+            transform_class=TokenizationTransform,
+            base_configuration=TokenizationTransformConfigurationBase(),
+        )
 
 
 class TokenizationTransformConfigurationPython(TransformConfiguration):
@@ -281,20 +281,14 @@ class TokenizationTransformConfigurationPython(TransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name="Tokenization", transform_class=TokenizationTransform)
-        self.base = TokenizationTransformConfigurationBase()
-
-    def add_input_params(self, parser: ArgumentParser) -> None:
-        return self.base.add_input_params(parser=parser)
-
-    def apply_input_params(self, args: Namespace) -> bool:
-        is_valid = self.base.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.base.params
-        return is_valid
+        super().__init__(
+            name="Tokenization",
+            transform_class=TokenizationTransform,
+            base_configuration=TokenizationTransformConfigurationBase(),
+        )
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncherRay(transform_runtime_config=TokenizationTransformConfigurationRay())
+    launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfigurationPython())
     logger.info("Launching Tokenization transform")
     launcher.launch()

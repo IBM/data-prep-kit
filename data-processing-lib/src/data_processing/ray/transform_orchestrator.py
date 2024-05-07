@@ -18,7 +18,7 @@ import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
     RayUtils,
-    TableTransformConfigurationRay,
+    TransformConfigurationRay,
     TransformOrchestratorConfiguration,
     TransformStatisticsRay,
     TransformTableProcessorRay,
@@ -35,7 +35,7 @@ logger = get_logger(__name__)
 def orchestrate(
     preprocessing_params: TransformOrchestratorConfiguration,
     data_access_factory: DataAccessFactoryBase,
-    transform_runtime_config: TableTransformConfigurationRay,
+    transform_runtime_config: TransformConfigurationRay,
 ) -> int:
     """
     orchestrator for transformer execution

@@ -18,14 +18,19 @@
 ################################################################################
 
 
-from argparse import ArgumentParser, Namespace
 import os
+from argparse import ArgumentParser, Namespace
 
 import numpy as np
 import pyarrow as pa
 from bs4 import BeautifulSoup
-from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.pure_python import TransformLauncher
+from data_processing.ray import TransformConfigurationRay
+from data_processing.transform import (
+    AbstractTableTransform,
+    TransformConfiguration,
+    TransformConfigurationBase,
+)
 from data_processing.utils import TransformUtils
 from transformers import AutoTokenizer
 
@@ -282,9 +287,9 @@ class CodeQualityTransform(AbstractTableTransform):
         return [annotated_table], {}
 
 
-class CodeQualityTransformConfigurationBase:
+class CodeQualityTransformConfigurationBase(TransformConfigurationBase):
     def __init__(self):
-        self.params = {}
+        super().__init__()
 
     @staticmethod
     def add_input_params(parser: ArgumentParser) -> None:
@@ -336,36 +341,25 @@ class CodeQualityTransformConfigurationBase:
         return True
 
 
-class CodeQualityTransformConfigurationRay(TableTransformConfigurationRay):
+class CodeQualityTransformConfigurationRay(TransformConfigurationRay):
     def __init__(self):
-        super().__init__(name="code_quality", transform_class=CodeQualityTransform)
-        self.base = CodeQualityTransformConfigurationBase()
-
-    def add_input_params(self, parser: ArgumentParser) -> None:
-        return self.base.add_input_params(parser=parser)
-
-    def apply_input_params(self, args: Namespace) -> bool:
-        is_valid = self.base.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.base.params
-        return is_valid
+        super().__init__(
+            name="code_quality",
+            transform_class=CodeQualityTransform,
+            base_configuration=CodeQualityTransformConfigurationBase(),
+        )
 
 
 class CodeQualityTransformConfigurationPython(TransformConfiguration):
     def __init__(self):
-        super().__init__(name="code_quality", transform_class=CodeQualityTransform)
+        super().__init__(
+            name="code_quality",
+            transform_class=CodeQualityTransform,
+            base_configuration=CodeQualityTransformConfigurationBase(),
+        )
         self.base = CodeQualityTransformConfigurationBase()
-
-    def add_input_params(self, parser: ArgumentParser) -> None:
-        return self.base.add_input_params(parser=parser)
-
-    def apply_input_params(self, args: Namespace) -> bool:
-        is_valid = self.base.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.base.params
-        return is_valid
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncherRay(transform_runtime_config=CodeQualityTransformConfigurationRay())
+    launcher = TransformLauncher(transform_runtime_config=CodeQualityTransformConfigurationPython())
     launcher.launch()

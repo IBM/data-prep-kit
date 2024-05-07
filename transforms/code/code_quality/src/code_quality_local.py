@@ -11,8 +11,6 @@
 ################################################################################
 
 import os
-import sys
-from pathlib import Path
 
 from code_quality_transform import CodeQualityTransform
 from data_processing.data_access import DataAccessLocal
@@ -23,11 +21,11 @@ input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-
 if __name__ == "__main__":
     codequality_params = {
         "code_quality_params": {
-                "contents_column_name": "contents",
-                "language_column_name": "language",
-                "tokenizer": "codeparrot/codeparrot",
-                "hf_token": None,
-            }
+            "contents_column_name": "contents",
+            "language_column_name": "language",
+            "tokenizer": "codeparrot/codeparrot",
+            "hf_token": None,
+        }
     }
     transform = CodeQualityTransform(codequality_params)
 

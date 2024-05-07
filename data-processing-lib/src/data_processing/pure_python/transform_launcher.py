@@ -15,7 +15,10 @@ import time
 
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.pure_python import orchestrate
-from data_processing.transform import TransformConfiguration, TransformExecutionConfiguration
+from data_processing.transform import (
+    TransformConfiguration,
+    TransformExecutionConfiguration,
+)
 from data_processing.utils import get_logger
 
 
@@ -59,9 +62,11 @@ class TransformLauncher:
         self.data_access_factory.add_input_params(parser=parser)
         self.execution_config.add_input_params(parser=parser)
         args = parser.parse_args()
-        return (self.transform_runtime_config.apply_input_params(args=args)
-                and self.execution_config.apply_input_params(args=args)
-                and self.data_access_factory.apply_input_params(args=args))
+        return (
+            self.transform_runtime_config.apply_input_params(args=args)
+            and self.execution_config.apply_input_params(args=args)
+            and self.data_access_factory.apply_input_params(args=args)
+        )
 
     def _submit_for_execution(self) -> int:
         """

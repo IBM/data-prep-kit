@@ -20,12 +20,16 @@ from data_processing.data_access import (
     DataAccessFactory,
     DataAccessFactoryBase,
 )
+from data_processing.pure_python import TransformLauncher
 from data_processing.ray import (
     DefaultTableTransformRuntimeRay,
-    TableTransformConfigurationRay,
-    TransformLauncherRay,
+    TransformConfigurationRay,
 )
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.transform import (
+    AbstractTableTransform,
+    TransformConfiguration,
+    TransformConfigurationBase,
+)
 from data_processing.utils import TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -150,15 +154,15 @@ class ProgLangSelectRuntime(DefaultTableTransformRuntimeRay):
         return {lang_allowed_languages: lang_refs} | self.params
 
 
-class ProgLangSelectTransformConfigurationBase:
+class ProgLangSelectTransformConfigurationBase(TransformConfigurationBase):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
+        super().__init__()
         self.daf = None
-        self.params = {}
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -216,7 +220,7 @@ class ProgLangSelectTransformConfigurationBase:
         return self.daf.apply_input_params(args)
 
 
-class ProgLangSelectTransformConfigurationRay(TableTransformConfigurationRay):
+class ProgLangSelectTransformConfigurationRay(TransformConfigurationRay):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -226,19 +230,10 @@ class ProgLangSelectTransformConfigurationRay(TableTransformConfigurationRay):
         super().__init__(
             name=shortname,
             transform_class=ProgLangSelectTransform,
+            base_configuration=ProgLangSelectTransformConfigurationBase(),
             runtime_class=ProgLangSelectRuntime,
-            remove_from_metadata=[lang_data_factory_key]
+            remove_from_metadata=[lang_data_factory_key],
         )
-        self.base = ProgLangSelectTransformConfigurationBase()
-
-    def add_input_params(self, parser: ArgumentParser) -> None:
-        return self.base.add_input_params(parser=parser)
-
-    def apply_input_params(self, args: Namespace) -> bool:
-        is_valid = self.base.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.base.params
-        return is_valid
 
 
 class ProgLangSelectTransformConfigurationPython(TransformConfiguration):
@@ -251,20 +246,11 @@ class ProgLangSelectTransformConfigurationPython(TransformConfiguration):
         super().__init__(
             name=shortname,
             transform_class=ProgLangSelectTransform,
-            remove_from_metadata=[lang_data_factory_key]
+            base_configuration=ProgLangSelectTransformConfigurationBase(),
+            remove_from_metadata=[lang_data_factory_key],
         )
-        self.base = ProgLangSelectTransformConfigurationBase()
-
-    def add_input_params(self, parser: ArgumentParser) -> None:
-        return self.base.add_input_params(parser=parser)
-
-    def apply_input_params(self, args: Namespace) -> bool:
-        is_valid = self.base.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.base.params
-        return is_valid
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncherRay(transform_runtime_config=ProgLangSelectTransformConfigurationRay())
+    launcher = TransformLauncher(transform_runtime_config=ProgLangSelectTransformConfigurationPython())
     launcher.launch()

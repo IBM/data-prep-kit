@@ -13,8 +13,12 @@
 import os
 import sys
 
-from data_processing.transform import TransformConfiguration, AbstractTableTransform
 from data_processing.pure_python import TransformLauncher
+from data_processing.transform import (
+    AbstractTableTransform,
+    TransformConfiguration,
+    TransformConfigurationBase,
+)
 from data_processing.utils import ParamsUtils
 
 
@@ -65,7 +69,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 0 == res
@@ -74,7 +78,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 1 == res
@@ -83,7 +87,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 0 == res
@@ -92,7 +96,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 1 == res
@@ -101,7 +105,7 @@ def test_launcher():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 0 == res
@@ -120,7 +124,7 @@ def test_local_config():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 0 == res
@@ -144,7 +148,7 @@ def test_local_config_validate():
     print(f"parameters {sys.argv}")
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 1 == res
@@ -152,7 +156,7 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 1 == res
@@ -160,7 +164,7 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 1 == res
@@ -168,7 +172,7 @@ def test_local_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 0 == res
@@ -193,7 +197,7 @@ def test_s3_config_validate():
     print(f"parameters {sys.argv}")
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 1 == res
@@ -201,7 +205,7 @@ def test_s3_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 1 == res
@@ -209,7 +213,7 @@ def test_s3_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 1 == res
@@ -217,7 +221,7 @@ def test_s3_config_validate():
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncher(
         transform_runtime_config=TransformConfiguration(
-            name="test", transform_class=AbstractTableTransform
+            name="test", transform_class=AbstractTableTransform, base_configuration=TransformConfigurationBase()
         ),
     ).launch()
     assert 0 == res

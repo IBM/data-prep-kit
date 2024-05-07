@@ -17,7 +17,7 @@ import time
 import ray
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.ray import (
-    TableTransformConfigurationRay,
+    TransformConfigurationRay,
     TransformOrchestratorConfiguration,
     orchestrate,
 )
@@ -34,7 +34,7 @@ class TransformLauncherRay:
 
     def __init__(
         self,
-        transform_runtime_config: TableTransformConfigurationRay,
+        transform_runtime_config: TransformConfigurationRay,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """

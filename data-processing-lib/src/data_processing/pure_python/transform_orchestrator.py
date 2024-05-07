@@ -16,7 +16,11 @@ from datetime import datetime
 
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.pure_python import TransformTableProcessor
-from data_processing.transform import TransformConfiguration, TransformStatistics, TransformExecutionConfiguration
+from data_processing.transform import (
+    TransformConfiguration,
+    TransformExecutionConfiguration,
+    TransformStatistics,
+)
 from data_processing.utils import get_logger
 
 
@@ -80,12 +84,12 @@ def orchestrate(
         input_params = transform_config.get_transform_metadata()
         metadata = {
             "pipeline": execution_config.pipeline_id,
-            "job details": execution_config.job_details |
-                           {
-                               "start_time": start_ts,
-                               "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                               "status": "success",
-                            },
+            "job details": execution_config.job_details
+            | {
+                "start_time": start_ts,
+                "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "status": "success",
+            },
             "code": execution_config.code_location,
             "job_input_params": input_params | data_access_factory.get_input_params(),
             "job_output_stats": stats,

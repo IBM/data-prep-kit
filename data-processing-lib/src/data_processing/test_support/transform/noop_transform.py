@@ -15,8 +15,24 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
-from data_processing.transform import AbstractTableTransform
+from data_processing.pure_python import TransformLauncher
+from data_processing.ray import TransformConfigurationRay
+from data_processing.transform import (
+    AbstractTableTransform,
+    TransformConfiguration,
+    TransformConfigurationBase,
+)
+from data_processing.utils import CLIArgumentProvider, get_logger
+
+
+logger = get_logger(__name__)
+
+short_name = "noop"
+cli_prefix = f"{short_name}_"
+sleep_key = "sleep_sec"
+pwd_key = "pwd"
+sleep_cli_param = f"{cli_prefix}{sleep_key}"
+pwd_cli_param = f"{cli_prefix}{pwd_key}"
 
 
 class NOOPTransform(AbstractTableTransform):
@@ -34,7 +50,7 @@ class NOOPTransform(AbstractTableTransform):
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of NOOPTransformConfiguration class
         super().__init__(config)
-        self.sleep = config.get("sleep", 1)
+        self.sleep = config.get("sleep_sec", 1)
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -43,27 +59,29 @@ class NOOPTransform(AbstractTableTransform):
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
+        logger.debug(f"Transforming one table with {len(table)} rows")
         if self.sleep is not None:
-            print(f"Sleep for {self.sleep} seconds")
+            logger.info(f"Sleep for {self.sleep} seconds")
             time.sleep(self.sleep)
-            print("Sleep completed - continue")
+            logger.info("Sleep completed - continue")
         # Add some sample metadata.
+        logger.debug(f"Transformed one table with {len(table)} rows")
         metadata = {"nfiles": 1, "nrows": len(table)}
         return [table], metadata
 
 
-class NOOPTransformConfiguration(TableTransformConfigurationRay):
+class NOOPTransformConfigurationBase(TransformConfigurationBase):
 
     """
     Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
+    configuration with CLI args.
     """
 
     def __init__(self):
-        super().__init__(name="NOOP", transform_class=NOOPTransform)
-        self.params = {}
+        super().__init__()
 
-    def add_input_params(self, parser: ArgumentParser) -> None:
+    @staticmethod
+    def add_input_params(parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         This will be included in a dictionary used to initialize the NOOPTransform.
@@ -71,10 +89,19 @@ class NOOPTransformConfiguration(TableTransformConfigurationRay):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            "--noop_sleep_sec",
+            f"--{sleep_cli_param}",
             type=int,
             default=1,
             help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
+        )
+        # An example of a command line option that we don't want included
+        # in the metadata collected by the Ray orchestrator
+        # See below for remove_from_metadata addition so that it is not reported.
+        parser.add_argument(
+            f"--{pwd_cli_param}",
+            type=str,
+            default="nothing",
+            help="A dummy password which should be filtered out of the metadata",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
@@ -83,16 +110,37 @@ class NOOPTransformConfiguration(TableTransformConfigurationRay):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        if args.noop_sleep_sec < 0:
-            print(
-                f"Parameter noop_sleep_sec should be greater then or equal to 0, you specified {args.noop_sleep_sec}"
-            )
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        if captured.get(sleep_key) < 0:
+            print(f"Parameter noop_sleep_sec should be non-negative. you specified {args.noop_sleep_sec}")
             return False
-        self.params["sleep"] = args.noop_sleep_sec
-        print(f"noop parameters are : {self.params}")
+
+        self.params = self.params | captured
+        logger.info(f"noop parameters are : {self.params}")
         return True
 
 
+class NOOPTransformConfigurationRay(TransformConfigurationRay):
+    def __init__(self):
+        super().__init__(
+            name=short_name,
+            transform_class=NOOPTransform,
+            base_configuration=NOOPTransformConfigurationBase(),
+            remove_from_metadata=[pwd_key],
+        )
+
+
+class NOOPTransformConfigurationPython(TransformConfiguration):
+    def __init__(self):
+        super().__init__(
+            name=short_name,
+            transform_class=NOOPTransform,
+            base_configuration=NOOPTransformConfigurationBase(),
+            remove_from_metadata=[pwd_key],
+        )
+
+
 if __name__ == "__main__":
-    launcher = TransformLauncherRay(transform_runtime_config=NOOPTransformConfiguration())
+    launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfigurationPython())
+    logger.info("Launching noop transform")
     launcher.launch()

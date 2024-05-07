@@ -17,6 +17,35 @@ from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider
 
 
+class TransformConfigurationBase:
+    """
+    This is a base transform configuration class defining transform's input/output parameter
+    """
+
+    def __init__(self):
+        """
+        Initialization
+        """
+        self.params = {}
+
+    @staticmethod
+    def add_input_params(parser: ArgumentParser) -> None:
+        """
+        Adds transform specific input parameters
+        :param parser: parameters parser
+        :return: None
+        """
+        pass
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        """
+        Validate and apply the arguments that have been parsed
+        :param args: user defined arguments.
+        :return: True, if validate pass or False otherwise
+        """
+        return True
+
+
 class TransformConfiguration(CLIArgumentProvider):
     """
     Provides support the configuration of a transformer runtime
@@ -27,9 +56,16 @@ class TransformConfiguration(CLIArgumentProvider):
         1) add_input_params() to add CLI argument definitions used in creating TransformRuntime.
     """
 
-    def __init__(self, name: str, transform_class: type[AbstractTableTransform], remove_from_metadata: list[str] = []):
+    def __init__(
+        self,
+        name: str,
+        transform_class: type[AbstractTableTransform],
+        base_configuration: TransformConfigurationBase,
+        remove_from_metadata: list[str] = [],
+    ):
         """
         Initialization
+        :param base_configuration: base transform configuration class
         :param transform_class: implementation of the Filter
         :return:
         """
@@ -38,6 +74,26 @@ class TransformConfiguration(CLIArgumentProvider):
         # These are expected to be updated later by the sub-class in apply_input_params().
         self.params = {}
         self.remove_from_metadata = remove_from_metadata
+        self.base = base_configuration
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        """
+        Add input parameters. Delegates to the base class
+        :param parser: parser
+        :return: None
+        """
+        return self.base.add_input_params(parser=parser)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        """
+        Validate and apply input parameters. Delegate to base class
+        :param args: arguments
+        :return: True, if parameters are valid, False otherwise
+        """
+        is_valid = self.base.apply_input_params(args=args)
+        if is_valid:
+            self.params = self.base.params
+        return is_valid
 
     def get_transform_class(self) -> type[AbstractTableTransform]:
         """

@@ -14,8 +14,8 @@ import argparse
 import ast
 from typing import Any
 
-from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger
 from data_processing.transform import TransformExecutionConfiguration
+from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger
 
 
 logger = get_logger(__name__)

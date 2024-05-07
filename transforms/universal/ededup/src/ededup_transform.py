@@ -19,10 +19,10 @@ from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
     DefaultTableTransformRuntimeRay,
     RayUtils,
-    TableTransformConfigurationRay,
+    TransformConfigurationRay,
     TransformLauncherRay,
 )
-from data_processing.transform import AbstractTableTransform
+from data_processing.transform import AbstractTableTransform, TransformConfigurationBase
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -218,17 +218,17 @@ class EdedupRuntime(DefaultTableTransformRuntimeRay):
         return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
 
 
-class EdedupTableTransformConfiguration(TableTransformConfigurationRay):
+class EdedupTableTransformConfigurationBase(TransformConfigurationBase):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__(name=short_name, runtime_class=EdedupRuntime, transform_class=EdedupTransform)
-        self.params = {}
+        super().__init__()
 
-    def add_input_params(self, parser: ArgumentParser) -> None:
+    @staticmethod
+    def add_input_params(parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         """
@@ -251,7 +251,22 @@ class EdedupTableTransformConfiguration(TableTransformConfigurationRay):
         return True
 
 
+class EdedupTransformConfiguration(TransformConfigurationRay):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(
+            name=short_name,
+            runtime_class=EdedupRuntime,
+            transform_class=EdedupTransform,
+            base_configuration=EdedupTableTransformConfigurationBase(),
+        )
+
+
 if __name__ == "__main__":
 
-    launcher = TransformLauncherRay(transform_runtime_config=EdedupTableTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=EdedupTransformConfiguration())
     launcher.launch()

@@ -16,8 +16,13 @@ import json
 
 import duckdb
 import pyarrow as pa
-from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.pure_python import TransformLauncher
+from data_processing.ray import TransformConfigurationRay
+from data_processing.transform import (
+    AbstractTableTransform,
+    TransformConfiguration,
+    TransformConfigurationBase,
+)
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -132,14 +137,14 @@ class FilterTransform(AbstractTableTransform):
         return [filtered_table_cols_dropped], metadata
 
 
-class FilterTransformConfigurationBase:
+class FilterTransformConfigurationBase(TransformConfigurationBase):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        self.params = {}
+        super().__init__()
 
     @staticmethod
     def add_input_params(parser: argparse.ArgumentParser) -> None:
@@ -194,35 +199,16 @@ class FilterTransformConfigurationBase:
         return True
 
 
-class FilterTransformConfigurationRay(TableTransformConfigurationRay):
+class FilterTransformConfigurationRay(TransformConfigurationRay):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__(name=short_name, transform_class=FilterTransform)
-        self.base = FilterTransformConfigurationBase()
-
-    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
-        """
-        Add Transform-specific arguments to the given parser.
-        This will be included in a dictionary used to initialize the FilterTransform.
-        By convention a common prefix should be used for all mutator-specific CLI args
-        (e.g, noop_, pii_, etc.)
-        """
-        return self.base.add_input_params(parser=parser)
-
-    def apply_input_params(self, args: argparse.Namespace) -> bool:
-        """
-        Validate and apply the arguments that have been parsed
-        :param args: user defined arguments.
-        :return: True, if validate pass or False otherwise
-        """
-        is_valid = self.base.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.base.params
-        return is_valid
+        super().__init__(
+            name=short_name, transform_class=FilterTransform, base_configuration=FilterTransformConfigurationBase()
+        )
 
 
 class FilterTransformConfigurationPython(TransformConfiguration):
@@ -232,31 +218,12 @@ class FilterTransformConfigurationPython(TransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name=short_name, transform_class=FilterTransform)
-        self.base = FilterTransformConfigurationBase()
-
-    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
-        """
-        Add Transform-specific arguments to the given parser.
-        This will be included in a dictionary used to initialize the FilterTransform.
-        By convention a common prefix should be used for all mutator-specific CLI args
-        (e.g, noop_, pii_, etc.)
-        """
-        return self.base.add_input_params(parser=parser)
-
-    def apply_input_params(self, args: argparse.Namespace) -> bool:
-        """
-        Validate and apply the arguments that have been parsed
-        :param args: user defined arguments.
-        :return: True, if validate pass or False otherwise
-        """
-        is_valid = self.base.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.base.params
-        return is_valid
+        super().__init__(
+            name=short_name, transform_class=FilterTransform, base_configuration=FilterTransformConfigurationBase()
+        )
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncherRay(transform_runtime_config=FilterTransformConfigurationRay())
+    launcher = TransformLauncher(transform_runtime_config=FilterTransformConfigurationPython())
     logger.info("Launching filtering")
     launcher.launch()

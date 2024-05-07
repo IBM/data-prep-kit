@@ -14,7 +14,7 @@ import sys
 import tempfile
 from typing import Any
 
-from data_processing.ray import TableTransformConfigurationRay, TransformLauncherRay
+from data_processing.ray import TransformConfigurationRay, TransformLauncherRay
 from data_processing.test_support.abstract_test import AbstractTest
 from data_processing.utils import ParamsUtils
 
@@ -39,7 +39,7 @@ class AbstractTransformLauncherTest(AbstractTest):
 
     def test_transform(
         self,
-        transform_config: TableTransformConfigurationRay,
+        transform_config: TransformConfigurationRay,
         cli_params: dict[str, Any],
         in_table_path: str,
         expected_out_table_path: str,

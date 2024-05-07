@@ -13,7 +13,11 @@
 from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.transform import (
+    AbstractTableTransform,
+    TransformConfiguration,
+    TransformConfigurationBase,
+)
 from ray.actor import ActorHandle
 
 
@@ -54,7 +58,7 @@ class DefaultTableTransformRuntimeRay:
         return stats
 
 
-class TableTransformConfigurationRay(TransformConfiguration):
+class TransformConfigurationRay(TransformConfiguration):
     """
     Provides support the configuration of a transformer running in the ray environment.
     It holds the following:
@@ -72,14 +76,21 @@ class TableTransformConfigurationRay(TransformConfiguration):
         self,
         name: str,
         transform_class: type[AbstractTableTransform],
+        base_configuration: TransformConfigurationBase,
         remove_from_metadata: list[str] = [],
         runtime_class: type[DefaultTableTransformRuntimeRay] = DefaultTableTransformRuntimeRay,
     ):
-        super().__init__(name=name, transform_class=transform_class, remove_from_metadata=remove_from_metadata)
+        super().__init__(
+            name=name,
+            transform_class=transform_class,
+            base_configuration=base_configuration,
+            remove_from_metadata=remove_from_metadata,
+        )
         """
         Initialization
         :param transform_class: implementation of the transform
         :param runtime_class: implementation of the transform runtime
+        :param base: base transform configuration class
         :param name: transform name
         :param remove_from_metadata: list of parameters to remove from metadata
         :return:
