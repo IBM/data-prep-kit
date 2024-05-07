@@ -5,7 +5,7 @@ include ${REPOROOT}/kfp/requirements.env
 # Use "make help" to see them.
 include ${REPOROOT}/.make.defaults
 
-DOCKER_REPO ?= ""
+DOCKER_IMAGE_NAME ?= NOOP
 
 define set_env_var
 	$(eval export $(1)=$(2))
