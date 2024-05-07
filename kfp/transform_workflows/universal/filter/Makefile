@@ -4,16 +4,17 @@ VENV_ACTIVATE=${REPOROOT}/kfp/transform_workflows/venv/bin/activate
 
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
-# to override/redefine the rules below. 
+# to override/redefine the rules below.
 include ../../.make.transforms_workflows
 
-SRC_DIR=${REPOROOT}/transforms/universal/doc_id/
+SRC_DIR=${REPOROOT}/transforms/universal/filter/
 
-YAML_FILE=doc_id_wf.yaml
+YAML_FILE=filter_wf.yaml
 
-DOCKER_IMAGE_NAME=doc_id
+
+DOCKER_IMAGE_NAME=filter
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${DOC_ID_VERSION}
+DOCKER_IMAGE_VERSION ?= ${FILTER_VERSION}
 
 venv:: .check_python_version ${VENV_ACTIVATE}
 
@@ -27,3 +28,4 @@ test:: .check_python_version ${VENV_ACTIVATE}
 
 upload:: .check_python_version ${VENV_ACTIVATE}
 	$(MAKE) .transforms_workflows.upload-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=${YAML_FILE}
+

@@ -168,6 +168,11 @@ test-locals:: .transforms.test-locals
 	    echo Directory $(CHECK_DIR) is very large;		\
 	fi
 
+.PHONY: .transforms.load-image
+.transforms.load-image:
+	@# Help:  Load the transform image to the kind cluster created with make setup.
+	kind load docker-image $(DOCKER_IMAGE) --name=$(KIND_CLUSTER_NAME)
+
 .PHONY: conventions
 conventions:
 	@# Help: Check transform project conventions and make recommendations, if needed.
