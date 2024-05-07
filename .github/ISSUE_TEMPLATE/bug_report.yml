@@ -53,8 +53,8 @@ body:
           label: What happened + What you expected to happen
           description: Describe 1. the bug 2. expected behavior 3. useful information (e.g., logs)
           placeholder: >
-              Please provide the context in which the problem occurred and explain what happened. Further,
-              please also explain why you think the behaviour is erroneous. It is extremely helpful if you can
+              Please provide the context in which the problem occurred and explain what happened, including
+              location in the repo, if relevant.  It is extremely helpful if you can
               copy and paste the fragment of logs showing the exact error messages or wrong behaviour here.
 
               **NOTE**: please copy and paste texts instead of taking screenshots of them for easy future search.
@@ -65,12 +65,13 @@ body:
       attributes:
           label: Reproduction script
           description: >
-              Please provide a reproducible script. Providing a narrow reproduction (minimal / no external dependencies) will
-              help us triage and address issues in the timely manner!
+              Please provide a reproducible script, including location in the repo if relevant. Providing a narrow 
+              reproduction (minimal / no external dependencies) will help us triage and address issues in the timely manner!
           placeholder: >
               Please provide a short code snippet (less than 50 lines if possible) that can be copy-pasted to
               reproduce the issue. The snippet should have **no external library dependencies**
-              (i.e., use fake or mock data / environments).
+              (i.e., use fake or mock data / environments). If this is a problem within the repo (e.g., makefile)
+              include the location in the repo (i.e., cd ...).
 
       validations:
           required: true
