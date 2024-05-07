@@ -5,7 +5,15 @@
 # Before including, the following must be defined:
 # REPOROOT points to the top of the git repository. 
 # 	For example REPOROOT=../../..
-
+# DOCKER_NAME - defines the name of the docker image
+#	For example DOCKER_NAME=noop
+# EXTRA_INDEX_URL - can define an additional pipy index for use 
+#	in creating venv and images.  This will be used on pip installs
+#	when building the venv and will be made available as
+#	a docker build argument when building the docker image.
+#	This is useful when the repo is used in conjunction with an 
+#	inhouse or private pypi.
+#
 # Targets defined here use double colon so can be overriden
 #
 # Reusable rules begin with '.'. To reuse without modification, for example,
@@ -25,13 +33,14 @@ PYTEST=pytest -s
 PYTHON_VERSION=$(shell $(PYTHON) --version)
 ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 DOCKER_FILE?=Dockerfile
-DOCKER_NAME?=data-prep-lab
+#DOCKER_NAME?=xyzzy	# Must be defined by the includeing makefile
 DOCKER?=docker
 DOCKER_HOSTNAME?=quay.io
 DOCKER_NAMESPACE ?= dataprep1
 DOCKER_REGISTRY_USER?=$(DPL_DOCKER_REGISTRY_USER)
 DOCKER_REGISTRY_KEY?=$(DPL_DOCKER_REGISTRY_KEY)
-DOCKER_REGISTRY_ENDPOINT?=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)/$(DOCKER_NAME)
+DOCKER_REGISTRY_ENDPOINT?=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)
+DOCKER_IMAGE?=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_NAME):$(DOCKER_IMAGE_VERSION)
 include $(REPOROOT)/.make.versions
 
 KIND_CLUSTER_NAME=dataprep
@@ -153,8 +162,9 @@ __check_defined = \
 .PHONY: .defaults.image
 .defaults.image:: # Must be called with a DOCKER_IMAGE= settings.
 	@# Help: Create the docker image $(DOCKER_IMAGE)
-	$(DOCKER) build -t $(DOCKER_IMAGE) \
-		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
+	$(DOCKER) build -t $(DOCKER_IMAGE) 					\
+		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
+		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\
 		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . 
 
 .PHONY: .defaults.lib-src-image
@@ -177,7 +187,10 @@ __check_defined = \
 	source venv/bin/activate;				      	\
 	pip install pytest;						\
 	pip uninstall -y data-prep-lab;		 			\
-	pip install  -e $(REPOROOT)/data-processing-lib/;	       	\
+	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
+		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
+	fi;								\
+	pip install $${extra_url}  -e $(REPOROOT)/data-processing-lib/;	\
 	if [ $$? -eq 0 ]; then  					\
 		echo Installed source from data processing library for `which $(PYTHON)`;       \
 	else 								\
@@ -234,7 +247,10 @@ __check_defined = \
 	@source venv/bin/activate;		\
 	pip install --upgrade pip;		\
 	pip install wheel;			\
-	pip install -r requirements.txt;	\
+	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
+		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
+	fi;								\
+	pip install $$extra_url -r requirements.txt;	
 
 .PHONY: .defaults.check.installed
 .defaults.check.installed::
