@@ -100,6 +100,10 @@ We provide several demos of the script usage for different data storage options:
 #[local file system](src/ingest2parquet_local.py)
 This script processes data stored locally on the system. It sets up parameters for local file paths and invokes the ingest2parquet() function from ingest2parquet.py to convert raw data files to Parquet format.
 
+**Run using make targets.**
+
+```run-local-sample``` - runs src/ingest2parquet_local.py
+
 **Run the script without any command-line arguments.**
 
 ```
@@ -121,11 +125,20 @@ python ingest2parquet.py \
 ```
 
 
-
 #[s3](src/ingest2parquet_s3.py) 
 This script is designed to process data stored on an S3 bucket. It sets up necessary parameters for accessing the S3 bucket and invokes the ingest2parquet() function from ingest2parquet.py to convert raw data files to Parquet format.
 
-To execute the script with S3 functionality, we utilize minio. Please consult the documentation on setting up minio for further guidance: [using_s3_transformers](../../data-processing-lib/doc/using_s3_transformers.md)
+To execute the script with S3 functionality, we utilize minio. 
+
+```make minio-start``` - To start minio server
+```make minio-load``` - To load the data into minio
+```make minio-stop``` - To stop the minio server
+
+Please consult the documentation for further guidance: [using_s3_transformers](../../data-processing-lib/doc/using_s3_transformers.md) 
+
+** Run script using make targets **
+```run-s3-sample``` : Starts minio server and load data from [test-data](test-data/input/) into local minio for S3 access and runs src/ ingest2parquet_s3.py
+
 
 **Run the script without any command-line arguments.**
 
