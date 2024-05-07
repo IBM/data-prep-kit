@@ -26,7 +26,7 @@ EXEC_SCRIPT_NAME: str = "proglang_select_transform.py"
 task_image = "quay.io/dataprep1/data-prep-lab/proglang_select:0.2.0"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.7"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.8"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, insted of creating a component we are creating it in place here.
