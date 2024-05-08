@@ -1,0 +1,21 @@
+name: deploy docs
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - dev
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-python@v2
+              with:
+                  python-version: 3.x
+            - run: pip install mkdocs-material mkdocstrings[python] mkdocs-badges mkdocs-same-dir
+            - run: |
+                  # remove badges 
+                  cat README.md |sed  '/img\.shields\.io/d' > README_.md
+                  mv README_.md README.md  
+                  mkdocs gh-deploy --force

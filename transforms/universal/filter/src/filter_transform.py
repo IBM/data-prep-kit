@@ -18,7 +18,7 @@ import duckdb
 import pyarrow as pa
 from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
 from data_processing.transform import AbstractTableTransform
-from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger
+from data_processing.utils import CLIArgumentProvider, get_logger
 
 
 logger = get_logger(__name__)

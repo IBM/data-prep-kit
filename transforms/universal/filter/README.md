@@ -230,14 +230,7 @@ As shown in the output of the local run of filtering, the metadata contains seve
   * `docs_filtered_by 'docq_perplex_score < 230'`, `bytes_filtered_by 'docq_perplex_score < 230'`  - the number of documents and bytes filtered out by the `docq_perplex_score < 230` filtering condition  
 
 
-### Building the Docker Image
-```shell
-% make image 
-...
-
-````
-In addition, there are some useful `make` targets (see conventions above)
-or use `make help` to see a list of available targets.
+## Running
 
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
@@ -259,8 +252,25 @@ the following command line arguments are available in addition to
 
 ```
 
-### Executing S3 examples
+### Running the samples
+To run the samples, use the following `make` targets
 
-To execute S3 examples, please refer to this [document](../../../data-processing-lib/doc/using_s3_transformers.md)
-for setting up MinIO and mc prior to running the example
+* `run-cli-ray-sample` - runs src/filter_transform.py using command line args
+* `run-local-sample` - runs src/filter_local.py
+* `run-local-ray-sample` - runs src/filter_local_ray.py
+* `run-s3-ray-sample` - runs src/filter_s3_ray.py
+    * Requires prior invocation of `make minio-start` to load data into local minio for S3 access.
 
+These targets will activate the virtual environment and set up any configuration needed.
+Use the `-n` option of `make` to see the detail of what is done to run the sample.
+
+For example, 
+```shell
+make run-cli-ray-sample
+...
+```
+Then 
+```shell
+ls output
+```
+To see results of the transform.

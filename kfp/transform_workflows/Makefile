@@ -15,7 +15,7 @@ include ../../.make.defaults
 
 include .make.transforms_workflows
 
-PYTHON=python3
+PYTHON=python
 PYTEST=pytest
 VENV_ACTIVATE=venv/bin/activate
 
@@ -46,17 +46,14 @@ build:: venv
 	${PYTHON} -m pip install --upgrade build
 	make ${YAML_WF}
 
-publish:: .check-env
-	@# Help: Publish the wheel to and pypi
-	@${PYTHON} -m twine upload --verbose --non-interactive --skip-existing --repository testpypi dist/*
-
 venv::	.check-env
 	@# Help: Create the virtual environment
 	sed -i.back "s/data-prep-lab-kfp==[0-9].*/data-prep-lab-kfp==${DPL_LIB_KFP_VERSION}/" ../kfp_ray_components/requirements.txt
 	rm -rf venv	
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE}; 	\
-	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple \
-	pip install -r ../kfp_ray_components/requirements.txt
+	pip install kfp==${KFP}  \
+	pip install -r ../kfp_ray_components/requirements.txt \
+	pip install data_prep_lab_kfp==${DPL_LIB_KFP_VERSION}
 
 test::

@@ -19,7 +19,7 @@ import mmh3
 import numpy as np
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccessFactory
+from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
     DefaultTableTransformConfiguration,
     DefaultTableTransformRuntime,
@@ -334,7 +334,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         self.random_delay_limit = self.params.get("random_delay_limit", 10)
 
     def get_transform_config(
-        self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
+        self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
     ) -> dict[str, Any]:
         """
         Set environment for filter execution
@@ -369,7 +369,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         }
 
     def _create_doc_actors(
-        self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
+        self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
     ) -> None:
         """
         Create document actors
@@ -420,7 +420,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             )
 
     def _create_doc_actors_internal(
-        self, data_access_factory: DataAccessFactory, statistics: ActorHandle, mn_min_hash: MurmurMH, files: list[str]
+        self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, mn_min_hash: MurmurMH, files: list[str]
     ) -> None:
         """
         Create document actors
@@ -495,7 +495,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
 
     def _process_buckets(
         self,
-        data_access_factory: DataAccessFactory,
+        data_access_factory: DataAccessFactoryBase,
         statistics: ActorHandle,
         bucket_collectors: list[ActorHandle],
         minhash_collectors: list[ActorHandle],
@@ -591,7 +591,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
 
     def _preprocess_tables(
         self,
-        data_access_factory: DataAccessFactory,
+        data_access_factory: DataAccessFactoryBase,
         statistics: ActorHandle,
         files: list[str],
         mn_min_hash: MurmurMH,
