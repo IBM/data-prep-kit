@@ -16,12 +16,15 @@ from typing import Any
 import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
+from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
 from data_processing.ray import (
-    DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
-    TransformLauncher,
+    DefaultTableTransformRuntimeRay,
+    RayLauncherConfiguration,
 )
-from data_processing.transform import AbstractTableTransform
+from data_processing.transform import (
+    AbstractTableTransform,
+    LauncherConfiguration,
+)
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -52,7 +55,8 @@ class IDGenerator(object):
         return start_id
 
 
-cli_prefix = "doc_id_"
+short_name = "doc_id"
+cli_prefix = f"{short_name}_"
 doc_column_name_key = "doc_column"
 hash_column_name_key = "hash_column"
 int_column_name_key = "int_column"
@@ -112,7 +116,7 @@ class DocIDTransform(AbstractTableTransform):
         return [table], {}
 
 
-class DocIDRuntime(DefaultTableTransformRuntime):
+class DocIDRuntime(DefaultTableTransformRuntimeRay):
     """
     Exact dedup runtime support
     """
@@ -141,7 +145,7 @@ class DocIDRuntime(DefaultTableTransformRuntime):
         return {_id_generator_key: IDGenerator.remote()} | self.params
 
 
-class DocIDTransformConfiguration(DefaultTableTransformConfiguration):
+class DocIDLauncherConfiguration(LauncherConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -149,10 +153,10 @@ class DocIDTransformConfiguration(DefaultTableTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(name="DocID", runtime_class=DocIDRuntime, transform_class=DocIDTransform)
-        self.params = {}
+        super().__init__()
 
-    def add_input_params(self, parser: ArgumentParser) -> None:
+    @staticmethod
+    def add_input_params(parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         This will be included in a dictionary used to initialize the NOOPTransform.
@@ -191,7 +195,30 @@ class DocIDTransformConfiguration(DefaultTableTransformConfiguration):
         return True
 
 
+class DocIDRayLauncherConfiguration(RayLauncherConfiguration):
+
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(
+            name="DocID",
+            runtime_class=DocIDRuntime,
+            transform_class=DocIDTransform,
+            launcher_configuration=DocIDLauncherConfiguration(),
+        )
+
+
+class DocIDPythonLauncherConfiguration(PythonLauncherConfiguration):
+    def __init__(self):
+        super().__init__(
+            name=short_name, transform_class=DocIDTransform, launcher_configuration=DocIDLauncherConfiguration()
+        )
+
+
 if __name__ == "__main__":
 
-    launcher = TransformLauncher(transform_runtime_config=DocIDTransformConfiguration())
+    launcher = PythonTransformLauncher(transform_runtime_config=DocIDPythonLauncherConfiguration())
     launcher.launch()

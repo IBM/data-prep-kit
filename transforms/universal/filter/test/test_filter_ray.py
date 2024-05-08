@@ -15,16 +15,11 @@ import os
 from data_processing.test_support.ray import AbstractTransformLauncherTest
 from filter_transform import (
     FilterTransform,
-    FilterTransformConfiguration,
+    FilterRayLauncherConfiguration,
     filter_columns_to_drop_cli_param,
-    filter_columns_to_drop_default,
-    filter_columns_to_drop_key,
     filter_criteria_cli_param,
-    filter_criteria_default,
-    filter_criteria_key,
     filter_logical_operator_cli_param,
     filter_logical_operator_default,
-    filter_logical_operator_key,
 )
 
 
@@ -40,7 +35,7 @@ class TestRayFilterTransform(AbstractTransformLauncherTest):
 
         fixtures.append(
             (
-                FilterTransformConfiguration(),
+                FilterRayLauncherConfiguration(),
                 {
                     filter_criteria_cli_param: [
                         "docq_total_words > 100 AND docq_total_words < 200",
@@ -56,7 +51,7 @@ class TestRayFilterTransform(AbstractTransformLauncherTest):
 
         fixtures.append(
             (
-                FilterTransformConfiguration(),
+                FilterRayLauncherConfiguration(),
                 {
                     filter_criteria_cli_param: [
                         "docq_total_words > 100 AND docq_total_words < 200",
@@ -72,7 +67,7 @@ class TestRayFilterTransform(AbstractTransformLauncherTest):
 
         fixtures.append(
             (
-                FilterTransformConfiguration(),
+                FilterRayLauncherConfiguration(),
                 {
                     filter_criteria_cli_param: [],
                     filter_logical_operator_cli_param: filter_logical_operator_default,
@@ -85,7 +80,7 @@ class TestRayFilterTransform(AbstractTransformLauncherTest):
 
         fixtures.append(
             (
-                FilterTransformConfiguration(),
+                FilterRayLauncherConfiguration(),
                 {
                     filter_criteria_cli_param: [
                         "date_acquired BETWEEN '2023-07-04' AND '2023-07-08'",
@@ -101,7 +96,7 @@ class TestRayFilterTransform(AbstractTransformLauncherTest):
 
         fixtures.append(
             (
-                FilterTransformConfiguration(),
+                FilterRayLauncherConfiguration(),
                 {
                     filter_criteria_cli_param: [
                         "document IN ('CC-MAIN-20190221132217-20190221154217-00305.warc.gz', 'CC-MAIN-20200528232803-20200529022803-00154.warc.gz', 'CC-MAIN-20190617103006-20190617125006-00025.warc.gz')",

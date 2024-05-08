@@ -18,21 +18,24 @@
 ################################################################################
 
 
-import argparse
 import os
+from argparse import ArgumentParser, Namespace
 
 import numpy as np
 import pyarrow as pa
 from bs4 import BeautifulSoup
-from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
-from data_processing.transform import AbstractTableTransform
+from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
+from data_processing.ray import RayLauncherConfiguration
+from data_processing.transform import (
+    AbstractTableTransform,
+    LauncherConfiguration,
+)
 from data_processing.utils import TransformUtils
 from transformers import AutoTokenizer
 
 
 CODE_QUALITY_PARAMS = "code_quality_params"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
 
 
 def is_xml(data, lang):
@@ -119,7 +122,7 @@ def is_config_or_test(data, scan_width=5, coeff=0.2):
     """
     Check if file is a configuration file or a unit test by :
     1- looking for keywords in the first few lines of the file.
-    2- counting number of occurence of the words 'config' and 'test' with respect to number of lines.
+    2- counting number of occurrences of the words 'config' and 'test' with respect to number of lines.
     """
     keywords = ["unit tests", "test file", "configuration file"]
     lines = data.splitlines()
@@ -283,11 +286,12 @@ class CodeQualityTransform(AbstractTableTransform):
         return [annotated_table], {}
 
 
-class CodeQualityTransformConfiguration(DefaultTableTransformConfiguration):
+class CodeQualityLauncherConfiguration(LauncherConfiguration):
     def __init__(self):
-        super().__init__(name="code_quality", transform_class=CodeQualityTransform)
+        super().__init__()
 
-    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+    @staticmethod
+    def add_input_params(parser: ArgumentParser) -> None:
         parser.add_argument(
             "--cq_contents_column_name",
             required=False,
@@ -321,7 +325,7 @@ class CodeQualityTransformConfiguration(DefaultTableTransformConfiguration):
             help="Huggingface auth token to download and use the tokenizer.",
         )
 
-    def apply_input_params(self, args: argparse.Namespace) -> bool:
+    def apply_input_params(self, args: Namespace) -> bool:
         dargs = vars(args)
 
         self.params = {
@@ -336,6 +340,25 @@ class CodeQualityTransformConfiguration(DefaultTableTransformConfiguration):
         return True
 
 
+class CodeQualityRayLauncherConfiguration(RayLauncherConfiguration):
+    def __init__(self):
+        super().__init__(
+            name="code_quality",
+            transform_class=CodeQualityTransform,
+            launcher_configuration=CodeQualityLauncherConfiguration(),
+        )
+
+
+class CodeQualityPythonLauncherConfiguration(PythonLauncherConfiguration):
+    def __init__(self):
+        super().__init__(
+            name="code_quality",
+            transform_class=CodeQualityTransform,
+            launcher_configuration=CodeQualityLauncherConfiguration(),
+        )
+        self.base = CodeQualityLauncherConfiguration()
+
+
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=CodeQualityTransformConfiguration())
+    launcher = PythonTransformLauncher(transform_runtime_config=CodeQualityPythonLauncherConfiguration())
     launcher.launch()

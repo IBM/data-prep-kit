@@ -21,13 +21,13 @@ import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
-    DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
+    DefaultTableTransformRuntimeRay,
     RayUtils,
-    TransformLauncher,
-    TransformTableProcessor,
+    RayLauncherConfiguration,
+    RayTransformLauncher,
+    TransformTableProcessorRay,
 )
-from data_processing.transform import AbstractTableTransform
+from data_processing.transform import AbstractTableTransform, LauncherConfiguration
 from data_processing.utils import (
     RANDOM_SEED,
     CLIArgumentProvider,
@@ -293,7 +293,7 @@ class FdedupFilter(AbstractTableTransform):
         return [out_table], stats
 
 
-class FdedupRuntime(DefaultTableTransformRuntime):
+class FdedupRuntime(DefaultTableTransformRuntimeRay):
     """
     Fuzzy dedup runtime support. Here we are using set environment to implement first two steps of fuzzy dedup
     processing - preprocessing and bucket hash processing
@@ -420,7 +420,11 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             )
 
     def _create_doc_actors_internal(
-        self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, mn_min_hash: MurmurMH, files: list[str]
+        self,
+        data_access_factory: DataAccessFactoryBase,
+        statistics: ActorHandle,
+        mn_min_hash: MurmurMH,
+        files: list[str],
     ) -> None:
         """
         Create document actors
@@ -640,7 +644,7 @@ class FdedupRuntime(DefaultTableTransformRuntime):
             "base_table_stats": False,
         }
         processors_list = RayUtils.create_actors(
-            clazz=TransformTableProcessor,
+            clazz=TransformTableProcessorRay,
             params=processor_params,
             actor_options=worker_options,
             n_actors=n_readers,
@@ -713,17 +717,17 @@ class FdedupRuntime(DefaultTableTransformRuntime):
         } | stats
 
 
-class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
+class FdedupTableLauncherConfiguration(LauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__(name=short_name, runtime_class=FdedupRuntime, transform_class=FdedupFilter)
-        self.params = {}
+        super().__init__()
 
-    def add_input_params(self, parser: ArgumentParser) -> None:
+    @staticmethod
+    def add_input_params(parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         """
@@ -789,7 +793,22 @@ class FdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
         return True
 
 
+class FdedupRayLauncherConfiguration(RayLauncherConfiguration):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(
+            name=short_name,
+            runtime_class=FdedupRuntime,
+            transform_class=FdedupFilter,
+            launcher_configuration=FdedupTableLauncherConfiguration(),
+        )
+
+
 if __name__ == "__main__":
 
-    launcher = TransformLauncher(transform_runtime_config=FdedupTableTransformConfiguration())
+    launcher = RayTransformLauncher(transform_runtime_config=FdedupRayLauncherConfiguration())
     launcher.launch()

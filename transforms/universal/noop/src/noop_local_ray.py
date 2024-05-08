@@ -13,9 +13,9 @@
 import os
 import sys
 
-from data_processing.ray import TransformLauncher
+from data_processing.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from noop_transform import NOOPTransformConfiguration
+from noop_transform import NOOPRayLauncherConfiguration
 
 
 # create parameters
@@ -25,7 +25,6 @@ local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
-noop_params = {"noop_sleep_sec": 1}
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
@@ -45,8 +44,8 @@ params = {
 }
 if __name__ == "__main__":
     # Set the simulated command line args
-    sys.argv = ParamsUtils.dict_to_req(d=params | noop_params)
+    sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
+    launcher = RayTransformLauncher(transform_runtime_config=NOOPRayLauncherConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

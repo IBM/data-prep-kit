@@ -16,17 +16,17 @@ jobs:
         name: Build and check packages
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout 
+            - name: Checkout
               uses: actions/checkout@v4
               with:
                   # for setuptools-scm
                   fetch-depth: 0
-            - name: Build Package for pypi 
+            - name: Build Package for pypi
               run: |
-                make -C data-processing-lib build
+                  make -C data-processing-lib build
     publish-test-pypi:
         name: Publish packages to test.pypi.org
-        # disabled 
+        # disabled
         if: false
         runs-on: ubuntu-latest
         needs: build-package

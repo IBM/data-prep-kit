@@ -21,9 +21,7 @@ class Detect_Programming_Lang:
         with open(file_path, "r") as file:
             json_data = file.read()
         self.lang_ext_mapper = json.loads(json_data)
-        self.reversed_mapper = {
-            ext: langs for langs, exts in self.lang_ext_mapper.items() for ext in exts
-        }
+        self.reversed_mapper = {ext: langs for langs, exts in self.lang_ext_mapper.items() for ext in exts}
 
     def get_lang_from_ext(self, ext):
         lang = "unknown"

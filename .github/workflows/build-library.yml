@@ -1,24 +1,23 @@
-
 name: Build Library
 
-on: 
-  workflow_dispatch:
-  push:
-    branches:
-      - "dev"
-  pull_request:
-    branches:
-      - "dev"
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - "dev"
+    pull_request:
+        branches:
+            - "dev"
 jobs:
-  build-lib:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python:
-          - "3.11"
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-    - name: Build data-processing-lib
-      run: |
-         make -C data-processing-lib DOCKER=docker venv build
+    build-lib:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python:
+                    - "3.11"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Build data-processing-lib
+              run: |
+                  make -C data-processing-lib DOCKER=docker venv build

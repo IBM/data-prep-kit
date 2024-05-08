@@ -23,7 +23,7 @@ logger = get_logger(__name__)
 
 
 @ray.remote(scheduling_strategy="SPREAD")
-class TransformTableProcessor:
+class TransformTableProcessorRay:
     """
     This is the class implementing the actual work/actor processing of a single pyarrow file
     """

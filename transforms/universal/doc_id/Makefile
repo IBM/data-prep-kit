@@ -7,6 +7,7 @@ REPOROOT=../../..
 include ../../.make.transforms
 
 TRANSFORM_NAME=doc_id
+# $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${DOC_ID_VERSION}
 
 venv::	.transforms.venv
@@ -38,5 +39,7 @@ run-local-sample: .transforms.run-local-sample
 run-local-ray-sample: .transforms.run-local-ray-sample
 
 run-s3-ray-sample: .transforms.run-s3-ray-sample
+
+minio-start:	.minio-start
 
 load-image:: .transforms.load-image

@@ -99,20 +99,14 @@ def raw_to_parquet(
             table = zip_to_table(data_access, file_path, detect_prog_lang)
             if table.num_rows > 0:
                 snapshot_column = [snapshot] * table.num_rows
-                table = TransformUtils.add_column(
-                    table=table, name="snapshot", content=snapshot_column
-                )
+                table = TransformUtils.add_column(table=table, name="snapshot", content=snapshot_column)
                 domain_column = [domain] * table.num_rows
-                table = TransformUtils.add_column(
-                    table=table, name="domain", content=domain_column
-                )
+                table = TransformUtils.add_column(table=table, name="domain", content=domain_column)
         else:
             raise Exception(f"Got {ext} file, not supported")
         if table.num_rows > 0:
             # Get the output file name for the Parquet file
-            output_file_name = data_access.get_output_location(file_path).replace(
-                ".zip", ".parquet"
-            )
+            output_file_name = data_access.get_output_location(file_path).replace(".zip", ".parquet")
             # Save the PyArrow table as a Parquet file and get metadata
             metadata = data_access.save_table(output_file_name, table)
             if metadata[1]:
@@ -151,9 +145,7 @@ def generate_stats(metadata: list) -> dict[str, Any]:
             failure_details.append(m[1])
 
     # Create DataFrame from success details to calculate total bytes in memory
-    success_df = pd.DataFrame(
-        sucess_details, columns=["path", "bytes_in_memory", "row_count"]
-    )
+    success_df = pd.DataFrame(sucess_details, columns=["path", "bytes_in_memory", "row_count"])
     total_bytes_in_memory = success_df["bytes_in_memory"].sum()
     total_row_count = success_df["row_count"].sum()
 
@@ -183,9 +175,7 @@ def ingest2parquet():
         type=bool,
         help="generate programming lang",
     )
-    parser.add_argument(
-        "-snapshot", "--snapshot", type=str, help="Name the dataset", default=""
-    )
+    parser.add_argument("-snapshot", "--snapshot", type=str, help="Name the dataset", default="")
     parser.add_argument(
         "-domain",
         "--domain",
@@ -204,18 +194,12 @@ def ingest2parquet():
     data_access = data_access_factory.create_data_access()
 
     # Retrieves file paths of files from the input folder.
-    file_paths = data_access.get_folder_files(
-        data_access.input_folder, args.data_files_to_use, False
-    )
+    file_paths = data_access.get_folder_files(data_access.input_folder, args.data_files_to_use, False)
 
     if len(file_paths) != 0:
         print(f"Number of files is {len(file_paths)} ")
         metadata = []
-        detect_prog_lang = (
-            detect_language.Detect_Programming_Lang()
-            if args.detect_programming_lang
-            else None
-        )
+        detect_prog_lang = detect_language.Detect_Programming_Lang() if args.detect_programming_lang else None
 
         with Pool() as p:
             # Processes each file concurrently

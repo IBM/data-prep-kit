@@ -254,10 +254,9 @@ __check_defined = \
 
 .PHONY: .defaults.check.installed
 .defaults.check.installed::
-	@installed=$$(which $(CHECK_RUNNABLE));		\
-	if [ -z "$$installed" ]; then			\
-	    echo $(CHECK_RUNNABLE) must be installed;	\
-	    exit 1;					\
+	if [ ! command -v $(CHECK_RUNNABLE) &>/dev/null ]; then \
+	    echo $(CHECK_RUNNABLE) must be installed;		\
+	    exit 1;						\
 	fi
 
 .PHONY: .defaults.minio.check

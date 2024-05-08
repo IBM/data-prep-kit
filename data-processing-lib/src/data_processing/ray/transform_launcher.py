@@ -17,7 +17,7 @@ import time
 import ray
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.ray import (
-    DefaultTableTransformConfiguration,
+    RayLauncherConfiguration,
     TransformOrchestratorConfiguration,
     orchestrate,
 )
@@ -27,14 +27,14 @@ from data_processing.utils import get_logger, str2bool
 logger = get_logger(__name__)
 
 
-class TransformLauncher:
+class RayTransformLauncher:
     """
     Driver class starting Filter execution
     """
 
     def __init__(
         self,
-        transform_runtime_config: DefaultTableTransformConfiguration,
+        transform_runtime_config: RayLauncherConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """

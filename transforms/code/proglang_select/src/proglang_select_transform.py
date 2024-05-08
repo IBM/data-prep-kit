@@ -10,19 +10,26 @@
 # limitations under the License.
 ################################################################################
 
-import argparse
+from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccess, DataAccessFactoryBase, DataAccessFactory
-from data_processing.ray import (
-    DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
-    TransformLauncher,
+from data_processing.data_access import (
+    DataAccess,
+    DataAccessFactory,
+    DataAccessFactoryBase,
 )
-from data_processing.transform import AbstractTableTransform
-from data_processing.utils import TransformUtils, get_logger, str2bool
+from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
+from data_processing.ray import (
+    DefaultTableTransformRuntimeRay,
+    RayLauncherConfiguration,
+)
+from data_processing.transform import (
+    AbstractTableTransform,
+    LauncherConfiguration,
+)
+from data_processing.utils import TransformUtils, get_logger
 from ray.actor import ActorHandle
 
 
@@ -103,7 +110,7 @@ class ProgLangSelectTransform(AbstractTableTransform):
         }
 
 
-class ProgLangSelectRuntime(DefaultTableTransformRuntime):
+class ProgLangSelectRuntime(DefaultTableTransformRuntimeRay):
     """
     Language selector runtime support
     """
@@ -146,22 +153,17 @@ class ProgLangSelectRuntime(DefaultTableTransformRuntime):
         return {lang_allowed_languages: lang_refs} | self.params
 
 
-class ProgLangSelectTransformConfiguration(DefaultTableTransformConfiguration):
+class ProgLangSelectLauncherConfiguration(LauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__(
-            name=shortname,
-            transform_class=ProgLangSelectTransform,
-            runtime_class=ProgLangSelectRuntime,
-        )
-        self.params = {}
+        super().__init__()
         self.daf = None
 
-    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+    def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given parser.
         This will be included in a dictionary used to initialize the ProgLangMatchTransform.
@@ -194,7 +196,7 @@ class ProgLangSelectTransformConfiguration(DefaultTableTransformConfiguration):
         # Add the DataAccessFactory parameters to the transform's configuration parameters.
         self.daf.add_input_params(parser)
 
-    def apply_input_params(self, args: argparse.Namespace) -> bool:
+    def apply_input_params(self, args: Namespace) -> bool:
         """
         Validate and apply the arguments that have been parsed
         :param args: user defined arguments.
@@ -213,12 +215,41 @@ class ProgLangSelectTransformConfiguration(DefaultTableTransformConfiguration):
             lang_data_factory_key: self.daf,
             lang_output_column_key: dargs.get(lang_output_column_key, None),
         }
-        # remove data access factory from metadata
-        self.remove_from_metadata.append(lang_data_factory_key)
         # Validate and populate the transform's DataAccessFactory
         return self.daf.apply_input_params(args)
 
 
+class ProgLangSelectRayLauncherConfiguration(RayLauncherConfiguration):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(
+            name=shortname,
+            transform_class=ProgLangSelectTransform,
+            launcher_configuration=ProgLangSelectLauncherConfiguration(),
+            runtime_class=ProgLangSelectRuntime,
+            remove_from_metadata=[lang_data_factory_key],
+        )
+
+
+class ProgLangSelectPytonLauncherConfiguration(PythonLauncherConfiguration):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
+    def __init__(self):
+        super().__init__(
+            name=shortname,
+            transform_class=ProgLangSelectTransform,
+            launcher_configuration=ProgLangSelectLauncherConfiguration(),
+            remove_from_metadata=[lang_data_factory_key],
+        )
+
+
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=ProgLangSelectTransformConfiguration())
+    launcher = PythonTransformLauncher(transform_runtime_config=ProgLangSelectPytonLauncherConfiguration())
     launcher.launch()

@@ -53,18 +53,19 @@ import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-import pyarrow as pa 
+import pyarrow as pa
 from data_processing.ray import (
-    DefaultTableTransformConfiguration,
-    DefaultTableTransformRuntime,
-    TransformLauncher,
+  RayLauncherConfiguration,
+  DefaultTableTransformRuntimeRay,
+  RayTransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 
+
 class NOOPTransform(AbstractTableTransform):
-    
-    def __init__(self, config: dict[str, Any]):
-        self.sleep = config.get("sleep", 1)
+
+  def __init__(self, config: dict[str, Any]):
+    self.sleep = config.get("sleep", 1)
 ```
 The `NOOPTransform` class extends the `AbstractTableTransform`, which defines the required methods.
 
