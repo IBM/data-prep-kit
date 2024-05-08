@@ -15,7 +15,7 @@ import os
 from data_processing.test_support.ray import AbstractTransformLauncherTest
 from doc_id_transform import (
     DocIDTransform,
-    DocIDTransformConfigurationRay,
+    DocIDRayLauncherConfiguration,
     doc_column_name_cli_param,
     doc_column_name_key,
     hash_column_name_cli_param,
@@ -39,5 +39,5 @@ class TestRayDocIDTransform(AbstractTransformLauncherTest):
             hash_column_name_cli_param: "doc_hash",
             int_column_name_cli_param: "doc_int",
         }
-        fixtures.append((DocIDTransformConfigurationRay(), config, basedir + "/input", basedir + "/expected"))
+        fixtures.append((DocIDRayLauncherConfiguration(), config, basedir + "/input", basedir + "/expected"))
         return fixtures
