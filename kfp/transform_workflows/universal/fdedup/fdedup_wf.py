@@ -27,7 +27,7 @@ EXEC_SCRIPT_NAME: str = "fdedup_transform.py"
 task_image = "quay.io/dataprep1/data-prep-lab/fdedup:0.2.1"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.7"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.8"
 
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(func=fdedup_compute_execution_params, base_image=base_kfp_image)
@@ -176,7 +176,7 @@ def fdedup(
                 "data_s3_config": data_s3_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
-                "num_workers": compute_exec_params.outputs["workers"],
+                "runtime_num_workers": compute_exec_params.outputs["workers"],
                 "runtime_worker_options": runtime_actor_options,
                 "runtime_pipeline_id": runtime_pipeline_id,
                 "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,

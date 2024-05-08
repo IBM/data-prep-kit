@@ -111,7 +111,7 @@ if __name__ == "__main__":
     execute_ray_jobs(
         name=cluster_name,
         d_access=data_access,
-        additional_params=KFPUtils.load_from_json(args.additional_params),
+        additional_params=KFPUtils.load_from_json(args.additional_params.replace("'", '"')),
         e_params=exec_params,
         exec_script_name=args.exec_script_name,
         server_url=args.server_url,

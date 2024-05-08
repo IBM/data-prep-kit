@@ -103,11 +103,11 @@ it is strongly encouraged to not use single dash options with a single
 or small number of characters (e.g. -n).
 
 ## Release process
-The transform versions are managed in a central file named [`transforms.versions`](../.make.versions).
+The transform versions are managed in a central file named [`.make.versions`](../.make.versions).
 This file is where the versions are automatically propagated to the Makefile rules when building and pushing the transform images.
 When a new transform version is created, the tag of the transform should be updated in this file.
 If there is no entry for the transform in the file yet, create a new one and add a reference to it in the transform Makefile,
- following the format used for other transforms.
+ following the format used for other transforms. More specifically, the entry should be of the following format: `<transform image name>_VERSION=<version>`, for example: `FDEDUP_VERSION=0.2.77`
 
 ### Building the docker image
 Generally to build a docker image, one uses the `make image` command, which uses

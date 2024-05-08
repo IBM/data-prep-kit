@@ -2,9 +2,6 @@ REPOROOT=../../../
 # Use "make help" to see them.
 include ../../../.make.defaults
 
-.reconcile-requirement::
-	$(MAKE) RULE=.reconcile-requirement .recurse
-
 clean:: 
 	@# Help: Recursively $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse

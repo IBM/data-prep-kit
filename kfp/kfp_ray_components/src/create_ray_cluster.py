@@ -31,15 +31,15 @@ def start_ray_cluster(
     :param additional_params:  additional parameters
     :return: None
     """
-    dict_params = KFPUtils.load_from_json(additional_params)
+    dict_params = KFPUtils.load_from_json(additional_params.replace("'", '"'))
     # get current namespace
     ns = KFPUtils.get_namespace()
     if ns == "":
         print(f"Failed to get namespace")
         sys.exit(1)
     # Convert input
-    head_options = KFPUtils.load_from_json(ray_head_options)
-    worker_node = KFPUtils.load_from_json(ray_worker_options)
+    head_options = KFPUtils.load_from_json(ray_head_options.replace("'", '"'))
+    worker_node = KFPUtils.load_from_json(ray_worker_options.replace("'", '"'))
     head_node = head_options | {
         "ray_start_params": {"metrics-export-port": "8080", "num-cpus": "0", "dashboard-host": "0.0.0.0"}
     }

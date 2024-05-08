@@ -5,7 +5,7 @@ include ${REPOROOT}/kfp/requirements.env
 # Use "make help" to see them.
 include ${REPOROOT}/.make.defaults
 
-DOCKER_REPO ?= ""
+USE_DEV_IMAGES ?= 1
 
 define set_env_var
 	$(eval export $(1)=$(2))
@@ -13,7 +13,13 @@ endef
 
 .PHONY: .transforms_workflows.reconcile-requirement
 .transforms_workflows.reconcile-requirement:
-	sed -i.back "s/${DOCKER_IMAGE_NAME}:.*/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}\"/" ${PIPELINE_FILE}
+	while IFS= read -r line; do \
+		[ -z "$$line" ] && continue; \
+		[[ $$line == *#* ]] && continue; \
+		export DOCKER_IMAGE_NAME=$$(echo $$line |cut -d "=" -f 1 |sed "s/_VERSION//" |tr '[:upper:]' '[:lower:]'); \
+		export DOCKER_IMAGE_VERSION=$$(echo $$line |cut -d "=" -f 2); \
+		sed -i.back "s/data\-prep\-lab\/$$DOCKER_IMAGE_NAME:.*/data\-prep\-lab\/$$DOCKER_IMAGE_NAME:$$DOCKER_IMAGE_VERSION\"/" $$PIPELINE_FILE ;\
+	done < ${REPOROOT}/.make.versions
 	sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION}\"/" ${PIPELINE_FILE}
 
 .PHONY: .transforms_workflows.compile-pipeline
@@ -26,12 +32,15 @@ endef
 
 .PHONY: .transforms_workflows.test-pipeline
 .transforms_workflows.test-pipeline:
+	@# Help: upload and run the workflow. Set export USE_DEV_IMAGES=0 to use release docker image versions.
 	$(call set_env_var, CLUSTER_EXISTS, $(shell kind get clusters | grep ${KIND_CLUSTER_NAME}))
 	@if [ -z ${CLUSTER_EXISTS} ]; then \
 		cd ${REPOROOT} && make setup;  \
 	fi
+ifeq ($(USE_DEV_IMAGES), 1)
 	cd ${TRANSFORM_SRC} && $(MAKE) image && $(MAKE) load-image
 	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) image && $(MAKE) load-image
+endif
 	. ${VENV_ACTIVATE}  && ${PYTHON} -m kfp_support.workflow_support.utils.pipelines_tests_utils -c "sanity-test" -p ${CURDIR}/${PIPELINE_FILE}
 
 ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt
@@ -52,5 +61,5 @@ ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${
 
 .PHONY: .transforms_workflows.clean
 .transforms_workflows.clean:
-	rm -rf "*_wf.yaml" || true
+	rm -rf *_wf.yaml || true
 
