@@ -80,11 +80,10 @@ class DataAccessLocal(DataAccess):
         files = []
         for c_path in sorted(Path(path).rglob("*")):
             # for every file
+            if c_path.is_dir():
+                continue
             s_path = str(c_path.absolute())
-            if extensions is None:
-                if c_path.is_dir():
-                    continue
-            else:
+            if extensions is not None:
                 _, extension = os.path.splitext(s_path)
                 if extension not in extensions:
                     continue
@@ -145,17 +144,19 @@ class DataAccessLocal(DataAccess):
                 path=input_path, cm_files=cm_files, min_file_size=min_file_size, max_file_size=max_file_size
             )
 
-        input_files = set(self._get_all_files_ext(path=input_path, extensions=self.files_to_use))
-        output_files = set(self._get_all_files_ext(path=output_path, extensions=self.files_to_use))
-        input_only_files = input_files - output_files
+        input_files = self._get_all_files_ext(path=input_path, extensions=self.files_to_use)
+        output_files = self._get_all_files_ext(path=output_path, extensions=self.files_to_use)
 
         total_input_file_size = 0
         i = 0
-        output_files = []
-        for filename in sorted(input_only_files):
+        result_files = []
+        for filename in sorted(input_files):
+            out_f_name = self.get_output_location(filename)
+            if out_f_name in output_files:
+                continue
             if i >= cm_files > 0:
                 break
-            output_files.append(filename)
+            result_files.append(filename)
             size = os.path.getsize(os.path.join(input_path, filename))
             total_input_file_size += size
             if min_file_size > size:
@@ -164,7 +165,7 @@ class DataAccessLocal(DataAccess):
                 max_file_size = size
             i += 1
         return (
-            output_files,
+            result_files,
             {
                 "max_file_size": max_file_size / MB,
                 "min_file_size": min_file_size / MB,

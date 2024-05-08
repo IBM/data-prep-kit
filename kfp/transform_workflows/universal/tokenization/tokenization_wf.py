@@ -26,7 +26,7 @@ EXEC_SCRIPT_NAME: str = "tokenization_transform.py"
 task_image = "quay.io/dataprep1/data-prep-lab/tokenization:0.2.0"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.6"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.7"
 # compute execution parameters. Use default one for now.
 compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image

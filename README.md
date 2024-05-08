@@ -2,12 +2,12 @@
 
 <h1 align="center">Data Prep Lab </h1>
 
-<div align="center">
+<div align="center"> 
 
-  [![Status](https://img.shields.io/badge/status-active-success.svg)]() 
-  [![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-lab/issues)
-  [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-lab/pulls)
-</div>
+<?  [![Status](https://img.shields.io/badge/status-active-success.svg)]() ?>
+<?  [![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-lab/issues) ?>
+<?  [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-lab/pulls) ?>
+</div> 
 
 ---
 
@@ -66,7 +66,7 @@ Features of the toolkit:
 - Growing set of module implementations across multiple runtimes and targeting laptop-scale to datacenter-scale processing
 - A growing set of sample pipelines developed for real enterprise use cases
 - [Data processing library](data-processing-lib) to enable contribution of new custom modules targeting new use cases
-- [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp) for no-code data prep
+- [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp/doc/simple_transform_pipeline.md) for no-code data prep
 
 Data modalities supported: 
 
@@ -161,7 +161,7 @@ Data Prep LAB will demonstrate how multiple simple transform pipelines can be co
 
 The project facilitates the creation of a local Kind cluster with all the required software and test data. 
 To work with the Kind cluster and KFP, you need to install several pre-required software packages. Please refer to 
-[Kind preinstalled software](./kind/README.md#preinstalled-software) for more details
+[preinstalled software](./kind/README.md#preinstalled-software) for more details
 
 When you have all packages installed, you can execute 
 

@@ -16,6 +16,7 @@ export TOOLS_DIR=${ROOT_DIR}/hack/tools
 export DEPLOY_KUBEFLOW ?= 1
 export USE_KFP_MINIO ?= 1
 export POPULATE_TEST_DATA ?= 1
+KIND_CLUSTER_NAME ?= dataprep
 
 setup::
 	@# Help: Building kind cluster with everything installed
@@ -42,15 +43,14 @@ endif
 
 clean::
 	@# Help: Deleting the kind cluster
-	cd $(TOOLS_DIR); ./kind_management.sh delete_cluster
+	cd $(TOOLS_DIR); ./kind_management.sh delete_cluster ${KIND_CLUSTER_NAME}
 
 build::
-
 
 test::
 
 .create-kind-cluster::
-	cd $(TOOLS_DIR); ./kind_management.sh create_cluster
+	cd $(TOOLS_DIR); ./kind_management.sh create_cluster ${KIND_CLUSTER_NAME}
 
 .cluster-prepare::
 	cd $(TOOLS_DIR) && ./install_nginx.sh deploy

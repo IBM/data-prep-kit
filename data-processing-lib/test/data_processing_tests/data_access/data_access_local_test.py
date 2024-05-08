@@ -110,8 +110,10 @@ class TestGetInputFiles(TestInit):
         """
         Utility function that sets up input and output directories
         """
-        input_path = Path(os.path.join(self.dal.input_folder, f"{prefix}input_dir"))
-        output_path = Path(os.path.join(self.dal.output_folder, f"{prefix}output_dir"))
+        #        input_path = Path(os.path.join(self.dal.input_folder, f"{prefix}input_dir"))
+        #        output_path = Path(os.path.join(self.dal.output_folder, f"{prefix}output_dir"))
+        input_path = Path(self.dal.input_folder)
+        output_path = Path(self.dal.output_folder)
         os.makedirs(input_path, exist_ok=True)
         os.makedirs(output_path, exist_ok=True)
         return input_path, output_path
@@ -171,9 +173,8 @@ class TestGetInputFiles(TestInit):
 
         file_list, size_dict = self.dal._get_input_files(str(input_path), str(output_path), cm_files=0)
         result = (file_list, size_dict)
-
         expected_result = (
-            [str(file.absolute()) for file in input_files if str(file.absolute()) != str(output_file.absolute())],
+            [str(file.absolute()) for file in input_files if str(file.name) != str(output_file.name)],
             self.size_stat_dict,
         )
 
@@ -312,8 +313,8 @@ class TestGetFilesToProcess(TestInit):
         ) = self.multiple_missing_files_setup()
 
         expected_result = (
-            [str(file.absolute()) for file in in_files_1 if file.absolute() != out_file_2.absolute()]
-            + [str(file.absolute()) for file in in_files_2 if str(file.absolute()) != str(out_file_2.absolute())],
+            [str(file.absolute()) for file in in_files_1]
+            + [str(file.absolute()) for file in in_files_2 if str(file.name) != str(out_file_2.name)],
             self.size_stat_dict_1,
         )
         self.multiple_missing_files_cleanup(
