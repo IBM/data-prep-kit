@@ -5,8 +5,8 @@
 <div align="center"> 
 
 <?  [![Status](https://img.shields.io/badge/status-active-success.svg)]() ?>
-<?  [![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-lab/issues) ?>
-<?  [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-lab/pulls) ?>
+<?  [![GitHub Issues](https://img.shields.io/github/issues/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-kit/issues) ?>
+<?  [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-kit/pulls) ?>
 </div> 
 
 ---
@@ -129,8 +129,8 @@ Docker/Podman
 ### Installation Steps
 
 ```shell
-git clone git@github.com:IBM/data-prep-lab.git
-cd data-prep-lab
+git clone git@github.com:IBM/data-prep-kit.git
+cd data-prep-kit
 pip install pre-commit
 pip install twine
 pre-commit install

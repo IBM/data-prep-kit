@@ -1,5 +1,5 @@
 [project]
-name = "data_prep_lab"
+name = "data_prep_kit"
 version = "0.1.6"
 requires-python = ">=3.10"
 description = "Data Preparation Laboratory Library"
