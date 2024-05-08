@@ -14,7 +14,7 @@ import sys
 import tempfile
 from typing import Any
 
-from data_processing.ray import DefaultTableTransformConfiguration, TransformLauncher
+from data_processing.ray import RayLauncherConfiguration, RayTransformLauncher
 from data_processing.test_support.abstract_test import AbstractTest
 from data_processing.utils import ParamsUtils
 
@@ -39,7 +39,7 @@ class AbstractTransformLauncherTest(AbstractTest):
 
     def test_transform(
         self,
-        transform_config: DefaultTableTransformConfiguration,
+        transform_config: RayLauncherConfiguration,
         cli_params: dict[str, Any],
         in_table_path: str,
         expected_out_table_path: str,
@@ -54,7 +54,7 @@ class AbstractTransformLauncherTest(AbstractTest):
         :return:
         """
 
-        launcher = TransformLauncher(transform_config)
+        launcher = RayTransformLauncher(transform_config)
         prefix = transform_config.get_name()
         with tempfile.TemporaryDirectory(prefix=prefix, dir="/tmp") as temp_dir:
             print(f"Using temporary output path {temp_dir}")

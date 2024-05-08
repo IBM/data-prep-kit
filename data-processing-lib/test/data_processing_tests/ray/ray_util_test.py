@@ -12,7 +12,7 @@
 
 import pyarrow as pa
 import ray
-from data_processing.ray import RayUtils, TransformStatistics
+from data_processing.ray import RayUtils, TransformStatisticsRay
 from data_processing.utils import GB, TransformUtils
 
 
@@ -83,7 +83,7 @@ def test_actor_creation():
     res = support.get_available_resources()
     print(f"\navailable resources {res}")
 
-    execs = support.create_actors(clazz=TransformStatistics, params=params, actor_options=actor_options, n_actors=1)
+    execs = support.create_actors(clazz=TransformStatisticsRay, params=params, actor_options=actor_options, n_actors=1)
 
     execs[0].add_stats.remote({"source_documents": 1, "source_size": 500})
     execs[0].add_stats.remote({"source_documents": 1, "source_size": 500, "result_documents": 1, "result_size": 300})

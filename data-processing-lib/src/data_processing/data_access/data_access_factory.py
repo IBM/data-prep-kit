@@ -174,7 +174,7 @@ class DataAccessFactory(DataAccessFactoryBase):
                 return False
             self.s3_config = s3_config
             self.logger.info(
-                f"data factory {self.cli_arg_prefix} is using S3 data access"
+                f"data factory {self.cli_arg_prefix} is using S3 data access: "
                 f'input path - {self.s3_config["input_folder"]}, '
                 f'output path - {self.s3_config["output_folder"]}'
             )
@@ -183,7 +183,7 @@ class DataAccessFactory(DataAccessFactoryBase):
                 return False
             self.local_config = local_config
             self.logger.info(
-                f"data factory {self.cli_arg_prefix} is using local data access"
+                f"data factory {self.cli_arg_prefix} is using local data access: "
                 f"input_folder - {self.local_config['input_folder']} "
                 f"output_folder - {self.local_config['output_folder']}"
             )

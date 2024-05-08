@@ -55,7 +55,7 @@ class KFPUtils:
 
     @staticmethod
     def credentials(
-            access_key: str = "S3_KEY", secret_key: str = "S3_SECRET", endpoint: str = "ENDPOINT"
+        access_key: str = "S3_KEY", secret_key: str = "S3_SECRET", endpoint: str = "ENDPOINT"
     ) -> tuple[str, str, str]:
         """
         Get credentials from the environment
@@ -142,48 +142,12 @@ class PipelinesUtils:
         :param host: host to connect to
         """
         self.kfp_client = Client(host=host)
-    
-    def upload_pipeline(
-        self,
-        pipeline_package_path: str = None,
-        pipeline_name: str = None,
-        description: str = None,
-    ) -> models.api_pipeline.ApiPipeline:
-        """
-        Uploads the pipeline
-        :param pipeline_package_path: Local path to the pipeline package.
-        :param pipeline_name: Optional. Name of the pipeline to be shown in the UI.
-        :param description: Optional. Description of the pipeline to be shown in the UI.
-        :return: Server response object containing pipleine id and other information.
-        """
-        try:
-            p = self.kfp_client.upload_pipeline(pipeline_package_path, pipeline_name, description)
-            logger.info("Pipeline uploaded")
-            return p
-        except Exception as e:
-            logger.warning(f"Exception uploading pipeline {e}")
-            return None
-
-    def delete_pipeline(self, pipeline_id):
-        """
-        Delete pipeline.
-
-        :param pipeline_id: id of the pipeline.
-        :return
-
-        Returns:
-          Object. If the method is called asynchronously, returns the request thread.
-
-        Raises:
-          kfp_server_api.ApiException: If pipeline is not found.
-        """
-        return self.kfp_client.delete_pipeline(pipeline_id)
 
     def start_pipeline(
-            self,
-            pipeline: models.api_pipeline.ApiPipeline,
-            experiment: models.api_experiment.ApiExperiment,
-            params: Optional[dict[str, Any]],
+        self,
+        pipeline: models.api_pipeline.ApiPipeline,
+        experiment: models.api_experiment.ApiExperiment,
+        params: Optional[dict[str, Any]],
     ) -> str:
         """
         Start a specified pipeline.
@@ -197,7 +161,7 @@ class PipelinesUtils:
             run_id = self.kfp_client.run_pipeline(
                 experiment_id=experiment.id, job_name=job_name, pipeline_id=pipeline.id, params=params
             )
-            logger.info(f"Pipeline run {job_name} submitted")
+            logger.info("Pipeline submitted")
             return run_id.id
         except Exception as e:
             logger.warning(f"Exception starting pipeline {e}")
@@ -276,11 +240,11 @@ class RayRemoteJobs:
     ansi_escape = re.compile(r"\x1B\[[0-?]*[ -/]*[@-~]")
 
     def __init__(
-            self,
-            server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-            default_image: str = "rayproject/ray:2.9.3-py310",
-            http_retries: int = 5,
-            wait_interval: int = 2,
+        self,
+        server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
+        default_image: str = "rayproject/ray:2.9.3-py310",
+        http_retries: int = 5,
+        wait_interval: int = 2,
     ):
         """
         Initialization
@@ -295,12 +259,12 @@ class RayRemoteJobs:
         self.default_image = default_image
 
     def create_ray_cluster(
-            self,
-            name: str,
-            namespace: str,
-            head_node: dict[str, Any],
-            worker_nodes: list[dict[str, Any]],
-            wait_cluster_ready: int = -1,
+        self,
+        name: str,
+        namespace: str,
+        head_node: dict[str, Any],
+        worker_nodes: list[dict[str, Any]],
+        wait_cluster_ready: int = -1,
     ) -> tuple[int, str]:
         """
         Create Ray cluster
@@ -491,12 +455,12 @@ class RayRemoteJobs:
         return status, error
 
     def submit_job(
-            self,
-            name: str,
-            namespace: str,
-            request: dict[str, Any],
-            runtime_env: str = None,
-            executor: str = "transformer_launcher.py",
+        self,
+        name: str,
+        namespace: str,
+        request: dict[str, Any],
+        runtime_env: str = None,
+        executor: str = "transformer_launcher.py",
     ) -> tuple[int, str, str]:
         """
         Submit job for execution
@@ -547,13 +511,13 @@ class RayRemoteJobs:
             print(l_to_print)
 
     def follow_execution(
-            self,
-            name: str,
-            namespace: str,
-            submission_id: str,
-            data_access: DataAccess = None,
-            job_ready_timeout: int = 600,
-            print_timeout: int = 120,
+        self,
+        name: str,
+        namespace: str,
+        submission_id: str,
+        data_access: DataAccess = None,
+        job_ready_timeout: int = 600,
+        print_timeout: int = 120,
     ) -> None:
         """
         Follow remote job execution
@@ -631,10 +595,10 @@ class ComponentUtils:
 
     @staticmethod
     def add_settings_to_component(
-            component: dsl.ContainerOp,
-            timeout: int,
-            image_pull_policy: str = "IfNotPresent",
-            cache_strategy: str = "P0D",
+        component: dsl.ContainerOp,
+        timeout: int,
+        image_pull_policy: str = "Always",
+        cache_strategy: str = "P0D",
     ) -> None:
         """
         Add settings to kfp component
@@ -652,10 +616,10 @@ class ComponentUtils:
 
     @staticmethod
     def set_s3_env_vars_to_component(
-            component: dsl.ContainerOp,
-            secret: str,
-            env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"},
-            prefix: str = None,
+        component: dsl.ContainerOp,
+        secret: str,
+        env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"},
+        prefix: str = None,
     ) -> None:
         """
         Set S3 env variables to KFP component
@@ -678,8 +642,8 @@ class ComponentUtils:
 
     @staticmethod
     def default_compute_execution_params(
-            worker_options: str,  # ray worker configuration
-            actor_options: str,  # cpus per actor
+        worker_options: str,  # ray worker configuration
+        actor_options: str,  # cpus per actor
     ) -> str:
         """
         This is the most simplistic transform execution parameters computation

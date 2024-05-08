@@ -13,13 +13,13 @@
 import os
 import sys
 
-from data_processing.ray import TransformLauncher
+from data_processing.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from fdedup_transform import FdedupTableTransformConfiguration
+from fdedup_transform import FdedupRayLauncherConfiguration
 
 
 # create launcher
-launcher = TransformLauncher(transform_runtime_config=FdedupTableTransformConfiguration())
+launcher = RayTransformLauncher(transform_runtime_config=FdedupRayLauncherConfiguration())
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
