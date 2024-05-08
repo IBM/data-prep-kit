@@ -4,8 +4,8 @@
 ################################################################################
 
 # Data prep lab wheel version
-DPL_LIB_VERSION=0.1.5
-DPL_LIB_KFP_VERSION=0.1.7
+DPL_LIB_VERSION=0.1.6
+DPL_LIB_KFP_VERSION=0.1.8
 
 # Begin transform versions/tags
 BLOCKLIST_VERSION=0.2.0
