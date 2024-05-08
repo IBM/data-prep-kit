@@ -12,13 +12,13 @@ memory. Therefore, we recommend deploying it on machines with at least 32 GB of 
 ### Preinstalled software
 The following programs should be manually installed:
 
-- [Helm](https://helm.sh/) 3.10.0 or greater must be installed and configured on your machine.
-- [Kind](https://kind.sigs.k8s.io/) tool for running local Kubernetes clusters 0.14.0 or newer must be installed on your machine.
+- [Helm](https://helm.sh/docs/intro/install/) 3.10.0 or greater must be installed and configured on your machine.
+- [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation) tool for running local Kubernetes clusters 0.14.0 or newer must be installed on your machine.
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) 1.26 or newer must be installed on your machine.
 - [wget](https://www.gnu.org/software/wget/) 1.21 must be installed on your machine.
-- [lsof](https://formulae.brew.sh/formula/lsof) must be installed on your machine.
-- [MinIO Client (mc)](https://min.io/docs/minio/linux/reference/minio-mc.html#quickstart) must be installed on your machine.
-- [lsof](https://www.ionos.com/digitalguide/server/configuration/linux-lsof/) useally it is part of Linux or MacOS distribution.
+- [MinIO Client (mc)](https://min.io/docs/minio/kubernetes/upstream/index.html) must be installed on your machine. Please 
+choose your OS system, and process according to "(Optional) Install the MinIO Client". You have to install the `mc` client only. 
+- [lsof](https://www.ionos.com/digitalguide/server/configuration/linux-lsof/) usually it is part of Linux or MacOS distribution.
 - Container agent such as [Docker](https://www.docker.com/) or [Podman](https://podman-desktop.io/)
 
 > **NOTE**: Additionally, ensure that nothing is running on port 8080, which is used by the Kind cluster ingress.

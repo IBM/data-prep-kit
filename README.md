@@ -161,7 +161,7 @@ Data Prep LAB will demonstrate how multiple simple transform pipelines can be co
 
 The project facilitates the creation of a local Kind cluster with all the required software and test data. 
 To work with the Kind cluster and KFP, you need to install several pre-required software packages. Please refer to 
-[Kind preinstalled software](./kind/README.md#preinstalled-software) for more details
+[preinstalled software](./kind/README.md#preinstalled-software) for more details
 
 When you have all packages installed, you can execute 
 
