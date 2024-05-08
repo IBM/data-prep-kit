@@ -17,7 +17,7 @@ from data_processing.test_support.transform import AbstractTransformTest
 from data_processing.transform import get_transform_config
 from proglang_select_transform import (
     ProgLangSelectTransform,
-    ProgLangSelectTransformConfigurationRay,
+    ProgLangSelectRayLauncherConfiguration,
     lang_allowed_langs_file_key,
     lang_lang_column_key,
     lang_output_column_key,
@@ -48,7 +48,7 @@ class TestProgLangSelectTransform(AbstractTransformTest):
         ]
 
         # Use the ProgLangMatchTransformConfiguration to compute the config parameters
-        lstc = ProgLangSelectTransformConfigurationRay()
+        lstc = ProgLangSelectRayLauncherConfiguration()
         config = get_transform_config(lstc, cli)
 
         fixtures = [
