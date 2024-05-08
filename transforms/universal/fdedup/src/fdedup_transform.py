@@ -23,11 +23,11 @@ from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
     DefaultTableTransformRuntimeRay,
     RayUtils,
-    TransformConfigurationRay,
-    TransformLauncherRay,
+    RayLauncherConfiguration,
+    RayTransformLauncher,
     TransformTableProcessorRay,
 )
-from data_processing.transform import AbstractTableTransform, TransformConfigurationBase
+from data_processing.transform import AbstractTableTransform, LauncherConfiguration
 from data_processing.utils import (
     RANDOM_SEED,
     CLIArgumentProvider,
@@ -717,7 +717,7 @@ class FdedupRuntime(DefaultTableTransformRuntimeRay):
         } | stats
 
 
-class FdedupTableTransformConfigurationBase(TransformConfigurationBase):
+class FdedupTableLauncherConfiguration(LauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -793,7 +793,7 @@ class FdedupTableTransformConfigurationBase(TransformConfigurationBase):
         return True
 
 
-class FdedupTransformConfigurationRay(TransformConfigurationRay):
+class FdedupRayLauncherConfiguration(RayLauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -804,11 +804,11 @@ class FdedupTransformConfigurationRay(TransformConfigurationRay):
             name=short_name,
             runtime_class=FdedupRuntime,
             transform_class=FdedupFilter,
-            base_configuration=FdedupTableTransformConfigurationBase(),
+            launcher_configuration=FdedupTableLauncherConfiguration(),
         )
 
 
 if __name__ == "__main__":
 
-    launcher = TransformLauncherRay(transform_runtime_config=FdedupTransformConfigurationRay())
+    launcher = RayTransformLauncher(transform_runtime_config=FdedupRayLauncherConfiguration())
     launcher.launch()

@@ -15,12 +15,11 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.pure_python import TransformLauncher
-from data_processing.ray import TransformConfigurationRay
+from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
+from data_processing.ray import RayLauncherConfiguration
 from data_processing.transform import (
     AbstractTableTransform,
-    TransformConfiguration,
-    TransformConfigurationBase,
+    LauncherConfiguration,
 )
 from data_processing.utils import CLIArgumentProvider, get_logger
 
@@ -70,7 +69,7 @@ class NOOPTransform(AbstractTableTransform):
         return [table], metadata
 
 
-class NOOPTransformConfigurationBase(TransformConfigurationBase):
+class NOOPLauncherConfiguration(LauncherConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -120,27 +119,27 @@ class NOOPTransformConfigurationBase(TransformConfigurationBase):
         return True
 
 
-class NOOPTransformConfigurationRay(TransformConfigurationRay):
+class NOOPRayLauncherConfiguration(RayLauncherConfiguration):
     def __init__(self):
         super().__init__(
             name=short_name,
             transform_class=NOOPTransform,
-            base_configuration=NOOPTransformConfigurationBase(),
+            launcher_configuration=NOOPLauncherConfiguration(),
             remove_from_metadata=[pwd_key],
         )
 
 
-class NOOPTransformConfigurationPython(TransformConfiguration):
+class NOOPPythonLauncherConfiguration(PythonLauncherConfiguration):
     def __init__(self):
         super().__init__(
             name=short_name,
             transform_class=NOOPTransform,
-            base_configuration=NOOPTransformConfigurationBase(),
+            launcher_configuration=NOOPLauncherConfiguration(),
             remove_from_metadata=[pwd_key],
         )
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfigurationPython())
+    launcher = PythonTransformLauncher(transform_runtime_config=NOOPPythonLauncherConfiguration())
     logger.info("Launching noop transform")
     launcher.launch()

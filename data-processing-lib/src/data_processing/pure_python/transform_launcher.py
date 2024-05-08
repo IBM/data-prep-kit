@@ -16,23 +16,23 @@ import time
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.pure_python import orchestrate
 from data_processing.transform import (
-    TransformConfiguration,
     TransformExecutionConfiguration,
 )
+from data_processing.pure_python import PythonLauncherConfiguration
 from data_processing.utils import get_logger
 
 
 logger = get_logger(__name__)
 
 
-class TransformLauncher:
+class PythonTransformLauncher:
     """
     Driver class starting Filter execution
     """
 
     def __init__(
         self,
-        transform_runtime_config: TransformConfiguration,
+        transform_runtime_config: PythonLauncherConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """

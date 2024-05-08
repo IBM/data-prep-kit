@@ -13,13 +13,13 @@
 import os
 import sys
 
-from data_processing.ray import TransformLauncherRay
+from data_processing.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from doc_id_transform import DocIDTransformConfigurationRay
+from doc_id_transform import DocIDRayLauncherConfiguration
 
 
 # create launcher
-launcher = TransformLauncherRay(transform_runtime_config=DocIDTransformConfigurationRay())
+launcher = RayTransformLauncher(transform_runtime_config=DocIDRayLauncherConfiguration())
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))

@@ -19,10 +19,10 @@ from data_processing.data_access import DataAccessFactoryBase
 from data_processing.ray import (
     DefaultTableTransformRuntimeRay,
     RayUtils,
-    TransformConfigurationRay,
-    TransformLauncherRay,
+    RayLauncherConfiguration,
+    RayTransformLauncher,
 )
-from data_processing.transform import AbstractTableTransform, TransformConfigurationBase
+from data_processing.transform import AbstractTableTransform, LauncherConfiguration
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -218,7 +218,7 @@ class EdedupRuntime(DefaultTableTransformRuntimeRay):
         return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
 
 
-class EdedupTableTransformConfigurationBase(TransformConfigurationBase):
+class EdedupTableLauncherConfiguration(LauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -251,7 +251,7 @@ class EdedupTableTransformConfigurationBase(TransformConfigurationBase):
         return True
 
 
-class EdedupTransformConfigurationRay(TransformConfigurationRay):
+class EdedupRayLauncherConfiguration(RayLauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -262,11 +262,11 @@ class EdedupTransformConfigurationRay(TransformConfigurationRay):
             name=short_name,
             runtime_class=EdedupRuntime,
             transform_class=EdedupTransform,
-            base_configuration=EdedupTableTransformConfigurationBase(),
+            launcher_configuration=EdedupTableLauncherConfiguration(),
         )
 
 
 if __name__ == "__main__":
 
-    launcher = TransformLauncherRay(transform_runtime_config=EdedupTransformConfigurationRay())
+    launcher = RayTransformLauncher(transform_runtime_config=EdedupRayLauncherConfiguration())
     launcher.launch()

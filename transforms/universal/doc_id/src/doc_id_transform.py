@@ -16,15 +16,14 @@ from typing import Any
 import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.pure_python import TransformLauncher
+from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
 from data_processing.ray import (
     DefaultTableTransformRuntimeRay,
-    TransformConfigurationRay,
+    RayLauncherConfiguration,
 )
 from data_processing.transform import (
     AbstractTableTransform,
-    TransformConfiguration,
-    TransformConfigurationBase,
+    LauncherConfiguration,
 )
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
@@ -146,7 +145,7 @@ class DocIDRuntime(DefaultTableTransformRuntimeRay):
         return {_id_generator_key: IDGenerator.remote()} | self.params
 
 
-class DocIDTransformConfigurationBase(TransformConfigurationBase):
+class DocIDLauncherConfiguration(LauncherConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -196,7 +195,7 @@ class DocIDTransformConfigurationBase(TransformConfigurationBase):
         return True
 
 
-class DocIDTransformConfigurationRay(TransformConfigurationRay):
+class DocIDRayLauncherConfiguration(RayLauncherConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -208,18 +207,18 @@ class DocIDTransformConfigurationRay(TransformConfigurationRay):
             name="DocID",
             runtime_class=DocIDRuntime,
             transform_class=DocIDTransform,
-            base_configuration=DocIDTransformConfigurationBase(),
+            launcher_configuration=DocIDLauncherConfiguration(),
         )
 
 
-class DocIDTransformConfigurationPython(TransformConfiguration):
+class DocIDPythonLauncherConfiguration(PythonLauncherConfiguration):
     def __init__(self):
         super().__init__(
-            name=short_name, transform_class=DocIDTransform, base_configuration=DocIDTransformConfigurationBase()
+            name=short_name, transform_class=DocIDTransform, launcher_configuration=DocIDLauncherConfiguration()
         )
 
 
 if __name__ == "__main__":
 
-    launcher = TransformLauncher(transform_runtime_config=DocIDTransformConfigurationPython())
+    launcher = PythonTransformLauncher(transform_runtime_config=DocIDPythonLauncherConfiguration())
     launcher.launch()

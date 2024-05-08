@@ -12,9 +12,9 @@
 
 import sys
 
-from data_processing.ray import TransformLauncherRay
+from data_processing.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from tokenization_transform import TokenizationTransformConfigurationRay
+from tokenization_transform import TokenizationRayLauncherConfiguration
 
 
 # create parameters
@@ -55,6 +55,6 @@ if __name__ == "__main__":
 
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = TransformLauncherRay(transform_runtime_config=TokenizationTransformConfigurationRay())
+    launcher = RayTransformLauncher(transform_runtime_config=TokenizationRayLauncherConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

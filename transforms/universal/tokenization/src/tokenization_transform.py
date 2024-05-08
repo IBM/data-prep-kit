@@ -20,12 +20,11 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.pure_python import TransformLauncher
-from data_processing.ray import TransformConfigurationRay
+from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
+from data_processing.ray import RayLauncherConfiguration
 from data_processing.transform import (
     AbstractTableTransform,
-    TransformConfiguration,
-    TransformConfigurationBase,
+    LauncherConfiguration,
 )
 from data_processing.utils import get_logger
 from tokenization_utils import is_valid_argument_string, load_tokenizer, split_text
@@ -156,7 +155,7 @@ class TokenizationTransform(AbstractTableTransform):
         return [out_table], metadata
 
 
-class TokenizationTransformConfigurationBase(TransformConfigurationBase):
+class TokenizationLauncherConfiguration(LauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -260,7 +259,7 @@ class TokenizationTransformConfigurationBase(TransformConfigurationBase):
         return True
 
 
-class TokenizationTransformConfigurationRay(TransformConfigurationRay):
+class TokenizationRayLauncherConfiguration(RayLauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -270,11 +269,11 @@ class TokenizationTransformConfigurationRay(TransformConfigurationRay):
         super().__init__(
             name="Tokenization",
             transform_class=TokenizationTransform,
-            base_configuration=TokenizationTransformConfigurationBase(),
+            launcher_configuration=TokenizationLauncherConfiguration(),
         )
 
 
-class TokenizationTransformConfigurationPython(TransformConfiguration):
+class TokenizationPythonLauncherConfiguration(PythonLauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -284,11 +283,11 @@ class TokenizationTransformConfigurationPython(TransformConfiguration):
         super().__init__(
             name="Tokenization",
             transform_class=TokenizationTransform,
-            base_configuration=TokenizationTransformConfigurationBase(),
+            launcher_configuration=TokenizationLauncherConfiguration(),
         )
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfigurationPython())
+    launcher = PythonTransformLauncher(transform_runtime_config=TokenizationPythonLauncherConfiguration())
     logger.info("Launching Tokenization transform")
     launcher.launch()

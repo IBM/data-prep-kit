@@ -16,12 +16,11 @@ import json
 
 import duckdb
 import pyarrow as pa
-from data_processing.pure_python import TransformLauncher
-from data_processing.ray import TransformConfigurationRay
+from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
+from data_processing.ray import RayLauncherConfiguration
 from data_processing.transform import (
     AbstractTableTransform,
-    TransformConfiguration,
-    TransformConfigurationBase,
+    LauncherConfiguration,
 )
 from data_processing.utils import CLIArgumentProvider, get_logger
 
@@ -137,7 +136,7 @@ class FilterTransform(AbstractTableTransform):
         return [filtered_table_cols_dropped], metadata
 
 
-class FilterTransformConfigurationBase(TransformConfigurationBase):
+class FilterLauncherConfiguration(LauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -199,7 +198,7 @@ class FilterTransformConfigurationBase(TransformConfigurationBase):
         return True
 
 
-class FilterTransformConfigurationRay(TransformConfigurationRay):
+class FilterRayLauncherConfiguration(RayLauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -207,11 +206,11 @@ class FilterTransformConfigurationRay(TransformConfigurationRay):
 
     def __init__(self):
         super().__init__(
-            name=short_name, transform_class=FilterTransform, base_configuration=FilterTransformConfigurationBase()
+            name=short_name, transform_class=FilterTransform, launcher_configuration=FilterLauncherConfiguration()
         )
 
 
-class FilterTransformConfigurationPython(TransformConfiguration):
+class FilterPythonLauncherConfiguration(PythonLauncherConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -219,11 +218,11 @@ class FilterTransformConfigurationPython(TransformConfiguration):
 
     def __init__(self):
         super().__init__(
-            name=short_name, transform_class=FilterTransform, base_configuration=FilterTransformConfigurationBase()
+            name=short_name, transform_class=FilterTransform, launcher_configuration=FilterLauncherConfiguration()
         )
 
 
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=FilterTransformConfigurationPython())
+    launcher = PythonTransformLauncher(transform_runtime_config=FilterPythonLauncherConfiguration())
     logger.info("Launching filtering")
     launcher.launch()

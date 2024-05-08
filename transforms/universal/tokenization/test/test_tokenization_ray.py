@@ -13,7 +13,7 @@
 import os
 
 from data_processing.test_support.ray import AbstractTransformLauncherTest
-from tokenization_transform import TokenizationTransformConfigurationRay
+from tokenization_transform import TokenizationTransformConfigurationRayLauncherConfiguration
 
 
 tkn_params = {
@@ -35,6 +35,6 @@ class TestRayTokenizationTransform(AbstractTransformLauncherTest):
         basedir = "../test-data"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         fixtures = [
-            (TokenizationTransformConfigurationRay(), tkn_params, basedir + "/ds01/input", basedir + "/ds01/expected")
+            (TokenizationTransformConfigurationRayLauncherConfiguration(), tkn_params, basedir + "/ds01/input", basedir + "/ds01/expected")
         ]
         return fixtures

@@ -15,7 +15,7 @@ import os
 import pyarrow.parquet as pq
 from code_quality_transform import (
     CodeQualityTransform,
-    CodeQualityTransformConfigurationRay,
+    CodeQualityRayLauncherConfiguration,
 )
 from data_processing.test_support.transform import AbstractTransformTest
 from data_processing.transform import get_transform_config
@@ -33,7 +33,7 @@ class TestCodeQualityTransform(AbstractTransformTest):
         ]
 
         # Use the CodeQualityTransformConfiguration to compute the config parameters
-        cqconfig = CodeQualityTransformConfigurationRay()
+        cqconfig = CodeQualityRayLauncherConfiguration()
         config = get_transform_config(cqconfig, cli)
 
         fixtures = [

@@ -15,9 +15,9 @@ from typing import Any
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import (
     AbstractTableTransform,
-    TransformConfiguration,
-    TransformConfigurationBase,
+    LauncherConfiguration,
 )
+from data_processing.pure_python import PythonLauncherConfiguration
 from ray.actor import ActorHandle
 
 
@@ -58,7 +58,7 @@ class DefaultTableTransformRuntimeRay:
         return stats
 
 
-class TransformConfigurationRay(TransformConfiguration):
+class RayLauncherConfiguration(PythonLauncherConfiguration):
     """
     Provides support the configuration of a transformer running in the ray environment.
     It holds the following:
@@ -76,14 +76,14 @@ class TransformConfigurationRay(TransformConfiguration):
         self,
         name: str,
         transform_class: type[AbstractTableTransform],
-        base_configuration: TransformConfigurationBase,
+        launcher_configuration: LauncherConfiguration,
         remove_from_metadata: list[str] = [],
         runtime_class: type[DefaultTableTransformRuntimeRay] = DefaultTableTransformRuntimeRay,
     ):
         super().__init__(
             name=name,
             transform_class=transform_class,
-            base_configuration=base_configuration,
+            launcher_configuration=launcher_configuration,
             remove_from_metadata=remove_from_metadata,
         )
         """

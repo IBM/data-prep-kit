@@ -12,7 +12,7 @@
 
 import os
 
-from code_quality_transform import CodeQualityTransformConfigurationRay
+from code_quality_transform import CodeQualityRayLauncherConfiguration
 from data_processing.test_support.ray import AbstractTransformLauncherTest
 
 
@@ -30,5 +30,5 @@ class TestCodeQualityTransform(AbstractTransformLauncherTest):
         }
         basedir = "../test-data"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
-        fixtures = [(CodeQualityTransformConfigurationRay(), cli, basedir + "/input", basedir + "/expected")]
+        fixtures = [(CodeQualityRayLauncherConfiguration(), cli, basedir + "/input", basedir + "/expected")]
         return fixtures

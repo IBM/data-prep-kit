@@ -13,9 +13,9 @@
 import os
 import sys
 
-from data_processing.ray import TransformLauncherRay
+from data_processing.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from noop_transform import NOOPTransformConfigurationRay
+from noop_transform import NOOPRayLauncherConfiguration
 
 
 # create parameters
@@ -46,6 +46,6 @@ if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = TransformLauncherRay(transform_runtime_config=NOOPTransformConfigurationRay())
+    launcher = RayTransformLauncher(transform_runtime_config=NOOPRayLauncherConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

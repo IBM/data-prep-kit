@@ -13,9 +13,9 @@
 import os
 import sys
 
-from data_processing.pure_python import TransformLauncher
+from data_processing.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
-from tokenization_transform import TokenizationTransformConfigurationPython
+from tokenization_transform import TokenizationPythonLauncherConfiguration
 
 
 # create parameters
@@ -39,6 +39,6 @@ if __name__ == "__main__":
 
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = TransformLauncher(transform_runtime_config=TokenizationTransformConfigurationPython())
+    launcher = PythonTransformLauncher(transform_runtime_config=TokenizationPythonLauncherConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

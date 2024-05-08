@@ -10,12 +10,10 @@
 # limitations under the License.
 ################################################################################
 
-import os
 import sys
-from pathlib import Path
 
-from code_quality_transform import CodeQualityTransformConfigurationRay
-from data_processing.ray import TransformLauncherRay
+from code_quality_transform import CodeQualityRayLauncherConfiguration
+from data_processing.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
 
 
@@ -30,7 +28,7 @@ s3_conf = {
 }
 
 # create launcher
-launcher = TransformLauncherRay(transform_runtime_config=CodeQualityTransformConfigurationRay())
+launcher = RayTransformLauncher(transform_runtime_config=CodeQualityRayLauncherConfiguration())
 
 
 worker_options = {"num_cpus": 0.8}
