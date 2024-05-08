@@ -1,6 +1,6 @@
 
 
-<h1 align="center">Data Prep Lab </h1>
+<h1 align="center">Data Prep Kit</h1>
 
 <div align="center"> 
 
@@ -11,7 +11,7 @@
 
 ---
 
-Data Prep Lab is a community project to democratize and accelerate unstructured data preparation for LLM app developers. 
+Data Prep Kit is a community project to democratize and accelerate unstructured data preparation for LLM app developers. 
 With the explosive growth of LLM-enabled use cases, developers are faced with the enormous challenge of preparing use case-specific unstructured data to fine-tune or instruct-tune the LLMs.
 As the variety of use cases grows, so does the need to support:
 
@@ -19,7 +19,7 @@ As the variety of use cases grows, so does the need to support:
 - New ways of transforming the data to optimize the performance of the resulting LLMs for each specific use case.
 - Large variety in the scale of data to be processed, from laptop-scale to datacenter-scale
 
-Data Prep Lab offers implementations of commonly needed data transformations, called *modules*, for both Code and Language modalities.
+Data Prep Kit offers implementations of commonly needed data transformations, called *modules*, for both Code and Language modalities.
 The goal is to offer high-level APIs for developers to quickly get started in working with their data, without needing expertise in the underlying runtimes and frameworks.
 
 ## 📝 Table of Contents
@@ -30,12 +30,12 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 - [Acknowledgments](#acknowledgement)
 
 ## &#x1F4D6; About <a name = "about"></a>
-Data Prep Lab is a toolkit for streamlining data preparation for developers looking to build LLM-enabled applications via fine-tuning or instruction-tuning.
-Data Prep Lab contributes a set of modules that the developer can get started with to easily build data pipelines suitable for their use case.
+Data Prep Kit is a toolkit for streamlining data preparation for developers looking to build LLM-enabled applications via fine-tuning or instruction-tuning.
+Data Prep Kit contributes a set of modules that the developer can get started with to easily build data pipelines suitable for their use case.
 These modules have been tested in producing pre-training datasets for the [Granite](https://huggingface.co/instructlab/granite-7b-lab) open models. 
 
 The modules are built on common frameworks (for Spark and Ray), called the *data processing library* that allows the developers to build new custom modules that readily scale across a variety of runtimes.
-Eventually, Data Prep Lab will offer consistent APIs and configurations across the following underlying runtimes.
+Eventually, Data Prep Kit will offer consistent APIs and configurations across the following underlying runtimes.
 
 1. Python runtime
 2. Ray runtime (local and distributed)

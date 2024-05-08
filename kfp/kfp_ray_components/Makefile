@@ -16,7 +16,7 @@ IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_VERSION}
 # Create the docker image making sure the preloaded models are available to copy into the image
 .kfp_comp.image:: Dockerfile requirements.txt
 	$(call check_defined, DOCKER_HOSTNAME)
-	sed -i.back "s/data-prep-kit-kfp==[0-9].*/data-prep-kit-kfp==${DPK_LIB_KFP_VERSION}/" requirements.txt
+	sed -i.back "s/data-prep-toolkit-kfp==[0-9].*/data-prep-toolkit-kfp==${DPK_LIB_KFP_VERSION}/" requirements.txt
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
 	$(DOCKER) build -t ${IMG} \
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
