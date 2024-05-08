@@ -5,11 +5,12 @@ op=$1
 SLEEP_TIME="${SLEEP_TIME:-50}"
 MAX_RETRIES="${MAX_RETRIES:-10}"
 EXIT_CODE=0
+NGINX_INSTALLATION_FILE="${ROOT_DIR}/hack/nginx_deploy.yaml"
 
 source ../common.sh
 
 deploy() {
-	kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+	kubectl apply -f "$NGINX_INSTALLATION_FILE"
 }
 
 wait(){
@@ -24,7 +25,7 @@ wait(){
 }
 
 delete(){
-	kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+	kubectl delete -f "$NGINX_INSTALLATION_FILE"
 }
 
 usage(){
