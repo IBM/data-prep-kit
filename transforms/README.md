@@ -103,7 +103,7 @@ it is strongly encouraged to not use single dash options with a single
 or small number of characters (e.g. -n).
 
 ## Release process
-The transform versions are managed in a central file named [`transforms.versions`](./transforms.versions).
+The transform versions are managed in a central file named [`transforms.versions`](../.make.versions).
 This file is where the versions are automatically propagated to the Makefile rules when building and pushing the transform images.
 When a new transform version is created, the tag of the transform should be updated in this file.
 If there is no entry for the transform in the file yet, create a new one and add a reference to it in the transform Makefile,
