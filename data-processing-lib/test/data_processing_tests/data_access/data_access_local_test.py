@@ -110,8 +110,8 @@ class TestGetInputFiles(TestInit):
         """
         Utility function that sets up input and output directories
         """
-#        input_path = Path(os.path.join(self.dal.input_folder, f"{prefix}input_dir"))
-#        output_path = Path(os.path.join(self.dal.output_folder, f"{prefix}output_dir"))
+        #        input_path = Path(os.path.join(self.dal.input_folder, f"{prefix}input_dir"))
+        #        output_path = Path(os.path.join(self.dal.output_folder, f"{prefix}output_dir"))
         input_path = Path(self.dal.input_folder)
         output_path = Path(self.dal.output_folder)
         os.makedirs(input_path, exist_ok=True)
