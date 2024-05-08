@@ -29,7 +29,7 @@ PREFIX: str = ""
 task_image = "quay.io/dataprep1/data-prep-lab/filter:0.2.0"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.6"
+base_kfp_image = "quay.io/dataprep1/data-prep-lab/kfp-data-processing:0.0.7"
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, insted of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(

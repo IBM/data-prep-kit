@@ -31,6 +31,10 @@ reconcile-requirements::
 	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_VERSION}/" cleanupRayComponent.yaml
 	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_VERSION}/" executeRayJobComponent_multi_s3.yaml
 
+load-image:
+	@# Help:  Load the image to the kind cluster created with make setup.
+	kind load docker-image $(IMG) --name=$(KIND_CLUSTER_NAME)
+
 build:: image
 
 publish::

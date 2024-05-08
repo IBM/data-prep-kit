@@ -1,6 +1,6 @@
 [project]
 name = "data_prep_lab_kfp"
-version = "0.1.6"
+version = "0.1.7"
 requires-python = ">=3.10"
 description = "Data Preparation Laboratory Library. KFP support"
 license = {text = "Apache-2.0"}

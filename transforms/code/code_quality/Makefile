@@ -42,3 +42,4 @@ run-local-ray-sample: .transforms.run-local-ray-sample
 
 run-s3-ray-sample: .transforms.run-s3-ray-sample
 
+load-image:: .transforms.load-image
