@@ -15,11 +15,11 @@ import sys
 
 from data_processing.ray import TransformLauncherRay
 from data_processing.utils import ParamsUtils
-from fdedup_transform import FdedupTransformConfiguration
+from fdedup_transform import FdedupTransformConfigurationRay
 
 
 # create launcher
-launcher = TransformLauncherRay(transform_runtime_config=FdedupTransformConfiguration())
+launcher = TransformLauncherRay(transform_runtime_config=FdedupTransformConfigurationRay())
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))

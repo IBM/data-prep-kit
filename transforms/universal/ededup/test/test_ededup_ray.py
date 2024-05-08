@@ -13,7 +13,7 @@
 import os
 
 from data_processing.test_support.ray import AbstractTransformLauncherTest
-from ededup_transform import EdedupTableTransformConfiguration
+from ededup_transform import EdedupTransformConfigurationRay
 
 
 class TestRayBlocklistTransform(AbstractTransformLauncherTest):
@@ -31,5 +31,5 @@ class TestRayBlocklistTransform(AbstractTransformLauncherTest):
             "ededup_num_hashes": 2,
             "ededup_doc_column": "contents",
         }
-        fixtures = [(EdedupTableTransformConfiguration(), config, basedir + "/input", basedir + "/expected")]
+        fixtures = [(EdedupTransformConfigurationRay(), config, basedir + "/input", basedir + "/expected")]
         return fixtures

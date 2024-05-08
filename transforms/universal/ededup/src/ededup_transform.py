@@ -251,7 +251,7 @@ class EdedupTableTransformConfigurationBase(TransformConfigurationBase):
         return True
 
 
-class EdedupTransformConfiguration(TransformConfigurationRay):
+class EdedupTransformConfigurationRay(TransformConfigurationRay):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -268,5 +268,5 @@ class EdedupTransformConfiguration(TransformConfigurationRay):
 
 if __name__ == "__main__":
 
-    launcher = TransformLauncherRay(transform_runtime_config=EdedupTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=EdedupTransformConfigurationRay())
     launcher.launch()

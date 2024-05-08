@@ -793,7 +793,7 @@ class FdedupTableTransformConfigurationBase(TransformConfigurationBase):
         return True
 
 
-class FdedupTransformConfiguration(TransformConfigurationRay):
+class FdedupTransformConfigurationRay(TransformConfigurationRay):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -810,5 +810,5 @@ class FdedupTransformConfiguration(TransformConfigurationRay):
 
 if __name__ == "__main__":
 
-    launcher = TransformLauncherRay(transform_runtime_config=FdedupTransformConfiguration())
+    launcher = TransformLauncherRay(transform_runtime_config=FdedupTransformConfigurationRay())
     launcher.launch()
