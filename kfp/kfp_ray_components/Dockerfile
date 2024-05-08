@@ -5,8 +5,8 @@ ARG GIT_COMMIT
 
 LABEL build-date=$BUILD_DATE
 LABEL git-commit=$GIT_COMMIT
-LABEL data-prep-lab=${DPL_LIB_VERSION}
-LABEL data-prep-lab-kfp=${DPL_LIB_KFP_VERSION}
+LABEL data-prep-kit=${DPK_LIB_VERSION}
+LABEL data-prep-kit-kfp=${DPK_LIB_KFP_VERSION}
 
 # install libraries
 COPY requirements.txt requirements.txt

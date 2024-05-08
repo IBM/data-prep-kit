@@ -48,11 +48,11 @@ Target               Description
 build                Create the venv and build the transform image 
 clean                Clean up the virtual environment.
 conventions          Check transform project conventions and make recommendations, if needed.
-image                Create the docker image quay.io/dataprep1/data-prep-lab/noop:0.7
-publish              Publish the quay.io/dataprep1/data-prep-lab/noop:0.7 to quay.io container registry
+image                Create the docker image quay.io/dataprep1/data-prep-kit/noop:0.7
+publish              Publish the quay.io/dataprep1/data-prep-kit/noop:0.7 to quay.io container registry
 setup                Do nothing, since nothing to setup by default. 
 test                 Run both source and image level tests.
-test-image           Test an quay.io/dataprep1/data-prep-lab/noop:0.7 use test source inside the image. 
+test-image           Test an quay.io/dataprep1/data-prep-kit/noop:0.7 use test source inside the image. 
 test-locals          Run the *local*.py files in the src directory 
 test-src             Run the transform's tests and any '*local' .py files
 venv                 Install the source from the data processing library for python
@@ -60,10 +60,10 @@ venv                 Install the source from the data processing library for pyt
 Overridable macro values include the following:
 DOCKER - the name of the docker executable to use. DOCKER=docker
 DOCKER_FILE - the name of the docker file to use. DOCKER_FILE=Dockerfile
-DOCKER_REGISTRY_ENDPOINT - the docker registry location to publish images. DOCKER_REGISTRY_ENDPOINT=quay.io/dataprep1/data-prep-lab
+DOCKER_REGISTRY_ENDPOINT - the docker registry location to publish images. DOCKER_REGISTRY_ENDPOINT=quay.io/dataprep1/data-prep-kit
 DOCKER_HOSTNAME - the name of the docker registry to use. DOCKER_HOSTNAME=quay.io
 DOCKER_NAMESPACE - the name space to use in the registry. DOCKER_NAMESPACE=dataprep1
-DOCKER_NAME - the name under the name space where images are publishes. DOCKER_NAME=data-prep-lab
+DOCKER_NAME - the name under the name space where images are publishes. DOCKER_NAME=data-prep-kit
 DOCKER_REGISTRY_USER - the docker user to use. DOCKER_REGISTRY_USER=dataprep1
 DOCKER_REGISTRY_KEY - the docker user to use. DOCKER_REGISTRY_KEY=secret
 PYTHON - the python executable to use. PYTHON=python

@@ -1,7 +1,7 @@
 site_name: "Data Prep LAB"
 docs_dir: .
 site_dir: ../site
-repo_url: https://github.com/IBM/data-prep-lab
+repo_url: https://github.com/IBM/data-prep-kit
 nav:
     - Home: README.md
     - Overview: data-processing-lib/doc/overview.md

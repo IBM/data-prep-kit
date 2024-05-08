@@ -45,11 +45,11 @@
         "table_processing": 0.1933128833770752
     },
     "source": {
-        "name": "/root/codellm/repos/external/forks/data-prep-lab/transforms/code/code_quality/test-data/input",
+        "name": "/root/codellm/repos/external/forks/data-prep-kit/transforms/code/code_quality/test-data/input",
         "type": "path"
     },
     "target": {
-        "name": "/root/codellm/repos/external/forks/data-prep-lab/transforms/code/code_quality/output",
+        "name": "/root/codellm/repos/external/forks/data-prep-kit/transforms/code/code_quality/output",
         "type": "path"
     }
 }

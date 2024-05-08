@@ -42,8 +42,8 @@ Run the following command to create the cluster:
 
 ```shell
 cd /tmp
-git clone git@github.com:IBM/data-prep-lab.git
-cd data-prep-lab
+git clone git@github.com:IBM/data-prep-kit.git
+cd data-prep-kit
 ROOT_DIR=$PWD/kind/
 kind create cluster --name dataprep --config ${ROOT_DIR}/hack/kind-cluster-config.yaml
 ```

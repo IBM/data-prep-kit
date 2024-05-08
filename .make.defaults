@@ -37,8 +37,8 @@ DOCKER_FILE?=Dockerfile
 DOCKER?=docker
 DOCKER_HOSTNAME?=quay.io
 DOCKER_NAMESPACE ?= dataprep1
-DOCKER_REGISTRY_USER?=$(DPL_DOCKER_REGISTRY_USER)
-DOCKER_REGISTRY_KEY?=$(DPL_DOCKER_REGISTRY_KEY)
+DOCKER_REGISTRY_USER?=$(DPK_DOCKER_REGISTRY_USER)
+DOCKER_REGISTRY_KEY?=$(DPK_DOCKER_REGISTRY_KEY)
 DOCKER_REGISTRY_ENDPOINT?=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)
 DOCKER_IMAGE?=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_NAME):$(DOCKER_IMAGE_VERSION)
 include $(REPOROOT)/.make.versions
@@ -186,7 +186,7 @@ __check_defined = \
 	@echo Installing source from data processing library for venv
 	source venv/bin/activate;				      	\
 	pip install pytest;						\
-	pip uninstall -y data-prep-lab;		 			\
+	pip uninstall -y data-prep-kit;		 			\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
@@ -265,7 +265,7 @@ __check_defined = \
 	$(MAKE) CHECK_RUNNABLE=minio .defaults.check.installed
 	$(MAKE) CHECK_RUNNABLE=mc .defaults.check.installed
 
-MINIO_DIR=/tmp/data-prep-lab
+MINIO_DIR=/tmp/data-prep-kit
 MINIO_ALIAS=local
 # These are the credentials used by samples.
 MINIO_ADMIN_USER=localminioaccesskey
