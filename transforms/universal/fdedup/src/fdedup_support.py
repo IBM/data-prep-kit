@@ -16,7 +16,7 @@ from typing import Any, Iterator, Union
 import numpy as np
 import ray
 from data_processing.data_access import DataAccess
-from data_processing.ray import RayUtils
+from data_processing.launch.ray import RayUtils
 from data_processing.utils import GB, RANDOM_SEED, TransformUtils, get_logger
 from ray import cloudpickle
 from ray.actor import ActorHandle

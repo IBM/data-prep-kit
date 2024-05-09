@@ -11,7 +11,9 @@
 ################################################################################
 from typing import Any
 from argparse import ArgumentParser, Namespace
-from data_processing.transform import AbstractTableTransform, LauncherConfiguration
+
+from data_processing.launch import LauncherConfiguration
+from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider
 
 

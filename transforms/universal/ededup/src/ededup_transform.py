@@ -16,13 +16,14 @@ from typing import Any
 import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.ray import (
+from data_processing.launch import LauncherConfiguration
+from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
     RayUtils,
     RayLauncherConfiguration,
     RayTransformLauncher,
 )
-from data_processing.transform import AbstractTableTransform, LauncherConfiguration
+from data_processing.transform import AbstractTableTransform
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 

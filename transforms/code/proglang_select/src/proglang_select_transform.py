@@ -20,15 +20,13 @@ from data_processing.data_access import (
     DataAccessFactory,
     DataAccessFactoryBase,
 )
-from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
-from data_processing.ray import (
+from data_processing.launch import LauncherConfiguration
+from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
+from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
     RayLauncherConfiguration,
 )
-from data_processing.transform import (
-    AbstractTableTransform,
-    LauncherConfiguration,
-)
+from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils, get_logger
 from ray.actor import ActorHandle
 

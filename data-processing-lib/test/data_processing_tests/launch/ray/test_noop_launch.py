@@ -13,7 +13,7 @@
 import os
 
 import pyarrow as pa
-from data_processing.test_support.ray import AbstractTransformLauncherTest
+from data_processing.test_support.launch.ray import AbstractTransformLauncherTest
 from data_processing.test_support.transform import NOOPTransformConfigurationRayLauncherConfiguration
 
 
@@ -29,7 +29,7 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        basedir = "../../../test-data/data_processing/ray/noop/"
+        basedir = "../../../../test-data/data_processing/ray/noop/"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         fixtures = [(NOOPTransformConfigurationRayLauncherConfiguration(), {"noop_sleep_sec": 0}, basedir + "/input", basedir + "/expected")]
         return fixtures

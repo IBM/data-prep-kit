@@ -32,7 +32,7 @@ The main components of runtime are described below
 
 [Table processing actor](src/fdedup_transform.py) is implemented following framework itself is implemented as a pair -
 `FdedupTransform` implementing the actual transformation and and 
-[transform table processor](../../../data-processing-lib/src/data_processing/ray/transform_table_processor.py) 
+[transform table processor](../../../data-processing-lib/src/data_processing/launch/ray/transform_table_processor.py) 
 (from the framework itself).
 
 ### DocsMinHash Actor

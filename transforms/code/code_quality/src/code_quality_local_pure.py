@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 from code_quality_transform import CodeQualityPythonLauncherConfiguration
-from data_processing.pure_python import PythonTransformLauncher
+from data_processing.launch.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 
 

@@ -13,7 +13,7 @@
 import os
 import sys
 
-from data_processing.pure_python import PythonTransformLauncher
+from data_processing.launch.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 from tokenization_transform import TokenizationPythonLauncherConfiguration
 
