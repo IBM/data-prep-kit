@@ -27,3 +27,8 @@ test:: .check_python_version ${VENV_ACTIVATE}
 
 upload:: .check_python_version ${VENV_ACTIVATE}
 	$(MAKE) .transforms_workflows.upload-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=${YAML_FILE}
+
+.PHONY: reconcile-requirements
+reconcile-requirements:
+	$(MAKE) .transforms_workflows.reconcile-requirement PIPELINE_FILE=proglang_select_wf.py
+
