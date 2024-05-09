@@ -2,23 +2,26 @@
 # # know where they are running from.
 REPOROOT=../..
 
-# Include the common rules.
-# Use "make help" to see them.
-include ../../.make.defaults
-
 IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
 
 include makeenv
 DOCKER_FILE=Dockerfile
 DOCKER_NAME=kfp-data-processing
-IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_VERSION}
+DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
+DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${DOCKER_IMAGE_VERSION}
+
+# Include the common rules.
+# Use "make help" to see them.
+include ../../.make.defaults
 
 # Create the docker image making sure the preloaded models are available to copy into the image
 .kfp_comp.image:: Dockerfile requirements.txt
 	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
 	$(call check_defined, DOCKER_HOSTNAME)
 	sed -i.back "s/data-prep-toolkit-kfp==[0-9].*/data-prep-toolkit-kfp==${DPK_LIB_KFP_VERSION}/" requirements.txt
-	$(DOCKER) build -t ${IMG} \
+	$(DOCKER) build -t ${DOCKER_IMG} \
+		--build-arg DPK_LIB_VERSION=${DPK_LIB_VERSION} \
+		--build-arg DPK_LIB_KFP_VERSION=${DPK_LIB_KFP_VERSION} \
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
 		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . --no-cache
 
@@ -40,8 +43,7 @@ load-image:
 build:: image
 
 publish::
-	@# Help: Push $(IMG) to the registry 
-	$(DOCKER) push ${IMG}
+	$(MAKE) image .defaults.publish
 
 test::
 
