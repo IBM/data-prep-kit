@@ -27,6 +27,8 @@ local_conf = {
 }
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
+    # where to run
+    "run_locally": True,
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # execution info
