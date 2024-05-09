@@ -186,7 +186,7 @@ __check_defined = \
 	@echo Installing source from data processing library for venv
 	source venv/bin/activate;				      	\
 	pip install pytest;						\
-	pip uninstall -y data-prep-kit;		 			\
+	pip uninstall -y data-prep-toolkit;		 			\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
