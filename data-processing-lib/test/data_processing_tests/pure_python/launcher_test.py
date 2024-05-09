@@ -58,6 +58,7 @@ class TestLauncherPython(PythonTransformLauncher):
 
 def test_launcher():
     params = {
+        "run_locally": True,
         "data_max_files": -1,
         "data_checkpointing": False,
         "runtime_pipeline_id": "pipeline_id",
@@ -113,6 +114,7 @@ def test_launcher():
 def test_local_config():
     # test that the driver works with local configuration
     params = {
+        "run_locally": True,
         "data_local_config": ParamsUtils.convert_to_ast(local_conf),
         "data_max_files": -1,
         "data_checkpointing": False,
@@ -132,6 +134,7 @@ def test_local_config():
 def test_local_config_validate():
     # test the validation of the local configuration
     params = {
+        "run_locally": True,
         "data_max_files": -1,
         "data_checkpointing": False,
         "runtime_pipeline_id": "pipeline_id",
@@ -180,6 +183,7 @@ def test_local_config_validate():
 def test_s3_config_validate():
     # test the validation of the local configuration
     params = {
+        "run_locally": True,
         "data_max_files": -1,
         "data_checkpointing": False,
         "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
