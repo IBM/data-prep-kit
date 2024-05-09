@@ -13,16 +13,16 @@
 import logging
 import os
 
-from data_processing.utils import DPLConfig
+from data_processing.utils import DPKConfig
 
 
 def get_log_level(name: str = None):
     if name is None:
-        level_name = DPLConfig.DEFAULT_LOG_LEVEL
+        level_name = DPKConfig.DEFAULT_LOG_LEVEL
     else:
         name = name.upper()
-        name = "DPL_" + name + "_LOG_LEVEL"
-        level_name = os.environ.get(name, DPLConfig.DEFAULT_LOG_LEVEL)
+        name = "DPK_" + name + "_LOG_LEVEL"
+        level_name = os.environ.get(name, DPKConfig.DEFAULT_LOG_LEVEL)
     return level_name
 
 

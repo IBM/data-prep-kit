@@ -13,12 +13,12 @@ endef
 
 .PHONY: .transforms_workflows.reconcile-requirement
 .transforms_workflows.reconcile-requirement:
-	while IFS= read -r line; do \
+	@while IFS= read -r line; do \
 		[ -z "$$line" ] && continue; \
 		[[ $$line == *#* ]] && continue; \
 		export DOCKER_IMAGE_NAME=$$(echo $$line |cut -d "=" -f 1 |sed "s/_VERSION//" |tr '[:upper:]' '[:lower:]'); \
 		export DOCKER_IMAGE_VERSION=$$(echo $$line |cut -d "=" -f 2); \
-		sed -i.back "s/data\-prep\-lab\/$$DOCKER_IMAGE_NAME:.*/data\-prep\-lab\/$$DOCKER_IMAGE_NAME:$$DOCKER_IMAGE_VERSION\"/" $$PIPELINE_FILE ;\
+		sed -i.back "s/data-prep-kit\/$$DOCKER_IMAGE_NAME:.*/data-prep-kit\/$$DOCKER_IMAGE_NAME:$$DOCKER_IMAGE_VERSION\"/" $$PIPELINE_FILE ;\
 	done < ${REPOROOT}/.make.versions
 	sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION}\"/" ${PIPELINE_FILE}
 
@@ -49,7 +49,7 @@ ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${
 	$(PYTHON) -m venv ${REPOROOT}/kfp/transform_workflows/venv
 	. ${VENV_ACTIVATE};     \
 	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple; \
-	pip install data_prep_lab_kfp==${DPL_LIB_KFP_VERSION}
+	pip install data_prep_toolkit_kfp==${DPK_LIB_KFP_VERSION}
 	
 .PHONY: .transforms_workflows.upload-pipeline
 .transforms_workflows.upload-pipeline:

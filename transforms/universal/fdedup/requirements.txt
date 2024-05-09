@@ -1,5 +1,5 @@
 # transform runtime
-#data-prep-lab==0.1.2
+#data-prep-kit==0.1.2
 # fdedup
 mmh3
 xxhash

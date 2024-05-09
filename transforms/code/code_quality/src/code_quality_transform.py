@@ -13,7 +13,7 @@
 # BigCode Dataset https://github.com/bigcode-project/bigcode-dataset/tree/main/preprocessing
 #
 # Code specific heuristics like alpha numeric, char token ratio implementations & others are taken from CodeParrot and BigCode Dataset
-# preprocessing scripts and modified according to data-prep-lab specific framework.
+# preprocessing scripts and modified according to data-prep-kit specific framework.
 
 ################################################################################
 
