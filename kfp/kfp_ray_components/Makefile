@@ -10,7 +10,7 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed '
 
 include makeenv
 DOCKER_FILE=Dockerfile
-DOCKER_NAME=data-prep-kit/kfp-data-processing
+DOCKER_NAME=kfp-data-processing
 IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${KFP_DOCKER_VERSION}
 
 # Create the docker image making sure the preloaded models are available to copy into the image
