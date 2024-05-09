@@ -61,14 +61,14 @@ to use different models and perhaps as a result have different results.
 
 Once the test class is defined you may run the test from your IDE or from the command line... 
 ```shell
-% cd .../data-prep-lab/transforms/universal/noop/src
+% cd .../data-prep-kit/transforms/universal/noop/src
 % make venv
 % source venv/bin/activate
-(venv)% export PYTHONPATH=.../data-prep-lab/transforms/universal/noop/src
+(venv)% export PYTHONPATH=.../data-prep-kit/transforms/universal/noop/src
 (venv)% pytest test/test_noop.py 
 ================================================================================ test session starts ================================================================================
 platform darwin -- Python 3.10.11, pytest-8.0.2, pluggy-1.4.0
-rootdir: /Users/dawood/git/data-prep-lab/transforms/universal/noop
+rootdir: /Users/dawood/git/data-prep-kit/transforms/universal/noop
 plugins: cov-4.1.0
 collected 2 items                                                                                                                                                                   
 
@@ -85,7 +85,7 @@ source venv/bin/activate;			\
 	cd test; pytest . 
 ========================================================================================== test session starts ==========================================================================================
 platform darwin -- Python 3.10.11, pytest-8.0.2, pluggy-1.4.0
-rootdir: /Users/dawood/git/data-prep-lab/transforms/universal/noop/test
+rootdir: /Users/dawood/git/data-prep-kit/transforms/universal/noop/test
 collected 3 items                                                                                                                                                                                       
 
 test_noop.py ..                                                                                                                                                                                   [ 66%]

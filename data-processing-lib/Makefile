@@ -3,7 +3,7 @@ REPOROOT=../
 include ../.make.defaults
 include ../.make.versions
 
-TAG := "v${DPL_LIB_VERSION}"
+TAG := "v${DPK_LIB_VERSION}"
 
 
 clean::
@@ -16,7 +16,7 @@ clean::
 
 update-toml:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml 
-	sed -e 's/^version[ ]*=.*/version = "'${DPL_LIB_VERSION}'"/' pyproject.toml > tt.toml
+	sed -e 's/^version[ ]*=.*/version = "'${DPK_LIB_VERSION}'"/' pyproject.toml > tt.toml
 	mv tt.toml pyproject.toml
 
 setup::

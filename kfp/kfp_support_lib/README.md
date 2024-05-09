@@ -17,7 +17,7 @@ It comprises 2 main modules
 ### Git
 Simple clone the repo and set up the pre-commit hooks.
 ```shell
-git clone git@github.com:IBM/data-prep-lab.git
+git clone git@github.com:IBM/data-prep-kit.git
 cd kfp/kfp_support_lib
 pre-commit install
 ```
@@ -43,7 +43,7 @@ To begin with, establish a Kind cluster and deploy all required components by ex
 make setup
 ```
 
-The next step is to deploy the `data-prep-lab-kfp` package locally within a Python virtual environment.
+The next step is to deploy the `data-prep-kit-kfp` package locally within a Python virtual environment.
 
 ```bash
 make  build

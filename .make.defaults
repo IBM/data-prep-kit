@@ -36,9 +36,9 @@ DOCKER_FILE?=Dockerfile
 #DOCKER_NAME?=xyzzy	# Must be defined by the includeing makefile
 DOCKER?=docker
 DOCKER_HOSTNAME?=quay.io
-DOCKER_NAMESPACE ?= dataprep1
-DOCKER_REGISTRY_USER?=$(DPL_DOCKER_REGISTRY_USER)
-DOCKER_REGISTRY_KEY?=$(DPL_DOCKER_REGISTRY_KEY)
+DOCKER_NAMESPACE ?= dataprep1/data-prep-kit
+DOCKER_REGISTRY_USER?=$(DPK_DOCKER_REGISTRY_USER)
+DOCKER_REGISTRY_KEY?=$(DPK_DOCKER_REGISTRY_KEY)
 DOCKER_REGISTRY_ENDPOINT?=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)
 DOCKER_IMAGE?=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_NAME):$(DOCKER_IMAGE_VERSION)
 include $(REPOROOT)/.make.versions
@@ -186,7 +186,7 @@ __check_defined = \
 	@echo Installing source from data processing library for venv
 	source venv/bin/activate;				      	\
 	pip install pytest;						\
-	pip uninstall -y data-prep-lab;		 			\
+	pip uninstall -y data-prep-toolkit;		 			\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
@@ -231,7 +231,7 @@ __check_defined = \
 .PHONY: .defaults.publish
 .defaults.publish:: 
 	@# Help: Publish the $(DOCKER_IMAGE) to $(DOCKER_HOSTNAME) container registry
-	$(DOCKER) logout $(DOCKER_HOSTNAME)
+	-$(DOCKER) logout $(DOCKER_HOSTNAME)
 	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
 	$(DOCKER) push  $(DOCKER_IMAGE)
 
@@ -265,7 +265,7 @@ __check_defined = \
 	$(MAKE) CHECK_RUNNABLE=minio .defaults.check.installed
 	$(MAKE) CHECK_RUNNABLE=mc .defaults.check.installed
 
-MINIO_DIR=/tmp/data-prep-lab
+MINIO_DIR=/tmp/data-prep-kit
 MINIO_ALIAS=local
 # These are the credentials used by samples.
 MINIO_ADMIN_USER=localminioaccesskey

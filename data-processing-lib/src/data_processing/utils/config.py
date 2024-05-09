@@ -14,7 +14,7 @@ import os
 from typing import Any, Union
 
 
-class DPLConfig:
+class DPKConfig:
     @staticmethod
     def _get_first_env_var(env_var_list: list[str]) -> Union[str, None]:
         for var in env_var_list:
@@ -25,10 +25,10 @@ class DPLConfig:
         # print(f"Did not find any of the following env vars {env_var_list}")
         return None
 
-    HUGGING_FACE_TOKEN = _get_first_env_var(["DPL_HUGGING_FACE_TOKEN"])
-    """ Set from DPL_HUGGING_FACE_TOKEN env var(s) """
-    DEFAULT_LOG_LEVEL = os.environ.get("DPL_LOG_LEVEL", "INFO")
-    """ Set from DPL_LOG_LEVEL env var(s) """
+    HUGGING_FACE_TOKEN = _get_first_env_var(["DPK_HUGGING_FACE_TOKEN"])
+    """ Set from DPK_HUGGING_FACE_TOKEN env var(s) """
+    DEFAULT_LOG_LEVEL = os.environ.get("DPK_LOG_LEVEL", "INFO")
+    """ Set from DPK_LOG_LEVEL env var(s) """
 
 
 def add_if_missing(config: dict[str, Any], key: str, dflt: Any):

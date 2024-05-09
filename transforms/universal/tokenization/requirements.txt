@@ -1,4 +1,4 @@
 # transform runtime
-#data-prep-lab==0.1.2
+#data-prep-kit==0.1.2
 # for downloading + loading tokenizers:
 transformers==4.38.0

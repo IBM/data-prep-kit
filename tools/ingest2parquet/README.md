@@ -175,7 +175,7 @@ The metadata.json file contains following essential information regarding the pr
 ## Run using docker image
 
 ```
-docker run -it -v $(pwd)/test-data/input:/test-data/input -v $(pwd)/test-data/output:/test-data/output quay.io/dataprep1/data-prep-lab/ingest2parquet:0.1 sh -c "python ingest2parquet.py \
+docker run -it -v $(pwd)/test-data/input:/test-data/input -v $(pwd)/test-data/output:/test-data/output quay.io/dataprep1/data-prep-kit/ingest2parquet:0.1 sh -c "python ingest2parquet.py \
     --detect_programming_lang True \
     --snapshot github \
     --domain code \
