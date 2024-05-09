@@ -36,7 +36,7 @@ DOCKER_FILE?=Dockerfile
 #DOCKER_NAME?=xyzzy	# Must be defined by the includeing makefile
 DOCKER?=docker
 DOCKER_HOSTNAME?=quay.io
-DOCKER_NAMESPACE ?= dataprep1
+DOCKER_NAMESPACE ?= dataprep1/data-prep-kit
 DOCKER_REGISTRY_USER?=$(DPK_DOCKER_REGISTRY_USER)
 DOCKER_REGISTRY_KEY?=$(DPK_DOCKER_REGISTRY_KEY)
 DOCKER_REGISTRY_ENDPOINT?=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)
@@ -231,7 +231,7 @@ __check_defined = \
 .PHONY: .defaults.publish
 .defaults.publish:: 
 	@# Help: Publish the $(DOCKER_IMAGE) to $(DOCKER_HOSTNAME) container registry
-	$(DOCKER) logout $(DOCKER_HOSTNAME)
+	-$(DOCKER) logout $(DOCKER_HOSTNAME)
 	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
 	$(DOCKER) push  $(DOCKER_IMAGE)
 
