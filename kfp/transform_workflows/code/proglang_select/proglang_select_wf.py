@@ -23,10 +23,10 @@ from kfp_support.workflow_support.utils import (
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "proglang_select_transform.py"
 
-task_image = "quay.io/dataprep1/data-prep-kit/proglang_select:0.2.0"
+task_image = "quay.io/dataprep1/data-prep-kit/proglang_select:0.3.0"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.0.8"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, insted of creating a component we are creating it in place here.
