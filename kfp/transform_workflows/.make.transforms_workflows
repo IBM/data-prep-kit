@@ -13,7 +13,7 @@ endef
 
 .PHONY: .transforms_workflows.reconcile-requirement
 .transforms_workflows.reconcile-requirement:
-	while IFS= read -r line; do \
+	@while IFS= read -r line; do \
 		[ -z "$$line" ] && continue; \
 		[[ $$line == *#* ]] && continue; \
 		export DOCKER_IMAGE_NAME=$$(echo $$line |cut -d "=" -f 1 |sed "s/_VERSION//" |tr '[:upper:]' '[:lower:]'); \
