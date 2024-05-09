@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 from code_quality_transform import CodeQualityRayLauncherConfiguration
-from data_processing.ray import RayTransformLauncher
+from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
 
 

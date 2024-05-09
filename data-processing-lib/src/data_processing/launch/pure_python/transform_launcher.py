@@ -14,11 +14,11 @@ import argparse
 import time
 
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
-from data_processing.pure_python import orchestrate
+from data_processing.launch.pure_python import orchestrate
 from data_processing.transform import (
     TransformExecutionConfiguration,
 )
-from data_processing.pure_python import PythonLauncherConfiguration
+from data_processing.launch.pure_python import PythonLauncherConfiguration
 from data_processing.utils import get_logger
 
 

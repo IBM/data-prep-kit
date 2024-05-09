@@ -16,12 +16,10 @@ import json
 
 import duckdb
 import pyarrow as pa
-from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
-from data_processing.ray import RayLauncherConfiguration
-from data_processing.transform import (
-    AbstractTableTransform,
-    LauncherConfiguration,
-)
+from data_processing.launch import LauncherConfiguration
+from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
+from data_processing.launch.ray import RayLauncherConfiguration
+from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 

@@ -12,7 +12,7 @@
 
 import pyarrow as pa
 import ray
-from data_processing.ray import RayUtils, TransformStatisticsRay
+from data_processing.launch.ray import RayUtils, TransformStatisticsRay
 from data_processing.utils import GB, TransformUtils
 
 

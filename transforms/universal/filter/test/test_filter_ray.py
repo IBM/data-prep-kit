@@ -12,9 +12,8 @@
 
 import os
 
-from data_processing.test_support.ray import AbstractTransformLauncherTest
+from data_processing.test_support.launch.ray import AbstractTransformLauncherTest
 from filter_transform import (
-    FilterTransform,
     FilterRayLauncherConfiguration,
     filter_columns_to_drop_cli_param,
     filter_criteria_cli_param,

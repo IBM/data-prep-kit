@@ -13,11 +13,10 @@
 from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.transform import (
-    AbstractTableTransform,
-    LauncherConfiguration,
-)
-from data_processing.pure_python import PythonLauncherConfiguration
+from data_processing.launch import LauncherConfiguration
+from data_processing.transform import AbstractTableTransform
+
+from data_processing.launch.pure_python import PythonLauncherConfiguration
 from ray.actor import ActorHandle
 
 

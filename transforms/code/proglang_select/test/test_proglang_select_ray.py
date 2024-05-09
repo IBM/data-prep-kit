@@ -12,7 +12,7 @@
 
 import os
 
-from data_processing.test_support.ray import AbstractTransformLauncherTest
+from data_processing.test_support.launch.ray import AbstractTransformLauncherTest
 from proglang_select_transform import (
     ProgLangSelectRayLauncherConfiguration,
     lang_allowed_langs_file_key,

@@ -12,16 +12,12 @@
 
 import os
 
-from data_processing.test_support.ray import AbstractTransformLauncherTest
+from data_processing.test_support.launch.ray import AbstractTransformLauncherTest
 from doc_id_transform import (
-    DocIDTransform,
     DocIDRayLauncherConfiguration,
     doc_column_name_cli_param,
-    doc_column_name_key,
     hash_column_name_cli_param,
-    hash_column_name_key,
     int_column_name_cli_param,
-    int_column_name_key,
 )
 
 

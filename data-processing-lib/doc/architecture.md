@@ -13,10 +13,10 @@ process many input files in parallel using a distribute network of RayWorkers.
 
 The architecture includes the following core components: 
 
-* [RayLauncher](../src/data_processing/ray/transform_launcher.py) accepts and validates 
+* [RayLauncher](../src/data_processing/launch/ray/transform_launcher.py) accepts and validates 
  CLI parameters to establish the Ray Orchestrator with the proper configuration. 
 It uses the following components, all of which can/do define CLI configuration parameters.:
-    * [Transform Orchestrator Configuration](../src/data_processing/ray/transform_orchestrator_configuration.py) is responsible 
+    * [Transform Orchestrator Configuration](../src/data_processing/launch/ray/transform_orchestrator_configuration.py) is responsible 
      for defining and validating infrastructure parameters 
      (e.g., number of workers, memory and cpu, local or remote cluster, etc.). This class has very simple state
      (several dictionaries) and is fully pickleable. As a result framework uses its instance as a
@@ -25,14 +25,14 @@ It uses the following components, all of which can/do define CLI configuration p
       configuration for the type of DataAccess to use when reading/writing the input/output data for
       the transforms.  Similar to Transform Orchestrator Configuration, this is a pickleable
       instance that is passed between Launcher, Orchestrator and Workers.
-    * [TransformConfiguration](../src/data_processing/ray/transform_runtime.py) - defines specifics
+    * [TransformConfiguration](../src/data_processing/launch/ray/transform_runtime.py) - defines specifics
       of the transform implementation including transform implementation class, its short name, any transform-
       specific CLI parameters, and an optional TransformRuntime class, discussed below. 
      
     After all parameters are validated, the ray cluster is started and the DataAccessFactory, TransformOrchestratorConfiguraiton
     and TransformConfiguration are given to the Ray Orchestrator, via Ray remote() method invocation.
     The Launcher waits for the Ray Orchestrator to complete.
-* [Ray Orchestrator](../src/data_processing/ray/transform_orchestrator.py) is responsible for overall management of
+* [Ray Orchestrator](../src/data_processing/launch/ray/transform_orchestrator.py) is responsible for overall management of
   the data processing job. It creates the actors, determines the set of input data and distributes the 
   references to the data files to be processed by the workers. More specifically, it performs the following:
   1. Uses the DataAccess instance created by the DataAccessFactory to determine the set of the files 
@@ -53,12 +53,12 @@ It uses the following components, all of which can/do define CLI configuration p
   Once all data is processed, the orchestrator will collect execution statistics (from the statistics actor) 
   and build and save it in the form of execution metadata (`metadata.json`). Finally, it will return the execution 
   result to the Launcher.
-* [Ray worker](../src/data_processing/ray/transform_table_processor.py) is responsible for 
+* [Ray worker](../src/data_processing/launch/ray/transform_table_processor.py) is responsible for 
 reading files (as [PyArrow Tables](https://levelup.gitconnected.com/deep-dive-into-pyarrow-understanding-its-features-and-benefits-2cce8b1466c8))
 assigned by the orchestrator, applying the transform to the input table and writing out the 
 resulting table(s).  Metadata produced by each table transformation is aggregated into
 Transform Statistics (below).
-* [Transform Statistics](../src/data_processing/ray/transform_statistics.py) is a general 
+* [Transform Statistics](../src/data_processing/launch/ray/transform_statistics.py) is a general 
 purpose data collector actor aggregating the numeric metadata from different places of 
 the framework (especially metadata produced by the transform).
 These statistics are reported as metadata (`metadata.json`) by the orchestrator upon completion.
@@ -92,10 +92,10 @@ For a more complete discussion, see the [tutorials](transform-tutorials.md).
 of any transform implementation - `transform()` and `flush()` - and provides the bulk of any transform implementation
 convert one Table to 0 or more new Tables.   In general, this is not tied to the above Ray infrastructure 
 and so can usually be used independent of Ray. 
-* [TransformRuntime ](../src/data_processing/ray/transform_runtime.py) - this class only needs to be
+* [TransformRuntime ](../src/data_processing/launch/ray/transform_runtime.py) - this class only needs to be
 extended/implemented when additional Ray components (actors, shared memory objects, etc.) are used
 by the transform. The main method `get_transform_config()` is used to enable these extensions.
-* [TransformConfiguration](../src/data_processing/ray/transform_runtime.py) - this is the bootstrap
+* [TransformConfiguration](../src/data_processing/launch/ray/transform_runtime.py) - this is the bootstrap
   class provided to the Launcher that enables the instantiation of the Transform and the TransformRuntime within
   the architecture.  It is a CLIProvider, which allows it to define transform-specific CLI configuration
   that is made available to the Transform's initializer.
