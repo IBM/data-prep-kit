@@ -24,10 +24,10 @@ from src.ededup_compute_execution_params import ededup_compute_execution_params
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "ededup_transform.py"
 
-task_image = "quay.io/dataprep1/data-prep-kit/ededup:0.2.1"
+task_image = "quay.io/dataprep1/data-prep-kit/ededup:0.3.0"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.0.8"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0"
 
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(func=ededup_compute_execution_params, base_image=base_kfp_image)

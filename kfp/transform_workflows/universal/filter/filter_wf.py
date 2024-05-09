@@ -26,10 +26,10 @@ from kfp_support.workflow_support.utils import (
 EXEC_SCRIPT_NAME: str = "filter_transform.py"
 PREFIX: str = ""
 
-task_image = "quay.io/dataprep1/data-prep-kit/filter:0.2.0"
+task_image = "quay.io/dataprep1/data-prep-kit/filter:0.3.0"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.0.8"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0"
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, insted of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(

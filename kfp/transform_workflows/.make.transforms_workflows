@@ -18,7 +18,7 @@ endef
 		[[ $$line == *#* ]] && continue; \
 		export DOCKER_IMAGE_NAME=$$(echo $$line |cut -d "=" -f 1 |sed "s/_VERSION//" |tr '[:upper:]' '[:lower:]'); \
 		export DOCKER_IMAGE_VERSION=$$(echo $$line |cut -d "=" -f 2); \
-		sed -i.back "s/data\-prep\-lab\/$$DOCKER_IMAGE_NAME:.*/data\-prep\-lab\/$$DOCKER_IMAGE_NAME:$$DOCKER_IMAGE_VERSION\"/" $$PIPELINE_FILE ;\
+		sed -i.back "s/data-prep-kit\/$$DOCKER_IMAGE_NAME:.*/data-prep-kit\/$$DOCKER_IMAGE_NAME:$$DOCKER_IMAGE_VERSION\"/" $$PIPELINE_FILE ;\
 	done < ${REPOROOT}/.make.versions
 	sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION}\"/" ${PIPELINE_FILE}
 
