@@ -24,7 +24,7 @@ from kubernetes import client as k8s_client
 
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "cq_transform.py"
+EXEC_SCRIPT_NAME: str = "code_quality_transform.py"
 PREFIX: str = ""
 
 task_image = "quay.io/dataprep1/data-prep-lab/code_quality:0.2.0"
@@ -69,9 +69,9 @@ def code_quality(
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
-    actor_options: str = "{'num_cpus': 0.8}",
-    pipeline_id: str = "pipeline_id",
-    code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    runtime_actor_options: str = "{'num_cpus': 0.8}",
+    runtime_pipeline_id: str = "runtime_pipeline_id",
+    runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
     # code quality parameters
     cq_contents_column_name: str = "contents",
     cq_language_column_name: str = "language",
@@ -108,8 +108,8 @@ def code_quality(
     :param data_s3_config - s3 configuration
     :param data_max_files - max files to process
     :param data_num_samples - num samples to process
-    :param actor_options - actor options
-    :param pipeline_id - pipeline id
+    :param runtime_actor_options - actor options
+    :param runtime_pipeline_id - pipeline id
     :param cq_contents_column_name - Name of the column holds the data to process
     :param cq_language_column_name - Name of the column holds the programming language details
     :param cq_tokenizer - Name or path to the tokenizer
@@ -124,7 +124,7 @@ def code_quality(
         # compute execution params
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
-            actor_options=actor_options,
+            actor_options=runtime_actor_options,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
@@ -148,10 +148,10 @@ def code_quality(
                 "data_s3_config": data_s3_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
-                "num_workers": compute_exec_params.output,
-                "worker_options": actor_options,
-                "pipeline_id": pipeline_id,
-                "job_id": dsl.RUN_ID_PLACEHOLDER,
+                "runtime_num_workers": compute_exec_params.output,
+                "runtime_worker_options": runtime_actor_options,
+                "runtime_pipeline_id": runtime_pipeline_id,
+                "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,
                 "cq_contents_column_name": cq_contents_column_name,
                 "cq_language_column_name": cq_language_column_name,
                 "cq_tokenizer": cq_tokenizer,
