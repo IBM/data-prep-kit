@@ -33,9 +33,9 @@ class RayTransformLauncher:
     """
 
     def __init__(
-        self,
-        transform_runtime_config: RayLauncherConfiguration,
-        data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
+            self,
+            transform_runtime_config: RayLauncherConfiguration,
+            data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """
         Creates driver
@@ -73,9 +73,9 @@ class RayTransformLauncher:
         else:
             logger.info("connecting to existing cluster")
         return (
-            self.transform_runtime_config.apply_input_params(args=args)
-            and self.data_access_factory.apply_input_params(args=args)
-            and self.ray_orchestrator.apply_input_params(args=args)
+                self.transform_runtime_config.apply_input_params(args=args)
+                and self.data_access_factory.apply_input_params(args=args)
+                and self.ray_orchestrator.apply_input_params(args=args)
         )
 
     def _submit_for_execution(self) -> int:
@@ -114,12 +114,13 @@ class RayTransformLauncher:
     def launch(self) -> int:
         """
         Execute method orchestrates driver invocation
-        :return:
+        :return: launch result
         """
         if self.__get_parameters():
-            return self._submit_for_execution()
-        if self.run_locally:
-            return 1
+            res = self._submit_for_execution()
         else:
+            res = 1
+        if not self.run_locally and res > 0:
             # if we are running in kfp exit to signal kfp that we failed
             sys.exit(1)
+        return res
