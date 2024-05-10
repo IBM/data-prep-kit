@@ -20,7 +20,6 @@ from data_processing.transform import TransformConfiguration
 from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
     RayUtils,
-    RayLauncherConfiguration,
     RayTransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform

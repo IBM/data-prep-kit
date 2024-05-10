@@ -24,7 +24,6 @@ from data_processing.transform import TransformConfiguration
 from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
     RayUtils,
-    RayLauncherConfiguration,
     RayTransformLauncher,
     TransformTableProcessorRay,
 )

@@ -20,7 +20,7 @@ from data_processing.data_access import DataAccessFactoryBase
 from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
 from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
-    RayLauncherConfiguration, RayTransformLauncher,
+    RayTransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 

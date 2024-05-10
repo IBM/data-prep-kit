@@ -14,7 +14,7 @@ import os
 
 import pyarrow as pa
 
-from data_processing.launch.ray import RayLauncherConfiguration, RayTransformLauncher
+from data_processing.launch.ray import RayTransformLauncher
 from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
 from data_processing.test_support.transform import NOOPTransformConfiguration
 
