@@ -20,7 +20,7 @@ import numpy as np
 import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.launch import TransformConfiguration
+from data_processing.transform import TransformConfiguration
 from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
     RayUtils,
@@ -795,9 +795,10 @@ class FdedupTableTransformConfiguration(TransformConfiguration):
         logger.info(f"fuzzy dedup params are {self.params}")
         return True
 
-
+class FdedupRayLauncher(RayTransformLauncher):
+    def __init__(self):
+        super().__init__(transform_config=FdedupTableTransformConfiguration(), runtime_class=FdedupRuntime)
 
 if __name__ == "__main__":
-
-    launcher = RayTransformLauncher(transform_runtime_config=FdedupRayLauncherConfiguration())
+    launcher = FdedupRayLauncher()
     launcher.launch()

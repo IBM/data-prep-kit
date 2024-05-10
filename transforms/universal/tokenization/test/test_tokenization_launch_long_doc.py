@@ -13,9 +13,8 @@
 import os
 
 
-from data_processing.launch.ray import RayTransformLauncher
 from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
-from tokenization_transform import TokenizationTransformConfiguration
+from tokenization_transform import TokenizationRayLauncher
 
 tkn_params = {
     "tkn_tokenizer": "hf-internal-testing/llama-tokenizer",
@@ -37,7 +36,7 @@ class TestRayTokenizationTransform(AbstractTransformLauncherTest):
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = "../test-data"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
-        launcher = RayTransformLauncher(TokenizationTransformConfiguration())
+        launcher =TokenizationRayLauncher()
         fixtures = [
             (launcher, tkn_params, basedir + "/ds02/input", basedir + "/ds02/expected")
         ]

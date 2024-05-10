@@ -14,7 +14,6 @@ import os
 import sys
 
 from data_processing.launch.pure_python import PythonTransformLauncher
-from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
 from proglang_select_transform import (
     lang_allowed_langs_file_key,
@@ -56,6 +55,6 @@ params = {
 if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = RayTransformLauncher(ProgLangSelectTransformConfiguration(), ProgLangSelectRuntime)
+    launcher = PythonTransformLauncher(ProgLangSelectTransformConfiguration())
     # launch
     launcher.launch()

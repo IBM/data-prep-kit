@@ -14,7 +14,7 @@ import sys
 import tempfile
 from typing import Any
 
-from data_processing.launch import TransformConfiguration
+from data_processing.transform import TransformConfiguration
 from data_processing.launch.ray import RayLauncherConfiguration, RayTransformLauncher
 from data_processing.launch.transform_launcher import AbstractTransformLauncher
 from data_processing.test_support.abstract_test import AbstractTest
@@ -31,11 +31,12 @@ class AbstractTransformLauncherTest(AbstractTest):
     """
 
     @staticmethod
-    def _get_argv(cli_params: dict[str, Any], in_table_path: str, out_table_path: str):
+    def _get_argv(launcher:AbstractTransformLauncher, cli_params: dict[str, Any], in_table_path: str, out_table_path: str):
         args = {} | cli_params
         local_ast = {"input_folder": in_table_path, "output_folder": out_table_path}
         args["data_local_config"] = local_ast
-        args["run_locally"] = "True"
+        if isinstance(launcher,RayTransformLauncher):
+            args["run_locally"] = "True"
         argv = ParamsUtils.dict_to_req(args)
         return argv
 
@@ -58,7 +59,7 @@ class AbstractTransformLauncherTest(AbstractTest):
         prefix = launcher.get_transform_name()
         with tempfile.TemporaryDirectory(prefix=prefix, dir="/tmp") as temp_dir:
             print(f"Using temporary output path {temp_dir}")
-            sys.argv = self._get_argv(cli_params, in_table_path, temp_dir)
+            sys.argv = self._get_argv(launcher, cli_params, in_table_path, temp_dir)
             launcher.launch()
             AbstractTest.validate_directory_contents(temp_dir, expected_out_table_path)
 

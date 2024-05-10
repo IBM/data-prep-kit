@@ -12,9 +12,8 @@
 
 import sys
 
-from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from tokenization_transform import TokenizationTransformConfiguration
+from tokenization_transform import TokenizationRayLauncher
 
 # create parameters
 s3_cred = {
@@ -54,6 +53,6 @@ if __name__ == "__main__":
 
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = RayTransformLauncher(TokenizationTransformConfiguration())
+    launcher = TokenizationRayLauncher()
     # Launch the ray actor(s) to process the input
     launcher.launch()

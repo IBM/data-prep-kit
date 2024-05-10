@@ -16,9 +16,9 @@ from typing import Any
 
 import pyarrow as pa
 
-from data_processing.launch import TransformConfiguration
+from data_processing.transform import TransformConfiguration
 from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
-from data_processing.launch.ray import RayLauncherConfiguration
+from data_processing.launch.ray import RayLauncherConfiguration, RayTransformLauncher
 from data_processing.transform import AbstractTableTransform
 
 from data_processing.utils import CLIArgumentProvider, get_logger
@@ -120,8 +120,11 @@ class NOOPTransformConfiguration(TransformConfiguration):
         self.params = self.params | captured
         logger.info(f"noop parameters are : {self.params}")
         return True
+class NOOPRayLauncher(RayTransformLauncher):
+    def __init__(self):
+        super().__init__(transform_config=NOOPTransformConfiguration())
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(transform_config=NOOPTransformConfiguration())
+    launcher = NOOPRayLauncher()
     logger.info("Launching noop transform")
     launcher.launch()

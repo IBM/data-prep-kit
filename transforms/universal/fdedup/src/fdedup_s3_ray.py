@@ -12,12 +12,11 @@
 
 import sys
 
-from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from fdedup_transform import FdedupTableTransformConfiguration, FdedupRuntime
+from fdedup_transform import FdedupRayLauncher
 
 # create launcher
-launcher = RayTransformLauncher(FdedupTableTransformConfiguration(), FdedupRuntime)
+launcher = FdedupRayLauncher()
 # create parameters
 s3_cred = {
     "access_key": "localminioaccesskey",

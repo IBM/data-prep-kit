@@ -16,7 +16,7 @@ from typing import Any
 import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.launch import TransformConfiguration
+from data_processing.transform import TransformConfiguration
 from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
     RayUtils,
@@ -252,7 +252,10 @@ class EdedupTableTransformConfiguration(TransformConfiguration):
         logger.info(f"exact dedup params are {self.params}")
         return True
 
+class EdedupRayLauncher(RayTransformLauncher):
+    def __init__(self):
+        super().__init__(transform_config=EdedupTableTransformConfiguration(), runtime_class=EdedupRuntime)
 
 if __name__ == "__main__":
-    launcher = RayTransformLauncher(EdedupTableTransformConfiguration(), EdedupRuntime)
+    launcher = EdedupRayLauncher()
     launcher.launch()

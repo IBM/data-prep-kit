@@ -15,12 +15,12 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.launch import TransformConfiguration
+from data_processing.transform import TransformConfiguration
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
 from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
-    RayLauncherConfiguration,
+    RayLauncherConfiguration, RayTransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 
@@ -216,7 +216,10 @@ class DocIDTransformConfiguration(TransformConfiguration):
 #             name=short_name, transform_class=DocIDTransform, launcher_configuration=DocIDTransformConfiguration()
 #         )
 #
+class DocIDRayLauncher(RayTransformLauncher):
+    def __init__(self):
+        super().__init__(transform_config=DocIDTransformConfiguration(), runtime_class=DocIDRuntime)
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(transform_config=DocIDTransformConfiguration())
+    launcher = DocIDRayLauncher()
     launcher.launch()

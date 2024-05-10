@@ -16,7 +16,7 @@ import time
 
 import ray
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
-from data_processing.launch import TransformConfiguration
+from data_processing.transform import TransformConfiguration
 from data_processing.launch.ray import (
     RayLauncherConfiguration,
     TransformOrchestratorConfiguration,
