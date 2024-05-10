@@ -13,10 +13,12 @@
 import os
 
 import pyarrow.parquet as pq
-from code_quality_transform import CodeQualityTransform, CodeQualityTransformConfiguration
-
-from data_processing.transform.transform_configuration import get_transform_config
+from code_quality_transform import (
+    CodeQualityTransform,
+    CodeQualityTransformConfiguration,
+)
 from data_processing.test_support.transform import AbstractTransformTest
+from data_processing.transform.transform_configuration import get_transform_config
 
 
 class TestCodeQualityTransform(AbstractTransformTest):
