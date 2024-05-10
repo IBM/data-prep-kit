@@ -18,6 +18,7 @@ from typing import Any
 
 import mmh3
 import pyarrow as pa
+import pyarrow.parquet as pq
 from data_processing.utils import get_logger
 
 
@@ -125,6 +126,38 @@ class TransformUtils:
         if not result:
             logger.error(f"Not all required columns are present in the table - required {required}, present {columns}")
         return result
+
+    @staticmethod
+    def convert_binary_to_arrow(data: bytes, schema: pa.schema = None) -> pa.Table:
+        """
+        Convert byte array to table
+        :param data: byte array
+        :param schema: optional Arrow table schema used for reading table, default None
+        :return: table or None if the conversion failed
+        """
+        try:
+            reader = pa.BufferReader(data)
+            table = pq.read_table(reader, schema=schema)
+            return table
+        except Exception as e:
+            logger.error(f"Failed to convert byte array to arrow table, exception {e}. Skipping it")
+            return None
+
+    @staticmethod
+    def convert_arrow_to_binary(table: pa.Table) -> bytes:
+        """
+        Convert Arrow table to byte array
+        :param table: Arrow table
+        :return: byte array or None if conversion fails
+        """
+        try:
+            # convert table to bytes
+            writer = pa.BufferOutputStream()
+            pq.write_table(table=table, where=writer)
+            return bytes(writer.getvalue())
+        except Exception as e:
+            logger.error(f"Failed to convert arrow table to byte array, exception {e}. Skipping it")
+            return None
 
     @staticmethod
     def add_column(table: pa.Table, name: str, content: list[Any]) -> pa.Table:
