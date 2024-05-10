@@ -5,9 +5,9 @@ for details on general project conventions, transform configuration,
 testing and IDE set up.
 
 ## Summary 
-This transforms serves as a template for transform writers as it does
+This transform serves as a template for transform writers as it does
 not perform any transformations on the input (i.e., a no-operation transform).
-As such it simply copies the input parquet files to the output directory.
+As such, it simply copies the input parquet files to the output directory.
 It shows the basics of creating a simple 1:1 table transform.
 It also implements a single configuration value to show how configuration
 of the transform is implemented.
