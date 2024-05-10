@@ -45,8 +45,6 @@ langselect_config = {
     lang_output_column_key: annotated_column_name,
 }
 params = {
-    # where to run
-    "run_locally": True,
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # orchestrator
