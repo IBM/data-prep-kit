@@ -24,9 +24,9 @@ from argparse import ArgumentParser, Namespace
 import numpy as np
 import pyarrow as pa
 from bs4 import BeautifulSoup
-from data_processing.launch import TransformConfiguration
+from data_processing.transform import TransformConfiguration
 from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
-from data_processing.launch.ray import RayLauncherConfiguration
+from data_processing.launch.ray import RayLauncherConfiguration, RayTransformLauncher
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils
 from transformers import AutoTokenizer
@@ -358,7 +358,10 @@ class CodeQualityTransformConfiguration(TransformConfiguration):
 #         )
 #         self.base = CodeQualityTransformConfiguration()
 
+class CodeQualityRayLauncher(RayTransformLauncher):
+    def __init__(self):
+        super().__init__(transform_config=CodeQualityTransformConfiguration())
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(transform_config=CodeQualityTransformConfiguration())
+    launcher = CodeQualityRayLauncher()
     launcher.launch()

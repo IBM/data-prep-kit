@@ -1,5 +1,5 @@
 from data_processing.data_access import DataAccessFactoryBase, DataAccessFactory
-from data_processing.launch import TransformConfiguration
+from data_processing.transform import TransformConfiguration
 
 
 class AbstractTransformLauncher:

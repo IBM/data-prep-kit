@@ -16,9 +16,8 @@ from typing import Any
 
 import pyarrow as pa
 
-from data_processing.launch import TransformConfiguration
 from data_processing.launch.pure_python import PythonTransformLauncher
-from data_processing.transform import AbstractTableTransform
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 

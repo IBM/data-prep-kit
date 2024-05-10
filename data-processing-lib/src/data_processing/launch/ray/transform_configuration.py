@@ -1,4 +1,4 @@
-from data_processing.launch import TransformConfiguration
+from data_processing.transform import TransformConfiguration
 from data_processing.launch.ray import DefaultTableTransformRuntimeRay
 from data_processing.transform import AbstractTableTransform
 

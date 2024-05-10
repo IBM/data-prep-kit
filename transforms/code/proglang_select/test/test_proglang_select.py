@@ -14,7 +14,7 @@ import os
 
 import pyarrow as pa
 
-from data_processing.launch.transform_configuration import get_transform_config
+from data_processing.transform.transform_configuration import get_transform_config
 from data_processing.test_support.transform import AbstractTransformTest
 from proglang_select_transform import (
     ProgLangSelectTransform,

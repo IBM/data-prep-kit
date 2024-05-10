@@ -20,9 +20,9 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.launch import TransformConfiguration
+from data_processing.transform import TransformConfiguration
 from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
-from data_processing.launch.ray import RayLauncherConfiguration
+from data_processing.launch.ray import RayLauncherConfiguration, RayTransformLauncher
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import get_logger
 from tokenization_utils import is_valid_argument_string, load_tokenizer, split_text
@@ -286,8 +286,11 @@ class TokenizationTransformConfiguration(TransformConfiguration):
 #             launcher_configuration=TokenizationTransformConfiguration(),
 #         )
 #
+class TokenizationRayLauncher(RayTransformLauncher):
+    def __init__(self):
+        super().__init__(transform_config=TokenizationTransformConfiguration())
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(transform_runtime_config=TokenizationPythonLauncherConfiguration())
+    launcher = TokenizationRayLauncher()
     logger.info("Launching Tokenization transform")
     launcher.launch()

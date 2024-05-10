@@ -16,8 +16,7 @@ import os
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from data_processing.launch.pure_python import PythonLauncherConfiguration
-from data_processing.launch.transform_configuration import get_transform_config
+from data_processing.transform.transform_configuration import get_transform_config
 from data_processing.test_support.transform import AbstractTransformTest
 from filter_transform import (
     FilterTransform,

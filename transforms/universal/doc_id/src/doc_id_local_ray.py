@@ -13,9 +13,8 @@
 import os
 import sys
 
-from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from doc_id_transform import DocIDRuntime, DocIDTransformConfiguration
+from doc_id_transform import DocIDRayLauncher
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
@@ -46,6 +45,6 @@ params = {
 sys.argv = ParamsUtils.dict_to_req(d=params)
 # create launcher
 
-launcher = RayTransformLauncher(transform_config=DocIDTransformConfiguration(), runtime_class=DocIDRuntime)
+launcher = DocIDRayLauncher()
 # launch
 launcher.launch()

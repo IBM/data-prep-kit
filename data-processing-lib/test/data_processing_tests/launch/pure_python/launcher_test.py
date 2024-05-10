@@ -13,7 +13,7 @@
 import os
 import sys
 
-from data_processing.launch import TransformConfiguration
+from data_processing.transform import TransformConfiguration
 from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import ParamsUtils
