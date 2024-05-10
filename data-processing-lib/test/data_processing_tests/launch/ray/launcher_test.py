@@ -13,11 +13,13 @@
 import os
 import sys
 
-from data_processing.transform import TransformConfiguration
-from data_processing.launch.ray import (
-    RayTransformLauncher,
+from data_processing.launch.ray import RayTransformLauncher
+from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
+from data_processing.test_support.transform import NOOPTransformConfiguration
+from data_processing.test_support.transform.noop_transform import (
+    NOOPRayTransformConfiguration,
 )
-from data_processing.transform import AbstractTableTransform
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import ParamsUtils
 
 
@@ -43,15 +45,13 @@ worker_options = {"num_cpu": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 
 
-class TestingTransformConfiguration(TransformConfiguration):
-    def __init__(self):
-        super().__init__("test", transform_class=AbstractTableTransform)
 class TestLauncherTransformLauncher(RayTransformLauncher):
     """
     Test driver for validation of the functionality
     """
+
     def __init__(self):
-        super().__init__( TestingTransformConfiguration())
+        super().__init__(NOOPRayTransformConfiguration())
 
     def _submit_for_execution(self) -> int:
         """
@@ -88,8 +88,6 @@ def test_launcher():
     params["data_s3_cred"] = ParamsUtils.convert_to_ast(s3_cred)
     sys.argv = ParamsUtils.dict_to_req(d=params)
     res = TestLauncherTransformLauncher().launch()
-
-
 
     assert 0 == res
     # Add local config, should fail because now three different configs exist

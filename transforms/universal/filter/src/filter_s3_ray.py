@@ -12,11 +12,13 @@
 
 import sys
 
+from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
 from filter_transform import (
+    FilterRayTransformConfiguration,
     filter_columns_to_drop_cli_param,
     filter_criteria_cli_param,
-    filter_logical_operator_cli_param, FilterRayLauncher,
+    filter_logical_operator_cli_param,
 )
 
 
@@ -67,6 +69,6 @@ if __name__ == "__main__":
     # Create the CLI args as will be parsed by the launcher
     sys.argv = ParamsUtils.dict_to_req(launcher_params | filter_params)
     # Create the longer to launch with the blocklist transform.
-    launcher = FilterRayLauncher()
+    launcher = RayTransformLauncher(FilterRayTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()
