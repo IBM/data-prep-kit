@@ -1,11 +1,11 @@
-from data_processing.data_access import DataAccessFactoryBase, DataAccessFactory
+from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.transform import TransformConfiguration
 
 
 class AbstractTransformLauncher:
     def __init__(
         self,
-            # transform_runtime_config: PythonLauncherConfiguration,
+        # transform_runtime_config: PythonLauncherConfiguration,
         transform_config: TransformConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
@@ -19,7 +19,7 @@ class AbstractTransformLauncher:
         self.data_access_factory = data_access_factory
 
     def launch(self):
-        raise ValueError("must be implemented by subclass");
+        raise ValueError("must be implemented by subclass")
 
     def get_transform_name(self) -> str:
         return self.name

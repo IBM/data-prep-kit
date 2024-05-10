@@ -16,14 +16,16 @@ import time
 
 import ray
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
-from data_processing.launch.ray import (
+from data_processing.runtime.ray import (
     DefaultTableTransformRuntimeRay,
     RayLauncherConfiguration,
     TransformOrchestratorConfiguration,
     orchestrate,
 )
-from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
-from data_processing.launch.transform_launcher import AbstractTransformLauncher
+from data_processing.runtime.ray.transform_configuration import (
+    RayTransformConfiguration,
+)
+from data_processing.runtime.transform_launcher import AbstractTransformLauncher
 from data_processing.transform import TransformConfiguration
 from data_processing.utils import get_logger, str2bool
 

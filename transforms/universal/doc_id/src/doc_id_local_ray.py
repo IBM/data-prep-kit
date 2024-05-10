@@ -13,7 +13,7 @@
 import os
 import sys
 
-from data_processing.launch.ray import RayTransformLauncher
+from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
 from doc_id_transform import DocIDRayTransformConfiguration
 

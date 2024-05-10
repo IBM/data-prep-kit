@@ -24,8 +24,10 @@ from argparse import ArgumentParser, Namespace
 import numpy as np
 import pyarrow as pa
 from bs4 import BeautifulSoup
-from data_processing.launch.ray import RayTransformLauncher
-from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
+from data_processing.runtime.ray import RayTransformLauncher
+from data_processing.runtime.ray.transform_configuration import (
+    RayTransformConfiguration,
+)
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import TransformUtils
 from transformers import AutoTokenizer

@@ -13,9 +13,10 @@
 import os
 import sys
 
-from data_processing.launch.pure_python import PythonTransformLauncher
+from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 from doc_id_transform import DocIDTransformConfiguration
+
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))

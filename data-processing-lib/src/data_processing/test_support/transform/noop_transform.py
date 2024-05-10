@@ -15,8 +15,10 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.launch.pure_python import PythonTransformLauncher
-from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
+from data_processing.runtime.pure_python import PythonTransformLauncher
+from data_processing.runtime.ray.transform_configuration import (
+    RayTransformConfiguration,
+)
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 

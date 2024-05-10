@@ -1,7 +1,6 @@
-from data_processing.launch.pure_python import PythonLauncherConfiguration
+from data_processing.runtime.pure_python import PythonLauncherConfiguration
+from data_processing.runtime.ray import DefaultTableTransformRuntimeRay
 from data_processing.transform import TransformConfiguration
-from data_processing.launch.ray import DefaultTableTransformRuntimeRay
-
 
 
 class RayLauncherConfiguration(PythonLauncherConfiguration):
