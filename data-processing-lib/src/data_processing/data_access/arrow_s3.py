@@ -14,9 +14,8 @@ from typing import Any
 
 import boto3
 import pyarrow as pa
-import pyarrow.parquet as pq
 from botocore.config import Config
-from data_processing.utils import get_logger
+from data_processing.utils import get_logger, TransformUtils
 
 
 logger = get_logger(__name__)
@@ -158,14 +157,7 @@ class ArrowS3:
         data = self.read_file(key)
         if data is None:
             return None
-        try:
-            # convert bytes to arrow table.
-            reader = pa.BufferReader(data)
-            table = pq.read_table(reader, schema=schema)
-            return table
-        except Exception as e:
-            logger.error(f"Failed to convert file {key} to arrow table, exception {e}. Skipping it")
-            return None
+        return TransformUtils.convert_binary_to_arrow(data=data, schema=schema)
 
     def save_table(self, key: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
         """
@@ -176,13 +168,9 @@ class ArrowS3:
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
         in the case of failure len is -1 and dict is None
         """
-        try:
-            # convert table to bytes
-            writer = pa.BufferOutputStream()
-            pq.write_table(table=table, where=writer)
-            data = bytes(writer.getvalue())
-        except Exception as e:
-            logger.error(f"Failed to convert arrow table to byte array for key {key}, exception {e}. Skipping it")
+        # convert to bytes
+        data = TransformUtils.convert_arrow_to_binary(table=table)
+        if data is None:
             return -1, None
         # save bytes
         return len(data), self.save_file(key, data)
