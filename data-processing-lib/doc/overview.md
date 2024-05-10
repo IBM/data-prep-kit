@@ -22,6 +22,7 @@ To learn more consider the following:
 * [Transform Runtimes](transform-runtimes.md)
 * [Transform Examples](transform-tutorial-examples.md)
 * [Testing Transforms](transform-testing.md)
+* [Utilities](transformer-utilities.md)
 * [Architecture Deep Dive](architecture.md)
 * [Transform project root readme](../../transforms/README.md)
 

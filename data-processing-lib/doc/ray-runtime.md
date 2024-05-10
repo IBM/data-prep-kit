@@ -57,10 +57,10 @@ and class. In addition, it is responsible for providing transform-specific
 methods to define and capture optional command line arguments.
 ```python
 
-class MyTransformConfiguration(TransformConfiguration):
+class YourTransformConfiguration(TransformConfiguration):
 
     def __init__(self):
-        super().__init__(name="MyTransform", transform_class=MyTransform)
+        super().__init__(name="YourTransform", transform_class=YourTransform)
         self.params = {}
         
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -69,16 +69,17 @@ class MyTransformConfiguration(TransformConfiguration):
         ...
 ```
 Next we define the Ray-runtime specific transform configuration as an exension of
-the RayTransformConfiguration and uses the `MyTransformConfiguration` above.
+the RayTransformConfiguration and uses the `YourTransformConfiguration` above.
 ```python
     
-class MyTransformConfiguration(RayTransformConfiguration):
+class YourTransformConfiguration(RayTransformConfiguration):
     def __init__(self):
-        super().__init__(MyTransformConfiguration(),
-                         runtime_class=MyTransformRuntime
+        super().__init__(YourTransformConfiguration(),
+                         runtime_class=YourTransformRuntime
 ```
-This class provides the ability to create the instance of `MyTransformRuntime` class
-as neede by the Ray runtime.
+This class provides the ability to create the instance of `YourTransformRuntime` class (see below)
+as needed by the Ray runtime.  Note, that not all transforms will require a `runtime_class`
+and can omit this parameter to default to an acceptable runtime class.
 Details are covered in the [advanced transform tutorial](advanced-transform-tutorial.md).
 
 ## Transform Runtime
