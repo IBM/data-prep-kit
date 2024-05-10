@@ -5,12 +5,7 @@ inputs:
     - { name: name, type: String, description: "Sub workflow name" }
     - { name: prefix, type: String, description: "Sub flow argument's prefix" }
     - { name: params, type: JsonObject, default: None, description: "Sub flow parameters" }
-    - {
-          name: host,
-          type: String,
-          default: "http://ml-pipeline:8888",
-          description: "URL of the host to connect to",
-      }
+    - { name: host, type: String, default: "http://ml-pipeline:8888", description: "URL of the host to connect to" }
     - { name: number_pipelines, type: Integer, default: "100", description: "Max number of pipelines to read" }
     - { name: experiment, type: String, default: "Default", description: "Name of the experiment for the run" }
     - {

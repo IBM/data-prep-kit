@@ -13,8 +13,10 @@
 import os
 
 import pyarrow as pa
+from data_processing.test_support.launch.transform_test import (
+    AbstractTransformLauncherTest,
+)
 
-from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
 
 table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})
 expected_table = table  # We're a noop after all.
@@ -33,7 +35,7 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
         # launcher = PythonTransformLauncher(NOOPTransformConfiguration())
         # fixtures = [(launcher, {"noop_sleep_sec": 0}, basedir + "/input", basedir + "/expected")]
         # return fixtures
-        return []   # This is passing in pycharm but failing at the command line due to DataAccessS3 getting involved.
+        return []  # This is passing in pycharm but failing at the command line due to DataAccessS3 getting involved.
+
 
 #
-
