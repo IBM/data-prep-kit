@@ -13,18 +13,15 @@
 import os
 import sys
 
-from data_processing.pure_python import PythonTransformLauncher
+from data_processing.launch.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 from proglang_select_transform import (
-    ProgLangSelectRayLauncherConfiguration,
     lang_allowed_langs_file_key,
     lang_lang_column_key,
-    lang_output_column_key,
+    lang_output_column_key, ProgLangSelectTransformConfiguration, ProgLangSelectRuntime,
 )
 
 
-# create launcher
-launcher = PythonTransformLauncher(transform_runtime_config=ProgLangSelectRayLauncherConfiguration())
 # create parameters
 language_column_name = "language"
 annotated_column_name = "lang_selected"
@@ -57,5 +54,7 @@ params = {
 
 if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=params)
+    # create launcher
+    launcher = PythonTransformLauncher(ProgLangSelectTransformConfiguration())
     # launch
     launcher.launch()

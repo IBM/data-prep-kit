@@ -16,13 +16,13 @@ from typing import Any
 import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.ray import (
+from data_processing.transform import TransformConfiguration
+from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
     RayUtils,
-    RayLauncherConfiguration,
     RayTransformLauncher,
 )
-from data_processing.transform import AbstractTableTransform, LauncherConfiguration
+from data_processing.transform import AbstractTableTransform
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -218,17 +218,18 @@ class EdedupRuntime(DefaultTableTransformRuntimeRay):
         return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
 
 
-class EdedupTableLauncherConfiguration(LauncherConfiguration):
+class EdedupTableTransformConfiguration(TransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
-
     def __init__(self):
-        super().__init__()
+        super().__init__(
+            name=short_name,
+            transform_class=EdedupTransform,
+        )
 
-    @staticmethod
-    def add_input_params(parser: ArgumentParser) -> None:
+    def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         """
@@ -250,23 +251,10 @@ class EdedupTableLauncherConfiguration(LauncherConfiguration):
         logger.info(f"exact dedup params are {self.params}")
         return True
 
-
-class EdedupRayLauncherConfiguration(RayLauncherConfiguration):
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
-
+class EdedupRayLauncher(RayTransformLauncher):
     def __init__(self):
-        super().__init__(
-            name=short_name,
-            runtime_class=EdedupRuntime,
-            transform_class=EdedupTransform,
-            launcher_configuration=EdedupTableLauncherConfiguration(),
-        )
-
+        super().__init__(transform_config=EdedupTableTransformConfiguration(), runtime_class=EdedupRuntime)
 
 if __name__ == "__main__":
-
-    launcher = RayTransformLauncher(transform_runtime_config=EdedupRayLauncherConfiguration())
+    launcher = EdedupRayLauncher()
     launcher.launch()

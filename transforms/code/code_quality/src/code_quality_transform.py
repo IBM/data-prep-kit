@@ -24,12 +24,9 @@ from argparse import ArgumentParser, Namespace
 import numpy as np
 import pyarrow as pa
 from bs4 import BeautifulSoup
-from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
-from data_processing.ray import RayLauncherConfiguration
-from data_processing.transform import (
-    AbstractTableTransform,
-    LauncherConfiguration,
-)
+from data_processing.transform import TransformConfiguration
+from data_processing.launch.ray import RayTransformLauncher
+from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils
 from transformers import AutoTokenizer
 
@@ -286,12 +283,14 @@ class CodeQualityTransform(AbstractTableTransform):
         return [annotated_table], {}
 
 
-class CodeQualityLauncherConfiguration(LauncherConfiguration):
+class CodeQualityTransformConfiguration(TransformConfiguration):
     def __init__(self):
-        super().__init__()
+        super().__init__(
+            name="code_quality",
+            transform_class=CodeQualityTransform
+        )
 
-    @staticmethod
-    def add_input_params(parser: ArgumentParser) -> None:
+    def add_input_params(self, parser: ArgumentParser) -> None:
         parser.add_argument(
             "--cq_contents_column_name",
             required=False,
@@ -340,25 +339,28 @@ class CodeQualityLauncherConfiguration(LauncherConfiguration):
         return True
 
 
-class CodeQualityRayLauncherConfiguration(RayLauncherConfiguration):
+# class CodeQualityRayLauncherConfiguration(RayLauncherConfiguration):
+#     def __init__(self):
+#         super().__init__(
+#             name="code_quality",
+#             transform_class=CodeQualityTransform,
+#             launcher_configuration=CodeQualityTransformConfiguration(),
+#         )
+#
+#
+# class CodeQualityPythonLauncherConfiguration(PythonLauncherConfiguration):
+#     def __init__(self):
+#         super().__init__(
+#             name="code_quality",
+#             transform_class=CodeQualityTransform,
+#             launcher_configuration=CodeQualityTransformConfiguration(),
+#         )
+#         self.base = CodeQualityTransformConfiguration()
+
+class CodeQualityRayLauncher(RayTransformLauncher):
     def __init__(self):
-        super().__init__(
-            name="code_quality",
-            transform_class=CodeQualityTransform,
-            launcher_configuration=CodeQualityLauncherConfiguration(),
-        )
-
-
-class CodeQualityPythonLauncherConfiguration(PythonLauncherConfiguration):
-    def __init__(self):
-        super().__init__(
-            name="code_quality",
-            transform_class=CodeQualityTransform,
-            launcher_configuration=CodeQualityLauncherConfiguration(),
-        )
-        self.base = CodeQualityLauncherConfiguration()
-
+        super().__init__(transform_config=CodeQualityTransformConfiguration())
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(transform_runtime_config=CodeQualityPythonLauncherConfiguration())
+    launcher = CodeQualityRayLauncher()
     launcher.launch()

@@ -14,7 +14,8 @@ import sys
 import tempfile
 from typing import Any
 
-from data_processing.ray import RayLauncherConfiguration, RayTransformLauncher
+from data_processing.launch.ray import RayTransformLauncher
+from data_processing.launch.transform_launcher import AbstractTransformLauncher
 from data_processing.test_support.abstract_test import AbstractTest
 from data_processing.utils import ParamsUtils
 
@@ -29,17 +30,18 @@ class AbstractTransformLauncherTest(AbstractTest):
     """
 
     @staticmethod
-    def _get_argv(cli_params: dict[str, Any], in_table_path: str, out_table_path: str):
+    def _get_argv(launcher:AbstractTransformLauncher, cli_params: dict[str, Any], in_table_path: str, out_table_path: str):
         args = {} | cli_params
         local_ast = {"input_folder": in_table_path, "output_folder": out_table_path}
         args["data_local_config"] = local_ast
-        args["run_locally"] = "True"
+        if isinstance(launcher,RayTransformLauncher):
+            args["run_locally"] = "True"
         argv = ParamsUtils.dict_to_req(args)
         return argv
 
     def test_transform(
         self,
-        transform_config: RayLauncherConfiguration,
+        launcher: AbstractTransformLauncher,
         cli_params: dict[str, Any],
         in_table_path: str,
         expected_out_table_path: str,
@@ -47,25 +49,23 @@ class AbstractTransformLauncherTest(AbstractTest):
         """
         Test the given transform and its runtime using the given CLI arguments, input directory of data files and expected output directory.
         Data is processed into a temporary output directory which is then compared with the directory of expected output.
-        :param transform_config:
+        :param launcher: launcher configured to run the transform being tested
         :param cli_params: a map of the simulated CLI arguments (w/o --).  This includes both the transform-specific CLI parameters and  the Ray launching args.
         :param in_table_path: a directory containing the input parquet files to be processed and results compared against the expected output table path.
         :param expected_out_table_path: directory contain parquet and metadata.json that is expected to match the processed input directory.
         :return:
         """
-
-        launcher = RayTransformLauncher(transform_config)
-        prefix = transform_config.get_name()
+        prefix = launcher.get_transform_name()
         with tempfile.TemporaryDirectory(prefix=prefix, dir="/tmp") as temp_dir:
             print(f"Using temporary output path {temp_dir}")
-            sys.argv = self._get_argv(cli_params, in_table_path, temp_dir)
+            sys.argv = self._get_argv(launcher, cli_params, in_table_path, temp_dir)
             launcher.launch()
             AbstractTest.validate_directory_contents(temp_dir, expected_out_table_path)
 
     def _install_test_fixtures(self, metafunc):
         # Apply the fixtures for the method with these input names (i.e. test_transform()).
         if (
-            "transform_config" in metafunc.fixturenames
+            "launcher" in metafunc.fixturenames
             and "cli_params" in metafunc.fixturenames
             and "in_table_path" in metafunc.fixturenames
             and "expected_out_table_path" in metafunc.fixturenames
@@ -73,7 +73,7 @@ class AbstractTransformLauncherTest(AbstractTest):
             # Let the sub-class define the specific tests and test data for the transform under test.
             f = self.get_test_transform_fixtures()
             # Install the fixture, matching the parameter names used by test_transform() method.
-            metafunc.parametrize("transform_config,cli_params,in_table_path,expected_out_table_path", f)
+            metafunc.parametrize("launcher,cli_params,in_table_path,expected_out_table_path", f)
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         """

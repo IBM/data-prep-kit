@@ -12,13 +12,11 @@
 
 import sys
 
-from data_processing.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from ededup_transform import EdedupRayLauncherConfiguration
-
+from ededup_transform import EdedupRayLauncher
 
 # create launcher
-launcher = RayTransformLauncher(transform_runtime_config=EdedupRayLauncherConfiguration())
+launcher = EdedupRayLauncher()
 # create parameters
 s3_cred = {
     "access_key": "localminioaccesskey",

@@ -15,12 +15,12 @@ import traceback
 from datetime import datetime
 
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.pure_python import TransformTableProcessor
+from data_processing.launch import TransformExecutionConfiguration
+from data_processing.launch.pure_python import TransformTableProcessor
 from data_processing.transform import (
-    TransformExecutionConfiguration,
     TransformStatistics,
 )
-from data_processing.pure_python import PythonLauncherConfiguration
+from data_processing.launch.pure_python import PythonLauncherConfiguration
 from data_processing.utils import get_logger
 
 

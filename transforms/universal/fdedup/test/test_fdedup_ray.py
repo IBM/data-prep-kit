@@ -12,8 +12,9 @@
 
 import os
 
-from data_processing.test_support.ray import AbstractTransformLauncherTest
-from fdedup_transform import FdedupRayLauncherConfiguration
+
+from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
+from fdedup_transform import FdedupRayLauncher
 
 
 class TestRayBlocklistTransform(AbstractTransformLauncherTest):
@@ -51,5 +52,6 @@ class TestRayBlocklistTransform(AbstractTransformLauncherTest):
             "fdedup_use_doc_snapshot": False,
             "fdedup_use_bucket_snapshot": False,
         }
-        fixtures = [(FdedupRayLauncherConfiguration(), config, basedir + "/input", basedir + "/expected")]
+        launcher = FdedupRayLauncher()
+        fixtures = [(launcher, config, basedir + "/input", basedir + "/expected")]
         return fixtures

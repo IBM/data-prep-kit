@@ -15,16 +15,15 @@ from typing import Any
 
 import pyarrow as pa
 import ray
+from data_processing.transform import TransformConfiguration
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
-from data_processing.ray import (
+from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
+from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
-    RayLauncherConfiguration,
+    RayTransformLauncher,
 )
-from data_processing.transform import (
-    AbstractTableTransform,
-    LauncherConfiguration,
-)
+from data_processing.transform import AbstractTableTransform
+
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -145,7 +144,7 @@ class DocIDRuntime(DefaultTableTransformRuntimeRay):
         return {_id_generator_key: IDGenerator.remote()} | self.params
 
 
-class DocIDLauncherConfiguration(LauncherConfiguration):
+class DocIDTransformConfiguration(TransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -153,10 +152,12 @@ class DocIDLauncherConfiguration(LauncherConfiguration):
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__(
+            name=short_name,
+            transform_class=DocIDTransform,
+        )
 
-    @staticmethod
-    def add_input_params(parser: ArgumentParser) -> None:
+    def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         This will be included in a dictionary used to initialize the NOOPTransform.
@@ -195,30 +196,30 @@ class DocIDLauncherConfiguration(LauncherConfiguration):
         return True
 
 
-class DocIDRayLauncherConfiguration(RayLauncherConfiguration):
+# class DocIDRayLauncherConfiguration(RayLauncherConfiguration):
+#
+#     """
+#     Provides support for configuring and using the associated Transform class include
+#     configuration with CLI args and combining of metadata.
+#     """
+#
+#     def __init__(self):
+#         super().__init__(
+#             transform_config = DocIDTransformConfiguration(),
+#             runtime_class=DocIDRuntime,
+#         )
+#
 
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
-
+# class DocIDPythonLauncherConfiguration(PythonLauncherConfiguration):
+#     def __init__(self):
+#         super().__init__(
+#             name=short_name, transform_class=DocIDTransform, launcher_configuration=DocIDTransformConfiguration()
+#         )
+#
+class DocIDRayLauncher(RayTransformLauncher):
     def __init__(self):
-        super().__init__(
-            name="DocID",
-            runtime_class=DocIDRuntime,
-            transform_class=DocIDTransform,
-            launcher_configuration=DocIDLauncherConfiguration(),
-        )
-
-
-class DocIDPythonLauncherConfiguration(PythonLauncherConfiguration):
-    def __init__(self):
-        super().__init__(
-            name=short_name, transform_class=DocIDTransform, launcher_configuration=DocIDLauncherConfiguration()
-        )
-
+        super().__init__(transform_config=DocIDTransformConfiguration(), runtime_class=DocIDRuntime)
 
 if __name__ == "__main__":
-
-    launcher = PythonTransformLauncher(transform_runtime_config=DocIDPythonLauncherConfiguration())
+    launcher = DocIDRayLauncher()
     launcher.launch()

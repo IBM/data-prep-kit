@@ -20,14 +20,14 @@ import numpy as np
 import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.ray import (
+from data_processing.transform import TransformConfiguration
+from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
     RayUtils,
-    RayLauncherConfiguration,
     RayTransformLauncher,
     TransformTableProcessorRay,
 )
-from data_processing.transform import AbstractTableTransform, LauncherConfiguration
+from data_processing.transform import AbstractTableTransform
 from data_processing.utils import (
     RANDOM_SEED,
     CLIArgumentProvider,
@@ -717,17 +717,19 @@ class FdedupRuntime(DefaultTableTransformRuntimeRay):
         } | stats
 
 
-class FdedupTableLauncherConfiguration(LauncherConfiguration):
+class FdedupTableTransformConfiguration(TransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__(
+            name=short_name,
+            transform_class=FdedupFilter,
+        )
 
-    @staticmethod
-    def add_input_params(parser: ArgumentParser) -> None:
+    def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         """
@@ -792,23 +794,10 @@ class FdedupTableLauncherConfiguration(LauncherConfiguration):
         logger.info(f"fuzzy dedup params are {self.params}")
         return True
 
-
-class FdedupRayLauncherConfiguration(RayLauncherConfiguration):
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
-
+class FdedupRayLauncher(RayTransformLauncher):
     def __init__(self):
-        super().__init__(
-            name=short_name,
-            runtime_class=FdedupRuntime,
-            transform_class=FdedupFilter,
-            launcher_configuration=FdedupTableLauncherConfiguration(),
-        )
-
+        super().__init__(transform_config=FdedupTableTransformConfiguration(), runtime_class=FdedupRuntime)
 
 if __name__ == "__main__":
-
-    launcher = RayTransformLauncher(transform_runtime_config=FdedupRayLauncherConfiguration())
+    launcher = FdedupRayLauncher()
     launcher.launch()

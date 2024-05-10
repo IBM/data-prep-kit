@@ -15,13 +15,9 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.pure_python import PythonTransformLauncher
-from data_processing.ray import RayLauncherConfiguration
-from data_processing.transform import (
-    AbstractTableTransform,
-    LauncherConfiguration,
-)
-from data_processing.pure_python import PythonLauncherConfiguration
+
+from data_processing.launch.pure_python import PythonTransformLauncher
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -69,8 +65,7 @@ class NOOPTransform(AbstractTableTransform):
         metadata = {"nfiles": 1, "nrows": len(table)}
         return [table], metadata
 
-
-class NOOPLauncherConfiguration(LauncherConfiguration):
+class NOOPTransformConfiguration(TransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -78,10 +73,13 @@ class NOOPLauncherConfiguration(LauncherConfiguration):
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__(
+            name=short_name,
+            transform_class=NOOPTransform,
+            remove_from_metadata=[pwd_key],
+        )
 
-    @staticmethod
-    def add_input_params(parser: ArgumentParser) -> None:
+    def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         This will be included in a dictionary used to initialize the NOOPTransform.
@@ -120,27 +118,30 @@ class NOOPLauncherConfiguration(LauncherConfiguration):
         return True
 
 
-class NOOPTransformConfigurationRayLauncherConfiguration(RayLauncherConfiguration):
-    def __init__(self):
-        super().__init__(
-            name=short_name,
-            transform_class=NOOPTransform,
-            launcher_configuration=NOOPLauncherConfiguration(),
-            remove_from_metadata=[pwd_key],
-        )
 
-
-class NOOPPythonLauncherConfigurationPython(PythonLauncherConfiguration):
-    def __init__(self):
-        super().__init__(
-            name=short_name,
-            transform_class=NOOPTransform,
-            launcher_configuration=NOOPLauncherConfiguration(),
-            remove_from_metadata=[pwd_key],
-        )
-
+#
+# class NOOPTransformConfigurationRayLauncherConfiguration(RayLauncherConfiguration):
+#     def __init__(self):
+#         super().__init__(
+#             name=short_name,
+#             transform_class=NOOPTransform,
+#             launcher_configuration=NOOPTransformConfiguration(),
+#             remove_from_metadata=[pwd_key],
+#         )
+#
+#
+# class NOOPPythonLauncherConfigurationPython(PythonLauncherConfiguration):
+#     def __init__(self):
+#         super().__init__(
+#             name=short_name,
+#             transform_class=NOOPTransform,
+#             launcher_configuration=NOOPTransformConfiguration(),
+#             remove_from_metadata=[pwd_key],
+#         )
+#
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(transform_runtime_config=NOOPPythonLauncherConfigurationPython())
+    #launcher = PythonTransformLauncher(transform_runtime_config=NOOPPythonLauncherConfigurationPython())
+    launcher = PythonTransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
     logger.info("Launching noop transform")
     launcher.launch()

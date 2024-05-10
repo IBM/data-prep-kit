@@ -14,7 +14,7 @@ import argparse
 import ast
 from typing import Any
 
-from data_processing.transform import TransformExecutionConfiguration
+from data_processing.launch import TransformExecutionConfiguration
 from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger
 
 
