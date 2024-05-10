@@ -21,3 +21,9 @@ build::
 test::
 
 upload::
+
+.PHONY: reconcile-requirements
+reconcile-requirements:
+	@for file in $(PYTHON_WF); do \
+		$(MAKE) .transforms_workflows.reconcile-requirement PIPELINE_FILE=$$file; \
+	done

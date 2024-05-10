@@ -29,3 +29,7 @@ test::
 upload::
 	@# Help: Recursively make $@ in all subdirs
 	@$(MAKE) RULE=$@ .recurse
+
+reconcile-requirements::
+	@# Help: Recursively make $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
