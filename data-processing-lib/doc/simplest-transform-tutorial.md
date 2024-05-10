@@ -98,28 +98,34 @@ If there is no metadata then simply return an empty dictionary.
 
 ## NOOPTransformConfiguration
 
-Next we define the `NOOPTransformConfiguration` class and its initializer that define the following:
+Next we define the `NOOPTransformConfiguration` and 
+classes and there initializer that define the following:
 
 * The short name for the transform
 * The class implementing the transform - in our case NOOPTransform
 * Command line argument support.
-* The transform runtime class be used.  We will use the `DefaultTableTransformRuntime`
-  which is sufficient for most 1:1 table transforms.  Extensions to this class can be
-  used when more complex interactions among transform is required.*
+ 
+We also define the `NOOPRayTransformationConfiguration` so we can run the transform
+in the Ray runtime as well.  This adds allows the option to add a transform-specific
+Ray runtime class allowing more complex distributed memory and data sharing operations.
+The NOOP transform will not make use of this so is a simple extension.:
 
-First we define the class and its initializer,
+First we define the pure python transform configuration  class and its initializer,
 
 ```python
-short_name = "NOOP"
+short_name = "noop"
 cli_prefix = f"{short_name}_"
+pwd_key = "pwd"
 
-class NOOPTransformConfiguration(DefaultTableTransformConfiguration):
-    
+class NOOPTransformConfiguration(TransformConfiguration):
     def __init__(self):
-        super().__init__(name=short_name, transform_class=NOOPTransform)
-        self.params = {}
+        super().__init__(
+            name=short_name,
+            transform_class=NOOPTransform,
+            remove_from_metadata=[pwd_key],
+        )
 ```
-The initializer extends the DefaultTableTransformConfiguration which provides simple
+The initializer extends the TransformConfiguration which provides simple
 capture of our configuration data and enables picklability through the network.
 It also adds a `params` field that will be used below to hold the transform's
 configuration data (used in `NOOPTransform.init()` above).
@@ -136,63 +142,70 @@ In our case we will use `noop_`.
 ```python
     def add_input_params(self, parser: ArgumentParser) -> None:
         parser.add_argument(
-            f"--{cli_prefix}noop_sleep_sec",
+            f"--{sleep_cli_param}",
             type=int,
             default=1,
-            help="Sleep actor for a number of seconds while processing the data frame",
+            help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
         )
-        # An example of a command line option that we don't want included in the metadata collected by the Ray orchestrator
-        # See below for remove_from_metadata addition so that it is not reported.
         parser.add_argument(
-            f"--{cli_prefix}noop_pwd",
+            f"--{pwd_cli_param}",
             type=str,
             default="nothing",
             help="A dummy password which should be filtered out of the metadata",
         )
+
+
+
 ```
-Next we implement a method that is called after the framework has parsed the CLI args
-and which allows us to capture the `NOOPTransform`-specific arguments, optionally validate them
-and flag that the `pwd` parameter should not be reported in the metadata.
+Next we implement a method that is called after the CLI args are parsed (usually by one
+of the runtimes) and which allows us to capture the `NOOPTransform`-specific arguments. 
 
 ```python
+
     def apply_input_params(self, args: Namespace) -> bool:
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         if captured.get(sleep_key) < 0:
-          print(f"Parameter noop_sleep_sec should be non-negative. you specified {args.noop_sleep_sec}")
-          return False
-      
-        self.params = self.params | captured
-        logger.info(f"noop parameters are : {self.params}")
-        # Don't publish this in the metadata produced by the ray orchestrator.
-        self.remove_from_metadata.append(pwd_key)
+            print(f"Parameter noop_sleep_sec should be non-negative. you specified {args.noop_sleep_sec}")
+            return False
+        self.params = captured
         return True
 ```
+## Runtime Launching
+To run the transform on a set of input data, we use one of the runtimes, each described below.
 
-## main()
-
-Next, we show how to launch the framework with the `NOOPTransform` using the
-framework's `TransformLauncher` class.
-
+### Python Runtime
+To run in the python runtime, we need to create the instance of `PythonTransformLauncher`
+using the `NOOPTransformConfiguration`, and launch it as follows:
 ```python
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
+    launcher = PythonTransformLauncher(transform_config=NOOPTransformConfiguration())
     launcher.launch()
 ```
-The launcher requires only an instance of DefaultTableTransformConfiguration
-(our `NOOPTransformConfiguration` class).
-A single method `launch()` is then invoked to run the transform in a Ray cluster.
 
-## Running
-
-Assuming the above `main()` is placed in `noop_main.py` we can run the transform on data
-in COS as follows:
-
+To run this on some test data, we'll use data in the repo for the noop transform
+and create a temporary directory to hold the output:
+```shell
+export DPK_REPOROOT=...
+export NOOP_INPUT=$DPK_REPOROOT/transforms/universal/noop/test-data/input
+```
+To run
 ```shell
 python noop_main.py --noop_sleep_msec 2 \
-  --run_locally True  \
-  --s3_cred "{'access_key': 'KEY', 'secret_key': 'SECRET', 'cos_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}" \
-  --s3_config "{'input_folder': 'cos-optimal-llm-pile/test/david/input/', 'output_folder': 'cos-optimal-llm-pile/test/david/output/'}"
+--data_local_config "{'input_folder': '"$NOOP_INPUT"', 'output_folder': '/tmp/noop-output'}"
 ```
-This is a minimal set of options to run locally.
-See the [launcher options](launcher-options.md) for a complete list of
+See the [python launcher options](python-launcher-options) for a complete list of
+transform-independent command line options.
+
+### Ray Runtime
+To run in the Ray runtime, instead of creating the `PythonTransformLauncher`
+we use the `RayTransformLauncher`.
+as follows:
+```python
+if __name__ == "__main__":
+    launcher = RayTransformLauncher(transform_config=NOOPRayTransformConfiguration())
+    launcher.launch()
+```
+We can run this with the same command as for the python runtime but to run in local Ray
+add the `--run_locally True` option.
+See the [ray launcher options](ray-launcher-options) for a complete list of
 transform-independent command line options.

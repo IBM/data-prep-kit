@@ -118,7 +118,7 @@ Above you see both parameters and their values for small runs (tens of files). W
 ### Launched Command Line Options
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to
-[the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
+[the options provided by the launcher](../../../data-processing-lib/doc/ray-launcher-options).
 
 ```shell
   --fdedup_doc_column FDEDUP_DOC_COLUMN
