@@ -9,11 +9,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-from typing import Any
 from argparse import ArgumentParser, Namespace
+from typing import Any
 
-from data_processing.transform import TransformConfiguration
-from data_processing.transform import AbstractTableTransform
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider
 
 
@@ -28,7 +27,8 @@ class PythonLauncherConfiguration(CLIArgumentProvider):
     """
 
     def __init__(
-            self, transform_configuration: TransformConfiguration,
+        self,
+        transform_configuration: TransformConfiguration,
     ):
         """
         Initialization

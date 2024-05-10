@@ -20,8 +20,10 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.launch.ray import RayTransformLauncher
-from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
+from data_processing.runtime.ray import RayTransformLauncher
+from data_processing.runtime.ray.transform_configuration import (
+    RayTransformConfiguration,
+)
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import get_logger
 from tokenization_utils import is_valid_argument_string, load_tokenizer, split_text

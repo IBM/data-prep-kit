@@ -13,9 +13,11 @@
 import os
 import sys
 
-from data_processing.transform import TransformConfiguration
-from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
-from data_processing.transform import AbstractTableTransform
+from data_processing.runtime.pure_python import (
+    PythonLauncherConfiguration,
+    PythonTransformLauncher,
+)
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import ParamsUtils
 
 
@@ -39,9 +41,11 @@ local_conf = {
 
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 
+
 class TestingTransformConfiguration(TransformConfiguration):
     def __init__(self):
-        super().__init__("test", transform_class = AbstractTableTransform)
+        super().__init__("test", transform_class=AbstractTableTransform)
+
 
 class TestLauncherPython(PythonTransformLauncher):
     """

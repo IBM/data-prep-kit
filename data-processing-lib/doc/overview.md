@@ -12,10 +12,10 @@ developers of data transformation are:
 
 * [Transformation](../src/data_processing/transform/table_transform.py) - a simple, easily-implemented interface defines
 the specifics of a given data transformation.
-* [Transform Configuration](../src/data_processing/launch/ray/transform_runtime.py) - defines
+* [Transform Configuration](../src/data_processing/runtime/ray/transform_runtime.py) - defines
 the transform implementation and runtime classes, the 
 command line arguments specific to transform, and the short name for the transform.
-* [Transformation Runtime](../src/data_processing/launch/ray/transform_runtime.py) - allows for customization of the Ray environment for the transformer.
+* [Transformation Runtime](../src/data_processing/runtime/ray/transform_runtime.py) - allows for customization of the Ray environment for the transformer.
 This might include provisioning of shared memory objects or creation of additional actors.
 
 To learn more consider the following:

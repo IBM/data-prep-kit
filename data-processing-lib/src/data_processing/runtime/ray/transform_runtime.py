@@ -51,6 +51,3 @@ class DefaultTableTransformRuntimeRay:
         :return: job execution statistics.  These are generally reported as metadata by the Ray Orchestrator.
         """
         return stats
-
-
-
