@@ -11,7 +11,9 @@
 ################################################################################
 from typing import Any
 from argparse import ArgumentParser, Namespace
-from data_processing.transform import AbstractTableTransform, LauncherConfiguration
+
+from data_processing.transform import TransformConfiguration
+from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider
 
 
@@ -26,11 +28,7 @@ class PythonLauncherConfiguration(CLIArgumentProvider):
     """
 
     def __init__(
-            self,
-            name: str,
-            transform_class: type[AbstractTableTransform],
-            launcher_configuration: LauncherConfiguration,
-            remove_from_metadata: list[str] = [],
+            self, transform_configuration: TransformConfiguration,
     ):
         """
         Initialization
@@ -38,12 +36,12 @@ class PythonLauncherConfiguration(CLIArgumentProvider):
         :param transform_class: implementation of the Filter
         :return:
         """
-        self.name = name
-        self.transform_class = transform_class
+        self.name = transform_configuration.name
+        self.transform_class = transform_configuration.transform_class
         # These are expected to be updated later by the sub-class in apply_input_params().
         self.params = {}
-        self.remove_from_metadata = remove_from_metadata
-        self.base = launcher_configuration
+        self.remove_from_metadata = transform_configuration.remove_from_metadata
+        self.transform_configuration = transform_configuration
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -51,7 +49,7 @@ class PythonLauncherConfiguration(CLIArgumentProvider):
         :param parser: parser
         :return: None
         """
-        return self.base.add_input_params(parser=parser)
+        return self.transform_configuration.add_input_params(parser=parser)
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -59,9 +57,9 @@ class PythonLauncherConfiguration(CLIArgumentProvider):
         :param args: arguments
         :return: True, if parameters are valid, False otherwise
         """
-        is_valid = self.base.apply_input_params(args=args)
+        is_valid = self.transform_configuration.apply_input_params(args=args)
         if is_valid:
-            self.params = self.base.params
+            self.params = self.transform_configuration.params
         return is_valid
 
     def get_transform_class(self) -> type[AbstractTableTransform]:

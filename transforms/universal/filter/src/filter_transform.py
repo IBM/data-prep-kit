@@ -16,12 +16,13 @@ import json
 
 import duckdb
 import pyarrow as pa
-from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
-from data_processing.ray import RayLauncherConfiguration
-from data_processing.transform import (
-    AbstractTableTransform,
-    LauncherConfiguration,
+from data_processing.launch.pure_python import (
+    PythonLauncherConfiguration,
+    PythonTransformLauncher,
 )
+from data_processing.launch.ray import RayTransformLauncher
+from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -136,17 +137,19 @@ class FilterTransform(AbstractTableTransform):
         return [filtered_table_cols_dropped], metadata
 
 
-class FilterLauncherConfiguration(LauncherConfiguration):
+class FilterTransformConfiguration(TransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__(
+            name=short_name,
+            transform_class=FilterTransform,
+        )
 
-    @staticmethod
-    def add_input_params(parser: argparse.ArgumentParser) -> None:
+    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given parser.
         This will be included in a dictionary used to initialize the FilterTransform.
@@ -198,31 +201,12 @@ class FilterLauncherConfiguration(LauncherConfiguration):
         return True
 
 
-class FilterRayLauncherConfiguration(RayLauncherConfiguration):
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
-
+class FilterRayTransformConfiguration(RayTransformConfiguration):
     def __init__(self):
-        super().__init__(
-            name=short_name, transform_class=FilterTransform, launcher_configuration=FilterLauncherConfiguration()
-        )
-
-
-class FilterPythonLauncherConfiguration(PythonLauncherConfiguration):
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
-
-    def __init__(self):
-        super().__init__(
-            name=short_name, transform_class=FilterTransform, launcher_configuration=FilterLauncherConfiguration()
-        )
+        super().__init__(transform_config=FilterTransformConfiguration())
 
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(transform_runtime_config=FilterPythonLauncherConfiguration())
+    launcher = RayTransformLauncher(FilterRayTransformConfiguration())
     logger.info("Launching filtering")
     launcher.launch()

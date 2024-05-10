@@ -12,8 +12,8 @@
 
 import sys
 
-from code_quality_transform import CodeQualityRayLauncherConfiguration
-from data_processing.ray import RayTransformLauncher
+from code_quality_transform import CodeQualityRayTransformConfiguration
+from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
 
 
@@ -28,7 +28,7 @@ s3_conf = {
 }
 
 # create launcher
-launcher = RayTransformLauncher(transform_runtime_config=CodeQualityRayLauncherConfiguration())
+launcher = RayTransformLauncher(CodeQualityRayTransformConfiguration())
 
 
 worker_options = {"num_cpus": 0.8}

@@ -16,25 +16,30 @@ import time
 
 import ray
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
-from data_processing.ray import (
+from data_processing.launch.ray import (
+    DefaultTableTransformRuntimeRay,
     RayLauncherConfiguration,
     TransformOrchestratorConfiguration,
     orchestrate,
 )
+from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
+from data_processing.launch.transform_launcher import AbstractTransformLauncher
+from data_processing.transform import TransformConfiguration
 from data_processing.utils import get_logger, str2bool
 
 
 logger = get_logger(__name__)
 
 
-class RayTransformLauncher:
+class RayTransformLauncher(AbstractTransformLauncher):
     """
     Driver class starting Filter execution
     """
 
     def __init__(
         self,
-        transform_runtime_config: RayLauncherConfiguration,
+        transform_config: RayTransformConfiguration,
+        # runtime_class: type[DefaultTableTransformRuntimeRay]=DefaultTableTransformRuntimeRay,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """
@@ -42,9 +47,8 @@ class RayTransformLauncher:
         :param transform_runtime_config: transform runtime factory
         :param data_access_factory: the factory to create DataAccess instances.
         """
-        self.name = transform_runtime_config.get_name()
-        self.transform_runtime_config = transform_runtime_config
-        self.data_access_factory = data_access_factory
+        super().__init__(transform_config, data_access_factory)
+        self.transform_runtime_config = RayLauncherConfiguration(transform_config, transform_config.runtime_class)
         self.ray_orchestrator = TransformOrchestratorConfiguration(name=self.name)
 
     def __get_parameters(self) -> bool:

@@ -20,12 +20,9 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
-from data_processing.ray import RayLauncherConfiguration
-from data_processing.transform import (
-    AbstractTableTransform,
-    LauncherConfiguration,
-)
+from data_processing.launch.ray import RayTransformLauncher
+from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import get_logger
 from tokenization_utils import is_valid_argument_string, load_tokenizer, split_text
 
@@ -155,17 +152,19 @@ class TokenizationTransform(AbstractTableTransform):
         return [out_table], metadata
 
 
-class TokenizationLauncherConfiguration(LauncherConfiguration):
+class TokenizationTransformConfiguration(TransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__(
+            name="Tokenization",
+            transform_class=TokenizationTransform,
+        )
 
-    @staticmethod
-    def add_input_params(parser: ArgumentParser) -> None:
+    def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         This will be included in a dictionary used to initialize the TokenizationTransform.
@@ -259,35 +258,39 @@ class TokenizationLauncherConfiguration(LauncherConfiguration):
         return True
 
 
-class TokenizationRayLauncherConfiguration(RayLauncherConfiguration):
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
-
+# class TokenizationRayLauncherConfiguration(RayLauncherConfiguration):
+#     """
+#     Provides support for configuring and using the associated Transform class include
+#     configuration with CLI args and combining of metadata.
+#     """
+#
+#     def __init__(self):
+#         super().__init__(
+#             name="Tokenization",
+#             transform_class=TokenizationTransform,
+#             launcher_configuration=TokenizationTransformConfiguration(),
+#         )
+#
+#
+# class TokenizationPythonLauncherConfiguration(PythonLauncherConfiguration):
+#     """
+#     Provides support for configuring and using the associated Transform class include
+#     configuration with CLI args and combining of metadata.
+#     """
+#
+#     def __init__(self):
+#         super().__init__(
+#             name="Tokenization",
+#             transform_class=TokenizationTransform,
+#             launcher_configuration=TokenizationTransformConfiguration(),
+#         )
+#
+class TokenizationRayConfiguration(RayTransformConfiguration):
     def __init__(self):
-        super().__init__(
-            name="Tokenization",
-            transform_class=TokenizationTransform,
-            launcher_configuration=TokenizationLauncherConfiguration(),
-        )
-
-
-class TokenizationPythonLauncherConfiguration(PythonLauncherConfiguration):
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
-
-    def __init__(self):
-        super().__init__(
-            name="Tokenization",
-            transform_class=TokenizationTransform,
-            launcher_configuration=TokenizationLauncherConfiguration(),
-        )
+        super().__init__(transform_config=TokenizationTransformConfiguration())
 
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(transform_runtime_config=TokenizationPythonLauncherConfiguration())
+    launcher = RayTransformLauncher(TokenizationRayConfiguration())
     logger.info("Launching Tokenization transform")
     launcher.launch()

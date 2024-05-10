@@ -26,7 +26,7 @@
 #######################################################################################
 SHELL=/bin/bash
 # Command to run python 
-PYTHON=python
+PYTHON?=python
 PIP=$(PYTHON) -m pip
 # Command to run pytest
 PYTEST=pytest -s
@@ -254,7 +254,7 @@ __check_defined = \
 
 .PHONY: .defaults.check.installed
 .defaults.check.installed::
-	if [ ! command -v $(CHECK_RUNNABLE) &>/dev/null ]; then \
+	@if [ ! command -v $(CHECK_RUNNABLE) &>/dev/null ]; then \
 	    echo $(CHECK_RUNNABLE) must be installed;		\
 	    exit 1;						\
 	fi

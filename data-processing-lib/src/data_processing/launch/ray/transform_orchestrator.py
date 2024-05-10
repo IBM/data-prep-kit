@@ -16,7 +16,7 @@ from datetime import datetime
 
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.ray import (
+from data_processing.launch.ray import (
     RayUtils,
     RayLauncherConfiguration,
     TransformOrchestratorConfiguration,

@@ -12,31 +12,31 @@
 
 import os
 
+import pyarrow as pa
 from data_processing.launch.ray import RayTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from tokenization_transform import TokenizationRayConfiguration
+from data_processing.test_support.transform import NOOPTransformConfiguration
+from data_processing.test_support.transform.noop_transform import (
+    NOOPRayTransformConfiguration,
+)
 
 
-tkn_params = {
-    "tkn_tokenizer": "hf-internal-testing/llama-tokenizer",
-    "tkn_doc_id_column": "document_id",
-    "tkn_doc_content_column": "contents",
-    "tkn_text_lang": "en",
-    "tkn_chunk_size": 0,
-}
+table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})
+expected_table = table  # We're a noop after all.
+expected_metadata_list = [{"nfiles": 1, "nrows": 1}, {}]  # transform() result  # flush() result
 
 
-class TestRayTokenizationTransform(AbstractTransformLauncherTest):
+class TestRayNOOPTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        basedir = "../test-data"
+        basedir = "../../../../test-data/data_processing/ray/noop/"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
-        launcher = RayTransformLauncher(TokenizationRayConfiguration())
-        fixtures = [(launcher, tkn_params, basedir + "/ds01/input", basedir + "/ds01/expected")]
+        launcher = RayTransformLauncher(NOOPRayTransformConfiguration())
+        fixtures = [(launcher, {"noop_sleep_sec": 0}, basedir + "/input", basedir + "/expected")]
         return fixtures

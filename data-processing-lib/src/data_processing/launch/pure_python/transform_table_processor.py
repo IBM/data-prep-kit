@@ -18,7 +18,7 @@ import pyarrow as pa
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import TransformStatistics
 from data_processing.utils import TransformUtils, get_logger
-from data_processing.pure_python import PythonLauncherConfiguration
+from data_processing.launch.pure_python import PythonLauncherConfiguration
 
 logger = get_logger(__name__)
 
