@@ -11,8 +11,7 @@ class extends transform's base TransformConfiguration implementation to add an o
 * [TransformRuntime](../src/data_processing/runtime/ray/transform_runtime.py) - 
 this provides the ability for the transform implementor to create additional Ray resources 
 and include them in the configuration used to create a transform
-(see, for example, [exact dedup](../../transforms/universal/ededup/src/ededup_transform.py) 
-or [blocklist](../../transforms/universal/blocklisting/src/blocklist_transform.py)).
+(see, for example, [exact dedup](../../transforms/universal/ededup/src/ededup_transform.py)).
 This also provide the ability to supplement the statics collected by
 [Statistics](../src/data_processing/runtime/ray/transform_statistics.py) (see below).
 
@@ -31,13 +30,13 @@ is used for building execution metadata.
 
 ![Processing Architecture](processing-architecture.jpg)
 
-## Transform Launcher
-The [TransformLauncher](../src/data_processing/runtime/ray/transform_launcher.py) uses the Transform Configuration
+## Ray Transform Launcher
+The [RayTransformLauncher](../src/data_processing/runtime/ray/transform_launcher.py) uses the Transform Configuration
 and provides a single method, `launch()`, that kicks off the Ray environment and transform execution coordinated 
 by [orchestrator](../src/data_processing/runtime/ray/transform_orchestrator.py).
 For example,
 ```python
-launcher = TransformLauncher(MyTransformConfiguration())
+launcher = RayTransformLauncher(YourTransformConfiguration())
 launcher.launch()
 ```
 Note that the launcher defines some additional CLI parameters that are used to control the operation of the 
@@ -47,30 +46,40 @@ number of workers, worker resources, etc.
 Discussion of these options is beyond the scope of this document 
 (see [Launcher Options](ray-launcher-options) for a list of available options.)
 
-## Transform Configuration
-The 
-[DefaultTableTransformConfiguration](../src/data_processing/runtime/ray/transform_runtime.py)
-class is sub-classed and initialized with transform-specific name, and implementation 
-and runtime classes. In addition, it is responsible for providing transform-specific
-methods to define and filter optional command line arguments.
-Finally, it creates the Transform Runtime, for which a default
-implementation uses the class available in the Transform Configuration.
+## Ray Transform Configuration
+In general, a transform should be able to run in both the python and Ray runtimes.
+As such we first define the python-only transform configuration, which will then
+be used by the Ray-runtime-specific transform configuration. 
+The python transform configuration implements  
+[TransformConfiguration](../src/data_processing/transform/transform_configuration.py)
+and deifnes with transform-specific name, and implementation 
+and class. In addition, it is responsible for providing transform-specific
+methods to define and capture optional command line arguments.
 ```python
 
-class MyTransformConfiguration(DefaultTableTransformConfiguration):
+class MyTransformConfiguration(TransformConfiguration):
 
     def __init__(self):
-        super().__init__(name="MyTransform", transform_class=MyTransform,
-                          runtime_class=MyTransformRuntime
+        super().__init__(name="MyTransform", transform_class=MyTransform)
         self.params = {}
+        
     def add_input_params(self, parser: ArgumentParser) -> None:
         ...
     def apply_input_params(self, args: Namespace) -> bool:
         ...
-    def create_transform_runtime(self) -> DefaultTableTransformRuntime:
-        ...
 ```
-Details are covered in the samples below.
+Next we define the Ray-runtime specific transform configuration as an exension of
+the RayTransformConfiguration and uses the `MyTransformConfiguration` above.
+```python
+    
+class MyTransformConfiguration(RayTransformConfiguration):
+    def __init__(self):
+        super().__init__(MyTransformConfiguration(),
+                         runtime_class=MyTransformRuntime
+```
+This class provides the ability to create the instance of `MyTransformRuntime` class
+as neede by the Ray runtime.
+Details are covered in the [advanced transform tutorial](advanced-transform-tutorial.md).
 
 ## Transform Runtime
 The 
@@ -131,26 +140,3 @@ the transform.
 In both cases, the framework will log the exception as an error.
 
 
-## Tutorial Examples
-With these basic concepts in mind, we start with a simple example and 
-progress to more complex transforms. 
-Before getting started  you may want to consult the 
-[transform project root readme](../../transforms/README.md) documentation.
-
-* [Simplest transform](simplest-transform-tutorial.md) - 
-Here we will take a simple example to show the basics of creating a simple transform
-that takes a single input Table, and produces a single Table.
-* [External resources transform](transform-external-resources.md) - shows how to load additional
-resources (models, configuration, etc) for a transform.
-* [Advanced transform](advanced-transform-tutorial.md)
-
-Once a transform has been built, testing can be enabled with the testing framework:
-
-* [Transform Testing](transform-standalone-testing) - shows how to test a transform
-independent of the Ray framework.
-* [End-to-End Testing](testing-e2e-transform.md) - shows how to test the
-transform running in the Ray environment.
-
-### Additional transform support
-
-We also started a library of [transform utilities](transformer-utilities.md)

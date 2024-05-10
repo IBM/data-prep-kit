@@ -35,7 +35,7 @@ when splitting tables by size or other criteria.
          transform might wish to track the number of instances of PII entities detected and might return 
          this as `{ "entities" : 1234 }`.
 * ```flush() -> tuple(list[pyarrow.Table], dict)``` - this is provided for transforms that
-make use of buffering (e.g. [coalesce](../../transforms/universal/coalesce/src/coalesce_transform.py)) across calls 
+make use of buffering (e.g. to resize the tables) across calls 
 to `transform()` and need to be flushed of all buffered data at the end of processing of input tables.  
 The return values are handled the same waa as the return values for `transform()`.  Since most transforms will likely
 not need this feature, a default implementation is provided to return an empty list and empty dictionary.
