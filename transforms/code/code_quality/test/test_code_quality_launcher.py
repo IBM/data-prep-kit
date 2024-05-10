@@ -12,8 +12,11 @@
 
 import os
 
-from code_quality_transform import CodeQualityRayLauncher
-from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
+from code_quality_transform import CodeQualityRayTransformConfiguration
+from data_processing.launch.ray import RayTransformLauncher
+from data_processing.test_support.launch.transform_test import (
+    AbstractTransformLauncherTest,
+)
 
 
 class TestCodeQualityTransform(AbstractTransformLauncherTest):
@@ -30,6 +33,6 @@ class TestCodeQualityTransform(AbstractTransformLauncherTest):
         }
         basedir = "../test-data"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
-        launcher = CodeQualityRayLauncher()
+        launcher = RayTransformLauncher(CodeQualityRayTransformConfiguration())
         fixtures = [(launcher, cli, basedir + "/input", basedir + "/expected")]
         return fixtures

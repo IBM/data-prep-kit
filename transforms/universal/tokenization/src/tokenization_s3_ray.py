@@ -13,12 +13,14 @@
 import os
 import sys
 
+from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from tokenization_transform import TokenizationRayLauncher
+from tokenization_transform import TokenizationRayConfiguration
+
 
 print(os.environ)
 # create launcher
-launcher = TokenizationRayLauncher()
+launcher = RayTransformLauncher(TokenizationRayConfiguration())
 # create parameters
 s3_cred = {
     "access_key": "localminioaccesskey",

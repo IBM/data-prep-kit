@@ -13,8 +13,10 @@
 import os
 import sys
 
+from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from noop_transform import NOOPRayLauncher
+from noop_transform import NOOPRayTransformConfiguration
+
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
@@ -44,6 +46,6 @@ if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = NOOPRayLauncher()
+    launcher = RayTransformLauncher(NOOPRayTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()
