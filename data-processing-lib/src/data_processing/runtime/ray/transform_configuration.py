@@ -1,4 +1,4 @@
-from data_processing.launch.ray import DefaultTableTransformRuntimeRay
+from data_processing.runtime.ray import DefaultTableTransformRuntimeRay
 from data_processing.transform.transform_configuration import (
     TransformConfiguration,
     TransformConfigurationProxy,

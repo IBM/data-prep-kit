@@ -4,7 +4,7 @@ All transforms operate on a [pyarrow Table](https://arrow.apache.org/docs/python
 and produce zero or more transformed tables and transform specific metadata.
 The Transform itself need only be concerned with the conversion of one in memory table at a time.  
 
-When running in the Ray worker (i.e. [TransformTableProcessor](../src/data_processing/launch/ray/transform_table_processor.py) ), the input
+When running in the Ray worker (i.e. [TransformTableProcessor](../src/data_processing/runtime/ray/transform_table_processor.py) ), the input
 tables are read from parquet files and the transform table(s) is/are stored in destination parquet files.
 Metadata accumulated across calls to all transforms is stored in the destination.
 
@@ -39,30 +39,30 @@ not need this feature, a default implementation is provided to return an empty l
 ### Running in Ray
 When a transform is run using the Ray-based framework a number of other capabilities are involved:
 
-* [Transform Runtime](../src/data_processing/launch/ray/transform_runtime.py) - this provides the ability for the
+* [Transform Runtime](../src/data_processing/runtime/ray/transform_runtime.py) - this provides the ability for the
 transform implementor to create additional Ray resources 
 and include them in the configuration used to create a transform
 (see, for example, [exact dedup](../../transforms/universal/ededup/src/ededup_transform.py) 
 or [blocklist](../../transforms/universal/blocklisting/src/blocklist_transform.py)).
 This also provide the ability to supplement the statics collected by
-[Statistics](../src/data_processing/launch/ray/transform_statistics.py) (see below).
-* [Transform Configuration](../src/data_processing/launch/ray/transform_runtime.py) - defines the following:
+[Statistics](../src/data_processing/runtime/ray/transform_statistics.py) (see below).
+* [Transform Configuration](../src/data_processing/runtime/ray/transform_runtime.py) - defines the following:
   * the transform class to be used, 
   * command line arguments used to initialize the Transform Runtime and generally, the Transform.
   * Transform Runtime class to use
   * transform short name 
-* [Transform Launcher](../src/data_processing/launch/ray/transform_launcher.py) - this is a class generally used to 
+* [Transform Launcher](../src/data_processing/runtime/ray/transform_launcher.py) - this is a class generally used to 
 implement `main()` that makes use of a Transform Configuration to start the Ray runtime and execute the transforms.
 
 Roughly speaking the following steps are completed to establish transforms in the RayWorkers
 
 1. Launcher parses the CLI parameters using an ArgumentParser configured with its own CLI parameters 
 along with those of the Transform Configuration, 
-2. Launcher passes the Transform Configuration and CLI parameters to the [RayOrchestrator](../src/data_processing/launch/ray/transform_orchestrator.py)
+2. Launcher passes the Transform Configuration and CLI parameters to the [RayOrchestrator](../src/data_processing/runtime/ray/transform_orchestrator.py)
 3. RayOrchestrator creates the Transform Runtime using the Transform Configuration and its CLI parameter values
 4. Transform Runtime creates transform initialization/configuration including the CLI parameters,  
 and any Ray components need by the transform.
-5. [RayWorker](../src/data_processing/launch/ray/transform_table_processor.py) is started with configuration from the Transform Runtime.
+5. [RayWorker](../src/data_processing/runtime/ray/transform_table_processor.py) is started with configuration from the Transform Runtime.
 6. RayWorker creates the Transform using the configuration provided by the Transform Runtime.
 7. Statistics is used to collect the statistics submitted by the individual transform, that 
 is used for building execution metadata.
@@ -70,16 +70,16 @@ is used for building execution metadata.
 ![Processing Architecture](processing-architecture.jpg)
 
 #### Transform Launcher
-The [TransformLauncher](../src/data_processing/launch/ray/transform_launcher.py) uses the Transform Configuration
+The [TransformLauncher](../src/data_processing/runtime/ray/transform_launcher.py) uses the Transform Configuration
 and provides a single method, `launch()`, that kicks off the Ray environment and transform execution coordinated 
-by [orchestrator](../src/data_processing/launch/ray/transform_orchestrator.py).
+by [orchestrator](../src/data_processing/runtime/ray/transform_orchestrator.py).
 For example,
 ```python
 launcher = TransformLauncher(MyTransformConfiguration())
 launcher.launch()
 ```
 Note that the launcher defines some additional CLI parameters that are used to control the operation of the 
-[orchestrator and workers](../src/data_processing/launch/ray/transform_orchestrator_configuration.py) and 
+[orchestrator and workers](../src/data_processing/runtime/ray/transform_orchestrator_configuration.py) and 
 [data access](../src/data_processing/data_access/data_access_factory.py).  Things such as data access configuration,
 number of workers, worker resources, etc.
 Discussion of these options is beyond the scope of this document 
@@ -87,7 +87,7 @@ Discussion of these options is beyond the scope of this document
 
 #### Transform Configuration
 The 
-[DefaultTableTransformConfiguration](../src/data_processing/launch/ray/transform_runtime.py)
+[DefaultTableTransformConfiguration](../src/data_processing/runtime/ray/transform_runtime.py)
 class is sub-classed and initialized with transform-specific name, and implementation 
 and runtime classes. In addition, it is responsible for providing transform-specific
 methods to define and filter optional command line arguments.
@@ -112,7 +112,7 @@ Details are covered in the samples below.
 
 #### Transform Runtime
 The 
-[DefaultTableTransformRuntime](../src/data_processing/launch/ray/transform_runtime.py)
+[DefaultTableTransformRuntime](../src/data_processing/runtime/ray/transform_runtime.py)
 class is provided and will be 
 sufficient for many use cases, especially 1:1 table transformation.
 However, some transforms will require use of the Ray environment, for example,

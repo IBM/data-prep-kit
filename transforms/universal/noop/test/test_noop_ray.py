@@ -12,8 +12,8 @@
 
 import os
 
-from data_processing.launch.pure_python import PythonTransformLauncher
-from data_processing.launch.ray import RayTransformLauncher
+from data_processing.runtime.pure_python import PythonTransformLauncher
+from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )

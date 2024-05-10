@@ -54,7 +54,7 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.launch.ray import (
+from data_processing.runtime.ray import (
     RayLauncherConfiguration,
     DefaultTableTransformRuntimeRay,
     RayTransformLauncher,
