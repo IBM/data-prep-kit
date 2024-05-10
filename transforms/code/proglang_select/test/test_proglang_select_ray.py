@@ -12,12 +12,13 @@
 
 import os
 
-from data_processing.test_support.launch.ray import AbstractTransformLauncherTest
+
+from data_processing.launch.ray import RayTransformLauncher
+from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
 from proglang_select_transform import (
-    ProgLangSelectRayLauncherConfiguration,
     lang_allowed_langs_file_key,
     lang_lang_column_key,
-    lang_output_column_key,
+    lang_output_column_key, ProgLangSelectTransformConfiguration, ProgLangSelectRuntime,
 )
 
 
@@ -44,7 +45,7 @@ class TestRayProgLangSelectTransform(AbstractTransformLauncherTest):
         }
         fixtures = [
             (
-                ProgLangSelectRayLauncherConfiguration(),
+                RayTransformLauncher(ProgLangSelectTransformConfiguration(), ProgLangSelectRuntime),
                 config,
                 basedir + "/input",
                 basedir + "/expected",

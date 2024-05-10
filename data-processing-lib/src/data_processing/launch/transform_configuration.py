@@ -12,23 +12,26 @@
 
 from argparse import ArgumentParser
 
+from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider
 
 
-class LauncherConfiguration(CLIArgumentProvider):
+class TransformConfiguration(CLIArgumentProvider):
     """
     This is a base transform configuration class defining transform's input/output parameter
     """
 
-    def __init__(self):
+    def __init__(self, name:str, transform_class:AbstractTableTransform, remove_from_metadata: list[str] = []):
         """
         Initialization
         """
+        self.name = name
+        self.transform_class = transform_class
+        self.remove_from_metadata = remove_from_metadata
         self.params = {}
 
-
 def get_transform_config(
-    transform_configuration: LauncherConfiguration, argv: list[str], parser: ArgumentParser = None
+    transform_configuration: TransformConfiguration, argv: list[str], parser: ArgumentParser = None
 ):
     """
     Create a transform configuration dictionary  using the given Configuration class and dictionary of

@@ -13,9 +13,10 @@
 import os
 
 import pyarrow as pa
-from data_processing.test_support.launch.ray import AbstractTransformLauncherTest
-from data_processing.test_support.transform import NOOPTransformConfigurationRayLauncherConfiguration
 
+from data_processing.launch.ray import RayLauncherConfiguration, RayTransformLauncher
+from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
+from data_processing.test_support.transform import NOOPTransformConfiguration
 
 table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})
 expected_table = table  # We're a noop after all.
@@ -31,5 +32,6 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = "../../../../test-data/data_processing/ray/noop/"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
-        fixtures = [(NOOPTransformConfigurationRayLauncherConfiguration(), {"noop_sleep_sec": 0}, basedir + "/input", basedir + "/expected")]
+        launcher = RayTransformLauncher(NOOPTransformConfiguration())
+        fixtures = [(launcher, {"noop_sleep_sec": 0}, basedir + "/input", basedir + "/expected")]
         return fixtures
