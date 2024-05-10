@@ -39,7 +39,7 @@ It uses a tokenizer to collect metrics specific to token ratio.  It is designed 
 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
-[the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
+[the options provided by the launcher](../../../data-processing-lib/doc/ray-launcher-options).
 
 * "--contents_column_name" - input a column name which contains data to process. The default column name: `contents`
 * "--language_column_name" - input a column name which contains programming language details. The default column name: `language`

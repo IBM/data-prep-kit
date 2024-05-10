@@ -25,7 +25,7 @@ configuration for values are as follows:
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
-[the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
+[the options provided by the launcher](../../../data-processing-lib/doc/ray-launcher-options).
 ```
   --noop_sleep_sec NOOP_SLEEP_SEC
                         Sleep actor for a number of seconds while processing the data frame, before writing the file to COS

@@ -13,15 +13,16 @@ developers of data transformation are:
 * [Transformation](../src/data_processing/transform/table_transform.py) - a simple, easily-implemented interface defines
 the specifics of a given data transformation.
 * [Transform Configuration](../src/data_processing/runtime/ray/transform_runtime.py) - defines
-the transform implementation and runtime classes, the 
-command line arguments specific to transform, and the short name for the transform.
-* [Transformation Runtime](../src/data_processing/runtime/ray/transform_runtime.py) - allows for customization of the Ray environment for the transformer.
-This might include provisioning of shared memory objects or creation of additional actors.
+the transform short name, its implementation class,  and command line configuration
+parameters.
 
 To learn more consider the following:
 
 * [Transform Tutorials](transform-tutorials.md)
-* [Testing transformers with S3](using_s3_transformers.md)
+* [Transform Runtimes](transform-runtimes.md)
+* [Transform Examples](transform-tutorial-examples.md)
+* [Testing Transforms](transform-testing.md)
+* [Utilities](transformer-utilities.md)
 * [Architecture Deep Dive](architecture.md)
 * [Transform project root readme](../../transforms/README.md)
 
