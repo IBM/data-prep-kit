@@ -15,15 +15,15 @@ import os
 
 import pyarrow as pa
 import pyarrow.parquet as pq
-
-from data_processing.transform.transform_configuration import get_transform_config
 from data_processing.test_support.transform import AbstractTransformTest
+from data_processing.transform.transform_configuration import get_transform_config
 from filter_transform import (
     FilterTransform,
+    FilterTransformConfiguration,
     filter_columns_to_drop_cli_param,
     filter_criteria_cli_param,
     filter_logical_operator_cli_param,
-    filter_logical_operator_default, FilterTransformConfiguration,
+    filter_logical_operator_default,
 )
 
 
