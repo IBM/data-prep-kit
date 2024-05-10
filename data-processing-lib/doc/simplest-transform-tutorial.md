@@ -31,6 +31,9 @@ tutorial can be found in the
 
 Finally, we show how to use the command line to run the transform in a local ray cluster.
 
+> **Note:** You will need to run the setup commands in the [`../README`](..) before running the following examples.
+
+
 ## `NOOPTransform`
 
 First, let's define the transform class.  To do this we extend

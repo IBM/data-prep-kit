@@ -144,6 +144,8 @@ Refer to [Minio install instructions](data-processing-lib/doc/using_s3_transform
 
 There are various entry points that you can choose based on the use case. Below are a few demos to get you started. 
 
+> **Note:** You will need to run the setup commands in the [`data-processing-lib/README`](data-processing-lib/README.md) before running the following examples.
+
 ### Run a Single Transform on Local Ray
 Get started by running the "noop" transform that performs an identity operation by following the 
 [tutorial](data-processing-lib/doc/simplest-transform-tutorial.md) and associated 
