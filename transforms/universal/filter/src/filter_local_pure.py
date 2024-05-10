@@ -44,6 +44,8 @@ filter_params = {
     filter_logical_operator_cli_param: filter_logical_operator,
 }
 params = {
+    # where to run
+    "run_locally": True,
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # execution info
