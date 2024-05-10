@@ -14,8 +14,7 @@ import sys
 import tempfile
 from typing import Any
 
-from data_processing.transform import TransformConfiguration
-from data_processing.launch.ray import RayLauncherConfiguration, RayTransformLauncher
+from data_processing.launch.ray import RayTransformLauncher
 from data_processing.launch.transform_launcher import AbstractTransformLauncher
 from data_processing.test_support.abstract_test import AbstractTest
 from data_processing.utils import ParamsUtils

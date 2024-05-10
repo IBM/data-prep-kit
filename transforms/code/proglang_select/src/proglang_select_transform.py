@@ -24,7 +24,7 @@ from data_processing.transform import TransformConfiguration
 from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
 from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
-    RayLauncherConfiguration, RayTransformLauncher,
+    RayTransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils, get_logger
