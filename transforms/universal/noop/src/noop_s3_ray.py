@@ -15,12 +15,11 @@ import sys
 
 from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from noop_transform import NOOPRayLauncherConfiguration
-
+from noop_transform import NOOPTransformConfiguration
 
 print(os.environ)
 # create launcher
-launcher = RayTransformLauncher(transform_runtime_config=NOOPRayLauncherConfiguration())
+launcher = RayTransformLauncher(transform_config=NOOPTransformConfiguration())
 # create parameters
 s3_cred = {
     "access_key": "localminioaccesskey",

@@ -12,12 +12,12 @@
 
 import os
 
-from data_processing.test_support.launch.ray import AbstractTransformLauncherTest
+from data_processing.launch.ray import RayLauncherConfiguration, RayTransformLauncher
+from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
 from doc_id_transform import (
-    DocIDRayLauncherConfiguration,
     doc_column_name_cli_param,
     hash_column_name_cli_param,
-    int_column_name_cli_param,
+    int_column_name_cli_param, DocIDTransformConfiguration, DocIDRuntime,
 )
 
 
@@ -30,10 +30,11 @@ class TestRayDocIDTransform(AbstractTransformLauncherTest):
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
         fixtures = []
-        config = {
+        transform_config = {
             doc_column_name_cli_param: "contents",
             hash_column_name_cli_param: "doc_hash",
             int_column_name_cli_param: "doc_int",
         }
-        fixtures.append((DocIDRayLauncherConfiguration(), config, basedir + "/input", basedir + "/expected"))
+        launcher = RayTransformLauncher(DocIDTransformConfiguration( ), DocIDRuntime)
+        fixtures.append((launcher, transform_config, basedir + "/input", basedir + "/expected"))
         return fixtures

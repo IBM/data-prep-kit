@@ -13,7 +13,7 @@
 from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.launch import LauncherConfiguration
+from data_processing.launch import TransformConfiguration
 from data_processing.transform import AbstractTableTransform
 
 from data_processing.launch.pure_python import PythonLauncherConfiguration
@@ -73,18 +73,9 @@ class RayLauncherConfiguration(PythonLauncherConfiguration):
 
     def __init__(
         self,
-        name: str,
-        transform_class: type[AbstractTableTransform],
-        launcher_configuration: LauncherConfiguration,
-        remove_from_metadata: list[str] = [],
+        transform_configuration: type[TransformConfiguration],
         runtime_class: type[DefaultTableTransformRuntimeRay] = DefaultTableTransformRuntimeRay,
     ):
-        super().__init__(
-            name=name,
-            transform_class=transform_class,
-            launcher_configuration=launcher_configuration,
-            remove_from_metadata=remove_from_metadata,
-        )
         """
         Initialization
         :param transform_class: implementation of the transform
@@ -94,6 +85,9 @@ class RayLauncherConfiguration(PythonLauncherConfiguration):
         :param remove_from_metadata: list of parameters to remove from metadata
         :return:
         """
+        super().__init__(
+            transform_configuration=transform_configuration,
+        )
         self.runtime_class = runtime_class
 
     def create_transform_runtime(self) -> DefaultTableTransformRuntimeRay:

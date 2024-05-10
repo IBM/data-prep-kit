@@ -16,15 +16,15 @@ import os
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from data_processing.launch.launcher_configuration import get_transform_config
+from data_processing.launch.pure_python import PythonLauncherConfiguration
+from data_processing.launch.transform_configuration import get_transform_config
 from data_processing.test_support.transform import AbstractTransformTest
 from filter_transform import (
     FilterTransform,
-    FilterPythonLauncherConfiguration,
     filter_columns_to_drop_cli_param,
     filter_criteria_cli_param,
     filter_logical_operator_cli_param,
-    filter_logical_operator_default,
+    filter_logical_operator_default, FilterTransformConfiguration,
 )
 
 
@@ -50,7 +50,7 @@ class TestFilterTransform(AbstractTransformTest):
             f"--{filter_columns_to_drop_cli_param}",
             filter_columns_to_drop,
         ]
-        ftc = FilterPythonLauncherConfiguration()
+        ftc = FilterTransformConfiguration()
         config = get_transform_config(ftc, cli)
         input_df = pq.read_table(os.path.join(input_dir, "test1.parquet"))
         expected_output_df = pq.read_table(os.path.join(expected_output_dir, "test1.parquet"))

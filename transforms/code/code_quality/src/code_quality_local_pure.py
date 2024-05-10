@@ -14,7 +14,7 @@ import os
 import sys
 from pathlib import Path
 
-from code_quality_transform import CodeQualityPythonLauncherConfiguration
+from code_quality_transform import CodeQualityTransformConfiguration
 from data_processing.launch.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 
@@ -27,7 +27,7 @@ local_conf = {
 }
 
 # create launcher
-launcher = PythonTransformLauncher(transform_runtime_config=CodeQualityPythonLauncherConfiguration())
+launcher = PythonTransformLauncher(transform_config=CodeQualityTransformConfiguration())
 
 
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}

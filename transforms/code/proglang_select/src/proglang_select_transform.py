@@ -20,11 +20,11 @@ from data_processing.data_access import (
     DataAccessFactory,
     DataAccessFactoryBase,
 )
-from data_processing.launch import LauncherConfiguration
+from data_processing.launch import TransformConfiguration
 from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
 from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
-    RayLauncherConfiguration,
+    RayLauncherConfiguration, RayTransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import TransformUtils, get_logger
@@ -151,14 +151,18 @@ class ProgLangSelectRuntime(DefaultTableTransformRuntimeRay):
         return {lang_allowed_languages: lang_refs} | self.params
 
 
-class ProgLangSelectLauncherConfiguration(LauncherConfiguration):
+class ProgLangSelectTransformConfiguration(TransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__(
+            name=shortname,
+            transform_class=ProgLangSelectTransform,
+            remove_from_metadata=[lang_data_factory_key],
+        )
         self.daf = None
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -217,37 +221,24 @@ class ProgLangSelectLauncherConfiguration(LauncherConfiguration):
         return self.daf.apply_input_params(args)
 
 
-class ProgLangSelectRayLauncherConfiguration(RayLauncherConfiguration):
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
+# class ProgLangSelectRayLauncherConfiguration(RayLauncherConfiguration):
+#     """
+#     Provides support for configuring and using the associated Transform class include
+#     configuration with CLI args and combining of metadata.
+#     """
+#
+#     def __init__(self):
+#         super().__init__(
+#             name=shortname,
+#             transform_class=ProgLangSelectTransform,
+#             launcher_configuration=ProgLangSelectTransformConfiguration(),
+#             runtime_class=ProgLangSelectRuntime,
+#             remove_from_metadata=[lang_data_factory_key],
+#         )
+#
 
-    def __init__(self):
-        super().__init__(
-            name=shortname,
-            transform_class=ProgLangSelectTransform,
-            launcher_configuration=ProgLangSelectLauncherConfiguration(),
-            runtime_class=ProgLangSelectRuntime,
-            remove_from_metadata=[lang_data_factory_key],
-        )
-
-
-class ProgLangSelectPytonLauncherConfiguration(PythonLauncherConfiguration):
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
-
-    def __init__(self):
-        super().__init__(
-            name=shortname,
-            transform_class=ProgLangSelectTransform,
-            launcher_configuration=ProgLangSelectLauncherConfiguration(),
-            remove_from_metadata=[lang_data_factory_key],
-        )
 
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(transform_runtime_config=ProgLangSelectPytonLauncherConfiguration())
+    launcher = RayTransformLauncher(ProgLangSelectTransformConfiguration(), ProgLangSelectRuntime)
     launcher.launch()

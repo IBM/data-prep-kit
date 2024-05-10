@@ -14,7 +14,7 @@ import os
 import sys
 from pathlib import Path
 
-from code_quality_transform import CodeQualityRayLauncherConfiguration
+from code_quality_transform import CodeQualityTransformConfiguration
 from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
 
@@ -27,7 +27,7 @@ local_conf = {
 }
 
 # create launcher
-launcher = RayTransformLauncher(transform_runtime_config=CodeQualityRayLauncherConfiguration())
+launcher = RayTransformLauncher(transform_config=CodeQualityTransformConfiguration())
 
 
 worker_options = {"num_cpus": 0.8}

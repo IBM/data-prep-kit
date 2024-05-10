@@ -20,7 +20,7 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.launch import LauncherConfiguration
+from data_processing.launch import TransformConfiguration
 from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
 from data_processing.launch.ray import RayLauncherConfiguration
 from data_processing.transform import AbstractTableTransform
@@ -153,17 +153,19 @@ class TokenizationTransform(AbstractTableTransform):
         return [out_table], metadata
 
 
-class TokenizationLauncherConfiguration(LauncherConfiguration):
+class TokenizationTransformConfiguration(TransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__()
+        super().__init__(
+            name="Tokenization",
+            transform_class=TokenizationTransform,
+        )
 
-    @staticmethod
-    def add_input_params(parser: ArgumentParser) -> None:
+    def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         This will be included in a dictionary used to initialize the TokenizationTransform.
@@ -257,33 +259,33 @@ class TokenizationLauncherConfiguration(LauncherConfiguration):
         return True
 
 
-class TokenizationRayLauncherConfiguration(RayLauncherConfiguration):
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
-
-    def __init__(self):
-        super().__init__(
-            name="Tokenization",
-            transform_class=TokenizationTransform,
-            launcher_configuration=TokenizationLauncherConfiguration(),
-        )
-
-
-class TokenizationPythonLauncherConfiguration(PythonLauncherConfiguration):
-    """
-    Provides support for configuring and using the associated Transform class include
-    configuration with CLI args and combining of metadata.
-    """
-
-    def __init__(self):
-        super().__init__(
-            name="Tokenization",
-            transform_class=TokenizationTransform,
-            launcher_configuration=TokenizationLauncherConfiguration(),
-        )
-
+# class TokenizationRayLauncherConfiguration(RayLauncherConfiguration):
+#     """
+#     Provides support for configuring and using the associated Transform class include
+#     configuration with CLI args and combining of metadata.
+#     """
+#
+#     def __init__(self):
+#         super().__init__(
+#             name="Tokenization",
+#             transform_class=TokenizationTransform,
+#             launcher_configuration=TokenizationTransformConfiguration(),
+#         )
+#
+#
+# class TokenizationPythonLauncherConfiguration(PythonLauncherConfiguration):
+#     """
+#     Provides support for configuring and using the associated Transform class include
+#     configuration with CLI args and combining of metadata.
+#     """
+#
+#     def __init__(self):
+#         super().__init__(
+#             name="Tokenization",
+#             transform_class=TokenizationTransform,
+#             launcher_configuration=TokenizationTransformConfiguration(),
+#         )
+#
 
 if __name__ == "__main__":
     launcher = PythonTransformLauncher(transform_runtime_config=TokenizationPythonLauncherConfiguration())

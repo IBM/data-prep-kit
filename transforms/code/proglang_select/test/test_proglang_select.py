@@ -14,14 +14,13 @@ import os
 
 import pyarrow as pa
 
-from data_processing.launch.launcher_configuration import get_transform_config
+from data_processing.launch.transform_configuration import get_transform_config
 from data_processing.test_support.transform import AbstractTransformTest
 from proglang_select_transform import (
     ProgLangSelectTransform,
-    ProgLangSelectRayLauncherConfiguration,
     lang_allowed_langs_file_key,
     lang_lang_column_key,
-    lang_output_column_key,
+    lang_output_column_key, ProgLangSelectTransformConfiguration,
 )
 
 
@@ -49,7 +48,7 @@ class TestProgLangSelectTransform(AbstractTransformTest):
         ]
 
         # Use the ProgLangMatchTransformConfiguration to compute the config parameters
-        lstc = ProgLangSelectRayLauncherConfiguration()
+        lstc = ProgLangSelectTransformConfiguration()
         config = get_transform_config(lstc, cli)
 
         fixtures = [
