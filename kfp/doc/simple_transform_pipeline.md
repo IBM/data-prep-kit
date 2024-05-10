@@ -197,12 +197,19 @@ The final thing that we need to do is set some pipeline global configuration:
     dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 ```
 
-## Compiling pipeline and deploying it to KFP
+## Compiling pipeline
 
-To compile pipeline execute Python with this [file](../transform_workflows/universal/noop/noop_wf.py), which will 
-produce file `noop_wf.yaml` in the same directory. Alternatively, `make venv && make build` Makefile rule can be executed under
-`../transform_workflows` directory (`make venv` can be executed once or after each dependency change).
-Now create a kind cluster with all required software installed
+To compile pipeline execute `make build` command in the same directory where your pipeline is
+
+## Preparing cluster for pipeline execution
+
+We support two options for preparing cluster - local KInd cluster and usage of the standard Kubernetes 
+or OpenShift cluster. We recommend using Kind cluster for only for local testing and debugging, 
+not production loads. For production loads use external Kubernetes cluster.
+
+### Preparing Knd cluster
+
+You can create a Kind cluster with all required software installed
 using the following command: 
 
 ````shell
@@ -210,7 +217,35 @@ using the following command:
 ````
 **Note** that this command has to run from the project kind subdirectory
 
-Once the cluster is up, go to `localhost:8080/kfp/`, which will bring up KFP UI, see below:
+We tested Kind cluster installation on multiple platforms, including Intel Mac, 
+AMD Mac (see [this](deployment_on_MacOS.md)), Windows, 
+RHEL(see [this](https://github.ibm.com/dettori/ks-integrations/blob/main/kfp/docs/RHEL-KS-install.md#increasing-limits)
+for additional RHEL configurations) and Ubuntu. Additional platform can be used, but might
+require additional configuration and testing.
+
+### Preparing an existing Kubernetes cluster
+
+Alternatively you can deploy pipeline to the existing Kubernetes cluster. This cluster should have both KubeRay
+and KFP (**Note** We are currently using KFP V1) installed.
+
+To install KubeRay on your cluster first create `kuberay` namespace:
+
+```shell
+kubectl create namespace kuberay
+```
+
+and deploy in it KubeRay operator and KubeRay API aerver. You can use
+this [script](../../kind/hack/tools/install_kuberay.sh) or use
+[documentation](https://docs.ray.io/en/master/cluster/kubernetes/getting-started.html#kuberay-quickstart)
+
+To install KFP on your cluster, you can use this
+[script](../../kind/hack/tools/install_kubeflow.sh))
+or refer to KFP [documentation](https://www.kubeflow.org/docs/components/pipelines/v1/installation/overview/).
+
+## Deploying workflow
+
+Once the cluster is up, go to the kfp endpoint (`localhost:8080/kfp/` for Kind cluster), which will bring up 
+KFP UI, see below:
 
 ![KFP UI](kfp_ui.png)
 
@@ -218,6 +253,7 @@ Click on the `Upload pipeline` link and follow instructions on the screen to upl
 name pipeline noop. Once this is done, you should see something as follows:
 
 ![noop pipeline](noop_pipeline.png)
+
 
 ## Executing pipeline and watching execution results
 
@@ -239,12 +275,14 @@ Note that the log (on the left) has the complete execution log.
 
 Additionally, the log is saved to S3 (location is denoted but the last line in the log)
 
-## Clean up cluster
+## Clean up Kind cluster
 
-Finally, you can delete kind cluster running the following command:
+If you are using Kind cluster, you can delete it running the following command:
 
 ```Shell
 make clean
 ```
 
 **Note** that this command has to run from the project kind subdirectory
+
+
