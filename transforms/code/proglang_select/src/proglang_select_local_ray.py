@@ -13,13 +13,14 @@
 import os
 import sys
 
+from data_processing.launch.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
 from proglang_select_transform import (
+    ProgLangSelectRayConfiguration,
     lang_allowed_langs_file_key,
     lang_lang_column_key,
-    lang_output_column_key, ProgLangSelectRayLauncher,
+    lang_output_column_key,
 )
-
 
 
 # create parameters
@@ -61,6 +62,6 @@ params = {
 if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = ProgLangSelectRayLauncher()
+    launcher = RayTransformLauncher(ProgLangSelectRayConfiguration())
     # launch
     launcher.launch()

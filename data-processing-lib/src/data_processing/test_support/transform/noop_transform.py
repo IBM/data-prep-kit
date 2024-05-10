@@ -15,8 +15,8 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-
 from data_processing.launch.pure_python import PythonTransformLauncher
+from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
@@ -64,6 +64,7 @@ class NOOPTransform(AbstractTableTransform):
         logger.debug(f"Transformed one table with {len(table)} rows")
         metadata = {"nfiles": 1, "nrows": len(table)}
         return [table], metadata
+
 
 class NOOPTransformConfiguration(TransformConfiguration):
 
@@ -118,6 +119,10 @@ class NOOPTransformConfiguration(TransformConfiguration):
         return True
 
 
+class NOOPRayTransformConfiguration(RayTransformConfiguration):
+    def __init__(self):
+        super().__init__(NOOPTransformConfiguration())
+
 
 #
 # class NOOPTransformConfigurationRayLauncherConfiguration(RayLauncherConfiguration):
@@ -141,7 +146,7 @@ class NOOPTransformConfiguration(TransformConfiguration):
 #
 
 if __name__ == "__main__":
-    #launcher = PythonTransformLauncher(transform_runtime_config=NOOPPythonLauncherConfigurationPython())
+    # launcher = PythonTransformLauncher(transform_runtime_config=NOOPPythonLauncherConfigurationPython())
     launcher = PythonTransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
     logger.info("Launching noop transform")
     launcher.launch()

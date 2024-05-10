@@ -15,12 +15,13 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-
-from data_processing.transform import TransformConfiguration
-from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
+from data_processing.launch.pure_python import (
+    PythonLauncherConfiguration,
+    PythonTransformLauncher,
+)
 from data_processing.launch.ray import RayTransformLauncher
-from data_processing.transform import AbstractTableTransform
-
+from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -120,11 +121,21 @@ class NOOPTransformConfiguration(TransformConfiguration):
         self.params = self.params | captured
         logger.info(f"noop parameters are : {self.params}")
         return True
-class NOOPRayLauncher(RayTransformLauncher):
+
+
+class NOOPRayTransformConfiguration(RayTransformConfiguration):
+    """
+    Implements the RayTransformConfiguration for NOOP as required by the RayTransformLauncher.
+    NOOP does not use a RayRuntime class so the superclass only needs the base
+    python-only configuration.
+    """
+
     def __init__(self):
-        super().__init__(transform_config=NOOPTransformConfiguration())
+        super().__init__(NOOPTransformConfiguration())
+
 
 if __name__ == "__main__":
-    launcher = NOOPRayLauncher()
+    # launcher = NOOPRayLauncher()
+    launcher = RayTransformLauncher(NOOPRayTransformConfiguration())
     logger.info("Launching noop transform")
     launcher.launch()

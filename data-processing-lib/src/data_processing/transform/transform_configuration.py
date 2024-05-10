@@ -9,8 +9,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
+import argparse
 from argparse import ArgumentParser
+from typing import Any
 
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider
@@ -21,7 +22,7 @@ class TransformConfiguration(CLIArgumentProvider):
     This is a base transform configuration class defining transform's input/output parameter
     """
 
-    def __init__(self, name:str, transform_class:AbstractTableTransform, remove_from_metadata: list[str] = []):
+    def __init__(self, name: str, transform_class: AbstractTableTransform, remove_from_metadata: list[str] = []):
         """
         Initialization
         """
@@ -29,6 +30,29 @@ class TransformConfiguration(CLIArgumentProvider):
         self.transform_class = transform_class
         self.remove_from_metadata = remove_from_metadata
         self.params = {}
+
+
+class TransformConfigurationProxy(TransformConfiguration):
+    def __init__(self, proxied_transform_config: TransformConfiguration):
+        self.proxied_transform_config = proxied_transform_config
+        # Python probably has a better way of doing this using the proxied transform config
+        self.name = proxied_transform_config.name
+        self.transform_class = proxied_transform_config.transform_class
+        self.remove_from_metadata = proxied_transform_config.remove_from_metadata
+        self.params = {}
+
+    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+        self.proxied_transform_config.add_input_params(parser)
+
+    def apply_input_params(self, args: argparse.Namespace) -> bool:
+        is_valid = self.proxied_transform_config.apply_input_params(args)
+        if is_valid:
+            self.params = self.proxied_transform_config.params
+        return is_valid
+
+    def get_input_params(self) -> dict[str, Any]:
+        return self.params
+
 
 def get_transform_config(
     transform_configuration: TransformConfiguration, argv: list[str], parser: ArgumentParser = None

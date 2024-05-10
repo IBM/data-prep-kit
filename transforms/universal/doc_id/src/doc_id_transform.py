@@ -15,15 +15,17 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.transform import TransformConfiguration
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
+from data_processing.launch.pure_python import (
+    PythonLauncherConfiguration,
+    PythonTransformLauncher,
+)
 from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
     RayTransformLauncher,
 )
-from data_processing.transform import AbstractTableTransform
-
+from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -196,30 +198,11 @@ class DocIDTransformConfiguration(TransformConfiguration):
         return True
 
 
-# class DocIDRayLauncherConfiguration(RayLauncherConfiguration):
-#
-#     """
-#     Provides support for configuring and using the associated Transform class include
-#     configuration with CLI args and combining of metadata.
-#     """
-#
-#     def __init__(self):
-#         super().__init__(
-#             transform_config = DocIDTransformConfiguration(),
-#             runtime_class=DocIDRuntime,
-#         )
-#
-
-# class DocIDPythonLauncherConfiguration(PythonLauncherConfiguration):
-#     def __init__(self):
-#         super().__init__(
-#             name=short_name, transform_class=DocIDTransform, launcher_configuration=DocIDTransformConfiguration()
-#         )
-#
-class DocIDRayLauncher(RayTransformLauncher):
+class DocIDRayTransformConfiguration(RayTransformConfiguration):
     def __init__(self):
         super().__init__(transform_config=DocIDTransformConfiguration(), runtime_class=DocIDRuntime)
 
+
 if __name__ == "__main__":
-    launcher = DocIDRayLauncher()
+    launcher = RayTransformLauncher(DocIDRayTransformConfiguration())
     launcher.launch()

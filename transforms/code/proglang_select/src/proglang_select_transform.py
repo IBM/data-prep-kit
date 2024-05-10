@@ -20,13 +20,16 @@ from data_processing.data_access import (
     DataAccessFactory,
     DataAccessFactoryBase,
 )
-from data_processing.transform import TransformConfiguration
-from data_processing.launch.pure_python import PythonTransformLauncher, PythonLauncherConfiguration
+from data_processing.launch.pure_python import (
+    PythonLauncherConfiguration,
+    PythonTransformLauncher,
+)
 from data_processing.launch.ray import (
     DefaultTableTransformRuntimeRay,
     RayTransformLauncher,
 )
-from data_processing.transform import AbstractTableTransform
+from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -237,10 +240,12 @@ class ProgLangSelectTransformConfiguration(TransformConfiguration):
 #         )
 #
 
-class ProgLangSelectRayLauncher(RayTransformLauncher):
+
+class ProgLangSelectRayConfiguration(RayTransformConfiguration):
     def __init__(self):
         super().__init__(ProgLangSelectTransformConfiguration(), ProgLangSelectRuntime)
 
+
 if __name__ == "__main__":
-    launcher = ProgLangSelectRayLauncher()
+    launcher = RayTransformLauncher(ProgLangSelectRayConfiguration())
     launcher.launch()
