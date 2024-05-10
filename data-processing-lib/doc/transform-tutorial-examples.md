@@ -13,6 +13,3 @@ resources (models, configuration, etc) for a transform.
 
 
 
-## Additional transform support
-
-We also started a library of [transform utilities](transformer-utilities.md)

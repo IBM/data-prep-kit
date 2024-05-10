@@ -8,3 +8,5 @@ A `PythonTransformLauncher` class is provided that enables the running of the tr
 launcher = PythonTransformLauncher(YourTransformConfiguration())
 launcher.launch()
 ```
+The `YourTransformConfiguration` class configures your transform.
+More details can be found in the [transform tutorial](transform-tutorials.md).
