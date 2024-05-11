@@ -28,8 +28,8 @@ as an example of metadata that we want to not include in logging.
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
-the options provided by the [ray launcher](../../../data-processing-lib/doc/ray-launcher-options)
-and the [python launcher](../../../data-processing-lib/doc/python-launcher-options).
+the options provided by the [ray launcher](../../../data-processing-lib/doc/ray-launcher-options.md)
+and the [python launcher](../../../data-processing-lib/doc/python-launcher-options.md).
 ```
   --noop_sleep_sec NOOP_SLEEP_SEC
                         Sleep actor for a number of seconds while processing the data frame, before writing the file to COS
