@@ -16,11 +16,9 @@ from datetime import datetime
 
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime import TransformExecutionConfiguration
-from data_processing.runtime.pure_python import (
-    PythonLauncherConfiguration,
-    TransformTableProcessor,
-)
-from data_processing.transform import TransformStatistics
+from data_processing.runtime.pure_python import TransformTableProcessor
+
+from data_processing.transform import TransformStatistics, TransformConfiguration
 from data_processing.utils import get_logger
 
 
@@ -29,13 +27,14 @@ logger = get_logger(__name__)
 
 def orchestrate(
     data_access_factory: DataAccessFactoryBase,
-    transform_config: PythonLauncherConfiguration,
+    transform_config: TransformConfiguration,
     execution_config: TransformExecutionConfiguration,
 ) -> int:
     """
     orchestrator for transformer execution
     :param data_access_factory: data access factory
     :param transform_config: transformer configuration
+    :param execution_config: execution configuration
     :return: 0 - success or 1 - failure
     """
     start_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

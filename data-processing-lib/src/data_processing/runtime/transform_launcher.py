@@ -15,7 +15,7 @@ class AbstractTransformLauncher:
         :param data_access_factory: the factory to create DataAccess instances.
         """
         self.transform_config = transform_config
-        self.name = self.transform_config.name
+        self.name = self.transform_config.get_name()
         self.data_access_factory = data_access_factory
 
     def launch(self):

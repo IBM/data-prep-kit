@@ -16,8 +16,7 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.runtime.pure_python import PythonLauncherConfiguration
-from data_processing.transform import TransformStatistics
+from data_processing.transform import TransformStatistics, TransformConfiguration
 from data_processing.utils import TransformUtils, get_logger
 
 
@@ -33,7 +32,7 @@ class TransformTableProcessor:
         self,
         data_access_factory: DataAccessFactoryBase,
         statistics: TransformStatistics,
-        params: PythonLauncherConfiguration,
+        params: TransformConfiguration,
     ):
         """
         Init method

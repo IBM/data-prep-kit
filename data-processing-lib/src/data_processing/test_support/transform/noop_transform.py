@@ -125,30 +125,7 @@ class NOOPRayTransformConfiguration(RayTransformConfiguration):
     def __init__(self):
         super().__init__(NOOPTransformConfiguration())
 
-
-#
-# class NOOPTransformConfigurationRayLauncherConfiguration(RayLauncherConfiguration):
-#     def __init__(self):
-#         super().__init__(
-#             name=short_name,
-#             transform_class=NOOPTransform,
-#             launcher_configuration=NOOPTransformConfiguration(),
-#             remove_from_metadata=[pwd_key],
-#         )
-#
-#
-# class NOOPPythonLauncherConfigurationPython(PythonLauncherConfiguration):
-#     def __init__(self):
-#         super().__init__(
-#             name=short_name,
-#             transform_class=NOOPTransform,
-#             launcher_configuration=NOOPTransformConfiguration(),
-#             remove_from_metadata=[pwd_key],
-#         )
-#
-
 if __name__ == "__main__":
-    # launcher = PythonTransformLauncher(transform_runtime_config=NOOPPythonLauncherConfigurationPython())
     launcher = PythonTransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
     logger.info("Launching noop transform")
     launcher.launch()

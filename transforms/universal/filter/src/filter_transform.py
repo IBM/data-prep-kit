@@ -16,10 +16,6 @@ import json
 
 import duckdb
 import pyarrow as pa
-from data_processing.runtime.pure_python import (
-    PythonLauncherConfiguration,
-    PythonTransformLauncher,
-)
 from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
     RayTransformConfiguration,
