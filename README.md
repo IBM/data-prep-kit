@@ -26,7 +26,7 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 - [About](#about)
 - [Setup](#setup)
 - [Getting Started](#getting_started)
-- [How to contribute](#contribute_steps)
+- [How to Contribute](#contribute_steps)
 - [Acknowledgments](#acknowledgement)
 
 ## &#x1F4D6; About <a name = "about"></a>
@@ -131,18 +131,21 @@ Two important tools will also be installed using the steps below:
 ### Installation Steps
 
 ```shell
-git clone git@github.com:IBM/data-prep-kit.git
-cd data-prep-kit
 pip install pre-commit
 pip install twine
+...
+git clone git@github.com:IBM/data-prep-kit.git
+cd data-prep-kit
 pre-commit install
 ```
-Additionally, if you will be using local Minio for S3 testing you need to install `Minio` and `mc`.
-Refer to [Minio install instructions](data-processing-lib/doc/using_s3_transformers.md) for more details.
 
 ## &#x1F680; Getting Started <a name = "getting_started"></a>
 
 There are various entry points that you can choose based on the use case. Below are a few demos to get you started. 
+
+### Build Your Own Transforms
+Follow the documentation [here](data-processing-lib/doc/overview.md) to build your own transform
+and run it in either the python  or Ray runtimes. 
 
 ### Run a Single Transform on Local Ray
 Get started by running the "noop" transform that performs an identity operation by following the 
@@ -151,9 +154,6 @@ Get started by running the "noop" transform that performs an identity operation 
 
 ### Run a Data Pipeline on Local Ray
 Get started by building a data pipeline with our example pipeline (link to be added) that can run on a laptop. 
-
-### Build Your Own Sequence of Transforms
-Follow the documentation [here](data-processing-lib/doc/overview.md) to build your own pipelines. 
 
 ### Automate a Pipeline
 The data preprocessing can be automated by running transformers as a KubeFlow pipeline (KFP). 
@@ -179,7 +179,7 @@ make clean
 ### How to Navigate and Use the Repository
 See the documentation on [repository structure and its use](doc/repo.md). 
 
-## &#x1F91D; How to contribute <a name = "contribute_steps"></a>
+## &#x1F91D; How to Contribute <a name = "contribute_steps"></a>
 See the [contribution guide](CONTRIBUTING.md)
 
 
