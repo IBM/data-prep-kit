@@ -34,8 +34,8 @@ The set of dictionary keys holding configuration for values are as follows:
 ### Launched Command Line Options 
 When running the transform with the Ray launcher,
 the following command line arguments are available in addition to 
-the options provided by the [ray launcher](../../../data-processing-lib/doc/ray-launcher-options)
-and the [python launcher](../../../data-processing-lib/doc/python-launcher-options).
+the options provided by the [ray launcher](../../../data-processing-lib/doc/ray-launcher-options.md)
+and the [python launcher](../../../data-processing-lib/doc/python-launcher-options.md).
 
 ```
   --proglang_select_allowed_langs_file PROGLANG_MATCH_ALLOWED_LANGS_FILE
