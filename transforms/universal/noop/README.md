@@ -17,15 +17,19 @@ of the transform is implemented.
 The set of dictionary keys holding [NOOPTransform](src/noop_transform.py) 
 configuration for values are as follows:
 
-* _noop_sleep_sec_ - specifies the number of seconds to sleep during table transformation. 
-* _noop_pwd_ - specifies a dummy password not included in metadata. 
+* _noop_sleep_sec_ - specifies the number of seconds to sleep during the call the 
+the `transform()` method of `NOOPTransformation`.  This may be useful for
+simulating real transform timings and as a way to limit I/O on an S3 endpoint..
+* _noop_pwd_ - specifies a dummy password not included in metadata. Provided
+as an example of metadata that we want to not include in logging.
 
 ## Running
 
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
-[the options provided by the launcher](../../../data-processing-lib/doc/ray-launcher-options).
+the options provided by the [ray launcher](../../../data-processing-lib/doc/ray-launcher-options)
+and the [python launcher](../../../data-processing-lib/doc/python-launcher-options).
 ```
   --noop_sleep_sec NOOP_SLEEP_SEC
                         Sleep actor for a number of seconds while processing the data frame, before writing the file to COS
