@@ -10,18 +10,20 @@
 # limitations under the License.
 ################################################################################
 
-from typing import Any
 from argparse import ArgumentParser, Namespace
+from typing import Any
+
 from data_processing.runtime.ray import DefaultTableTransformRuntimeRay
-from data_processing.transform import TransformConfiguration, AbstractTableTransform
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider
 
 
 class RayTransformConfiguration(CLIArgumentProvider):
-    def __init__(self,
-                 transform_config: TransformConfiguration,
-                 runtime_class: type[DefaultTableTransformRuntimeRay] = DefaultTableTransformRuntimeRay,
-                 ):
+    def __init__(
+        self,
+        transform_config: TransformConfiguration,
+        runtime_class: type[DefaultTableTransformRuntimeRay] = DefaultTableTransformRuntimeRay,
+    ):
         """
         Initialization
         :param transform_config: configuration for pure Python
@@ -39,7 +41,6 @@ class RayTransformConfiguration(CLIArgumentProvider):
 
     def get_input_params(self) -> dict[str, Any]:
         return self.base_configuration.get_input_params()
-
 
     def get_transform_class(self) -> type[AbstractTableTransform]:
         """

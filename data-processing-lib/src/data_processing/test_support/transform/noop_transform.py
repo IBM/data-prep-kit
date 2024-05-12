@@ -125,6 +125,7 @@ class NOOPRayTransformConfiguration(RayTransformConfiguration):
     def __init__(self):
         super().__init__(NOOPTransformConfiguration())
 
+
 if __name__ == "__main__":
     launcher = PythonTransformLauncher(transform_runtime_config=NOOPTransformConfiguration())
     logger.info("Launching noop transform")

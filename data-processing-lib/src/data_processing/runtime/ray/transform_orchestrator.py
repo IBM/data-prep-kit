@@ -17,11 +17,11 @@ from datetime import datetime
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.ray import (
+    RayTransformConfiguration,
     RayUtils,
     TransformOrchestratorConfiguration,
     TransformStatisticsRay,
     TransformTableProcessorRay,
-    RayTransformConfiguration
 )
 from data_processing.utils import get_logger
 from ray.util import ActorPool

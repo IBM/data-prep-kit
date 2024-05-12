@@ -16,7 +16,7 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.transform import TransformStatistics, TransformConfiguration
+from data_processing.transform import TransformConfiguration, TransformStatistics
 from data_processing.utils import TransformUtils, get_logger
 
 
@@ -122,8 +122,9 @@ class TransformTableProcessor:
         :param stats: execution statistics to populate
         :return: None
         """
-        logger.debug(f"submitting tables under file named {self.last_file_name}.parquet, "
-                     f"number of tables {len(out_tables)}")
+        logger.debug(
+            f"submitting tables under file named {self.last_file_name}.parquet, " f"number of tables {len(out_tables)}"
+        )
         # Compute output file location. Preserve sub folders for Wisdom
         match len(out_tables):
             case 0:
