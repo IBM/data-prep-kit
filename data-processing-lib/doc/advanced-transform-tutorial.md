@@ -58,15 +58,17 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccessFactory
+from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.ray import (
-  RayLauncherConfiguration,
   DefaultTableTransformRuntimeRay,
-  RayUtils,
   RayTransformLauncher,
+  RayUtils,
 )
-from data_processing.transform import AbstractTableTransform
-from data_processing.utils import GB, TransformUtils
+from data_processing.runtime.ray.transform_configuration import (
+  RayTransformConfiguration,
+)
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
 
@@ -205,8 +207,10 @@ collected by hash actors and custom computations based on statistics data.
 
 ## EdedupTableTransformConfiguration
 
-The final class we need to implement is `EdedupTableTransformConfiguration` class and its initializer that
-define the following:
+The final class we need to implement is `EdedupRayTransformConfiguration` class that provides configuration for 
+running our transform. Although we provide only Ray-based implementation, Ray-based configuration relies on Python-based
+configuration that we need to define first. So we first need to define `EdedupTableTransformConfiguration` class, 
+defining the following:
 
 * The short name for the transform
 * The class implementing the transform - in our case EdedupTransform
@@ -219,10 +223,12 @@ First we define the class and its initializer,
 short_name = "ededup"
 cli_prefix = f"{short_name}_"
 
-class EdedupTableTransformConfiguration(DefaultTableTransformConfiguration):
-    def __init__(self):
-        super().__init__(name=short_name, runtime_class=EdedupRuntime, transform_class=EdedupTransform)
-        self.params = {}
+class EdedupTableTransformConfiguration(TransformConfiguration):
+  def __init__(self):
+    super().__init__(
+      name=short_name,
+      transform_class=EdedupTransform,
+    )
 ```
 
 The initializer extends the DefaultTableTransformConfiguration which provides simple
@@ -256,6 +262,13 @@ and which allows us to capture the `EdedupTransform`-specific arguments and opti
       logger.info(f"exact dedup params are {self.params}")
       return True
 ```
+Now we can implement `EdedupRayTransformConfiguration`with the following code
+```python
+class EdedupRayTransformConfiguration(RayTransformConfiguration):
+    def __init__(self):
+        super().__init__(transform_config=EdedupTableTransformConfiguration(), runtime_class=EdedupRuntime)
+
+```
 
 ## main()
 
@@ -264,11 +277,12 @@ framework's `TransformLauncher` class.
 
 ```python
 if __name__ == "__main__":
-    launcher = TransformLauncher(transform_runtime_config=EdedupTransformConfiguration())
-    launcher.launch()
+  launcher = RayTransformLauncher(EdedupRayTransformConfiguration())
+  launcher.launch()
 ```
+
 The launcher requires only an instance of DefaultTableTransformConfiguration
-(our `EdedupTransformConfiguration` class).
+(our `EdedupRayTransformConfiguration` class).
 A single method `launch()` is then invoked to run the transform in a Ray cluster.
 
 ## Running
