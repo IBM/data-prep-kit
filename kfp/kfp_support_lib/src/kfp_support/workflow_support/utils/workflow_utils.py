@@ -143,6 +143,39 @@ class PipelinesUtils:
         """
         self.kfp_client = Client(host=host)
 
+    def upload_pipeline(
+        self,
+        pipeline_package_path: str = None,
+        pipeline_name: str = None,
+        description: str = None,
+    ) -> models.api_pipeline.ApiPipeline:
+        """
+        Uploads the pipeline
+        :param pipeline_package_path: Local path to the pipeline package.
+        :param pipeline_name: Optional. Name of the pipeline to be shown in the UI.
+        :param description: Optional. Description of the pipeline to be shown in the UI.
+        :return: Server response object containing pipleine id and other information.
+        """
+        try:
+            p = self.kfp_client.upload_pipeline(pipeline_package_path, pipeline_name, description)
+            logger.info("Pipeline uploaded")
+            return p
+        except Exception as e:
+            logger.warning(f"Exception uploading pipeline {e}")
+            return None
+
+    def delete_pipeline(self, pipeline_id):
+        """
+        Delete pipeline.
+        :param pipeline_id: id of the pipeline.
+        :return
+        Returns:
+          Object. If the method is called asynchronously, returns the request thread.
+        Raises:
+          kfp_server_api.ApiException: If pipeline is not found.
+        """
+        return self.kfp_client.delete_pipeline(pipeline_id)
+
     def start_pipeline(
         self,
         pipeline: models.api_pipeline.ApiPipeline,
@@ -161,7 +194,7 @@ class PipelinesUtils:
             run_id = self.kfp_client.run_pipeline(
                 experiment_id=experiment.id, job_name=job_name, pipeline_id=pipeline.id, params=params
             )
-            logger.info("Pipeline submitted")
+            logger.info(f"Pipeline run {job_name} submitted")
             return run_id.id
         except Exception as e:
             logger.warning(f"Exception starting pipeline {e}")
@@ -597,7 +630,7 @@ class ComponentUtils:
     def add_settings_to_component(
         component: dsl.ContainerOp,
         timeout: int,
-        image_pull_policy: str = "Always",
+        image_pull_policy: str = "IfNotPresent",
         cache_strategy: str = "P0D",
     ) -> None:
         """
