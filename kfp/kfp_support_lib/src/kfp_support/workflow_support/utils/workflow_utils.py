@@ -147,22 +147,39 @@ class PipelinesUtils:
         self,
         pipeline_package_path: str = None,
         pipeline_name: str = None,
+        overwrite: bool = False,
         description: str = None,
     ) -> models.api_pipeline.ApiPipeline:
         """
         Uploads the pipeline
         :param pipeline_package_path: Local path to the pipeline package.
-        :param pipeline_name: Optional. Name of the pipeline to be shown in the UI.
+        :param pipeline_name: Optional. Name of the pipeline to be shown in the UI
+        :param overwrite: Optional. If pipeline exists, delete it before creating a new one.
         :param description: Optional. Description of the pipeline to be shown in the UI.
-        :return: Server response object containing pipleine id and other information.
+        :return: Server response object containing pipeline id and other information.
         """
+        pipeline = None
+        if overwrite:
+            pipeline = self.get_pipeline_by_name(name=pipeline_name)
+            if pipeline is not None:
+                try:
+                    print(f"pipeline {pipeline_name} already exists. Trying to delete it.")
+                    self.kfp_client.delete_pipeline(pipeline_id=pipeline.id)
+                except Exception as e:
+                    print(f"Exception deleting pipeline {e} before uploading")
+                    return None
         try:
-            p = self.kfp_client.upload_pipeline(pipeline_package_path, pipeline_name, description)
-            logger.info("Pipeline uploaded")
-            return p
+            pipeline = self.kfp_client.upload_pipeline(
+                pipeline_package_path=pipeline_package_path, pipeline_name=pipeline_name, description=description
+            )
         except Exception as e:
             logger.warning(f"Exception uploading pipeline {e}")
             return None
+        if pipeline is None:
+            print(f"Failed to upload pipeline {pipeline_name}.")
+            return None
+        logger.info("Pipeline uploaded")
+        return pipeline
 
     def delete_pipeline(self, pipeline_id):
         """

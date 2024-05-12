@@ -38,7 +38,7 @@ reconcile-requirements::
 
 load-image:
 	@# Help: Load the image to the kind cluster created with make setup.
-	kind load docker-image $(IMG) --name=$(KIND_CLUSTER_NAME)
+	kind load docker-image $(DOCKER_IMG) --name=$(KIND_CLUSTER_NAME)
 
 build:: image
 
