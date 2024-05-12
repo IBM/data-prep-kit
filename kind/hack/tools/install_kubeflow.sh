@@ -51,6 +51,7 @@ wait(){
 delete(){
 	kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/cluster-scoped-resources?ref=$PIPELINE_VERSION"
 	kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/env/dev?ref=$PIPELINE_VERSION"
+	kubectl delete clusterrolebinding pipeline-runner-extend
 }
 
 usage(){

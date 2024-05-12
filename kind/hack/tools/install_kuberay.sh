@@ -11,7 +11,7 @@ EXIT_CODE=0
 deploy() {
 	sed -i.back "s/tag: v[0-9].*/tag: v${KUBERAY_APISERVER}/" ${ROOT_DIR}/hack/ray_api_server_values.yaml
 	helm repo add kuberay https://ray-project.github.io/kuberay-helm/
-	helm repo update
+	helm repo update kuberay
 	helm install kuberay-operator kuberay/kuberay-operator -n kuberay --version ${KUBERAY_OPERATOR} --set image.pullPolicy=IfNotPresent --create-namespace
 	helm install -f ${ROOT_DIR}/hack/ray_api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay --version ${KUBERAY_APISERVER} --set image.pullPolicy=IfNotPresent
 	echo "Finished KubeRay deployment."
