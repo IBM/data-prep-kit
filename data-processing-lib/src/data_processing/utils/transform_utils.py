@@ -97,17 +97,13 @@ class TransformUtils:
             return ""
 
     @staticmethod
-    def get_file_extension(file_path) -> str:
+    def get_file_extension(file_path) -> list[str]:
         """
-        Get the file extension from the given file path.
+        Get the file's root and extension from the given file path.
         :param file_path : The path of the file.
         :return: str: The file extension including the dot ('.') if present, otherwise an empty string.
         """
-        ext = os.path.splitext(file_path)[1]
-        if len(ext) > 0:
-            return ext
-        else:
-            return ""
+        return os.path.splitext(file_path)
 
     @staticmethod
     def validate_columns(table: pa.Table, required: list[str]) -> bool:

@@ -49,7 +49,7 @@ def zip_to_table(data_access: DataAccess, file_path, detect_prog_lang: Any) -> p
                         # Decode the content
                         content_string = TransformUtils.decode_content(content_bytes)
                         if content_string and len(content_string) > 0:
-                            ext = TransformUtils.get_file_extension(member.filename)
+                            ext = TransformUtils.get_file_extension(member.filename)[1]
                             row_data = {
                                 "title": member.filename,
                                 "document": zip_name,
@@ -94,7 +94,7 @@ def raw_to_parquet(
         data_access = data_access_factory.create_data_access()
 
         # Get the file extension
-        ext = TransformUtils.get_file_extension(file_path)
+        ext = TransformUtils.get_file_extension(file_path)[1]
         if ext == ".zip":
             table = zip_to_table(data_access, file_path, detect_prog_lang)
             if table.num_rows > 0:
