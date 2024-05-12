@@ -4,7 +4,7 @@ op=$1
 
 source ../common.sh
 
-SLEEP_TIME="${SLEEP_TIME:-50}"
+SLEEP_TIME="${SLEEP_TIME:-60}"
 MAX_RETRIES="${MAX_RETRIES:-20}"
 EXIT_CODE=0
 
@@ -13,9 +13,8 @@ deploy() {
 	echo "Temporary dir:"
 	echo "${TEMP_DIR}"
 	cd $TEMP_DIR
-	git clone https://github.com/kubeflow/pipelines.git
+	git clone https://github.com/kubeflow/pipelines.git --branch ${PIPELINE_VERSION} --single-branch
 	cd pipelines
-	git checkout tags/${PIPELINE_VERSION}
 	kubectl apply -k manifests/kustomize/cluster-scoped-resources
 	kubectl wait --for condition=established --timeout=60s crd/applications.app.k8s.io
 	# Disable the public endpoint
@@ -36,6 +35,8 @@ deploy() {
 
 wait(){
 	echo "Wait for kubeflow deployment."
+	# see https://github.com/kubeflow/pipelines/issues/5411
+	kubectl delete deployment -n kubeflow controller-manager
 	wait_for_pods "kubeflow" "$MAX_RETRIES" "$SLEEP_TIME" || EXIT_CODE=$?
 
 	if [[ $EXIT_CODE -ne 0 ]]
@@ -49,9 +50,9 @@ wait(){
 }
 
 delete(){
-	kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/cluster-scoped-resources?ref=$PIPELINE_VERSION"
-	kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/env/dev?ref=$PIPELINE_VERSION"
-	kubectl delete clusterrolebinding pipeline-runner-extend
+  kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/env/dev?ref=$PIPELINE_VERSION" --ignore-not-found || True
+  kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/cluster-scoped-resources?ref=$PIPELINE_VERSION" --ignore-not-found || True
+  kubectl delete --ignore-not-found clusterrolebinding pipeline-runner-extend
 }
 
 usage(){
