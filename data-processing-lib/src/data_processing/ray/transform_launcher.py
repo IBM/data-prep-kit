@@ -42,6 +42,7 @@ class RayTransformLauncher:
         :param transform_runtime_config: transform runtime factory
         :param data_access_factory: the factory to create DataAccess instances.
         """
+        self.run_locally = False
         self.name = transform_runtime_config.get_name()
         self.transform_runtime_config = transform_runtime_config
         self.data_access_factory = data_access_factory
@@ -66,7 +67,10 @@ class RayTransformLauncher:
         self.transform_runtime_config.add_input_params(parser=parser)
         self.data_access_factory.add_input_params(parser=parser)
         self.ray_orchestrator.add_input_params(parser=parser)
-        args = parser.parse_args()
+        try:
+            args = parser.parse_args()
+        except SystemExit:
+            return False
         self.run_locally = args.run_locally
         if self.run_locally:
             logger.info("Running locally")
