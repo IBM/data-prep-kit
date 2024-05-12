@@ -81,7 +81,7 @@ class TransformTableProcessorRay:
                 self.stats.add_stats.remote({"skipped empty tables": 1})
                 return
             # save results
-            self._submit_table(f_name=self.last_file_name, t_start=t_start, out_tables=out_tables, stats=stats)
+            self._submit_table(t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
             logger.warning(f"Exception {e} processing file {f_name}: {traceback.format_exc()}")
             self.stats.add_stats.remote({"transform execution exception": 1})
@@ -105,32 +105,29 @@ class TransformTableProcessorRay:
             out_tables, stats = self.transform.flush()
             logger.debug(f"Done flushing transform, got {len(out_tables)} tables")
             # Here we are using the name of the last table, that we were processing
-            self._submit_table(f_name=self.last_file_name, t_start=t_start, out_tables=out_tables, stats=stats)
+            self._submit_table(t_start=t_start, out_tables=out_tables, stats=stats)
         except Exception as e:
             logger.warning(f"Exception {e} flushing: {traceback.format_exc()}")
             self.stats.add_stats.remote({"transform execution exception": 1})
 
-    def _submit_table(self, f_name: str, t_start: float, out_tables: list[pa.Table], stats: dict[str, Any]) -> None:
+    def _submit_table(self, t_start: float, out_tables: list[pa.Table], stats: dict[str, Any]) -> None:
         """
         This is a helper method writing output tables and statistics
-        :param f_name: input file n
         :param t_start: execution start time
         :param out_tables: list of tables to write
         :param stats: execution statistics to populate
         :return: None
         """
-        logger.debug(f"submitting tables under file named {f_name}, number of tables {len(out_tables)}")
+        logger.debug(f"submitting tables under file named {self.last_file_name}, number of tables {len(out_tables)}")
         # Compute output file location. Preserve sub folders for Wisdom
-        self.last_file_name = f_name
-        self.last_file_name_next_index = None
         match len(out_tables):
             case 0:
                 # no tables - save input file name for flushing
-                logger.debug(f"Transform did not produce a transformed table for file {f_name}")
+                logger.debug(f"Transform did not produce a transformed table for file {self.last_file_name}.parquet")
             case 1:
                 # we have exactly 1 table
-                output_name = self.data_access.get_output_location(path=f"{f_name}.parquet")
-                logger.debug(f"Writing transformed file {f_name}.parquet to {output_name}")
+                output_name = self.data_access.get_output_location(path=f"{self.last_file_name}.parquet")
+                logger.debug(f"Writing transformed file {self.last_file_name}.parquet to {output_name}")
                 if TransformUtils.verify_no_duplicate_columns(table=out_tables[0], file=output_name):
                     output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
                     if save_res is not None:
@@ -145,11 +142,11 @@ class TransformTableProcessorRay:
                     else:
                         logger.warning(f"Failed to write file {output_name}")
                         self.stats.add_stats.remote({"failed_writes": 1})
-                self.last_file_name_next_index = 1
+                self.last_file_name_next_index = 0
             case _:
                 # we have more then 1 table
                 table_sizes = 0
-                output_file_name = self.data_access.get_output_location(path=f_name)
+                output_file_name = self.data_access.get_output_location(path=self.last_file_name)
                 start_index = self.last_file_name_next_index
                 if start_index is None:
                     start_index = 0
@@ -159,7 +156,8 @@ class TransformTableProcessorRay:
                     if TransformUtils.verify_no_duplicate_columns(table=out_tables[index], file=output_name_indexed):
                         table_sizes += out_tables[index].nbytes
                         logger.debug(
-                            f"Writing transformed file {f_name}.parquet, {index + 1} of {count}  to {output_name_indexed}"
+                            f"Writing transformed file {self.last_file_name}.parquet, "
+                            f"{index + 1} of {count}  to {output_name_indexed}"
                         )
                         output_file_size, save_res = self.data_access.save_table(
                             path=output_name_indexed, table=out_tables[index]
