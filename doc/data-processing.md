@@ -14,6 +14,7 @@ to, for example:
 * Filter the table to remove or edit rows and/or columns, for example to remove rows from blocked domains.
 
 The table is generally expected to have something like the following minimal set of columns :
+
 * URL source of the document (can be use for domain block listing)
 * Document id
 * Contents of the actual document to be used for LLM training

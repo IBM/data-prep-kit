@@ -32,20 +32,22 @@ It uses the following components, all of which can/do define CLI configuration p
     After all parameters are validated, the ray cluster is started and the DataAccessFactory, TransformOrchestratorConfiguraiton
     and TransformConfiguration are given to the Ray Orchestrator, via Ray remote() method invocation.
     The Launcher waits for the Ray Orchestrator to complete.
-* [Ray Orchestrator](../src/data_processing/runtime/ray/transform_orchestrator.py) is responsible for overall management of
+
+* documents with [Ray Orchestrator](../src/data_processing/runtime/ray/transform_orchestrator.py) is responsible for overall management of
   the data processing job. It creates the actors, determines the set of input data and distributes the 
   references to the data files to be processed by the workers. More specifically, it performs the following:
+
   1. Uses the DataAccess instance created by the DataAccessFactory to determine the set of the files 
   to be processed.  
   2. uses the TransformConfiguration to create the TransformRuntime instance 
   3. Uses the TransformRuntime to optionally apply additional configuration (ray object storage, etc) for the configuration
   and operation of the Transform.
-  3. uses the TransformOrchestratorConfiguration to determine the set of RayWorkers to create
+  4. uses the TransformOrchestratorConfiguration to determine the set of RayWorkers to create
   to execute transformers in parallel, providing the following to each worker:
       * Ray worker configuration
       * DataAccessFactory 
       * Transform class and its TransformConfiguration containing the CLI parameters and any TransformRuntime additions.
-  4. in a load-balanced, round-robin fashion, distributes the names of the input files to the workers for them to transform/process.
+  5. in a load-balanced, round-robin fashion, distributes the names of the input files to the workers for them to transform/process.
    
   Additionally, to provide monitoring of long-running transforms, the orchestrator is instrumented with 
   [custom metrics](https://docs.ray.io/en/latest/ray-observability/user-guides/add-app-metrics.html), that are exported to localhost:8080 (this is the endpoint that 
@@ -53,11 +55,13 @@ It uses the following components, all of which can/do define CLI configuration p
   Once all data is processed, the orchestrator will collect execution statistics (from the statistics actor) 
   and build and save it in the form of execution metadata (`metadata.json`). Finally, it will return the execution 
   result to the Launcher.
+
 * [Ray worker](../src/data_processing/runtime/ray/transform_table_processor.py) is responsible for 
 reading files (as [PyArrow Tables](https://levelup.gitconnected.com/deep-dive-into-pyarrow-understanding-its-features-and-benefits-2cce8b1466c8))
 assigned by the orchestrator, applying the transform to the input table and writing out the 
 resulting table(s).  Metadata produced by each table transformation is aggregated into
 Transform Statistics (below).
+
 * [Transform Statistics](../src/data_processing/runtime/ray/transform_statistics.py) is a general 
 purpose data collector actor aggregating the numeric metadata from different places of 
 the framework (especially metadata produced by the transform).

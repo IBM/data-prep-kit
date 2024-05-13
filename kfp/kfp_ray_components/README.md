@@ -12,6 +12,7 @@ A pipeline component is a self-contained set of code that performs one step in a
 ````
 
 The first step in creation of components its implementation. The framework automation includes the following 3 components:
+
 * [Create Ray cluster](src/create_ray_cluster.py) is responsible for creation of the Ray cluster. Its implementation is 
   based on the [RayRemoteJobs class](../kfp_support_lib/src/kfp_support/workflow_support/README.md)
 * [execute Ray job](src/execute_ray_job.py) is responsible for submission of the Ray job, watching its execution,
@@ -29,6 +30,7 @@ command-line arguments to pass to your component’s code.
 * The component’s metadata, such as the name and description.
 
 Components specifications are provided here:
+
 * [Create Ray cluster Component](createRayComponent.yaml)
 * [execute Ray job component](executeRayJobComponent.yaml)
 * [clean up Ray cluster component](cleanupRayComponent.yaml)

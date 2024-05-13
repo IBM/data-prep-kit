@@ -44,16 +44,19 @@ not need this feature, a default implementation is provided to return an empty l
 The [TransformConfiguration](../src/data_processing/transform/transform_configuration.py)
 serves as an interface and must be implemented by the any `AbstractTableTransform`
 implementation to provide the following configuration:
+
 * the transform class to be used,
 * command line arguments used to initialize the Transform Runtime and generally, the Transform.
 * Transform Runtime class to use
 * transform short name 
+
 It is expected that transforms are initialized with a fixed name, the class of its corresponding
 `AbstractTableTransform` implementation and optionally the configuration keys that should not
 be exposed as metadata for a run.
 To support command line configuration, the `TransformConfiguration` extends the
 [CLIArgumentProvider](../src/data_processing/utils/cli_utils.py) class.
 The set of methods of interest are
+
 * ```__init__(self, name:str, transform_class:type[AbstractTableTransform], list[str]:remove_from_metadata )``` - sets the required fields
 * ```add_input_params(self, parser:ArgumentParser)``` - adds transform-specific command line options that will
 be made available in the dictionary provided to the transform's initializer.

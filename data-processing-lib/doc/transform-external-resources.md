@@ -8,6 +8,7 @@ In addition to actually loading the resource(s), the transform needs to define t
 defines the location of the domain list. 
 
 In the next sections we cover the following:
+
    1. How to define the transform-specific resource location(s) as command line arguments
    2. How to load the transform-specific resources, either or both of:
       1. During transform initialization - this is useful for testing outside of ray, and optionally
