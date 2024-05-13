@@ -623,7 +623,9 @@ class RayRemoteJobs:
         if status // 100 != 2:
             sys.exit(1)
         self._print_log(log=log, previous_log_len=previous_log_len)
-        logger.info(f"Job completed with execution status {status}")
+        logger.info(f"Job completed with execution status {job_status}")
+        if job_status != JobStatus.SUCCEEDED:
+            sys.exit(1)
         if data_access is None:
             return
         # Here data access is either S3 or lakehouse both of which contain self.output_folder
