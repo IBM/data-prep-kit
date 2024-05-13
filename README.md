@@ -112,6 +112,9 @@ for creating and managing the Ray cluster and [KubeRay API server](https://githu
 to interact with the KubeRay operator. An additional [framework](kfp/kfp_support_lib) along with several
 [kfp components](kfp/kfp_ray_components) is used to simplify the pipeline implementation.
 
+#### Example Notebook
+A quick way to get started is to use a demo data-processing pipeline locally via [example notebook](./examples/).  
+
 
 ## &#x2699; Setup <a name = "setup"></a>
 
