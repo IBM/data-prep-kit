@@ -17,7 +17,8 @@ The following programs should be manually installed:
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) 1.26 or newer must be installed on your machine.
 - [wget](https://www.gnu.org/software/wget/) 1.21 must be installed on your machine.
 - [MinIO Client (mc)](https://min.io/docs/minio/kubernetes/upstream/index.html) must be installed on your machine. Please 
-choose your OS system, and process according to "(Optional) Install the MinIO Client". You have to install the `mc` client only. 
+choose your OS system, and process according to "(Optional) Install the MinIO Client". You have to install the `mc` client only.
+- [git client](https://git-scm.com/downloads), we use git client to clone installation repository
 - [lsof](https://www.ionos.com/digitalguide/server/configuration/linux-lsof/) usually it is part of Linux or MacOS distribution.
 - Container agent such as [Docker](https://www.docker.com/) or [Podman](https://podman-desktop.io/)
 

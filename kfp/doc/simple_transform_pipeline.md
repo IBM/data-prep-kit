@@ -203,11 +203,12 @@ To compile pipeline execute `make build` command in the same directory where you
 
 ## Preparing cluster for pipeline execution
 
-We support two options for preparing cluster - local KInd cluster and usage of the standard Kubernetes 
-or OpenShift cluster. We recommend using Kind cluster for only for local testing and debugging, 
-not production loads. For production loads use external Kubernetes cluster.
+The project provides instructions and deployment automation to run all components in an all-inclusive fashion on a 
+single machine using a Kind cluster. However, this topology is not suitable for processing medium and large datasets, 
+and deployment should be carried out on a real Kubernetes or OpenShift cluster. Therefore, we recommend using Kind 
+cluster for only for local testing and debugging, not production loads. For production loads use a real Kubernetes cluster.
 
-### Preparing Knd cluster
+### Preparing Kind cluster
 
 You can create a Kind cluster with all required software installed
 using the following command: 
@@ -215,7 +216,6 @@ using the following command:
 ````shell
  make setup
 ````
-**Note** that this command has to run from the project kind subdirectory
 
 We tested Kind cluster installation on multiple platforms, including Intel Mac, 
 AMD Mac (see [this](deployment_on_MacOS.md)), Windows, 
@@ -224,23 +224,47 @@ for additional RHEL configurations) and Ubuntu. Additional platform can be used,
 require additional configuration and testing.
 
 ### Preparing an existing Kubernetes cluster
+Alternatively you can deploy pipeline to the existing Kubernetes cluster. 
 
-Alternatively you can deploy pipeline to the existing Kubernetes cluster. This cluster should have both KubeRay
-and KFP (**Note** We are currently using KFP V1) installed.
+#### Pre-requirements
+Deployment on an existing cluster requires less pre-installed software
+Only the following programs should be manually installed:
 
-To install KubeRay on your cluster first create `kuberay` namespace:
+- [Helm](https://helm.sh/docs/intro/install/) 3.10.0 or greater must be installed and configured on your machine.
+- [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) 1.26 or newer must be installed on your machine, and be 
+able to connect to the external cluster. For OpenShift clusters OpenShift CLI 
+[oc](https://docs.openshift.com/container-platform/4.15/cli_reference/openshift_cli/getting-started-cli.html) can be used instead.
+- [wget](https://www.gnu.org/software/wget/) 1.21 must be installed on your machine.
 
-```shell
-kubectl create namespace kuberay
+#### Installation steps
+
+In order to execute data transformers on the remote cluster, the following packages should be installed on the Kubernetes cluster:
+
+- [KubeFlow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) (KFP). Currently, we use 
+upstream Argo-based KFP v1.
+- [KubeRay](https://docs.ray.io/en/latest/cluster/kubernetes/index.html) controller and 
+[KubeRay API Server](https://ray-project.github.io/kuberay/components/apiserver/) 
+
+You can install the software from their repositories, or you can use our installation scripts.
+
+If your local kubectl is configured to connect to the external cluster do the following:
+```bash
+export EXTERNAL_CLUSTER=1
+make setup
 ```
 
-and deploy in it KubeRay operator and KubeRay API aerver. You can use
-this [script](../../kind/hack/tools/install_kuberay.sh) or use
-[documentation](https://docs.ray.io/en/master/cluster/kubernetes/getting-started.html#kuberay-quickstart)
+- In addition, you should configure external access to the KFP UI (`svc/ml-pipeline-ui` in the `kubeflow` ns) and the Ray 
+Server API (`svc/kuberay-apiserver-service` in the `kuberay` ns). Depends on your cluster and its deployment it can be 
+LoadBalancer services, Ingresses or Routes. 
 
-To install KFP on your cluster, you can use this
-[script](../../kind/hack/tools/install_kubeflow.sh))
-or refer to KFP [documentation](https://www.kubeflow.org/docs/components/pipelines/v1/installation/overview/).
+- Optionally, you can upload the test data into the [MinIO](https://min.io/) Object Store, deployed as part of KFP. In 
+order to do this, please provide external access to the Minio (`svc/minio-service` in the `kubeflow` ns) and execute the 
+following commands: 
+```bash
+export MINIO_SERVER=<Minio external URL>
+kubectl apply -f kind/hack/s3_secret.yaml
+kind/hack/populate_minio.sh
+```
 
 ## Deploying workflow
 
