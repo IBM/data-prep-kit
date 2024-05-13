@@ -218,10 +218,8 @@ using the following command:
 ````
 
 We tested Kind cluster installation on multiple platforms, including Intel Mac, 
-AMD Mac (see [this](deployment_on_MacOS.md)), Windows, 
-RHEL(see [this](https://github.ibm.com/dettori/ks-integrations/blob/main/kfp/docs/RHEL-KS-install.md#increasing-limits)
-for additional RHEL configurations) and Ubuntu. Additional platform can be used, but might
-require additional configuration and testing.
+AMD Mac (see [this](deployment_on_MacOS.md)), WSL on Windows, 
+RHEL and Ubuntu. Additional platform can be used, but might require additional configuration and testing.
 
 ### Preparing an existing Kubernetes cluster
 Alternatively you can deploy pipeline to the existing Kubernetes cluster. 
