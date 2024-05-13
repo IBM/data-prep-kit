@@ -120,12 +120,13 @@ class RayTransformLauncher(AbstractTransformLauncher):
     def launch(self) -> int:
         """
         Execute method orchestrates driver invocation
-        :return:
+        :return: launch result
         """
         if self.__get_parameters():
-            return self._submit_for_execution()
-        if self.run_locally:
-            return 1
+            res = self._submit_for_execution()
         else:
+            res = 1
+        if not self.run_locally and res > 0:
             # if we are running in kfp exit to signal kfp that we failed
             sys.exit(1)
+        return res
