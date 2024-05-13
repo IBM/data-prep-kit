@@ -52,7 +52,18 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requiremen
 	. ${WORKFLOW_VENV_ACTIVATE};     \
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/;
 	@# Help: Create the virtual environment common to all workflows
-	
+
+
+#TODO KFPv2
+${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt
+	@# Help: Create the virtual environment common to all workflows
+	rm -rf ${REPOROOT}/kfp/transform_workflows/venv
+	$(PYTHON) -m venv ${REPOROOT}/kfp/transform_workflows/venv
+	. ${VENV_ACTIVATE};     \
+	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple; \
+	pip install kfp-kubernetes --extra-index-url https://pypi.org/simple; \
+	pip install -e $(REPOROOT)/kfp/kfp_support_lib/
+
 .PHONY: .transforms_workflows.upload-pipeline
 .transforms_workflows.upload-pipeline:
 	$(call set_env_var, CLUSTER_EXISTS, $(shell kind get clusters | grep ${KIND_CLUSTER_NAME}))
