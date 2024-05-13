@@ -15,9 +15,11 @@ import time
 
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.runtime import TransformExecutionConfiguration
-from data_processing.runtime.pure_python import orchestrate
+from data_processing.runtime.pure_python import (
+    PythonTransformConfiguration,
+    orchestrate,
+)
 from data_processing.runtime.transform_launcher import AbstractTransformLauncher
-from data_processing.transform import TransformConfiguration
 from data_processing.utils import get_logger
 
 
@@ -31,7 +33,7 @@ class PythonTransformLauncher(AbstractTransformLauncher):
 
     def __init__(
         self,
-        transform_config: TransformConfiguration,
+        transform_config: PythonTransformConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """

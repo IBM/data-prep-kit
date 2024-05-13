@@ -1,3 +1,4 @@
 from data_processing.runtime.execution_configuration import TransformExecutionConfiguration
+from data_processing.runtime.transform_configuration import AbstractTransformConfiguration
 from data_processing.runtime.transform_launcher import AbstractTransformLauncher
 from data_processing.runtime.transform_table_processor import AbstractTransformTableProcessor

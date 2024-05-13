@@ -24,11 +24,14 @@ from argparse import ArgumentParser, Namespace
 import numpy as np
 import pyarrow as pa
 from bs4 import BeautifulSoup
+from data_processing.runtime.pure_python.transform_configuration import (
+    PythonTransformConfiguration,
+)
 from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
     RayTransformConfiguration,
 )
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.transform import AbstractTableTransform, BaseTransformConfiguration
 from data_processing.utils import TransformUtils
 from transformers import AutoTokenizer
 
@@ -285,7 +288,7 @@ class CodeQualityTransform(AbstractTableTransform):
         return [annotated_table], {}
 
 
-class CodeQualityTransformConfiguration(TransformConfiguration):
+class CodeQualityTransformConfiguration(BaseTransformConfiguration):
     def __init__(self):
         super().__init__(name="code_quality", transform_class=CodeQualityTransform)
 
@@ -340,7 +343,12 @@ class CodeQualityTransformConfiguration(TransformConfiguration):
 
 class CodeQualityRayTransformConfiguration(RayTransformConfiguration):
     def __init__(self):
-        super().__init__(transform_config=CodeQualityTransformConfiguration())
+        super().__init__(base_configuration=CodeQualityTransformConfiguration())
+
+
+class CodeQualityPythonTransformConfiguration(PythonTransformConfiguration):
+    def __init__(self):
+        super().__init__(base_configuration=CodeQualityTransformConfiguration())
 
 
 if __name__ == "__main__":

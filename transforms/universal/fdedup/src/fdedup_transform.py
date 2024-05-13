@@ -29,7 +29,7 @@ from data_processing.runtime.ray import (
 from data_processing.runtime.ray.transform_configuration import (
     RayTransformConfiguration,
 )
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.transform import AbstractTableTransform, BaseTransformConfiguration
 from data_processing.utils import (
     RANDOM_SEED,
     CLIArgumentProvider,
@@ -719,7 +719,7 @@ class FdedupRuntime(DefaultTableTransformRuntimeRay):
         } | stats
 
 
-class FdedupTableTransformConfiguration(TransformConfiguration):
+class FdedupTableTransformConfiguration(BaseTransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -799,7 +799,7 @@ class FdedupTableTransformConfiguration(TransformConfiguration):
 
 class FdedupRayTransformConfiguration(RayTransformConfiguration):
     def __init__(self):
-        super().__init__(transform_config=FdedupTableTransformConfiguration(), runtime_class=FdedupRuntime)
+        super().__init__(base_configuration=FdedupTableTransformConfiguration(), runtime_class=FdedupRuntime)
 
 
 if __name__ == "__main__":

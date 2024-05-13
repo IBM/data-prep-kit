@@ -17,7 +17,7 @@ from data_processing.transform import AbstractTableTransform
 from data_processing.utils import CLIArgumentProvider
 
 
-class TransformConfiguration(CLIArgumentProvider):
+class BaseTransformConfiguration(CLIArgumentProvider):
     """
     This is a base transform configuration class defining transform's input/output parameter
     """
@@ -25,6 +25,9 @@ class TransformConfiguration(CLIArgumentProvider):
     def __init__(self, name: str, transform_class: type[AbstractTableTransform], remove_from_metadata: list[str] = []):
         """
         Initialization
+        :param name: transformer name
+        :param transform_class: transform implementation class
+        :param remove_from_metadata - list of parameters to remove from metadata
         """
         self.name = name
         self.transform_class = transform_class
@@ -67,7 +70,7 @@ class TransformConfiguration(CLIArgumentProvider):
 
 
 def get_transform_config(
-    transform_configuration: TransformConfiguration, argv: list[str], parser: ArgumentParser = None
+    transform_configuration: BaseTransformConfiguration, argv: list[str], parser: ArgumentParser = None
 ):
     """
     Create a transform configuration dictionary  using the given Configuration class and dictionary of

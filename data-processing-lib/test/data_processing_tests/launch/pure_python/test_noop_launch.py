@@ -13,9 +13,11 @@
 import os
 
 import pyarrow as pa
+from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
+from data_processing.test_support.transform import NOOPPythonTransformConfiguration
 
 
 table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})
@@ -30,12 +32,8 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        # basedir = "../../../../test-data/data_processing/ray/noop/"
-        # basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
-        # launcher = PythonTransformLauncher(NOOPTransformConfiguration())
-        # fixtures = [(launcher, {"noop_sleep_sec": 0}, basedir + "/input", basedir + "/expected")]
-        # return fixtures
-        return []  # This is passing in pycharm but failing at the command line due to DataAccessS3 getting involved.
-
-
-#
+        basedir = "../../../../test-data/data_processing/ray/noop/"
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
+        fixtures = [(launcher, {"noop_sleep_sec": 0}, basedir + "/input", basedir + "/expected")]
+        return fixtures

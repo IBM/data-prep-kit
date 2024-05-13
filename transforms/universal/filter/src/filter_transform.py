@@ -16,11 +16,14 @@ import json
 
 import duckdb
 import pyarrow as pa
+from data_processing.runtime.pure_python.transform_configuration import (
+    PythonTransformConfiguration,
+)
 from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
     RayTransformConfiguration,
 )
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.transform import AbstractTableTransform, BaseTransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -135,7 +138,7 @@ class FilterTransform(AbstractTableTransform):
         return [filtered_table_cols_dropped], metadata
 
 
-class FilterTransformConfiguration(TransformConfiguration):
+class FilterTransformConfiguration(BaseTransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -199,9 +202,14 @@ class FilterTransformConfiguration(TransformConfiguration):
         return True
 
 
+class FilterPythonTransformConfiguration(PythonTransformConfiguration):
+    def __init__(self):
+        super().__init__(base_configuration=FilterTransformConfiguration())
+
+
 class FilterRayTransformConfiguration(RayTransformConfiguration):
     def __init__(self):
-        super().__init__(transform_config=FilterTransformConfiguration())
+        super().__init__(base_configuration=FilterTransformConfiguration())
 
 
 if __name__ == "__main__":

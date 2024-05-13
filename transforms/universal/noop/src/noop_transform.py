@@ -15,11 +15,14 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
+from data_processing.runtime.pure_python.transform_configuration import (
+    PythonTransformConfiguration,
+)
 from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
     RayTransformConfiguration,
 )
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.transform import AbstractTableTransform, BaseTransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -68,7 +71,7 @@ class NOOPTransform(AbstractTableTransform):
         return [table], metadata
 
 
-class NOOPTransformConfiguration(TransformConfiguration):
+class NOOPBaseTransformConfiguration(BaseTransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -121,6 +124,21 @@ class NOOPTransformConfiguration(TransformConfiguration):
         return True
 
 
+class NOOPPythonTransformConfiguration(PythonTransformConfiguration):
+    """
+    Implements the PythonTransformConfiguration for NOOP as required by the PythonTransformLauncher.
+    NOOP does not use a RayRuntime class so the superclass only needs the base
+    python-only configuration.
+    """
+
+    def __init__(self):
+        """
+        Initialization
+        :param base_configuration - base configuration class
+        """
+        super().__init__(base_configuration=NOOPBaseTransformConfiguration())
+
+
 class NOOPRayTransformConfiguration(RayTransformConfiguration):
     """
     Implements the RayTransformConfiguration for NOOP as required by the RayTransformLauncher.
@@ -129,7 +147,11 @@ class NOOPRayTransformConfiguration(RayTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(transform_config=NOOPTransformConfiguration())
+        """
+        Initialization
+        :param base_configuration - base configuration class
+        """
+        super().__init__(base_configuration=NOOPBaseTransformConfiguration())
 
 
 if __name__ == "__main__":

@@ -15,9 +15,12 @@ import traceback
 from datetime import datetime
 
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.runtime import TransformExecutionConfiguration
+from data_processing.runtime import (
+    AbstractTransformConfiguration,
+    TransformExecutionConfiguration,
+)
 from data_processing.runtime.pure_python import TransformTableProcessor
-from data_processing.transform import TransformConfiguration, TransformStatistics
+from data_processing.transform import TransformStatistics
 from data_processing.utils import get_logger
 
 
@@ -26,7 +29,7 @@ logger = get_logger(__name__)
 
 def orchestrate(
     data_access_factory: DataAccessFactoryBase,
-    transform_config: TransformConfiguration,
+    transform_config: AbstractTransformConfiguration,
     execution_config: TransformExecutionConfiguration,
 ) -> int:
     """
