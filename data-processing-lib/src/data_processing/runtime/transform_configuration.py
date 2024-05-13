@@ -13,12 +13,12 @@
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-from data_processing.transform import AbstractTableTransform, BaseTransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider
 
 
 class AbstractTransformConfiguration(CLIArgumentProvider):
-    def __init__(self, base_configuration: BaseTransformConfiguration):
+    def __init__(self, base_configuration: TransformConfiguration):
         """
         Initialization
         :param base_configuration - base configuration class

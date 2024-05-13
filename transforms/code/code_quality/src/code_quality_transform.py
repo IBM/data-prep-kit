@@ -31,7 +31,7 @@ from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
     RayTransformConfiguration,
 )
-from data_processing.transform import AbstractTableTransform, BaseTransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import TransformUtils
 from transformers import AutoTokenizer
 
@@ -288,7 +288,7 @@ class CodeQualityTransform(AbstractTableTransform):
         return [annotated_table], {}
 
 
-class CodeQualityTransformConfiguration(BaseTransformConfiguration):
+class CodeQualityTransformConfiguration(TransformConfiguration):
     def __init__(self):
         super().__init__(name="code_quality", transform_class=CodeQualityTransform)
 

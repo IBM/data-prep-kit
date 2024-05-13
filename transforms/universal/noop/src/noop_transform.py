@@ -22,7 +22,7 @@ from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
     RayTransformConfiguration,
 )
-from data_processing.transform import AbstractTableTransform, BaseTransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -71,7 +71,7 @@ class NOOPTransform(AbstractTableTransform):
         return [table], metadata
 
 
-class NOOPBaseTransformConfiguration(BaseTransformConfiguration):
+class NOOPBaseTransformConfiguration(TransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include

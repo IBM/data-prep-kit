@@ -26,7 +26,7 @@ from data_processing.runtime.ray import (
 from data_processing.runtime.ray.transform_configuration import (
     RayTransformConfiguration,
 )
-from data_processing.transform import AbstractTableTransform, BaseTransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -147,7 +147,7 @@ class DocIDRuntime(DefaultTableTransformRuntimeRay):
         return {_id_generator_key: IDGenerator.remote()} | self.params
 
 
-class DocIDTransformConfiguration(BaseTransformConfiguration):
+class DocIDTransformConfiguration(TransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include

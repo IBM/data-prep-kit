@@ -30,7 +30,7 @@ from data_processing.runtime.ray import (
 from data_processing.runtime.ray.transform_configuration import (
     RayTransformConfiguration,
 )
-from data_processing.transform import AbstractTableTransform, BaseTransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import TransformUtils, get_logger
 from ray.actor import ActorHandle
 
@@ -155,7 +155,7 @@ class ProgLangSelectRuntime(DefaultTableTransformRuntimeRay):
         return {lang_allowed_languages: lang_refs} | self.params
 
 
-class ProgLangSelectTransformConfiguration(BaseTransformConfiguration):
+class ProgLangSelectTransformConfiguration(TransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.

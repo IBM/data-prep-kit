@@ -12,13 +12,13 @@
 
 from data_processing.runtime import AbstractTransformConfiguration
 from data_processing.runtime.ray import DefaultTableTransformRuntimeRay
-from data_processing.transform import BaseTransformConfiguration
+from data_processing.transform import TransformConfiguration
 
 
 class RayTransformConfiguration(AbstractTransformConfiguration):
     def __init__(
         self,
-        base_configuration: BaseTransformConfiguration,
+        base_configuration: TransformConfiguration,
         runtime_class: type[DefaultTableTransformRuntimeRay] = DefaultTableTransformRuntimeRay,
     ):
         """

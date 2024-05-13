@@ -23,7 +23,7 @@ from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
     RayTransformConfiguration,
 )
-from data_processing.transform import AbstractTableTransform, BaseTransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -138,7 +138,7 @@ class FilterTransform(AbstractTableTransform):
         return [filtered_table_cols_dropped], metadata
 
 
-class FilterTransformConfiguration(BaseTransformConfiguration):
+class FilterTransformConfiguration(TransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.

@@ -11,11 +11,11 @@
 ################################################################################
 
 from data_processing.runtime import AbstractTransformConfiguration
-from data_processing.transform import BaseTransformConfiguration
+from data_processing.transform import TransformConfiguration
 
 
 class PythonTransformConfiguration(AbstractTransformConfiguration):
-    def __init__(self, base_configuration: BaseTransformConfiguration):
+    def __init__(self, base_configuration: TransformConfiguration):
         """
         Initialization
         :param base_configuration - base configuration class
