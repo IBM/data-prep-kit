@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# The functions in this file are taken from:
+# "https://raw.githubusercontent.com/kubeflow/kfp-tekton/v1.8.1/scripts/deploy/iks/helper-functions.sh".
+
 wait_for_pods () {
     if [[ $# -ne 3 ]]
     then
