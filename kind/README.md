@@ -5,7 +5,8 @@
 ### Supported platforms
 A Kind cluster is not intended for production purposes; it is only meant as a local execution example. However,
 running a Kind Kubernetes cluster with KubeFlow pipelines (KFP) and local data storage (Minio) requires significant
-memory. Therefore, we recommend deploying it on machines with at least 32 GB of RAM and 8-9 CPU cores.
+memory. Therefore, we recommend deploying it on machines with at least 32 GB of RAM and 8-9 CPU cores. RHEL OS requires 
+more resources, e.g. 64 GB RAM and 32 CPU cores.
 
 > **Note**: for MacOS users, see the following [comments](../doc/mac.md)
 
