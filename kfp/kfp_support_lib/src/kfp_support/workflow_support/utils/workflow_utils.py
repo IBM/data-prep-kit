@@ -163,10 +163,10 @@ class PipelinesUtils:
             pipeline = self.get_pipeline_by_name(name=pipeline_name)
             if pipeline is not None:
                 try:
-                    print(f"pipeline {pipeline_name} already exists. Trying to delete it.")
+                    logger.info(f"pipeline {pipeline_name} already exists. Trying to delete it.")
                     self.kfp_client.delete_pipeline(pipeline_id=pipeline.id)
                 except Exception as e:
-                    print(f"Exception deleting pipeline {e} before uploading")
+                    logger.warning(f"Exception deleting pipeline {e} before uploading")
                     return None
         try:
             pipeline = self.kfp_client.upload_pipeline(
