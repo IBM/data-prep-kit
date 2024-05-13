@@ -8,14 +8,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Collection of code data specific annotations and its heuristics are inspired from:
+################################################################################
+
+# Collection of code data specific annotations and its heuristics are borrowed from:
 # CodeParrot  https://github.com/huggingface/transformers/tree/main/examples/research_projects/codeparrot#preprocessing
 # BigCode Dataset https://github.com/bigcode-project/bigcode-dataset/tree/main/preprocessing
 #
 # Code specific heuristics like alpha numeric, char token ratio implementations & others are taken from CodeParrot and BigCode Dataset
 # preprocessing scripts and modified according to data-prep-kit specific framework.
-
-################################################################################
 
 
 import os
