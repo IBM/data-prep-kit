@@ -15,11 +15,13 @@ from typing import Any
 
 from kfp_support.api_server_client.params import (
     EnvironmentVariables,
+    BaseVolume,
     HeadNodeSpec,
     WorkerNodeSpec,
     environment_variables_decoder,
     head_node_spec_decoder,
     worker_node_spec_decoder,
+    volume_decoder
 )
 
 
@@ -34,6 +36,118 @@ class Environment(enum.Enum):
     PRODUCTION = 3  # production
 
 
+class UpscalingMode(enum.Enum):
+    """
+    Enumeration of autoscaling mode
+    """
+
+    Conservative = "Conservative"  # Rate-limited; the number of pending worker pods is at most the size of the Ray cluster
+    Default = "Default"  # no rate limitations
+    Aggressive = "Aggressive"  # same as default
+
+
+class AutoscalerOptions:
+    """
+    AutoscalerOptions is used to define Ray cluster autoscaling.
+    It provides APIs to create, stringify and convert to dict.
+
+    Methods:
+    - Create autoscaling options specification: gets the following parameters:
+        idle_timeout - optional, number of seconds to wait before scaling down a worker pod which is not using Ray
+                       resources. Default 60sec (one minute).
+        upscaling_mode - required autoscaler upscaling mode
+        image - optional, allows to override the autoscaler's container image
+        image_pull_policy - optional, allows to override the autoscaler's container image pull policy
+        cpus - optional, CPUs requirements for autoscaler - default "500m"
+        memory - optional, memory requirements for autoscaler - default "512Mi"
+        environment - optional, environment variables for autoscaler container
+        volumes - optional, a list of volumes to attach to autoscaler container.
+                  This is needed for enabling TLS for the autoscaler container.
+    """
+    def __init__(
+            self,
+            upscaling_mode: UpscalingMode = UpscalingMode.Default,
+            idle_tmout: int = None,
+            image: str = None,
+            image_pull_policy: str = None,
+            cpus: str = None,
+            memory: str = None,
+            environment: EnvironmentVariables = None,
+            volumes: list[BaseVolume] = None,
+    ):
+        """
+        Initialization
+        :param upscaling_mode: upscale mode
+        :param idle_tmout: idle timeout
+        :param image: image
+        :param image_pull_policy: image pull policy
+        :param cpus: cpu requirement for autoscaling
+        :param memory: memory requirement for autoscaling
+        :param environment: autoscaler environment
+        :param volumes:  volumes for autoscaler
+        """
+        self.upscaling_mode = upscaling_mode
+        self.idle_tmout = idle_tmout
+        self.image = image
+        self.image_pull_policy = image_pull_policy
+        self.cpus = cpus
+        self.memory = memory
+        self.environment = environment
+        self.volumes = volumes
+
+    def to_string(self) -> str:
+        """
+        Convert to string
+        :return: string representation of the head node
+        """
+        val = f"upscaling_mode = {self.upscaling_mode}"
+        if self.idle_tmout is not None:
+            val += f", idle_timeout = {self.idle_tmout}"
+        if self.image is not None:
+            val += f", image = {self.image}"
+        if self.image_pull_policy is not None:
+            val += f", image_pull_policy = {self.image_pull_policy}"
+        if self.cpus is not None:
+            val += f", cpus = {self.cpus}"
+        if self.memory is not None:
+            val += f", memory = {self.memory}"
+        if self.volumes is not None:
+            val = val + ",\n volumes = ["
+            first = True
+            for v in self.volumes:
+                if first:
+                    first = False
+                else:
+                    val += ", "
+                val = val + "{" + v.to_string() + "}"
+            val = val + "]"
+        if self.environment is not None:
+            val = val + f",\n environment = {self.environment.to_string()}"
+        return val
+
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Convert to dictionary
+        :return: dictionary representation of the head node
+        """
+        dct = {"upscalingMode": self.upscaling_mode.value}
+        if self.idle_tmout is not None:
+            dct["idleTimeoutSeconds"] = self.idle_tmout
+        if self.image is not None:
+            dct["image"] = self.image
+        if self.image_pull_policy is not None:
+            dct["imagePullPolicy"] = self.image_pull_policy
+        if self.cpus is not None:
+            dct["cpu"] = self.cpus
+        if self.memory is not None:
+            dct["memory"] = self.memory
+        if self.volumes is not None:
+            dct["volumes"] = [v.to_dict() for v in self.volumes]
+        if self.environment is not None:
+            dct["envs"] = self.environment.to_dict()
+        return dct
+
+
 class ClusterSpec:
     """
     ClusterSpec is used to define Ray cluster.
@@ -43,18 +157,22 @@ class ClusterSpec:
     - Create cluster spec from: gets the following parameters:
         head_group_spec - required, specification of the head node
         worker_group_spec - optional, list of worker group specs
+        autoscaler_options - optional, autoscaling options
     - to_string() -> str: convert toleration to string for printing
     - to_dict() -> dict[str, Any] convert to dict
     """
 
-    def __init__(self, head_node: HeadNodeSpec, worker_groups: list[WorkerNodeSpec] = None):
+    def __init__(self, head_node: HeadNodeSpec, worker_groups: list[WorkerNodeSpec] = None,
+                 autoscaling_options: AutoscalerOptions = None):
         """
         Initialization
         :param head_node - head node definition
         :param worker_groups - worker group definition
+        :param autoscaling_options - autoscaler options
         """
         self.head_node = head_node
         self.worker_groups = worker_groups
+        self.autoscaling_options = autoscaling_options
 
     def to_string(self) -> str:
         """
@@ -66,6 +184,8 @@ class ClusterSpec:
             val += "\nworker groups: "
             for w in self.worker_groups:
                 val += f"\nworker_group_spec = {w.to_string()}]"
+        if self.autoscaling_options is not None:
+            val += f"\nautoscaling options = {self.autoscaling_options.to_string()}"
         return val
 
     def to_dict(self) -> dict[str, Any]:
@@ -76,6 +196,9 @@ class ClusterSpec:
         dst = {"headGroupSpec": self.head_node.to_dict()}
         if self.worker_groups is not None:
             dst["workerGroupSpec"] = [w.to_dict() for w in self.worker_groups]
+        if self.autoscaling_options is not None:
+            dst["enableInTreeAutoscaling"] = True
+            dst["autoscalerOptions"] = self.autoscaling_options.to_dict()
         return dst
 
 
@@ -258,6 +381,33 @@ class Cluster:
 """
 
 
+def autoscaling_decoder(dct: dict[str, Any]) -> AutoscalerOptions:
+    """
+    Create autoscaling options from its dictionary representation
+    :param dct: dictionary representation of cluster spec
+    :return: autoscaling options
+    """
+    upscaling_mode = UpscalingMode.Default
+    if "upscalingMode" in dct:
+        upscaling_mode = UpscalingMode(dct.get("upscalingMode"))
+    volumes = None
+    if "volumes" in dct:
+        volumes = [volume_decoder(v) for v in dct["volumes"]]
+    environments = None
+    if "environment" in dct and len(dct.get("envs")) > 0:
+        environments = environment_variables_decoder(dct.get("envs"))
+    return AutoscalerOptions(
+        upscaling_mode=upscaling_mode,
+        idle_tmout=dct.get("idleTimeoutSeconds", None),
+        image=dct.get("image", None),
+        image_pull_policy=dct.get("imagePullPolicy", None),
+        cpus=dct.get("cpu", None),
+        memory=dct.get("memory", None),
+        environment=environments,
+        volumes=volumes
+    )
+
+
 def cluster_spec_decoder(dct: dict[str, Any]) -> ClusterSpec:
     """
     Create cluster spec from its dictionary representation
@@ -265,9 +415,13 @@ def cluster_spec_decoder(dct: dict[str, Any]) -> ClusterSpec:
     :return: cluster spec
     """
     workers = None
+    autoscaling_options = None
     if "workerGroupSpec" in dct:
         workers = [worker_node_spec_decoder(w) for w in dct["workerGroupSpec"]]
-    return ClusterSpec(head_node=head_node_spec_decoder(dct.get("headGroupSpec")), worker_groups=workers)
+    if "enableInTreeAutoscaling" in dct and dct.get("enableInTreeAutoscaling"):
+        autoscaling_options = autoscaling_decoder(dct.get("autoscalerOptions", {}))
+    return ClusterSpec(head_node=head_node_spec_decoder(dct.get("headGroupSpec")), worker_groups=workers,
+                       autoscaling_options=autoscaling_options)
 
 
 def cluster_decoder(dct: dict[str, Any]) -> Cluster:

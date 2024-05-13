@@ -15,6 +15,7 @@ import json
 from kfp_support.api_server_client.params import (
     DEFAULT_HEAD_START_PARAMS,
     DEFAULT_WORKER_START_PARAMS,
+    AutoscalerOptions,
     AccessMode,
     Cluster,
     ClusterEvent,
@@ -40,6 +41,7 @@ from kfp_support.api_server_client.params import (
     TolerationEffect,
     TolerationOperation,
     WorkerNodeSpec,
+    autoscaling_decoder,
     cluster_decoder,
     cluster_spec_decoder,
     env_var_from_decoder,
@@ -197,6 +199,7 @@ def test_head_node_spec():
         service_type=ServiceType.ClusterIP,
         volumes=volumes,
         environment=env_s,
+        image_pull_policy="Always"
     )
     print(f"\nhead node: {head.to_string()}")
     head_json = json.dumps(head.to_dict())
@@ -230,11 +233,26 @@ def test_worker_node_spec():
         ray_start_params=DEFAULT_WORKER_START_PARAMS,
         environment=env_s,
         labels={"key": "value"},
+        image_pull_policy="IfNotPresent"
     )
     print(f"\nworker node: {worker.to_string()}")
     worker_json = json.dumps(worker.to_dict())
     print(f"worker node JSON: {worker_json}")
     assert worker_node_spec_decoder(json.loads(worker_json)).to_string() == worker.to_string()
+
+
+def test_autoscaler_options():
+    options = AutoscalerOptions()
+    print(f"\nautoscaler options: {options.to_string()}")
+    options_json = json.dumps(options.to_dict())
+    print(f"autoscaler options JSON: {options_json}")
+    assert autoscaling_decoder(json.loads(options_json)).to_string() == options.to_string()
+
+    options = AutoscalerOptions(cpus="1.0", memory="64GB")
+    print(f"\nautoscaler options: {options.to_string()}")
+    options_json = json.dumps(options.to_dict())
+    print(f"autoscaler options JSON: {options_json}")
+    assert autoscaling_decoder(json.loads(options_json)).to_string() == options.to_string()
 
 
 def test_cluster_spec():
@@ -288,6 +306,7 @@ def test_cluster_spec():
                 labels={"key": "value"},
             ),
         ],
+        autoscaling_options=AutoscalerOptions(),
     )
     print(f"\ncluster spec: {spec.to_string()}")
     spec_json = json.dumps(spec.to_dict())
