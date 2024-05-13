@@ -1,6 +1,6 @@
 import os
 
-from data_processing.utils import str2bool
+from data_processing.utils import get_logger, str2bool
 
 from . import PipelinesUtils
 
