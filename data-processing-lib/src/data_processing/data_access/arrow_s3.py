@@ -15,7 +15,7 @@ from typing import Any
 import boto3
 import pyarrow as pa
 from botocore.config import Config
-from data_processing.utils import get_logger, TransformUtils
+from data_processing.utils import TransformUtils, get_logger
 
 
 logger = get_logger(__name__)

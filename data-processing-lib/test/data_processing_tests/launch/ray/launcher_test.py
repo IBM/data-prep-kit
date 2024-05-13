@@ -13,8 +13,10 @@
 import os
 import sys
 
-from data_processing.launch.ray import RayTransformLauncher
-from data_processing.launch.ray.transform_configuration import RayTransformConfiguration
+from data_processing.runtime.ray import RayTransformLauncher
+from data_processing.runtime.ray.transform_configuration import (
+    RayTransformConfiguration,
+)
 from data_processing.test_support.transform import NOOPTransformConfiguration
 from data_processing.test_support.transform.noop_transform import (
     NOOPRayTransformConfiguration,

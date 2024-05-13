@@ -15,6 +15,7 @@ transform implementation tests will easily leverage.
 
 The first (currently only test) is a the `test_transform()` method that takes the
 following inputs:
+
 * the transform implementation being tested, properly configured with the configuration
 dictionary for the associated test data.
 * a list of N (1 or more) input tables to be processed with the transform's `transform(Table)` method.

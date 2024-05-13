@@ -47,7 +47,11 @@ def sample_ray_orchestrator(
     p3_doc_id_hash_column: str = "hash_column",
     p3_doc_id_int_column: str = "int_id_column",
     # overriding parameters
-    p3_overriding_params: str = '{"ray_worker_options": {"image": "' + doc_id_image + '"}, "ray_head_options": {"image": "' + doc_id_image + '"}}',
+    p3_overriding_params: str = '{"ray_worker_options": {"image": "'
+    + doc_id_image
+    + '"}, "ray_head_options": {"image": "'
+    + doc_id_image
+    + '"}}',
     # Exact dedup step parameters
     p4_name: str = "ededup",
     p4_skip: bool = False,
@@ -60,7 +64,11 @@ def sample_ray_orchestrator(
     # data sampling
     p4_ededup_n_samples: int = 10,
     # overriding parameters
-    p4_overriding_params: str = '{"ray_worker_options": {"image": "' + ededup_image + '"}, "ray_head_options": {"image": "' + ededup_image + '"}}',
+    p4_overriding_params: str = '{"ray_worker_options": {"image": "'
+    + ededup_image
+    + '"}, "ray_head_options": {"image": "'
+    + ededup_image
+    + '"}}',
     # Fuzzy dedup step parameters
     p5_name: str = "fdedup",
     p5_skip: bool = False,
@@ -91,7 +99,11 @@ def sample_ray_orchestrator(
     # data sampling
     p5_fdedup_n_samples: int = 10,
     # overriding parameters
-    p5_overriding_params: str = '{"ray_worker_options": {"image": "' + fdedup_image + '"}, "ray_head_options": {"image": "' + fdedup_image + '"}}',
+    p5_overriding_params: str = '{"ray_worker_options": {"image": "'
+    + fdedup_image
+    + '"}, "ray_head_options": {"image": "'
+    + fdedup_image
+    + '"}}',
 ):
 
     # get all arguments

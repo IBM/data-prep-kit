@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
-echo "creating minio alias"
-mc alias set kfp http://localhost:8080 minio minio123
+if [ "$MINIO_SERVER" == "" ]; then
+    MINIO_SERVER="http://localhost:8080"
+fi
+
+echo "creating minio alias to $MINIO_SERVER"
+mc alias set kfp $MINIO_SERVER minio minio123
+
 echo "creating test bucket"
 mc mb kfp/test
 echo "copying data"

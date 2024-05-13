@@ -13,6 +13,7 @@ removes duplicate documents across all files. In this tutorial, we will show the
   the operation of our _noop_ transform.
 
 The complete task involves the following:
+
 * EdedupTransform - class that implements the specific transformation
 * EdedupRuntime - class that implements custom TransformRuntime to create supporting Ray objects and enhance job output
   statistics
@@ -39,6 +40,7 @@ First, let's define the transform class.  To do this we extend
 the base abstract/interface class
 [AbstractTableTransform](../src/data_processing/transform/table_transform.py),
 which requires definition of the following:
+
 * an initializer (i.e. `init()`) that accepts a dictionary of configuration
   data.  For this example, the configuration data will only be defined by
   command line arguments (defined below).
@@ -57,11 +59,11 @@ from typing import Any
 import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactory
-from data_processing.launch.ray import (
-    RayLauncherConfiguration,
-    DefaultTableTransformRuntimeRay,
-    RayUtils,
-    RayTransformLauncher,
+from data_processing.runtime.ray import (
+  RayLauncherConfiguration,
+  DefaultTableTransformRuntimeRay,
+  RayUtils,
+  RayTransformLauncher,
 )
 from data_processing.transform import AbstractTableTransform
 from data_processing.utils import GB, TransformUtils
@@ -70,10 +72,10 @@ from ray.actor import ActorHandle
 
 class EdedupTransform(AbstractTableTransform):
 
-    def __init__(self, config: dict):
-        super().__init__(config)
-        self.doc_column = config.get("doc_column", "")
-        self.hashes = config.get("hashes", [])
+  def __init__(self, config: dict):
+    super().__init__(config)
+    self.doc_column = config.get("doc_column", "")
+    self.hashes = config.get("hashes", [])
 ```
 The `EdedupTransform` class extends the `AbstractTableTransform`, which defines the required methods.
 
@@ -136,8 +138,9 @@ If there is no metadata then simply return an empty dictionary.
 
 First, let's define the transform runtime class.  To do this we extend
 the base abstract/interface class
-[DefaultTableTransformRuntime](../src/data_processing/launch/ray/transform_runtime.py),
+[DefaultTableTransformRuntime](../src/data_processing/runtime/ray/transform_runtime.py),
 which requires definition of the following:
+
 * an initializer (i.e. `init()`) that accepts a dictionary of configuration
   data.  For this example, the configuration data will only be defined by
   command line arguments (defined below).
@@ -280,5 +283,5 @@ python ededup_transform.py --hash_cpu 0.5 --num_hashes 2 --doc_column "contents"
   --s3_config "{'input_folder': 'cos-optimal-llm-pile/test/david/input/', 'output_folder': 'cos-optimal-llm-pile/test/david/output/'}"
 ```
 This is a minimal set of options to run locally.
-See the [launcher options](launcher-options.md) for a complete list of
+See the [launcher options](ray-launcher-options) for a complete list of
 transform-independent command line options.

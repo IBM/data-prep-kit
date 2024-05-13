@@ -197,20 +197,77 @@ The final thing that we need to do is set some pipeline global configuration:
     dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 ```
 
-## Compiling pipeline and deploying it to KFP
+## Compiling pipeline
 
-To compile pipeline execute Python with this [file](../transform_workflows/universal/noop/noop_wf.py), which will 
-produce file `noop_wf.yaml` in the same directory. Alternatively, `make venv && make build` Makefile rule can be executed under
-`../transform_workflows` directory (`make venv` can be executed once or after each dependency change).
-Now create a kind cluster with all required software installed
+To compile pipeline execute `make build` command in the same directory where your pipeline is
+
+## Preparing cluster for pipeline execution
+
+The project provides instructions and deployment automation to run all components in an all-inclusive fashion on a 
+single machine using a Kind cluster. However, this topology is not suitable for processing medium and large datasets, 
+and deployment should be carried out on a real Kubernetes or OpenShift cluster. Therefore, we recommend using Kind 
+cluster for only for local testing and debugging, not production loads. For production loads use a real Kubernetes cluster.
+
+### Preparing Kind cluster
+
+You can create a Kind cluster with all required software installed
 using the following command: 
 
 ````shell
  make setup
 ````
-**Note** that this command has to run from the project kind subdirectory
 
-Once the cluster is up, go to `localhost:8080/kfp/`, which will bring up KFP UI, see below:
+We tested Kind cluster installation on multiple platforms, including Intel Mac, 
+AMD Mac (see [this](deployment_on_MacOS.md)), WSL on Windows, 
+RHEL and Ubuntu. Additional platform can be used, but might require additional configuration and testing.
+
+### Preparing an existing Kubernetes cluster
+Alternatively you can deploy pipeline to the existing Kubernetes cluster. 
+
+#### Pre-requirements
+Deployment on an existing cluster requires less pre-installed software
+Only the following programs should be manually installed:
+
+- [Helm](https://helm.sh/docs/intro/install/) 3.10.0 or greater must be installed and configured on your machine.
+- [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) 1.26 or newer must be installed on your machine, and be 
+able to connect to the external cluster. For OpenShift clusters OpenShift CLI 
+[oc](https://docs.openshift.com/container-platform/4.15/cli_reference/openshift_cli/getting-started-cli.html) can be used instead.
+- [wget](https://www.gnu.org/software/wget/) 1.21 must be installed on your machine.
+
+#### Installation steps
+
+In order to execute data transformers on the remote cluster, the following packages should be installed on the Kubernetes cluster:
+
+- [KubeFlow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) (KFP). Currently, we use 
+upstream Argo-based KFP v1.
+- [KubeRay](https://docs.ray.io/en/latest/cluster/kubernetes/index.html) controller and 
+[KubeRay API Server](https://ray-project.github.io/kuberay/components/apiserver/) 
+
+You can install the software from their repositories, or you can use our installation scripts.
+
+If your local kubectl is configured to connect to the external cluster do the following:
+```bash
+export EXTERNAL_CLUSTER=1
+make setup
+```
+
+- In addition, you should configure external access to the KFP UI (`svc/ml-pipeline-ui` in the `kubeflow` ns) and the Ray 
+Server API (`svc/kuberay-apiserver-service` in the `kuberay` ns). Depends on your cluster and its deployment it can be 
+LoadBalancer services, Ingresses or Routes. 
+
+- Optionally, you can upload the test data into the [MinIO](https://min.io/) Object Store, deployed as part of KFP. In 
+order to do this, please provide external access to the Minio (`svc/minio-service` in the `kubeflow` ns) and execute the 
+following commands: 
+```bash
+export MINIO_SERVER=<Minio external URL>
+kubectl apply -f kind/hack/s3_secret.yaml
+kind/hack/populate_minio.sh
+```
+
+## Deploying workflow
+
+Once the cluster is up, go to the kfp endpoint (`localhost:8080/kfp/` for Kind cluster), which will bring up 
+KFP UI, see below:
 
 ![KFP UI](kfp_ui.png)
 
@@ -218,6 +275,7 @@ Click on the `Upload pipeline` link and follow instructions on the screen to upl
 name pipeline noop. Once this is done, you should see something as follows:
 
 ![noop pipeline](noop_pipeline.png)
+
 
 ## Executing pipeline and watching execution results
 
@@ -239,12 +297,14 @@ Note that the log (on the left) has the complete execution log.
 
 Additionally, the log is saved to S3 (location is denoted but the last line in the log)
 
-## Clean up cluster
+## Clean up Kind cluster
 
-Finally, you can delete kind cluster running the following command:
+If you are using Kind cluster, you can delete it running the following command:
 
 ```Shell
 make clean
 ```
 
 **Note** that this command has to run from the project kind subdirectory
+
+

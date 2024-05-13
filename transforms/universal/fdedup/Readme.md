@@ -32,7 +32,7 @@ The main components of runtime are described below
 
 [Table processing actor](src/fdedup_transform.py) is implemented following framework itself is implemented as a pair -
 `FdedupTransform` implementing the actual transformation and and 
-[transform table processor](../../../data-processing-lib/src/data_processing/launch/ray/transform_table_processor.py) 
+[transform table processor](../../../data-processing-lib/src/data_processing/runtime/ray/transform_table_processor.py) 
 (from the framework itself).
 
 ### DocsMinHash Actor
@@ -118,7 +118,7 @@ Above you see both parameters and their values for small runs (tens of files). W
 ### Launched Command Line Options
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to
-[the options provided by the launcher](../../../data-processing-lib/doc/launcher-options.md).
+[the options provided by the launcher](../../../data-processing-lib/doc/ray-launcher-options.md).
 
 ```shell
   --fdedup_doc_column FDEDUP_DOC_COLUMN

@@ -14,8 +14,8 @@ import sys
 import tempfile
 from typing import Any
 
-from data_processing.launch.ray import RayTransformLauncher
-from data_processing.launch.transform_launcher import AbstractTransformLauncher
+from data_processing.runtime.ray import RayTransformLauncher
+from data_processing.runtime.transform_launcher import AbstractTransformLauncher
 from data_processing.test_support.abstract_test import AbstractTest
 from data_processing.utils import ParamsUtils
 
@@ -30,11 +30,13 @@ class AbstractTransformLauncherTest(AbstractTest):
     """
 
     @staticmethod
-    def _get_argv(launcher:AbstractTransformLauncher, cli_params: dict[str, Any], in_table_path: str, out_table_path: str):
+    def _get_argv(
+        launcher: AbstractTransformLauncher, cli_params: dict[str, Any], in_table_path: str, out_table_path: str
+    ):
         args = {} | cli_params
         local_ast = {"input_folder": in_table_path, "output_folder": out_table_path}
         args["data_local_config"] = local_ast
-        if isinstance(launcher,RayTransformLauncher):
+        if isinstance(launcher, RayTransformLauncher):
             args["run_locally"] = "True"
         argv = ParamsUtils.dict_to_req(args)
         return argv
