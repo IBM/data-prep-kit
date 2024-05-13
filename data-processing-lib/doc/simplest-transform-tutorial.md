@@ -203,7 +203,7 @@ To run
 python noop_main.py --noop_sleep_msec 2 \
   --data_local_config "{'input_folder': '"$NOOP_INPUT"', 'output_folder': '/tmp/noop-output'}"
 ```
-See the [python launcher options](python-launcher-options) for a complete list of
+See the [python launcher options](python-launcher-options.md) for a complete list of
 transform-independent command line options.
 
 ### Ray Runtime
@@ -217,5 +217,5 @@ if __name__ == "__main__":
 ```
 We can run this with the same command as for the python runtime but to run in local Ray
 add the `--run_locally True` option.
-See the [ray launcher options](ray-launcher-options) for a complete list of
+See the [ray launcher options](ray-launcher-options.md) for a complete list of
 transform-independent command line options.
