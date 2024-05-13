@@ -19,13 +19,16 @@ venv:: .check_python_version ${VENV_ACTIVATE}
 
 clean:: .transforms_workflows.clean
 
-build:: venv
+.PHONY: build
+build: venv
 	$(MAKE) ${YAML_FILE}
 
-test:: build
+.PHONY: test
+test: build
 	$(MAKE) .transforms_workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=${YAML_FILE}
 
-upload:: build
+.PHONY: upload
+upload: build
 	$(MAKE) .transforms_workflows.upload-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=${YAML_FILE}
 
 .PHONY: reconcile-requirements
