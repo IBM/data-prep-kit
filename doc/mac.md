@@ -3,10 +3,9 @@ Starting with certain models introduced in late 2020, Apple began the transition
 These CPUs have ARM architecture and are incompatible with Intel processors. 
 
 ### Transforms
-Developing transforms for either the [python or Ray runtimes](../data-processing-lib/doc/transform-runtimes.md) should have no issues on Mac,
+Developing transforms for either the [python or Ray runtimes](../data-processing-lib/doc/transform-runtimes.md), without KubeFlow pipelines (KFP), should have no issues on Apple silicon Macs,
 or other platforms for that matter.
-To the extent the support versions of python are used, transforms can be developed and run as on any other platform.
- 
+Therefore, to the extent the supported versions of python are used, transforms can be developed that will run on Apple silicon Macs. 
 ### Virtualization Considerations
 
 Desktops such as [Docker Desktop](https://www.docker.com/products/docker-desktop/),
@@ -16,7 +15,7 @@ to allow the execution of containers based on images compiled for Intel silicon.
 impacts performance, and there are additional restrictions, such as Virtual Machine RAM size.
 
 On the other hand, executing a Kind Kubernetes cluster with KubeFlow pipelines (KFP) and local data storage (Minio)
-requires a significant amount of memory. For this initial Data Prep LAB release, we do not recommend local (Kind)
+requires a significant amount of memory. For this initial Data Prep Kit release, we do not recommend local (Kind)
 execution on Mac computers with Apple silicon. Instead, we suggest using a real Kubernetes cluster or a Linux virtual
 machine with an Intel CPU.
 
