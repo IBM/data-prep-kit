@@ -15,11 +15,13 @@ one table to another.  That said, we will show the following:
   the operation of our _noop_ transform.
 
 We will **not** be showing the following:
+
 * The creation of a custom TransformRuntime that would enable more global
   state and/or coordination among the transforms running in other ray actors.
   This will be covered in an advanced tutorial.
 
 The complete task involves the following:
+
 * NOOPTransform - class that implements the specific transformation
 * NOOPTableTransformConfiguration - class that provides configuration for the
   NOOPTransform, specifically the command line arguments used to configure it.
@@ -37,6 +39,7 @@ First, let's define the transform class.  To do this we extend
 the base abstract/interface class
 [AbstractTableTransform](../src/data_processing_ibm/transform/table_transform.py),
 which requires definition of the following:
+
 * an initializer (i.e. `init()`) that accepts a dictionary of configuration
   data.  For this example, the configuration data will only be defined by
   command line arguments (defined below).
