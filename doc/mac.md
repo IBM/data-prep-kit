@@ -3,9 +3,9 @@ Starting with certain models introduced in late 2020, Apple began the transition
 These CPUs have ARM architecture and are incompatible with Intel processors. 
 
 ### Transforms
-Developing transforms for either the [python or Ray runtimes](../data-processing-lib/doc/transform-runtimes.md), without KubeFlow pipelines (KFP), should have no issues on Apple Silicon Macs,
+Developing transforms for either the [python or Ray runtimes](../data-processing-lib/doc/transform-runtimes.md), without KubeFlow pipelines (KFP), should have no issues on Apple silicon Macs,
 or other platforms for that matter.
-Therefore, to the extent the supported versions of python are used, transforms can be developed that will run on Apple Silicon Macs. 
+Therefore, to the extent the supported versions of python are used, transforms can be developed that will run on Apple silicon Macs. 
 ### Virtualization Considerations
 
 Desktops such as [Docker Desktop](https://www.docker.com/products/docker-desktop/),
