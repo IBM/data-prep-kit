@@ -176,7 +176,7 @@ class PipelinesUtils:
             logger.warning(f"Exception uploading pipeline {e}")
             return None
         if pipeline is None:
-            print(f"Failed to upload pipeline {pipeline_name}.")
+            logger.warning(f"Failed to upload pipeline {pipeline_name}.")
             return None
         logger.info("Pipeline uploaded")
         return pipeline

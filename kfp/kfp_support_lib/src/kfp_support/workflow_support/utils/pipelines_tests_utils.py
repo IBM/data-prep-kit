@@ -5,6 +5,9 @@ from data_processing.utils import str2bool
 from . import PipelinesUtils
 
 
+logger = get_logger(__name__)
+
+
 def run_test(pipeline_package_path: str, endpoint: str = "http://localhost:8080/kfp", overwrite: bool = True):
     """
     Upload and run a single pipeline
@@ -30,9 +33,9 @@ def run_test(pipeline_package_path: str, endpoint: str = "http://localhost:8080/
     status, error = utils.wait_pipeline_completion(run_id=run_id, timeout=tmout, wait=wait)
     if status.lower() not in ["succeeded", "completed"]:
         # Execution failed
-        print(f"Pipeline {pipeline_name} failed with error {error} and status {status}")
+        logger.warning(f"Pipeline {pipeline_name} failed with error {error} and status {status}")
         return None
-    print(f"Pipeline {pipeline_name} successfully completed")
+    logger.info(f"Pipeline {pipeline_name} successfully completed")
     return pipeline_name
 
 
@@ -47,7 +50,7 @@ def run_sanity_test(
     """
     pipeline_run = run_test(pipeline_package_path, endpoint=endpoint, overwrite=overwrite)
     if pipeline_run is not None:
-        print(f"{pipeline_run} run successfully launched")
+        logger.info(f"{pipeline_run} run successfully launched")
 
 
 if __name__ == "__main__":
@@ -77,5 +80,5 @@ if __name__ == "__main__":
                 overwrite=str2bool(args.overwrite),
             )
         case _:
-            print("Unsupported command")
+            logger.warning("Unsupported command")
             exit(1)
