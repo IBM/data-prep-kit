@@ -9,6 +9,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
@@ -16,51 +17,22 @@ from data_processing.transform import AbstractTableTransform, TransformConfigura
 from data_processing.utils import CLIArgumentProvider
 
 
-class PythonLauncherConfiguration(CLIArgumentProvider):
-    """
-    Provides support the configuration of a transformer runtime
-    It holds the following:
-        1) The type of the concrete AbstractTransform class, that is created by a the worker with a
-            dictionary of parameters to perform that table transformations.
-    Sub-classes may extend this class to override the following:
-        1) add_input_params() to add CLI argument definitions used in creating TransformRuntime.
-    """
-
-    def __init__(
-        self,
-        transform_configuration: TransformConfiguration,
-    ):
+class TransformRuntimeConfiguration(CLIArgumentProvider):
+    def __init__(self, base_configuration: TransformConfiguration):
         """
         Initialization
-        :param launcher_configuration: base transform configuration class
-        :param transform_class: implementation of the Filter
-        :return:
+        :param base_configuration - base configuration class
         """
-        self.name = transform_configuration.name
-        self.transform_class = transform_configuration.transform_class
-        # These are expected to be updated later by the sub-class in apply_input_params().
-        self.params = {}
-        self.remove_from_metadata = transform_configuration.remove_from_metadata
-        self.transform_configuration = transform_configuration
+        self.base_configuration = base_configuration
 
     def add_input_params(self, parser: ArgumentParser) -> None:
-        """
-        Add input parameters. Delegates to the base class
-        :param parser: parser
-        :return: None
-        """
-        return self.transform_configuration.add_input_params(parser=parser)
+        self.base_configuration.add_input_params(parser)
 
     def apply_input_params(self, args: Namespace) -> bool:
-        """
-        Validate and apply input parameters. Delegate to base class
-        :param args: arguments
-        :return: True, if parameters are valid, False otherwise
-        """
-        is_valid = self.transform_configuration.apply_input_params(args=args)
-        if is_valid:
-            self.params = self.transform_configuration.params
-        return is_valid
+        return self.base_configuration.apply_input_params(args)
+
+    def get_input_params(self) -> dict[str, Any]:
+        return self.base_configuration.get_input_params()
 
     def get_transform_class(self) -> type[AbstractTableTransform]:
         """
@@ -69,10 +41,10 @@ class PythonLauncherConfiguration(CLIArgumentProvider):
         the associated TransformRuntime get_transform_config() method.
         :return: class extending AbstractTableTransform
         """
-        return self.transform_class
+        return self.base_configuration.get_transform_class()
 
     def get_name(self):
-        return self.name
+        return self.base_configuration.get_name()
 
     def get_transform_metadata(self) -> dict[str, Any]:
         """
@@ -82,16 +54,11 @@ class PythonLauncherConfiguration(CLIArgumentProvider):
         information, access keys, secrets, passwords, etc
         :return parameters for metadata:
         """
-        # get input parameters
-        parameters = self.get_input_params()
-        # remove everything that user marked as to be removed
-        for key in self.remove_from_metadata:
-            del self.params[key]
-        return parameters
+        return self.base_configuration.get_transform_metadata()
 
     def get_transform_params(self) -> dict[str, Any]:
         """
          Get transform parameters
         :return: transform parameters
         """
-        return self.params
+        return self.base_configuration.get_transform_params()

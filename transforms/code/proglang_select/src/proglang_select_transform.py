@@ -20,16 +20,15 @@ from data_processing.data_access import (
     DataAccessFactory,
     DataAccessFactoryBase,
 )
-from data_processing.runtime.pure_python import (
-    PythonLauncherConfiguration,
-    PythonTransformLauncher,
+from data_processing.runtime.pure_python.transform_configuration import (
+    PythonTransformRuntimeConfiguration,
 )
 from data_processing.runtime.ray import (
     DefaultTableTransformRuntimeRay,
     RayTransformLauncher,
 )
 from data_processing.runtime.ray.transform_configuration import (
-    RayTransformConfiguration,
+    RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import TransformUtils, get_logger
@@ -226,26 +225,18 @@ class ProgLangSelectTransformConfiguration(TransformConfiguration):
         return self.daf.apply_input_params(args)
 
 
-# class ProgLangSelectRayLauncherConfiguration(RayLauncherConfiguration):
-#     """
-#     Provides support for configuring and using the associated Transform class include
-#     configuration with CLI args and combining of metadata.
-#     """
-#
-#     def __init__(self):
-#         super().__init__(
-#             name=shortname,
-#             transform_class=ProgLangSelectTransform,
-#             launcher_configuration=ProgLangSelectTransformConfiguration(),
-#             runtime_class=ProgLangSelectRuntime,
-#             remove_from_metadata=[lang_data_factory_key],
-#         )
-#
-
-
-class ProgLangSelectRayConfiguration(RayTransformConfiguration):
+class ProgLangSelectPythonConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(ProgLangSelectTransformConfiguration(), ProgLangSelectRuntime)
+        super().__init__(
+            base_configuration=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime
+        )
+
+
+class ProgLangSelectRayConfiguration(RayTransformRuntimeConfiguration):
+    def __init__(self):
+        super().__init__(
+            base_configuration=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime
+        )
 
 
 if __name__ == "__main__":

@@ -15,9 +15,11 @@ import time
 
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.runtime import TransformExecutionConfiguration
-from data_processing.runtime.pure_python import PythonLauncherConfiguration, orchestrate
+from data_processing.runtime.pure_python import (
+    PythonTransformRuntimeConfiguration,
+    orchestrate,
+)
 from data_processing.runtime.transform_launcher import AbstractTransformLauncher
-from data_processing.transform import TransformConfiguration
 from data_processing.utils import get_logger
 
 
@@ -31,17 +33,16 @@ class PythonTransformLauncher(AbstractTransformLauncher):
 
     def __init__(
         self,
-        # transform_runtime_config: PythonLauncherConfiguration,
-        transform_config: TransformConfiguration,
+        transform_config: PythonTransformRuntimeConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """
         Creates driver
-        :param transform_runtime_config: transform runtime factory
+        :param transform_config: transform runtime factory
         :param data_access_factory: the factory to create DataAccess instances.
         """
         super().__init__(transform_config, data_access_factory)
-        self.transform_runtime_config = PythonLauncherConfiguration(transform_config)
+        self.transform_runtime_config = transform_config
         self.execution_config = TransformExecutionConfiguration(name=self.transform_runtime_config.get_name())
 
     def __get_parameters(self) -> bool:

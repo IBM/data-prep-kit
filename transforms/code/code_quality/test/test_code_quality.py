@@ -18,7 +18,7 @@ from code_quality_transform import (
     CodeQualityTransformConfiguration,
 )
 from data_processing.test_support.transform import AbstractTransformTest
-from data_processing.transform.transform_configuration import get_transform_config
+from data_processing.transform import get_transform_config
 
 
 class TestCodeQualityTransform(AbstractTransformTest):

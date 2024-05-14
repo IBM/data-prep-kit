@@ -1,5 +1,6 @@
-# Python Launcher Command Line Options
-A number of command line options are available when launching a transform.  
+# Pure Python Launcher Command Line Options
+
+A number of command line options are available when launching a transform as a Python class.  
 
 The following is a current --help output (a work in progress) for 
 the `NOOPTransform` (note the --noop_sleep_sec option):

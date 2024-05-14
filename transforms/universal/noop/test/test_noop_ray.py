@@ -18,8 +18,8 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from noop_transform import (
+    NOOPPythonTransformConfiguration,
     NOOPRayTransformConfiguration,
-    NOOPTransformConfiguration,
     sleep_cli_param,
 )
 
@@ -34,7 +34,7 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
         basedir = "../test-data"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         fixtures = []
-        launcher = PythonTransformLauncher(NOOPTransformConfiguration())
+        launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
         fixtures.append((launcher, {sleep_cli_param: 0}, basedir + "/input", basedir + "/expected"))
         # launcher = NOOPRayLauncher()
         launcher = RayTransformLauncher(NOOPRayTransformConfiguration())

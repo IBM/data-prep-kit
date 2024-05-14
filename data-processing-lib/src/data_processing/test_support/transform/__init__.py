@@ -1,5 +1,6 @@
 from .noop_transform import (
     NOOPTransform,
-    NOOPTransformConfiguration,
+    NOOPPythonTransformConfiguration,
+    NOOPRayTransformConfiguration,
 )
 from .transform_test import AbstractTransformTest

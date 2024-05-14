@@ -16,13 +16,12 @@ import json
 
 import duckdb
 import pyarrow as pa
-from data_processing.runtime.pure_python import (
-    PythonLauncherConfiguration,
-    PythonTransformLauncher,
+from data_processing.runtime.pure_python.transform_configuration import (
+    PythonTransformRuntimeConfiguration,
 )
 from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
-    RayTransformConfiguration,
+    RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
@@ -203,9 +202,14 @@ class FilterTransformConfiguration(TransformConfiguration):
         return True
 
 
-class FilterRayTransformConfiguration(RayTransformConfiguration):
+class FilterPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=FilterTransformConfiguration())
+        super().__init__(base_configuration=FilterTransformConfiguration())
+
+
+class FilterRayTransformConfiguration(RayTransformRuntimeConfiguration):
+    def __init__(self):
+        super().__init__(base_configuration=FilterTransformConfiguration())
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-import argparse
+
 from argparse import ArgumentParser
 from typing import Any
 
@@ -22,35 +22,50 @@ class TransformConfiguration(CLIArgumentProvider):
     This is a base transform configuration class defining transform's input/output parameter
     """
 
-    def __init__(self, name: str, transform_class: AbstractTableTransform, remove_from_metadata: list[str] = []):
+    def __init__(self, name: str, transform_class: type[AbstractTableTransform], remove_from_metadata: list[str] = []):
         """
         Initialization
+        :param name: transformer name
+        :param transform_class: transform implementation class
+        :param remove_from_metadata - list of parameters to remove from metadata
         """
         self.name = name
         self.transform_class = transform_class
         self.remove_from_metadata = remove_from_metadata
         self.params = {}
 
+    def get_transform_class(self) -> type[AbstractTableTransform]:
+        """
+        Get the class extending AbstractTableTransform which implements a specific transformation.
+        The class will generally be instantiated with a dictionary of configuration produced by
+        the associated TransformRuntime get_transform_config() method.
+        :return: class extending AbstractTableTransform
+        """
+        return self.transform_class
 
-class TransformConfigurationProxy(TransformConfiguration):
-    def __init__(self, proxied_transform_config: TransformConfiguration):
-        self.proxied_transform_config = proxied_transform_config
-        # Python probably has a better way of doing this using the proxied transform config
-        self.name = proxied_transform_config.name
-        self.transform_class = proxied_transform_config.transform_class
-        self.remove_from_metadata = proxied_transform_config.remove_from_metadata
-        self.params = {}
+    def get_name(self):
+        return self.name
 
-    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
-        self.proxied_transform_config.add_input_params(parser)
+    def get_transform_metadata(self) -> dict[str, Any]:
+        """
+        Get transform metadata. Before returning remove all parameters key accumulated in
+        self.remove_from metadata. This allows transform developer to mark any input parameters
+        that should not make it to the metadata. This can be parameters containing sensitive
+        information, access keys, secrets, passwords, etc
+        :return parameters for metadata:
+        """
+        # get input parameters
+        parameters = self.get_input_params()
+        # remove everything that user marked as to be removed
+        for key in self.remove_from_metadata:
+            del self.params[key]
+        return parameters
 
-    def apply_input_params(self, args: argparse.Namespace) -> bool:
-        is_valid = self.proxied_transform_config.apply_input_params(args)
-        if is_valid:
-            self.params = self.proxied_transform_config.params
-        return is_valid
-
-    def get_input_params(self) -> dict[str, Any]:
+    def get_transform_params(self) -> dict[str, Any]:
+        """
+         Get transform parameters
+        :return: transform parameters
+        """
         return self.params
 
 

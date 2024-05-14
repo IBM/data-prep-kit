@@ -15,13 +15,12 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.runtime.pure_python import (
-    PythonLauncherConfiguration,
-    PythonTransformLauncher,
+from data_processing.runtime.pure_python.transform_configuration import (
+    PythonTransformRuntimeConfiguration,
 )
 from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
-    RayTransformConfiguration,
+    RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
@@ -125,7 +124,22 @@ class NOOPTransformConfiguration(TransformConfiguration):
         return True
 
 
-class NOOPRayTransformConfiguration(RayTransformConfiguration):
+class NOOPPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
+    """
+    Implements the PythonTransformConfiguration for NOOP as required by the PythonTransformLauncher.
+    NOOP does not use a RayRuntime class so the superclass only needs the base
+    python-only configuration.
+    """
+
+    def __init__(self):
+        """
+        Initialization
+        :param base_configuration - base configuration class
+        """
+        super().__init__(base_configuration=NOOPTransformConfiguration())
+
+
+class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
     """
     Implements the RayTransformConfiguration for NOOP as required by the RayTransformLauncher.
     NOOP does not use a RayRuntime class so the superclass only needs the base
@@ -133,7 +147,11 @@ class NOOPRayTransformConfiguration(RayTransformConfiguration):
     """
 
     def __init__(self):
-        super().__init__(NOOPTransformConfiguration())
+        """
+        Initialization
+        :param base_configuration - base configuration class
+        """
+        super().__init__(base_configuration=NOOPTransformConfiguration())
 
 
 if __name__ == "__main__":

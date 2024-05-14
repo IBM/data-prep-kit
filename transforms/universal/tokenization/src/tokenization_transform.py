@@ -20,9 +20,12 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
+from data_processing.runtime.pure_python.transform_configuration import (
+    PythonTransformRuntimeConfiguration,
+)
 from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
-    RayTransformConfiguration,
+    RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import get_logger
@@ -260,36 +263,14 @@ class TokenizationTransformConfiguration(TransformConfiguration):
         return True
 
 
-# class TokenizationRayLauncherConfiguration(RayLauncherConfiguration):
-#     """
-#     Provides support for configuring and using the associated Transform class include
-#     configuration with CLI args and combining of metadata.
-#     """
-#
-#     def __init__(self):
-#         super().__init__(
-#             name="Tokenization",
-#             transform_class=TokenizationTransform,
-#             launcher_configuration=TokenizationTransformConfiguration(),
-#         )
-#
-#
-# class TokenizationPythonLauncherConfiguration(PythonLauncherConfiguration):
-#     """
-#     Provides support for configuring and using the associated Transform class include
-#     configuration with CLI args and combining of metadata.
-#     """
-#
-#     def __init__(self):
-#         super().__init__(
-#             name="Tokenization",
-#             transform_class=TokenizationTransform,
-#             launcher_configuration=TokenizationTransformConfiguration(),
-#         )
-#
-class TokenizationRayConfiguration(RayTransformConfiguration):
+class TokenizationRayConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=TokenizationTransformConfiguration())
+        super().__init__(base_configuration=TokenizationTransformConfiguration())
+
+
+class TokenizationPythonConfiguration(PythonTransformRuntimeConfiguration):
+    def __init__(self):
+        super().__init__(base_configuration=TokenizationTransformConfiguration())
 
 
 if __name__ == "__main__":

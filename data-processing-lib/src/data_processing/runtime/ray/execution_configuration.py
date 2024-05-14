@@ -24,7 +24,7 @@ logger = get_logger(__name__)
 cli_prefix = "runtime_"
 
 
-class TransformOrchestratorConfiguration(TransformExecutionConfiguration):
+class RayTransformExecutionConfiguration(TransformExecutionConfiguration):
     """
     A class specifying and validating Ray orchestrator configuration
     """

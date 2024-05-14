@@ -40,7 +40,7 @@ launcher = RayTransformLauncher(YourTransformConfiguration())
 launcher.launch()
 ```
 Note that the launcher defines some additional CLI parameters that are used to control the operation of the 
-[orchestrator and workers](../src/data_processing/runtime/ray/transform_orchestrator_configuration.py) and 
+[orchestrator and workers](../src/data_processing/runtime/ray/execution_configuration.py) and 
 [data access](../src/data_processing/data_access/data_access_factory.py).  Things such as data access configuration,
 number of workers, worker resources, etc.
 Discussion of these options is beyond the scope of this document 
@@ -51,7 +51,7 @@ In general, a transform should be able to run in both the python and Ray runtime
 As such we first define the python-only transform configuration, which will then
 be used by the Ray-runtime-specific transform configuration. 
 The python transform configuration implements  
-[TransformConfiguration](../src/data_processing/transform/transform_configuration.py)
+[TransformConfiguration](../src/data_processing/runtime/transform_configuration.py)
 and deifnes with transform-specific name, and implementation 
 and class. In addition, it is responsible for providing transform-specific
 methods to define and capture optional command line arguments.

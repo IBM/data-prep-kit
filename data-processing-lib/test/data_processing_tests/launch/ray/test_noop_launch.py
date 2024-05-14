@@ -17,7 +17,6 @@ from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from data_processing.test_support.transform import NOOPTransformConfiguration
 from data_processing.test_support.transform.noop_transform import (
     NOOPRayTransformConfiguration,
 )
