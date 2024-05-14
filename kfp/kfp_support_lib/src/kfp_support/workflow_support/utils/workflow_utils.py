@@ -20,7 +20,7 @@ from typing import Any, Optional
 
 import kfp.dsl as dsl
 from data_processing.data_access import DataAccess
-from data_processing.utils import get_logger
+from data_processing.utils import get_logger, GB
 from kfp_server_api import models
 from kfp_support.api_server_client import KubeRayAPIs
 from kfp_support.api_server_client.params import (
@@ -732,7 +732,7 @@ class ComponentUtils:
         logger.info(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}, GPUs {cluster_gpu}")
         # compute number of actors
         n_actors_cpu = int(cluster_cpu * 0.85 / a_options.get("num_cpus", 0.5))
-        n_actors_memory = int(cluster_mem * 0.85 / a_options.get("memory", 1))
+        n_actors_memory = int(cluster_mem * 0.85 / (a_options.get("memory", GB) / GB))
         n_actors = min(n_actors_cpu, n_actors_memory)
         # Check if we need gpu calculations as well
         actor_gpu = a_options.get("num_gpus", 0)
