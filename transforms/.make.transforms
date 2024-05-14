@@ -224,7 +224,7 @@ conventions:
 
 # Expects RUN_FILE
 .PHONY: .transforms.run-src-file
-.transforms.run-src-file:
+.transforms.run-src-file: .defaults.run-src-file
 	@# Help: Run $(RUN_FILE) (if it exists).
 	@if [ ! -e "src/$(RUN_FILE)" ];	then	\
 	    echo "";					\

@@ -225,6 +225,25 @@ __check_defined = \
 	    fi;                                 \
 	done   
 
+# Expects RUN_FILE RUN_ARGS
+.PHONY: .defaults.run-src-file
+.defaults.run-src-file:
+	@# Help: Run $(RUN_FILE) (if it exists).
+	@if [ ! -e "src/$(RUN_FILE)" ];	then	\
+	    echo "";					\
+	    echo src/$(RUN_FILE) does not exist.;	\
+	    echo "";					\
+	    exit 1;					\
+	fi
+	@if [ ! -d "venv" ];	then			\
+	    echo "";					\
+	    echo "Please 'make venv' before running $(RUN_FILE).";		\
+	    echo "";					\
+	    exit 1;					\
+	fi
+	source venv/bin/activate;	\
+	cd src;				\
+	python $(RUN_FILE) $(RUN_ARGS)
 
 # This expects the image to already be built and so does not depending on .defaults.publish.
 # This allows others to define their own image building prior to publishing.

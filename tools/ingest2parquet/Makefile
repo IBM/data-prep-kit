@@ -1,6 +1,6 @@
 REPOROOT=../../
 # Use make help, to see the available rules
-include ./.make.tools
+
 include $(REPOROOT)/.make.defaults
 
 
@@ -35,10 +35,10 @@ test-local:: .defaults.test-locals
 publish:: image .defaults.publish
 
 run-local-sample:
-	$(MAKE) RUN_FILE=ingest2parquet_local.py  .tools.run-src-file
+	$(MAKE) RUN_FILE=ingest2parquet_local.py  .defaults.run-src-file
 	
 run-s3-sample:
-	$(MAKE) minio-start minio-load RUN_FILE=ingest2parquet_s3.py .tools.run-src-file
+	$(MAKE) minio-start minio-load RUN_FILE=ingest2parquet_s3.py .defaults.run-src-file
 	@# Help: Run src/ingest2parquet_s3.py file (if it exists).  Assumes minio has beens started.
 	@echo ""
 	@echo "You may want to stop the minio server now (see make help)"
