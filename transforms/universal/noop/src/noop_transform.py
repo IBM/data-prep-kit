@@ -71,7 +71,7 @@ class NOOPTransform(AbstractTableTransform):
         return [table], metadata
 
 
-class NOOPBaseTransformConfiguration(TransformConfiguration):
+class NOOPTransformConfiguration(TransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -136,7 +136,7 @@ class NOOPPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
         Initialization
         :param base_configuration - base configuration class
         """
-        super().__init__(base_configuration=NOOPBaseTransformConfiguration())
+        super().__init__(base_configuration=NOOPTransformConfiguration())
 
 
 class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
@@ -151,7 +151,7 @@ class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
         Initialization
         :param base_configuration - base configuration class
         """
-        super().__init__(base_configuration=NOOPBaseTransformConfiguration())
+        super().__init__(base_configuration=NOOPTransformConfiguration())
 
 
 if __name__ == "__main__":
