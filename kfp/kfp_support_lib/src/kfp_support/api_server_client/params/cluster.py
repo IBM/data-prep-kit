@@ -14,14 +14,14 @@ import enum
 from typing import Any
 
 from kfp_support.api_server_client.params import (
-    EnvironmentVariables,
     BaseVolume,
+    EnvironmentVariables,
     HeadNodeSpec,
     WorkerNodeSpec,
     environment_variables_decoder,
     head_node_spec_decoder,
+    volume_decoder,
     worker_node_spec_decoder,
-    volume_decoder
 )
 
 
@@ -41,7 +41,9 @@ class UpscalingMode(enum.Enum):
     Enumeration of autoscaling mode
     """
 
-    Conservative = "Conservative"  # Rate-limited; the number of pending worker pods is at most the size of the Ray cluster
+    Conservative = (
+        "Conservative"  # Rate-limited; the number of pending worker pods is at most the size of the Ray cluster
+    )
     Default = "Default"  # no rate limitations
     Aggressive = "Aggressive"  # same as default
 
@@ -64,16 +66,17 @@ class AutoscalerOptions:
         volumes - optional, a list of volumes to attach to autoscaler container.
                   This is needed for enabling TLS for the autoscaler container.
     """
+
     def __init__(
-            self,
-            upscaling_mode: UpscalingMode = UpscalingMode.Default,
-            idle_tmout: int = None,
-            image: str = None,
-            image_pull_policy: str = None,
-            cpus: str = None,
-            memory: str = None,
-            environment: EnvironmentVariables = None,
-            volumes: list[BaseVolume] = None,
+        self,
+        upscaling_mode: UpscalingMode = UpscalingMode.Default,
+        idle_tmout: int = None,
+        image: str = None,
+        image_pull_policy: str = None,
+        cpus: str = None,
+        memory: str = None,
+        environment: EnvironmentVariables = None,
+        volumes: list[BaseVolume] = None,
     ):
         """
         Initialization
@@ -162,8 +165,12 @@ class ClusterSpec:
     - to_dict() -> dict[str, Any] convert to dict
     """
 
-    def __init__(self, head_node: HeadNodeSpec, worker_groups: list[WorkerNodeSpec] = None,
-                 autoscaling_options: AutoscalerOptions = None):
+    def __init__(
+        self,
+        head_node: HeadNodeSpec,
+        worker_groups: list[WorkerNodeSpec] = None,
+        autoscaling_options: AutoscalerOptions = None,
+    ):
         """
         Initialization
         :param head_node - head node definition
@@ -404,7 +411,7 @@ def autoscaling_decoder(dct: dict[str, Any]) -> AutoscalerOptions:
         cpus=dct.get("cpu", None),
         memory=dct.get("memory", None),
         environment=environments,
-        volumes=volumes
+        volumes=volumes,
     )
 
 
@@ -420,8 +427,11 @@ def cluster_spec_decoder(dct: dict[str, Any]) -> ClusterSpec:
         workers = [worker_node_spec_decoder(w) for w in dct["workerGroupSpec"]]
     if "enableInTreeAutoscaling" in dct and dct.get("enableInTreeAutoscaling"):
         autoscaling_options = autoscaling_decoder(dct.get("autoscalerOptions", {}))
-    return ClusterSpec(head_node=head_node_spec_decoder(dct.get("headGroupSpec")), worker_groups=workers,
-                       autoscaling_options=autoscaling_options)
+    return ClusterSpec(
+        head_node=head_node_spec_decoder(dct.get("headGroupSpec")),
+        worker_groups=workers,
+        autoscaling_options=autoscaling_options,
+    )
 
 
 def cluster_decoder(dct: dict[str, Any]) -> Cluster:

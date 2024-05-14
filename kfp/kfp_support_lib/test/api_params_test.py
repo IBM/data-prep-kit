@@ -15,8 +15,8 @@ import json
 from kfp_support.api_server_client.params import (
     DEFAULT_HEAD_START_PARAMS,
     DEFAULT_WORKER_START_PARAMS,
-    AutoscalerOptions,
     AccessMode,
+    AutoscalerOptions,
     Cluster,
     ClusterEvent,
     ClusterSpec,
@@ -199,7 +199,7 @@ def test_head_node_spec():
         service_type=ServiceType.ClusterIP,
         volumes=volumes,
         environment=env_s,
-        image_pull_policy="Always"
+        image_pull_policy="Always",
     )
     print(f"\nhead node: {head.to_string()}")
     head_json = json.dumps(head.to_dict())
@@ -233,7 +233,7 @@ def test_worker_node_spec():
         ray_start_params=DEFAULT_WORKER_START_PARAMS,
         environment=env_s,
         labels={"key": "value"},
-        image_pull_policy="IfNotPresent"
+        image_pull_policy="IfNotPresent",
     )
     print(f"\nworker node: {worker.to_string()}")
     worker_json = json.dumps(worker.to_dict())

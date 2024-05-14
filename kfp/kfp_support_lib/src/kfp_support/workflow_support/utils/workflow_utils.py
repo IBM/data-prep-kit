@@ -335,6 +335,7 @@ class RayRemoteJobs:
                 environment - dictionary of head node environment
                 annotations: dictionary of head node annotation
                 labels: dictionary of head node labels
+                image_pull_policy: image pull policy, default IfNotPresent
 
         :param worker_nodes: an array of worker node specification dictionary including the following:
             mandatory fields:
@@ -354,6 +355,8 @@ class RayRemoteJobs:
                 environment - dictionary of node of this group environment
                 annotations: dictionary of node of this group annotation
                 labels: dictionary of node of this group labels
+                image_pull_policy: image pull policy, default IfNotPresent
+
         :param wait_cluster_ready - time to wait for cluster ready sec (-1 forever)
         :return:tuple containing
             http return code
@@ -404,6 +407,7 @@ class RayRemoteJobs:
         # Build head node spec
         image = head_node.get("image", self.default_image)
         image_pull_secret = head_node.get("image_pull_secret", None)
+        image_pull_policy = head_node.get("image_pull_policy", None)
         ray_start_params = head_node.get("ray_start_params", DEFAULT_HEAD_START_PARAMS)
         volumes_dict = head_node.get("volumes", None)
         service_account = head_node.get("service_account", None)
@@ -428,6 +432,7 @@ class RayRemoteJobs:
             environment=environment,
             annotations=annotations,
             labels=labels,
+            image_pull_policy=image_pull_policy,
         )
         # build worker nodes
         worker_groups = []
@@ -438,6 +443,7 @@ class RayRemoteJobs:
             min_replicas = worker_node.get("min_replicas", 0)
             image = worker_node.get("image", self.default_image)
             image_pull_secret = worker_node.get("image_pull_secret", None)
+            image_pull_policy = head_node.get("image_pull_policy", None)
             ray_start_params = worker_node.get("ray_start_params", DEFAULT_WORKER_START_PARAMS)
             volumes_dict = worker_node.get("volumes", None)
             service_account = worker_node.get("service_account", None)
@@ -467,6 +473,7 @@ class RayRemoteJobs:
                     environment=environment,
                     annotations=annotations,
                     labels=labels,
+                    image_pull_policy=image_pull_policy,
                 )
             )
             index += 1
@@ -524,6 +531,11 @@ class RayRemoteJobs:
             message - only returned if http return code is not equal to 200
             submission id - submission id
         """
+        # Although the cluster is ready, the service web server might not be ready yet at this point.
+        # To ensure that it is ready, trying to get jobs info from the cluster. Even if it fails
+        # couple of times, its harmless
+        _, _, _ = self.api_server_client.list_job_info(ns=namespace, name=name)
+        time.sleep(5)
         # Build job request
         job_request = RayJobRequest(entrypoint=KFPUtils.dict_to_req(d=request, executor=executor))
         if runtime_env is not None:
@@ -630,7 +642,7 @@ class RayRemoteJobs:
             return
         # Here data access is either S3 or lakehouse both of which contain self.output_folder
         try:
-            output_folder = data_access.output_folder
+            output_folder = data_access.get_output_folder()
         except Exception as e:
             logger.warning(f"failed to get output folder {e}")
             return

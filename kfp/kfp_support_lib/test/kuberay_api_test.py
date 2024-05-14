@@ -16,6 +16,7 @@ from configmaps import ConfigmapsManager
 from kfp_support.api_server_client import KubeRayAPIs
 from kfp_support.api_server_client.params import (
     DEFAULT_WORKER_START_PARAMS,
+    AutoscalerOptions,
     Cluster,
     ClusterSpec,
     ConfigMapVolume,
@@ -105,10 +106,11 @@ def test_cluster():
     head = HeadNodeSpec(
         compute_template="default-template",
         ray_start_params={"metrics-export-port": "8080", "num-cpus": "0"},
-        image="rayproject/ray:2.9.0-py310",
+        image="rayproject/ray:2.9.3-py310",
         service_type=ServiceType.ClusterIP,
         volumes=[volume],
         environment=environment,
+        image_pull_policy="Always",
     )
     worker = WorkerNodeSpec(
         group_name="small",
@@ -117,9 +119,10 @@ def test_cluster():
         min_replicas=1,
         max_replicas=1,
         ray_start_params=DEFAULT_WORKER_START_PARAMS,
-        image="rayproject/ray:2.9.0-py310",
+        image="rayproject/ray:2.9.3-py310",
         volumes=[volume],
         environment=environment,
+        image_pull_policy="Always",
     )
     t_cluster = Cluster(
         name="test",
@@ -203,28 +206,31 @@ def test_job_submission():
     head = HeadNodeSpec(
         compute_template="default-template",
         ray_start_params={"metrics-export-port": "8080", "num-cpus": "0"},
-        image="rayproject/ray:2.9.0-py310",
+        image="rayproject/ray:2.9.3-py310",
         service_type=ServiceType.ClusterIP,
         volumes=[volume],
         environment=environment,
+        image_pull_policy="IfNotPresent",
     )
     worker = WorkerNodeSpec(
         group_name="small",
         compute_template="default-template",
-        replicas=1,
-        min_replicas=1,
-        max_replicas=1,
+        replicas=0,
+        min_replicas=0,
+        max_replicas=2,
         ray_start_params=DEFAULT_WORKER_START_PARAMS,
-        image="rayproject/ray:2.9.0-py310",
+        image="rayproject/ray:2.9.3-py310",
         volumes=[volume],
         environment=environment,
+        image_pull_policy="IfNotPresent",
     )
+    autoscaler = AutoscalerOptions()
     t_cluster = Cluster(
         name="test-job",
         namespace="default",
         user="boris",
         version="2.9.0",
-        cluster_spec=ClusterSpec(head_node=head, worker_groups=[worker]),
+        cluster_spec=ClusterSpec(head_node=head, worker_groups=[worker], autoscaling_options=autoscaler),
     )
     # create
     status, error = apis.create_cluster(t_cluster)
@@ -245,6 +251,14 @@ def test_job_submission():
     job_request = RayJobRequest(
         entrypoint="python /home/ray/samples/sample_code.py", runtime_env=resource_yaml, num_cpu=0.5
     )
+    # To ensure that Ray cluster HTTP is ready try to get jobs info from the cluster
+    status, error, job_info_array = apis.list_job_info(ns="default", name="test-job")
+    assert status == 200
+    assert error is None
+    print("jobs info")
+    for inf in job_info_array:
+        print(f"    {inf.to_string()}")
+    time.sleep(5)
     status, error, sid = apis.submit_job(ns="default", name="test-job", job_request=job_request)
     assert status == 200
     assert error is None
