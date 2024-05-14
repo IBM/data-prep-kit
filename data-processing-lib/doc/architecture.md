@@ -16,7 +16,7 @@ The architecture includes the following core components:
 * [RayLauncher](../src/data_processing/runtime/ray/transform_launcher.py) accepts and validates 
  CLI parameters to establish the Ray Orchestrator with the proper configuration. 
 It uses the following components, all of which can/do define CLI configuration parameters.:
-    * [Transform Orchestrator Configuration](../src/data_processing/runtime/ray/transform_orchestrator_configuration.py) is responsible 
+    * [Transform Orchestrator Configuration](../src/data_processing/runtime/ray/execution_configuration.py) is responsible 
      for defining and validating infrastructure parameters 
      (e.g., number of workers, memory and cpu, local or remote cluster, etc.). This class has very simple state
      (several dictionaries) and is fully pickleable. As a result framework uses its instance as a

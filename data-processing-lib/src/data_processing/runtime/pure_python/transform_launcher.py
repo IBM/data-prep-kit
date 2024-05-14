@@ -16,7 +16,7 @@ import time
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.runtime import TransformExecutionConfiguration
 from data_processing.runtime.pure_python import (
-    PythonTransformConfiguration,
+    PythonTransformRuntimeConfiguration,
     orchestrate,
 )
 from data_processing.runtime.transform_launcher import AbstractTransformLauncher
@@ -33,7 +33,7 @@ class PythonTransformLauncher(AbstractTransformLauncher):
 
     def __init__(
         self,
-        transform_config: PythonTransformConfiguration,
+        transform_config: PythonTransformRuntimeConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """

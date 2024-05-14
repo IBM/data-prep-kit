@@ -21,11 +21,11 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.runtime.pure_python.transform_configuration import (
-    PythonTransformConfiguration,
+    PythonTransformRuntimeConfiguration,
 )
 from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
-    RayTransformConfiguration,
+    RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import get_logger
@@ -263,12 +263,12 @@ class TokenizationTransformConfiguration(TransformConfiguration):
         return True
 
 
-class TokenizationRayConfiguration(RayTransformConfiguration):
+class TokenizationRayConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(base_configuration=TokenizationTransformConfiguration())
 
 
-class TokenizationPythonConfiguration(PythonTransformConfiguration):
+class TokenizationPythonConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(base_configuration=TokenizationTransformConfiguration())
 

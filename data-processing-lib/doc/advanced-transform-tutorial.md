@@ -60,12 +60,12 @@ import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.ray import (
-  DefaultTableTransformRuntimeRay,
-  RayTransformLauncher,
-  RayUtils,
+    DefaultTableTransformRuntimeRay,
+    RayTransformLauncher,
+    RayUtils,
 )
 from data_processing.runtime.ray.transform_configuration import (
-  RayTransformConfiguration,
+    RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger
@@ -74,10 +74,10 @@ from ray.actor import ActorHandle
 
 class EdedupTransform(AbstractTableTransform):
 
-  def __init__(self, config: dict):
-    super().__init__(config)
-    self.doc_column = config.get("doc_column", "")
-    self.hashes = config.get("hashes", [])
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.doc_column = config.get("doc_column", "")
+        self.hashes = config.get("hashes", [])
 ```
 The `EdedupTransform` class extends the `AbstractTableTransform`, which defines the required methods.
 

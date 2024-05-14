@@ -40,7 +40,7 @@ launcher = RayTransformLauncher(YourTransformConfiguration())
 launcher.launch()
 ```
 Note that the launcher defines some additional CLI parameters that are used to control the operation of the 
-[orchestrator and workers](../src/data_processing/runtime/ray/transform_orchestrator_configuration.py) and 
+[orchestrator and workers](../src/data_processing/runtime/ray/execution_configuration.py) and 
 [data access](../src/data_processing/data_access/data_access_factory.py).  Things such as data access configuration,
 number of workers, worker resources, etc.
 Discussion of these options is beyond the scope of this document 

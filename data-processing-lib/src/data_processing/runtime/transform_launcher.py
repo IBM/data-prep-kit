@@ -1,11 +1,11 @@
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
-from data_processing.runtime import AbstractTransformConfiguration
+from data_processing.runtime import TransformRuntimeConfiguration
 
 
 class AbstractTransformLauncher:
     def __init__(
         self,
-        transform_config: AbstractTransformConfiguration,
+        transform_config: TransformRuntimeConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """

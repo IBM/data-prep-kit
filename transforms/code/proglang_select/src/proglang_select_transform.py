@@ -21,14 +21,14 @@ from data_processing.data_access import (
     DataAccessFactoryBase,
 )
 from data_processing.runtime.pure_python.transform_configuration import (
-    PythonTransformConfiguration,
+    PythonTransformRuntimeConfiguration,
 )
 from data_processing.runtime.ray import (
     DefaultTableTransformRuntimeRay,
     RayTransformLauncher,
 )
 from data_processing.runtime.ray.transform_configuration import (
-    RayTransformConfiguration,
+    RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import TransformUtils, get_logger
@@ -225,14 +225,14 @@ class ProgLangSelectTransformConfiguration(TransformConfiguration):
         return self.daf.apply_input_params(args)
 
 
-class ProgLangSelectPythonConfiguration(PythonTransformConfiguration):
+class ProgLangSelectPythonConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(
             base_configuration=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime
         )
 
 
-class ProgLangSelectRayConfiguration(RayTransformConfiguration):
+class ProgLangSelectRayConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(
             base_configuration=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime

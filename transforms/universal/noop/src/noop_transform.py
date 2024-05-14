@@ -16,11 +16,11 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.runtime.pure_python.transform_configuration import (
-    PythonTransformConfiguration,
+    PythonTransformRuntimeConfiguration,
 )
 from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.transform_configuration import (
-    RayTransformConfiguration,
+    RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
@@ -124,7 +124,7 @@ class NOOPBaseTransformConfiguration(TransformConfiguration):
         return True
 
 
-class NOOPPythonTransformConfiguration(PythonTransformConfiguration):
+class NOOPPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
     """
     Implements the PythonTransformConfiguration for NOOP as required by the PythonTransformLauncher.
     NOOP does not use a RayRuntime class so the superclass only needs the base
@@ -139,7 +139,7 @@ class NOOPPythonTransformConfiguration(PythonTransformConfiguration):
         super().__init__(base_configuration=NOOPBaseTransformConfiguration())
 
 
-class NOOPRayTransformConfiguration(RayTransformConfiguration):
+class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
     """
     Implements the RayTransformConfiguration for NOOP as required by the RayTransformLauncher.
     NOOP does not use a RayRuntime class so the superclass only needs the base

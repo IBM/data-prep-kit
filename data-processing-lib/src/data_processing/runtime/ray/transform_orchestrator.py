@@ -17,9 +17,9 @@ from datetime import datetime
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.ray import (
-    RayTransformConfiguration,
+    RayTransformExecutionConfiguration,
+    RayTransformRuntimeConfiguration,
     RayUtils,
-    TransformOrchestratorConfiguration,
     TransformStatisticsRay,
     TransformTableProcessorRay,
 )
@@ -33,9 +33,9 @@ logger = get_logger(__name__)
 
 @ray.remote(num_cpus=1, scheduling_strategy="SPREAD")
 def orchestrate(
-    preprocessing_params: TransformOrchestratorConfiguration,
+    preprocessing_params: RayTransformExecutionConfiguration,
     data_access_factory: DataAccessFactoryBase,
-    transform_runtime_config: RayTransformConfiguration,
+    transform_runtime_config: RayTransformRuntimeConfiguration,
 ) -> int:
     """
     orchestrator for transformer execution

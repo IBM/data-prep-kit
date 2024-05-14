@@ -10,12 +10,12 @@
 # limitations under the License.
 ################################################################################
 
-from data_processing.runtime import AbstractTransformConfiguration
+from data_processing.runtime import TransformRuntimeConfiguration
 from data_processing.runtime.ray import DefaultTableTransformRuntimeRay
 from data_processing.transform import TransformConfiguration
 
 
-class RayTransformConfiguration(AbstractTransformConfiguration):
+class RayTransformRuntimeConfiguration(TransformRuntimeConfiguration):
     def __init__(
         self,
         base_configuration: TransformConfiguration,

@@ -17,7 +17,7 @@ from data_processing.transform import AbstractTableTransform, TransformConfigura
 from data_processing.utils import CLIArgumentProvider
 
 
-class AbstractTransformConfiguration(CLIArgumentProvider):
+class TransformRuntimeConfiguration(CLIArgumentProvider):
     def __init__(self, base_configuration: TransformConfiguration):
         """
         Initialization

@@ -27,7 +27,7 @@ from data_processing.runtime.ray import (
     TransformTableProcessorRay,
 )
 from data_processing.runtime.ray.transform_configuration import (
-    RayTransformConfiguration,
+    RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import (
@@ -797,7 +797,7 @@ class FdedupTableTransformConfiguration(TransformConfiguration):
         return True
 
 
-class FdedupRayTransformConfiguration(RayTransformConfiguration):
+class FdedupRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(base_configuration=FdedupTableTransformConfiguration(), runtime_class=FdedupRuntime)
 

@@ -10,11 +10,11 @@
 # limitations under the License.
 ################################################################################
 
-from data_processing.runtime import AbstractTransformConfiguration
+from data_processing.runtime import TransformRuntimeConfiguration
 from data_processing.transform import TransformConfiguration
 
 
-class PythonTransformConfiguration(AbstractTransformConfiguration):
+class PythonTransformRuntimeConfiguration(TransformRuntimeConfiguration):
     def __init__(self, base_configuration: TransformConfiguration):
         """
         Initialization

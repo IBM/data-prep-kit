@@ -14,8 +14,8 @@ from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime import (
-    AbstractTransformConfiguration,
     AbstractTransformTableProcessor,
+    TransformRuntimeConfiguration,
 )
 from data_processing.transform import TransformStatistics
 
@@ -29,7 +29,7 @@ class TransformTableProcessor(AbstractTransformTableProcessor):
         self,
         data_access_factory: DataAccessFactoryBase,
         statistics: TransformStatistics,
-        params: AbstractTransformConfiguration,
+        params: TransformRuntimeConfiguration,
     ):
         """
         Init method
