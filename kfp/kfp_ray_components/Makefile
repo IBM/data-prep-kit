@@ -14,21 +14,29 @@ DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${DOCKER_IMAGE_
 # Use "make help" to see them.
 include ../../.make.defaults
 
-# Create the docker image making sure the preloaded models are available to copy into the image
-.kfp_comp.image:: Dockerfile requirements.txt
-	@# Help: Build the docker image using the $(DOCKER_FILE) and requirements.txt 
-	$(call check_defined, DOCKER_HOSTNAME)
-	sed -i.back "s/data-prep-toolkit-kfp==[0-9].*/data-prep-toolkit-kfp==${DPK_LIB_KFP_VERSION}/" requirements.txt
-	$(DOCKER) build -t ${DOCKER_IMG} \
-		--build-arg DPK_LIB_VERSION=${DPK_LIB_VERSION} \
-		--build-arg DPK_LIB_KFP_VERSION=${DPK_LIB_KFP_VERSION} \
-		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  \
-		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . --no-cache
+.PHONY: .copy-lib
+.copy-lib:
+	rm -rf ${LIB_NAME}
+	mkdir ${LIB_NAME}
+	cp -p -R ${LIB_PATH}/src ${LIB_NAME}
+	cp -p -R ${LIB_PATH}/pyproject.toml ${LIB_NAME}
+	cp -p -R ${LIB_PATH}/README.md ${LIB_NAME}
 
-image:: .kfp_comp.image
+.PHONY: .lib-src-image
+.lib-src-image:: 
+	$(MAKE) .copy-lib LIB_PATH=$(REPOROOT)/data-processing-lib LIB_NAME=data-processing-lib
+	$(MAKE) .copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib LIB_NAME=kfp_support_lib
+	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
+	rm -rf data-processing-lib
+	rm -rf kfp_support_lib
+
+.PHONY: image
+image: Dockerfile requirements.txt
 	$(MAKE) reconcile-requirements
+	$(MAKE) .lib-src-image
 
-reconcile-requirements::
+.PHONY: reconcile-requirements
+reconcile-requirements:
 	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
 	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_VERSION}/" executeRayJobComponent.yaml
 	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_VERSION}/" createRayComponent.yaml
@@ -36,18 +44,22 @@ reconcile-requirements::
 	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_VERSION}/" executeRayJobComponent_multi_s3.yaml
 	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_VERSION}/" executeSubWorkflowComponent.yaml
 
+.PHONY: load-image
 load-image:
 	@# Help: Load the image to the kind cluster created with make setup.
 	kind load docker-image $(DOCKER_IMG) --name=$(KIND_CLUSTER_NAME)
 
-build:: image
+.PHONY: build
+build: image
 
-publish::
+.PHONY: publish
+publish:
 	$(MAKE) image .defaults.publish
 
 test::
 
-clean::
+.PHONY: clean
+clean:
 	@# Help: Remove $(IMG) 
 	$(DOCKER) image rm ${IMG} || true
 	-rm  makeenv
