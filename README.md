@@ -112,9 +112,6 @@ for creating and managing the Ray cluster and [KubeRay API server](https://githu
 to interact with the KubeRay operator. An additional [framework](kfp/kfp_support_lib) along with several
 [kfp components](kfp/kfp_ray_components) is used to simplify the pipeline implementation.
 
-#### Example Notebook
-A quick way to get started is to use a demo data-processing pipeline locally via [example notebook](./examples/).  
-
 
 ## &#x2699; Setup <a name = "setup"></a>
 
@@ -156,7 +153,7 @@ Get started by running the "noop" transform that performs an identity operation 
 [noop implementation](transforms/universal/noop). 
 
 ### Run a Data Pipeline on Local Ray
-Get started by building a data pipeline with our example pipeline (link to be added) that can run on a laptop. 
+Get started by building a data pipeline with our [example pipeline](./examples/) that can run on a laptop. To test this pipeline, you can download this repo as a zip file and get started. 
 
 ### Automate a Pipeline
 The data preprocessing can be automated by running transformers as a KubeFlow pipeline (KFP). 
@@ -187,7 +184,9 @@ See the [contribution guide](CONTRIBUTING.md)
 
 
 ## &#x2B50; Acknowledgements <a name = "acknowledgement"></a>
-Thanks to the [BigCode Project](https://github.com/bigcode-project), which built the code quality module. 
+Thanks to the [BigCode Project](https://github.com/bigcode-project), which served as the source for borrowing the code quality metrics.
+
+
 
 
 
