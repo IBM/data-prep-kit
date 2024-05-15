@@ -134,7 +134,7 @@ To execute the script with S3 functionality, we utilize minio.
 ```make minio-load``` - To load the data into minio
 ```make minio-stop``` - To stop the minio server
 
-Please consult the documentation for further guidance: [using_s3_transformers](../../data-processing-lib/doc/using_s3_transformers.md) 
+Please consult the documentation for further guidance: [transform-s3-testing](../../data-processing-lib/doc/transform-s3-testing.md) 
 
 ** Run script using make targets **
 ```run-s3-sample``` : Starts minio server and load data from [test-data](test-data/input/) into local minio for S3 access and runs src/ ingest2parquet_s3.py
