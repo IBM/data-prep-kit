@@ -21,9 +21,7 @@ from data_processing.runtime.ray import (
     RayTransformLauncher,
     RayUtils,
 )
-from data_processing.runtime.ray.transform_configuration import (
-    RayTransformRuntimeConfiguration,
-)
+from data_processing.runtime.ray.runtime_configuration import RayRuntimeConfiguration
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
@@ -255,7 +253,7 @@ class EdedupTableTransformConfiguration(TransformConfiguration):
         return True
 
 
-class EdedupRayTransformConfiguration(RayTransformRuntimeConfiguration):
+class EdedupRayTransformConfiguration(RayRuntimeConfiguration):
     def __init__(self):
         super().__init__(transform_config=EdedupTableTransformConfiguration(), runtime_class=EdedupRuntime)
 

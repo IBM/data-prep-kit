@@ -60,8 +60,8 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.runtime.ray import RayTransformLauncher
-from data_processing.runtime.ray.transform_configuration import (
-    RayTransformRuntimeConfiguration,
+from data_processing.runtime.ray.runtime_configuration import (
+  RayRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
@@ -69,8 +69,8 @@ from data_processing.utils import CLIArgumentProvider, get_logger
 
 class NOOPTransform(AbstractTableTransform):
 
-    def __init__(self, config: dict[str, Any]):
-        self.sleep = config.get("sleep", 1)
+  def __init__(self, config: dict[str, Any]):
+    self.sleep = config.get("sleep", 1)
 ```
 The `NOOPTransform` class extends the `AbstractTableTransform`, which defines the required methods.
 

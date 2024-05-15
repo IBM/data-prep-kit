@@ -40,6 +40,6 @@ if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = PythonTransformLauncher(transform_config=NOOPPythonTransformConfiguration())
+    launcher = PythonTransformLauncher(runtime_config=NOOPPythonTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

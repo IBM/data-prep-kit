@@ -5,7 +5,7 @@ The Ray runtime includes the following set of components:
 class generally used to implement `main()` that makes use of a `TransformConfiguration` to 
 start the Ray runtime and execute the transform over the specified set of input files.
 The RayTransformLauncher is created using a `RayTransformConfiguration` instance.
-* [RayTransformConfiguration](../src/data_processing/runtime/ray/transform_configuration.py) - this 
+* [RayTransformConfiguration](../src/data_processing/runtime/ray/runtime_configuration.py) - this 
 class extends transform's base TransformConfiguration implementation to add an optional 
 `TranformRuntime` (see next) class to be used by the transform implementation.
 * [TransformRuntime](../src/data_processing/runtime/ray/transform_runtime.py) - 
@@ -51,7 +51,7 @@ In general, a transform should be able to run in both the python and Ray runtime
 As such we first define the python-only transform configuration, which will then
 be used by the Ray-runtime-specific transform configuration. 
 The python transform configuration implements  
-[TransformConfiguration](../src/data_processing/runtime/transform_configuration.py)
+[TransformConfiguration](../src/data_processing/runtime/runtime_configuration.py)
 and deifnes with transform-specific name, and implementation 
 and class. In addition, it is responsible for providing transform-specific
 methods to define and capture optional command line arguments.

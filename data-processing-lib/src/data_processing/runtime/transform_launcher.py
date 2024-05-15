@@ -5,15 +5,15 @@ from data_processing.runtime import TransformRuntimeConfiguration
 class AbstractTransformLauncher:
     def __init__(
         self,
-        transform_config: TransformRuntimeConfiguration,
+        runtime_config: TransformRuntimeConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """
         Creates driver
-        :param transform_config: transform runtime factory
+        :param runtime_config: transform runtime factory
         :param data_access_factory: the factory to create DataAccess instances.
         """
-        self.transform_config = transform_config
+        self.transform_config = runtime_config
         self.name = self.transform_config.get_name()
         self.data_access_factory = data_access_factory
 

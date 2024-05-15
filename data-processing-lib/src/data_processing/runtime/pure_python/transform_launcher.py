@@ -33,16 +33,16 @@ class PythonTransformLauncher(AbstractTransformLauncher):
 
     def __init__(
         self,
-        transform_config: PythonTransformRuntimeConfiguration,
+        runtime_config: PythonTransformRuntimeConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """
         Creates driver
-        :param transform_config: transform runtime factory
+        :param runtime_config: transform runtime factory
         :param data_access_factory: the factory to create DataAccess instances.
         """
-        super().__init__(transform_config, data_access_factory)
-        self.transform_runtime_config = transform_config
+        super().__init__(runtime_config, data_access_factory)
+        self.transform_runtime_config = runtime_config
         self.execution_config = TransformExecutionConfiguration(name=self.transform_runtime_config.get_name())
 
     def __get_parameters(self) -> bool:

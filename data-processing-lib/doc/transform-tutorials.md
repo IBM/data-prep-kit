@@ -41,7 +41,7 @@ The return values are handled the same waa as the return values for `transform()
 not need this feature, a default implementation is provided to return an empty list and empty dictionary.
  
 #### TransformConfiguration class
-The [TransformConfiguration](../src/data_processing/runtime/transform_configuration.py)
+The [TransformConfiguration](../src/data_processing/runtime/runtime_configuration.py)
 serves as an interface and must be implemented by the any `AbstractTableTransform`
 implementation to provide the following configuration:
 

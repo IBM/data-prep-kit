@@ -20,16 +20,14 @@ from data_processing.data_access import (
     DataAccessFactory,
     DataAccessFactoryBase,
 )
-from data_processing.runtime.pure_python.transform_configuration import (
+from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.runtime.ray import (
     DefaultTableTransformRuntimeRay,
     RayTransformLauncher,
 )
-from data_processing.runtime.ray.transform_configuration import (
-    RayTransformRuntimeConfiguration,
-)
+from data_processing.runtime.ray.runtime_configuration import RayRuntimeConfiguration
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import TransformUtils, get_logger
 from ray.actor import ActorHandle
@@ -230,7 +228,7 @@ class ProgLangSelectPythonConfiguration(PythonTransformRuntimeConfiguration):
         super().__init__(transform_config=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime)
 
 
-class ProgLangSelectRayConfiguration(RayTransformRuntimeConfiguration):
+class ProgLangSelectRayConfiguration(RayRuntimeConfiguration):
     def __init__(self):
         super().__init__(transform_config=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime)
 

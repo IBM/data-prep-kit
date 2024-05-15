@@ -16,16 +16,14 @@ from typing import Any
 import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.runtime.pure_python.transform_configuration import (
+from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.runtime.ray import (
     DefaultTableTransformRuntimeRay,
     RayTransformLauncher,
 )
-from data_processing.runtime.ray.transform_configuration import (
-    RayTransformRuntimeConfiguration,
-)
+from data_processing.runtime.ray.runtime_configuration import RayRuntimeConfiguration
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from ray.actor import ActorHandle
@@ -204,7 +202,7 @@ class DocIDPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
         super().__init__(transform_config=DocIDTransformConfiguration())
 
 
-class DocIDRayTransformConfiguration(RayTransformRuntimeConfiguration):
+class DocIDRayTransformConfiguration(RayRuntimeConfiguration):
     def __init__(self):
         super().__init__(transform_config=DocIDTransformConfiguration(), runtime_class=DocIDRuntime)
 
