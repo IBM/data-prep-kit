@@ -4,7 +4,7 @@
 ################################################################################
 
 # Data prep lab wheel version
-DPK_LIB_VERSION=0.0.1
+DPK_LIB_VERSION=0.1.0
 DPK_LIB_KFP_VERSION=0.0.1
 
 # Begin transform versions/tags
