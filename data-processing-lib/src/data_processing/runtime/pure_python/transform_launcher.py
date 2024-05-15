@@ -33,17 +33,16 @@ class PythonTransformLauncher(AbstractTransformLauncher):
 
     def __init__(
         self,
-        transform_config: PythonTransformRuntimeConfiguration,
+        runtime_config: PythonTransformRuntimeConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """
         Creates driver
-        :param transform_config: transform runtime factory
+        :param runtime_config: transform runtime factory
         :param data_access_factory: the factory to create DataAccess instances.
         """
-        super().__init__(transform_config, data_access_factory)
-        self.transform_runtime_config = transform_config
-        self.execution_config = TransformExecutionConfiguration(name=self.transform_runtime_config.get_name())
+        super().__init__(runtime_config, data_access_factory)
+        self.execution_config = TransformExecutionConfiguration(name=runtime_config.get_name())
 
     def __get_parameters(self) -> bool:
         """
@@ -58,12 +57,12 @@ class PythonTransformLauncher(AbstractTransformLauncher):
             formatter_class=argparse.RawTextHelpFormatter,
         )
         # add additional arguments
-        self.transform_runtime_config.add_input_params(parser=parser)
+        self.runtime_config.add_input_params(parser=parser)
         self.data_access_factory.add_input_params(parser=parser)
         self.execution_config.add_input_params(parser=parser)
         args = parser.parse_args()
         return (
-            self.transform_runtime_config.apply_input_params(args=args)
+            self.runtime_config.apply_input_params(args=args)
             and self.execution_config.apply_input_params(args=args)
             and self.data_access_factory.apply_input_params(args=args)
         )
@@ -79,7 +78,7 @@ class PythonTransformLauncher(AbstractTransformLauncher):
             logger.debug("Starting orchestrator")
             res = orchestrate(
                 data_access_factory=self.data_access_factory,
-                transform_config=self.transform_runtime_config,
+                runtime_config=self.runtime_config,
                 execution_config=self.execution_config,
             )
             logger.debug("Completed orchestrator")

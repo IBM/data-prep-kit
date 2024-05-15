@@ -27,7 +27,7 @@ local_conf = {
 }
 
 # create launcher
-launcher = PythonTransformLauncher(transform_config=CodeQualityTransformConfiguration())
+launcher = PythonTransformLauncher(runtime_config=CodeQualityTransformConfiguration())
 
 
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}

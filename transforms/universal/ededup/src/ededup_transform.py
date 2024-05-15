@@ -21,7 +21,7 @@ from data_processing.runtime.ray import (
     RayTransformLauncher,
     RayUtils,
 )
-from data_processing.runtime.ray.transform_configuration import (
+from data_processing.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
@@ -257,7 +257,7 @@ class EdedupTableTransformConfiguration(TransformConfiguration):
 
 class EdedupRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=EdedupTableTransformConfiguration(), runtime_class=EdedupRuntime)
+        super().__init__(transform_config=EdedupTableTransformConfiguration(), runtime_class=EdedupRuntime)
 
 
 if __name__ == "__main__":

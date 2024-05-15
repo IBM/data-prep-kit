@@ -35,13 +35,13 @@ logger = get_logger(__name__)
 def orchestrate(
     preprocessing_params: RayTransformExecutionConfiguration,
     data_access_factory: DataAccessFactoryBase,
-    transform_runtime_config: RayTransformRuntimeConfiguration,
+    runtime_config: RayTransformRuntimeConfiguration,
 ) -> int:
     """
     orchestrator for transformer execution
     :param preprocessing_params: orchestrator configuration
     :param data_access_factory: data access factory
-    :param transform_runtime_config: transformer runtime configuration
+    :param runtime_config: transformer runtime configuration
     :return: 0 - success or 1 - failure
     """
     start_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -70,13 +70,13 @@ def orchestrate(
             f"Number of workers - {preprocessing_params.n_workers} " f"with {preprocessing_params.worker_options} each"
         )
         # create transformer runtime
-        runtime = transform_runtime_config.create_transform_runtime()
+        runtime = runtime_config.create_transform_runtime()
         # create statistics
         statistics = TransformStatisticsRay.remote({})
         # create executors
         processor_params = {
             "data_access_factory": data_access_factory,
-            "transform_class": transform_runtime_config.get_transform_class(),
+            "transform_class": runtime_config.get_transform_class(),
             "transform_params": runtime.get_transform_config(
                 data_access_factory=data_access_factory, statistics=statistics, files=files
             ),
@@ -128,7 +128,7 @@ def orchestrate(
             "job details": preprocessing_params.job_details
             | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "status": "success"},
             "code": preprocessing_params.code_location,
-            "job_input_params": transform_runtime_config.get_transform_metadata()
+            "job_input_params": runtime_config.get_transform_metadata()
             | data_access_factory.get_input_params()
             | preprocessing_params.get_input_params(),
             "execution_stats": resources,

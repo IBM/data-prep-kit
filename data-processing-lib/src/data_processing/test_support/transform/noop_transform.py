@@ -15,11 +15,11 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.runtime.pure_python.transform_configuration import (
+from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.runtime.ray import RayTransformLauncher
-from data_processing.runtime.ray.transform_configuration import (
+from data_processing.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
@@ -135,7 +135,7 @@ class NOOPPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
         """
         Initialization
         """
-        super().__init__(base_configuration=NOOPTransformConfiguration())
+        super().__init__(transform_config=NOOPTransformConfiguration())
 
 
 class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
@@ -149,7 +149,7 @@ class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
         """
         Initialization
         """
-        super().__init__(base_configuration=NOOPTransformConfiguration())
+        super().__init__(transform_config=NOOPTransformConfiguration())
 
 
 if __name__ == "__main__":
