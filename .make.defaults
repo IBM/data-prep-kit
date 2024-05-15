@@ -58,12 +58,14 @@ KIND_CLUSTER_NAME=dataprep
 	@make -pqR : 2>/dev/null  | grep '@# Help:' | grep -v make | grep -v IGNORE | sed -e 's/.*Help://' -e 's/[ 	]*//' | \
 		awk -F, '{printf("%-15s%s\n",$$1,$$2)}'
 
+# Gnu awk requires running awk in 2 steps, below.
 help::
 	@printf "%-20s %s\n" "Target" "Description"
 	@printf "%-20s %s\n" "------" "-----------"
 	@export submakes=$$(find ./* -mindepth 1 -maxdepth 1 -name Makefile);	\
 	make -pqR : 2>/dev/null \
-		| awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' \
+		| awk  '/^# File/,/^# Finished Make data base/ {print $$0}' \
+		| awk  -v RS= -F:  '{if ($$1 !~ "^[#.]") {print $$1}}' \
 		| sort \
 		| egrep -v -e '^[^[:alnum:]]' -e '^$@$$' \
 		| xargs -I _ sh -c 'printf "%-20s " _; make _ -nB 2>/dev/null | (grep -i "^# Help:" || echo "") \
