@@ -20,7 +20,7 @@ from typing import Any, Optional
 
 import kfp.dsl as dsl
 from data_processing.data_access import DataAccess
-from data_processing.utils import get_logger, GB
+from data_processing.utils import get_logger
 from kfp_server_api import models
 from kfp_support.api_server_client import KubeRayAPIs
 from kfp_support.api_server_client.params import (
@@ -717,7 +717,7 @@ class ComponentUtils:
         """
         import sys
 
-        from data_processing.utils import get_logger
+        from data_processing.utils import get_logger, GB
         from kfp_support.workflow_support.utils import KFPUtils
 
         logger = get_logger(__name__)
