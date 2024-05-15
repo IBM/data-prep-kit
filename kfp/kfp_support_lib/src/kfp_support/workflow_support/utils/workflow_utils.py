@@ -143,6 +143,56 @@ class PipelinesUtils:
         """
         self.kfp_client = Client(host=host)
 
+    def upload_pipeline(
+        self,
+        pipeline_package_path: str = None,
+        pipeline_name: str = None,
+        overwrite: bool = False,
+        description: str = None,
+    ) -> models.api_pipeline.ApiPipeline:
+        """
+        Uploads the pipeline
+        :param pipeline_package_path: Local path to the pipeline package.
+        :param pipeline_name: Optional. Name of the pipeline to be shown in the UI
+        :param overwrite: Optional. If pipeline exists, delete it before creating a new one.
+        :param description: Optional. Description of the pipeline to be shown in the UI.
+        :return: Server response object containing pipeline id and other information.
+        """
+        pipeline = None
+        if overwrite:
+            pipeline = self.get_pipeline_by_name(name=pipeline_name)
+            if pipeline is not None:
+                try:
+                    logger.info(f"pipeline {pipeline_name} already exists. Trying to delete it.")
+                    self.kfp_client.delete_pipeline(pipeline_id=pipeline.id)
+                except Exception as e:
+                    logger.warning(f"Exception deleting pipeline {e} before uploading")
+                    return None
+        try:
+            pipeline = self.kfp_client.upload_pipeline(
+                pipeline_package_path=pipeline_package_path, pipeline_name=pipeline_name, description=description
+            )
+        except Exception as e:
+            logger.warning(f"Exception uploading pipeline {e}")
+            return None
+        if pipeline is None:
+            logger.warning(f"Failed to upload pipeline {pipeline_name}.")
+            return None
+        logger.info("Pipeline uploaded")
+        return pipeline
+
+    def delete_pipeline(self, pipeline_id):
+        """
+        Delete pipeline.
+        :param pipeline_id: id of the pipeline.
+        :return
+        Returns:
+          Object. If the method is called asynchronously, returns the request thread.
+        Raises:
+          kfp_server_api.ApiException: If pipeline is not found.
+        """
+        return self.kfp_client.delete_pipeline(pipeline_id)
+
     def start_pipeline(
         self,
         pipeline: models.api_pipeline.ApiPipeline,
@@ -161,7 +211,7 @@ class PipelinesUtils:
             run_id = self.kfp_client.run_pipeline(
                 experiment_id=experiment.id, job_name=job_name, pipeline_id=pipeline.id, params=params
             )
-            logger.info("Pipeline submitted")
+            logger.info(f"Pipeline run {job_name} submitted")
             return run_id.id
         except Exception as e:
             logger.warning(f"Exception starting pipeline {e}")
@@ -573,7 +623,9 @@ class RayRemoteJobs:
         if status // 100 != 2:
             sys.exit(1)
         self._print_log(log=log, previous_log_len=previous_log_len)
-        logger.info(f"Job completed with execution status {status}")
+        logger.info(f"Job completed with execution status {job_status}")
+        if job_status != JobStatus.SUCCEEDED:
+            sys.exit(1)
         if data_access is None:
             return
         # Here data access is either S3 or lakehouse both of which contain self.output_folder
@@ -597,7 +649,7 @@ class ComponentUtils:
     def add_settings_to_component(
         component: dsl.ContainerOp,
         timeout: int,
-        image_pull_policy: str = "Always",
+        image_pull_policy: str = "IfNotPresent",
         cache_strategy: str = "P0D",
     ) -> None:
         """
