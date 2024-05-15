@@ -232,7 +232,6 @@ Only the following programs should be manually installed:
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) 1.26 or newer must be installed on your machine, and be 
 able to connect to the external cluster. For OpenShift clusters OpenShift CLI 
 [oc](https://docs.openshift.com/container-platform/4.15/cli_reference/openshift_cli/getting-started-cli.html) can be used instead.
-- [wget](https://www.gnu.org/software/wget/) 1.21 must be installed on your machine.
 
 #### Installation steps
 

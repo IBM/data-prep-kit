@@ -17,13 +17,7 @@ if [[ "$os" == "unknown" ]]; then
 	exit 1
 fi
 
-if [ ! -f ${ROOT_DIR}/hack/.helper-functions.sh ]; then
-	echo "Download helper-functions.sh"
-	TEKTON_KFP_SERVER_VERSION=1.8.1
-	wget https://raw.githubusercontent.com/kubeflow/kfp-tekton/v${TEKTON_KFP_SERVER_VERSION}/scripts/deploy/iks/helper-functions.sh -O ${ROOT_DIR}/hack/.helper-functions.sh
-fi
-source ${ROOT_DIR}/hack/.helper-functions.sh
-
+source ${ROOT_DIR}/hack/helper-functions.sh
 
 # Turn colors in this script off by setting the NO_COLOR variable in your
 # environment to any value:
