@@ -3,6 +3,7 @@ REPOROOT=../../
 
 include $(REPOROOT)/.make.defaults
 
+
 DOCKER_IMAGE_VERSION=${INGEST_TO_PARQUET_VERSION}
 DOCKER_IMAGE_NAME?=ingest2parquet
 DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
@@ -27,6 +28,18 @@ minio-load:
 
 minio-start: .defaults.minio.start
 
+minio-stop:	.defaults.minio.stop 
+
 test-local:: .defaults.test-locals
 
 publish:: image .defaults.publish
+
+run-local-sample:
+	$(MAKE) RUN_FILE=ingest2parquet_local.py  .defaults.run-src-file
+	
+run-s3-sample:
+	$(MAKE) minio-start minio-load RUN_FILE=ingest2parquet_s3.py .defaults.run-src-file
+	@# Help: Run src/ingest2parquet_s3.py file (if it exists).  Assumes minio has beens started.
+	@echo ""
+	@echo "You may want to stop the minio server now (see make help)"
+	@echo ""

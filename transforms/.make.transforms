@@ -224,23 +224,7 @@ conventions:
 
 # Expects RUN_FILE
 .PHONY: .transforms.run-src-file
-.transforms.run-src-file:
-	@# Help: Run $(RUN_FILE) (if it exists).
-	@if [ ! -e "src/$(RUN_FILE)" ];	then	\
-	    echo "";					\
-	    echo src/$(RUN_FILE) does not exist.;	\
-	    echo "";					\
-	    exit 1;					\
-	fi
-	@if [ ! -d "venv" ];	then			\
-	    echo "";					\
-	    echo "Please 'make venv' before running $(RUN_FILE).";		\
-	    echo "";					\
-	    exit 1;					\
-	fi
-	source venv/bin/activate;	\
-	cd src;				\
-	python $(RUN_FILE) $(RUN_ARGS)
+.transforms.run-src-file: .defaults.run-src-file
 
 .PHONY: .transforms.load-minio
 .transforms.minio-load::

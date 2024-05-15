@@ -73,21 +73,14 @@ configuration for values are as follows:
   --domain DOMAIN
                         To identify whether data is code or natural language
   --data_s3_cred DATA_S3_CRED
-                        AST string of options for cos credentials. Only required for COS.
-                        access_key: access key help text secret_key: secret key help text url: S3 url Example:
-                        { 'access_key': 'AFDSASDFASDFDSF ', 'secret_key': 'XSDFYZZZ', 'url': 's3:/cos-optimal-
-                        llm-pile/test/' }
+                        AST string of options for s3 credentials. Only required for S3 data access. access_key: access key help text secret_key: secret key help text url: optional s3 url region: optional s3 region Example: { 'access_key':
+                        'access', 'secret_key': 'secret', 'url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud', 'region': 'us-east-1' }
   --data_s3_config DATA_S3_CONFIG
-                        AST string containing input/output paths. input_folder: Path to input folder of files to
-                        be processed output_folder: Path to output folder of processed files Example: {
-                        'input_folder': '/cos-optimal-llm-pile/bluepile-
-                        processing/rel0_8/cc15_30_preproc_ededup', 'output_folder': '/cos-optimal-llm-
-                        pile/bluepile-processing/rel0_8/cc15_30_preproc_ededup/processed' }
-
+                        AST string containing input/output paths. input_folder: Path to input folder of files to be processed output_folder: Path to output folder of processed files Example: { 'input_folder': 's3-path/your-input-bucket',
+                        'output_folder': 's3-path/your-output-bucket' }
   --data_local_config DATA_LOCAL_CONFIG
-                        ast string containing input/output folders using local fs. input_folder: Path to input
-                        folder of files to be processed output_folder: Path to output folder of processed
-                        files Example: { 'input_folder': './input', 'output_folder': '/tmp/output' }
+                        ast string containing input/output folders using local fs. input_folder: Path to input folder of files to be processed output_folder: Path to output folder of processed files Example: { 'input_folder': './input',
+                        'output_folder': '/tmp/output' }
   --data_max_files DATA_MAX_FILES
                         Max amount of files to process
   --data_checkpointing DATA_CHECKPOINTING
@@ -106,6 +99,10 @@ We provide several demos of the script usage for different data storage options:
 
 #[local file system](src/ingest2parquet_local.py)
 This script processes data stored locally on the system. It sets up parameters for local file paths and invokes the ingest2parquet() function from ingest2parquet.py to convert raw data files to Parquet format.
+
+**Run using make targets.**
+
+```run-local-sample``` - runs src/ingest2parquet_local.py
 
 **Run the script without any command-line arguments.**
 
@@ -128,11 +125,20 @@ python ingest2parquet.py \
 ```
 
 
-
 #[s3](src/ingest2parquet_s3.py) 
 This script is designed to process data stored on an S3 bucket. It sets up necessary parameters for accessing the S3 bucket and invokes the ingest2parquet() function from ingest2parquet.py to convert raw data files to Parquet format.
 
-To execute the script with S3 functionality, we utilize minio. Please consult the documentation on setting up minio for further guidance: [using_s3_transformers](../../data-processing-lib/doc/using_s3_transformers.md)
+To execute the script with S3 functionality, we utilize minio. 
+
+```make minio-start``` - To start minio server
+```make minio-load``` - To load the data into minio
+```make minio-stop``` - To stop the minio server
+
+Please consult the documentation for further guidance: [using_s3_transformers](../../data-processing-lib/doc/using_s3_transformers.md) 
+
+** Run script using make targets **
+```run-s3-sample``` : Starts minio server and load data from [test-data](test-data/input/) into local minio for S3 access and runs src/ ingest2parquet_s3.py
+
 
 **Run the script without any command-line arguments.**
 

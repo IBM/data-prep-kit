@@ -92,8 +92,7 @@ class TransformUtils:
         try:
             content_string = content_bytes.decode(encoding)
             return content_string
-        except Exception as e:
-            logger.error(f"Error -> {e}")
+        except Exception:
             return ""
 
     @staticmethod
