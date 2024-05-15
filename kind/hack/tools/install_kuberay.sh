@@ -29,9 +29,8 @@ wait(){
 }
 
 delete(){
-	helm uninstall kuberay-operator -n kuberay || True
-	helm uninstall kuberay-apiserver -n kuberay || True
-	helm uninstall kuberay-apiserver -n kuberay || True
+	helm uninstall kuberay-operator -n kuberay || true
+	helm uninstall kuberay-apiserver -n kuberay || true
 }
 
 usage(){

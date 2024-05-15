@@ -50,8 +50,8 @@ wait(){
 }
 
 delete(){
-  kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/env/dev?ref=$PIPELINE_VERSION" --ignore-not-found || True
-  kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/cluster-scoped-resources?ref=$PIPELINE_VERSION" --ignore-not-found || True
+  kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/env/dev?ref=$PIPELINE_VERSION" --ignore-not-found || true
+  kubectl delete -k "github.com/kubeflow/pipelines/manifests/kustomize/cluster-scoped-resources?ref=$PIPELINE_VERSION" --ignore-not-found || true
   kubectl delete --ignore-not-found clusterrolebinding pipeline-runner-extend
 }
 
