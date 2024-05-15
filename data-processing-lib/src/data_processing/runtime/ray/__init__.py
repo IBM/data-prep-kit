@@ -6,3 +6,4 @@ from data_processing.runtime.ray.transform_table_processor import TransformTable
 from data_processing.runtime.ray.execution_configuration import RayTransformExecutionConfiguration
 from data_processing.runtime.ray.transform_orchestrator import orchestrate
 from data_processing.runtime.ray.transform_launcher import RayTransformLauncher
+from data_processing.runtime.runtime_configuration import TransformRuntimeConfiguration

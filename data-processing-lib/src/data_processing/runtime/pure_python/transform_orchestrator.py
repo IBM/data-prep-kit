@@ -29,18 +29,18 @@ logger = get_logger(__name__)
 
 def orchestrate(
     data_access_factory: DataAccessFactoryBase,
-    transform_config: TransformRuntimeConfiguration,
+    runtime_config: TransformRuntimeConfiguration,
     execution_config: TransformExecutionConfiguration,
 ) -> int:
     """
     orchestrator for transformer execution
     :param data_access_factory: data access factory
-    :param transform_config: transformer configuration
+    :param runtime_config: transformer configuration
     :param execution_config: execution configuration
     :return: 0 - success or 1 - failure
     """
     start_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    logger.info(f"orchestrator {transform_config.get_name()} started at {start_ts}")
+    logger.info(f"orchestrator {runtime_config.get_name()} started at {start_ts}")
     try:
         # create data access
         data_access = data_access_factory.create_data_access()
@@ -61,10 +61,10 @@ def orchestrate(
         statistics = TransformStatistics()
         # create executor
         executor = TransformTableProcessor(
-            data_access_factory=data_access_factory, statistics=statistics, params=transform_config
+            data_access_factory=data_access_factory, statistics=statistics, params=runtime_config
         )
         # process data
-        logger.debug(f"{transform_config.get_name()} Begin processing files")
+        logger.debug(f"{runtime_config.get_name()} Begin processing files")
         t_start = time.time()
         completed = 0
         for path in files:
@@ -82,7 +82,7 @@ def orchestrate(
         stats = statistics.get_execution_stats()
         # build and save metadata
         logger.debug("Building job metadata")
-        input_params = transform_config.get_transform_metadata()
+        input_params = runtime_config.get_transform_metadata()
         metadata = {
             "pipeline": execution_config.pipeline_id,
             "job details": execution_config.job_details

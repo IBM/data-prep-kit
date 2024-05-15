@@ -43,7 +43,6 @@ class RayTransformLauncher(AbstractTransformLauncher):
         :param data_access_factory: the factory to create DataAccess instances.
         """
         super().__init__(runtime_config, data_access_factory)
-        self.transform_runtime_config = runtime_config
         self.execution_config = RayTransformExecutionConfiguration(name=self.name)
 
     def __get_parameters(self) -> bool:
@@ -62,7 +61,7 @@ class RayTransformLauncher(AbstractTransformLauncher):
             "--run_locally", type=lambda x: bool(str2bool(x)), default=False, help="running ray local flag"
         )
         # add additional arguments
-        self.transform_runtime_config.add_input_params(parser=parser)
+        self.runtime_config.add_input_params(parser=parser)
         self.data_access_factory.add_input_params(parser=parser)
         self.execution_config.add_input_params(parser=parser)
         args = parser.parse_args()
@@ -72,7 +71,7 @@ class RayTransformLauncher(AbstractTransformLauncher):
         else:
             logger.info("connecting to existing cluster")
         return (
-            self.transform_runtime_config.apply_input_params(args=args)
+            self.runtime_config.apply_input_params(args=args)
             and self.data_access_factory.apply_input_params(args=args)
             and self.execution_config.apply_input_params(args=args)
         )
@@ -98,7 +97,7 @@ class RayTransformLauncher(AbstractTransformLauncher):
                 orchestrate.remote(
                     preprocessing_params=self.execution_config,
                     data_access_factory=self.data_access_factory,
-                    transform_runtime_config=self.transform_runtime_config,
+                    runtime_config=self.runtime_config,
                 )
             )
             logger.debug("Completed orchestrator")

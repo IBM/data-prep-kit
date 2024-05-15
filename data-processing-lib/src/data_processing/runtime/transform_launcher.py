@@ -10,8 +10,9 @@
 # limitations under the License.
 ################################################################################
 
-from typing import Any
 import sys
+from typing import Any
+
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.runtime import TransformRuntimeConfiguration
 from data_processing.utils import ParamsUtils, get_logger
@@ -31,8 +32,8 @@ class AbstractTransformLauncher:
         :param runtime_config: transform runtime factory
         :param data_access_factory: the factory to create DataAccess instances.
         """
-        self.transform_config = runtime_config
-        self.name = self.transform_config.get_name()
+        self.runtime_config = runtime_config
+        self.name = self.runtime_config.get_name()
         self.data_access_factory = data_access_factory
 
     def launch(self):
@@ -40,6 +41,7 @@ class AbstractTransformLauncher:
 
     def get_transform_name(self) -> str:
         return self.name
+
 
 def multi_luncher(params: dict[str, Any], launcher: AbstractTransformLauncher) -> int:
     """
@@ -75,4 +77,3 @@ def multi_luncher(params: dict[str, Any], launcher: AbstractTransformLauncher) -
         else:
             n_launches += 1
     return n_launches
-
