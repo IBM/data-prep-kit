@@ -13,10 +13,7 @@
 import os
 import sys
 
-from data_processing.runtime.pure_python import (
-    PythonTransformLauncher,
-    PythonTransformRuntimeConfiguration,
-)
+from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.transform import NOOPPythonTransformConfiguration
 from data_processing.utils import ParamsUtils
 
@@ -42,25 +39,19 @@ local_conf = {
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 
 
-class TestingTransformConfiguration(PythonTransformRuntimeConfiguration):
-    def __init__(self):
-        super().__init__(base_configuration=NOOPPythonTransformConfiguration())
-
-
 class TestLauncherPython(PythonTransformLauncher):
     """
     Test driver for validation of the functionality
     """
 
     def __init__(self):
-        super().__init__(TestingTransformConfiguration())
+        super().__init__(NOOPPythonTransformConfiguration())
 
     def _submit_for_execution(self) -> int:
         """
         Overwrite this method to just print all parameters to make sure that everything works
         :return:
         """
-        print("\n\nPrinting preprocessing parameters")
         return 0
 
 
