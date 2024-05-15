@@ -65,7 +65,7 @@ from data_processing.runtime.ray import (
   RayUtils,
 )
 from data_processing.runtime.ray.runtime_configuration import (
-  RayRuntimeConfiguration,
+  RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger

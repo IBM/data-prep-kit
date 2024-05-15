@@ -20,7 +20,9 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.runtime.ray import RayTransformLauncher
-from data_processing.runtime.ray.runtime_configuration import RayRuntimeConfiguration
+from data_processing.runtime.ray.runtime_configuration import (
+    RayTransformRuntimeConfiguration,
+)
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
@@ -205,7 +207,7 @@ class FilterPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
         super().__init__(transform_config=FilterTransformConfiguration())
 
 
-class FilterRayTransformConfiguration(RayRuntimeConfiguration):
+class FilterRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(transform_config=FilterTransformConfiguration())
 

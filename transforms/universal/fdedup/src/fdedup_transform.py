@@ -26,7 +26,9 @@ from data_processing.runtime.ray import (
     RayUtils,
     TransformTableProcessorRay,
 )
-from data_processing.runtime.ray.runtime_configuration import RayRuntimeConfiguration
+from data_processing.runtime.ray.runtime_configuration import (
+    RayTransformRuntimeConfiguration,
+)
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import (
     RANDOM_SEED,
@@ -795,7 +797,7 @@ class FdedupTableTransformConfiguration(TransformConfiguration):
         return True
 
 
-class FdedupRayTransformConfiguration(RayRuntimeConfiguration):
+class FdedupRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(transform_config=FdedupTableTransformConfiguration(), runtime_class=FdedupRuntime)
 

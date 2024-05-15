@@ -17,7 +17,9 @@ import time
 import ray
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.runtime.ray import RayTransformExecutionConfiguration, orchestrate
-from data_processing.runtime.ray.runtime_configuration import RayRuntimeConfiguration
+from data_processing.runtime.ray.runtime_configuration import (
+    RayTransformRuntimeConfiguration,
+)
 from data_processing.runtime.transform_launcher import AbstractTransformLauncher
 from data_processing.utils import get_logger, str2bool
 
@@ -32,7 +34,7 @@ class RayTransformLauncher(AbstractTransformLauncher):
 
     def __init__(
         self,
-        runtime_config: RayRuntimeConfiguration,
+        runtime_config: RayTransformRuntimeConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """

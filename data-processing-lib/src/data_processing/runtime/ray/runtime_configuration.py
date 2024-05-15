@@ -15,7 +15,7 @@ from data_processing.runtime.ray import DefaultTableTransformRuntimeRay
 from data_processing.transform import TransformConfiguration
 
 
-class RayRuntimeConfiguration(TransformRuntimeConfiguration):
+class RayTransformRuntimeConfiguration(TransformRuntimeConfiguration):
     def __init__(
         self,
         transform_config: TransformConfiguration,

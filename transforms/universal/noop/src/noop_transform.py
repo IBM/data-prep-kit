@@ -19,7 +19,9 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.runtime.ray import RayTransformLauncher
-from data_processing.runtime.ray.runtime_configuration import RayRuntimeConfiguration
+from data_processing.runtime.ray.runtime_configuration import (
+    RayTransformRuntimeConfiguration,
+)
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
@@ -137,7 +139,7 @@ class NOOPPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
         super().__init__(transform_config=NOOPTransformConfiguration())
 
 
-class NOOPRayTransformConfiguration(RayRuntimeConfiguration):
+class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
     """
     Implements the RayTransformConfiguration for NOOP as required by the RayTransformLauncher.
     NOOP does not use a RayRuntime class so the superclass only needs the base
