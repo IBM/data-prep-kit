@@ -255,13 +255,14 @@ def test_job_submission():
     status, error, job_info_array = apis.list_job_info(ns="default", name="test-job")
     assert status == 200
     assert error is None
-    print("jobs info")
+    print("\n initial jobs info")
     for inf in job_info_array:
         print(f"    {inf.to_string()}")
     time.sleep(5)
     status, error, sid = apis.submit_job(ns="default", name="test-job", job_request=job_request)
     assert status == 200
     assert error is None
+    time.sleep(10)
     # get Ray job info
     status, error, jinfo = apis.get_job_info(ns="default", name="test-job", sid=sid)
     assert status == 200
