@@ -26,10 +26,6 @@ kind_create() {
       echo "kubectl could not be found. Please install it and try again"
       exit 1
   fi
-  if ! command -v wget &> /dev/null ; then
-      echo "wget could not be found"
-      exit 1
-  fi
   if ! command -v mc &> /dev/null ; then
       echo "mc could not be found"
       exit 1

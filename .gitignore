@@ -136,7 +136,6 @@ dmypy.json
 .DS_Store
 
 
-kind/hack/.helper-functions.sh
 **/*.back
 **/makeenv
 **/*.yaml
