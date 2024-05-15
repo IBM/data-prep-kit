@@ -16,7 +16,6 @@ from configmaps import ConfigmapsManager
 from kfp_support.api_server_client import KubeRayAPIs
 from kfp_support.api_server_client.params import (
     DEFAULT_WORKER_START_PARAMS,
-    AutoscalerOptions,
     Cluster,
     ClusterSpec,
     ConfigMapVolume,
@@ -215,22 +214,21 @@ def test_job_submission():
     worker = WorkerNodeSpec(
         group_name="small",
         compute_template="default-template",
-        replicas=0,
-        min_replicas=0,
-        max_replicas=2,
+        replicas=1,
+        min_replicas=1,
+        max_replicas=1,
         ray_start_params=DEFAULT_WORKER_START_PARAMS,
         image="rayproject/ray:2.9.3-py310",
         volumes=[volume],
         environment=environment,
         image_pull_policy="IfNotPresent",
     )
-    autoscaler = AutoscalerOptions()
     t_cluster = Cluster(
         name="test-job",
         namespace="default",
         user="boris",
         version="2.9.0",
-        cluster_spec=ClusterSpec(head_node=head, worker_groups=[worker], autoscaling_options=autoscaler),
+        cluster_spec=ClusterSpec(head_node=head, worker_groups=[worker]),
     )
     # create
     status, error = apis.create_cluster(t_cluster)
