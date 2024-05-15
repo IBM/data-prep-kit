@@ -136,7 +136,7 @@ class NOOPPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
         Initialization
         :param base_configuration - base configuration class
         """
-        super().__init__(base_configuration=NOOPTransformConfiguration())
+        super().__init__(transform_config=NOOPTransformConfiguration())
 
 
 class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
@@ -151,7 +151,7 @@ class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
         Initialization
         :param base_configuration - base configuration class
         """
-        super().__init__(base_configuration=NOOPTransformConfiguration())
+        super().__init__(transform_config=NOOPTransformConfiguration())
 
 
 if __name__ == "__main__":

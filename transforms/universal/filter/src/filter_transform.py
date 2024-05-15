@@ -204,12 +204,12 @@ class FilterTransformConfiguration(TransformConfiguration):
 
 class FilterPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=FilterTransformConfiguration())
+        super().__init__(transform_config=FilterTransformConfiguration())
 
 
 class FilterRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=FilterTransformConfiguration())
+        super().__init__(transform_config=FilterTransformConfiguration())
 
 
 if __name__ == "__main__":

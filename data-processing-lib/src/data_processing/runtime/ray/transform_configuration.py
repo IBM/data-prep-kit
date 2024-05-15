@@ -18,16 +18,16 @@ from data_processing.transform import TransformConfiguration
 class RayTransformRuntimeConfiguration(TransformRuntimeConfiguration):
     def __init__(
         self,
-        base_configuration: TransformConfiguration,
+        transform_config: TransformConfiguration,
         runtime_class: type[DefaultTableTransformRuntimeRay] = DefaultTableTransformRuntimeRay,
     ):
         """
         Initialization
-        :param base_configuration - base configuration class
+        :param transform_config - base configuration class
         :param runtime_class: implementation of the transform runtime
         :param remove_from_metadata - list of parameters to remove from metadata
         """
-        super().__init__(base_configuration=base_configuration)
+        super().__init__(transform_config=transform_config)
         self.runtime_class = runtime_class
 
     def create_transform_runtime(self) -> DefaultTableTransformRuntimeRay:
@@ -35,4 +35,4 @@ class RayTransformRuntimeConfiguration(TransformRuntimeConfiguration):
         Create transform runtime with the parameters captured during apply_input_params()
         :return: transform runtime object
         """
-        return self.runtime_class(self.base_configuration.get_transform_params())
+        return self.runtime_class(self.transform_config.get_transform_params())

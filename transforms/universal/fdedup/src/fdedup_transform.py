@@ -799,7 +799,7 @@ class FdedupTableTransformConfiguration(TransformConfiguration):
 
 class FdedupRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=FdedupTableTransformConfiguration(), runtime_class=FdedupRuntime)
+        super().__init__(transform_config=FdedupTableTransformConfiguration(), runtime_class=FdedupRuntime)
 
 
 if __name__ == "__main__":

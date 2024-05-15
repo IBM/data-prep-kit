@@ -15,10 +15,10 @@ from data_processing.transform import TransformConfiguration
 
 
 class PythonTransformRuntimeConfiguration(TransformRuntimeConfiguration):
-    def __init__(self, base_configuration: TransformConfiguration):
+    def __init__(self, transform_config: TransformConfiguration):
         """
         Initialization
-        :param base_configuration - base configuration class
+        :param transform_config - base configuration class
         """
-        self.base_configuration = base_configuration
-        super().__init__(base_configuration=base_configuration)
+        self.transform_config = transform_config
+        super().__init__(transform_config=transform_config)

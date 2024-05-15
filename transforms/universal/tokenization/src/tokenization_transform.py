@@ -265,12 +265,12 @@ class TokenizationTransformConfiguration(TransformConfiguration):
 
 class TokenizationRayConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=TokenizationTransformConfiguration())
+        super().__init__(transform_config=TokenizationTransformConfiguration())
 
 
 class TokenizationPythonConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=TokenizationTransformConfiguration())
+        super().__init__(transform_config=TokenizationTransformConfiguration())
 
 
 if __name__ == "__main__":

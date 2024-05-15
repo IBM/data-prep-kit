@@ -201,12 +201,12 @@ class DocIDTransformConfiguration(TransformConfiguration):
 
 class DocIDPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=DocIDTransformConfiguration())
+        super().__init__(transform_config=DocIDTransformConfiguration())
 
 
 class DocIDRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=DocIDTransformConfiguration(), runtime_class=DocIDRuntime)
+        super().__init__(transform_config=DocIDTransformConfiguration(), runtime_class=DocIDRuntime)
 
 
 if __name__ == "__main__":

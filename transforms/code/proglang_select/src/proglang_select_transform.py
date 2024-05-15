@@ -227,16 +227,12 @@ class ProgLangSelectTransformConfiguration(TransformConfiguration):
 
 class ProgLangSelectPythonConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(
-            base_configuration=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime
-        )
+        super().__init__(transform_config=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime)
 
 
 class ProgLangSelectRayConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(
-            base_configuration=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime
-        )
+        super().__init__(transform_config=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime)
 
 
 if __name__ == "__main__":

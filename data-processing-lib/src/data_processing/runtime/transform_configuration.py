@@ -18,21 +18,21 @@ from data_processing.utils import CLIArgumentProvider
 
 
 class TransformRuntimeConfiguration(CLIArgumentProvider):
-    def __init__(self, base_configuration: TransformConfiguration):
+    def __init__(self, transform_config: TransformConfiguration):
         """
         Initialization
-        :param base_configuration - base configuration class
+        :param transform_config - base configuration class
         """
-        self.base_configuration = base_configuration
+        self.transform_config = transform_config
 
     def add_input_params(self, parser: ArgumentParser) -> None:
-        self.base_configuration.add_input_params(parser)
+        self.transform_config.add_input_params(parser)
 
     def apply_input_params(self, args: Namespace) -> bool:
-        return self.base_configuration.apply_input_params(args)
+        return self.transform_config.apply_input_params(args)
 
     def get_input_params(self) -> dict[str, Any]:
-        return self.base_configuration.get_input_params()
+        return self.transform_config.get_input_params()
 
     def get_transform_class(self) -> type[AbstractTableTransform]:
         """
@@ -41,10 +41,10 @@ class TransformRuntimeConfiguration(CLIArgumentProvider):
         the associated TransformRuntime get_transform_config() method.
         :return: class extending AbstractTableTransform
         """
-        return self.base_configuration.get_transform_class()
+        return self.transform_config.get_transform_class()
 
     def get_name(self):
-        return self.base_configuration.get_name()
+        return self.transform_config.get_name()
 
     def get_transform_metadata(self) -> dict[str, Any]:
         """
@@ -54,11 +54,11 @@ class TransformRuntimeConfiguration(CLIArgumentProvider):
         information, access keys, secrets, passwords, etc
         :return parameters for metadata:
         """
-        return self.base_configuration.get_transform_metadata()
+        return self.transform_config.get_transform_metadata()
 
     def get_transform_params(self) -> dict[str, Any]:
         """
          Get transform parameters
         :return: transform parameters
         """
-        return self.base_configuration.get_transform_params()
+        return self.transform_config.get_transform_params()

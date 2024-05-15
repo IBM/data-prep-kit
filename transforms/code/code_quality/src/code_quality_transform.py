@@ -343,12 +343,12 @@ class CodeQualityTransformConfiguration(TransformConfiguration):
 
 class CodeQualityRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=CodeQualityTransformConfiguration())
+        super().__init__(transform_config=CodeQualityTransformConfiguration())
 
 
 class CodeQualityPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=CodeQualityTransformConfiguration())
+        super().__init__(transform_config=CodeQualityTransformConfiguration())
 
 
 if __name__ == "__main__":

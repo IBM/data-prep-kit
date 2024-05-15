@@ -257,7 +257,7 @@ class EdedupTableTransformConfiguration(TransformConfiguration):
 
 class EdedupRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=EdedupTableTransformConfiguration(), runtime_class=EdedupRuntime)
+        super().__init__(transform_config=EdedupTableTransformConfiguration(), runtime_class=EdedupRuntime)
 
 
 if __name__ == "__main__":

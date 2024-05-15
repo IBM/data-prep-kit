@@ -44,7 +44,7 @@ code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 
 class TestingTransformConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(base_configuration=NOOPPythonTransformConfiguration())
+        super().__init__(transform_config=NOOPPythonTransformConfiguration())
 
 
 class TestLauncherPython(PythonTransformLauncher):
