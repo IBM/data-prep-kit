@@ -19,8 +19,6 @@ COPY --chown=ray:users kfp_support_lib/ kfp_support_lib/
 RUN cd kfp_support_lib && pip install --no-cache-dir -e .
 # remove credentials-containing file
 RUN rm requirements.txt
-RUN rm kfp_support_lib/
-RUN rm data-processing-lib/
 
 
 
