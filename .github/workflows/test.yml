@@ -14,9 +14,9 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Test data-processing-lib
+            - name: Test data-processing-lib/ray
               run: |
-                  make -C data-processing-lib DOCKER=docker venv test
+                  make -C data-processing-lib/ray DOCKER=docker venv test
     test-code:
         runs-on: ubuntu-latest
         steps:
