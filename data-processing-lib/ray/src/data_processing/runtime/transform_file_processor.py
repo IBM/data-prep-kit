@@ -63,7 +63,7 @@ class AbstractTransformFileProcessor:
             self.last_file_name = name_extension[0]
             self.last_file_name_next_index = None
             # save results
-            self._submit_table(t_start=t_start, out_files=out_files, stats=stats)
+            self._submit_file(t_start=t_start, out_files=out_files, stats=stats)
         except Exception as e:
             self.logger.warning(f"Exception {e} processing file {f_name}: {traceback.format_exc()}")
             self._publish_stats({"transform execution exception": 1})
@@ -87,14 +87,14 @@ class AbstractTransformFileProcessor:
             out_files, stats = self.transform.flush()
             self.logger.debug(f"Done flushing transform, got {len(out_files)} files")
             # Here we are using the name of the last table, that we were processing
-            self._submit_table(t_start=t_start, out_files=out_files, stats=stats)
+            self._submit_file(t_start=t_start, out_files=out_files, stats=stats)
         except Exception as e:
             self.logger.warning(f"Exception {e} flushing: {traceback.format_exc()}")
             self._publish_stats({"transform execution exception": 1})
 
-    def _submit_table(self, t_start: float, out_files: list[tuple[bytes, str]], stats: dict[str, Any]) -> None:
+    def _submit_file(self, t_start: float, out_files: list[tuple[bytes, str]], stats: dict[str, Any]) -> None:
         """
-        This is a helper method writing output tables and statistics
+        This is a helper method writing output files and statistics
         :param t_start: execution start time
         :param out_files: list of files to write
         :param stats: execution statistics to populate
@@ -108,55 +108,54 @@ class AbstractTransformFileProcessor:
             case 0:
                 # no tables - save input file name for flushing
                 self.logger.debug(
-                    f"Transform did not produce a transformed table for " f"file {self.last_file_name}.parquet"
+                    f"Transform did not produce a transformed file for " f"file {self.last_file_name}.parquet"
                 )
             case 1:
                 # we have exactly 1 table
-                output_name = self.data_access.get_output_location(path=f"{self.last_file_name}.parquet")
-                self.logger.debug(f"Writing transformed file {self.last_file_name}.parquet to {output_name}")
-                if TransformUtils.verify_no_duplicate_columns(table=out_files[0], file=output_name):
-                    output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_files[0])
-                    if save_res is not None:
-                        # Store execution statistics. Doing this async
-                        self._publish_stats(
-                            {
-                                "result_files": 1,
-                                "result_size": out_files[0].nbytes,
-                                "table_processing": time.time() - t_start,
-                            }
-                        )
-                    else:
-                        self.logger.warning(f"Failed to write file {output_name}")
-                        self._publish_stats({"failed_writes": 1})
+                file_ext = out_files[0]
+                output_name = self.data_access.get_output_location(path=f"{self.last_file_name}.{file_ext[1]}")
+                self.logger.debug(f"Writing transformed file {self.last_file_name}.{self.last_extension} "
+                                  f"to {output_name}")
+                save_res = self.data_access.save_file(path=output_name, data=file_ext[0])
+                if save_res is not None:
+                    # Store execution statistics. Doing this async
+                    self._publish_stats(
+                        {
+                            "result_files": 1,
+                            "result_size": len(file_ext[0]),
+                            "table_processing": time.time() - t_start,
+                        }
+                    )
+                else:
+                    self.logger.warning(f"Failed to write file {output_name}")
+                    self._publish_stats({"failed_writes": 1})
                 self.last_file_name_next_index = 0
             case _:
                 # we have more then 1 table
-                table_sizes = 0
+                file_sizes = 0
                 output_file_name = self.data_access.get_output_location(path=self.last_file_name)
                 start_index = self.last_file_name_next_index
                 if start_index is None:
                     start_index = 0
                 count = len(out_files)
                 for index in range(count):
-                    output_name_indexed = f"{output_file_name}_{start_index + index}.parquet"
-                    if TransformUtils.verify_no_duplicate_columns(table=out_files[index], file=output_name_indexed):
-                        table_sizes += out_files[index].nbytes
-                        self.logger.debug(
-                            f"Writing transformed file {self.last_file_name}.parquet, {index + 1} "
-                            f"of {count}  to {output_name_indexed}"
-                        )
-                        output_file_size, save_res = self.data_access.save_table(
-                            path=output_name_indexed, table=out_files[index]
-                        )
-                        if save_res is None:
-                            self.logger.warning(f"Failed to write file {output_name_indexed}")
-                            self._publish_stats({"failed_writes": 1})
-                            break
+                    file_ext = out_files[index]
+                    output_name_indexed = f"{output_file_name}_{start_index + index}.{file_ext[1]}"
+                    file_sizes += len(file_ext[0])
+                    self.logger.debug(
+                        f"Writing transformed file {self.last_file_name}.{self.last_extension}, {index + 1} "
+                        f"of {count}  to {output_name_indexed}"
+                    )
+                    save_res = self.data_access.save_file(path=output_name_indexed, data=file_ext[0])
+                    if save_res is None:
+                        self.logger.warning(f"Failed to write file {output_name_indexed}")
+                        self._publish_stats({"failed_writes": 1})
+                        break
                 self.last_file_name_next_index = start_index + count
                 self._publish_stats(
                     {
                         "result_files": len(out_files),
-                        "result_size": table_sizes,
+                        "result_size": file_sizes,
                         "table_processing": time.time() - t_start,
                     }
                 )
