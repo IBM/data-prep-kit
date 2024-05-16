@@ -31,18 +31,19 @@ class WorkerNodeSpec:
     Methods:
     - Create worker node pool specification: gets the following parameters:
         group_name - required, group name of the worker group
-        compute_template - required, the computeTemplate of head node group
+        compute_template - required, the computeTemplate of worker node group
         replicas - required, desired replicas of the worker group
         min_replicas - required Min replicas of the worker group, can't be greater than max_replicas
         max_replicas - required, max replicas of the worker group
         ray_start_params - required, Ray start parameters
-        image - optional, image used for head node
-        volumes - optional, a list of volumes to attach to head node
-        service_account - optional, a service account (has to exist) to run head node
-        image_pull_secret - optional, secret to pull head node image from registry
-        environment - optional, environment variables for head pod
-        annotations - optional, annotations for head node
-        labels - optional, labels for head node
+        image - optional, image used for worker node
+        volumes - optional, a list of volumes to attach to worker node
+        service_account - optional, a service account (has to exist) to run worker node
+        image_pull_secret - optional, secret to pull worker node image from registry
+        environment - optional, environment variables for worker pod
+        annotations - optional, annotations for worker node
+        labels - optional, labels for worker node
+        image_pull_policy - optional, worker node pull image policy. Default IfNotPresent
     """
 
     def __init__(
@@ -60,6 +61,7 @@ class WorkerNodeSpec:
         environment: EnvironmentVariables = None,
         annotations: dict[str, str] = None,
         labels: dict[str, str] = None,
+        image_pull_policy: str = None,
     ):
         """
         Initialization
@@ -76,6 +78,7 @@ class WorkerNodeSpec:
         :param environment: environment
         :param annotations: annotations
         :param labels: labels
+        :param image_pull_policy: image pull policy
         """
         # Validate replicas
         if min_replicas > replicas:
@@ -97,6 +100,7 @@ class WorkerNodeSpec:
         self.environment = environment
         self.annotations = annotations
         self.labels = labels
+        self.image_pull_policy = image_pull_policy
 
     def to_string(self) -> str:
         """
@@ -114,6 +118,8 @@ class WorkerNodeSpec:
             val += f", service_account = {self.service_account}"
         if self.image_pull_secret is not None:
             val += f", image_pull_secret = {self.image_pull_secret}"
+        if self.image_pull_policy is not None:
+            val += f", image_pull_policy = {self.image_pull_policy}"
         if self.volumes is not None:
             val = val + ",\n volumes = ["
             first = True
@@ -151,6 +157,8 @@ class WorkerNodeSpec:
             dct["service_account"] = self.service_account
         if self.image_pull_secret is not None:
             dct["imagePullSecret"] = self.image_pull_secret
+        if self.image_pull_policy is not None:
+            dct["imagePullPolicy"] = self.image_pull_policy
         if self.volumes is not None:
             dct["volumes"] = [v.to_dict() for v in self.volumes]
         if self.environment is not None:
@@ -163,7 +171,7 @@ class WorkerNodeSpec:
 
 
 """
-    Creates new head node from dictionary, used for unmarshalling json. Python does not
+    Creates new worker node from dictionary, used for unmarshalling json. Python does not
     support multiple constructors, so do it this way
 """
 
@@ -189,9 +197,10 @@ def worker_node_spec_decoder(dct: dict[str, Any]) -> WorkerNodeSpec:
         ray_start_params=dct.get("rayStartParams"),
         image=dct.get("image"),
         volumes=volumes,
-        service_account=dct.get("service_account"),
-        image_pull_secret=dct.get("imagePullSecret"),
+        service_account=dct.get("service_account", None),
+        image_pull_secret=dct.get("imagePullSecret", None),
+        image_pull_policy=dct.get("imagePullPolicy", None),
         environment=environments,
-        annotations=dct.get("annotations"),
-        labels=dct.get("labels"),
+        annotations=dct.get("annotations", None),
+        labels=dct.get("labels", None),
     )

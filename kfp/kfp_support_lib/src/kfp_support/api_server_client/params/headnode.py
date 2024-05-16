@@ -52,6 +52,7 @@ class HeadNodeSpec:
         environment - optional, environment variables for head pod
         annotations - optional, annotations for head node
         labels - optional, labels for head node
+        image_pull_policy - optional, head node pull image policy. Default IfNotPresent
     """
 
     def __init__(
@@ -67,6 +68,7 @@ class HeadNodeSpec:
         environment: EnvironmentVariables = None,
         annotations: dict[str, str] = None,
         labels: dict[str, str] = None,
+        image_pull_policy: str = None,
     ):
         """
         Initialization
@@ -81,6 +83,7 @@ class HeadNodeSpec:
         :param environment: head node environment
         :param annotations: head node annotation
         :param labels: labels
+        :param image_pull_policy: image pull policy
         """
 
         self.compute_template = compute_template
@@ -95,6 +98,7 @@ class HeadNodeSpec:
         self.environment = environment
         self.annotations = annotations
         self.labels = labels
+        self.image_pull_policy = image_pull_policy
 
     def to_string(self) -> str:
         """
@@ -112,6 +116,8 @@ class HeadNodeSpec:
             val += f", service_account = {self.service_account}"
         if self.image_pull_secret is not None:
             val += f", image_pull_secret = {self.image_pull_secret}"
+        if self.image_pull_policy is not None:
+            val += f", image_pull_policy = {self.image_pull_policy}"
         if self.volumes is not None:
             val = val + ",\n volumes = ["
             first = True
@@ -146,6 +152,8 @@ class HeadNodeSpec:
             dct["service_account"] = self.service_account
         if self.image_pull_secret is not None:
             dct["image_pull_secret"] = self.image_pull_secret
+        if self.image_pull_policy is not None:
+            dct["imagePullPolicy"] = self.image_pull_policy
         if self.volumes is not None:
             dct["volumes"] = [v.to_dict() for v in self.volumes]
         if self.environment is not None:
@@ -185,9 +193,10 @@ def head_node_spec_decoder(dct: dict[str, Any]) -> HeadNodeSpec:
         service_type=service_type,
         enable_ingress=dct.get("enableIngress", False),
         volumes=volumes,
-        service_account=dct.get("service_account"),
-        image_pull_secret=dct.get("image_pull_secret"),
+        service_account=dct.get("service_account", None),
+        image_pull_secret=dct.get("imagePullSecret", None),
+        image_pull_policy=dct.get("imagePullPolicy", None),
         environment=environments,
-        annotations=dct.get("annotations"),
-        labels=dct.get("labels"),
+        annotations=dct.get("annotations", None),
+        labels=dct.get("labels", None),
     )

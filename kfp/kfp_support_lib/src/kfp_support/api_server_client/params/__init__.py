@@ -40,9 +40,11 @@ from kfp_support.api_server_client.params.workernode import (
 )
 from kfp_support.api_server_client.params.cluster import (
     Environment,
+    AutoscalerOptions,
     ClusterSpec,
     ClusterEvent,
     Cluster,
+    autoscaling_decoder,
     cluster_spec_decoder,
     cluster_decoder,
     clusters_decoder,

@@ -459,7 +459,7 @@ class KubeRayAPIs:
                 logger.warning(f"Failed to submit job to the cluster {name} in namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
-            time.sleep(1)
+            time.sleep(5)
         return status, message, None
 
     def get_job_info(self, ns: str, name: str, sid: str) -> tuple[int, str, RayJobInfo]:
@@ -515,7 +515,10 @@ class KubeRayAPIs:
                 response = requests.get(url, headers=_headers, timeout=TIMEOUT)
                 if response.status_code // 100 == 2:
                     job_info_array = response.json().get("submissions", None)
-                    return response.status_code, None, [RayJobInfo(i) for i in job_info_array]
+                    if job_info_array is None:
+                        return response.status_code, None, []
+                    else:
+                        return response.status_code, None, [RayJobInfo(i) for i in job_info_array]
                 else:
                     logger.warning(
                         f"Failed to list jobs from the cluster {name} in namespace {ns}, "
@@ -527,7 +530,7 @@ class KubeRayAPIs:
                 logger.warning(f"Failed to list jobs from the cluster {name} in namespace {ns}, exception : {e}")
                 status = 500
                 message = str(e)
-            time.sleep(1)
+            time.sleep(5)
         return status, message, []
 
     def get_job_log(self, ns: str, name: str, sid: str) -> tuple[int, str, str]:

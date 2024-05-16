@@ -34,18 +34,20 @@ def test_ray_remote_jobs():
     head_node = {
         "cpu": 2,
         "memory": 4,
-        "image": "rayproject/ray:2.9.0-py310",
+        "image": "rayproject/ray:2.9.3-py310",
         # Ray start params, just to show
         "ray_start_params": {"metrics-export-port": "8080", "num-cpus": "0", "dashboard-host": "0.0.0.0"},
+        "image_pull_policy": "Always",
     } | dct_volumes
 
     worker_node = {
         "cpu": 2,
         "memory": 4,
-        "image": "rayproject/ray:2.9.0-py310",
+        "image": "rayproject/ray:2.9.3-py310",
         "replicas": 1,
         "min_replicas": 1,
         "max_replicas": 1,
+        "image_pull_policy": "Always",
     } | dct_volumes
 
     # Create configmap for testing
