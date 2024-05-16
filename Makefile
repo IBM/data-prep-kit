@@ -45,7 +45,7 @@ test::
 
 lib-release:
 	@# Help: Publish data-prep-kit $(DPK_LIB_VERSION) and data-prep-kit-kfp $(DPK_LIB_KFP_VERSION) libraries to pypi 
-	@$(MAKE) -C data-processing-lib build publish
+	@$(MAKE) -C $(DPK_RAY_LIB_DIR) build publish
 	@$(MAKE) -C kfp/kfp_support_lib build publish
 	@echo ""
 	@echo "This modified files in the repo. Please be sure to commit/push back to the repository."

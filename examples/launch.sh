@@ -4,7 +4,7 @@ echo $REPO_ROOT
 
 
 # Set PYTHONPATH for `data_processing` library
-export PYTHONPATH=$REPO_ROOT/data-processing-lib/src/
+export PYTHONPATH=$REPO_ROOT/data-processing-lib/ray/src/
 
 # Set PYTHONAPATH for transforms
 export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/transforms/code/malware/src

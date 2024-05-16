@@ -65,7 +65,7 @@ Features of the toolkit:
 - It aims to accelerate unstructured data prep for the "long tail" of LLM use cases.
 - It offers a growing set of module implementations across multiple runtimes, targeting laptop-scale to datacenter-scale processing.
 - It provides a growing set of sample pipelines developed for real enterprise use cases.
-- It provides the [Data processing library](data-processing-lib) to enable contribution of new custom modules targeting new use cases.
+- It provides the [Data processing library](data-processing-lib/ray) to enable contribution of new custom modules targeting new use cases.
 - It uses [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp/doc/simple_transform_pipeline.md) for no-code data prep.
 
 Data modalities supported: 
