@@ -44,7 +44,7 @@ DOCKER_IMAGE?=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_NAME):$(DOCKER_IMAGE_VERSION)
 include $(REPOROOT)/.make.versions
 
 KIND_CLUSTER_NAME=dataprep
-
+DPK_RAY_LIB_DIR=$(REPOROOT)/data-processing-lib/ray
 #######################################################################################
 # Lists all targets and optional help text found in the target.
 # Adapted from https://stackoverflow.com/a/65243296/45375
@@ -175,9 +175,9 @@ __check_defined = \
 	rm -rf data-processing-lib
 	mkdir data-processing-lib	       
 	# Copy with -p so docker cachine works when copying this into the image
-	cp -p -R $(REPOROOT)/data-processing-lib/src data-processing-lib
-	cp -p  $(REPOROOT)/data-processing-lib/pyproject.toml data-processing-lib
-	cp -p  $(REPOROOT)/data-processing-lib/README.md data-processing-lib
+	cp -p -R $(DPK_RAY_LIB_DIR)/src data-processing-lib
+	cp -p  $(DPK_RAY_LIB_DIR)/pyproject.toml data-processing-lib
+	cp -p  $(DPK_RAY_LIB_DIR)/README.md data-processing-lib
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
 	rm -rf data-processing-lib
 
@@ -188,11 +188,11 @@ __check_defined = \
 	@echo Installing source from data processing library for venv
 	source venv/bin/activate;				      	\
 	pip install pytest;						\
-	pip uninstall -y data-prep-toolkit;		 			\
+	pip uninstall -y data-prep-toolkit;		 		\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
-	pip install $${extra_url}  -e $(REPOROOT)/data-processing-lib/;	\
+	pip install $${extra_url}  -e $(DPK_RAY_LIB_DIR);			\
 	if [ $$? -eq 0 ]; then  					\
 		echo Installed source from data processing library for `which $(PYTHON)`;       \
 	else 								\

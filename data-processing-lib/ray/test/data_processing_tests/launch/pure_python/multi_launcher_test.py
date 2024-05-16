@@ -13,9 +13,9 @@
 import os
 
 from data_processing.runtime import multi_luncher
-from data_processing.runtime.ray import RayTransformLauncher
+from data_processing.runtime.pure_python import PythonTransformLauncher
+from data_processing.test_support.transform import NOOPPythonTransformConfiguration
 from data_processing.utils import ParamsUtils
-from data_processing.test_support.transform import NOOPRayTransformConfiguration
 
 
 s3_cred = {
@@ -32,25 +32,22 @@ local_conf = {
     "output_folder": os.path.join(os.sep, "tmp", "output"),
 }
 
-worker_options = {"num_cpu": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 
 
-class TestLauncherRay(RayTransformLauncher):
+class TestLauncherPython(PythonTransformLauncher):
     """
     Test driver for validation of the functionality
     """
 
     def __init__(self):
-        super().__init__(NOOPRayTransformConfiguration())
+        super().__init__(NOOPPythonTransformConfiguration())
 
     def _submit_for_execution(self) -> int:
         """
         Overwrite this method to just print all parameters to make sure that everything works
         :return:
         """
-        print("\n\nPrinting preprocessing parameters")
-        print(f"Run locally {self.run_locally}")
         return 0
 
 
@@ -65,7 +62,7 @@ def test_multi_launcher():
         "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     }
     # s3 configuration
-    res = multi_luncher(params=params, launcher=TestLauncherRay())
+    res = multi_luncher(params=params, launcher=TestLauncherPython())
     assert 1 == res
     params = {
         "data_max_files": -1,
@@ -76,5 +73,5 @@ def test_multi_launcher():
         "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     }
     # local configuration
-    res = multi_luncher(params=params, launcher=TestLauncherRay())
+    res = multi_luncher(params=params, launcher=TestLauncherPython())
     assert 1 == res

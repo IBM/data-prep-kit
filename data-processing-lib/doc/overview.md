@@ -10,9 +10,9 @@ This might include operations such as de-duplication, merging, and splitting.
 The framework uses a plugin-model for the primary functions.  The key ones for
 developers of data transformation are:
 
-* [Transformation](../src/data_processing/transform/table_transform.py) - a simple, easily-implemented interface defines
+* [Transformation](../ray/src/data_processing/transform/table_transform.py) - a simple, easily-implemented interface defines
 the specifics of a given data transformation.
-* [Transform Configuration](../src/data_processing/runtime/ray/transform_runtime.py) - defines
+* [Transform Configuration](../ray/src/data_processing/runtime/ray/transform_runtime.py) - defines
 the transform short name, its implementation class,  and command line configuration
 parameters.
 
