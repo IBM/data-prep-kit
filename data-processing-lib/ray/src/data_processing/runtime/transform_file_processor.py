@@ -14,7 +14,6 @@ import time
 import traceback
 from typing import Any
 
-import pyarrow as pa
 from data_processing.utils import TransformUtils, get_logger
 
 
@@ -31,6 +30,7 @@ class AbstractTransformFileProcessor:
         self.transform = None
         self.stats = None
         self.last_file_name = None
+        self.last_extension = None
         self.last_file_name_next_index = None
         self.logger = get_logger(__name__)
 
@@ -46,27 +46,24 @@ class AbstractTransformFileProcessor:
             return
         t_start = time.time()
         # Read source table
-        table = self.data_access.get_table(path=f_name)
-        if table is None:
-            self.logger.warning("File read resulted in None. Returning.")
+        file = self.data_access.get_file(path=f_name)
+        if file is None:
+            self.logger.warning(f"File read resulted in None for {f_name}. Returning.")
             self._publish_stats({"failed_reads": 1})
             return
-        self._publish_stats({"source_files": 1, "source_size": table.nbytes})
-        # Process input table
+        self._publish_stats({"source_files": 1, "source_size": len(file)})
+        # Process input file
         try:
-            if table.num_rows > 0:
-                # execute local processing
-                self.logger.debug(f"Begin transforming table from {f_name}")
-                out_tables, stats = self.transform.transform(table=table)
-                self.logger.debug(f"Done transforming table from {f_name}")
-                self.last_file_name = TransformUtils.get_file_extension(f_name)[0]
-                self.last_file_name_next_index = None
-            else:
-                self.logger.info(f"table: {f_name} is empty, skipping processing")
-                self._publish_stats({"skipped empty tables": 1})
-                return
+            # execute local processing
+            name_extension = TransformUtils.get_file_extension(f_name)
+            self.last_extension = name_extension[1]
+            self.logger.debug(f"Begin transforming table from {f_name}")
+            out_files, stats = self.transform.transform(file=file, ext=name_extension[1])
+            self.logger.debug(f"Done transforming table from {f_name}")
+            self.last_file_name = name_extension[0]
+            self.last_file_name_next_index = None
             # save results
-            self._submit_table(t_start=t_start, out_tables=out_tables, stats=stats)
+            self._submit_table(t_start=t_start, out_files=out_files, stats=stats)
         except Exception as e:
             self.logger.warning(f"Exception {e} processing file {f_name}: {traceback.format_exc()}")
             self._publish_stats({"transform execution exception": 1})
@@ -87,27 +84,27 @@ class AbstractTransformFileProcessor:
         try:
             # get flush results
             self.logger.debug(f"Begin flushing transform")
-            out_tables, stats = self.transform.flush()
-            self.logger.debug(f"Done flushing transform, got {len(out_tables)} tables")
+            out_files, stats = self.transform.flush()
+            self.logger.debug(f"Done flushing transform, got {len(out_files)} files")
             # Here we are using the name of the last table, that we were processing
-            self._submit_table(t_start=t_start, out_tables=out_tables, stats=stats)
+            self._submit_table(t_start=t_start, out_files=out_files, stats=stats)
         except Exception as e:
             self.logger.warning(f"Exception {e} flushing: {traceback.format_exc()}")
             self._publish_stats({"transform execution exception": 1})
 
-    def _submit_table(self, t_start: float, out_tables: list[pa.Table], stats: dict[str, Any]) -> None:
+    def _submit_table(self, t_start: float, out_files: list[tuple[bytes, str]], stats: dict[str, Any]) -> None:
         """
         This is a helper method writing output tables and statistics
         :param t_start: execution start time
-        :param out_tables: list of tables to write
+        :param out_files: list of files to write
         :param stats: execution statistics to populate
         :return: None
         """
         self.logger.debug(
-            f"submitting tables under file named {self.last_file_name}.parquet, " f"number of tables {len(out_tables)}"
+            f"submitting files under file named {self.last_file_name}.{self.last_extension} "
+            f"number of files {len(out_files)}"
         )
-        # Compute output file location. Preserve sub folders for Wisdom
-        match len(out_tables):
+        match len(out_files):
             case 0:
                 # no tables - save input file name for flushing
                 self.logger.debug(
@@ -117,14 +114,14 @@ class AbstractTransformFileProcessor:
                 # we have exactly 1 table
                 output_name = self.data_access.get_output_location(path=f"{self.last_file_name}.parquet")
                 self.logger.debug(f"Writing transformed file {self.last_file_name}.parquet to {output_name}")
-                if TransformUtils.verify_no_duplicate_columns(table=out_tables[0], file=output_name):
-                    output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_tables[0])
+                if TransformUtils.verify_no_duplicate_columns(table=out_files[0], file=output_name):
+                    output_file_size, save_res = self.data_access.save_table(path=output_name, table=out_files[0])
                     if save_res is not None:
                         # Store execution statistics. Doing this async
                         self._publish_stats(
                             {
                                 "result_files": 1,
-                                "result_size": out_tables[0].nbytes,
+                                "result_size": out_files[0].nbytes,
                                 "table_processing": time.time() - t_start,
                             }
                         )
@@ -139,17 +136,17 @@ class AbstractTransformFileProcessor:
                 start_index = self.last_file_name_next_index
                 if start_index is None:
                     start_index = 0
-                count = len(out_tables)
+                count = len(out_files)
                 for index in range(count):
                     output_name_indexed = f"{output_file_name}_{start_index + index}.parquet"
-                    if TransformUtils.verify_no_duplicate_columns(table=out_tables[index], file=output_name_indexed):
-                        table_sizes += out_tables[index].nbytes
+                    if TransformUtils.verify_no_duplicate_columns(table=out_files[index], file=output_name_indexed):
+                        table_sizes += out_files[index].nbytes
                         self.logger.debug(
                             f"Writing transformed file {self.last_file_name}.parquet, {index + 1} "
                             f"of {count}  to {output_name_indexed}"
                         )
                         output_file_size, save_res = self.data_access.save_table(
-                            path=output_name_indexed, table=out_tables[index]
+                            path=output_name_indexed, table=out_files[index]
                         )
                         if save_res is None:
                             self.logger.warning(f"Failed to write file {output_name_indexed}")
@@ -158,7 +155,7 @@ class AbstractTransformFileProcessor:
                 self.last_file_name_next_index = start_index + count
                 self._publish_stats(
                     {
-                        "result_files": len(out_tables),
+                        "result_files": len(out_files),
                         "result_size": table_sizes,
                         "table_processing": time.time() - t_start,
                     }

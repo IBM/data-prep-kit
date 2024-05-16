@@ -11,13 +11,13 @@
 ################################################################################
 
 from typing import Any
-
 import pyarrow as pa
+from data_processing.transform import AbstractTransform
 
 
-class AbstractTableTransform:
+class AbstractTableTransform(AbstractTransform):
     """
-    Converts input to output table
+    Converts input to 0 or more output table
     Sub-classes must provide the transform() method to provide the conversion of one table to 0 or more new tables.
     """
 

@@ -11,13 +11,12 @@
 ################################################################################
 
 from typing import Any
+from data_processing.transform import AbstractTransform
 
-import pyarrow as pa
 
-
-class AbstractFileTransform:
+class AbstractFileTransform(AbstractTransform):
     """
-    Converts input to output file (binary)
+    Converts input binary file to output file(s) (binary)
     Sub-classes must provide the transform() method to provide the conversion of one binary files to 0 or
     more new binary files.
     """
@@ -30,22 +29,23 @@ class AbstractFileTransform:
 
     def transform(self, file: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
-        Converts input table into an output table.
+        Converts input file into o or more output files.
         If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
-        :param table: input table
-        :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
-        propagated to metadata
+        :param file: input file
+        :param ext: file extension
+        :return: a tuple of a list of 0 or more converted file and a dictionary of statistics that will be
+                 propagated to metadata
         """
         raise NotImplemented()
 
-    def flush(self) -> tuple[list[pa.Table], dict[str, Any]]:
+    def flush(self) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         This is supporting method for transformers, that implement buffering of tables, for example coalesce.
         These transformers can have buffers containing tables that were not written to the output. Flush is
         the hook for them to return back locally stored tables and their statistics. The majority of transformers
         should use default implementation.
         If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
-        :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
-        propagated to metadata
+        :return: a tuple of a list of 0 or more converted file and a dictionary of statistics that will be
+                 propagated to metadata
         """
         return [], {}
