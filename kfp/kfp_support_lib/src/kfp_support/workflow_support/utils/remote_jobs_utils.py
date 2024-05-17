@@ -526,7 +526,7 @@ def execute_ray_jobs(
                 print_timeout=additional_params.get("wait_print_tmout", 120),
                 job_ready_timeout=additional_params.get("wait_job_ready_tmout", 600),
             )
-            n_launches += 0
+            n_launches += 1
         except SystemExit:
             print(f"Failed to execute job for configuration {conf}")
             continue

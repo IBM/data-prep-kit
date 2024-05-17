@@ -22,10 +22,6 @@ from kfp import Client
 
 logger = get_logger(__name__)
 
-ONE_HOUR_SEC = 60 * 60
-ONE_DAY_SEC = ONE_HOUR_SEC * 24
-ONE_WEEK_SEC = ONE_DAY_SEC * 7
-
 
 class PipelinesUtils:
     """
