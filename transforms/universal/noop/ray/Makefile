@@ -1,42 +1,41 @@
+# Define the root of the local git clone for the common rules to be able 
+# know where they are running from.
 REPOROOT=../../../..
-# Use make help, to see the available rules
+# Include a library of common .transform.* targets which most
+# transforms should be able to reuse.  However, feel free
+# to override/redefine the rules below. 
 include $(REPOROOT)/transforms/.make.transforms
 
-setup::
-	@# Help: Recursively make $@ all subdirs 
-	$(MAKE) RULE=$@ .recurse
+TRANSFORM_NAME=noop
+# $(REPOROOT)/.make.versions file contains the versions
+DOCKER_IMAGE_VERSION=${NOOP_VERSION}
 
-clean::
-	@# Help: Recursively make $@ all subdirs 
-	$(MAKE) RULE=$@ .recurse
+venv::	.transforms.venv
 
-build::
-	@# Help: Recursively make $@ in subdirs 
-	$(MAKE) RULE=$@ .recurse
-venv::
-	@# Help: Recursively make $@ in subdirs 
-	$(MAKE) RULE=$@ .recurse
+build::	.transforms.build
 
-image:: 
-	@# Help: Recursively make $@ in all subdirs 
-	@$(MAKE) RULE=$@ .recurse
+test::	.transforms.test
 
-publish:: 
-	@# Help: Recursively make $@ in all subdirs 
-	@$(MAKE) RULE=$@ .recurse
+clean:: .transforms.clean
 
-test-image:: 
-	@# Help: Recursively make $@ in all subdirs 
-	@$(MAKE) RULE=$@ .recurse
+image:: .transforms.image
 
-test:: 
-	@# Help: Recursively make $@ in all subdirs 
-	@$(MAKE) RULE=$@ .recurse
+test-src:: .transforms.test-src
 
-test-src::
-	@# Help: Recursively make $@ in all subdirs 
-	$(MAKE) RULE=$@ .recurse
+setup:: .transforms.setup
 
-load-image::
-	@# Help: Recursively make $@ in all subdirs 
-	$(MAKE) RULE=$@ .recurse
+test-image:: .transforms.test-image
+
+publish:: .transforms.publish
+
+run-cli-ray-sample: .transforms.run-cli-ray-sample
+
+run-local-sample: .transforms.run-local-sample
+
+run-local-ray-sample: .transforms.run-local-ray-sample
+
+run-s3-ray-sample: .transforms.run-s3-ray-sample
+
+minio-start:	.minio-start
+
+load-image:: .transforms.load-image
