@@ -33,7 +33,7 @@ class RayTransformExecutionConfiguration(TransformExecutionConfiguration):
         """
         Initialization
         """
-        super().__init__(name=name)
+        super().__init__(name=name, print_params=False)
         self.worker_options = {}
         self.n_workers = 1
         self.creation_delay = 0
@@ -91,10 +91,8 @@ class RayTransformExecutionConfiguration(TransformExecutionConfiguration):
 
         # print them
         logger.info(f"number of workers {self.n_workers} worker options {self.worker_options}")
-        logger.info(f"pipeline id {self.pipeline_id}; number workers {self.n_workers}")
-        logger.info(f"job details {self.job_details}")
-        logger.info(f"code location {self.code_location}")
         logger.info(f"actor creation delay {self.creation_delay}")
+        logger.info(f"job details {self.job_details}")
         return True
 
     def get_input_params(self) -> dict[str, Any]:
