@@ -9,7 +9,7 @@ include ../../.make.transforms_workflows
 
 DOCKER_IMAGE_NAME=ededup
 
-SRC_DIR=${REPOROOT}/transforms/universal/ededup
+SRC_DIR=${REPOROOT}/transforms/universal/ededup/ray
 
 YAML_FILE=ededup_wf.yaml
 # $(REPOROOT)/.make.versions file contains the versions
