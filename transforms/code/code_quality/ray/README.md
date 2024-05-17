@@ -1,7 +1,7 @@
 # Code Quality 
 
 Please see the set of
-[transform project conventions](../../README.md)
+[transform project conventions](../../../README.md)
 for details on general project conventions, transform configuration,
 testing and IDE set up.
 
@@ -39,8 +39,8 @@ It uses a tokenizer to collect metrics specific to token ratio.  It is designed 
 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
-the options provided by the [ray launcher](../../../data-processing-lib/doc/ray-launcher-options.md)
-and the [python launcher](../../../data-processing-lib/doc/python-launcher-options.md).
+the options provided by the [ray launcher](../../../../data-processing-lib/doc/ray-launcher-options.md)
+and the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 
 * "--contents_column_name" - input a column name which contains data to process. The default column name: `contents`
 * "--language_column_name" - input a column name which contains programming language details. The default column name: `language`

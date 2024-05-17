@@ -9,7 +9,7 @@
 
 # Data Tokenization
 Please see the set of
-[transform project conventions](../../README.md)
+[transform project conventions](../../../README.md)
 for details on general project conventions, transform configuration,
 testing and IDE set up.
 
@@ -56,8 +56,8 @@ By default, the value of `--tkn_chunk_size` is `0`, indicating that each documen
 ### CLI Options
 When running the transform with the Ray launcher,
 the following command line arguments are available in addition to 
-the options provided by the [ray launcher](../../../data-processing-lib/doc/ray-launcher-options.md)
-and the [python launcher](../../../data-processing-lib/doc/python-launcher-options.md).
+the options provided by the [ray launcher](../../../../data-processing-lib/doc/ray-launcher-options.md)
+and the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 ```
   --tkn_tokenizer TKN_TOKENIZER
                         Tokenizer used for tokenization. It also can be a path to a pre-trained tokenizer. By defaut, `hf-internal-testing/llama-tokenizer` from HuggingFace is used
