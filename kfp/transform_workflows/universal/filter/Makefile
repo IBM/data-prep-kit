@@ -7,7 +7,7 @@ VENV_ACTIVATE=${REPOROOT}/kfp/transform_workflows/venv/bin/activate
 # to override/redefine the rules below.
 include ../../.make.transforms_workflows
 
-SRC_DIR=${REPOROOT}/transforms/universal/filter/
+SRC_DIR=${REPOROOT}/transforms/universal/filter/ray
 
 YAML_FILE=filter_wf.yaml
 

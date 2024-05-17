@@ -1,7 +1,7 @@
 # Document ID Annotator
 
 Please see the set of
-[transform project conventions](../../README.md)
+[transform project conventions](../../../README.md)
 for details on general project conventions, transform configuration,
 testing and IDE set up.
 
@@ -48,7 +48,7 @@ At least one of _hash_column_ or _int_id_column_ must be specified.
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
-[the options provided by the ray launcher](../../../data-processing-lib/doc/ray-launcher-options.md).
+[the options provided by the ray launcher](../../../../data-processing-lib/doc/ray-launcher-options.md).
 ```
   --doc_id_doc_column DOC_ID_DOC_COLUMN
                         doc column name

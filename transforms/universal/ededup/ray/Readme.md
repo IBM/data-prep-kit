@@ -1,7 +1,7 @@
 # Exact Dedup
 
 Please see the set of
-[transform project conventions](../../README.md)
+[transform project conventions](../../../README.md)
 for details on general project conventions, transform configuration,
 testing and IDE set up.
 
@@ -53,7 +53,7 @@ We also provide an [estimate](src/cluster_estimator.py) to roughly determine clu
 ### Launched Command Line Options
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to
-[the options provided by the launcher](../../../data-processing-lib/doc/ray-launcher-options.md).
+[the options provided by the launcher](../../../../data-processing-lib/doc/ray-launcher-options.md).
 
 ```shell
   --ededup_hash_cpu EDEDUP_HASH_CPU

@@ -1,47 +1,42 @@
-
-# Define the root of the local git clone for the common rules to be able
-# know where they are running from.
 REPOROOT=../../..
-include ../../.make.transforms
+# Use make help, to see the available rules
+include $(REPOROOT)/.make.defaults
 
-TRANSFORM_NAME=code_quality
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${CODE_QUALITY_VERSION}
+setup::
+	@# Help: Recursively make $@ all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
-# Use default rule inherited from makefile.common
-clean:: .transforms.clean
+clean::
+	@# Help: Recursively make $@ all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
-# Use default rule inherited from makefile.common
-test:: .transforms.test
+build::
+	@# Help: Recursively make $@ in subdirs 
+	$(MAKE) RULE=$@ .recurse
+venv::
+	@# Help: Recursively make $@ in subdirs 
+	$(MAKE) RULE=$@ .recurse
 
-# Use default rule inherited from makefile.common
-image:: .transforms.image
+image:: 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 
-# Use default rule inherited from makefile.common
-build:: .transforms.build
+publish:: 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 
-# Use default rule inherited from makefile.common
-venv:: .transforms.venv
+test-image:: 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 
-test-src:: .transforms.test-src
+test:: 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 
-test-image:: .transforms.test-image
+test-src::
+	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
-publish:: .transforms.publish
-
-setup:: .transforms.setup
-
-
-run-cli-ray-sample: .transforms.run-cli-ray-sample
-
-run-local-sample: #.transforms.run-local-sample
-	@# Help: Not implemented yet
-	@echo "No src/code_quality_local.py yet :("
-
-run-local-ray-sample: .transforms.run-local-ray-sample
-
-run-s3-ray-sample: .transforms.run-s3-ray-sample
-
-minio-start:	.minio-start
-
-load-image:: .transforms.load-image
+load-image::
+	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
