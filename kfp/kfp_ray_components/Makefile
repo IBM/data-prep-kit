@@ -24,7 +24,7 @@ include ../../.make.defaults
 
 .PHONY: .lib-src-image
 .lib-src-image:: 
-	$(MAKE) .copy-lib LIB_PATH=$(REPOROOT)/data-processing-lib LIB_NAME=data-processing-lib
+	$(MAKE) .copy-lib LIB_PATH=$(REPOROOT)/data-processing-lib/ray LIB_NAME=data-processing-lib
 	$(MAKE) .copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib LIB_NAME=kfp_support_lib
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
 	rm -rf data-processing-lib

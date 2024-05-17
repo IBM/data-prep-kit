@@ -7,7 +7,7 @@ VENV_ACTIVATE=${REPOROOT}/kfp/transform_workflows/venv/bin/activate
 # to override/redefine the rules below.
 include ../../.make.transforms_workflows
 
-SRC_DIR=${REPOROOT}/transforms/universal/tokenization/
+SRC_DIR=${REPOROOT}/transforms/universal/tokenization/ray
 
 YAML_FILE=tokenization_wf.yaml
 
