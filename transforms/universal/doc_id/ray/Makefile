@@ -20,7 +20,7 @@ clean:: .transforms.clean
 
 image:: .transforms.ray-image
 
-test-src:: .transforms.test
+test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
