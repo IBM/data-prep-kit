@@ -21,8 +21,7 @@ machine with an Intel CPU.
 
 ### Memory Considerations
 
-To verify that running transforms through KFP does not leak memory and also get an idea on the required Podman VM memory size configuration, 
-we devised and ran a few tests, as summarized [here](memory.md).
+To verify that running transforms through KFP does not leak memory and also get an idea on the required Podman VM memory size configuration, a few tests were devised and run, as summarized [here](memory.md).
 
 > **Note**: the *current* release does not support building cross-platform images, therefore, please do not build images 
 on the Apple silicon. 
