@@ -19,7 +19,10 @@ from data_processing.runtime import (
     TransformExecutionConfiguration,
     TransformRuntimeConfiguration,
 )
-from data_processing.runtime.pure_python import TransformTableProcessor
+from data_processing.runtime.pure_python import (
+    TransformFileProcessor,
+    TransformTableProcessor,
+)
 from data_processing.transform import TransformStatistics
 from data_processing.utils import get_logger
 
@@ -60,9 +63,14 @@ def orchestrate(
         # create statistics
         statistics = TransformStatistics()
         # create executor
-        executor = TransformTableProcessor(
-            data_access_factory=data_access_factory, statistics=statistics, params=runtime_config
-        )
+        if execution_config.table:
+            executor = TransformTableProcessor(
+                data_access_factory=data_access_factory, statistics=statistics, params=runtime_config
+            )
+        else:
+            executor = TransformFileProcessor(
+                data_access_factory=data_access_factory, statistics=statistics, params=runtime_config
+            )
         # process data
         logger.debug(f"{runtime_config.get_name()} Begin processing files")
         t_start = time.time()

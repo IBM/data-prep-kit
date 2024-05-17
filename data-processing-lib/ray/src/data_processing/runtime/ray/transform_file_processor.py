@@ -13,13 +13,13 @@
 from typing import Any
 
 import ray
-from data_processing.runtime import AbstractTransformTableProcessor
+from data_processing.runtime import AbstractTransformFileProcessor
 
 
 @ray.remote(scheduling_strategy="SPREAD")
-class RayTransformTableProcessor(AbstractTransformTableProcessor):
+class RayTransformFileProcessor(AbstractTransformFileProcessor):
     """
-    This is the class implementing the actual work/actor processing of a single pyarrow file
+    This is the class implementing the actual work/actor processing of a single file
     """
 
     def __init__(self, params: dict[str, Any]):

@@ -13,7 +13,7 @@
 import argparse
 import ast
 
-from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger
+from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger, str2bool
 
 
 logger = get_logger(__name__)
@@ -27,15 +27,17 @@ class TransformExecutionConfiguration(CLIArgumentProvider):
     A class specifying and validating transform execution configuration
     """
 
-    def __init__(self, name: str, pp: bool = True):
+    def __init__(self, name: str):
         """
         Initialization
+        :param name: job name
+        :param print_params: flag to print parameters
         """
         self.pipeline_id = ""
         self.job_details = {}
         self.code_location = {}
+        self.table = True
         self.name = name
-        self.pp = pp
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
@@ -45,6 +47,12 @@ class TransformExecutionConfiguration(CLIArgumentProvider):
         """
         parser.add_argument(f"--{cli_prefix}pipeline_id", type=str, default="pipeline_id", help="pipeline id")
         parser.add_argument(f"--{cli_prefix}job_id", type=str, default="job_id", help="job id")
+        parser.add_argument(
+            f"--" f"{cli_prefix}table",
+            type=lambda x: bool(str2bool(x)),
+            default="True",
+            help="Run table or binary transform - default arrow",
+        )
 
         help_example_dict = {
             "github": ["https://github.com/somerepo", "Github repository URL."],
@@ -74,10 +82,13 @@ class TransformExecutionConfiguration(CLIArgumentProvider):
             "job id": captured["job_id"],
         }
         self.code_location = captured["code_location"]
-
-        if self.pp:
-            # print parameters
-            logger.info(f"pipeline id {self.pipeline_id}")
-            logger.info(f"job details {self.job_details}")
-            logger.info(f"code location {self.code_location}")
+        self.table = captured["table"]
+        # print parameters
+        if self.table:
+            logger.info("Processing tables")
+        else:
+            logger.info("Processing files")
+        logger.info(f"pipeline id {self.pipeline_id}")
+        logger.info(f"job details {self.job_details}")
+        logger.info(f"code location {self.code_location}")
         return True

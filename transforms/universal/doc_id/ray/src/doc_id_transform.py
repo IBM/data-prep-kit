@@ -19,10 +19,7 @@ from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
-from data_processing.runtime.ray import (
-    DefaultTableTransformRuntimeRay,
-    RayTransformLauncher,
-)
+from data_processing.runtime.ray import DefaultRayTransformRuntime, RayTransformLauncher
 from data_processing.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
@@ -118,7 +115,7 @@ class DocIDTransform(AbstractTableTransform):
         return [table], {}
 
 
-class DocIDRuntime(DefaultTableTransformRuntimeRay):
+class DocIDRuntime(DefaultRayTransformRuntime):
     """
     Exact dedup runtime support
     """

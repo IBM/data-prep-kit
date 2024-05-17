@@ -33,7 +33,7 @@ class RayTransformExecutionConfiguration(TransformExecutionConfiguration):
         """
         Initialization
         """
-        super().__init__(name=name, pp=False)
+        super().__init__(name=name)
         self.worker_options = {}
         self.n_workers = 1
         self.creation_delay = 0

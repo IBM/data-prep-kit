@@ -125,7 +125,7 @@ class AbstractTransformTableProcessor:
                             {
                                 "result_files": 1,
                                 "result_size": out_tables[0].nbytes,
-                                "table_processing": time.time() - t_start,
+                                "processing_time": time.time() - t_start,
                             }
                         )
                     else:
@@ -160,7 +160,7 @@ class AbstractTransformTableProcessor:
                     {
                         "result_files": len(out_tables),
                         "result_size": table_sizes,
-                        "table_processing": time.time() - t_start,
+                        "processing_time": time.time() - t_start,
                     }
                 )
         # save transformer's statistics

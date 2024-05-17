@@ -17,7 +17,7 @@ import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.ray import (
-    DefaultTableTransformRuntimeRay,
+    DefaultRayTransformRuntime,
     RayTransformLauncher,
     RayUtils,
 )
@@ -163,7 +163,7 @@ class EdedupTransform(AbstractTableTransform):
         return unique
 
 
-class EdedupRuntime(DefaultTableTransformRuntimeRay):
+class EdedupRuntime(DefaultRayTransformRuntime):
     """
     Exact dedup runtime support
     """
