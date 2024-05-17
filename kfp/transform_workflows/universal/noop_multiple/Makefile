@@ -7,13 +7,13 @@ VENV_ACTIVATE=${REPOROOT}/kfp/transform_workflows/venv/bin/activate
 # to override/redefine the rules below.
 include ../../.make.transforms_workflows
 
-SRC_DIR=${REPOROOT}/transforms/universal/noop/
+SRC_DIR=${REPOROOT}/transforms/universal/noop_multiple/
 
-YAML_FILE=noop_wf.yaml
+YAML_FILE=noop_multiple_wf.yaml
 
-DOCKER_IMAGE_NAME=noop
+DOCKER_IMAGE_NAME=noop_multiple
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${NOOP_VERSION}
+DOCKER_IMAGE_VERSION=${NOOP_MULTIPLE_VERSION}
 
 venv:: .check_python_version ${VENV_ACTIVATE}
 
@@ -33,4 +33,4 @@ upload: build
 
 .PHONY: reconcile-requirements
 reconcile-requirements:
-	$(MAKE) .transforms_workflows.reconcile-requirement PIPELINE_FILE=noop_wf.py
+	$(MAKE) .transforms_workflows.reconcile-requirement PIPELINE_FILE=noop_multiple_wf.py
