@@ -11,27 +11,20 @@
 ################################################################################
 
 from data_processing.data_access import DataAccessFactory
-from kfp_support.workflow_support.utils import KFPUtils, execute_ray_job
+from kfp_support.workflow_support.utils import KFPUtils, execute_ray_jobs
 
 
 if __name__ == "__main__":
     import argparse
 
-    """
-    This implementation is not completely generic. It is based on the assumption
-    that there is 1 additional data access and it is S3 base. A typical example for such
-    use case is usage of 2 S3 buckets with different access credentials -
-    one for the data access and one for the additional data, for example, config files, models, etc.
-    """
     parser = argparse.ArgumentParser(description="Execute Ray job operation")
-    parser.add_argument("--ray_name", type=str, default="")
-    parser.add_argument("--run_id", type=str, default="")
-    parser.add_argument("--additional_params", type=str, default="{}")
-    parser.add_argument("--server_url", type=str, default="")
-    parser.add_argument("--prefix", type=str, default="")
+    parser.add_argument("-rn", "--ray_name", type=str, default="")
+    parser.add_argument("-id", "--run_id", type=str, default="")
+    parser.add_argument("-ap", "--additional_params", type=str, default="{}")
+    parser.add_argument("-su", "--server_url", type=str, default="")
     # The component converts the dictionary to json string
-    parser.add_argument("--exec_params", type=str, default="{}")
-    parser.add_argument("--exec_script_name", default="transformer_launcher.py", type=str)
+    parser.add_argument("-ep", "--exec_params", type=str, default="{}")
+    parser.add_argument("-esn", "--exec_script_name", default="transformer_launcher.py", type=str)
 
     args = parser.parse_args()
     cluster_name = KFPUtils.runtime_name(
@@ -57,29 +50,15 @@ if __name__ == "__main__":
         }
     )
     data_access = data_factory.create_data_access()
-    # extra credentials
-    prefix = args.prefix
-    extra_access_key, extra_secret_key, extra_url = KFPUtils.credentials(
-        access_key=f"{prefix}_S3_KEY", secret_key=f"{prefix}_S3_SECRET", endpoint=f"{prefix}_ENDPOINT"
-    )
-    # enhance exec params
+    # restore and enhance exec params
     exec_params["data_s3_cred"] = (
         "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
     )
-    exec_params[f"{prefix}_s3_cred"] = (
-        "{'access_key': '"
-        + extra_access_key
-        + "', 'secret_key': '"
-        + extra_secret_key
-        + "', 'url': '"
-        + extra_url
-        + "'}"
-    )
     # Execute Ray jobs
-    execute_ray_job(
+    execute_ray_jobs(
         name=cluster_name,
         d_access=data_access,
-        additional_params=KFPUtils.load_from_json(args.additional_params),
+        additional_params=KFPUtils.load_from_json(args.additional_params.replace("'", '"')),
         e_params=exec_params,
         exec_script_name=args.exec_script_name,
         server_url=args.server_url,

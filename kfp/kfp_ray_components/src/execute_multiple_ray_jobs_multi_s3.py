@@ -11,7 +11,7 @@
 ################################################################################
 
 from data_processing.data_access import DataAccessFactory
-from kfp_support.workflow_support.utils import KFPUtils, execute_ray_job
+from kfp_support.workflow_support.utils import KFPUtils, execute_ray_jobs
 
 
 if __name__ == "__main__":
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         + "'}"
     )
     # Execute Ray jobs
-    execute_ray_job(
+    execute_ray_jobs(
         name=cluster_name,
         d_access=data_access,
         additional_params=KFPUtils.load_from_json(args.additional_params),

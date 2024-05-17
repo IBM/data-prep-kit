@@ -10,18 +10,13 @@
 # limitations under the License.
 ################################################################################
 
-import datetime
-import json
-import os
 import re
 import sys
 import time
-from typing import Any, Optional
+from typing import Any
 
-import kfp.dsl as dsl
 from data_processing.data_access import DataAccess
 from data_processing.utils import get_logger
-from kfp_server_api import models
 from kfp_support.api_server_client import KubeRayAPIs
 from kfp_support.api_server_client.params import (
     DEFAULT_HEAD_START_PARAMS,
@@ -35,251 +30,11 @@ from kfp_support.api_server_client.params import (
     environment_variables_decoder,
     volume_decoder,
 )
-from kubernetes import client as k8s_client
+from kfp_support.workflow_support.utils import KFPUtils
 from ray.job_submission import JobStatus
-
-from kfp import Client
 
 
 logger = get_logger(__name__)
-
-ONE_HOUR_SEC = 60 * 60
-ONE_DAY_SEC = ONE_HOUR_SEC * 24
-ONE_WEEK_SEC = ONE_DAY_SEC * 7
-
-
-class KFPUtils:
-    """
-    Helper utilities for KFP implementations
-    """
-
-    @staticmethod
-    def credentials(
-        access_key: str = "S3_KEY", secret_key: str = "S3_SECRET", endpoint: str = "ENDPOINT"
-    ) -> tuple[str, str, str]:
-        """
-        Get credentials from the environment
-        :param access_key: environment variable for access key
-        :param secret_key: environment variable for secret key
-        :param endpoint: environment variable for S3 endpoint
-        :return:
-        """
-        s3_key = os.getenv(access_key, None)
-        s3_secret = os.getenv(secret_key, None)
-        s3_endpoint = os.getenv(endpoint, None)
-        if s3_key is None or s3_secret is None or s3_endpoint is None:
-            logger.warning("Failed to load s3 credentials")
-        return s3_key, s3_secret, s3_endpoint
-
-    @staticmethod
-    def get_namespace() -> str:
-        """
-        Get k8 namespace that we are running it
-        :return:
-        """
-        ns = ""
-        try:
-            file = open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r")
-        except Exception as e:
-            logger.warning(
-                f"Failed to open /var/run/secrets/kubernetes.io/serviceaccount/namespace file, " f"exception {e}"
-            )
-        else:
-            with file:
-                ns = file.read()
-        return ns
-
-    @staticmethod
-    def runtime_name(ray_name: str = "", run_id: str = "") -> str:
-        """
-        Get unique runtime name
-        :param ray_name:
-        :param run_id:
-        :return: runtime name
-        """
-        # K8s objects cannot contain special characters, except '_', All characters should be in lower case.
-        if ray_name != "":
-            ray_name = ray_name.replace("_", "-").lower()
-            pattern = r"[^a-zA-Z0-9-]"  # the ray_name cannot contain upper case here, but leave it just in case.
-            ray_name = re.sub(pattern, "", ray_name)
-        else:
-            ray_name = "a"
-        # the return value plus namespace name will be the name of the Ray Route,
-        # which length is restricted to 64 characters,
-        # therefore we restrict the return name by 15 character.
-        if run_id != "":
-            return f"{ray_name[:9]}-{run_id[:5]}"
-        return ray_name[:15]
-
-    @staticmethod
-    def dict_to_req(d: dict[str, Any], executor: str = "transformer_launcher.py") -> str:
-        res = f"python {executor} "
-        for key, value in d.items():
-            if isinstance(value, str):
-                res += f'--{key}="{value}" '
-            else:
-                res += f"--{key}={value} "
-        return res
-
-    # Load a string that represents a json to python dictionary
-    @staticmethod
-    def load_from_json(js: str) -> dict[str, Any]:
-        try:
-            return json.loads(js)
-        except Exception as e:
-            logger.warning(f"Failed to load parameters {js} with error {e}")
-            sys.exit(1)
-
-
-class PipelinesUtils:
-    """
-    Helper class for pipeline management
-    """
-
-    def __init__(self, host: str = "http://localhost:8080"):
-        """
-        Initialization
-        :param host: host to connect to
-        """
-        self.kfp_client = Client(host=host)
-
-    def upload_pipeline(
-        self,
-        pipeline_package_path: str = None,
-        pipeline_name: str = None,
-        overwrite: bool = False,
-        description: str = None,
-    ) -> models.api_pipeline.ApiPipeline:
-        """
-        Uploads the pipeline
-        :param pipeline_package_path: Local path to the pipeline package.
-        :param pipeline_name: Optional. Name of the pipeline to be shown in the UI
-        :param overwrite: Optional. If pipeline exists, delete it before creating a new one.
-        :param description: Optional. Description of the pipeline to be shown in the UI.
-        :return: Server response object containing pipeline id and other information.
-        """
-        pipeline = None
-        if overwrite:
-            pipeline = self.get_pipeline_by_name(name=pipeline_name)
-            if pipeline is not None:
-                try:
-                    logger.info(f"pipeline {pipeline_name} already exists. Trying to delete it.")
-                    self.kfp_client.delete_pipeline(pipeline_id=pipeline.id)
-                except Exception as e:
-                    logger.warning(f"Exception deleting pipeline {e} before uploading")
-                    return None
-        try:
-            pipeline = self.kfp_client.upload_pipeline(
-                pipeline_package_path=pipeline_package_path, pipeline_name=pipeline_name, description=description
-            )
-        except Exception as e:
-            logger.warning(f"Exception uploading pipeline {e}")
-            return None
-        if pipeline is None:
-            logger.warning(f"Failed to upload pipeline {pipeline_name}.")
-            return None
-        logger.info("Pipeline uploaded")
-        return pipeline
-
-    def delete_pipeline(self, pipeline_id):
-        """
-        Delete pipeline.
-        :param pipeline_id: id of the pipeline.
-        :return
-        Returns:
-          Object. If the method is called asynchronously, returns the request thread.
-        Raises:
-          kfp_server_api.ApiException: If pipeline is not found.
-        """
-        return self.kfp_client.delete_pipeline(pipeline_id)
-
-    def start_pipeline(
-        self,
-        pipeline: models.api_pipeline.ApiPipeline,
-        experiment: models.api_experiment.ApiExperiment,
-        params: Optional[dict[str, Any]],
-    ) -> str:
-        """
-        Start a specified pipeline.
-        :param pipeline: pipeline definition
-        :param experiment: experiment to use
-        :param params: pipeline parameters
-        :return: the id of the run object
-        """
-        job_name = pipeline.name + " " + datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-        try:
-            run_id = self.kfp_client.run_pipeline(
-                experiment_id=experiment.id, job_name=job_name, pipeline_id=pipeline.id, params=params
-            )
-            logger.info(f"Pipeline run {job_name} submitted")
-            return run_id.id
-        except Exception as e:
-            logger.warning(f"Exception starting pipeline {e}")
-            return None
-
-    def get_experiment_by_name(self, name: str = "Default") -> models.api_experiment.ApiExperiment:
-        """
-        Get experiment by name
-        :param name: name
-        :return: experiment
-        """
-        try:
-            return self.kfp_client.get_experiment(experiment_name=name)
-        except Exception as e:
-            logger.warning(f"Exception getting experiment {e}")
-            return None
-
-    def get_pipeline_by_name(self, name: str, np: int = 100) -> models.api_pipeline.ApiPipeline:
-        """
-        Given pipeline name, return the pipeline
-        :param name: pipeline name
-        :param np: page size for pipeline query. For large clusters with many pipelines, you might need to
-                   increase this number
-        :return: pipeline
-        """
-        try:
-            # Get all pipelines
-            pipelines = self.kfp_client.list_pipelines(page_size=np).pipelines
-            required = list(filter(lambda p: name in p.name, pipelines))
-            if len(required) != 1:
-                logger.warning(f"Failure to get pipeline. Number of pipelines with name {name} is {len(required)}")
-                return None
-            return required[0]
-
-        except Exception as e:
-            logger.warning(f"Exception getting pipeline {e}")
-            return None
-
-    def wait_pipeline_completion(self, run_id: str, timeout: int = -1, wait: int = 600) -> tuple[str, str]:
-        """
-        Waits for a pipeline run to complete
-        :param run_id: run id
-        :param timeout: timeout (sec) (-1 wait forever)
-        :param wait: internal wait (sec)
-        :return: Completion status and an error message if such exists
-        """
-        try:
-            if timeout > 0:
-                end = time.time() + timeout
-            else:
-                end = 2**63 - 1
-            run_details = self.kfp_client.get_run(run_id=run_id)
-            status = run_details.run.status
-            while status is None or status.lower() not in ["succeeded", "completed", "failed", "skipped", "error"]:
-                time.sleep(wait)
-                if (end - time.time()) < 0:
-                    return "failed", f"Execution is taking too long"
-                run_details = self.kfp_client.get_run(run_id=run_id)
-                status = run_details.run.status
-                logger.info(f"Got pipeline execution status {status}")
-
-            if status.lower() in ["succeeded", "completed"]:
-                return status, ""
-            return status, run_details.run.error
-
-        except Exception as e:
-            logger.warning(f"Failed waiting pipeline completion {e}")
-            return "failed", str(e)
 
 
 class RayRemoteJobs:
@@ -652,101 +407,132 @@ class RayRemoteJobs:
         data_access.save_file(path=execution_log_path, data=bytes(log, "UTF-8"))
 
 
-class ComponentUtils:
+def execute_ray_job(
+    name: str,  # name of Ray cluster
+    d_access: DataAccess,  # data access
+    additional_params: dict[str, Any],
+    e_params: dict[str, Any],
+    exec_script_name: str,
+    server_url: str,
+) -> None:
     """
-    Class containing methods supporting building pipelines
+    Execute Ray job on a cluster periodically printing execution log. Completes when Ray job completes
+    (succeeds or fails)
+    :param name: cluster name
+    :param d_access: data access class
+    :param additional_params: additional parameters for the job
+    :param e_params: job execution parameters (specific for a specific transform,
+                        generated by the transform workflow)
+    :param exec_script_name: script to run (has to be present in the image)
+    :param server_url: API server url
+    :return: None
     """
+    # get current namespace
+    ns = KFPUtils.get_namespace()
+    if ns == "":
+        print(f"Failed to get namespace")
+        sys.exit(1)
+    # submit job
+    remote_jobs = RayRemoteJobs(
+        server_url=server_url,
+        http_retries=additional_params.get("http_retries", 5),
+        wait_interval=additional_params.get("wait_interval", 2),
+    )
+    status, error, submission = remote_jobs.submit_job(
+        name=name, namespace=ns, request=e_params, executor=exec_script_name
+    )
+    if status != 200:
+        print(f"Failed to submit job - status: {status}, error: {error}")
+        exit(1)
 
-    @staticmethod
-    def add_settings_to_component(
-        component: dsl.ContainerOp,
-        timeout: int,
-        image_pull_policy: str = "IfNotPresent",
-        cache_strategy: str = "P0D",
-    ) -> None:
-        """
-        Add settings to kfp component
-        :param component: kfp component
-        :param timeout: timeout to set to the component in seconds
-        :param image_pull_policy: pull policy to set to the component
-        :param cache_strategy: cache strategy
-        """
-        # Set cashing
-        component.execution_options.caching_strategy.max_cache_staleness = cache_strategy
-        # image pull policy
-        component.container.set_image_pull_policy(image_pull_policy)
-        # Set the timeout for the task
-        component.set_timeout(timeout)
+    print(f"submitted job successfully, submission id {submission}")
+    # print execution log
+    remote_jobs.follow_execution(
+        name=name,
+        namespace=ns,
+        submission_id=submission,
+        data_access=d_access,
+        print_timeout=additional_params.get("wait_print_tmout", 120),
+        job_ready_timeout=additional_params.get("wait_job_ready_tmout", 600),
+    )
 
-    @staticmethod
-    def set_s3_env_vars_to_component(
-        component: dsl.ContainerOp,
-        secret: str,
-        env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"},
-        prefix: str = None,
-    ) -> None:
-        """
-        Set S3 env variables to KFP component
-        :param component: kfp component
-        :param secret: secret name with the S3 credentials
-        :param env2key: dict with mapping each env variable to a key in the secret
-        :param prefix: prefix to add to env name
-        """
-        for env_name, secret_key in env2key.items():
-            if prefix is not None:
-                env_name = f"{prefix}_{env_name}"
-            component = component.add_env_variable(
-                k8s_client.V1EnvVar(
-                    name=env_name,
-                    value_from=k8s_client.V1EnvVarSource(
-                        secret_key_ref=k8s_client.V1SecretKeySelector(name=secret, key=secret_key)
-                    ),
-                )
+
+def execute_ray_jobs(
+    name: str,  # name of Ray cluster
+    d_access: DataAccess,  # data access
+    additional_params: dict[str, Any],
+    e_params: dict[str, Any],
+    exec_script_name: str,
+    server_url: str,
+) -> None:
+    """
+    Execute Ray jobs on a cluster periodically printing execution log. Completes when all Ray job complete.
+    All of the jobs will be executed, although some of the jobs may fail.
+    :param name: cluster name
+    :param d_access: data access class
+    :param additional_params: additional parameters for the job
+    :param e_params: job execution parameters (specific for a specific transform,
+                        generated by the transform workflow)
+    :param exec_script_name: script to run (has to be present in the image)
+    :param server_url: API server url
+    :return: None
+    """
+    # get current namespace
+    ns = KFPUtils.get_namespace()
+    if ns == "":
+        print(f"Failed to get namespace")
+        sys.exit(1)
+    # Create Ray job submitter
+    remote_jobs = RayRemoteJobs(
+        server_url=server_url,
+        http_retries=additional_params.get("http_retries", 5),
+        wait_interval=additional_params.get("wait_interval", 2),
+    )
+    # find config parameter
+    config = None
+    for key in e_params.keys():
+        if key.startswith("data") and key.endswith("config"):
+            config = key
+            break
+    if config is None:
+        print("Could no find config parameter")
+        exit(1)
+    config_value = e_params[config]
+    if type(config_value) is not list:
+        print("config value is not a list")
+        exit(1)
+    # remove config key from the dictionary
+    launch_params = dict(e_params)
+    del launch_params[config]
+    # Loop through all configuration
+    n_launches = 0
+    for conf in config_value:
+        # populate individual config and launch
+        launch_params[config] = conf
+        status, error, submission = remote_jobs.submit_job(
+            name=name, namespace=ns, request=launch_params, executor=exec_script_name
+        )
+        if status != 200:
+            print(f"Failed to submit job - status: {status}, error: {error}, for configuration {conf}")
+            continue
+        print(f"submitted job successfully for configuration {conf}, submission id {submission}")
+        # print execution log
+        try:
+            remote_jobs.follow_execution(
+                name=name,
+                namespace=ns,
+                submission_id=submission,
+                data_access=d_access,
+                print_timeout=additional_params.get("wait_print_tmout", 120),
+                job_ready_timeout=additional_params.get("wait_job_ready_tmout", 600),
             )
+            n_launches += 0
+        except SystemExit:
+            print(f"Failed to execute job for configuration {conf}")
+            continue
 
-    @staticmethod
-    def default_compute_execution_params(
-        worker_options: str,  # ray worker configuration
-        actor_options: str,  # cpus per actor
-    ) -> str:
-        """
-        This is the most simplistic transform execution parameters computation
-        :param worker_options: configuration of ray workers
-        :param actor_options: actor request requirements
-        :return: number of actors
-        """
-        import sys
-
-        from data_processing.utils import get_logger, GB
-        from kfp_support.workflow_support.utils import KFPUtils
-
-        logger = get_logger(__name__)
-
-        # convert input
-        w_options = KFPUtils.load_from_json(worker_options.replace("'", '"'))
-        a_options = KFPUtils.load_from_json(actor_options.replace("'", '"'))
-        # Compute available cluster resources
-        cluster_cpu = w_options["replicas"] * w_options["cpu"]
-        cluster_mem = w_options["replicas"] * w_options["memory"]
-        cluster_gpu = w_options["replicas"] * w_options.get("gpu", 0.0)
-        logger.info(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}, GPUs {cluster_gpu}")
-        # compute number of actors
-        n_actors_cpu = int(cluster_cpu * 0.85 / a_options.get("num_cpus", 0.5))
-        n_actors_memory = int(cluster_mem * 0.85 / (a_options.get("memory", GB) / GB))
-        n_actors = min(n_actors_cpu, n_actors_memory)
-        # Check if we need gpu calculations as well
-        actor_gpu = a_options.get("num_gpus", 0)
-        if actor_gpu > 0:
-            n_actors_gpu = int(cluster_gpu / actor_gpu)
-            n_actors = min(n_actors, n_actors_gpu)
-        logger.info(f"Number of actors - {n_actors}")
-        if n_actors < 1:
-            logger.warning(
-                f"Not enough cpu/gpu/memory to run transform, "
-                f"required cpu {a_options.get('num_cpus', .5)}, available {cluster_cpu}, "
-                f"required memory {a_options.get('memory', 1)}, available {cluster_mem}, "
-                f"required cpu {actor_gpu}, available {cluster_gpu}"
-            )
-            sys.exit(1)
-
-        return str(n_actors)
+    if n_launches == 0:
+        print("All executions failed")
+        sys.exit(1)
+    else:
+        print(f"{n_launches} ot of {len(config_value)} succeeded")
