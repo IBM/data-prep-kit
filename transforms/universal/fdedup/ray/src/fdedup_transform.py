@@ -23,7 +23,7 @@ from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
-    RayTransformTableProcessor,
+    RayTransformFileProcessor,
     RayUtils,
 )
 from data_processing.runtime.ray.runtime_configuration import (
@@ -646,7 +646,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             "base_table_stats": False,
         }
         processors_list = RayUtils.create_actors(
-            clazz=RayTransformTableProcessor,
+            clazz=RayTransformFileProcessor,
             params=processor_params,
             actor_options=worker_options,
             n_actors=n_readers,
