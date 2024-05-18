@@ -13,10 +13,14 @@
 from typing import Any
 
 import pyarrow as pa
-from data_processing.transform import AbstractTransform
+from data_processing.transform import AbstractFileTransform
+from data_processing.utils import TransformUtils, get_logger
 
 
-class AbstractTableTransform(AbstractTransform):
+logger = get_logger(__name__)
+
+
+class AbstractTableTransform(AbstractFileTransform):
     """
     Converts input to 0 or more output table
     Sub-classes must provide the transform() method to provide the conversion of one table to 0 or more new tables.
@@ -26,7 +30,34 @@ class AbstractTableTransform(AbstractTransform):
         """
         Initialize based on the dictionary of configuration information.
         """
-        self.config = config
+        super().__init__(config)
+
+    def transform_file(self, file: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+        """
+        Converts input file into o or more output files.
+        If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
+        :param file: input file
+        :param ext: file extension
+        :return: a tuple of a list of 0 or more converted file and a dictionary of statistics that will be
+                 propagated to metadata
+        """
+        # validate extension
+        if ext != ".parquet":
+            logger.warning(f"Get wrong file type {ext}")
+            return [], {"wrong file type": 1}
+        # convert to table
+        table = TransformUtils.convert_binary_to_arrow(data=file)
+        if table is None:
+            logger.warning("Transformation of file to table failed")
+            return [], {"failed_reads": 1}
+        # Ensure that table is not empty
+        if table.num_rows == 0:
+            logger.warning(f"table is empty, skipping processing")
+            return [], {"skipped empty tables": 1}
+        # transform table
+        out_tables, stats = self.transform(table=table)
+        # convert tables to files
+        return self._convert_tables(out_tables=out_tables, stats=stats)
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -37,6 +68,19 @@ class AbstractTableTransform(AbstractTransform):
         propagated to metadata
         """
         raise NotImplemented()
+
+    def flush_files(self) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+        """
+        This is supporting method for transformers, that implement buffering of tables, for example coalesce.
+        These transformers can have buffers containing tables that were not written to the output. Flush is
+        the hook for them to return back locally stored tables and their statistics. The majority of transformers
+        should use default implementation.
+        If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
+        :return: a tuple of a list of 0 or more converted file and a dictionary of statistics that will be
+                 propagated to metadata
+        """
+        out_tables, stats = self.flush()
+        return self._convert_tables(out_tables=out_tables, stats=stats)
 
     def flush(self) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -49,3 +93,20 @@ class AbstractTableTransform(AbstractTransform):
         propagated to metadata
         """
         return [], {}
+
+    @staticmethod
+    def _convert_tables(
+        out_tables: list[pa.Table], stats: dict[str, Any]
+    ) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+
+        out_files = [tuple[bytes, str]] * len(out_tables)
+        for i in range(len(out_tables)):
+            if not TransformUtils.verify_no_duplicate_columns(table=out_tables[i], file=""):
+                logger.warning("Transformer created file with the duplicate columns")
+                return [], {"duplicate columns result": 1}
+            out_binary = TransformUtils.convert_arrow_to_binary(table=out_tables[i])
+            if out_binary is None:
+                logger.warning("Failed to convert table to binary")
+                return [], {"failed_writes": 1}
+            out_files[i] = (out_binary, ".parquet")
+        return out_files, stats

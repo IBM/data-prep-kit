@@ -4,8 +4,8 @@ All transforms operate on a [pyarrow Table](https://arrow.apache.org/docs/python
 and produce zero or more transformed tables and transform specific metadata.
 The Transform itself need only be concerned with the conversion of one in memory table at a time.  
 
-When running in the Ray worker (i.e. [TransformTableProcessor](../ray/src/data_processing/runtime/ray/transform_table_processor.py) ), the input
-tables are read from parquet files and the transform table(s) is/are stored in destination parquet files.
+When running in the Ray worker (i.e. [TransformFileProcessor](../ray/src/data_processing/runtime/ray/transform_file_processor.py) ), the input
+files are read from parquet files and are converted to tables. The transform table(s) is/are stored in destination parquet files.
 Metadata accumulated across calls to all transforms is stored in the destination.
 
 ### Transform Basics

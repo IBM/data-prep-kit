@@ -33,7 +33,6 @@ params = {
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # orchestrator
-    "runtime_table": False,
     "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
     "runtime_num_workers": 3,
     "runtime_pipeline_id": "pipeline_id",

@@ -13,7 +13,7 @@
 import argparse
 import ast
 
-from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger, str2bool
+from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger
 
 
 logger = get_logger(__name__)
@@ -36,7 +36,6 @@ class TransformExecutionConfiguration(CLIArgumentProvider):
         self.pipeline_id = ""
         self.job_details = {}
         self.code_location = {}
-        self.table = True
         self.name = name
         self.print_params = print_params
 
@@ -48,12 +47,6 @@ class TransformExecutionConfiguration(CLIArgumentProvider):
         """
         parser.add_argument(f"--{cli_prefix}pipeline_id", type=str, default="pipeline_id", help="pipeline id")
         parser.add_argument(f"--{cli_prefix}job_id", type=str, default="job_id", help="job id")
-        parser.add_argument(
-            f"--" f"{cli_prefix}table",
-            type=lambda x: bool(str2bool(x)),
-            default="True",
-            help="Run table or binary transform - default arrow",
-        )
 
         help_example_dict = {
             "github": ["https://github.com/somerepo", "Github repository URL."],
@@ -83,12 +76,7 @@ class TransformExecutionConfiguration(CLIArgumentProvider):
             "job id": captured["job_id"],
         }
         self.code_location = captured["code_location"]
-        self.table = captured["table"]
         # print parameters
-        if self.table:
-            logger.info("Processing tables")
-        else:
-            logger.info("Processing files")
         logger.info(f"pipeline id {self.pipeline_id}")
         if self.print_params:
             logger.info(f"job details {self.job_details}")

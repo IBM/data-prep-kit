@@ -11,7 +11,7 @@ class extends transform's base TransformConfiguration implementation to add an o
 * [TransformRuntime](../ray/src/data_processing/runtime/ray/transform_runtime.py) - 
 this provides the ability for the transform implementor to create additional Ray resources 
 and include them in the configuration used to create a transform
-(see, for example, [exact dedup](../../transforms/universal/ededup/src/ededup_transform.py)).
+(see, for example, [exact dedup](../../transforms/universal/ededup/ray/src/ededup_transform.py)).
 This also provide the ability to supplement the statics collected by
 [Statistics](../ray/src/data_processing/runtime/ray/transform_statistics.py) (see below).
 
@@ -23,7 +23,7 @@ along with those of the Transform Configuration,
 3. RayOrchestrator creates the Transform Runtime using the Transform Configuration and its CLI parameter values
 4. Transform Runtime creates transform initialization/configuration including the CLI parameters,  
 and any Ray components need by the transform.
-5. [RayWorker](../ray/src/data_processing/runtime/ray/transform_table_processor.py) is started with configuration from the Transform Runtime.
+5. [RayWorker](../ray/src/data_processing/runtime/ray/transform_file_processor.py) is started with configuration from the Transform Runtime.
 6. RayWorker creates the Transform using the configuration provided by the Transform Runtime.
 7. Statistics is used to collect the statistics submitted by the individual transform, that 
 is used for building execution metadata.

@@ -14,7 +14,6 @@ import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-import pyarrow as pa
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
@@ -22,7 +21,7 @@ from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
-from data_processing.transform import AbstractFileTransform, TransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -36,7 +35,7 @@ sleep_cli_param = f"{cli_prefix}{sleep_key}"
 pwd_cli_param = f"{cli_prefix}{pwd_key}"
 
 
-class NOOPFileTransform(AbstractFileTransform):
+class NOOPFileTransform(AbstractTableTransform):
     """
     Implements a simple copy of a pyarrow Table.
     """
@@ -53,7 +52,7 @@ class NOOPFileTransform(AbstractFileTransform):
         super().__init__(config)
         self.sleep = config.get("sleep_sec", 1)
 
-    def transform(self, file: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def transform_file(self, file: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         Converts input file into o or more output files.
         If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
@@ -136,7 +135,6 @@ class NOOPPythonFileTransformConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
         """
         Initialization
-        :param base_configuration - base configuration class
         """
         super().__init__(transform_config=NOOPFileTransformConfiguration())
 
@@ -151,7 +149,6 @@ class NOOPRayFileTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
         """
         Initialization
-        :param base_configuration - base configuration class
         """
         super().__init__(transform_config=NOOPFileTransformConfiguration())
 

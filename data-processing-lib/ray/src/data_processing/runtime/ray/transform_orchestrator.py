@@ -20,7 +20,6 @@ from data_processing.runtime.ray import (
     RayTransformExecutionConfiguration,
     RayTransformFileProcessor,
     RayTransformRuntimeConfiguration,
-    RayTransformTableProcessor,
     RayUtils,
     TransformStatisticsRay,
 )
@@ -84,12 +83,8 @@ def orchestrate(
             "statistics": statistics,
         }
         logger.debug("Creating actors")
-        if preprocessing_params.table:
-            clazz = RayTransformTableProcessor
-        else:
-            clazz = RayTransformFileProcessor
         processors = RayUtils.create_actors(
-            clazz=clazz,
+            clazz=RayTransformFileProcessor,
             params=processor_params,
             actor_options=preprocessing_params.worker_options,
             n_actors=preprocessing_params.n_workers,
