@@ -80,7 +80,7 @@ DOCKER_IMAGE_VERSION - the version of the docker image to produce. DOCKER_IMAGE_
 If you'd like to build each component separately, you can move into the sub-directories as desired.  
 If planning to develop and/or use on Apple Mac please see these [considerations](mac.md).
 
-## Data Prep Lab Library 
+## Data Prep Kit Library 
 To build the wheel for the data processing library and publish it to a pypi... 
 ```shell
 cd data-processing-lib 
