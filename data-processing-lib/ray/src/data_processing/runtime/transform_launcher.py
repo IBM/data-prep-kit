@@ -51,21 +51,9 @@ def multi_luncher(params: dict[str, Any], launcher: AbstractTransformLauncher) -
     :return: number of launches
     """
     # find config parameter
-    config = None
-    for key in params.keys():
-        if key.startswith("data") and key.endswith("config"):
-            config = key
-            break
+    config, config_value, launch_params = ParamsUtils.get_multi_launch_parameters_list(params)
     if config is None:
-        logger.warning("Could no find config parameter")
         return 1
-    config_value = params[config]
-    if type(config_value) is not list:
-        logger.warning("config value is not a list")
-        return 1
-    # remove config key from the dictionary
-    launch_params = dict(params)
-    del launch_params[config]
     n_launches = 0
     for conf in config_value:
         # populate individual config and launch

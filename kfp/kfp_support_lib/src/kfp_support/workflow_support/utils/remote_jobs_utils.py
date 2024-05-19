@@ -16,7 +16,7 @@ import time
 from typing import Any
 
 from data_processing.data_access import DataAccess
-from data_processing.utils import get_logger
+from data_processing.utils import ParamsUtils, get_logger
 from kfp_support.api_server_client import KubeRayAPIs
 from kfp_support.api_server_client.params import (
     DEFAULT_HEAD_START_PARAMS,
@@ -489,21 +489,9 @@ def execute_ray_jobs(
         wait_interval=additional_params.get("wait_interval", 2),
     )
     # find config parameter
-    config = None
-    for key in e_params.keys():
-        if key.startswith("data") and key.endswith("config"):
-            config = key
-            break
+    config, config_value, launch_params = ParamsUtils.get_multi_launch_parameters_list(e_params)
     if config is None:
-        print("Could no find config parameter")
         exit(1)
-    config_value = e_params[config]
-    if type(config_value) is not list:
-        print("config value is not a list")
-        exit(1)
-    # remove config key from the dictionary
-    launch_params = dict(e_params)
-    del launch_params[config]
     # Loop through all configuration
     n_launches = 0
     for conf in config_value:

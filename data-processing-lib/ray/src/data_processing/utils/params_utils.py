@@ -11,6 +11,10 @@
 ################################################################################
 
 from typing import Any
+from data_processing.utils import get_logger
+
+
+logger = get_logger(__name__)
 
 
 class ParamsUtils:
@@ -92,6 +96,31 @@ class ParamsUtils:
         return all_text
 
     @staticmethod
+    def get_multi_launch_parameters_list(params: dict[str, Any]) -> tuple[str, list, dict[str, Any]]:
+        """
+        Get parameters for multi launch
+        :param params: original parameters
+        :return: tuple of name of repeated parameter, list of repeated parameters, and dict of non changing ones
+        """
+        # find config parameter
+        config = None
+        for key in params.keys():
+            if key.startswith("data") and key.endswith("config"):
+                config = key
+                break
+        if config is None:
+            logger.warning("Could no find config parameter")
+            return None, None, None
+        config_value = params[config]
+        if type(config_value) is not list:
+            logger.warning("config value is not a list")
+            return None, None, None
+        # remove config key from the dictionary
+        launch_params = dict(params)
+        del launch_params[config]
+        return config, config_value, launch_params
+
+    @staticmethod
     def get_ast_help_and_example_text(help_dict: dict[str, str], examples: list[dict[str, Any]]):
         initial_indent = ""
         indent_per_level = "   "
@@ -135,7 +164,7 @@ class ParamsUtils:
                 help="ast string of options for s3 credentials\n" +
                      ParamsUtils.get_ast_help_text(help_example_dict)
             )
-        :return:  a string to be included in help text, usually concantentated with the general
+        :return:  a string to be included in help text, usually concatenated with the general
         parameter help text.
         """
 
