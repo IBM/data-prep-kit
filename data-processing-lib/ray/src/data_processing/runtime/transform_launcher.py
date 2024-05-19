@@ -43,7 +43,7 @@ class AbstractTransformLauncher:
         return self.name
 
 
-def multi_luncher(params: dict[str, Any], launcher: AbstractTransformLauncher) -> int:
+def multi_launcher(params: dict[str, Any], launcher: AbstractTransformLauncher) -> int:
     """
     Multi launcher. A function orchestrating multiple launcher executions
     :param params: A set of parameters containing an array of configs (s3, local, etc)
@@ -51,9 +51,18 @@ def multi_luncher(params: dict[str, Any], launcher: AbstractTransformLauncher) -
     :return: number of launches
     """
     # find config parameter
-    config, config_value, launch_params = ParamsUtils.get_multi_launch_parameters_list(params)
+    config = ParamsUtils.get_config_parameter(params)
     if config is None:
         return 1
+    # get and validate config value
+    config_value = params[config]
+    if type(config_value) is not list:
+        logger.warning("config value is not a list")
+        return 1
+    # remove config key from the dictionary
+    launch_params = dict(params)
+    del launch_params[config]
+    # Loop through all parameters
     n_launches = 0
     for conf in config_value:
         # populate individual config and launch

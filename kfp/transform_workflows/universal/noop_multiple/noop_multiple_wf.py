@@ -36,7 +36,7 @@ compute_exec_params_op = comp.func_to_container_op(
 # create Ray cluster
 create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayClusterComponent.yaml")
 # execute job
-execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeMultipleRayJobComponent.yaml")
+execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayJobComponent.yaml")
 # clean up Ray
 cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/deleteRayClusterComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.

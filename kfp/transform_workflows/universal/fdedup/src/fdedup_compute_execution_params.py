@@ -125,6 +125,9 @@ def fdedup_compute_execution_params(
     s3_key, s3_secret, s3_endpoint = KFPUtils.credentials()
     s3_creds = {"access_key": s3_key, "secret_key": s3_secret, "url": s3_endpoint}
     s3_config = KFPUtils.load_from_json(params.get("s3_config", {}).replace("'", '"'))
+    if type(s3_config) is list:
+        # S3 config is list. take the first element
+        s3_config = s3_config[0]
     # because S3 is the only viable version for kfp-based implementation, we are here creating DataAccess S3 directly
     data_access = DataAccessS3(s3_credentials=s3_creds, s3_config=s3_config, d_sets=None, checkpoint=False, m_files=-1)
     # sample input data
