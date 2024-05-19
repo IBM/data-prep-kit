@@ -32,11 +32,11 @@ base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0"
 # compute execution parameters
 compute_exec_params_op = comp.func_to_container_op(func=ededup_compute_execution_params, base_image=base_kfp_image)
 # create Ray cluster
-create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
+create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayClusterComponent.yaml")
 # execute job
 execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayJobComponent.yaml")
 # clean up Ray
-cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
+cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/deleteRayClusterComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
 TASK_NAME: str = "ededup"
 
