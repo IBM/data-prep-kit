@@ -14,9 +14,14 @@ workflow-build:
 	@for file in $(YAML_WF); do \
 		$(MAKE) $$file;       \
 	done
-test::
 
-upload::
+workflow-test::
+
+.PHONY: workflow-upload
+workflow-upload: workflow-build
+	@for file in $(YAML_WF); do \
+                $(MAKE) .transforms_workflows.upload-pipeline PIPELINE_FILE=$$file; \
+        done
 
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:

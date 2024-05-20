@@ -22,7 +22,7 @@ workflow-test: workflow-build
 
 .PHONY: workflow-upload
 workflow-upload: workflow-build
-	$(MAKE) .transforms_workflows.upload-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=${YAML_FILE}
+	$(MAKE) .transforms_workflows.upload-pipeline PIPELINE_FILE=${YAML_FILE}
 
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:
