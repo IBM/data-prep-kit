@@ -61,5 +61,5 @@ test::
 .PHONY: clean
 clean:
 	@# Help: Remove $(IMG) 
-	$(DOCKER) image rm ${IMG} || true
 	-rm  makeenv
+	rm -rf *.back || true
