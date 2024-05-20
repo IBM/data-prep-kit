@@ -11,9 +11,9 @@ SRC_DIR=${REPOROOT}/transforms/universal/noop_multiple/
 
 YAML_FILE=noop_multiple_wf.yaml
 
-DOCKER_IMAGE_NAME=noop_multiple
+DOCKER_IMAGE_NAME=noop
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${NOOP_MULTIPLE_VERSION}
+DOCKER_IMAGE_VERSION=${NOOP_VERSION}
 
 venv:: .check_python_version ${VENV_ACTIVATE}
 
