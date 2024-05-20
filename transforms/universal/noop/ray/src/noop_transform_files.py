@@ -52,7 +52,7 @@ class NOOPFileTransform(AbstractTableTransform):
         super().__init__(config)
         self.sleep = config.get("sleep_sec", 1)
 
-    def transform_binary(self, file: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def transform_binary(self, byte_array: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         Converts input file into o or more output files.
         If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
@@ -61,15 +61,15 @@ class NOOPFileTransform(AbstractTableTransform):
         :return: a tuple of a list of 0 or more converted file and a dictionary of statistics that will be
                  propagated to metadata
         """
-        logger.debug(f"Transforming one file with len {len(file)} and extension {ext}")
+        logger.debug(f"Transforming one file with len {len(byte_array)} and extension {ext}")
         if self.sleep is not None:
             logger.info(f"Sleep for {self.sleep} seconds")
             time.sleep(self.sleep)
             logger.info("Sleep completed - continue")
         # Add some sample metadata.
-        logger.debug(f"Transformed one file with len {len(file)} and extension {ext}")
-        metadata = {"nfiles": 1, "size": len(file)}
-        return [(file, ext)], metadata
+        logger.debug(f"Transformed one file with len {len(byte_array)} and extension {ext}")
+        metadata = {"nfiles": 1, "size": len(byte_array)}
+        return [(byte_array, ext)], metadata
 
 
 class NOOPFileTransformConfiguration(TransformConfiguration):
