@@ -19,7 +19,7 @@ from data_processing.runtime import (
     TransformExecutionConfiguration,
     TransformRuntimeConfiguration,
 )
-from data_processing.runtime.pure_python import TransformFileProcessor
+from data_processing.runtime.pure_python import PythonTransformFileProcessor
 from data_processing.transform import TransformStatistics
 from data_processing.utils import get_logger
 
@@ -60,15 +60,15 @@ def orchestrate(
         # create statistics
         statistics = TransformStatistics()
         # create executor
-        executor = TransformFileProcessor(
-            data_access_factory=data_access_factory, statistics=statistics, params=runtime_config
+        executor = PythonTransformFileProcessor(
+            data_access_factory=data_access_factory, statistics=statistics, runtime_configuration=runtime_config
         )
         # process data
         logger.debug(f"{runtime_config.get_name()} Begin processing files")
         t_start = time.time()
         completed = 0
         for path in files:
-            executor.process_files(path)
+            executor.proces_files(path)
             completed += 1
             if completed % print_interval == 0:
                 logger.info(f"Completed {completed} files in {(time.time() - t_start)/60} min")

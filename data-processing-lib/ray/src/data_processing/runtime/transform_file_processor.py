@@ -34,7 +34,7 @@ class AbstractTransformFileProcessor:
         self.last_file_name_next_index = None
         self.logger = get_logger(__name__)
 
-    def process_files(self, f_name: str) -> None:
+    def proces_files(self, f_name: str) -> None:
         """
         Method processing an individual file
         :param f_name: file name

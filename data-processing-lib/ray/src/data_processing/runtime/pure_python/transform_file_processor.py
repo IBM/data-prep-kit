@@ -15,12 +15,12 @@ from typing import Any
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime import (
     AbstractTransformFileProcessor,
-    TransformRuntimeConfiguration,
 )
 from data_processing.transform import TransformStatistics
+from data_processing.runtime.pure_python import PythonTransformRuntimeConfiguration
 
 
-class TransformFileProcessor(AbstractTransformFileProcessor):
+class PythonTransformFileProcessor(AbstractTransformFileProcessor):
     """
     This is the class implementing the worker class processing of a single file
     """
@@ -29,23 +29,23 @@ class TransformFileProcessor(AbstractTransformFileProcessor):
         self,
         data_access_factory: DataAccessFactoryBase,
         statistics: TransformStatistics,
-        params: TransformRuntimeConfiguration,
+        runtime_configuration: PythonTransformRuntimeConfiguration,
     ):
         """
         Init method
         :param data_access_factory - data access factory
         :param statistics - reference to statistics class
-        :param params: transform configuration class
+        :param runtime_configuration: transform configuration class
         """
         # Create data access
         super().__init__()
         self.data_access = data_access_factory.create_data_access()
         # Add data access and statistics to the processor parameters
-        transform_params = dict(params.get_transform_params())
+        transform_params = dict(runtime_configuration.get_transform_params())
         transform_params["data_access"] = self.data_access
         transform_params["statistics"] = statistics
         # Create local processor
-        self.transform = params.get_transform_class()(transform_params)
+        self.transform = runtime_configuration.get_transform_class()(transform_params)
         # Create statistics
         self.stats = statistics
 
