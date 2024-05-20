@@ -10,15 +10,15 @@ TRANSFORM_NAME=fdedup
 # $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${FDEDUP_VERSION}
 
-venv::	.transforms.venv
+venv::	.transforms.ray-venv
 
-build::	.transforms.build
+build::	.transforms.ray-build
 
-test::	.transforms.test
+test::	.transforms.ray-test
 
 clean:: .transforms.clean
 
-image:: .transforms.image
+image:: .transforms.ray-image
 
 test-src:: .transforms.test-src
 
@@ -27,7 +27,7 @@ setup:: .transforms.setup
 test-image:: .transforms.test-image-help
 	@echo WARNING: Skipping pytest test until we have a test/test_fdedup.py file.
 
-publish:: .transforms.publish
+publish:: .transforms.ray-publish
 
 run-cli-ray-sample: 
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \

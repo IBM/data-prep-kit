@@ -12,22 +12,22 @@ DOCKER_IMAGE_VERSION=${CODE_QUALITY_VERSION}
 clean:: .transforms.clean
 
 # Use default rule inherited from makefile.common
-test:: .transforms.test
+test:: .transforms.ray-test
 
 # Use default rule inherited from makefile.common
-image:: .transforms.image
+image:: .transforms.ray-image
 
 # Use default rule inherited from makefile.common
-build:: .transforms.build
+build:: .transforms.ray-build
 
 # Use default rule inherited from makefile.common
-venv:: .transforms.venv
+venv:: .transforms.ray-venv
 
 test-src:: .transforms.test-src
 
-test-image:: .transforms.test-image
+test-image:: .transforms.ray-test-image
 
-publish:: .transforms.publish
+publish:: .transforms.ray-publish
 
 setup:: .transforms.setup
 
