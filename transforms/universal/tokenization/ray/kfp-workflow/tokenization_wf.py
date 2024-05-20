@@ -20,42 +20,45 @@ from kfp_support.workflow_support.utils import (
 )
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.0"
-
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "doc_id_transform.py"
+EXEC_SCRIPT_NAME: str = "tokenization_transform.py"
+
+task_image = "quay.io/dataprep1/data-prep-kit/tokenization:0.2.0"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0"
+# path to kfp component specifications files
+component_spec_path = "../../../../../kfp/kfp_ray_components/"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
-# a result, instead of creating a component we are creating it in place here.
+# a result, insted of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
 )
 # create Ray cluster
-create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
+create_ray_op = comp.load_component_from_file(component_spec_path + "createRayComponent.yaml")
 # execute job
-execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayJobComponent.yaml")
+execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "executeRayJobComponent.yaml")
 # clean up Ray
-cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
+cleanup_ray_op = comp.load_component_from_file(component_spec_path + "cleanupRayComponent.yaml")
+
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "doc_id"
+TASK_NAME: str = "tokenization"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for doc_id",
+    description="Pipeline for tokenization",
 )
-def doc_id(
+def tokenization(
     # Ray cluster
-    ray_name: str = "doc_id-kfp-ray",  # name of Ray cluster
+    ray_name: str = "tkn-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
     '"image_pull_secret": "", "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'test/doc_id/input/', 'output_folder': 'test/doc_id/output/'}",
+    data_s3_config: str = "{'input_folder': 'test/tokenization/ds01/input/', 'output_folder': 'test/tokenization/ds01/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
@@ -63,15 +66,18 @@ def doc_id(
     runtime_actor_options: str = "{'num_cpus': 0.8}",
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # doc id parameters
-    doc_id_doc_column: str = "contents",
-    doc_id_hash_column: str = "hash_column",
-    doc_id_int_column: str = "int_id_column",
+    # tokenizer parameters
+    tkn_tokenizer: str = "hf-internal-testing/llama-tokenizer",
+    tkn_doc_id_column: str = "document_id",
+    tkn_doc_content_column: str = "contents",
+    tkn_text_lang: str = "en",
+    tkn_tokenizer_args: str = "cache_dir=/tmp/hf",
+    tkn_chunk_size: int = 0,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
-    Pipeline to execute NOOP transform
+    Pipeline to execute tokenization transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -101,9 +107,12 @@ def doc_id(
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    :param doc_id_doc_column - document column
-    :param doc_id_hash_column - hash id column
-    :param doc_id_int_column - integer id column
+    :param tkn_tokenizer - Tokenizer used for tokenization
+    :param tkn_tokenizer_args - Arguments for tokenizer.
+    :param tkn_doc_id_column - Column contains document id which values should be unique across dataset
+    :param tkn_doc_content_column - Column contains document content
+    :param tkn_text_lang - Specify language used in the text content for better text splitting if needed
+    :param tkn_chunk_size - Specify >0 value to tokenize each row/text in chunks of characters (rounded in words)
     :return: None
     """
     # create clean_up task
@@ -117,6 +126,8 @@ def doc_id(
             actor_options=runtime_actor_options,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
+        ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
+
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
@@ -133,7 +144,6 @@ def doc_id(
             ray_name=ray_name,
             run_id=dsl.RUN_ID_PLACEHOLDER,
             additional_params=additional_params,
-            # note that the parameters below are specific for NOOP transform
             exec_params={
                 "data_s3_config": data_s3_config,
                 "data_max_files": data_max_files,
@@ -143,9 +153,12 @@ def doc_id(
                 "runtime_pipeline_id": runtime_pipeline_id,
                 "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,
                 "runtime_code_location": runtime_code_location,
-                "doc_id_doc_column": doc_id_doc_column,
-                "doc_id_hash_column": doc_id_hash_column,
-                "doc_id_int_column": doc_id_int_column,
+                "tkn_tokenizer": tkn_tokenizer,
+                "tkn_tokenizer_args": tkn_tokenizer_args,
+                "tkn_doc_id_column": tkn_doc_id_column,
+                "tkn_doc_content_column": tkn_doc_content_column,
+                "tkn_text_lang": tkn_text_lang,
+                "tkn_chunk_size": tkn_chunk_size,
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
@@ -160,4 +173,4 @@ def doc_id(
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(doc_id, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(tokenization, __file__.replace(".py", ".yaml"))

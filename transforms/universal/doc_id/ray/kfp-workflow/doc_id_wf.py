@@ -18,42 +18,47 @@ from kfp_support.workflow_support.utils import (
     ONE_WEEK_SEC,
     ComponentUtils,
 )
-from src.ededup_compute_execution_params import ededup_compute_execution_params
 
+
+task_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.0"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "ededup_transform.py"
-
-task_image = "quay.io/dataprep1/data-prep-kit/ededup:0.3.0"
+EXEC_SCRIPT_NAME: str = "doc_id_transform.py"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0"
 
-# compute execution parameters
-compute_exec_params_op = comp.func_to_container_op(func=ededup_compute_execution_params, base_image=base_kfp_image)
+# path to kfp component specifications files
+component_spec_path = "../../../../../kfp/kfp_ray_components/"
+
+# compute execution parameters. Here different tranforms might need different implementations. As
+# a result, insted of creating a component we are creating it in place here.
+compute_exec_params_op = comp.func_to_container_op(
+    func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
+)
 # create Ray cluster
-create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
+create_ray_op = comp.load_component_from_file(component_spec_path + "createRayComponent.yaml")
 # execute job
-execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayJobComponent.yaml")
+execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "executeRayJobComponent.yaml")
 # clean up Ray
-cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
+cleanup_ray_op = comp.load_component_from_file(component_spec_path + "cleanupRayComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "ededup"
+TASK_NAME: str = "doc_id"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for ededup",
+    description="Pipeline for doc_id",
 )
-def ededup(
+def doc_id(
     # Ray cluster
-    ray_name: str = "ededup-kfp-ray",  # name of Ray cluster
+    ray_name: str = "doc_id-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
     '"image_pull_secret": "", "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-    # data access. checkpointing is not supported by dedup
-    data_s3_config: str = "{'input_folder': 'test/ededup/input/', 'output_folder': 'test/ededup/output'}",
+    # data access
+    data_s3_config: str = "{'input_folder': 'test/doc_id/input/', 'output_folder': 'test/doc_id/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
@@ -61,16 +66,15 @@ def ededup(
     runtime_actor_options: str = "{'num_cpus': 0.8}",
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # ededup
-    ededup_hash_cpu: float = 0.5,
-    ededup_doc_column: str = "contents",
-    # data sampling
-    ededup_n_samples: int = 10,
+    # doc id parameters
+    doc_id_doc_column: str = "contents",
+    doc_id_hash_column: str = "hash_column",
+    doc_id_int_column: str = "int_id_column",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
-    Pipeline to execute EDEDUP transform
+    Pipeline to execute NOOP transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -100,9 +104,9 @@ def ededup(
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    :param ededup_hash_cpu - number of CPUs per hash
-    :param ededup_doc_column - key for accessing data
-    :param ededup_n_samples - number of samples for parameters computation
+    :param doc_id_doc_column - document column
+    :param doc_id_hash_column - hash id column
+    :param doc_id_int_column - integer id column
     :return: None
     """
     # create clean_up task
@@ -114,12 +118,8 @@ def ededup(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=runtime_actor_options,
-            params={"s3_config": data_s3_config, "hash_cpu": ededup_hash_cpu},
-            n_samples=ededup_n_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
-        ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
-
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
@@ -136,18 +136,19 @@ def ededup(
             ray_name=ray_name,
             run_id=dsl.RUN_ID_PLACEHOLDER,
             additional_params=additional_params,
+            # note that the parameters below are specific for NOOP transform
             exec_params={
                 "data_s3_config": data_s3_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
-                "runtime_num_workers": compute_exec_params.outputs["workers"],
+                "runtime_num_workers": compute_exec_params.output,
                 "runtime_worker_options": runtime_actor_options,
                 "runtime_pipeline_id": runtime_pipeline_id,
                 "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,
                 "runtime_code_location": runtime_code_location,
-                "ededup_doc_column": ededup_doc_column,
-                "ededup_hash_cpu": ededup_hash_cpu,
-                "ededup_num_hashes": compute_exec_params.outputs["hashes"],
+                "doc_id_doc_column": doc_id_doc_column,
+                "doc_id_hash_column": doc_id_hash_column,
+                "doc_id_int_column": doc_id_int_column,
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
@@ -162,4 +163,4 @@ def ededup(
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(ededup, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(doc_id, __file__.replace(".py", ".yaml"))
