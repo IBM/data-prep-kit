@@ -70,4 +70,5 @@ jobs:
               uses: actions/checkout@v4
             - name: Test KFP compile
               run: |
-                  make -C kfp/transform_workflows venv build
+                  make -C transforms workflow-build
+                  make -C kfp/superworkflows workflow-build
