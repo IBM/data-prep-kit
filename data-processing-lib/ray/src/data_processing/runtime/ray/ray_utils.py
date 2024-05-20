@@ -132,12 +132,12 @@ class RayUtils:
         completed = 0
         for path in files:
             if executors.has_free():  # still have room
-                executors.submit(lambda a, v: a.process_data.remote(v), path)
+                executors.submit(lambda a, v: a.process_files.remote(v), path)
                 running = running + 1
                 files_in_progress_gauge.set(running)
             else:  # need to wait for some actors
                 executors.get_next_unordered()
-                executors.submit(lambda a, v: a.process_data.remote(v), path)
+                executors.submit(lambda a, v: a.process_files.remote(v), path)
                 completed = completed + 1
                 files_completed_gauge.set(completed)
                 RayUtils.get_available_resources(

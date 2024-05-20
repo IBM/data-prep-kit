@@ -67,7 +67,7 @@ class AbstractTransformTest(AbstractTest):
             all_table_list.extend(table_list)
             all_metadata_list.append(metadata)
 
-        table_list, metadata = transform.flush_files()
+        table_list, metadata = transform.flush_binary()
         all_table_list.extend(table_list)
         all_metadata_list.append(metadata)
 

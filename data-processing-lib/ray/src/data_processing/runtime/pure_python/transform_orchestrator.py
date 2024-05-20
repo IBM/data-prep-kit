@@ -68,7 +68,7 @@ def orchestrate(
         t_start = time.time()
         completed = 0
         for path in files:
-            executor.process_data(path)
+            executor.process_files(path)
             completed += 1
             if completed % print_interval == 0:
                 logger.info(f"Completed {completed} files in {(time.time() - t_start)/60} min")

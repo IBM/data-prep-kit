@@ -13,14 +13,14 @@
 from typing import Any
 
 import pyarrow as pa
-from data_processing.transform import AbstractFileTransform
+from data_processing.transform import AbstractBinaryTransform
 from data_processing.utils import TransformUtils, get_logger
 
 
 logger = get_logger(__name__)
 
 
-class AbstractTableTransform(AbstractFileTransform):
+class AbstractTableTransform(AbstractBinaryTransform):
     """
     Converts input to 0 or more output table
     Sub-classes must provide the transform() method to provide the conversion of one table to 0 or more new tables.
@@ -32,7 +32,7 @@ class AbstractTableTransform(AbstractFileTransform):
         """
         super().__init__(config)
 
-    def transform_file(self, file: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def transform_binary(self, file: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         Converts input file into o or more output files.
         If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
@@ -69,7 +69,7 @@ class AbstractTableTransform(AbstractFileTransform):
         """
         raise NotImplemented()
 
-    def flush_files(self) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def flush_binary(self) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         This is supporting method for transformers, that implement buffering of tables, for example coalesce.
         These transformers can have buffers containing tables that were not written to the output. Flush is

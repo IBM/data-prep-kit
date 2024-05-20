@@ -34,7 +34,7 @@ class AbstractTransformFileProcessor:
         self.last_file_name_next_index = None
         self.logger = get_logger(__name__)
 
-    def process_data(self, f_name: str) -> None:
+    def process_files(self, f_name: str) -> None:
         """
         Method processing an individual file
         :param f_name: file name
@@ -57,7 +57,7 @@ class AbstractTransformFileProcessor:
             # execute local processing
             name_extension = TransformUtils.get_file_extension(f_name)
             self.logger.debug(f"Begin transforming file {f_name}")
-            out_files, stats = self.transform.transform_file(file=filedata, ext=name_extension[1])
+            out_files, stats = self.transform.transform_binary(file=filedata, ext=name_extension[1])
             self.logger.debug(f"Done transforming file {f_name}")
             self.last_file_name = name_extension[0]
             self.last_file_name_next_index = None
@@ -84,7 +84,7 @@ class AbstractTransformFileProcessor:
             t_start = time.time()
             # get flush results
             self.logger.debug(f"Begin flushing transform")
-            out_files, stats = self.transform.flush_files()
+            out_files, stats = self.transform.flush_binary()
             self.logger.debug(f"Done flushing transform, got {len(out_files)} files")
             # Here we are using the name of the last file, that we were processing
             self._submit_file(t_start=t_start, out_files=out_files, stats=stats)

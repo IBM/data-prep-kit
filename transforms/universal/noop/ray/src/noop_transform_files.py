@@ -52,7 +52,7 @@ class NOOPFileTransform(AbstractTableTransform):
         super().__init__(config)
         self.sleep = config.get("sleep_sec", 1)
 
-    def transform_file(self, file: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def transform_binary(self, file: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         Converts input file into o or more output files.
         If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
