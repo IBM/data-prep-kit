@@ -18,7 +18,7 @@ The first step in creation of components its implementation. The framework autom
 * [execute Ray job](src/execute_ray_job.py) is responsible for submission of the Ray job, watching its execution,
   periodically printing job execution log and completing, once the job is completed. Its implementation is
   based on the [RayRemoteJobs class](../kfp_support_lib/src/kfp_support/workflow_support/README.md)
-* [clean up Ray cluster](src/cleanup_ray_cluster.py) is responsible for deletion of the Ray cluster, thus freeing
+* [clean up Ray cluster](src/delete_ray_cluster.py) is responsible for deletion of the Ray cluster, thus freeing
   up cluster resources. Its implementation is based on the 
   [RayRemoteJobs class](../kfp_support_lib/src/kfp_support/workflow_support/README.md)
 
@@ -31,9 +31,9 @@ command-line arguments to pass to your component’s code.
 
 Components specifications are provided here:
 
-* [Create Ray cluster Component](createRayComponent.yaml)
+* [Create Ray cluster Component](createRayClusterComponent.yaml)
 * [execute Ray job component](executeRayJobComponent.yaml)
-* [clean up Ray cluster component](cleanupRayComponent.yaml)
+* [clean up Ray cluster component](deleteRayClusterComponent.yaml)
 
 ## Building the docker image
 

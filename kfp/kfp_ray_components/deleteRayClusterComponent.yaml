@@ -17,7 +17,7 @@ implementation:
                 # Force the stdout and stderr streams to be unbuffered
                 -u,
                 # Path of the program inside the container
-                /pipelines/component/src/cleanup_ray_cluster.py,
+                /pipelines/component/src/delete_ray_cluster.py,
                 --ray_name,
                 { inputValue: ray_name },
                 --run_id,

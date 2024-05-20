@@ -60,7 +60,7 @@ Ray cluster. For each step we have to define a component that will execute them:
 Note: here we are using shared components described in this [document](../kfp_ray_components/README.md) for `create_ray_op`, 
 `execute_ray_jobs_op` and `cleanup_ray_op`,  while `compute_exec_params_op` component is built inline, because it might
 differ significantly. For "simple" pipeline cases we can use the 
-[default implementation](../kfp_support_lib/src/kfp_support/workflow_support/utils/workflow_utils.py),
+[default implementation](../kfp_support_lib/src/kfp_support/workflow_support/utils/remote_jobs_utils.py),
 while, for example for exact dedup, we are using a very [specialized one](../transform_workflows/universal/ededup/src/ededup_compute_execution_params.py).
 
 ### Input parameters definition

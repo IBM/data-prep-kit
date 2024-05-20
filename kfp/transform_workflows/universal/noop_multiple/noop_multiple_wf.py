@@ -18,19 +18,21 @@ from kfp_support.workflow_support.utils import (
     ONE_WEEK_SEC,
     ComponentUtils,
 )
-from src.ededup_compute_execution_params import ededup_compute_execution_params
 
+
+task_image = "quay.io/dataprep1/data-prep-kit/noop_multiple:0.1.0"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "ededup_transform.py"
-
-task_image = "quay.io/dataprep1/data-prep-kit/ededup:0.3.0"
+EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0"
 
-# compute execution parameters
-compute_exec_params_op = comp.func_to_container_op(func=ededup_compute_execution_params, base_image=base_kfp_image)
+# compute execution parameters. Here different tranforms might need different implementations. As
+# a result, instead of creating a component we are creating it in place here.
+compute_exec_params_op = comp.func_to_container_op(
+    func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
+)
 # create Ray cluster
 create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayClusterComponent.yaml")
 # execute job
@@ -38,22 +40,23 @@ execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components
 # clean up Ray
 cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/deleteRayClusterComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "ededup"
+TASK_NAME: str = "noop"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for ededup",
+    description="Pipeline for multiple noop",
 )
-def ededup(
+def noop(
     # Ray cluster
-    ray_name: str = "ededup-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
+    ray_name: str = "noop-kfp-ray",  # name of Ray cluster
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", '
+    '"image": "' + task_image + '", "image_pull_policy": "Always" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image_pull_secret": "", "image": "' + task_image + '"}',
+    '"image_pull_secret": "", "image": "' + task_image + '", "image_pull_policy": "Always" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-    # data access. checkpointing is not supported by dedup
-    data_s3_config: str = "{'input_folder': 'test/ededup/input/', 'output_folder': 'test/ededup/output'}",
+    # data access
+    data_s3_config: str = "[{'input_folder': 'test/noop/input/', 'output_folder': 'test/noop/output/'}]",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
@@ -61,16 +64,13 @@ def ededup(
     runtime_actor_options: str = "{'num_cpus': 0.8}",
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # ededup
-    ededup_hash_cpu: float = 0.5,
-    ededup_doc_column: str = "contents",
-    # data sampling
-    ededup_n_samples: int = 10,
+    # noop parameters
+    noop_sleep_sec: int = 10,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
-    Pipeline to execute EDEDUP transform
+    Pipeline to execute NOOP transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -94,15 +94,13 @@ def ededup(
         wait_print_tmout - time between prints, sec
         http_retries - http retries for API server calls
     :param data_s3_access_secret - s3 access secret
-    :param data_s3_config - s3 configuration
+    :param data_s3_config - s3 configuration. Note that config here should be an array
     :param data_max_files - max files to process
     :param data_num_samples - num samples to process
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    :param ededup_hash_cpu - number of CPUs per hash
-    :param ededup_doc_column - key for accessing data
-    :param ededup_n_samples - number of samples for parameters computation
+    :param noop_sleep_sec - noop sleep time
     :return: None
     """
     # create clean_up task
@@ -114,12 +112,8 @@ def ededup(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=runtime_actor_options,
-            params={"s3_config": data_s3_config, "hash_cpu": ededup_hash_cpu},
-            n_samples=ededup_n_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
-        ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
-
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
@@ -136,18 +130,17 @@ def ededup(
             ray_name=ray_name,
             run_id=dsl.RUN_ID_PLACEHOLDER,
             additional_params=additional_params,
+            # note that the parameters below are specific for NOOP transform
             exec_params={
                 "data_s3_config": data_s3_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
-                "runtime_num_workers": compute_exec_params.outputs["workers"],
+                "runtime_num_workers": compute_exec_params.output,
                 "runtime_worker_options": runtime_actor_options,
                 "runtime_pipeline_id": runtime_pipeline_id,
                 "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,
                 "runtime_code_location": runtime_code_location,
-                "ededup_doc_column": ededup_doc_column,
-                "ededup_hash_cpu": ededup_hash_cpu,
-                "ededup_num_hashes": compute_exec_params.outputs["hashes"],
+                "noop_sleep_sec": noop_sleep_sec,
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
@@ -162,4 +155,4 @@ def ededup(
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(ededup, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(noop, __file__.replace(".py", ".yaml"))

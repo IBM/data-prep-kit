@@ -62,5 +62,5 @@ ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${
 
 .PHONY: .transforms_workflows.clean
 .transforms_workflows.clean:
-	rm -rf *_wf.yaml || true
+	rm -rf *.back || true
 
