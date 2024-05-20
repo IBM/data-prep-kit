@@ -20,7 +20,6 @@ from kfp_support.workflow_support.utils import (
     ONE_WEEK_SEC,
     ComponentUtils,
 )
-from kubernetes import client as k8s_client
 
 
 # the name of the job script
@@ -40,11 +39,12 @@ compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
 )
 # create Ray cluster
-create_ray_op = comp.load_component_from_file(component_spec_path + "createRayComponent.yaml")
+create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
 # execute job
 execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "executeRayJobComponent.yaml")
 # clean up Ray
-cleanup_ray_op = comp.load_component_from_file(component_spec_path + "cleanupRayComponent.yaml")
+cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
+
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
 TASK_NAME: str = "code_quality"
 

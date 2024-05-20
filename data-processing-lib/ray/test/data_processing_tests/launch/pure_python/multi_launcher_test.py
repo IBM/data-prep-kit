@@ -12,7 +12,7 @@
 
 import os
 
-from data_processing.runtime import multi_luncher
+from data_processing.runtime import multi_launcher
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.transform import NOOPPythonTransformConfiguration
 from data_processing.utils import ParamsUtils
@@ -62,7 +62,7 @@ def test_multi_launcher():
         "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     }
     # s3 configuration
-    res = multi_luncher(params=params, launcher=TestLauncherPython())
+    res = multi_launcher(params=params, launcher=TestLauncherPython())
     assert 1 == res
     params = {
         "data_max_files": -1,
@@ -73,5 +73,5 @@ def test_multi_launcher():
         "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     }
     # local configuration
-    res = multi_luncher(params=params, launcher=TestLauncherPython())
+    res = multi_launcher(params=params, launcher=TestLauncherPython())
     assert 1 == res
