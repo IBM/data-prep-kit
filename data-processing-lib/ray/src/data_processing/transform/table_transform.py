@@ -22,8 +22,8 @@ logger = get_logger(__name__)
 
 class AbstractTableTransform(AbstractBinaryTransform):
     """
-    Converts input to 0 or more output table
-    Sub-classes must provide the transform() method to provide the conversion of one table to 0 or more new tables.
+    Extends AbstractBinaryTransform to expect the byte arrays from to contain a pyarrow Table.
+    Sub-classes are expected to implement transform() on the parsed Table instances.
     """
 
     def __init__(self, config: dict[str, Any]):
@@ -59,7 +59,7 @@ class AbstractTableTransform(AbstractBinaryTransform):
         # Add number of rows to stats
         stats = stats | {"input_doc_count": table.num_rows}
         # convert tables to files
-        return self._convert_tables(out_tables=out_tables, stats=stats)
+        return self._check_and_convert_tables(out_tables=out_tables, stats=stats)
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -82,7 +82,7 @@ class AbstractTableTransform(AbstractBinaryTransform):
                  propagated to metadata
         """
         out_tables, stats = self.flush()
-        return self._convert_tables(out_tables=out_tables, stats=stats)
+        return self._check_and_convert_tables(out_tables=out_tables, stats=stats)
 
     def flush(self) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -97,7 +97,7 @@ class AbstractTableTransform(AbstractBinaryTransform):
         return [], {}
 
     @staticmethod
-    def _convert_tables(
+    def _check_and_convert_tables(
         out_tables: list[pa.Table], stats: dict[str, Any]
     ) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
 

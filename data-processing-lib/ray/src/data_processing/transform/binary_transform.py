@@ -23,28 +23,31 @@ class AbstractBinaryTransform:
     def __init__(self, config: dict[str, Any]):
         """
         Initialize based on the dictionary of configuration information.
+        This simply stores the given instance in this instance for later use.
         """
         self.config = config
 
     def transform_binary(self, byte_array: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         Converts input file into o or more output files.
-        If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
-        :param byte_array: input file
-        :param ext: file extension
-        :return: a tuple of a list of 0 or more converted file and a dictionary of statistics that will be
-                 propagated to metadata
+        If there is an error, an exception must be raised - exit()ing is not generally allowed.
+        :param byte_array: contents of the input file to be transformed.
+        :param ext: the file extension of the file containing the given byte_array.
+        :return: a tuple of a list of 0 or more tuples and a dictionary of statistics that will be propagated
+                to metadata.  Each element of the return list, is a tuple of the transformed bytes and a string
+                holding the extension to be used when writing out the new bytes.
         """
         raise NotImplemented()
 
     def flush_binary(self) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
-        This is supporting method for transformers, that implement buffering of tables, for example coalesce.
-        These transformers can have buffers containing tables that were not written to the output. Flush is
-        the hook for them to return back locally stored tables and their statistics. The majority of transformers
-        should use default implementation.
-        If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
-        :return: a tuple of a list of 0 or more converted file and a dictionary of statistics that will be
-                 propagated to metadata
+        This is supporting method for transformers, that implement buffering of data, for example coalesce.
+        These transformers can have buffers containing data that were not written to the output immediately.
+        Flush is the hook for them to return back locally stored data and their statistics.
+        The majority of transformers are expected not to use such buffering and can use this default implementation.
+        If there is an error, an exception must be raised - exit()ing is not generally allowed.
+        :return: a tuple of a list of 0 or more tuples and a dictionary of statistics that will be propagated
+                to metadata.  Each element of the return list, is a tuple of the transformed bytes and a string
+                holding the extension to be used when writing out the new bytes.
         """
         return [], {}
