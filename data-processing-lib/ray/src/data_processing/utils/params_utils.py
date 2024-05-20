@@ -92,6 +92,21 @@ class ParamsUtils:
         return all_text
 
     @staticmethod
+    def get_config_parameter(params: dict[str, Any]) -> str:
+        """
+        Get parameters for multi launch
+        :param params: original parameters
+        :return: tuple of name of repeated parameter, list of repeated parameters, and dict of non changing ones
+        """
+        # find config parameter
+        config = None
+        for key in params.keys():
+            if key.startswith("data") and key.endswith("config"):
+                config = key
+                break
+        return config
+
+    @staticmethod
     def get_ast_help_and_example_text(help_dict: dict[str, str], examples: list[dict[str, Any]]):
         initial_indent = ""
         indent_per_level = "   "
@@ -135,7 +150,7 @@ class ParamsUtils:
                 help="ast string of options for s3 credentials\n" +
                      ParamsUtils.get_ast_help_text(help_example_dict)
             )
-        :return:  a string to be included in help text, usually concantentated with the general
+        :return:  a string to be included in help text, usually concatenated with the general
         parameter help text.
         """
 

@@ -44,6 +44,7 @@ from kfp_support.api_server_client.params.cluster import (
     ClusterSpec,
     ClusterEvent,
     Cluster,
+    UpscalingMode,
     autoscaling_decoder,
     cluster_spec_decoder,
     cluster_decoder,

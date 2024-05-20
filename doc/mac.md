@@ -19,5 +19,9 @@ requires a significant amount of memory. For this initial Data Prep Kit release,
 execution on Mac computers with Apple silicon. Instead, we suggest using a real Kubernetes cluster or a Linux virtual
 machine with an Intel CPU.
 
+### Memory Considerations
+
+To verify that running transforms through KFP does not leak memory and also get an idea on the required Podman VM memory size configuration, a few tests were devised and run, as summarized [here](memory.md).
+
 > **Note**: the *current* release does not support building cross-platform images, therefore, please do not build images 
 on the Apple silicon. 
