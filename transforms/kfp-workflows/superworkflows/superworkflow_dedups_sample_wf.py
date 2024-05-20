@@ -5,10 +5,12 @@ from kfp_support.workflow_support.utils import ONE_WEEK_SEC
 
 
 # Components
+# path to kfp component specifications files
+component_spec_path = "../../../kfp/kfp_ray_components/"
 # For every sub workflow we need a separate components, that knows about this subworkflow.
-run_doc_id_op = comp.load_component_from_file("../../kfp_ray_components/executeSubWorkflowComponent.yaml")
-run_exact_dedup_op = comp.load_component_from_file("../../kfp_ray_components/executeSubWorkflowComponent.yaml")
-run_fuzzy_dedup_op = comp.load_component_from_file("../../kfp_ray_components/executeSubWorkflowComponent.yaml")
+run_doc_id_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
+run_exact_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
+run_fuzzy_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 
 doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.0"
 ededup_image = "quay.io/dataprep1/data-prep-kit/ededup:0.3.0"

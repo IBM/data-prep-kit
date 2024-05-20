@@ -4,7 +4,8 @@ include $(REPOROOT)/transforms/.make.transforms_workflows
 
 SRC_DIR=${CURDIR}/../
 
-YAML_FILE=noop_wf.yaml
+PYTHON_WF := $(shell find ./ -name '*_wf.py')
+YAML_WF := $(patsubst %.py, %.yaml, ${PYTHON_WF})
 
 DOCKER_IMAGE_NAME=${TRANSFORM_NAME}
 # $(REPOROOT)/.make.versions file contains the versions
@@ -14,16 +15,24 @@ workflow-venv: .check_python_version ${WORKFLOW_VENV_ACTIVATE}
 
 .PHONY: workflow-build
 workflow-build: workflow-venv
-	$(MAKE) ${YAML_FILE} 
+	@for file in $(YAML_WF); do \
+		$(MAKE) $$file; \
+	done
 
 .PHONY: workflow-test
 workflow-test: workflow-build
-	$(MAKE) .transforms_workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=${YAML_FILE}
+	@for file in $(YAML_WF); do \
+		$(MAKE) .transforms_workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=$$file; \
+	done
 
 .PHONY: workflow-upload
 workflow-upload: workflow-build
-	$(MAKE) .transforms_workflows.upload-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=${YAML_FILE}
+	@for file in $(YAML_WF); do \
+		$(MAKE) .transforms_workflows.upload-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=$$file; \
+	done
 
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:
-	$(MAKE) .transforms_workflows.reconcile-requirement PIPELINE_FILE=noop_wf.py
+	@for file in $(PYTHON_WF); do \
+		$(MAKE) .transforms_workflows.reconcile-requirement PIPELINE_FILE=$$file; \
+	done
