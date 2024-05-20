@@ -56,6 +56,8 @@ class AbstractTableTransform(AbstractBinaryTransform):
             return [], {"skipped empty tables": 1}
         # transform table
         out_tables, stats = self.transform(table=table)
+        # Add number of rows to stats
+        stats = stats | {"input_doc_count": table.num_rows}
         # convert tables to files
         return self._convert_tables(out_tables=out_tables, stats=stats)
 
