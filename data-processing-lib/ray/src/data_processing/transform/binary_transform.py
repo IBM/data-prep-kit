@@ -26,11 +26,11 @@ class AbstractBinaryTransform:
         """
         self.config = config
 
-    def transform_binary(self, file: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def transform_binary(self, byte_array: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         Converts input file into o or more output files.
         If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
-        :param file: input file
+        :param byte_array: input file
         :param ext: file extension
         :return: a tuple of a list of 0 or more converted file and a dictionary of statistics that will be
                  propagated to metadata
