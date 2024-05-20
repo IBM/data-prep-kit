@@ -44,13 +44,16 @@ minio-start:	.minio-start
 
 load-image:: .transforms.load-image
 
-workflow-venv::
+.PHONY: workflow-venv
+workflow-venv:
 	$(MAKE) -C kfp-workflow workflow-venv
 
-workflow-build:: 
+.PHONY: workflow-build
+workflow-build:
 	$(MAKE) -C kfp-workflow workflow-build
 
-workflow-test:: 
+.PHONY: workflow-test
+workflow-test:
 	$(MAKE) -C kfp-workflow workflow-test
 
 .PHONY: workflow-upload
