@@ -49,17 +49,17 @@ load-image:: .transforms.load-image
 
 .PHONY: workflow-venv
 workflow-venv:
-	$(MAKE) -C kfp-workflow workflow-venv
+	$(MAKE) -C kfp/v1 workflow-venv
 
 .PHONY: workflow-build
 workflow-build:
-	$(MAKE) -C kfp-workflow workflow-build
+	$(MAKE) -C kfp/v1 workflow-build
 
 .PHONY: workflow-test
 workflow-test:
-	$(MAKE) -C kfp-workflow workflow-test
+	$(MAKE) -C kfp/v1 workflow-test
 
 .PHONY: workflow-upload
 workflow-upload:
-	$(MAKE) -C kfp-workflow workflow-upload
+	$(MAKE) -C kfp/v1 workflow-upload
 

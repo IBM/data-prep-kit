@@ -32,7 +32,7 @@ run-cli-ray-sample:
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
                 --doc_id_int True "	\
-                .transforms.run-src-file
+		.transforms.run-src-file
 
 run-local-sample: .transforms.run-local-sample
 
@@ -46,16 +46,16 @@ load-image:: .transforms.load-image
 
 .PHONY: workflow-venv
 workflow-venv:
-	$(MAKE) -C kfp-workflow workflow-venv
+	$(MAKE) -C kfp/v1 workflow-venv
 
 .PHONY: workflow-build
 workflow-build:
-	$(MAKE) -C kfp-workflow workflow-build
+	$(MAKE) -C kfp/v1 workflow-build
 
 .PHONY: workflow-test
 workflow-test:
-	$(MAKE) -C kfp-workflow workflow-test
+	$(MAKE) -C kfp/v1 workflow-test
 
 .PHONY: workflow-upload
 workflow-upload:
-	$(MAKE) -C kfp-workflow workflow-upload
+	$(MAKE) -C kfp/v1 workflow-upload

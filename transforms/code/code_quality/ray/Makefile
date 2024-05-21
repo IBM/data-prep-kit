@@ -46,18 +46,18 @@ minio-start:	.minio-start
 
 load-image:: .transforms.load-image
 
-.PHONY: workflow-venv
-workflow-venv:
-	$(MAKE) -C kfp-workflow workflow-venv
+workflow-venv::
+	@# Help: Recursively make $@ in subdirs
+	$(MAKE) RULE=$@ .recurse
 
-.PHONY: workflow-build
-workflow-build:
-	$(MAKE) -C kfp-workflow workflow-build
+workflow-build::
+	@# Help: Recursively make $@ in subdirs
+	$(MAKE) RULE=$@ .recurse
 
-.PHONY: workflow-test
-workflow-test:
-	$(MAKE) -C kfp-workflow workflow-test
+workflow-test::
+	@# Help: Recursively make $@ in subdirs
+	$(MAKE) RULE=$@ .recurse
 
-.PHONY: workflow-upload
-workflow-upload:
-	$(MAKE) -C kfp-workflow workflow-upload
+workflow-upload::
+	@# Help: Recursively make $@ in subdirs
+	$(MAKE) RULE=$@ .recurse
