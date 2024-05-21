@@ -484,8 +484,10 @@ def execute_ray_jobs(
         exit(1)
     # get config value
     config_value = e_params[config]
+    launch_params = dict(e_params)
     if type(config_value) is not list:
         # single request
+        launch_params[config] = KFPUtils.load_from_json(config_value.replace("'", '"'))
         return _execute_remote_job(
             name=name,
             ns=ns,
@@ -495,13 +497,12 @@ def execute_ray_jobs(
             remote_jobs=remote_jobs,
         )
     # remove config key from the dictionary
-    launch_params = dict(e_params)
     del launch_params[config]
     # Loop through all configuration
     n_launches = 0
     for conf in config_value:
         # populate individual config and launch
-        launch_params[config] = conf
+        launch_params[config] = KFPUtils.load_from_json(conf.replace("'", '"'))
         try:
             _execute_remote_job(
                 name=name,
