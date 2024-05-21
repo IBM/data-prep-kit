@@ -62,5 +62,6 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requiremen
 
 .PHONY: .transforms_workflows.clean
 .transforms_workflows.clean:
-	rm -rf *_wf.yaml || true
+	find . -name "*.bak" -type f -delete
+	rm -rf venv || true
 

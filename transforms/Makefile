@@ -1,12 +1,13 @@
 REPOROOT=../
 # Use make help, to see the available rules
 include ../.make.defaults
+include .make.transforms_workflows
 
 setup::
 	@# Help: Recursively make $@ all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
-clean::
+clean:: .transforms_workflows.clean
 	@# Help: Recursively make $@ all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
