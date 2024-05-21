@@ -26,7 +26,7 @@ EXEC_SCRIPT_NAME: str = "tokenization_transform.py"
 task_image = "quay.io/dataprep1/data-prep-kit/tokenization:0.2.0"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0"
 # path to kfp component specifications files
 
 component_spec_path = "../../../../../../kfp/kfp_ray_components/"

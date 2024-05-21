@@ -16,7 +16,7 @@ from data_processing.data_access import DataAccessFactoryBase
 from ray.actor import ActorHandle
 
 
-class DefaultTableTransformRuntimeRay:
+class DefaultRayTransformRuntime:
     """
     Transformer runtime used by processor to to create Transform specific environment
     """

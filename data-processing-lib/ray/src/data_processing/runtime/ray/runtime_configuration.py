@@ -11,7 +11,7 @@
 ################################################################################
 
 from data_processing.runtime import TransformRuntimeConfiguration
-from data_processing.runtime.ray import DefaultTableTransformRuntimeRay
+from data_processing.runtime.ray import DefaultRayTransformRuntime
 from data_processing.transform import TransformConfiguration
 
 
@@ -19,7 +19,7 @@ class RayTransformRuntimeConfiguration(TransformRuntimeConfiguration):
     def __init__(
         self,
         transform_config: TransformConfiguration,
-        runtime_class: type[DefaultTableTransformRuntimeRay] = DefaultTableTransformRuntimeRay,
+        runtime_class: type[DefaultRayTransformRuntime] = DefaultRayTransformRuntime,
     ):
         """
         Initialization
@@ -30,7 +30,7 @@ class RayTransformRuntimeConfiguration(TransformRuntimeConfiguration):
         super().__init__(transform_config=transform_config)
         self.runtime_class = runtime_class
 
-    def create_transform_runtime(self) -> DefaultTableTransformRuntimeRay:
+    def create_transform_runtime(self) -> DefaultRayTransformRuntime:
         """
         Create transform runtime with the parameters captured during apply_input_params()
         :return: transform runtime object
