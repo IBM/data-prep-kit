@@ -10,7 +10,7 @@
 # limitations under the License.
 ################################################################################
 
-from typing import Any
+from typing import Any, TypeVar
 
 import pyarrow as pa
 from data_processing.transform import AbstractBinaryTransform
@@ -20,7 +20,7 @@ from data_processing.utils import TransformUtils, get_logger
 logger = get_logger(__name__)
 
 
-class AbstractTableTransform(AbstractBinaryTransform):
+class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
     """
     Extends AbstractBinaryTransform to expect the byte arrays from to contain a pyarrow Table.
     Sub-classes are expected to implement transform() on the parsed Table instances.
@@ -59,17 +59,19 @@ class AbstractTableTransform(AbstractBinaryTransform):
         # Add number of rows to stats
         stats = stats | {"source_doc_count": table.num_rows}
         # convert tables to files
-        return self._check_and_convert_tables(out_tables=out_tables, stats=stats | {"source_doc_count": table.num_rows})
+        return self._check_and_convert_tables(
+            out_tables=out_tables, stats=stats | {"source_doc_count": table.num_rows}
+        )
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
-        """
-        Converts input table into an output table.
-        If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
-        :param table: input table
-        :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
-        propagated to metadata
-        """
-        raise NotImplemented()
+    # def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
+    #     """
+    #     Converts input table into an output table.
+    #     If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
+    #     :param table: input table
+    #     :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
+    #     propagated to metadata
+    #     """
+    #     raise NotImplemented()
 
     def flush_binary(self) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
