@@ -26,7 +26,7 @@ task_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.0"
 EXEC_SCRIPT_NAME: str = "doc_id_transform.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1-dev0"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
@@ -59,6 +59,9 @@ def doc_id(
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
+    data_checkpointing: bool = False,
+    data_data_sets: str = "",
+    data_files_to_use: str = "['.parquet']",
     # orchestrator
     runtime_actor_options: str = "{'num_cpus': 0.8}",
     runtime_pipeline_id: str = "pipeline_id",
@@ -138,6 +141,9 @@ def doc_id(
                 "data_s3_config": data_s3_config,
                 "data_max_files": data_max_files,
                 "data_num_samples": data_num_samples,
+                "data_checkpointing": data_checkpointing,
+                "data_data_sets": data_data_sets,
+                "data_files_to_use": data_files_to_use,
                 "runtime_num_workers": compute_exec_params.output,
                 "runtime_worker_options": runtime_actor_options,
                 "runtime_pipeline_id": runtime_pipeline_id,

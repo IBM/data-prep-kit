@@ -89,10 +89,15 @@ class KFPUtils:
     def dict_to_req(d: dict[str, Any], executor: str = "transformer_launcher.py") -> str:
         res = f"python {executor} "
         for key, value in d.items():
-            if isinstance(value, str):
-                res += f'--{key}="{value}" '
+            if isinstance(value, bool):
+                if value:
+                    res += f"--{key} "
+            elif isinstance(value, str):
+                if value != "":
+                    res += f'--{key}="{value}" '
             else:
                 res += f"--{key}={value} "
+        logger.info(f"request to execute: {res}")
         return res
 
     # Load a string that represents a json to python dictionary
