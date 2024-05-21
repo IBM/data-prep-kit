@@ -23,10 +23,7 @@ from data_processing.data_access import (
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
-from data_processing.runtime.ray import (
-    DefaultTableTransformRuntimeRay,
-    RayTransformLauncher,
-)
+from data_processing.runtime.ray import DefaultRayTransformRuntime, RayTransformLauncher
 from data_processing.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
@@ -112,7 +109,7 @@ class ProgLangSelectTransform(AbstractTableTransform):
         }
 
 
-class ProgLangSelectRuntime(DefaultTableTransformRuntimeRay):
+class ProgLangSelectRuntime(DefaultRayTransformRuntime):
     """
     Language selector runtime support
     """
