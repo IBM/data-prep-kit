@@ -5,7 +5,7 @@ include ../.make.defaults
 
 clean:: .defaults.clean
 
-venv:: .defaults.lib-src-venv
+venv:: .defaults.ray-lib-src-venv
 	@# Help: Install requirements from all transforms into a venv 
 	. ./venv/bin/activate && bash ./prepare_env.sh
 

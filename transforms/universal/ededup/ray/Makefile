@@ -10,15 +10,15 @@ TRANSFORM_NAME=ededup
 # $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${EDEDUP_VERSION}
 
-venv::	.transforms.venv
+venv::	.transforms.ray-venv
 
-build::	.transforms.build
+build::	.transforms.ray-build
 
-test::	.transforms.test
+test::	.transforms.ray-test
 
 clean:: .transforms.clean
 
-image:: .transforms.image
+image:: .transforms.ray-image
 
 test-src:: .transforms.test-src
 
@@ -28,7 +28,7 @@ test-image:: .transforms.test-image-help
 	@echo WARNING: Skipping pytest version of this test until we have a test/test_ededup.py file.
 
 
-publish:: .transforms.publish
+publish:: .transforms.ray-publish
 
 run-cli-ray-sample: 
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \

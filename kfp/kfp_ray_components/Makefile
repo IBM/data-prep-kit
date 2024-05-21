@@ -12,20 +12,12 @@ DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${DOCKER_IMAGE_
 
 # Include the common rules.
 # Use "make help" to see them.
-include ../../.make.defaults
-
-.PHONY: .copy-lib
-.copy-lib:
-	rm -rf ${LIB_NAME}
-	mkdir ${LIB_NAME}
-	cp -p -R ${LIB_PATH}/src ${LIB_NAME}
-	cp -p -R ${LIB_PATH}/pyproject.toml ${LIB_NAME}
-	cp -p -R ${LIB_PATH}/README.md ${LIB_NAME}
+include $(REPOROOT)/.make.defaults
 
 .PHONY: .lib-src-image
 .lib-src-image:: 
-	$(MAKE) .copy-lib LIB_PATH=$(REPOROOT)/data-processing-lib/ray LIB_NAME=data-processing-lib
-	$(MAKE) .copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib LIB_NAME=kfp_support_lib
+	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib
+	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib LIB_NAME=kfp_support_lib
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
 	rm -rf data-processing-lib
 	rm -rf kfp_support_lib

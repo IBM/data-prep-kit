@@ -10,23 +10,23 @@ TRANSFORM_NAME=proglang_select
 # $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${PROGLANG_SELECT_VERSION}
 
-venv::	.transforms.venv
+venv::	.transforms.ray-venv
 
-build::	.transforms.build
+build::	.transforms.ray-build
 
-test::	.transforms.test
+test::	.transforms.ray-test
 
 clean:: .transforms.clean
 
-image:: .transforms.image
+image:: .transforms.ray-image
 
 test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-test-image:: .transforms.test-image
+test-image:: .transforms.ray-test-image
 
-publish:: .transforms.publish
+publish:: .transforms.ray-publish
 
 
 run-cli-ray-sample: .transforms.run-cli-ray-sample

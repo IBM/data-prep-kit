@@ -91,7 +91,7 @@ extra-help:
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
 .PHONY: .transforms.venv
-.transforms.venv:: .defaults.lib-src-venv
+.transforms.ray-venv:: .defaults.ray-lib-src-venv
 
 .PHONY: .transforms.check_env
 .transforms.check_env::
@@ -100,26 +100,24 @@ extra-help:
 # Create the docker image making sure the preloaded models are available to copy into the image
 # We copy the library/framework source here so it can be installed into the docker image and
 # pip installed inside the Dockerfile
-.PHONY: .transforms.image
-.transforms.image:: .defaults.lib-src-image
+.PHONY: .transforms.ray-image
+.transforms.ray-image:: .defaults.ray-lib-src-image
 
-.PHONY: .transforms.lib-src-venv
-.transforms.lib-src-venv:: .defaults.lib-src-venv
-
-.PHONY: .transforms.build
-.transforms.build:: .transforms.venv .transforms.image	
+.PHONY: .transforms.ray-build
+.transforms.ray-build:: .transforms.venv .transforms.ray-image	
 	@# Help: Create the venv and build the transform image 
 
-.PHONY: .transforms.test 
-.transforms.test::  .transforms.test-src .transforms.test-image
+.PHONY: .transforms.ray-test 
+.transforms.ray-test::  .transforms.test-src .transforms.ray-test-image
 	@# Help: Run both source and image level tests.
 
+# Assumes the runtime-specific venv has already been built.
 .PHONY: .transforms.test-src
 .transforms.test-src::  .defaults.test-src .transforms.test-locals
 	@# Help: Run the transform's tests and any '*local' .py files
 
-.PHONY: .transforms.test-image
-.transforms.test-image:: .transforms.image .defaults.test-image-pytest 
+.PHONY: .transforms.ray-test-image
+.transforms.ray-test-image:: .transforms.ray-image .defaults.test-image-pytest 
 
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest:: .defaults.test-image-pytest 
@@ -136,8 +134,8 @@ test-locals:: .transforms.test-locals
 .transforms.test-locals:: .defaults.test-locals
 
 # Build the image the transform way and then use the default publishing
-.PHONY: .transforms.publish
-.transforms.publish:: .transforms.image .defaults.publish 
+.PHONY: .transforms.ray-publish
+.transforms.ray-publish:: .transforms.ray-image .defaults.publish 
 
 .PHONY: .transforms-check-exists
 .transforms-check-exists:

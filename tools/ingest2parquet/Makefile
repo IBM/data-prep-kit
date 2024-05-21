@@ -9,7 +9,7 @@ DOCKER_IMAGE_NAME?=ingest2parquet
 DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 
 
-venv::	.defaults.lib-src-venv
+venv::	.defaults.ray-lib-src-venv
 
 build::	venv image
 
@@ -17,7 +17,7 @@ test::	venv test-src test-image
 
 clean:: .defaults.clean
 
-image:: .defaults.lib-src-image
+image:: .defaults.ray-lib-src-image
 
 test-src:: .defaults.test-src test-local
 
