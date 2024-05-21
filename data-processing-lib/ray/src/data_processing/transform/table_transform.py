@@ -57,9 +57,9 @@ class AbstractTableTransform(AbstractBinaryTransform):
         # transform table
         out_tables, stats = self.transform(table=table)
         # Add number of rows to stats
-        stats = stats | {"input_doc_count": table.num_rows}
+        stats = stats | {"source_doc_count": table.num_rows}
         # convert tables to files
-        return self._check_and_convert_tables(out_tables=out_tables, stats=stats)
+        return self._check_and_convert_tables(out_tables=out_tables, stats=stats | {"source_doc_count": table.num_rows})
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -102,6 +102,7 @@ class AbstractTableTransform(AbstractBinaryTransform):
     ) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
 
         out_files = [tuple[bytes, str]] * len(out_tables)
+        out_docs = 0
         for i in range(len(out_tables)):
             if not TransformUtils.verify_no_duplicate_columns(table=out_tables[i], file=""):
                 logger.warning("Transformer created file with the duplicate columns")
@@ -110,5 +111,6 @@ class AbstractTableTransform(AbstractBinaryTransform):
             if out_binary is None:
                 logger.warning("Failed to convert table to binary")
                 return [], {"failed_writes": 1}
+            out_docs += out_tables[i].num_rows
             out_files[i] = (out_binary, ".parquet")
-        return out_files, stats
+        return out_files, stats | {"result_doc_count": out_docs}

@@ -28,8 +28,10 @@ class TransformStatisticsRay(TransformStatistics):
         super().__init__()
         self.data_write_counter = Counter("data_written", "Total data written bytes")
         self.data_read_counter = Counter("data_read", "Total data read bytes")
-        self.source_document_counter = Counter("source_files_processed", "Total source document processed")
-        self.result_document_counter = Counter("result_files_written", "Total result documents written")
+        self.source_files_counter = Counter("source_files_processed", "Total source files processed")
+        self.result_files_counter = Counter("result_files_written", "Total result files written")
+        self.source_documents_counter = Counter("source_documents_processed", "Total source document processed")
+        self.result_documents_counter = Counter("result_documents_written", "Total result documents written")
         self.empty_table_counter = Counter("empty_tables", "Total empty tables read")
         self.failed_read_counter = Counter("failed_read_files", "Total read failed files")
         self.failed_write_counter = Counter("failed_write_files", "Total write failed files")
@@ -45,11 +47,15 @@ class TransformStatisticsRay(TransformStatistics):
             if val > 0:
                 self.stats[key] = self.stats.get(key, 0) + val
                 if key == "source_files":
-                    self.source_document_counter.inc(val)
+                    self.source_files_counter.inc(val)
                 if key == "source_size":
                     self.data_read_counter.inc(val)
                 if key == "result_files":
-                    self.result_document_counter.inc(val)
+                    self.result_files_counter.inc(val)
+                if key == "source_doc_count":
+                    self.source_documents_counter.inc(val)
+                if key == "result_doc_count":
+                    self.result_documents_counter.inc(val)
                 if key == "skipped empty tables":
                     self.empty_table_counter.inc(val)
                 if key == "failed_reads":
