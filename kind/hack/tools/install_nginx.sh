@@ -6,11 +6,13 @@ SLEEP_TIME="${SLEEP_TIME:-50}"
 MAX_RETRIES="${MAX_RETRIES:-10}"
 EXIT_CODE=0
 NGINX_INSTALLATION_FILE="${ROOT_DIR}/hack/nginx_deploy.yaml"
+NGINX_MINIO_INSTALLATION_FILE="${ROOT_DIR}/hack/nginx_deploy_minio.yaml"
 
 source ../common.sh
 
 deploy() {
 	kubectl apply -f "$NGINX_INSTALLATION_FILE"
+	kubectl apply -f "$NGINX_MINIO_INSTALLATION_FILE"
 }
 
 wait(){
@@ -22,10 +24,19 @@ wait(){
 		echo "NGINX Deployment unsuccessful. Not all pods running"
 		exit $EXIT_CODE
 	fi
+
+	wait_for_pods "ingress-nginx-minio" "$MAX_RETRIES" "$SLEEP_TIME" || EXIT_CODE=$?
+
+	if [[ $EXIT_CODE -ne 0 ]]
+	then
+		echo "NGINX Deployment unsuccessful. Not all pods running"
+		exit $EXIT_CODE
+	fi
 }
 
 delete(){
 	kubectl delete -f "$NGINX_INSTALLATION_FILE"
+	kubectl apply -f "$NGINX_MINIO_INSTALLATION_FILE"
 }
 
 usage(){

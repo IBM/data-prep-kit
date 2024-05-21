@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ "$MINIO_SERVER" == "" ]; then
-    MINIO_SERVER="http://localhost:8080"
+    MINIO_SERVER="http://localhost:8090"
 fi
 
 echo "creating minio alias to $MINIO_SERVER"
