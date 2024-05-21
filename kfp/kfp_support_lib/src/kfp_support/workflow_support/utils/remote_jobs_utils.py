@@ -485,6 +485,7 @@ def execute_ray_jobs(
     # get config value
     config_value = KFPUtils.load_from_json(e_params[config].replace("'", '"'))
     launch_params = dict(e_params)
+    launch_params["data_s3_cred"] = KFPUtils.load_from_json(launch_params["data_s3_cred"].replace("'", '"'))
     if type(config_value) is not list:
         # single request
         launch_params[config] = config_value
