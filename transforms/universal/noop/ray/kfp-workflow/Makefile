@@ -7,10 +7,6 @@ SRC_DIR=${CURDIR}/../
 PYTHON_WF := $(shell find ./ -name '*_wf.py')
 YAML_WF := $(patsubst %.py, %.yaml, ${PYTHON_WF})
 
-DOCKER_IMAGE_NAME=${TRANSFORM_NAME}
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${DOC_ID_VERSION}
-
 workflow-venv: .check_python_version ${WORKFLOW_VENV_ACTIVATE}
 
 .PHONY: workflow-build
