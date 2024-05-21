@@ -43,6 +43,7 @@ venv::	pyproject.toml
 	$(PYTHON) -m venv venv
 	source venv/bin/activate; 	\
 	pip install --upgrade pip;	\
+	pip install -e ../ray;		\
 	pip install -e .;		\
 	pip install pytest pytest-cov moto==5.0.5 markupsafe==2.0.1
 
