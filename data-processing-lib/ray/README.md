@@ -1,9 +1,9 @@
 # Data Processing Library
 This provides a python framework for developing _transforms_
 on data stored in files - currently parquet files are supported -
-and running them in a [ray](https://ray.com) cluster.
+and running them in a [ray](https://www.ray.io/) cluster.
 Data files may be stored in the local file system or  COS/S3.
-For more details see the [documentation](doc/overview.md).
+For more details see the [documentation](../doc/overview.md).
 
 ### Virtual Environment
 The project uses `pyproject.toml` and a Makefile for operations.
