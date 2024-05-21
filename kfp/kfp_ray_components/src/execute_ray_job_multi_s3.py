@@ -10,7 +10,6 @@
 # limitations under the License.
 ################################################################################
 
-from data_processing.data_access import DataAccessFactory
 from kfp_support.workflow_support.utils import KFPUtils, execute_ray_jobs
 
 
@@ -40,31 +39,16 @@ if __name__ == "__main__":
     )
     # convert exec params to dictionary
     exec_params = KFPUtils.load_from_json(args.exec_params)
-    # convert s3 config to proper dictionary to use for data access factory
-    s3_config = exec_params.get("data_s3_config", "None")
-    if s3_config == "None" or s3_config == "":
-        s3_config_dict = None
-    else:
-        s3_config_dict = KFPUtils.load_from_json(s3_config.replace("'", '"'))
     # get and build S3 credentials
     access_key, secret_key, url = KFPUtils.credentials()
-    # Create data access factory and data access
-    data_factory = DataAccessFactory()
-    data_factory.apply_input_params(
-        args={
-            "data_s3_config": s3_config_dict,
-            "data_s3_cred": {"access_key": access_key, "secret_key": secret_key, "url": url},
-        }
+    # add s3 credentials to exec params
+    exec_params["data_s3_cred"] = (
+            "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
     )
-    data_access = data_factory.create_data_access()
     # extra credentials
     prefix = args.prefix
     extra_access_key, extra_secret_key, extra_url = KFPUtils.credentials(
         access_key=f"{prefix}_S3_KEY", secret_key=f"{prefix}_S3_SECRET", endpoint=f"{prefix}_ENDPOINT"
-    )
-    # enhance exec params
-    exec_params["data_s3_cred"] = (
-        "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
     )
     exec_params[f"{prefix}_s3_cred"] = (
         "{'access_key': '"
@@ -78,7 +62,6 @@ if __name__ == "__main__":
     # Execute Ray jobs
     execute_ray_jobs(
         name=cluster_name,
-        d_access=data_access,
         additional_params=KFPUtils.load_from_json(args.additional_params),
         e_params=exec_params,
         exec_script_name=args.exec_script_name,
