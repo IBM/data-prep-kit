@@ -10,7 +10,7 @@ TRANSFORM_NAME=noop
 # $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${NOOP_VERSION}
 
-venv::	.transforms.ray-venv
+venv::	.transforms.spark-venv
 
 build::	.transforms.ray-build
 

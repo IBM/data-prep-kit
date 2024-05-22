@@ -90,8 +90,11 @@ extra-help:
 # We install wheel, because it seems to be required for fasttext install on redhat.
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
-.PHONY: .transforms.venv
+.PHONY: .transforms.ray-venv
 .transforms.ray-venv:: .defaults.ray-lib-src-venv
+
+.PHONY: .transforms.spark-venv
+.transforms.spark-venv:: .defaults.spark-lib-src-venv
 
 .PHONY: .transforms.check_env
 .transforms.check_env::

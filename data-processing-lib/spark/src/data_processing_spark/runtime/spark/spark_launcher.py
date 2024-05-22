@@ -18,6 +18,9 @@ from data_processing.utils import get_logger, str2bool
 from data_processing_spark.runtime.spark.runtime_config import (
     SparkTransformRuntimeConfiguration,
 )
+from data_processing_spark.runtime.spark.spark_execution_config import (
+    SparkExecutionConfiguration,
+)
 from data_processing_spark.runtime.spark.spark_transform import AbstractSparkTransform
 from pyspark.sql import DataFrame, SparkSession
 
@@ -42,7 +45,7 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         """
         super().__init__(runtime_config, data_access_factory)
         self.runtime_config = runtime_config
-        self.execution_config = TransformExecutionConfiguration(runtime_config.get_name())
+        self.execution_config = SparkExecutionConfiguration(runtime_config.get_name())
 
     def launch(self):
         if not self._get_args():
@@ -60,11 +63,12 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         server_port_https = int(os.getenv("KUBERNETES_SERVICE_PORT_HTTPS", "-1"))
         if server_port_https == -1:
             # we are running locally, use the spark_profile_local.yaml file for configuration
-            config_filepath = os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__), "../../../../", "test-data", "config", "spark_profile_local.yaml"
-                )
-            )
+            config_filepath = self.execution_config.local_config_filepath
+            # config_filepath = os.path.abspath(
+            #     os.path.join(
+            #         os.path.dirname(__file__), "../../../../", "test-data", "config", "spark_profile_local.yaml"
+            #     )
+            # )
             with open(config_filepath, "r") as config_fp:
                 spark_config = yaml.safe_load(os.path.expandvars(config_fp.read()))
             app_name = spark_config.get("spark.app.name", "my-spark-app")
@@ -77,14 +81,14 @@ class SparkTransformLauncher(AbstractTransformLauncher):
             master_url = f"k8s://https://kubernetes.default:{server_port}"
 
             # Read Spark configuration profile
-            config_filepath = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "..", "config", "spark_profile.yaml")
-            )
+            config_filepath = self.execution_config.kube_config_filepath
             with open(config_filepath, "r") as config_fp:
                 spark_config = yaml.safe_load(os.path.expandvars(config_fp.read()))
             spark_config["spark.submit.deployMode"] = "client"
 
             # configure the executor pods from template
+            # todo: put this file in the pypi wheel
+            logger.warning("TODO: Need to define location of pod template!")
             executor_pod_template_file = os.path.join(
                 os.path.dirname(__file__),
                 "templates",
@@ -194,20 +198,20 @@ class SparkTransformLauncher(AbstractTransformLauncher):
 
     def _add_input_params(self, parser):
 
-        parser.add_argument(
-            "--run_locally", type=lambda x: bool(str2bool(x)), default=False, help="running ray local flag"
-        )
+        # parser.add_argument(
+        #     "--run_locally", type=lambda x: bool(str2bool(x)), default=False, help="Run Spark locally "
+        # )
         # add additional arguments
         self.runtime_config.add_input_params(parser=parser)
         self.data_access_factory.add_input_params(parser=parser)
         self.execution_config.add_input_params(parser=parser)
 
     def _apply_input_params(self, args: argparse.Namespace):
-        self.run_locally = args.run_locally
-        if self.run_locally:
-            logger.info("Running locally")
-        else:
-            logger.info("connecting to existing cluster")
+        # self.run_locally = args.run_locally
+        # if self.run_locally:
+        #     logger.info("Running locally")
+        # else:
+        #     logger.info("connecting to existing cluster")
         return (
             self.runtime_config.apply_input_params(args=args)
             and self.data_access_factory.apply_input_params(args=args)

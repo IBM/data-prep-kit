@@ -26,6 +26,7 @@ local_conf = {
     "output_folder": output_folder,
 }
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
+config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "config/spark_profile_local.yml"))
 params = {
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
@@ -33,6 +34,7 @@ params = {
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
+    "spark_local_config_filepath": config_path,
     # noop params
     "noop_sleep_sec": 1,
 }

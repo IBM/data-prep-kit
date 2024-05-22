@@ -45,6 +45,7 @@ include $(REPOROOT)/.make.versions
 
 KIND_CLUSTER_NAME=dataprep
 DPK_RAY_LIB_DIR=$(REPOROOT)/data-processing-lib/ray
+DPK_SPARK_LIB_DIR=$(REPOROOT)/data-processing-lib/spark
 #######################################################################################
 # Lists all targets and optional help text found in the target.
 # Adapted from https://stackoverflow.com/a/65243296/45375
@@ -191,8 +192,8 @@ __check_defined = \
 
 .PHONY: .defaults.ray-lib-src-venv
 .defaults.ray-lib-src-venv:: .defaults.venv
-	@# Help: Install the source from the data processing library for $(PYTHON)
-	@echo Installing source from data processing library for venv
+	@# Help: Install the source from the Ray data processing library for $(PYTHON)
+	@echo Installing source from Ray data processing library for venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
 	pip uninstall -y data-prep-toolkit;		 		\
@@ -201,7 +202,27 @@ __check_defined = \
 	fi;								\
 	pip install $${extra_url}  -e $(DPK_RAY_LIB_DIR);			\
 	if [ $$? -eq 0 ]; then  					\
-		echo Installed source from data processing library for `which $(PYTHON)`;       \
+		echo Installed source from Ray data processing library for `which $(PYTHON)`;       \
+	else 								\
+		echo ERROR installing source into `which $(PYTHON)`;    \
+	fi  
+
+# Install the ray-based lib AFTER spark since the latter had pypi depenency on data-prep-kit
+# so we want to overwrite with the source and not use pypi
+.PHONY: .defaults.spark-lib-src-venv
+.defaults.spark-lib-src-venv:: .defaults.venv
+	@# Help: Install the source from the Spark data processing library for $(PYTHON)
+	@echo Installing source from Spark data processing library for venv
+	@source venv/bin/activate;				      	\
+	pip install pytest;						\
+	pip uninstall -y data-prep-toolkit;		 		\
+	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
+		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
+	fi;								\
+	pip install $${extra_url}  -e $(DPK_SPARK_LIB_DIR);		\
+	pip install $${extra_url}  -e $(DPK_RAY_LIB_DIR);		\
+	if [ $$? -eq 0 ]; then  					\
+		echo Installed source from data Spark processing library for `which $(PYTHON)`;       \
 	else 								\
 		echo ERROR installing source into `which $(PYTHON)`;    \
 	fi  
