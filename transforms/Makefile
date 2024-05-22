@@ -1,13 +1,15 @@
 REPOROOT=../
 # Use make help, to see the available rules
 include ../.make.defaults
-include .make.transforms_workflows
 
 setup::
 	@# Help: Recursively make $@ all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
-clean:: .transforms_workflows.clean
+clean::
+	# Clean up workflows common virtual environment.
+	rm -rf venv || true
+	find . -name "*.bak" -type f -delete
 	@# Help: Recursively make $@ all subdirs 
 	$(MAKE) RULE=$@ .recurse
 

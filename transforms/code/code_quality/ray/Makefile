@@ -31,7 +31,6 @@ publish:: .transforms.ray-publish
 
 setup:: .transforms.setup
 
-
 run-cli-ray-sample: .transforms.run-cli-ray-sample
 
 run-local-sample: #.transforms.run-local-sample

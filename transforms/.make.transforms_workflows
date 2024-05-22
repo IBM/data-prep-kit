@@ -60,8 +60,3 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requiremen
 	fi
 	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m kfp_support.workflow_support.utils.pipelines_tests_utils -c "upload" -p ${CURDIR}/${PIPELINE_FILE}
 
-.PHONY: .transforms_workflows.clean
-.transforms_workflows.clean:
-	find . -name "*.bak" -type f -delete
-	rm -rf venv || true
-
