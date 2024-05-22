@@ -178,8 +178,8 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         files, _ = data_access.get_files_to_process()
         spark_df = self._read_data(files, data_type="parquet")
         res_spark_df, metadata = transform.transform(spark_df)
-        data_access.save_job_metadata(metadata)
         self._write_data(res_spark_df[0], data_access.get_output_folder(), data_type="parquet")
+        data_access.save_job_metadata(metadata)
 
     def _get_args(self) -> bool:
         parser = argparse.ArgumentParser(
