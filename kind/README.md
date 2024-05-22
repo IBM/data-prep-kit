@@ -22,7 +22,7 @@ choose your OS system, and process according to "(Optional) Install the MinIO Cl
 - [lsof](https://www.ionos.com/digitalguide/server/configuration/linux-lsof/) usually it is part of Linux or MacOS distribution.
 - Container agent such as [Docker](https://www.docker.com/) or [Podman](https://podman-desktop.io/)
 
-> **NOTE**: Additionally, ensure that nothing is running on port 8080, which is used by the Kind cluster ingress.
+> **NOTE**: Additionally, ensure that nothing is running on port 8080 and 8090, which is used by the Kind cluster ingress.
 
 If you do not want to upload the testing data into the local Minio, and reduce memory footprint, please set:
 ```bash
@@ -33,7 +33,7 @@ export POPULATE_TEST_DATA ?= 0
 
 This is a manual build instruction. As an alternative, you can execute the `make setup` makefile rule in
 the project `kind` directory instead. `make setup` performs complete installation, including validation that port
-8080 is available, creation of the cluster, installing required software (NGNIX, KubeRay and KFP), creating
+8080 and 8090 is available, creation of the cluster, installing required software (NGNIX, KubeRay and KFP), creating
 ingresses and secrets and loading local data to Minio.
 
 ### Create cluster
