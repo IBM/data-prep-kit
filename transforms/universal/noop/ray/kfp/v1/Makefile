@@ -30,5 +30,5 @@ workflow-upload: workflow-build
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:
 	@for file in $(PYTHON_WF); do \
-		$(MAKE) .transforms_workflows.reconcile-requirement PIPELINE_FILE=$$file; \
+		$(MAKE) .transforms_workflows.reconcile-requirements PIPELINE_FILE=$$file; \
 	done

@@ -11,8 +11,9 @@ define set_env_var
 	$(eval export $(1)=$(2))
 endef
 
-.PHONY: .transforms_workflows.reconcile-requirement
-.transforms_workflows.reconcile-requirement:
+.PHONY: .transforms_workflows.reconcile-requirements
+.transforms_workflows.reconcile-requirements:
+	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) reconcile-requirements && cd -
 	@while IFS= read -r line; do \
 		[ -z "$$line" ] && continue; \
 		[[ $$line == *#* ]] && continue; \
@@ -27,7 +28,7 @@ endef
 	. ${WORKFLOW_VENV_ACTIVATE} && ${PYTHON} ${WF_NAME}.py
 
 %.yaml: %.py ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${DPK_RAY_LIB_DIR} ${REPOROOT}/kfp/kfp_support_lib/
-	$(MAKE) .transforms_workflows.reconcile-requirement PIPELINE_FILE=$<
+	$(MAKE) .transforms_workflows.reconcile-requirements PIPELINE_FILE=$<
 	$(MAKE) .transforms_workflows.compile-pipeline WF_NAME=$(shell (basename $< .py))
 
 .PHONY: .transforms_workflows.test-pipeline

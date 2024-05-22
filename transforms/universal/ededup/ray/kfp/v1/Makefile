@@ -22,4 +22,4 @@ workflow-upload: workflow-build
 
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:
-	$(MAKE) .transforms_workflows.reconcile-requirement PIPELINE_FILE=ededup_wf.py
+	$(MAKE) .transforms_workflows.reconcile-requirements PIPELINE_FILE=ededup_wf.py
