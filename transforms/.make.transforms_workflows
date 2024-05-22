@@ -13,7 +13,7 @@ endef
 
 .PHONY: .transforms_workflows.reconcile-requirements
 .transforms_workflows.reconcile-requirements:
-	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) reconcile-requirements && cd -
+	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) reconcile-requirements
 	@while IFS= read -r line; do \
 		[ -z "$$line" ] && continue; \
 		[[ $$line == *#* ]] && continue; \
