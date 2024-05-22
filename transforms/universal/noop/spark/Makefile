@@ -12,29 +12,25 @@ DOCKER_IMAGE_VERSION=${NOOP_VERSION}
 
 venv::	.transforms.spark-venv
 
-build::	.transforms.ray-build
+build::	.transforms.spark-build
 
-test::	.transforms.ray-test
+test::	.transforms.spark-test
 
 clean:: .transforms.clean
 
-image:: .transforms.ray-image
+image:: .transforms.spark-image
 
 test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-test-image:: .transforms.ray-test-image
+test-image:: .transforms.spark-test-image
 
-publish:: .transforms.ray-publish
+publish:: .transforms.spark-publish
 
-run-cli-ray-sample: .transforms.run-cli-ray-sample
+run-cli-sample: .transforms.run-cli-spark-sample
 
 run-local-sample: .transforms.run-local-sample
-
-run-local-ray-sample: .transforms.run-local-ray-sample
-
-run-s3-ray-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 

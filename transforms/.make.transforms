@@ -106,12 +106,23 @@ extra-help:
 .PHONY: .transforms.ray-image
 .transforms.ray-image:: .defaults.ray-lib-src-image
 
+.PHONY: .transforms.spark-image
+.transforms.spark-image:: .defaults.spark-lib-src-image
+
 .PHONY: .transforms.ray-build
-.transforms.ray-build:: .transforms.venv .transforms.ray-image	
+.transforms.ray-build:: .transforms.ray-venv .transforms.ray-image	
+	@# Help: Create the venv and build the transform image 
+
+.PHONY: .transforms.spark-build
+.transforms.spark-build:: .transforms.spark-venv .transforms.spark-image	
 	@# Help: Create the venv and build the transform image 
 
 .PHONY: .transforms.ray-test 
 .transforms.ray-test::  .transforms.test-src .transforms.ray-test-image
+	@# Help: Run both source and image level tests.
+
+.PHONY: .transforms.spark-test 
+.transforms.spark-test::  .transforms.test-src .transforms.spark-test-image
 	@# Help: Run both source and image level tests.
 
 # Assumes the runtime-specific venv has already been built.
@@ -121,6 +132,9 @@ extra-help:
 
 .PHONY: .transforms.ray-test-image
 .transforms.ray-test-image:: .transforms.ray-image .defaults.test-image-pytest 
+
+.PHONY: .transforms.spark-test-image
+.transforms.spark-test-image:: .transforms.spark-image .defaults.test-image-pytest 
 
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest:: .defaults.test-image-pytest 
@@ -139,6 +153,9 @@ test-locals:: .transforms.test-locals
 # Build the image the transform way and then use the default publishing
 .PHONY: .transforms.ray-publish
 .transforms.ray-publish:: .transforms.ray-image .defaults.publish 
+
+.PHONY: .transforms.spark-publish
+.transforms.spark-publish:: .transforms.spark-image .defaults.publish 
 
 .PHONY: .transforms-check-exists
 .transforms-check-exists:
@@ -222,6 +239,11 @@ conventions:
 .transforms.run-cli-ray-sample:
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
 		RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" " .transforms.run-src-file
+
+.PHONY: .transforms.run-cli-spark-sample 
+.transforms.run-cli-spark-sample:
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+		RUN_ARGS="--data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" --spark_local_config_filepath ../config/spark_profile_local.yml " .transforms.run-src-file
 
 # Expects RUN_FILE
 .PHONY: .transforms.run-src-file
