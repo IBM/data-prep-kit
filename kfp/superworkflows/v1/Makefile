@@ -31,5 +31,5 @@ workflow-reconcile-requirements:
 
 .PHONY: clean
 clean:
-	find . -name "*.bak" -type f -delete
+	rm -rf *.back || true
 	rm -rf $(REPOROOT)/transforms/venv

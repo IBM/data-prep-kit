@@ -9,7 +9,7 @@ setup::
 clean::
 	# Clean up workflows common virtual environment.
 	rm -rf venv || true
-	find . -name "*.bak" -type f -delete
+	rm -rf *.back || true
 	@# Help: Recursively make $@ all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
