@@ -41,23 +41,27 @@ load-image::
 	@# Help: Recursively make $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
-workflow-venv::
-	@# Help: Recursively make $@ in subdirs
-	$(MAKE) RULE=$@ .recurse	
 
-workflow-build::
-	@# Help: Recursively make $@ in subdirs
-	$(MAKE) RULE=$@ .recurse
+.PHONY: workflow-venv
+workflow-venv:
+	$(MAKE) -C kfp/v1 workflow-venv
 
-workflow-test::
-	@# Help: Recursively make $@ in subdirs
-	$(MAKE) RULE=$@ .recurse
+.PHONY: workflow-venv
+workflow-venv:
+	$(MAKE) -C kfp/v1 workflow-venv
 
-workflow-upload::
-	@# Help: Recursively make $@ in subdirs
-	$(MAKE) RULE=$@ .recurse
+.PHONY: workflow-build
+workflow-build:
+	$(MAKE) -C kfp/v1 workflow-build
 
-workflow-reconcile-requirements::
-	@# Help: Recursively make $@ in all subdirs
-	@$(MAKE) RULE=$@ .recurse
+.PHONY: workflow-test
+workflow-test:
+	$(MAKE) -C kfp/v1 workflow-test
 
+.PHONY: workflow-upload
+workflow-upload:
+	$(MAKE) -C kfp/v1 workflow-upload
+
+.PHONY: workflow-reconcile-requirements
+workflow-reconcile-requirements:
+	$(MAKE) -C kfp/v1 workflow-reconcile-requirements
