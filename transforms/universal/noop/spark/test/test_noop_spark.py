@@ -12,9 +12,7 @@
 
 import os
 
-from data_processing_spark.runtime.spark.spark_execution_config.SparkExecutionConfiguration import (
-    local_config_path_key,
-)
+from data_processing_spark.runtime.spark import local_config_path_cli
 from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
 from data_processing_spark.test_support.launch.abstract_launcher_test import (
     AbstractSparkTransformLauncherTest,
@@ -29,14 +27,15 @@ class TestRayNOOPTransform(AbstractSparkTransformLauncherTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        basedir = "../test-data"
-        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        proj_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        basedir = os.path.join(proj_dir, "test-data")
+        config_file_path = os.path.join(proj_dir, "config", "spark_profile_local.yml")
         fixtures = []
         launcher = SparkTransformLauncher(NOOPSparkRuntimeConfiguration())
         fixtures.append(
             (
                 launcher,
-                {sleep_cli_param: 0, local_config_path_key: "config/spark_profile_local.yml"},
+                {sleep_cli_param: 0, local_config_path_cli: config_file_path},
                 basedir + "/input",
                 basedir + "/expected",
             )
