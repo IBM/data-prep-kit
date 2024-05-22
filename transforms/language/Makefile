@@ -54,3 +54,7 @@ workflow-upload::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse
 
+workflow-reconcile-requirements::
+	@# Help: Recursively make $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
+

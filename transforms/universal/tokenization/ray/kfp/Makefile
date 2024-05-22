@@ -3,7 +3,6 @@
 REPOROOT=../../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
-# Define the root of the local git clone for the common rules to be able
 workflow-venv::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse	
@@ -19,3 +18,7 @@ workflow-test::
 workflow-upload::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse
+
+workflow-reconcile-requirements::
+	@# Help: Recursively make $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
