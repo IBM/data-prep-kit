@@ -28,3 +28,8 @@ workflow-reconcile-requirements:
 	@for file in $(PYTHON_WF); do \
 		$(MAKE) .transforms_workflows.reconcile-requirement PIPELINE_FILE=$$file; \
 	done
+
+.PHONY: clean
+clean:
+	find . -name "*.bak" -type f -delete
+	rm -rf $(REPOROOT)/transforms/venv
