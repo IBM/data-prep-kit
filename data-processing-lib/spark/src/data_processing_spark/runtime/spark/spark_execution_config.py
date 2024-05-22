@@ -6,10 +6,10 @@ from data_processing.utils import CLIArgumentProvider, get_logger
 
 cli_prefix = "spark_"
 
-local_config_path_key = "local_config_filepath"
+local_config_path_cli = f"{cli_prefix}local_config_filepath"
 local_config_path_default = "config/spark_profile_local.yml"
 
-kube_config_path_key = "kube_config_filepath"
+kube_config_path_cli = f"{cli_prefix}kube_config_filepath"
 kube_config_path_default = "config/spark_profile_kube.yml"
 
 logger = get_logger(__name__)
@@ -24,13 +24,13 @@ class SparkExecutionConfiguration(TransformExecutionConfiguration):
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         super().add_input_params(parser)
         parser.add_argument(
-            f"--{cli_prefix}{local_config_path_key}",
+            f"--{local_config_path_cli}",
             type=str,
             default=local_config_path_default,
             help="Path to spark configuration for run",
         )
         parser.add_argument(
-            f"--{cli_prefix}{kube_config_path_key}",
+            f"--{kube_config_path_cli}",
             type=str,
             default=kube_config_path_default,
             help="Path to Kubernetes-based configuration.",
@@ -38,8 +38,8 @@ class SparkExecutionConfiguration(TransformExecutionConfiguration):
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         super().apply_input_params(args)
-        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, True)
         logger.info(f"spark execution config : {captured}")
-        self.local_config_filepath = captured.get(local_config_path_key)
-        self.kube_config_filepath = captured.get(kube_config_path_key)
+        self.local_config_filepath = captured.get(local_config_path_cli)
+        self.kube_config_filepath = captured.get(kube_config_path_cli)
         return True
