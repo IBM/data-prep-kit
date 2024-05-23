@@ -10,6 +10,7 @@
 # limitations under the License.
 ################################################################################
 
+import json
 import os
 
 from data_processing_spark.runtime.spark import local_config_path_cli
@@ -18,9 +19,10 @@ from data_processing_spark.test_support.launch.abstract_launcher_test import (
     AbstractSparkTransformLauncherTest,
 )
 from noop_transform import NOOPSparkRuntimeConfiguration, sleep_cli_param
+from pyspark.sql import DataFrame, SparkSession
 
 
-class TestRayNOOPTransform(AbstractSparkTransformLauncherTest):
+class TestSparkNOOPTransform(AbstractSparkTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -41,3 +43,18 @@ class TestRayNOOPTransform(AbstractSparkTransformLauncherTest):
             )
         )
         return fixtures
+
+    def _validate_directory_contents_match(self, dir: str, expected: str):
+
+        spark = SparkSession.builder.getOrCreate()
+        result_df = spark.read.parquet(os.path.join(dir, "*.parquet"))
+        expected_df = spark.read.parquet(os.path.join(expected, "*.parquet"))
+        result_length = result_df.count()
+        expected_length = expected_df.count()
+        spark.stop()
+        assert result_length == expected_length
+        with open(os.path.join(dir, "metadata.json"), "r") as meta_fp:
+            meta_dict = json.load(meta_fp)
+            with open(os.path.join(expected, "metadata.json")) as expected_meta_fp:
+                expected_meta_dict = json.load(expected_meta_fp)
+                assert "nrows" in meta_dict and meta_dict["nrows"] == expected_meta_dict["nrows"]
