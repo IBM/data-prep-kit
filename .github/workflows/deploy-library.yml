@@ -13,7 +13,7 @@ permissions:
 
 jobs:
     build-package:
-        name: Build Ray data processing library
+        name: Build Ray data processing libraries
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -21,9 +21,9 @@ jobs:
               with:
                   # for setuptools-scm
                   fetch-depth: 0
-            - name: Build Package for pypi
+            - name: Build Packages for pypi
               run: |
-                  make -C data-processing-lib/ray build
+                  make -C data-processing-lib build
     publish-test-pypi:
         name: Publish packages to test.pypi.org
         # disabled
