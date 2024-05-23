@@ -1,20 +1,24 @@
-FROM docker.io/rayproject/ray:2.9.3-py310
+ARG BASE_IMAGE=docker.io/cmadam/cma-pyspark:3.5.1
+FROM ${BASE_IMAGE}
 
+USER root
 # install pytest
 RUN pip install --no-cache-dir pytest
+
+WORKDIR ${SPARK_HOME}/work-dir
 
 # Copy in the data processing framework source/project and install it
 # This is expected to be placed in the docker context before this is run (see the make image).
 
-COPY --chown=ray:users data-processing-spark/ data-processing-spark/
+COPY --chown=spark:root data-processing-spark/ data-processing-spark/
 RUN cd data-processing-spark && pip install --no-cache-dir -e .
 
 # Install the base library 2nd to overwrite the data-prep-kit dependency from data-prep-kit-spark
-COPY --chown=ray:users data-processing-lib/ data-processing-lib/
+COPY --chown=spark:root data-processing-lib/ data-processing-lib/
 RUN cd data-processing-lib && pip install --no-cache-dir -e .
 
 COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r  requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # copy source data
 COPY ./src/noop_transform.py .
@@ -27,8 +31,10 @@ COPY test-data/ test-data/
 # copy config
 COPY config/ config/
 
+USER spark
+
 # Set environment
-ENV PYTHONPATH /home/ray
+ENV PYTHONPATH=${SPARK_HOME}/work-dir/:${PYTHONPATH}
 
 # Put these at the end since they seem to upset the docker cache.
 ARG BUILD_DATE
