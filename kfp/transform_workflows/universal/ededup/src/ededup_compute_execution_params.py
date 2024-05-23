@@ -63,7 +63,7 @@ def ededup_compute_execution_params(
     sampling = data_access.sample_input_data(n_samples=n_samples)
     avg_doc_size = sampling.get("average doc size KB")
     number_of_docs = sampling.get("estimated number of docs")
-    if avg_doc_size == 0 or number_of_docs == 0:
+    if number_of_docs == 0:
         print(f"Estimated number of documents and documents size is zero. Please verify the input path.")
         sys.exit(1)
     avg_table_size = sampling.get("average table size MB") / KB
