@@ -22,8 +22,13 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        basedir = "../../../../test-data/data_processing/spark/noop/"
-        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        proj_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
+        test_data_dir = os.path.join(proj_dir, "test-data/data_processing/spark/noop/")
+        config_path = os.path.join(proj_dir, "config/spark_profile_local.yml")
         launcher = SparkTransformLauncher(NOOPSparkRuntimeConfiguration())
-        fixtures = [(launcher, {"noop_sleep_sec": 0}, basedir + "/input", basedir + "/expected")]
+        cli_params = {
+            "noop_sleep_sec": 0,
+            "spark_local_config_filepath": config_path,
+        }
+        fixtures = [(launcher, cli_params, test_data_dir + "/input", test_data_dir + "/expected")]
         return fixtures
