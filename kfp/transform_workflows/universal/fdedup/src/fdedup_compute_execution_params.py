@@ -135,6 +135,9 @@ def fdedup_compute_execution_params(
     avg_doc_size = sampling.get("average doc size KB")
     number_of_docs = sampling.get("estimated number of docs")
     avg_table_size = sampling.get("average table size MB") / KB
+    if avg_doc_size == 0 or number_of_docs == 0:
+        print(f"Estimated number of documents and documents size is zero. Please verify the input path.")
+        sys.exit(1)
     # we are creating more buckets actors, so that we get better parallelization for bucket processing
     b_actors = math.ceil(num_buckets * number_of_docs * 64 * 1.1 / GB)
     d_actors = math.ceil(number_of_docs * 48 * 1.1 / GB)
