@@ -1,7 +1,10 @@
 # Use make help, to see the available rules
 REPOROOT=../..
 include $(REPOROOT)/.make.defaults
-
+SPARK_VERSION=3.5.1
+DOCKER_IMAGE_BASE_NAME=data-prep-kit-spark-$(SPARK_VERSION)
+DOCKER_IMAGE_LIB_NAME=data-prep-kit-spark
+DOCKER_IMAGE_VERSION=$(DPK_LIB_VERSION)
 TAG := "v${DPK_LIB_VERSION}"
 
 
@@ -15,7 +18,9 @@ clean::
 
 update-toml:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml 
-	sed -e 's/^version[ ]*=.*/version = "'${DPK_LIB_VERSION}'"/' pyproject.toml > tt.toml
+	sed -e 's/^version[ ]*=.*/version = "'${DPK_LIB_VERSION}'"/' 	\
+	    -e 's/"pyspark...*",/"pyspark>=${SPARK_VERSION}",/'		\
+	    pyproject.toml > tt.toml
 	mv tt.toml pyproject.toml
 
 setup::
@@ -47,6 +52,17 @@ venv::	pyproject.toml
 	pip install -e .;		\
 	pip install pytest pytest-cov 
 
+image:: image-spark
+
+image-spark:: Dockerfile
+	@# Help: Build the bare Spark image 
+	$(MAKE) DOCKER_NAME=$(DOCKER_IMAGE_BASE_NAME) .defaults.image
+
+#image-dpk:: Dockerfile
+#	@# Help: Build the Spark image containing the data-prep-kit for spark 
+#	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib .defaults.copy-lib
+#	$(MAKE) DOCKER_NAME=$(DOCKER_IMAGE_LIB_NAME) .defaults.image
+#	rm -rf data-processing-lib
 
 # Here we run each test directory of tests and each ray launched test separately, because
 # it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.
@@ -60,4 +76,3 @@ test::
 	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/ray_util_test.py;
 	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/launcher_test.py;
 	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/test_noop_launch.py;
-

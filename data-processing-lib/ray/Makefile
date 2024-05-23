@@ -46,6 +46,9 @@ venv::	pyproject.toml
 	pip install -e .;		\
 	pip install pytest pytest-cov moto==5.0.5 markupsafe==2.0.1
 
+image:: 
+	@# Help: Placeholder does nothing for now.
+	@echo "Image building for ray is in the works (comming soon)."
 
 # Here we run each test directory of tests and each ray launched test separately, because
 # it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.

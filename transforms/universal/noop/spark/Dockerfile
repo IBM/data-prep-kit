@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=docker.io/cmadam/cma-pyspark:3.5.1
+ARG BASE_IMAGE=quay.io/dataprep1/data-prep-kit/data-prep-kit-spark-3.5.1:0.1.0
 FROM ${BASE_IMAGE}
 
 USER root
