@@ -26,7 +26,7 @@ task_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.0"
 EXEC_SCRIPT_NAME: str = "doc_id_transform.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
