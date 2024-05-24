@@ -63,14 +63,14 @@ class NOOPTransform(AbstractSparkTransform):
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
-        logger.debug(f"Transforming one data with {len(data)} rows")
+        logger.debug(f"Transforming one data with {data.count()} rows")
         if self.sleep is not None:
             logger.info(f"Sleep for {self.sleep} seconds")
             time.sleep(self.sleep)
             logger.info("Sleep completed - continue")
         # Add some sample metadata.
-        logger.debug(f"Transformed one data with {len(data)} rows")
-        metadata = {"nfiles": 1, "nrows": len(data)}
+        logger.debug(f"Transformed one data with {data.count()} rows")
+        metadata = {"nfiles": 1, "nrows": data.count()}
         return [data], metadata
 
 

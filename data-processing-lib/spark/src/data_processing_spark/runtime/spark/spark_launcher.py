@@ -149,7 +149,9 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         else:
             read_cmd = read_cmd.text
 
-        spark_df = read_cmd(",".join(input_data_url) if isinstance(input_data_url, list) else input_data_url)
+        # if isinstance(input_data_url, list):
+        #     input_data_url = ",".join(input_data_url)
+        spark_df = read_cmd(*input_data_url)
         return spark_df
 
     def _write_data(self, spark_df: DataFrame, output_data_url: str, data_type: str):
