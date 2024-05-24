@@ -45,14 +45,7 @@ class TestSparkNOOPTransform(AbstractSparkTransformLauncherTest):
         return fixtures
 
     def _validate_directory_contents_match(self, dir: str, expected: str):
-
-        spark = SparkSession.builder.getOrCreate()
-        result_df = spark.read.parquet(os.path.join(dir, "*.parquet"))
-        expected_df = spark.read.parquet(os.path.join(expected, "*.parquet"))
-        result_length = result_df.count()
-        expected_length = expected_df.count()
-        spark.stop()
-        assert result_length == expected_length
+        super()._validate_directory_contents_match(dir, expected)
         with open(os.path.join(dir, "metadata.json"), "r") as meta_fp:
             meta_dict = json.load(meta_fp)
             with open(os.path.join(expected, "metadata.json")) as expected_meta_fp:
