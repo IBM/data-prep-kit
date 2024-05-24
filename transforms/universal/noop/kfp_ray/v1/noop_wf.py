@@ -32,7 +32,7 @@ base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1"
 component_spec_path = "../../../../../kfp/kfp_ray_components/"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
-# a result, insted of creating a component we are creating it in place here.
+# a result, instead of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
 )
@@ -42,6 +42,7 @@ create_ray_op = comp.load_component_from_file(component_spec_path + "createRayCl
 execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "executeRayJobComponent.yaml")
 # clean up Ray
 cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
+# Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
 TASK_NAME: str = "noop"
 
 

@@ -28,16 +28,11 @@ EXEC_SCRIPT_NAME: str = "noop_transform.py"
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1"
 
-# compute execution parameters. Here different tranforms might need different implementations. As
-# a result, instead of creating a component we are creating it in place here.
-compute_exec_params_op = comp.func_to_container_op(
-    func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
-)
 # path to kfp component specifications files
 component_spec_path = "../../../../../kfp/kfp_ray_components/"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
-# a result, insted of creating a component we are creating it in place here.
+# a result, instead of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
 )

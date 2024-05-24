@@ -7,12 +7,12 @@ supporting data transformations in a Ray cluster
     * universal
         * ededup
           * ray
-            * kfp
+          * kfp_ray
         * ...
     * code
         * code_quality
             * ray
-               * kfp
+            * kfp_ray
         * ...
     * language
         * ...
@@ -65,7 +65,7 @@ workflow-upload      Recursively make workflow-upload in subdirs
 workflow-venv        Recursively make workflow-venv in subdirs
 ```
 
-The `workflow-` related Makefile targets are used for managing [Kubeflow Pipelines](https://github.com/kubeflow/pipelines) workflows for the specified transforms. These targets are located within the `transforms` directory.
+The `workflow-` related Makefile targets are dedicated for handling the [Kubeflow Pipelines](https://github.com/kubeflow/pipelines) workflows for the specified transforms.
 
 Overridable macro values include the following:
 DOCKER - the name of the docker executable to use. DOCKER=docker

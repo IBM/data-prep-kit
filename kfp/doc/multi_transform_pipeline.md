@@ -24,7 +24,7 @@ In the list of its input parameters, we also see `data_s3_config`. Now, we have 
 ![param list](param_list2.png)
 
 
-**Note** An example super pipeline that combines several transforms, `doc_id`, `ededup`, and `fdedup`, can be found in [superworkflow_dedups_sample_wf.py](../superworkflows/superworkflow_dedups_sample_wf.py).
+**Note** An example super pipeline that combines several transforms, `doc_id`, `ededup`, and `fdedup`, can be found in [superworkflow_dedups_sample_wf.py](../superworkflows/v1/superworkflow_dedups_sample_wf.py).
 
 ![super pipeline](super_pipeline.png)
 

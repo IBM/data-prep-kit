@@ -32,18 +32,19 @@ base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1"
 component_spec_path = "../../../../../kfp/kfp_ray_components/"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
-# a result, insted of creating a component we are creating it in place here.
+# a result, instead of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
 )
 # create Ray cluster
 create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
 # execute job
-execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "executeRayJobComponent.yaml")
+execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "executeRayJobComponent_multi_s3.yaml")
 # clean up Ray
 cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
 TASK_NAME: str = "proglang_select"
+PREFIX: str = "proglang_select"
 
 
 @dsl.pipeline(
@@ -151,10 +152,11 @@ def lang_select(
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
+            prefix=PREFIX,
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
-        ComponentUtils.set_s3_env_vars_to_component(execute_job, proglang_select_s3_access_secret)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, proglang_select_s3_access_secret, prefix=PREFIX)
         execute_job.after(ray_cluster)
 
     # Configure the pipeline level to one week (in seconds)
