@@ -27,7 +27,9 @@ endef
 .transforms_workflows.compile-pipeline:
 	. ${WORKFLOW_VENV_ACTIVATE} && ${PYTHON} ${WF_NAME}.py
 
-%.yaml: %.py ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${DPK_RAY_LIB_DIR} ${REPOROOT}/kfp/kfp_support_lib/
+FORCE:
+
+%.yaml: %.py FORCE
 	$(MAKE) .transforms_workflows.reconcile-requirements PIPELINE_FILE=$<
 	$(MAKE) .transforms_workflows.compile-pipeline WF_NAME=$(shell (basename $< .py))
 
