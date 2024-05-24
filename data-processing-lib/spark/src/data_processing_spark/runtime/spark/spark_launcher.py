@@ -123,17 +123,61 @@ class SparkTransformLauncher(AbstractTransformLauncher):
     def _stop_spark(self):
         self.spark.stop()
 
+    def _get_io_env_var(self, base_name: str, for_input: bool):
+        """
+        Get the env var that may or may not exist with _IN or _OUT suffix.
+        First try with the suffix using the given base_name.  If found return its value,
+        otherwise get the the env var value for the given base_name.
+        The idea is to allow the non-suffixed value to serve as a default for both *_IN and *_OUT
+        env vars.
+        Args:
+            base_name:
+            for_input:
+
+        Returns: None if none found.
+        """
+        if for_input:
+            io_var = base_name + +"_IN"
+        else:
+            io_var = base_name + +"_OUT"
+        value = os.getenv(io_var)
+        if value is None:
+            value = os.getenv(base_name)
+        return value
+
+    def _apply_s3_credentials(self, for_input: bool) -> None:
+        """
+        Consult AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY and AWS_ENDPOINT_URL
+        w/ and w/o corresponding _IN or _OUT suffix and set the values (if found)
+        into the corresponding 'fs.s3a.*' settings for hadoop configuration of
+        this instance's spark session.
+        Args:
+            for_input: true if settings are for reads, false is for writes.
+        """
+
+        hconf = self.spark.sparkContext._jsc.hadoopConfiguration()
+        if for_input:
+            input_name = "input"
+        else:
+            ouput_name = "output"
+        value = self._get_aws("AWS_ACCESS_KEY_ID", for_input)
+        if value is not None:
+            logger.info(f"Applying user-provided S3 {input_name} access key: {value}")
+            hconf.set("fs.s3a.access.key", value)
+        value = self._get_aws("AWS_SECRET_ACCESS_KEY", True)
+        if value is not None:
+            logger.info(f"Applying user-provided S3 {input_name} secret key")
+            hconf.set("fs.s3a.secret.key", value)
+        value = self._get_aws("AWS_ENDPOINT_URL", True)
+        if value is not None:
+            logger.info(f"Applying user-provided S3 {input_name} end point: {value}")
+            hconf.set("fs.s3a.endpoint", value)
+        # for some reason, Hadoop can only process S3 urls if they start with s3a://, not s3://
+
     def _read_data(self, input_data_url: Union[list[str], str], data_type: str) -> DataFrame:
 
         if isinstance(input_data_url, str) and input_data_url.startswith("s3://"):
-            hconf = self.spark.sparkContext._jsc.hadoopConfiguration()
-            access_key = os.getenv("AWS_ACCESS_KEY_ID_IN")
-            secret_key = os.getenv("AWS_SECRET_ACCESS_KEY_IN")
-            endpoint = os.getenv("AWS_ENDPOINT_URL_IN")
-            hconf.set("fs.s3a.access.key", access_key)
-            hconf.set("fs.s3a.secret.key", secret_key)
-            hconf.set("fs.s3a.endpoint", endpoint)
-            logger.info("Applied user-provided credential to S3")
+            self._apply_s3_credentials(True)
             # for some reason, Hadoop can only process S3 urls if they start with s3a://, not s3://
             input_data_url = input_data_url.replace("s3://", "s3a://")
 
@@ -156,14 +200,7 @@ class SparkTransformLauncher(AbstractTransformLauncher):
 
     def _write_data(self, spark_df: DataFrame, output_data_url: str, data_type: str):
         if isinstance(output_data_url, str) and output_data_url.startswith("s3://"):
-            hconf = self.spark.sparkContext._jsc.hadoopConfiguration()
-            access_key = os.getenv("AWS_ACCESS_KEY_ID_OUT")
-            secret_key = os.getenv("AWS_SECRET_ACCESS_KEY_OUT")
-            endpoint = os.getenv("AWS_ENDPOINT_URL_OUT")
-            hconf.set("fs.s3a.access.key", access_key)
-            hconf.set("fs.s3a.secret.key", secret_key)
-            hconf.set("fs.s3a.endpoint", endpoint)
-            logger.info("Applied user-provided credential to S3")
+            self._apply_s3_credentials(False)
             # for some reason, Hadoop can only process S3 urls if they start with s3a://, not s3://
             output_data_url = output_data_url.replace("s3://", "s3a://")
 
