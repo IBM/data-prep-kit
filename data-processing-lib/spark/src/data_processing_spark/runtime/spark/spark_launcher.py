@@ -126,7 +126,7 @@ class SparkTransformLauncher(AbstractTransformLauncher):
     def _read_data(self, input_data_url: Union[list[str], str], data_type: str) -> DataFrame:
 
         if (isinstance(input_data_url, str) and input_data_url.startswith("s3://")) or (
-            isinstance(input_data_url, list[str]) and input_data_url.startswith("s3://")
+            isinstance(input_data_url, list) and input_data_url.startswith("s3://")
         ):
             hconf = self.spark.sparkContext._jsc.hadoopConfiguration()
             access_key = os.getenv("AWS_ACCESS_KEY_ID_IN")
