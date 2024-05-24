@@ -1,9 +1,9 @@
 import os
 
-from data_processing.test_support.launch.transform_test import (
-    AbstractTransformLauncherTest,
-)
 from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
+from data_processing_spark.test_support.launch.abstract_launcher_test import (
+    AbstractSparkTransformLauncherTest,
+)
 from data_processing_spark.test_support.transform.noop_transform import (
     NOOPSparkRuntimeConfiguration,
     NOOPTransformConfiguration,
@@ -15,7 +15,7 @@ expected_table = df  # We're a noop after all.
 expected_metadata_list = [{"nfiles": 1, "nrows": 1}, {}]  # transform() result  # flush() result
 
 
-class TestRayNOOPTransform(AbstractTransformLauncherTest):
+class TestSparkNOOPTransform(AbstractSparkTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.

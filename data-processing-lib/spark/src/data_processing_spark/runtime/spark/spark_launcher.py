@@ -180,6 +180,7 @@ class SparkTransformLauncher(AbstractTransformLauncher):
 
     def _run_transform(self, data_access: DataAccess, transform: AbstractSparkTransform):
         files, _ = data_access.get_files_to_process()
+        logger.info(f"files = {files}")
         spark_df = self._read_data(files, data_type="parquet")
         res_spark_df, metadata = transform.transform(spark_df)
         self._write_data(res_spark_df[0], data_access.get_output_folder(), data_type="parquet")
