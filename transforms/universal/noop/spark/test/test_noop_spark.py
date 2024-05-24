@@ -44,10 +44,5 @@ class TestSparkNOOPTransform(AbstractSparkTransformLauncherTest):
         )
         return fixtures
 
-    def _validate_directory_contents_match(self, dir: str, expected: str):
-        super()._validate_directory_contents_match(dir, expected)
-        with open(os.path.join(dir, "metadata.json"), "r") as meta_fp:
-            meta_dict = json.load(meta_fp)
-            with open(os.path.join(expected, "metadata.json")) as expected_meta_fp:
-                expected_meta_dict = json.load(expected_meta_fp)
-                assert "nrows" in meta_dict and meta_dict["nrows"] == expected_meta_dict["nrows"]
+    def _validate_metadata_content(self, test_generated: dict, expected: dict):
+        assert "nrows" in test_generated and test_generated["nrows"] == expected["nrows"]
