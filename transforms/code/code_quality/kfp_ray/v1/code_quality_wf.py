@@ -29,7 +29,7 @@ PREFIX: str = ""
 task_image = "quay.io/dataprep1/data-prep-kit/code_quality:0.3.0"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1"
 
 component_spec_path = "../../../../../kfp/kfp_ray_components/"
 

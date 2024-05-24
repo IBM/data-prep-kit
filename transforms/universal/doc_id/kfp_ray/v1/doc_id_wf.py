@@ -26,7 +26,7 @@ task_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.0"
 EXEC_SCRIPT_NAME: str = "doc_id_transform.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../../kfp/kfp_ray_components/"
