@@ -13,11 +13,9 @@
 from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.runtime import (
-    AbstractTransformFileProcessor,
-)
-from data_processing.transform import TransformStatistics
+from data_processing.runtime import AbstractTransformFileProcessor
 from data_processing.runtime.pure_python import PythonTransformRuntimeConfiguration
+from data_processing.transform import TransformStatistics
 
 
 class PythonTransformFileProcessor(AbstractTransformFileProcessor):

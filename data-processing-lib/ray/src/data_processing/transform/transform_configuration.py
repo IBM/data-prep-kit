@@ -22,7 +22,9 @@ class TransformConfiguration(CLIArgumentProvider):
     This is a base transform configuration class defining transform's input/output parameter
     """
 
-    def __init__(self, name: str, transform_class: type[AbstractBinaryTransform], remove_from_metadata: list[str] = []):
+    def __init__(
+        self, name: str, transform_class: type[AbstractBinaryTransform], remove_from_metadata: list[str] = []
+    ):
         """
         Initialization
         :param name: transformer name

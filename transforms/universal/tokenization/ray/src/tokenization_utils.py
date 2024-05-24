@@ -59,14 +59,14 @@ def _split_text_with_word_space(text: str, chunk_size: int) -> str:
 
             if last_space_index != -1:  # s[last_space_index] = ' '
                 # If found, return the chunk up to and include such space:
-                yield text[index: last_space_index + 1]
+                yield text[index : last_space_index + 1]
                 index = last_space_index + 1
             else:
                 # If not, force cutting up to chunk_size:
-                yield text[index: index + chunk_size]
+                yield text[index : index + chunk_size]
                 index += chunk_size
         else:
-            yield text[index: index + chunk_size]
+            yield text[index : index + chunk_size]
             index += chunk_size
 
 

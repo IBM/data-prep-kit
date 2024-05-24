@@ -59,7 +59,9 @@ class AbstractTableTransform(AbstractBinaryTransform):
         # Add number of rows to stats
         stats = stats | {"source_doc_count": table.num_rows}
         # convert tables to files
-        return self._check_and_convert_tables(out_tables=out_tables, stats=stats | {"source_doc_count": table.num_rows})
+        return self._check_and_convert_tables(
+            out_tables=out_tables, stats=stats | {"source_doc_count": table.num_rows}
+        )
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
         """

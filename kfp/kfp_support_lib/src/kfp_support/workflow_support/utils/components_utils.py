@@ -52,7 +52,11 @@ class ComponentUtils:
     def set_s3_env_vars_to_component(
         component: dsl.ContainerOp,
         secret: str,
-        env2key: dict[str, str] = {"S3_KEY": "s3-key", "S3_SECRET": "s3-secret", "ENDPOINT": "s3-endpoint"},
+        env2key: dict[str, str] = {
+            "S3_KEY": "s3-key",
+            "S3_SECRET": "s3-secret",  # pragma: allowlist secret
+            "ENDPOINT": "s3-endpoint",
+        },
         prefix: str = None,
     ) -> None:
         """

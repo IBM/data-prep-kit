@@ -43,7 +43,7 @@ if __name__ == "__main__":
     access_key, secret_key, url = KFPUtils.credentials()
     # add s3 credentials to exec params
     exec_params["data_s3_cred"] = (
-            "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
+        "{'access_key': '" + access_key + "', 'secret_key': '" + secret_key + "', 'url': '" + url + "'}"
     )
     # extra credentials
     prefix = args.prefix

@@ -48,11 +48,11 @@
         "num_chars": 16836009
     },
     "source": {
-        "name": "/Users/xdang/00proj/04-FM/01_code/fm-data-engineering/transforms/universal/tokenization/test-data/ds02/input",
+        "name": "fm-data-engineering/transforms/universal/tokenization/test-data/ds02/input",
         "type": "path"
     },
     "target": {
-        "name": "/Users/xdang/00proj/04-FM/01_code/fm-data-engineering/transforms/universal/tokenization/output/ds02",
+        "name": "fm-data-engineering/transforms/universal/tokenization/output/ds02",
         "type": "path"
     }
 }
