@@ -125,7 +125,9 @@ class SparkTransformLauncher(AbstractTransformLauncher):
 
     def _read_data(self, input_data_url: Union[list[str], str], data_type: str) -> DataFrame:
 
-        if isinstance(input_data_url, str) and input_data_url.startswith("s3://"):
+        if (isinstance(input_data_url, str) and input_data_url.startswith("s3://")) or (
+            isinstance(input_data_url, list[str]) and input_data_url.startswith("s3://")
+        ):
             hconf = self.spark.sparkContext._jsc.hadoopConfiguration()
             access_key = os.getenv("AWS_ACCESS_KEY_ID_IN")
             secret_key = os.getenv("AWS_SECRET_ACCESS_KEY_IN")
@@ -135,7 +137,10 @@ class SparkTransformLauncher(AbstractTransformLauncher):
             hconf.set("fs.s3a.endpoint", endpoint)
             logger.info("Applied user-provided credential to S3")
             # for some reason, Hadoop can only process S3 urls if they start with s3a://, not s3://
-            input_data_url = input_data_url.replace("s3://", "s3a://")
+            if isinstance(input_data_url, str):
+                input_data_url = input_data_url.replace("s3://", "s3a://")
+            else:
+                input_data_url = [x.replace("s3://", "s3a://") for x in input_data_url]
 
         read_cmd = self.spark.read
         if data_type == "parquet":
@@ -149,8 +154,6 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         else:
             read_cmd = read_cmd.text
 
-        # if isinstance(input_data_url, list):
-        #     input_data_url = ",".join(input_data_url)
         spark_df = read_cmd(*input_data_url)
         return spark_df
 
