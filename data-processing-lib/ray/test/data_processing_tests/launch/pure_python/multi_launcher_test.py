@@ -51,10 +51,6 @@ class TestLauncherPython(PythonTransformLauncher):
         return 0
 
 
-import pytest
-
-
-@pytest.mark.skip(reason="failing for now aws credentials")
 def test_multi_launcher():
     params = {
         "data_max_files": -1,
