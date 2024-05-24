@@ -48,9 +48,16 @@ class DataAccessS3(DataAccess):
         :param n_samples: amount of files to randomly sample
         :param files_to_use: files extensions of files to include
         """
+        self.s3_credentials = {} | s3_credentials
+        access_key = self.get_access_key()
+        if access_key is None:
+            access_key = ""
+        secret_key = self.get_secret_key()
+        if secret_key is None:
+            secret_key = ""
         self.arrS3 = ArrowS3(
-            access_key=s3_credentials.get("access_key", ""),
-            secret_key=s3_credentials.get("secret_key", ""),
+            access_key,
+            secret_key,
             endpoint=s3_credentials.get("url", None),
             region=s3_credentials.get("region", None),
         )
@@ -65,6 +72,18 @@ class DataAccessS3(DataAccess):
         self.m_files = m_files
         self.n_samples = n_samples
         self.files_to_use = files_to_use
+
+    def get_access_key(self):
+        self.s3_credentials.get("access_key", None),
+
+    def get_secret_key(self):
+        return (self.s3_credentials.get("secret_key", None),)
+
+    def get_endpoint(self):
+        return (self.s3_credentials.get("url", None),)
+
+    def get_region(self):
+        return (self.s3_credentials.get("region", None),)
 
     def get_num_samples(self) -> int:
         """

@@ -9,6 +9,7 @@ from data_processing.data_access import (
     DataAccess,
     DataAccessFactory,
     DataAccessFactoryBase,
+    DataAccessS3,
 )
 from data_processing.runtime import (
     AbstractTransformLauncher,
@@ -64,11 +65,6 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         if server_port_https == -1:
             # we are running locally, use the spark_profile_local.yaml file for configuration
             config_filepath = self.execution_config.local_config_filepath
-            # config_filepath = os.path.abspath(
-            #     os.path.join(
-            #         os.path.dirname(__file__), "../../../../", "test-data", "config", "spark_profile_local.yaml"
-            #     )
-            # )
             with open(config_filepath, "r") as config_fp:
                 spark_config = yaml.safe_load(os.path.expandvars(config_fp.read()))
             app_name = spark_config.get("spark.app.name", "my-spark-app")
@@ -145,7 +141,7 @@ class SparkTransformLauncher(AbstractTransformLauncher):
             value = os.getenv(base_name)
         return value
 
-    def _apply_s3_credentials(self, for_input: bool) -> None:
+    def _apply_s3_credentials(self, for_input: bool, data_access: DataAccess) -> None:
         """
         Consult AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY and AWS_ENDPOINT_URL
         w/ and w/o corresponding _IN or _OUT suffix and set the values (if found)
@@ -159,27 +155,39 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         if for_input:
             input_name = "input"
         else:
-            ouput_name = "output"
-        value = self._get_aws("AWS_ACCESS_KEY_ID", for_input)
+            input_name = "output"
+        data_access_s3 = data_access if isinstance(data_access, DataAccessS3) else None
+
+        value = None if data_access_s3 is None else data_access_s3.get_access_key()
+        if value is None:
+            value = self._get_io_env_var("AWS_ACCESS_KEY_ID", for_input)
         if value is not None:
             logger.info(f"Applying user-provided S3 {input_name} access key: {value}")
             hconf.set("fs.s3a.access.key", value)
-        value = self._get_aws("AWS_SECRET_ACCESS_KEY", True)
+
+        value = None if data_access_s3 is None else data_access_s3.get_secret_key()
+        if value is None:
+            value = self._get_io_env_var("AWS_SECRET_ACCESS_KEY", True)
         if value is not None:
             logger.info(f"Applying user-provided S3 {input_name} secret key")
             hconf.set("fs.s3a.secret.key", value)
-        value = self._get_aws("AWS_ENDPOINT_URL", True)
+
+        value = None if data_access_s3 is None else data_access_s3.get_endpoint()
+        if value is None:
+            value = self._get_io_env_var("AWS_ENDPOINT_URL", True)
         if value is not None:
             logger.info(f"Applying user-provided S3 {input_name} end point: {value}")
             hconf.set("fs.s3a.endpoint", value)
-        # for some reason, Hadoop can only process S3 urls if they start with s3a://, not s3://
 
-    def _read_data(self, input_data_url: Union[list[str], str], data_type: str) -> DataFrame:
+    def _read_data(self, data_access: DataAccess) -> DataFrame:
+        input_data_url, _ = data_access.get_files_to_process()
+        logger.info(f"files = {input_data_url}")
+        data_type = "parquet"  # This should come from the extensions in data_access,
 
         if (isinstance(input_data_url, str) and input_data_url.startswith("s3://")) or (
             isinstance(input_data_url, list) and len(input_data_url) > 0 and input_data_url[0].startswith("s3://")
         ):
-            self._apply_s3_credentials(True)
+            self._apply_s3_credentials(True, data_access)
             # for some reason, Hadoop can only process S3 urls if they start with s3a://, not s3://
             if isinstance(input_data_url, str):
                 input_data_url = input_data_url.replace("s3://", "s3a://")
@@ -201,9 +209,11 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         spark_df = read_cmd(*input_data_url)
         return spark_df
 
-    def _write_data(self, spark_df: DataFrame, output_data_url: str, data_type: str):
+    def _write_data(self, spark_df: DataFrame, data_access: DataAccess):
+        data_type = "parquet"  # Todo: this should come from data access.
+        output_data_url = data_access.get_output_folder()
         if isinstance(output_data_url, str) and output_data_url.startswith("s3://"):
-            self._apply_s3_credentials(False)
+            self._apply_s3_credentials(False, data_access)
             # for some reason, Hadoop can only process S3 urls if they start with s3a://, not s3://
             output_data_url = output_data_url.replace("s3://", "s3a://")
 
@@ -221,11 +231,9 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         write_cmd(output_data_url)
 
     def _run_transform(self, data_access: DataAccess, transform: AbstractSparkTransform):
-        files, _ = data_access.get_files_to_process()
-        logger.info(f"files = {files}")
-        spark_df = self._read_data(files, data_type="parquet")
+        spark_df = self._read_data(data_access)
         res_spark_df, metadata = transform.transform(spark_df)
-        self._write_data(res_spark_df[0], data_access.get_output_folder(), data_type="parquet")
+        self._write_data(res_spark_df[0], data_access)
         data_access.save_job_metadata(metadata)
 
     def _get_args(self) -> bool:
