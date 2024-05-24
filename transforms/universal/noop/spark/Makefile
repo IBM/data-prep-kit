@@ -11,7 +11,7 @@ TRANSFORM_RUNTIME=spark
 include $(REPOROOT)/transforms/.make.transforms
 TRANSFORM_NAME=noop
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${NOOP_VERSION}
+DOCKER_IMAGE_VERSION=${NOOP_SPARK_VERSION}
 
 venv::	.transforms.spark-venv
 
