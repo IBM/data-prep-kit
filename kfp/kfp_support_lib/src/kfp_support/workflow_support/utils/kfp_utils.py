@@ -89,14 +89,17 @@ class KFPUtils:
     def dict_to_req(d: dict[str, Any], executor: str = "transformer_launcher.py") -> str:
         res = f"python {executor} "
         for key, value in d.items():
-            if isinstance(value, bool):
-                if value:
-                    res += f"--{key} "
-            elif isinstance(value, str):
-                if value != "":
+            if str(value) != "":
+                if isinstance(value, str):
+                    if '"' in value:
+                        logger.warning(f"can't parse inputs with double quotation marks, please use single quotation marks instead")
                     res += f'--{key}="{value}" '
-            else:
-                res += f"--{key}={value} "
+                elif isinstance(value, bool):
+                    if value:
+                        res += f"--{key} "
+                else:
+                    res += f"--{key}={value} "
+
         logger.info(f"request to execute: {res}")
         return res
 
