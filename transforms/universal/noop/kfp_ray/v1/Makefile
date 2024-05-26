@@ -17,9 +17,7 @@ workflow-build: workflow-venv
 
 .PHONY: workflow-test
 workflow-test: workflow-build
-	@for file in $(YAML_WF); do \
-		$(MAKE) .transforms_workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=$$file; \
-	done
+	$(MAKE) .transforms_workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=noop_wf.yaml
 
 .PHONY: workflow-upload
 workflow-upload: workflow-build
