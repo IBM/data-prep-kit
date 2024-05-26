@@ -39,23 +39,3 @@ run-s3-ray-sample: .transforms.run-s3-ray-sample
 minio-start:	.minio-start
 
 load-image:: .transforms.load-image
-
-.PHONY: workflow-venv
-workflow-venv:
-	$(MAKE) -C kfp_ray/v1 workflow-venv
-
-.PHONY: workflow-build
-workflow-build:
-	$(MAKE) -C kfp_ray/v1 workflow-build
-
-.PHONY: workflow-test
-workflow-test:
-	$(MAKE) -C kfp_ray/v1 workflow-test
-
-.PHONY: workflow-upload
-workflow-upload:
-	$(MAKE) -C kfp_ray/v1 workflow-upload
-
-.PHONY: workflow-reconcile-requirements
-workflow-reconcile-requirements:
-	$(MAKE) -C kfp_ray/v1 workflow-reconcile-requirements
