@@ -24,7 +24,6 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 
 ## 📝 Table of Contents
 - [About](#about)
-- [Setup](#setup)
 - [Getting Started](#getting_started)
 - [How to Contribute](#contribute_steps)
 - [Acknowledgments](#acknowledgement)
@@ -40,7 +39,7 @@ Eventually, Data Prep Kit will offer consistent APIs and configurations across t
 1. Python runtime
 2. Ray runtime (local and distributed)
 3. Spark runtime (local and distributed)
-4. [No-code pipelines with KFP](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) (local and distributed, wrapping Ray)
+4. [Kubeflow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) (local and distributed, wrapping Ray)
 
 The current matrix for the combination of modules and supported runtimes is shown in the table below. 
 Contributors are welcome to add new modules as well as add runtime support for existing modules!
@@ -66,7 +65,7 @@ Features of the toolkit:
 - It offers a growing set of module implementations across multiple runtimes, targeting laptop-scale to datacenter-scale processing.
 - It provides a growing set of sample pipelines developed for real enterprise use cases.
 - It provides the [Data processing library](data-processing-lib/ray) to enable contribution of new custom modules targeting new use cases.
-- It uses [Kube Flow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp/doc/simple_transform_pipeline.md) for no-code data prep.
+- It uses [Kubeflow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp/doc/simple_transform_pipeline.md).
 
 Data modalities supported: 
 
@@ -97,7 +96,8 @@ A general purpose [SQL-based filter transform](transforms/universal/filter) enab
 For a new module to be added, a user can pick the right design based on the processing to be applied. More details [here](transforms). 
 
 #### Scaling of Transforms
-To enable processing of large data volumes leveraging multi-mode clusters, [Ray](https://docs.ray.io/en/latest/index.html) and [Spark](https://spark.apache.org) wrappers are provided, to readily scale out the Python implementations.
+To enable processing of large data volumes leveraging multi-mode clusters, [Ray](https://docs.ray.io/en/latest/index.html) 
+or [Spark](https://spark.apache.org) wrappers are provided, to readily scale out the Python implementations.
 A generalized workflow is shown [here](doc/data-processing.md).
 
 #### Bring Your Own Transform 
@@ -107,41 +107,17 @@ More details on the data processing library are [here](data-processing-lib/doc/o
 #### Automation
 The toolkit also supports transform execution automation based on 
 [Kubeflow pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) (KFP),
-tested on [Kind clusters](https://kind.sigs.k8s.io/). The KFP implementation is based on the [KubeRay Operator](https://docs.ray.io/en/master/cluster/kubernetes/getting-started.html)
+tested on a locally deployed [Kind cluster](https://kind.sigs.k8s.io/) and external OpenShift clusters. There is an 
+automation to create a Kind cluster and deploy all required components on it.
+The KFP implementation is based on the [KubeRay Operator](https://docs.ray.io/en/master/cluster/kubernetes/getting-started.html)
 for creating and managing the Ray cluster and [KubeRay API server](https://github.com/ray-project/kuberay/tree/master/apiserver)
 to interact with the KubeRay operator. An additional [framework](kfp/kfp_support_lib) along with several
 [kfp components](kfp/kfp_ray_components) is used to simplify the pipeline implementation.
 
-
-## &#x2699; Setup <a name = "setup"></a>
-
-We tried the project on different hardware/software configurations (see [Apple/Mac considerations](doc/mac.md).)
-We recommend using a laptop with at least 16GB of memory and 8 CPU cores for development without KFP, 
-and at least 32GB and preferably 16 CPU cores if you plan to run KFP on Kind.
-
-### Prerequisites
-
-* Python 3.10 or 3.11 
-* Docker/Podman
-
-Two important tools will also be installed using the steps below:
-* [pre-commit](https://pre-commit.com/)
-* [twine](https://twine.readthedocs.io/en/stable/) 
-
-### Installation Steps
-
-```shell
-pip install pre-commit
-pip install twine
-...
-git clone git@github.com:IBM/data-prep-kit.git
-cd data-prep-kit
-pre-commit install
-```
-
 ## &#x1F680; Getting Started <a name = "getting_started"></a>
 
-There are various entry points that you can choose based on the use case. Below are a few demos to get you started. 
+There are various entry points that you can choose based on the use case. Each entry point has its pre-requirements and setup steps.
+Below are a few demos to get you started. 
 
 ### Build Your Own Transforms
 Follow the documentation [here](data-processing-lib/doc/overview.md) to build your own transform
@@ -152,11 +128,12 @@ Get started by running the "noop" transform that performs an identity operation 
 [tutorial](data-processing-lib/doc/simplest-transform-tutorial.md) and associated 
 [noop implementation](transforms/universal/noop). 
 
-### Run a Data Pipeline on Local Ray
-Get started by building a data pipeline with our [example pipeline](./examples/) that can run on a laptop. To test this pipeline, you can download this repo as a zip file and get started. 
+### Run a Jupyter notebook on Local Ray cluster
+Get started by building a data pipeline with our [example pipeline](./examples/) that can run on a laptop. 
+To test this pipeline, you can download this repo as a zip file and get started. 
 
 ### Automate a Pipeline
-The data preprocessing can be automated by running transformers as a KubeFlow pipeline (KFP). 
+The data preprocessing can be automated by running transformers as a Kubeflow pipeline (KFP). 
 See this simple transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md). See [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
 if you want to combine several data transformation steps.
 
