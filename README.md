@@ -117,8 +117,25 @@ to interact with the KubeRay operator. An additional [framework](kfp/kfp_support
 ## &#x1F680; Getting Started <a name = "getting_started"></a>
 
 There are various entry points that you can choose based on the use case. Each entry point has its pre-requirements and setup steps.
-Below are a few demos to get you started. 
+The common part of are:
+#### Prerequisites
+- Python 3.10 or 3.11 
+-Docker/Podman
 
+Two important development tools will also be installed using the steps below:
+-[pre-commit](https://pre-commit.com/)
+-[twine](https://twine.readthedocs.io/en/stable/) 
+
+#### Installation Steps
+```shell
+pip install pre-commit
+pip install twine
+...
+git clone git@github.com:IBM/data-prep-kit.git
+cd data-prep-kit
+pre-commit install
+```
+Below are a few demos to get you started.
 ### Build Your Own Transforms
 Follow the documentation [here](data-processing-lib/doc/overview.md) to build your own transform
 and run it in either the python  or Ray runtimes. 
