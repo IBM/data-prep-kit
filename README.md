@@ -146,8 +146,8 @@ Get started by running the "noop" transform that performs an identity operation 
 [noop implementation](transforms/universal/noop). 
 
 ### Run a Jupyter notebook on Local Ray cluster
-Get started by building a data pipeline with our [example pipeline](./examples/) that can run on a laptop. 
-To test this pipeline, you can download this repo as a zip file and get started. 
+Get started by building a Jupiter notebook executing a sequence of Transforms with our  [example pipeline](./examples/) 
+that can run on your machine. This implementation can also be extended to connect to the remote Ray cluster.
 
 ### Automate a Pipeline
 The data preprocessing can be automated by running transformers as a Kubeflow pipeline (KFP). 
