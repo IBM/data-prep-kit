@@ -27,15 +27,17 @@ class TransformExecutionConfiguration(CLIArgumentProvider):
     A class specifying and validating transform execution configuration
     """
 
-    def __init__(self, name: str, pp: bool = True):
+    def __init__(self, name: str, print_params: bool = True):
         """
         Initialization
+        :param name: job name
+        :param print_params: flag to print parameters
         """
         self.pipeline_id = ""
         self.job_details = {}
         self.code_location = {}
         self.name = name
-        self.pp = pp
+        self.print_params = print_params
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
@@ -74,10 +76,9 @@ class TransformExecutionConfiguration(CLIArgumentProvider):
             "job id": captured["job_id"],
         }
         self.code_location = captured["code_location"]
-
-        if self.pp:
-            # print parameters
-            logger.info(f"pipeline id {self.pipeline_id}")
+        # print parameters
+        logger.info(f"pipeline id {self.pipeline_id}")
+        if self.print_params:
             logger.info(f"job details {self.job_details}")
-            logger.info(f"code location {self.code_location}")
+        logger.info(f"code location {self.code_location}")
         return True

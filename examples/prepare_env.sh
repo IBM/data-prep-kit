@@ -7,15 +7,15 @@ echo $REPO_ROOT
 pip install jupyter 
 
 requirement_files=(
-"$REPO_ROOT/transforms/code/malware/requirements.txt"
-"$REPO_ROOT/transforms/code/code_quality/requirements.txt"
-"$REPO_ROOT/transforms/code/proglang_select/requirements.txt"
-"$REPO_ROOT/transforms/universal/ededup/requirements.txt"
-"$REPO_ROOT/transforms/universal/fdedup/requirements.txt"
-"$REPO_ROOT/transforms/universal/filter/requirements.txt"
+"$REPO_ROOT/transforms/code/malware/ray/requirements.txt"
+"$REPO_ROOT/transforms/code/code_quality/ray/requirements.txt"
+"$REPO_ROOT/transforms/code/proglang_select/ray/requirements.txt"
+"$REPO_ROOT/transforms/universal/ededup/ray/requirements.txt"
+"$REPO_ROOT/transforms/universal/fdedup/ray/requirements.txt"
+"$REPO_ROOT/transforms/universal/filter/ray/requirements.txt"
 "$REPO_ROOT/tools/ingest2parquet/requirements.txt"
-"$REPO_ROOT/transforms/universal/doc_id/requirements.txt"
-"$REPO_ROOT/transforms/universal/tokenization/requirements.txt"
+"$REPO_ROOT/transforms/universal/doc_id/ray/requirements.txt"
+"$REPO_ROOT/transforms/universal/tokenization/ray/requirements.txt"
 )
 
 # Iterate through the list and install requirements from each file

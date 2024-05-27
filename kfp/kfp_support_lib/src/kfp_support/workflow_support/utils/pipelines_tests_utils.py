@@ -1,4 +1,5 @@
 import os
+import sys
 
 from data_processing.utils import get_logger, str2bool
 
@@ -39,20 +40,6 @@ def run_test(pipeline_package_path: str, endpoint: str = "http://localhost:8080/
     return pipeline_name
 
 
-def run_sanity_test(
-    pipeline_package_path: str = "", endpoint: str = "http://localhost:8080/kfp", overwrite: bool = True
-):
-    """
-    Run sanity test: automatic upload and run a pipeline.
-
-    :param pipeline_package_path: Local path to the pipeline package.
-    :param endpoint: endpoint to kfp service
-    """
-    pipeline_run = run_test(pipeline_package_path, endpoint=endpoint, overwrite=overwrite)
-    if pipeline_run is not None:
-        logger.info(f"{pipeline_run} run successfully launched")
-
-
 if __name__ == "__main__":
     import argparse
 
@@ -68,17 +55,21 @@ if __name__ == "__main__":
             file_name = os.path.basename(args.pipeline_package_path)
             pipeline_name = os.path.splitext(file_name)[0]
             utils = PipelinesUtils(host=args.endpoint)
-            utils.upload_pipeline(
+            pipeline = utils.upload_pipeline(
                 pipeline_package_path=args.pipeline_package_path,
                 pipeline_name=pipeline_name,
                 overwrite=str2bool(args.overwrite),
             )
+            if pipeline is None:
+                sys.exit(1)
         case "sanity-test":
-            run_sanity_test(
+            run = run_test(
                 endpoint=args.endpoint,
                 pipeline_package_path=args.pipeline_package_path,
                 overwrite=str2bool(args.overwrite),
             )
+            if run is None:
+                sys.exit(1)
         case _:
             logger.warning("Unsupported command")
             exit(1)

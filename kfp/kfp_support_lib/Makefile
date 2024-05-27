@@ -18,6 +18,8 @@ clean::
 	@# Help: Clean up the distribution build and the venv 
 	rm -r dist venv || true
 	rm -rf src/*egg-info || true
+	rm -rf *.back || true
+
 
 .check-env:: .check_python_version
 	@echo "Checks passed"

@@ -18,10 +18,10 @@ import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.ray import (
     RayTransformExecutionConfiguration,
+    RayTransformFileProcessor,
     RayTransformRuntimeConfiguration,
     RayUtils,
     TransformStatisticsRay,
-    TransformTableProcessorRay,
 )
 from data_processing.utils import get_logger
 from ray.util import ActorPool
@@ -84,7 +84,7 @@ def orchestrate(
         }
         logger.debug("Creating actors")
         processors = RayUtils.create_actors(
-            clazz=TransformTableProcessorRay,
+            clazz=RayTransformFileProcessor,
             params=processor_params,
             actor_options=preprocessing_params.worker_options,
             n_actors=preprocessing_params.n_workers,
