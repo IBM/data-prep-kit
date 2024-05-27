@@ -26,7 +26,7 @@ Note: the project and the explanation below are based on [KFPv1](https://www.kub
 
 ## Implementing pipeline <a name = "implementing"></a> 
 
-[Overall implementation](../transform_workflows/universal/noop/noop_wf.py) roughly contains 5 major sections:
+[Overall implementation](../../transforms/universal/noop/kfp_ray/v1/noop_wf.py) roughly contains 5 major sections:
 
 * Imports
 * Components definition - definition of the main steps of our pipeline
