@@ -1,8 +1,8 @@
-REPOROOT=${CURDIR}/../../..
+REPOROOT=${CURDIR}/../../../..
 WORKFLOW_VENV_ACTIVATE=${REPOROOT}/transforms/venv/bin/activate
 include $(REPOROOT)/transforms/.make.transforms_workflows
 
-PYTHON_WF := $(shell find ./ -name *_wf.py)
+PYTHON_WF := $(shell find ./ -name "*_wf.py")
 YAML_WF=$(patsubst %.py, %.yaml, ${PYTHON_WF})
 
 workflow-venv:: .check_python_version ${WORKFLOW_VENV_ACTIVATE}

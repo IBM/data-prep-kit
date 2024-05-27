@@ -23,13 +23,33 @@ In the list of its input parameters, we also see `data_s3_config`. Now, we have 
 
 ![param list](param_list2.png)
 
+### Examples
 
-**Note** An example super pipeline that combines several transforms, `doc_id`, `ededup`, and `fdedup`, can be found in [superworkflow_dedups_sample_wf.py](../superworkflows/v1/superworkflow_dedups_sample_wf.py).
+The following sections contains two super pipelines examples:
+
+1) [dedups super pipelines](#De-dups-super-pipeline)
+1) [programming language super pipeline](#programming-language-super-pipeline)
+
+### De-dups super pipeline
+
+This pipeline combines several transforms, `doc_id`, `ededup`, and `fdedup`, can be found in [superworkflow_dedups_sample_wf.py](../transform_workflows/superworkflows/superworkflow_dedups_sample_wf.py).
 
 ![super pipeline](super_pipeline.png)
 
 
 The input parameters of the super pipelines:
+
+The input parameters of the super pipelines are described in this [section](#Super-pipeline-Input-Parameters).
+
+### Programming languages Super pipeline
+
+This pipeline combines several programming-languages transforms: `proglang_select`, `code_quality`, and `malware`. It can be found in [superworkflow_code_wf.py](../transform_workflows/superworkflows/superworkflow_code_wf.py).
+
+![super pipeline](super-code-pipeline.png)
+
+The input parameters of the super pipelines are described in this [section](#Super-pipeline-Input-Parameters).
+
+### Super Pipeline Input Parameters
 
 There are several `groups` of input parameters for super pipelines, each group of parameters has a prefix of "p<x>_" string, where <x> is an order number.
 
