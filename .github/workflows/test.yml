@@ -93,5 +93,5 @@ jobs:
                   curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
                   chmod +x /tmp/mc
                   make -C kind setup
-                  make -C kfp/transform_workflows venv build
-                  make -C kfp/transform_workflows/universal/noop test
+                  make -C transforms workflow-build
+                  make -C transforms/universal/noop workflow-test
