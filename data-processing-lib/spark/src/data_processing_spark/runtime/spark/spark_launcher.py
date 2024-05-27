@@ -57,8 +57,12 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         transform = transform_class(transform_params)
         data_access = self.data_access_factory.create_data_access()
         self._start_spark()
-        self._run_transform(data_access, transform)
-        self._stop_spark()
+        try:
+            self._run_transform(data_access, transform)
+        except Exception as ex:
+            logger.error(f"Failed to run transform: {ex}")
+        finally:
+            self._stop_spark()
 
     def _start_spark(self):
         server_port_https = int(os.getenv("KUBERNETES_SERVICE_PORT_HTTPS", "-1"))
