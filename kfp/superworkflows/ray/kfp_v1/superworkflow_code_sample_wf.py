@@ -21,7 +21,7 @@ malware_image = "quay.io/dataprep1/data-prep-kit/malware:0.4.0"
 doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.1"
 ededup_image = "quay.io/dataprep1/data-prep-kit/ededup:0.3.0"
 fdedup_image = "quay.io/dataprep1/data-prep-kit/fdedup:0.3.0"
-tokenizer_image = "quay.io/dataprep1/data-prep-kit/tokenization:0.2.0"
+tokenizer_image = "quay.io/dataprep1/data-prep-kit/tokenization:0.3.0"
 
 
 # Pipeline to invoke execution on remote resource

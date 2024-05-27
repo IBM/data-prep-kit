@@ -20,7 +20,7 @@ from kfp_support.workflow_support.utils import (
 )
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.0"
+task_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.1"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "doc_id_transform.py"
