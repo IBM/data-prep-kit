@@ -1,0 +1,14 @@
+{
+    "total_docs_count": 100,
+    "total_columns_count": 26,
+    "docs_after_doc_id": 100,
+    "columns_after_doc_id": 26,
+    "source": {
+        "name": "/home/cma/de/data-prep-kit/transforms/universal/doc_id/spark/test-data/input",
+        "type": "path"
+    },
+    "target": {
+        "name": "/home/cma/de/data-prep-kit/transforms/universal/doc_id/spark/output",
+        "type": "path"
+    }
+}
