@@ -174,43 +174,30 @@ This filter operation applied on the table above will return the following resul
 
 
 ## Running
-You can run the [filter_local.py](src/filter_local.py) (python-only implementation) or [filter_local_ray.py](src/filter_local_ray.py) (ray-based  implementation) to transform the `test1.parquet` file in [test input data](test-data/input) to an `output` directory.  The directory will contain both the new annotated `test1.parquet` file and the `metadata.json` file.
+You can run the Spark filter transform [filter_local.py](src/filter_local.py) to filter the `test1.parquet` file in [test input data](test-data/input) to an `output` directory.  The directory will contain one or several filtered parquet files and the `metadata.json` file.
 
-#### Running as ray-based application
+#### Running as Spark-based application
 ```
-(venv) cma:src$ python filter_local_ray.py
-12:48:01 INFO - Running locally
-12:48:01 INFO - Using local configuration with: input_folder - /home/cma/de/data-prep-kit/transforms/universal/filtering/test-data/input output_folder - /home/cma/de/data-prep-kit/transforms/universal/filtering/output
-12:48:01 INFO - Not using data sets, checkpointing False, max files -1
-12:48:01 INFO - number of workers 5 worker options {'num_cpus': 0.8}
-12:48:01 INFO - pipeline id pipeline_id; number workers 5
-12:48:01 INFO - job details {'job category': 'preprocessing', 'job name': 'filter', 'job type': 'ray', 'job id': 'job_id'}
-12:48:01 INFO - code location {'github': 'github', 'commit_hash': '12345', 'path': 'path'}
-12:48:01 INFO - actor creation delay 0
-2024-03-31 12:48:03,390	INFO worker.py:1715 -- Started a local Ray instance. View the dashboard at 127.0.0.1:8265 
-(orchestrate pid=308034) 12:48:04 INFO - orchestrator started at 2024-03-31 12:48:04
-(orchestrate pid=308034) 12:48:04 INFO - Number of files is 1, source profile {'max_file_size': 0.15915775299072266, 'min_file_size': 0.15915775299072266, 'total_file_size': 0.15915775299072266}
-(orchestrate pid=308034) 12:48:04 INFO - Cluster resources: {'cpus': 20, 'gpus': 0, 'memory': 31.60095291212201, 'object_store': 15.800476455129683}
-(orchestrate pid=308034) 12:48:04 INFO - Number of workers - 5 with {'num_cpus': 0.8} each
-(orchestrate pid=308034) 12:48:04 INFO - Completed 0 files in 5.312760670979818e-06 min. Waiting for completion
-(orchestrate pid=308034) 12:48:06 INFO - Completed processing in 0.022701112429300944 min
-12:48:16 INFO - Completed execution in 0.24697633584340414 min, execution result 0
+(venv) cma:spark$ python src/filter_local.py 
+18:57:46 INFO - data factory data_ is using local data access: input_folder - /home/cma/de/data-prep-kit/transforms/universal/filter/spark/test-data/input output_folder - /home/cma/de/data-prep-kit/transforms/universal/filter/spark/output at "/home/cma/de/data-prep-kit/data-processing-lib/ray/src/data_processing/data_access/data_access_factory.py:185"
+18:57:46 INFO - data factory data_ max_files -1, n_sample -1 at "/home/cma/de/data-prep-kit/data-processing-lib/ray/src/data_processing/data_access/data_access_factory.py:201"
+18:57:46 INFO - data factory data_ Not using data sets, checkpointing False, max files -1, random samples -1, files to use ['.parquet'] at "/home/cma/de/data-prep-kit/data-processing-lib/ray/src/data_processing/data_access/data_access_factory.py:214"
+18:57:46 INFO - pipeline id pipeline_id at "/home/cma/de/data-prep-kit/data-processing-lib/ray/src/data_processing/runtime/execution_configuration.py:80"
+18:57:46 INFO - code location {'github': 'github', 'commit_hash': '12345', 'path': 'path'} at "/home/cma/de/data-prep-kit/data-processing-lib/ray/src/data_processing/runtime/execution_configuration.py:83"
+18:57:46 INFO - spark execution config : {'spark_local_config_filepath': '/home/cma/de/data-prep-kit/transforms/universal/filter/spark/config/spark_profile_local.yml', 'spark_kube_config_filepath': 'config/spark_profile_kube.yml'} at "/home/cma/de/data-prep-kit/data-processing-lib/spark/src/data_processing_spark/runtime/spark/spark_execution_config.py:42"
+24/05/26 18:57:47 WARN Utils: Your hostname, li-7aed0a4c-2d51-11b2-a85c-dfad31db696b.ibm.com resolves to a loopback address: 127.0.0.1; using 192.168.1.223 instead (on interface wlp0s20f3)
+24/05/26 18:57:47 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+24/05/26 18:57:48 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+18:57:50 INFO - files = ['/home/cma/de/data-prep-kit/transforms/universal/filter/spark/test-data/input/test1.parquet'] at "/home/cma/de/data-prep-kit/data-processing-lib/spark/src/data_processing_spark/runtime/spark/spark_launcher.py:188"
 ```
-#### Running as pure python application
-<pre>
-% make venv
-% source venv/bin/activate
-(venv) % cd src
-(venv) % python filter_local_ray.py
-input table has 100 rows
 
-output table has 11 rows
-output metadata : {'total_docs_count': 100, 'total_bytes_count': 478602, 'total_columns_count': 25, "docs_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'": 78, "bytes_filtered_by 'docq_total_words > 100 AND docq_total_words < 200'": 429191, "docs_filtered_by 'docq_perplex_score < 230'": 53, "bytes_filtered_by 'docq_perplex_score < 230'": 275911, 'docs_after_filter': 11, 'bytes_after_filter': 24061, 'columns_after_filter': 23}
-(venv) % deactivate
-% ls ../output
-metadata.json	test1.parquet
-%
-</pre>
+Then 
+```shell
+ls output
+```
+To see results of the transform.
 
 #### Passing parameters through command-line-interface
 
@@ -233,10 +220,9 @@ As shown in the output of the local run of filtering, the metadata contains seve
 ## Running
 
 ### Launched Command Line Options 
-When running the transform with the Ray launcher (i.e. TransformLauncher),
+When running the transform with the Spark launcher (i.e. SparkTransformLauncher),
 the following command line arguments are available in addition to 
-the options provided by the [ray launcher](../../../../data-processing-lib/doc/ray-launcher-options.md)
-and the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
+the options provided by the [spark launcher](../../../../data-processing-lib/doc/spark-launcher-options.md).
 
 ```
   --filter_criteria_list FILTER_CRITERIA_LIST
@@ -253,26 +239,3 @@ and the [python launcher](../../../../data-processing-lib/doc/python-launcher-op
                         logical operator (AND or OR) that joins filter criteria
 
 ```
-
-### Running the samples
-To run the samples, use the following `make` targets
-
-* `run-cli-ray-sample` - runs src/filter_transform.py using command line args
-* `run-local-sample` - runs src/filter_local.py
-* `run-local-ray-sample` - runs src/filter_local_ray.py
-* `run-s3-ray-sample` - runs src/filter_s3_ray.py
-    * Requires prior invocation of `make minio-start` to load data into local minio for S3 access.
-
-These targets will activate the virtual environment and set up any configuration needed.
-Use the `-n` option of `make` to see the detail of what is done to run the sample.
-
-For example, 
-```shell
-make run-cli-ray-sample
-...
-```
-Then 
-```shell
-ls output
-```
-To see results of the transform.
