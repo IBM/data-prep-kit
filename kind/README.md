@@ -62,7 +62,8 @@ kubectl apply -f $ROOT_DIR/hack/kfp_ingress.yaml
 kubectl apply -f $ROOT_DIR/hack/minio_ingress.yaml
 ```
 
-Open the Kubeflow Pipelines UI at  http://localhost:8080
+Open the Kubeflow Pipelines UI at  http://localhost:8080/kfp/
+Note: pay attention to the slash at the end of the URL.
 
 
 ### Working with a MinIO server instead of S3 storage
@@ -89,7 +90,6 @@ Populating Minio server with test data can be done using `mc`. Use the following
 This file creates an mc alias, creates the test bucket and copies the local test data into MinIO. If you need
 to load additional data, please load it using additional `mc` commands, similar to the ones being
 used by `populate_minio.sh`
-You can access the minio dashboard at `http://localhost:8090`
 
 
 ## Cleanup
