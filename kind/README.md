@@ -46,21 +46,11 @@ kubectl wait --for=condition=ready --all pod -n kuberay --timeout=300s
 
 To access the API server and Kubeflow pipeline UI externally, we make use NGINX ingress.
 
-Install [Ingress NGNIX](https://kind.sigs.k8s.io/docs/user/ingress/#ingress-nginx) for KFP and RAY and wait for it to be ready:
+Install [Ingress NGNIX](https://kind.sigs.k8s.io/docs/user/ingress/#ingress-nginx) for KFP, RAY and MinIO and wait for it to be ready:
 
 ```shell
 ${ROOT_DIR}/hack/tools/install_nginx.sh deploy
 kubectl wait --namespace ingress-nginx \
-          --for=condition=ready pod \
-          --selector=app.kubernetes.io/component=controller \
-          --timeout=90s
-```
-
-Install [Ingress NGNIX](https://kind.sigs.k8s.io/docs/user/ingress/#ingress-nginx) for Minio and wait for it to be ready:
-
-```shell
-kubectl apply -f $ROOT_DIR/hack/nginx_deploy_minio.yaml
-kubectl wait --namespace ingress-nginx-minio \
           --for=condition=ready pod \
           --selector=app.kubernetes.io/component=controller \
           --timeout=90s
