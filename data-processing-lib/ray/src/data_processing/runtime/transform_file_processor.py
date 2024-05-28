@@ -58,7 +58,7 @@ class AbstractTransformFileProcessor:
             name_extension = TransformUtils.get_file_extension(f_name)
             self.logger.debug(f"Begin transforming file {f_name}")
             out_files, stats = self.transform.transform_binary(byte_array=filedata, ext=name_extension[1])
-            self.logger.debug(f"Done transforming file {f_name}")
+            self.logger.debug(f"Done transforming file {f_name}, got {len(out_files)} files")
             self.last_file_name = name_extension[0]
             self.last_file_name_next_index = None
             self.last_extension = name_extension[1]
@@ -83,7 +83,7 @@ class AbstractTransformFileProcessor:
         try:
             t_start = time.time()
             # get flush results
-            self.logger.debug(f"Begin flushing transform")
+            self.logger.debug(f"Begin flushing transform, last file name {self.last_file_name}, last index {self.last_file_name_next_index}")
             out_files, stats = self.transform.flush_binary()
             self.logger.debug(f"Done flushing transform, got {len(out_files)} files")
             # Here we are using the name of the last file, that we were processing
@@ -113,9 +113,12 @@ class AbstractTransformFileProcessor:
             case 1:
                 # we have exactly 1 output file
                 file_ext = out_files[0]
-                output_name = self.data_access.get_output_location(path=f"{self.last_file_name}{file_ext[1]}")
+                lfn = self.last_file_name
+                if self.last_file_name_next_index is not None:
+                    lfn = f"{lfn}_{self.last_file_name_next_index}"
+                output_name = self.data_access.get_output_location(path=f"{lfn}{file_ext[1]}")
                 self.logger.debug(
-                    f"Writing transformed file {self.last_file_name}{self.last_extension} " f"to {output_name}"
+                    f"Writing transformed file {self.last_file_name}{self.last_extension} to {output_name}"
                 )
                 save_res = self.data_access.save_file(path=output_name, data=file_ext[0])
                 if save_res is not None:
