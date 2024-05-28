@@ -9,7 +9,7 @@ from . import PipelinesUtils
 logger = get_logger(__name__)
 
 
-def run_test(pipeline_package_path: str, endpoint: str = "http://localhost:8080/kfp", overwrite: bool = True):
+def run_test(pipeline_package_path: str, endpoint: str = "http://localhost:8080/", overwrite: bool = True):
     """
     Upload and run a single pipeline
 
@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Run sanity test")
     parser.add_argument("-c", "--command", type=str, choices=["upload", "sanity-test"])
-    parser.add_argument("-e", "--endpoint", type=str, default="http://localhost:8080/kfp")
+    parser.add_argument("-e", "--endpoint", type=str, default="http://localhost:8080/")
     parser.add_argument("-p", "--pipeline_package_path", type=str, default="")
     parser.add_argument("-o", "--overwrite", type=str, default="True")
 
