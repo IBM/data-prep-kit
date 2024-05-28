@@ -21,10 +21,10 @@ import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.ray import (
-    DefaultTableTransformRuntimeRay,
+    DefaultRayTransformRuntime,
+    RayTransformFileProcessor,
     RayTransformLauncher,
     RayUtils,
-    TransformTableProcessorRay,
 )
 from data_processing.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
@@ -295,7 +295,7 @@ class FdedupFilter(AbstractTableTransform):
         return [out_table], stats
 
 
-class FdedupRuntime(DefaultTableTransformRuntimeRay):
+class FdedupRuntime(DefaultRayTransformRuntime):
     """
     Fuzzy dedup runtime support. Here we are using set environment to implement first two steps of fuzzy dedup
     processing - preprocessing and bucket hash processing
@@ -646,7 +646,7 @@ class FdedupRuntime(DefaultTableTransformRuntimeRay):
             "base_table_stats": False,
         }
         processors_list = RayUtils.create_actors(
-            clazz=TransformTableProcessorRay,
+            clazz=RayTransformFileProcessor,
             params=processor_params,
             actor_options=worker_options,
             n_actors=n_readers,

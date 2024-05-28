@@ -56,7 +56,7 @@ It uses the following components, all of which can/do define CLI configuration p
   and build and save it in the form of execution metadata (`metadata.json`). Finally, it will return the execution 
   result to the Launcher.
 
-* [Ray worker](../ray/src/data_processing/runtime/ray/transform_table_processor.py) is responsible for 
+* [Ray worker](../ray/src/data_processing/runtime/ray/transform_file_processor.py) is responsible for 
 reading files (as [PyArrow Tables](https://levelup.gitconnected.com/deep-dive-into-pyarrow-understanding-its-features-and-benefits-2cce8b1466c8))
 assigned by the orchestrator, applying the transform to the input table and writing out the 
 resulting table(s).  Metadata produced by each table transformation is aggregated into

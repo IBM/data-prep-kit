@@ -5,18 +5,20 @@
 supporting data transformations in a Ray cluster
 * transform
     * universal
-        * ededup 
+        * ededup
+          * ray
+          * kfp_ray
         * ...
     * code
-        * code_quality 
+        * code_quality
+            * ray
+            * kfp_ray
         * ...
     * language
         * ...
 * kfp - Kubeflow pipeline support
-    * transform_workflows - implements pipelines over transform images.
-       * universal 
-           * ...
-       * ...
+    * kfp_support_lib - Data Preparation Kit Library. KFP support
+    * kfp_ray_components - Kubflow pipeline components used in the pipelines
 * kind - kind
 
 
@@ -56,6 +58,14 @@ test-image           Test an quay.io/dataprep1/data-prep-kit/noop:0.7 use test s
 test-locals          Run the *local*.py files in the src directory 
 test-src             Run the transform's tests and any '*local' .py files
 venv                 Install the source from the data processing library for python
+workflow-build       Recursively make workflow-build in subdirs
+workflow-reconcile-requirements Recursively make workflow-reconcile-requirements in all subdirs
+workflow-test        Recursively make workflow-test in subdirs
+workflow-upload      Recursively make workflow-upload in subdirs
+workflow-venv        Recursively make workflow-venv in subdirs
+```
+
+The `workflow-` related Makefile targets are dedicated for handling the [Kubeflow Pipelines](https://github.com/kubeflow/pipelines) workflows for the specified transforms.
 
 Overridable macro values include the following:
 DOCKER - the name of the docker executable to use. DOCKER=docker

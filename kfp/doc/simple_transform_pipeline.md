@@ -11,9 +11,22 @@ In this tutorial, we will show the following:
 
 Note: the project and the explanation below are based on [KFPv1](https://www.kubeflow.org/docs/components/pipelines/v1/)
 
-## Implementing pipeline
+## 📝 Table of Contents
+- [Implementing pipeline](#implementing)
+  - [Imports definition](#imports) 
+  - [Components definition](#components)
+  - [Input parameters definition](#inputs)
+  - [Pipeline definition](#pipeline)
+  - [Additional configuration](#add_config)
+- [Compiling a pipeline](#compilation)
+- [Deploying a pipeline](#deploying)
+- [Executing pipeline and watching execution results](#execution)
+- [Clean up the cluster](#cleanup")
+  
 
-[Overall implementation](../transform_workflows/universal/noop/noop_wf.py) roughly contains 5 major sections:
+## Implementing pipeline <a name = "implementing"></a> 
+
+[Overall implementation](../../transforms/universal/noop/kfp_ray/v1/noop_wf.py) roughly contains 5 major sections:
 
 * Imports
 * Components definition - definition of the main steps of our pipeline
@@ -21,7 +34,7 @@ Note: the project and the explanation below are based on [KFPv1](https://www.kub
 * Pipeline wiring - definition of the sequence of invocation (with parameter passing) of participating components
 * Additional configuration
 
-### Imports definitions:
+### Imports definition <a name = "imports"></a> 
 
 ```python
 import kfp.compiler as compiler
@@ -35,7 +48,7 @@ from kfp_support.workflow_support.utils import (
 from kubernetes import client as k8s_client
 ```
 
-### Components definition
+### Components definition <a name = "components"></a> 
 
 Our pipeline includes 4 steps - compute execution parameters, create Ray cluster, submit and watch Ray job, clean up 
 Ray cluster. For each step we have to define a component that will execute them:
@@ -63,7 +76,7 @@ differ significantly. For "simple" pipeline cases we can use the
 [default implementation](../kfp_support_lib/src/kfp_support/workflow_support/utils/remote_jobs_utils.py),
 while, for example for exact dedup, we are using a very [specialized one](../transform_workflows/universal/ededup/src/ededup_compute_execution_params.py).
 
-### Input parameters definition
+### Input parameters definition <a name = "inputs"></a> 
 
 The input parameters section defines all the parameters required for the pipeline execution:
 
@@ -128,7 +141,7 @@ The parameters used here are as follows:
 
 **Note** Parameters are defining both S3 and Lakehouse configuration, but only one at a time can be used.
 
-### Pipeline wiring
+### Pipeline definition <a name = "pipeline"></a> 
 
 Now, when all components and input parameters are defined, we can implement pipeline wiring defining sequence of 
 component execution and parameters submitted to every component. 
@@ -188,7 +201,7 @@ invoked either the steps into it succeeded or failed.
 Then we create each individual component passing it required parameters and specify execution sequence, for example
 (`ray_cluster.after(compute_exec_params)`).
 
-### Additional configuration
+### Additional configuration <a name = "add_config"></a>
 
 The final thing that we need to do is set some pipeline global configuration:
 
@@ -197,75 +210,16 @@ The final thing that we need to do is set some pipeline global configuration:
     dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 ```
 
-## Compiling pipeline
+## Compiling a pipeline <a name = "compilation"></a>
 
-To compile pipeline execute `make build` command in the same directory where your pipeline is
+To compile pipeline execute `make build` command in the same directory where your pipeline is. 
 
-## Preparing cluster for pipeline execution
+## Deploying a pipeline <a name = "deploying"></a>
 
-The project provides instructions and deployment automation to run all components in an all-inclusive fashion on a 
-single machine using a Kind cluster. However, this topology is not suitable for processing medium and large datasets, 
-and deployment should be carried out on a real Kubernetes or OpenShift cluster. Therefore, we recommend using Kind 
-cluster for only for local testing and debugging, not production loads. For production loads use a real Kubernetes cluster.
+Prepare local Kind or external Kubernetes cluster as described in [Set Up a cluster](./setup.md)
 
-### Preparing Kind cluster
-
-You can create a Kind cluster with all required software installed
-using the following command: 
-
-````shell
- make setup
-````
-
-We tested Kind cluster installation on multiple platforms, including Intel Mac, 
-AMD Mac (see [this](deployment_on_MacOS.md)), WSL on Windows, 
-RHEL and Ubuntu. Additional platform can be used, but might require additional configuration and testing.
-
-### Preparing an existing Kubernetes cluster
-Alternatively you can deploy pipeline to the existing Kubernetes cluster. 
-
-#### Pre-requirements
-Deployment on an existing cluster requires less pre-installed software
-Only the following programs should be manually installed:
-
-- [Helm](https://helm.sh/docs/intro/install/) 3.10.0 or greater must be installed and configured on your machine.
-- [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl) 1.26 or newer must be installed on your machine, and be 
-able to connect to the external cluster. For OpenShift clusters OpenShift CLI 
-[oc](https://docs.openshift.com/container-platform/4.15/cli_reference/openshift_cli/getting-started-cli.html) can be used instead.
-
-#### Installation steps
-
-In order to execute data transformers on the remote cluster, the following packages should be installed on the Kubernetes cluster:
-
-- [KubeFlow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) (KFP). Currently, we use 
-upstream Argo-based KFP v1.
-- [KubeRay](https://docs.ray.io/en/latest/cluster/kubernetes/index.html) controller and 
-[KubeRay API Server](https://ray-project.github.io/kuberay/components/apiserver/) 
-
-You can install the software from their repositories, or you can use our installation scripts.
-
-If your local kubectl is configured to connect to the external cluster do the following:
-```bash
-export EXTERNAL_CLUSTER=1
-make setup
-```
-
-- In addition, you should configure external access to the KFP UI (`svc/ml-pipeline-ui` in the `kubeflow` ns) and the Ray 
-Server API (`svc/kuberay-apiserver-service` in the `kuberay` ns). Depends on your cluster and its deployment it can be 
-LoadBalancer services, Ingresses or Routes. 
-
-- Optionally, you can upload the test data into the [MinIO](https://min.io/) Object Store, deployed as part of KFP. In 
-order to do this, please provide external access to the Minio (`svc/minio-service` in the `kubeflow` ns) and execute the 
-following commands: 
-```bash
-export MINIO_SERVER=<Minio external URL>
-kubectl apply -f kind/hack/s3_secret.yaml
-kind/hack/populate_minio.sh
-```
-
-## Deploying workflow
-
-Once the cluster is up, go to the kfp endpoint (`localhost:8080/kfp/` for Kind cluster), which will bring up 
+Once the cluster is up, go to the kfp endpoint (`localhost:8080/kfp/` for Kind cluster, the end point of the external existing 
+cluster depends on the KFP end-point configuration), which will bring up 
 KFP UI, see below:
 
 ![KFP UI](kfp_ui.png)
@@ -276,11 +230,16 @@ name pipeline noop. Once this is done, you should see something as follows:
 ![noop pipeline](noop_pipeline.png)
 
 
-## Executing pipeline and watching execution results
+## Executing pipeline and watching execution results <a name = "execution"></a>
 
 Before we can run the pipeline we need to create required secrets (one for image loading in case of secured 
-registry and one for S3 access). As KFP is deployed in `kubeflow` namespace, workflow execution will happen
+image registry and one for S3 access). As KFP is deployed in `kubeflow` namespace, workflow execution will happen
 there as well, which means that secrets have to be created there as well.
+
+When the MinIO Object Store, deployed as part of KFP, is used, its access secret is deployed as part of the cluster preparation, 
+see [s3_secret.yaml](../../kind/hack/s3_secret.yaml). 
+Creation a secret to pull images from a private repository described [here](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+)
 
 Once this is done we can execute the workflow. 
 
@@ -296,14 +255,7 @@ Note that the log (on the left) has the complete execution log.
 
 Additionally, the log is saved to S3 (location is denoted but the last line in the log)
 
-## Clean up Kind cluster
+## Clean up the cluster <a name = "cleanup"></a>
 
-If you are using Kind cluster, you can delete it running the following command:
-
-```Shell
-make clean
-```
-
-**Note** that this command has to run from the project kind subdirectory
-
+The cluster clean up is described at [Clean up the cluster](./setup#cleanup)
 

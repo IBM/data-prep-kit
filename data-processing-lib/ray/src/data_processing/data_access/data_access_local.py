@@ -318,32 +318,32 @@ class DataAccessLocal(DataAccess):
         metadata["source"] = {"name": self.input_folder, "type": "path"}
         metadata["target"] = {"name": self.output_folder, "type": "path"}
         return self.save_file(
-            file_path=os.path.join(self.output_folder, "metadata.json"),
-            bytes_data=json.dumps(metadata, indent=2).encode(),
+            path=os.path.join(self.output_folder, "metadata.json"),
+            data=json.dumps(metadata, indent=2).encode(),
         )
 
-    def get_file(self, file_path: str) -> bytes:
+    def get_file(self, path: str) -> bytes:
         """
         Gets the contents of a file as a byte array, decompressing gz files if needed.
 
         Args:
-            file_path (str): The path to the file.
+            path (str): The path to the file.
 
         Returns:
             bytes: The contents of the file as a byte array, or None if an error occurs.
         """
 
         try:
-            if file_path.endswith(".gz"):
-                with gzip.open(file_path, "rb") as f:
+            if path.endswith(".gz"):
+                with gzip.open(path, "rb") as f:
                     data = f.read()
             else:
-                with open(file_path, "rb") as f:
+                with open(path, "rb") as f:
                     data = f.read()
             return data
 
         except (FileNotFoundError, gzip.BadGzipFile) as e:
-            logger.error(f"Error reading file {file_path}: {e}")
+            logger.error(f"Error reading file {path}: {e}")
             raise e
 
     def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) -> dict[str, bytes]:
@@ -374,13 +374,13 @@ class DataAccessLocal(DataAccess):
             matching_files[filename] = _get_file_content(filename, return_data)
         return matching_files
 
-    def save_file(self, file_path: str, bytes_data: bytes) -> dict[str, Any]:
+    def save_file(self, path: str, data: bytes) -> dict[str, Any]:
         """
         Saves bytes to a file and returns a dictionary with file information.
 
         Args:
-            bytes_data (bytes): The bytes data to save.
-            file_path (str): The full name of the file to save.
+            data (bytes): The bytes data to save.
+            path (str): The full name of the file to save.
 
         Returns:
             dict or None: A dictionary with "name" and "size" keys if successful,
@@ -388,12 +388,12 @@ class DataAccessLocal(DataAccess):
         """
 
         try:
-            os.makedirs(os.path.dirname(file_path), exist_ok=True)
-            with open(file_path, "wb") as f:
-                f.write(bytes_data)
-            file_info = {"name": file_path, "size": os.path.getsize(file_path)}
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "wb") as f:
+                f.write(data)
+            file_info = {"name": path, "size": os.path.getsize(path)}
             return file_info
 
         except Exception as e:
-            logger.error(f"Error saving bytes to file {file_path}: {e}")
+            logger.error(f"Error saving bytes to file {path}: {e}")
             return None

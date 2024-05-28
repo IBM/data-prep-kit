@@ -17,7 +17,7 @@ import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.ray import (
-    DefaultTableTransformRuntimeRay,
+    DefaultRayTransformRuntime,
     RayTransformLauncher,
     RayUtils,
 )
@@ -163,7 +163,7 @@ class EdedupTransform(AbstractTableTransform):
         return unique
 
 
-class EdedupRuntime(DefaultTableTransformRuntimeRay):
+class EdedupRuntime(DefaultRayTransformRuntime):
     """
     Exact dedup runtime support
     """
@@ -249,7 +249,7 @@ class EdedupTableTransformConfiguration(TransformConfiguration):
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         self.params = self.params | captured
         if self.params["num_hashes"] <= 0:
-            logger.info(f"Number of hashes should be greater then zero, provided {args.num_hashes}")
+            logger.info(f"Number of hashes should be greater then zero, provided {self.params['num_hashes']}")
             return False
         logger.info(f"exact dedup params are {self.params}")
         return True

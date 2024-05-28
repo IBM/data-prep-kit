@@ -13,7 +13,7 @@
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider
 
 
@@ -34,12 +34,12 @@ class TransformRuntimeConfiguration(CLIArgumentProvider):
     def get_input_params(self) -> dict[str, Any]:
         return self.transform_config.get_input_params()
 
-    def get_transform_class(self) -> type[AbstractTableTransform]:
+    def get_transform_class(self) -> type[AbstractBinaryTransform]:
         """
-        Get the class extending AbstractTableTransform which implements a specific transformation.
+        Get the class extending AbstractTransform which implements a specific transformation.
         The class will generally be instantiated with a dictionary of configuration produced by
         the associated TransformRuntime get_transform_config() method.
-        :return: class extending AbstractTableTransform
+        :return: class extending AbstractTransform
         """
         return self.transform_config.get_transform_class()
 
