@@ -46,6 +46,9 @@ venv::	pyproject.toml
 	pip install -e .;		\
 	pip install pytest pytest-cov moto==5.0.5 markupsafe==2.0.1
 
+image:: 
+	@# Help: Placeholder does nothing for now.
+	@echo "Image building for ray is in the works (comming soon)."
 
 # Here we run each test directory of tests and each ray launched test separately, because
 # it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.
@@ -58,7 +61,8 @@ test::
 	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/launch/pure_python/multi_launcher_test.py;
 	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/launch/pure_python/test_noop_launch.py;
 	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/ray_util_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/multi_launcher_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/launcher_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/test_noop_launch.py;
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/ray_launcher_test.py;
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/ray_test_noop_launch.py;
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/ray_multi_launcher_test.py;
+
 

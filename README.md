@@ -47,8 +47,8 @@ Contributors are welcome to add new modules as well as add runtime support for e
 
 |Modules                       | Python-only       | Ray              | Spark              | KFP on Ray             |
 |------------------------------  |-------------------|------------------|--------------------|------------------------|
-|No-op / template                |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
-|Doc ID annotation               |:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      |
+|No-op / template                |:white_check_mark: |:white_check_mark:|:white_check_mark   |:white_check_mark:      |
+|Doc ID annotation               |:white_check_mark: |:white_check_mark:|:white_check_mark   |:white_check_mark:      |
 |Programming language annnotation|:white_check_mark: |:white_check_mark:|                    |:white_check_mark:      | 
 |Exact dedup filter              |                   |:white_check_mark:|                    |:white_check_mark:      |
 |Fuzzy dedup filter              |                   |:white_check_mark:|                    |:white_check_mark:      |

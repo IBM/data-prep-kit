@@ -6,9 +6,10 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed '
 
 include makeenv
 DOCKER_FILE=Dockerfile
-DOCKER_NAME=kfp-data-processing
+DOCKER_IMAGE_NAME=kfp-data-processing
 DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
-DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_NAME}:${DOCKER_IMAGE_VERSION}
+#DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}
+DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 
 # Include the common rules.
 # Use "make help" to see them.

@@ -5,7 +5,7 @@
 # REPOROOT points to the top of the git repository. 
 # 	For example REPOROOT=../../..
 # TRANSFORM_NAME defines the name of the transform and is used to derive
-#  	DOCKER_NAME  and TRANSFORM_SRC_FILE if not already defined.
+#  	DOCKER_IMAGE_NAME  and TRANSFORM_SRC_FILE if not already defined.
 
 # Optional inputs (that have defaults)
 # TRANSFORM_SRC_FILE is the base name of the python source file containing the main()
@@ -13,7 +13,7 @@
 #       By convention this name defaults to $(TRANSFORM_NAME)_transform.py.
 #	This file is then assumed to be in the home dir of the docker image and
 #	can be run with "python $(TRANSFORM_SRC_FILE) --help"
-# DOCKER_NAME  is the name of the docker image.  
+# DOCKER_IMAGE_NAME  is the name of the docker image.  
 #	By default its value is $(TRANSFORM_NAME).
 #
 # Targets defined here use double colon so can be overriden
@@ -28,8 +28,12 @@
 #######################################################################################
 include $(REPOROOT)/.make.defaults
 
-DOCKER_NAME?=$(TRANSFORM_NAME)
-#DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_NAME):$(DOCKER_IMAGE_VERSION)
+ifeq ($(origin TRANSFORM_RUNTIME), undefined)
+#$(error TRANSFORM_RUNTIME must be defined before including this file)
+DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
+else
+DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)-$(TRANSFORM_RUNTIME)
+endif
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
 TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_transform.py
@@ -47,7 +51,7 @@ extra-help:
 	@echo DOCKER_REGISTRY_ENDPOINT - the docker registry location to publish images.  DOCKER_REGISTRY_ENDPOINT=$(DOCKER_REGISTRY_ENDPOINT)
 	@echo DOCKER_HOSTNAME - the name of the docker registry to use.  DOCKER_HOSTNAME=$(DOCKER_HOSTNAME)
 	@echo DOCKER_NAMESPACE - the name space to use in the registry.  DOCKER_NAMESPACE=$(DOCKER_NAMESPACE)
-	@echo DOCKER_NAME - the name under the name space where images are publishes.  DOCKER_NAME=$(DOCKER_NAME)
+	@echo DOCKER_IMAGE_NAME - the name under the name space where images are publishes.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
 	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
 	@echo DOCKER_REGISTRY_KEY - the docker user to use.  DOCKER_REGISTRY_KEY=secret
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
@@ -90,8 +94,11 @@ extra-help:
 # We install wheel, because it seems to be required for fasttext install on redhat.
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
-.PHONY: .transforms.venv
+.PHONY: .transforms.ray-venv
 .transforms.ray-venv:: .defaults.ray-lib-src-venv
+
+.PHONY: .transforms.spark-venv
+.transforms.spark-venv:: .defaults.spark-lib-src-venv
 
 .PHONY: .transforms.check_env
 .transforms.check_env::
@@ -103,12 +110,23 @@ extra-help:
 .PHONY: .transforms.ray-image
 .transforms.ray-image:: .defaults.ray-lib-src-image
 
+.PHONY: .transforms.spark-image
+.transforms.spark-image:: .defaults.spark-lib-src-image
+
 .PHONY: .transforms.ray-build
-.transforms.ray-build:: .transforms.venv .transforms.ray-image	
+.transforms.ray-build:: .transforms.ray-venv .transforms.ray-image	
+	@# Help: Create the venv and build the transform image 
+
+.PHONY: .transforms.spark-build
+.transforms.spark-build:: .transforms.spark-venv .transforms.spark-image	
 	@# Help: Create the venv and build the transform image 
 
 .PHONY: .transforms.ray-test 
 .transforms.ray-test::  .transforms.test-src .transforms.ray-test-image
+	@# Help: Run both source and image level tests.
+
+.PHONY: .transforms.spark-test 
+.transforms.spark-test::  .transforms.test-src .transforms.spark-test-image
 	@# Help: Run both source and image level tests.
 
 # Assumes the runtime-specific venv has already been built.
@@ -119,13 +137,16 @@ extra-help:
 .PHONY: .transforms.ray-test-image
 .transforms.ray-test-image:: .transforms.ray-image .defaults.test-image-pytest 
 
+.PHONY: .transforms.spark-test-image
+.transforms.spark-test-image:: .transforms.spark-image .defaults.test-image-pytest 
+
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest:: .defaults.test-image-pytest 
 
 .PHONY: .transforms.test-image-help
 .transforms.test-image-help::
 	@# Help: Test an already-built image (use make image) to be sure the --help option works
-	$(DOCKER) run -t --rm $(DOCKER_IMAGE) python $(TRANSFORM_SRC_FILE) --help
+	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) python $(TRANSFORM_SRC_FILE) --help
 
 .PHONY: test-locals
 test-locals:: .transforms.test-locals
@@ -136,6 +157,9 @@ test-locals:: .transforms.test-locals
 # Build the image the transform way and then use the default publishing
 .PHONY: .transforms.ray-publish
 .transforms.ray-publish:: .transforms.ray-image .defaults.publish 
+
+.PHONY: .transforms.spark-publish
+.transforms.spark-publish:: .transforms.spark-image .defaults.publish 
 
 .PHONY: .transforms-check-exists
 .transforms-check-exists:
@@ -168,7 +192,7 @@ test-locals:: .transforms.test-locals
 .PHONY: .transforms.load-image
 .transforms.load-image:
 	@# Help:  Load the transform image to the kind cluster created with make setup.
-	kind load docker-image $(DOCKER_IMAGE) --name=$(KIND_CLUSTER_NAME)
+	kind load docker-image $(DOCKER_LOCAL_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
 .PHONY: conventions
 conventions:
@@ -219,6 +243,11 @@ conventions:
 .transforms.run-cli-ray-sample:
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
 		RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" " .transforms.run-src-file
+
+.PHONY: .transforms.run-cli-spark-sample 
+.transforms.run-cli-spark-sample:
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+		RUN_ARGS="--data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" --spark_local_config_filepath ../config/spark_profile_local.yml " .transforms.run-src-file
 
 # Expects RUN_FILE
 .PHONY: .transforms.run-src-file

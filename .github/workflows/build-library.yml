@@ -9,7 +9,7 @@ on:
         branches:
             - "dev"
 jobs:
-    build-lib:
+    build-ray-lib:
         runs-on: ubuntu-latest
         strategy:
             matrix:
@@ -21,3 +21,15 @@ jobs:
             - name: Build data-processing-lib/ray
               run: |
                   make -C data-processing-lib/ray DOCKER=docker venv build
+    build-spark-lib:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python:
+                    - "3.11"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Build data-processing-lib/spark
+              run: |
+                  make -C data-processing-lib/spark DOCKER=docker venv build

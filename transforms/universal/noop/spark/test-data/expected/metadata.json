@@ -1,0 +1,12 @@
+{
+    "nfiles": 1,
+    "nrows": 7,
+    "source": {
+        "name": "/home/cma/de/data-prep-kit/transforms/universal/noop/spark/test-data/input",
+        "type": "path"
+    },
+    "target": {
+        "name": "/home/cma/de/data-prep-kit/transforms/universal/noop/spark/output",
+        "type": "path"
+    }
+}

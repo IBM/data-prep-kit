@@ -62,7 +62,14 @@ class AbstractTransformLauncherTest(AbstractTest):
             print(f"Using temporary output path {temp_dir}")
             sys.argv = self._get_argv(launcher, cli_params, in_table_path, temp_dir)
             launcher.launch()
-            AbstractTest.validate_directory_contents(temp_dir, expected_out_table_path)
+            self._validate_directory_contents_match(temp_dir, expected_out_table_path)
+
+    def _validate_directory_contents_match(self, dir: str, expected: str):
+        """
+        Confirm that the two directories contains the same files.
+        Stubbed out like this to allow spark tests to override this since spark tends to rename the files.
+        """
+        AbstractTest.validate_directory_contents(dir, expected)
 
     def _install_test_fixtures(self, metafunc):
         # Apply the fixtures for the method with these input names (i.e. test_transform()).

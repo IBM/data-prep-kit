@@ -16,6 +16,7 @@ jobs:
               uses: actions/checkout@v4
             - name: Build and Test Code Transforms
               run: |
+                  make -C data-processing-lib DOCKER=docker image 
                   make -C transforms/code DOCKER=docker image test-image
     build-universal:
         runs-on: ubuntu-latest
@@ -24,12 +25,14 @@ jobs:
               uses: actions/checkout@v4
             - name: Build and Test Universal Transforms
               run: |
+                  make -C data-processing-lib DOCKER=docker image 
+                  docker images
                   make -C transforms/universal DOCKER=docker image test-image
     build-tools:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Build and Test Universal Transforms
+            - name: Build and Test Tool images
               run: |
                   make -C tools/ingest2parquet DOCKER=docker image test-image
