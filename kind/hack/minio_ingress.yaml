@@ -4,7 +4,7 @@ metadata:
     name: minio
     namespace: kubeflow
 spec:
-    ingressClassName: nginx
+    ingressClassName: nginx-minio
     rules:
         - http:
               paths:

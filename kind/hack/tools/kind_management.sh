@@ -34,6 +34,10 @@ kind_create() {
       echo "port 8080 is in use, please clear the port and try again"
       exit 1
   fi
+  if lsof -Pi :8090 -sTCP:LISTEN -t >/dev/null ; then
+      echo "port 8090 is in use, please clear the port and try again"
+      exit 1
+  fi
   kind create cluster --name $cluster_name --config ${ROOT_DIR}/hack/kind-cluster-config.yaml
 }
 

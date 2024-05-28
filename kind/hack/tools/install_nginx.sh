@@ -2,15 +2,17 @@
 
 op=$1
 
-SLEEP_TIME="${SLEEP_TIME:-50}"
-MAX_RETRIES="${MAX_RETRIES:-10}"
+SLEEP_TIME="${SLEEP_TIME:-30}"
+MAX_RETRIES="${MAX_RETRIES:-20}"
 EXIT_CODE=0
 NGINX_INSTALLATION_FILE="${ROOT_DIR}/hack/nginx_deploy.yaml"
+NGINX_MINIO_INSTALLATION_FILE="${ROOT_DIR}/hack/nginx_deploy_minio.yaml"
 
-source ../common.sh
+source ${ROOT_DIR}/hack/common.sh
 
 deploy() {
 	kubectl apply -f "$NGINX_INSTALLATION_FILE"
+	kubectl apply -f "$NGINX_MINIO_INSTALLATION_FILE"
 }
 
 wait(){
@@ -25,6 +27,7 @@ wait(){
 }
 
 delete(){
+  kubectl delete -f "$NGINX_MINIO_INSTALLATION_FILE"
 	kubectl delete -f "$NGINX_INSTALLATION_FILE"
 }
 

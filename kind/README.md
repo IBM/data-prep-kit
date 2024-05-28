@@ -5,6 +5,7 @@
 - [Supported platforms](../kfp/doc/setup.md#kind_platforms)
 - [Preinstalled software components](../kfp/doc/setup.md#kind)
 - [Preparing a Kind cluster for testing](../kfp/doc/setup.md#installation)
+
 As an alternative, you can execute the following manual installation instructions:
 
 ### Create cluster
@@ -45,7 +46,7 @@ kubectl wait --for=condition=ready --all pod -n kuberay --timeout=300s
 
 To access the API server and Kubeflow pipeline UI externally, we make use NGINX ingress.
 
-Install [Ingress NGNIX](https://kind.sigs.k8s.io/docs/user/ingress/#ingress-nginx) and wait for it to be ready:
+Install [Ingress NGNIX](https://kind.sigs.k8s.io/docs/user/ingress/#ingress-nginx) for KFP, RAY and MinIO and wait for it to be ready:
 
 ```shell
 ${ROOT_DIR}/hack/tools/install_nginx.sh deploy
@@ -62,16 +63,15 @@ kubectl apply -f $ROOT_DIR/hack/kfp_ingress.yaml
 kubectl apply -f $ROOT_DIR/hack/minio_ingress.yaml
 ```
 
-Open the Kubeflow Pipelines UI at  http://localhost:8080/kfp/
-Note: pay attention to the slash at the end of the URL.
+Open the Kubeflow Pipelines UI at  http://localhost:8080/
 
 
 ### Working with a MinIO server instead of S3 storage
 You can work with a real S3 storage, but for testing you can use the Mino server which is deployed as part of the KFP
-installation.
+installation. You can access the Minio dashboard at http://localhost:8090/
 
-#### Create a sicret
-The MinIO service, deployed as a part of KFP, uses a username (`minio`) as an access key and password ('minio123')
+#### Create a secret
+The MinIO service, deployed as a part of KFP, uses a username (`minio`) as an access_key/password (`minio123`)
 as the secret key.
 A secret needs to be created for accessing MinIO using the following command:
 

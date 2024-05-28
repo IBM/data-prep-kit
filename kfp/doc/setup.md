@@ -76,6 +76,7 @@ If you do not want to upload the testing data into the locally deployed Minio, a
 ```bash
 export POPULATE_TEST_DATA ?= 0
 ```
+You can access the KFP dashboard at http://localhost:8080/ and the MinIO dashboard at http://localhost:8090/
 
 ### Installation on an existing Kubernetes cluster <a name = "installation_existing"></a>
 Alternatively you can deploy pipeline to the existing Kubernetes cluster. If your local kubectl is configured to 
