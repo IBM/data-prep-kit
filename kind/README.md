@@ -78,7 +78,7 @@ Open the Kubeflow Pipelines UI at  http://localhost:8080/
 
 ### Working with a MinIO server instead of S3 storage
 You can work with a real S3 storage, but for testing you can use the Mino server which is deployed as part of the KFP
-installation.
+installation. You can access the Minio dashboard at http://localhost8090/
 
 #### Create a sicret
 The MinIO service, deployed as a part of KFP, uses a username (`minio`) as an access key and password ('minio123')
