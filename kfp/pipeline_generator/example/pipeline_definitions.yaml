@@ -1,0 +1,22 @@
+pipeline_parameters:
+    name: "noop"
+    description: "Pipeline for noop task"
+    script_name: "transformer_launcher.py"
+    prefix: ""
+    multi_s3: False
+    compute_func_name: ""
+    compute_func_import: ""
+
+pipeline_common_input_parameters_values:
+    transform_image: "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop-guf:0.0.1"
+    s3_access_secret: "cos-access"
+    image_pull_secret: "prod-all-icr-io"
+    input_folder: "cos-optimal-llm-pile/doc_annotation_test/input/noop_small/"
+    output_folder: "cos-optimal-llm-pile/doc_annotation_test/output_noop_guf/"
+
+pipeline_transform_input_parameters:
+   pipeline_arguments:
+        - name: "noop_sleep_sec"
+          type: "int"
+          value: 10
+          description: "# noop sleep time"
