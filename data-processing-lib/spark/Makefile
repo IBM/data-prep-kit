@@ -2,9 +2,9 @@
 REPOROOT=../..
 include $(REPOROOT)/.make.defaults
 SPARK_VERSION=3.5.1
-DOCKER_IMAGE_BASE_NAME=data-prep-kit-spark-$(SPARK_VERSION)
-DOCKER_IMAGE_LIB_NAME=data-prep-kit-spark
+DOCKER_NAME=data-prep-kit-spark-$(SPARK_VERSION)
 DOCKER_IMAGE_VERSION=$(DPK_LIB_VERSION)
+DOCKER_IMAGE_LIB_NAME=data-prep-kit-spark
 TAG := "v${DPK_LIB_VERSION}"
 
 
@@ -56,7 +56,7 @@ image:: image-spark
 
 image-spark:: Dockerfile
 	@# Help: Build the bare Spark image 
-	$(MAKE) DOCKER_NAME=$(DOCKER_IMAGE_BASE_NAME) .defaults.image
+	$(MAKE) .defaults.image
 
 #image-dpk:: Dockerfile
 #	@# Help: Build the Spark image containing the data-prep-kit for spark 
