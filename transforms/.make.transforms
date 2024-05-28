@@ -5,7 +5,7 @@
 # REPOROOT points to the top of the git repository. 
 # 	For example REPOROOT=../../..
 # TRANSFORM_NAME defines the name of the transform and is used to derive
-#  	DOCKER_NAME  and TRANSFORM_SRC_FILE if not already defined.
+#  	DOCKER_IMAGE_NAME  and TRANSFORM_SRC_FILE if not already defined.
 
 # Optional inputs (that have defaults)
 # TRANSFORM_SRC_FILE is the base name of the python source file containing the main()
@@ -13,7 +13,7 @@
 #       By convention this name defaults to $(TRANSFORM_NAME)_transform.py.
 #	This file is then assumed to be in the home dir of the docker image and
 #	can be run with "python $(TRANSFORM_SRC_FILE) --help"
-# DOCKER_NAME  is the name of the docker image.  
+# DOCKER_IMAGE_NAME  is the name of the docker image.  
 #	By default its value is $(TRANSFORM_NAME).
 #
 # Targets defined here use double colon so can be overriden
@@ -30,9 +30,9 @@ include $(REPOROOT)/.make.defaults
 
 ifeq ($(origin TRANSFORM_RUNTIME), undefined)
 #$(error TRANSFORM_RUNTIME must be defined before including this file)
-DOCKER_NAME?=$(TRANSFORM_NAME)
+DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
 else
-DOCKER_NAME?=$(TRANSFORM_NAME)-$(TRANSFORM_RUNTIME)
+DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)-$(TRANSFORM_RUNTIME)
 endif
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
@@ -51,7 +51,7 @@ extra-help:
 	@echo DOCKER_REGISTRY_ENDPOINT - the docker registry location to publish images.  DOCKER_REGISTRY_ENDPOINT=$(DOCKER_REGISTRY_ENDPOINT)
 	@echo DOCKER_HOSTNAME - the name of the docker registry to use.  DOCKER_HOSTNAME=$(DOCKER_HOSTNAME)
 	@echo DOCKER_NAMESPACE - the name space to use in the registry.  DOCKER_NAMESPACE=$(DOCKER_NAMESPACE)
-	@echo DOCKER_NAME - the name under the name space where images are publishes.  DOCKER_NAME=$(DOCKER_NAME)
+	@echo DOCKER_IMAGE_NAME - the name under the name space where images are publishes.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
 	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
 	@echo DOCKER_REGISTRY_KEY - the docker user to use.  DOCKER_REGISTRY_KEY=secret
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)

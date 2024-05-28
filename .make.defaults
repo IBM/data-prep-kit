@@ -5,8 +5,8 @@
 # Before including, the following must be defined:
 # REPOROOT points to the top of the git repository. 
 # 	For example REPOROOT=../../..
-# DOCKER_NAME - defines the name of the docker image
-#	For example DOCKER_NAME=noop
+# DOCKER_IMAGE_NAME - defines the name of the docker image
+#	For example DOCKER_IMAGE_NAME=noop
 # EXTRA_INDEX_URL - can define an additional pipy index for use 
 #	in creating venv and images.  This will be used on pip installs
 #	when building the venv and will be made available as
@@ -35,15 +35,15 @@ PYTEST=pytest -s
 PYTHON_VERSION=$(shell $(PYTHON) --version)
 ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 DOCKER_FILE?=Dockerfile
-#DOCKER_NAME?=xyzzy	# Must be defined by the includeing makefile
+#DOCKER_IMAGE_NAME?=xyzzy	# Must be defined by the includeing makefile
 DOCKER?=docker
 DOCKER_HOSTNAME?=quay.io
 DOCKER_NAMESPACE ?= dataprep1/data-prep-kit
 DOCKER_REGISTRY_USER?=$(DPK_DOCKER_REGISTRY_USER)
 DOCKER_REGISTRY_KEY?=$(DPK_DOCKER_REGISTRY_KEY)
 DOCKER_REGISTRY_ENDPOINT?=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)
-DOCKER_LOCAL_IMAGE=$(DOCKER_NAME):$(DOCKER_IMAGE_VERSION)
-DOCKER_REMOTE_IMAGE=$(DOCKER_NAME):$(DOCKER_IMAGE_VERSION)
+DOCKER_LOCAL_IMAGE=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
+DOCKER_REMOTE_IMAGE=$DOCKER_HOSTNAME)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 DOCKER_SPARK_BASE_IMAGE=data-prep-kit-spark-3.5.1:$(DPK_LIB_VERSION)
 # Deprecated in favor of DOCKER_REMOTE_IMAGE
 DOCKER_IMAGE?=$(DOCKER_REMOTE_IMAGE)
