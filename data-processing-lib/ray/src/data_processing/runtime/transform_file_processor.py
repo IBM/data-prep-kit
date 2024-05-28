@@ -133,8 +133,11 @@ class AbstractTransformFileProcessor:
                 else:
                     self.logger.warning(f"Failed to write file {output_name}")
                     self._publish_stats({"failed_writes": 1})
-                self.last_file_name_next_index = 0
-            case _:
+                if self.last_file_name_next_index is None:
+                    self.last_file_name_next_index = 0
+                else:
+                    self.last_file_name_next_index += 1
+             case _:
                 # we have more then 1 file
                 file_sizes = 0
                 output_file_name = self.data_access.get_output_location(path=self.last_file_name)
