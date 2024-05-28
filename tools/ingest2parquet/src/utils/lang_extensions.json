@@ -315,6 +315,7 @@
     "Pickle": [".pkl"],
     "PigLatin": [".pig"],
     "Pike": [".pike", ".pmod"],
+    "PLI": [".PLI", ".pli", ".inc", ".INC"],
     "Pod": [".pod"],
     "PogoScript": [".pogo"],
     "Pony": [".pony"],
