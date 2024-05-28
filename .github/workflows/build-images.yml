@@ -26,6 +26,7 @@ jobs:
             - name: Build and Test Universal Transforms
               run: |
                   make -C data-processing-lib DOCKER=docker image 
+                  docker images
                   make -C transforms/universal DOCKER=docker image test-image
     build-tools:
         runs-on: ubuntu-latest
