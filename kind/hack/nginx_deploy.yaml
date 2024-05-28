@@ -92,8 +92,6 @@ rules:
           - watch
     - apiGroups:
           - coordination.k8s.io
-      resourceNames:
-          - ingress-nginx-leader
       resources:
           - leases
       verbs:
