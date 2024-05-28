@@ -123,8 +123,8 @@ The common part of are:
 -Docker/Podman
 
 Two important development tools will also be installed using the steps below:
--[pre-commit](https://pre-commit.com/)
--[twine](https://twine.readthedocs.io/en/stable/) 
+- [pre-commit](https://pre-commit.com/)
+- [twine](https://twine.readthedocs.io/en/stable/) 
 
 #### Installation Steps
 ```shell
@@ -151,24 +151,15 @@ that can run on your machine. This implementation can also be extended to connec
 
 ### Automate a Pipeline
 The data preprocessing can be automated by running transformers as a Kubeflow pipeline (KFP). 
-See this simple transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md). See [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
-if you want to combine several data transformation steps.
+The project facilitates the creation of a local [Kind cluster](https://kind.sigs.k8s.io/) with all the required 
+software and test data, or deployment of required software on an existing cluster. 
+See [Set up a Kubernetes clusters for KFP execution](kfp/doc/setup.md)
 
-The project facilitates the creation of a local [Kind cluster](https://kind.sigs.k8s.io/) with all the required software and test data. 
-To work with the Kind cluster and KFP, you need to install several required software packages. Please refer to 
-[prerequisite software](./kind/README.md#preinstalled-software) for more details.
+A simple transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md) explains the pipeline creation and execution. 
+In addition, if you want to combine severat transformers in a single pipeline, you can look at [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
 
-When you have all those packages installed, you can execute the following setup command,
-
-```bash
-make setup
-```
-from this main package directory or from the `kind` directory.
-
-When you finish working with the cluster, you can destroy it by running,
-```bash
-make clean
-```
+When you finish working with the cluster, and want to clean up or destroy it. See the 
+[clean up the cluster](../kfp/doc/setup.md#cleanup)
 
 ### How to Navigate and Use the Repository
 See the documentation on [repository structure and its use](doc/repo.md). 
