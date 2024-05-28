@@ -33,7 +33,6 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Build and Test Universal Transforms
+            - name: Build and Test Tool images
               run: |
-                  make -C data-processing-lib DOCKER=docker image 
                   make -C tools/ingest2parquet DOCKER=docker image test-image
