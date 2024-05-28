@@ -74,51 +74,53 @@ class SparkTransformLauncher(AbstractTransformLauncher):
             app_name = spark_config.get("spark.app.name", "my-spark-app")
             self.spark = SparkSession.builder.appName(app_name).config(map=spark_config).getOrCreate()
         else:
-            # we are running in Kubernetes, use spark_profile.yaml and
-            # environment variables for configuration
+            logger.info("Kubernetes launch currently work in progress")
 
-            server_port = os.environ["KUBERNETES_SERVICE_PORT"]
-            master_url = f"k8s://https://kubernetes.default:{server_port}"
+        #     # we are running in Kubernetes, use spark_profile.yaml and
+        #     # environment variables for configuration
 
-            # Read Spark configuration profile
-            config_filepath = self.execution_config.kube_config_filepath
-            with open(config_filepath, "r") as config_fp:
-                spark_config = yaml.safe_load(os.path.expandvars(config_fp.read()))
-            spark_config["spark.submit.deployMode"] = "client"
+        #     server_port = os.environ["KUBERNETES_SERVICE_PORT"]
+        #     master_url = f"k8s://https://kubernetes.default:{server_port}"
 
-            # configure the executor pods from template
-            # todo: put this file in the pypi wheel
-            logger.warning("TODO: Need to define location of pod template!")
-            executor_pod_template_file = os.path.join(
-                os.path.dirname(__file__),
-                "templates",
-                "spark-executor-pod-template.yaml",
-            )
-            spark_config["spark.kubernetes.executor.podTemplateFile"] = executor_pod_template_file
-            spark_config["spark.kubernetes.container.image.pullPolicy"] = "Always"
+        #     # Read Spark configuration profile
+        #     config_filepath = self.execution_config.kube_config_filepath
+        #     with open(config_filepath, "r") as config_fp:
+        #         spark_config = yaml.safe_load(os.path.expandvars(config_fp.read()))
+        #     spark_config["spark.submit.deployMode"] = "client"
 
-            # Pass the driver IP address to the workers for callback
-            myservice_url = socket.gethostbyname(socket.gethostname())
-            spark_config["spark.driver.host"] = myservice_url
-            spark_config["spark.driver.bindAddress"] = "0.0.0.0"
+        #     # configure the executor pods from template
+        #     # todo: put this file in the pypi wheel
+        #     logger.warning("TODO: Need to define location of pod template!")
+        #     executor_pod_template_file = os.path.join(
+        #         os.path.dirname(__file__),
+        #         "templates",
+        #         "spark-executor-pod-template.yaml",
+        #     )
+        #     spark_config["spark.kubernetes.executor.podTemplateFile"] = executor_pod_template_file
+        #     spark_config["spark.kubernetes.container.image.pullPolicy"] = "Always"
 
-            spark_config["spark.decommission.enabled"] = True
+        #     # Pass the driver IP address to the workers for callback
+        #     myservice_url = socket.gethostbyname(socket.gethostname())
+        #     spark_config["spark.driver.host"] = myservice_url
+        #     spark_config["spark.driver.bindAddress"] = "0.0.0.0"
 
-            logger.info(f"Launching Spark Session with configuration\n" f"{yaml.dump(spark_config, indent=2)}")
-            app_name = spark_config.get("spark.app.name", "my-spark-app")
-            self.spark = (
-                SparkSession.builder.master(master_url).appName(app_name).config(map=spark_config).getOrCreate()
-            )
+        #     spark_config["spark.decommission.enabled"] = True
 
-        # configure S3 for Spark Session
-        hconf = self.spark.sparkContext._jsc.hadoopConfiguration()
-        hconf.set("com.amazonaws.services.s3.enableV4", "true")
-        hconf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
-        # hconf.set(
-        #     "fs.s3a.aws.credentials.provider",
-        #     "com.amazonaws.auth.InstanceProfileCredentialsProvider,com.amazonaws.auth.DefaultAWSCredentialsProviderChain",
-        # )
-        hconf.set("fs.AbstractFileSystem.s3a.impl", "org.apache.hadoop.fs.s3a.S3A")
+        #     logger.info(f"Launching Spark Session with configuration\n" f"{yaml.dump(spark_config, indent=2)}")
+        #     app_name = spark_config.get("spark.app.name", "my-spark-app")
+        #     self.spark = (
+        #         SparkSession.builder.master(master_url).appName(app_name).config(map=spark_config).getOrCreate()
+        #     )
+
+        # # configure S3 for Spark Session
+        # hconf = self.spark.sparkContext._jsc.hadoopConfiguration()
+        # hconf.set("com.amazonaws.services.s3.enableV4", "true")
+        # hconf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        # # hconf.set(
+        # #     "fs.s3a.aws.credentials.provider",
+        # #     "com.amazonaws.auth.InstanceProfileCredentialsProvider,com.amazonaws.auth.DefaultAWSCredentialsProviderChain",
+        # # )
+        # hconf.set("fs.AbstractFileSystem.s3a.impl", "org.apache.hadoop.fs.s3a.S3A")
 
     def _stop_spark(self):
         self.spark.stop()
