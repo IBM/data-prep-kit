@@ -7,13 +7,13 @@ from kfp_support.workflow_support.utils import ONE_WEEK_SEC
 # Components
 # For every sub workflow we need a separate components, that knows about this subworkflow.
 component_spec_path = "../../../kfp_ray_components/"
-run_code_quality_op = comp.load_component_from_file(component_spec_path+"executeSubWorkflowComponent.yaml")
-run_malware_op = comp.load_component_from_file(component_spec_path+"executeSubWorkflowComponent.yaml")
-run_proglang_select_op = comp.load_component_from_file(component_spec_path+"executeSubWorkflowComponent.yaml")
-run_doc_id_op = comp.load_component_from_file(component_spec_path+"executeSubWorkflowComponent.yaml")
-run_exact_dedup_op = comp.load_component_from_file(component_spec_path+"executeSubWorkflowComponent.yaml")
-run_fuzzy_dedup_op = comp.load_component_from_file(component_spec_path+"executeSubWorkflowComponent.yaml")
-run_tokenization_op = comp.load_component_from_file(component_spec_path+"executeSubWorkflowComponent.yaml")
+run_code_quality_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
+run_malware_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
+run_proglang_select_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
+run_doc_id_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
+run_exact_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
+run_fuzzy_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
+run_tokenization_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 
 proglang_select_image = "quay.io/dataprep1/data-prep-kit/proglang_select:0.3.0"
 code_quality_image = "quay.io/dataprep1/data-prep-kit/code_quality:0.3.0"
@@ -48,15 +48,14 @@ def sample_code_ray_orchestrator(
     p2_pipeline_additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
     p2_pipeline_data_s3_access_secret: str = "s3-secret",
     p2_pipeline_runtime_code_location: str = '{"github": "github", "commit_hash": "12345", "path": "path"}',
+    p2_pipeline_runtime_actor_options: str = '{"num_cpus": 0.8}',
+    p2_pipeline_data_max_files: int = -1,
+    p2_pipeline_data_num_samples: int = -1,
     # Exact dedup step parameters
     p3_name: str = "ededup",
     p3_skip: bool = False,
     p3_ededup_doc_column: str = "contents",
     p3_ededup_hash_cpu: float = 0.5,
-    p3_runtime_actor_options: str = '{"num_cpus": 0.8}',
-    # data access.
-    p3_data_max_files: int = -1,
-    p3_data_num_samples: int = -1,
     # data sampling
     p3_ededup_n_samples: int = 10,
     # overriding parameters
@@ -68,11 +67,6 @@ def sample_code_ray_orchestrator(
     # Document ID step parameters
     p4_name: str = "doc_id",
     p4_skip: bool = False,
-    # data access.
-    p4_data_max_files: int = -1,
-    p4_data_num_samples: int = -1,
-    # orchestrator
-    p4_runtime_actor_options: str = '{"num_cpus": 0.8}',
     # doc id parameters
     p4_doc_id_doc_column: str = "contents",
     p4_doc_id_hash_column: str = "hash_column",
@@ -91,10 +85,6 @@ def sample_code_ray_orchestrator(
     p5_fdedup_id_column: str = "int_id_column",
     p5_fdedup_cluster_column: str = "cluster",
     # orchestrator
-    p5_runtime_actor_options: str = '{"num_cpus": 0.8}',
-    # data access. checkpointing is not supported by dedup
-    p5_data_num_samples: int = -1,
-    p5_data_max_files: int = -1,
     # infrastructure
     p5_fdedup_bucket_cpu: float = 0.5,
     p5_fdedup_doc_cpu: float = 0.5,
@@ -124,11 +114,6 @@ def sample_code_ray_orchestrator(
     p6_proglang_select_allowed_langs_file: str = "test/proglang_select/languages/allowed-code-languages.txt",
     p6_proglang_select_language_column: str = "programming_language",
     p6_proglang_select_s3_access_secret: str = "s3-secret",
-    # data access.
-    p6_data_max_files: int = -1,
-    p6_data_num_samples: int = -1,
-    # orchestrator
-    p6_runtime_actor_options: str = '{"num_cpus": 0.8}',
     # overriding parameters
     p6_overriding_params: str = '{"ray_worker_options": {"image": "'
     + proglang_select_image
@@ -142,11 +127,7 @@ def sample_code_ray_orchestrator(
     p7_cq_language_column_name: str = "programming_language",
     p7_cq_tokenizer: str = "codeparrot/codeparrot",
     p7_cq_hf_token: str = "None",
-    # data access.
-    p7_data_max_files: int = -1,
-    p7_data_num_samples: int = -1,
     # orchestrator
-    p7_runtime_actor_options: str = '{"num_cpus": 0.8}',
     # overriding parameters
     p7_overriding_params: str = '{"ray_worker_options": {"image": "'
     + code_quality_image
@@ -159,10 +140,6 @@ def sample_code_ray_orchestrator(
     p8_malware_input_column: str = "contents",
     p8_malware_output_column: str = "virus_detection",
     # orchestrator
-    p8_runtime_actor_options: str = '{"num_cpus": 0.8}',
-    # data access.
-    p8_data_max_files: int = -1,
-    p8_data_num_samples: int = -1,
     # overriding parameters
     p8_overriding_params: str = '{"ray_worker_options": {"image": "'
     + malware_image
