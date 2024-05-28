@@ -7,7 +7,7 @@
   - [An existing cluster](#existing_cluster)
 - [Installation steps](#installation)
   - [Installation on an existing Kubernetes cluster](#installation_existing)
-- [Clean up the cluster](#cleanup")
+- [Clean up the cluster](#cleanup)
 
 The project provides instructions and deployment automation to run all components in an all-inclusive fashion on a 
 single machine using a [Kind cluster](https://kind.sigs.k8s.io/) and a local data storage ([MinIO](https://min.io/)).

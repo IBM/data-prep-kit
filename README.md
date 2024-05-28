@@ -123,8 +123,8 @@ The common part of are:
 -Docker/Podman
 
 Two important development tools will also be installed using the steps below:
--[pre-commit](https://pre-commit.com/)
--[twine](https://twine.readthedocs.io/en/stable/) 
+- [pre-commit](https://pre-commit.com/)
+- [twine](https://twine.readthedocs.io/en/stable/) 
 
 #### Installation Steps
 ```shell
