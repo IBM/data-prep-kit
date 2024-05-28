@@ -1,4 +1,6 @@
-Map betweens transforms and KFP pipelines
+# Automation with Kubeflow Pipelines 
+
+## Map betweens transforms and KFP pipelines
 
 | Transform                           |                                    KFP pipeline                                    |          
 |-------------------------------------|:----------------------------------------------------------------------------------:|
@@ -13,4 +15,9 @@ Map betweens transforms and KFP pipelines
 | universal/tokenization              |         [tokenization_wf.py](../transforms/universal/tokenization/kfp_ray/v1/tokenization_wf.py)          |
 
 
-For more information you can find [here](./doc/simple_transform_pipeline.md) a toturial that shows how to build, compile, and execute a KFP pipeline for a simple transfotm.
+## Set up and working steps
+
+- [Set up a Kubernetes clusters for KFP execution](./doc/setup.md)
+- [Simple Transform pipeline tutorial](./doc/simple_transform_pipeline.md)
+- [Execution several transformers](./doc/multi_transform_pipeline.md)
+- [Clean up the cluster](./doc/setup#cleanup)
