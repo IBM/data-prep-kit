@@ -27,10 +27,10 @@ In the list of its input parameters, we also see `data_s3_config`. Now, we have 
 
 The sections that follow display two super pipelines as examples:
 
-1) [dedups super pipeline](#De-dups-super-pipeline)
-1) [programming language super pipeline](#programming-languages-super-pipeline)
+1) [dedups super pipeline](#dedups)
+1) [programming language super pipeline](#code)
 
-### Dedups super pipeline
+### Dedups super pipeline <a name = "dedups"></a>
 
 This pipeline combines several transforms, `doc_id`, `ededup`, and `fdedup`, can be found in [superworkflow_dedups_sample_wf.py](../superworkflows/ray/kfp_v1/superworkflow_dedups_sample_wf.py).
 
@@ -38,9 +38,9 @@ This pipeline combines several transforms, `doc_id`, `ededup`, and `fdedup`, can
 
 The input parameters of the super pipelines are described in this [section](#super-pipeline-Input-Parameters).
 
-### Programming languages Super pipeline
+### Programming languages Super pipeline <a name = "code"></a>
 
-This pipeline combines several programming-languages transforms: `ededup`, `doc_id`, `fdedup`, `proglang_select`, `code_quality`,  `malware` and `tokenization`. It can be found in [superworkflow_code_wf.py](../superworkflows/ray/kfp_v1/superworkflow_code_sample_wf.py).
+This pipeline combines transforms for programming languages data preprocessing: `ededup`, `doc_id`, `fdedup`, `proglang_select`, `code_quality`,  `malware` and `tokenization`. It can be found in [superworkflow_code_wf.py](../superworkflows/ray/kfp_v1/superworkflow_code_sample_wf.py).
 
 ![super pipeline](super-code-pipeline.png)
 
