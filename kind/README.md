@@ -14,7 +14,7 @@ Run the following command to create the cluster:
 
 ```shell
 cd /tmp
-git clone git@github.com:IBM/data-prep-kit.git
+git clone https://github.com/IBM/data-prep-kit.git
 cd data-prep-kit
 ROOT_DIR=$PWD/kind/
 kind create cluster --name dataprep --config ${ROOT_DIR}/hack/kind-cluster-config.yaml
@@ -28,7 +28,7 @@ amount of node, modify [cluster configuration](hack/kind-cluster-config.yaml)
 Install [Kubeflow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/installation/standalone-deployment/#deploying-kubeflow-pipelines) and wait for it to be ready:
 
 ```shell
-${ROOT_DIR}/hack/tools/install_kubeflow.sh deploy
+cd $ROOT_DIR/hack/tools/ && PIPELINE_VERSION=1.8.5 ./install_kubeflow.sh deploy && cd -
 kubectl wait --for=condition=ready --all pod -n kubeflow --timeout=300s
 ```
 
@@ -37,7 +37,7 @@ kubectl wait --for=condition=ready --all pod -n kubeflow --timeout=300s
 Install Kuberay:
 
 ```shell
-${ROOT_DIR}/hack/tools/install_kuberay.sh deploy
+cd $ROOT_DIR/hack/tools && KUBERAY_APISERVER=1.1.0 KUBERAY_OPERATOR=1.0.0 ./install_kuberay.sh deploy && cd -
 kubectl wait --for=condition=ready --all pod -n kuberay --timeout=300s
 ```
 
@@ -84,7 +84,7 @@ kubectl apply -f $ROOT_DIR/hack/s3_secret.yaml
 Populating Minio server with test data can be done using `mc`. Use the following command:
 
 ```shell
-./hack/populate_minio.sh
+$ROOT_DIR/hack/populate_minio.sh
 ```
 
 This file creates an mc alias, creates the test bucket and copies the local test data into MinIO. If you need
