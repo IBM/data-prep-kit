@@ -13,7 +13,7 @@
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from kfp_support.workflow_support.runtime_utils import (
+from kfp_support.workflow_support.utils import (
     ONE_HOUR_SEC,
     ONE_WEEK_SEC,
     ComponentUtils,
@@ -29,7 +29,7 @@ task_image = "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
 EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0-kfp-v21"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1-kfp-v21"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
@@ -40,13 +40,16 @@ def compute_exec_params_op(worker_options: str, actor_options: str) -> str:
     return ComponentUtils.default_compute_execution_params(worker_options, actor_options)
 
 
+# path to kfp component specifications files
+component_spec_path = "../../../../../kfp/kfp_ray_components/"
+
 # create Ray cluster
-create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
+create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
 # execute job
-execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayJobComponent.yaml")
+execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "executeRayJobComponent.yaml")
 # clean up Ray
-cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
-# Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
+cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
+
 TASK_NAME: str = "noop"
 
 

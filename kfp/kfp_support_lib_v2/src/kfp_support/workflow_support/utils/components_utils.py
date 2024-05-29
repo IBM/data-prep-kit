@@ -1,15 +1,37 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
+import os
 import kfp.dsl as dsl
 from kfp import kubernetes
 from typing import Dict
 
 RUN_NAME = "KFP_RUN_NAME"
+from data_processing.utils import get_logger
+from kubernetes import client as k8s_client
+
+
+logger = get_logger(__name__)
+
+ONE_HOUR_SEC = 60 * 60
+ONE_DAY_SEC = ONE_HOUR_SEC * 24
+ONE_WEEK_SEC = ONE_DAY_SEC * 7
+
 
 class ComponentUtils:
     """
     Class containing methods supporting building pipelines
     """
 
-    @staticmethod
     def add_settings_to_component(
             task: dsl.PipelineTask,
             timeout: int,
@@ -55,8 +77,8 @@ class ComponentUtils:
 
     @staticmethod
     def default_compute_execution_params(
-            worker_options: str,  # ray worker configuration
-            actor_options: str,  # cpus per actor
+        worker_options: str,  # ray worker configuration
+        actor_options: str,  # cpus per actor
     ) -> str:
         """
         This is the most simplistic transform execution parameters computation
@@ -67,7 +89,7 @@ class ComponentUtils:
         import sys
 
         from data_processing.utils import GB, get_logger
-        from kfp_support.workflow_support.runtime_utils import KFPUtils
+        from kfp_support.workflow_support.utils import KFPUtils
 
         logger = get_logger(__name__)
 

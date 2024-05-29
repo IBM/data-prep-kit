@@ -1,4 +1,6 @@
 REPOROOT=../../..
+
+KFPv2 ?= 1
 # Use make help, to see the available rules
 include $(REPOROOT)/.make.defaults
 
@@ -43,20 +45,41 @@ load-image::
 
 .PHONY: workflow-venv
 workflow-venv:
+ifeq ($(KFPv2), 1)
+	$(MAKE) -C kfp_ray/v2 workflow-venv
+else
 	$(MAKE) -C kfp_ray/v1 workflow-venv
+endif
 
 .PHONY: workflow-build
 workflow-build:
-	$(MAKE) -C kfp_ray/v1 workflow-build
+ifeq ($(KFPv2), 1)
+	$(MAKE) -C kfp_ray/v2 workflow-build
+else
+ 	$(MAKE) -C kfp_ray/v1 workflow-build
+endif
+	
 
 .PHONY: workflow-test
 workflow-test:
-	$(MAKE) -C $(PIPELINE_PATH) workflow-test
+ifeq ($(KFPv2), 1)
+	$(MAKE) -C kfp_ray/v2 workflow-build
+else
+	$(MAKE) -C kfp_ray/v1 workflow-test
+endif
 
 .PHONY: workflow-upload
 workflow-upload:
-	$(MAKE) -C $(PIPELINE_PATH) workflow-upload
+ifeq ($(KFPv2), 1)
+	$(MAKE) -C kfp_ray/v2 workflow-upload
+else
+	$(MAKE) -C kfp_ray/v1 workflow-upload
+endif
 
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:
-	$(MAKE) -C $(PIPELINE_PATH) workflow-reconcile-requirements
+ifeq ($(KFPv2), 1)
+	$(MAKE) -C kfp_ray/v2 reconcile-requirements
+else
+	$(MAKE) -C kfp_ray/v1 reconcile-requirements
+endif

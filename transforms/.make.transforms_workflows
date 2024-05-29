@@ -6,6 +6,7 @@ include ${REPOROOT}/kfp/requirements.env
 include ${REPOROOT}/.make.defaults
 
 USE_DEV_IMAGES ?= 1
+KFPv2 ?= 1
 
 define set_env_var
 	$(eval export $(1)=$(2))
@@ -21,7 +22,12 @@ endef
 		export DOCKER_IMAGE_VERSION=$$(echo $$line |cut -d "=" -f 2); \
 		sed -i.back "s/data-prep-kit\/$$DOCKER_IMAGE_NAME:.*/data-prep-kit\/$$DOCKER_IMAGE_NAME:$$DOCKER_IMAGE_VERSION\"/" $$PIPELINE_FILE ;\
 	done < ${REPOROOT}/.make.versions
+ifeq ($(KFPv2), 1)
+	@sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION_v2}\"/" ${PIPELINE_FILE}
+else
 	@sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION}\"/" ${PIPELINE_FILE}
+endif
+
 
 .PHONY: .transforms_workflows.compile-pipeline
 .transforms_workflows.compile-pipeline:
@@ -53,6 +59,12 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requiremen
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/;
 	@# Help: Create the virtual environment common to all workflows
 
+	pip install -e $(DPK_RAY_LIB_DIR)
+ifeq ($(KFPv2), 1)
+	. ${WORKFLOW_VENV_ACTIVATE} && pip install -e $(REPOROOT)/kfp/kfp_support_lib_v2/
+else
+	. ${WORKFLOW_VENV_ACTIVATE}  && pip install -e $(REPOROOT)/kfp/kfp_support_lib/
+endif
 
 #TODO KFPv2
 ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt

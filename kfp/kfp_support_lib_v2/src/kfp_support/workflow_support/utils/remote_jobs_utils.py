@@ -30,7 +30,7 @@ from kfp_support.api_server_client.params import (
     environment_variables_decoder,
     volume_decoder,
 )
-from kfp_support.workflow_support.runtime_utils import KFPUtils
+from kfp_support.workflow_support.utils import KFPUtils
 from ray.job_submission import JobStatus
 
 
