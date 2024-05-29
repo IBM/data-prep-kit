@@ -28,7 +28,7 @@ In the list of its input parameters, we also see `data_s3_config`. Now, we have 
 The sections that follow display two super pipelines as examples:
 
 1) [dedups super pipeline](#dedups)
-1) [programming language super pipeline](#code)
+1) [programming languages super pipeline](#code)
 
 ### Dedups super pipeline <a name = "dedups"></a>
 
