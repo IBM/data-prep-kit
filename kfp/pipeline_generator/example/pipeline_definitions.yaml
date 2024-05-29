@@ -1,18 +1,19 @@
 pipeline_parameters:
     name: "noop"
     description: "Pipeline for noop task"
-    script_name: "transformer_launcher.py"
+    script_name: "noop_transform.py"
     prefix: ""
     multi_s3: False
     compute_func_name: ""
     compute_func_import: ""
 
 pipeline_common_input_parameters_values:
-    transform_image: "us.icr.io/cil15-shared-registry/preprocessing-pipelines/noop-guf:0.0.1"
-    s3_access_secret: "cos-access"
+    kfp_base_image: "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1"
+    transform_image: "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
+    s3_access_secret: "s3-secret"
     image_pull_secret: "prod-all-icr-io"
-    input_folder: "cos-optimal-llm-pile/doc_annotation_test/input/noop_small/"
-    output_folder: "cos-optimal-llm-pile/doc_annotation_test/output_noop_guf/"
+    input_folder: "test/noop/input/"
+    output_folder: "test/noop/output/"
 
 pipeline_transform_input_parameters:
    pipeline_arguments:

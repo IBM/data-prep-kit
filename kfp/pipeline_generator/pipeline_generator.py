@@ -110,6 +110,7 @@ if __name__ == "__main__":
             .replace("__input_folder__", common_input_params_values.get("input_folder", ""))
             .replace("__output_folder__", common_input_params_values.get("output_folder", ""))
             .replace("__transform_image__", common_input_params_values["transform_image"])
+            .replace("__kfp_base_image__", common_input_params_values["kfp_base_image"])
             .replace("__execute_comp__", execute_comp_file)
             .replace("__prefix_name__", prefix_name)
             .replace("__prefix_execute__", prefix_execute)
