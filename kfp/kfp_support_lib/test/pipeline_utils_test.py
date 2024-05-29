@@ -17,7 +17,7 @@ def test_pipelines():
     """
     Test pipelines utils
     """
-    utils = PipelinesUtils(host="http://localhost:8080/kfp")
+    utils = PipelinesUtils(host="http://localhost:8080")
     # get pipeline by name
     pipeline = utils.get_pipeline_by_name("[Tutorial] Data passing in python components")
     assert pipeline is not None

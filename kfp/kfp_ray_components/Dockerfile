@@ -8,8 +8,6 @@ LABEL git-commit=$GIT_COMMIT
 
 # install libraries
 COPY requirements.txt requirements.txt
-RUN pip install kfp==2.7.0 --extra-index-url https://pypi.org/simple
-RUN pip install kfp-kubernetes --extra-index-url https://pypi.org/simple
 RUN pip install --no-cache-dir -r  requirements.txt
 
 # Copy and install data processing libraries 

@@ -51,12 +51,12 @@ workflow-build:
 
 .PHONY: workflow-test
 workflow-test:
-	$(MAKE) -C kfp_ray/v1 workflow-test
+	$(MAKE) -C $(PIPELINE_PATH) workflow-test
 
 .PHONY: workflow-upload
 workflow-upload:
-	$(MAKE) -C kfp_ray/v1 workflow-upload
+	$(MAKE) -C $(PIPELINE_PATH) workflow-upload
 
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:
-	$(MAKE) -C kfp_ray/v1 workflow-reconcile-requirements
+	$(MAKE) -C $(PIPELINE_PATH) workflow-reconcile-requirements

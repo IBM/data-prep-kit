@@ -13,7 +13,7 @@
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from kfp_support.workflow_support.utils import (
+from kfp_support.workflow_support.runtime_utils import (
     ONE_HOUR_SEC,
     ONE_WEEK_SEC,
     ComponentUtils,
