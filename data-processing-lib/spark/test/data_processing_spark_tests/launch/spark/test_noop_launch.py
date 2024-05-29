@@ -22,7 +22,7 @@ class TestSparkNOOPTransform(AbstractSparkTransformLauncherTest):
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         proj_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../.."))
-        test_data_dir = os.path.join(proj_dir, "test-data/data_processing_ray/spark/noop/")
+        test_data_dir = os.path.join(proj_dir, "test-data/data_processing/spark/noop/")
         config_path = os.path.join(proj_dir, "config/spark_profile_local.yml")
         launcher = SparkTransformLauncher(NOOPSparkRuntimeConfiguration())
         cli_params = {
