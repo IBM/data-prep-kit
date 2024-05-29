@@ -20,13 +20,13 @@ from kfp_support.workflow_support.utils import (
 )
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
+task_image = "quay.io/dataprep1/data-prep-kit/noop:0.9.0"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../../kfp/kfp_ray_components/"
