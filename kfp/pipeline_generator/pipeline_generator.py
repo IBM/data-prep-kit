@@ -3,7 +3,7 @@ import json
 import yaml
 
 
-PRE_COMMIT = "pre-commit-config.yaml"
+PRE_COMMIT = "./pre-commit-config.yaml"
 PIPELINE_TEMPLATE_FILE = "pipeline.ptmpl"
 
 INPUT_PARAMETERS = "input_parameters"
@@ -135,5 +135,5 @@ if __name__ == "__main__":
 
     print(f"Pipeline ${dst_file} auto generation completed")
     # format the pipeline python file
-    args = ["run", "--file", f"{dst_file}", "-c", "./pre-commit-config.yaml"]
+    args = ["run", "--file", f"{dst_file}", "-c", PRE_COMMIT]
     sys.exit(main(args))
