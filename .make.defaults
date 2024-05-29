@@ -171,7 +171,7 @@ __check_defined = \
 .PHONY: .defaults.image
 .defaults.image:: # Must be called with a DOCKER_IMAGE= settings.
 	@# Help: Create the docker image $(DOCKER_LOCAL_IMAGE)
-	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE)		\
+	$(DOCKER) build -t $(DOCKER_FILE)			\
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\
