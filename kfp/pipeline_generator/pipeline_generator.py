@@ -78,6 +78,10 @@ if __name__ == "__main__":
     # define arguments to the Ray execution job
     execute_job_params = get_execute_job_params_guf(pipeline_definitions[PIPELINE_TRANSFORM_INPUT_PARAMETERS])
 
+    component_spec_path = pipeline_parameters.get("component_spec_path", "")
+    if component_spec_path == "":
+        component_spec_path = "../../../../../kfp/kfp_ray_components/"
+
     compute_func_name = pipeline_parameters.get("compute_func_name", "")
     if compute_func_name == "":
         compute_func_name = "ComponentUtils.default_compute_execution_params"
@@ -103,6 +107,7 @@ if __name__ == "__main__":
             .replace("__pipeline_arguments__", transform_input_parameters)
             .replace("__execute_job_params__", execute_job_params)
             .replace("__compute_func_name__", compute_func_name)
+            .replace("__component_spec_path__", component_spec_path)
             .replace("__compute_import__", compute_func_import)
             .replace("__script_name__", pipeline_parameters["script_name"])
             .replace("__image_pull_secret__", common_input_params_values["image_pull_secret"])

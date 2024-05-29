@@ -18,7 +18,7 @@ PREFIX: str = "__prefix_name__"
 base_kfp_image = "__kfp_base_image__"
 
 # path to kfp component specifications files
-component_spec_path = "../../../../../kfp/kfp_ray_components/"
+component_spec_path = "__component_spec_path__"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
