@@ -24,7 +24,7 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-test-image:: .transforms.test-image-help
+test-image:: image .transforms.test-image-help
 	@echo WARNING: Skipping pytest version of this test until we have a test/test_ededup.py file.
 
 
