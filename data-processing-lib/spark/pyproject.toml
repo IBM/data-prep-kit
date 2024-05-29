@@ -1,6 +1,6 @@
 [project]
 name = "data_prep_toolkit_spark"
-version = "0.1.0"
+version = "0.2.0"
 requires-python = ">=3.10"
 description = "Data Preparation Toolkit Library for Spark"
 license = {text = "Apache-2.0"}

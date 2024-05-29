@@ -46,13 +46,14 @@ publish::
 	${PYTHON} -m twine upload --verbose --non-interactive dist/*
 
 venv::	pyproject.toml .check-env
-	@# Help: Create the virtual environment using pyproject.toml 
 	rm -rf venv
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
 	pip install -e .;		\
 	pip install ray==${RAY} \
 	pip install pytest pytest-cov 
+	$(MAKE) .defaults.install-python-lib-src-venv
+	@# Help: Create the virtual environment using pyproject.toml 
 
 test:: 	venv
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.
