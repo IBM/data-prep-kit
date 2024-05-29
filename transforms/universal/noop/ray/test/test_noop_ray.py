@@ -13,10 +13,10 @@
 import os
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
-from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
+from data_processing_ray.runtime.ray import RayTransformLauncher
 from noop_transform import (
     NOOPPythonTransformConfiguration,
     NOOPRayTransformConfiguration,
@@ -38,5 +38,7 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
         fixtures.append((launcher, {sleep_cli_param: 0}, basedir + "/input", basedir + "/expected"))
         # launcher = NOOPRayLauncher()
         launcher = RayTransformLauncher(NOOPRayTransformConfiguration())
-        fixtures.append((launcher, {sleep_cli_param: 0}, basedir + "/input", basedir + "/expected"))
+        fixtures.append(
+            (launcher, {sleep_cli_param: 0, "run_locally": True}, basedir + "/input", basedir + "/expected")
+        )
         return fixtures

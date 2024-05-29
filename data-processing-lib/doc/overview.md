@@ -10,10 +10,10 @@ This might include operations such as de-duplication, merging, and splitting.
 The framework uses a plugin-model for the primary functions.  The key ones for
 developers of data transformation are:
 
-* Transformation both [files](../ray/src/data_processing/transform/binary_transform.py) and 
-[parquet/arrow](../ray/src/data_processing/transform/table_transform.py) - a simple, easily-implemented interface defines
+* Transformation both [files](../ray/src/data_processing_ray/transform/binary_transform.py) and 
+[parquet/arrow](../ray/src/data_processing_ray/transform/table_transform.py) - a simple, easily-implemented interface defines
 the specifics of a given data transformation.
-* [Transform Configuration](../ray/src/data_processing/runtime/ray/transform_runtime.py) - defines
+* [Transform Configuration](../ray/src/data_processing_ray/runtime/ray/transform_runtime.py) - defines
 the transform short name, its implementation class,  and command line configuration
 parameters.
 

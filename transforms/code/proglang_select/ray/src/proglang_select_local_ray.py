@@ -13,8 +13,8 @@
 import os
 import sys
 
-from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
+from data_processing_ray.runtime.ray import RayTransformLauncher
 from proglang_select_transform import (
     ProgLangSelectRayConfiguration,
     lang_allowed_langs_file_key,

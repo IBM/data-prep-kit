@@ -3,7 +3,7 @@ REPO_ROOT=$(cd ../ && pwd && cd - > /dev/null )
 echo $REPO_ROOT
 
 
-# Set PYTHONPATH for `data_processing` library
+# Set PYTHONPATH for `data_processing_ray` library
 export PYTHONPATH=$REPO_ROOT/data-processing-lib/ray/src
 
 # Set PYTHONAPATH for transforms

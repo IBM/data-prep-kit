@@ -40,16 +40,8 @@ publish:: .check-env update-toml
 	#@git tag ${TAG}
 	#@git push origin ${TAG}
 
-venv::	pyproject.toml
-	@# Help: Create the virtual environment using pyproject.toml 
-	rm -r dist venv || true
-	rm -rf src/*egg-info || true
-	rm makeenv || true
-	$(PYTHON) -m venv venv
-	source venv/bin/activate; 	\
-	pip install --upgrade pip;	\
-	pip install -e ../ray;		\
-	pip install -e .;		\
+venv::  pyproject.toml
+	$(MAKE) .defaults.spark-lib-src-venv
 	pip install pytest pytest-cov 
 
 image:: image-spark

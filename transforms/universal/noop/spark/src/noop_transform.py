@@ -14,13 +14,8 @@ import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-import pyarrow as pa
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
-)
-from data_processing.runtime.ray import RayTransformLauncher
-from data_processing.runtime.ray.runtime_configuration import (
-    RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger

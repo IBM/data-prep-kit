@@ -42,7 +42,7 @@ def create_test_zip(file_names, contents_list):
 
 class TestZipToTable(unittest.TestCase):
     def setUp(self):
-        self.mock_data_access_patcher = patch("data_processing.data_access.DataAccess")
+        self.mock_data_access_patcher = patch("data_processing_ray.data_access.DataAccess")
         self.mock_data_access = self.mock_data_access_patcher.start()
         self.mock_instance = self.mock_data_access.return_value
         self.addCleanup(self.mock_data_access_patcher.stop)
@@ -92,7 +92,7 @@ class TestZipToTable(unittest.TestCase):
         self.assertEqual(table.schema.field("programming_language").type, pa.string())
         self.assertEqual(len(table), len(file_names))
 
-        with patch("data_processing.utils.TransformUtils.decode_content") as mock_decode_content:
+        with patch("data_processing_ray.utils.TransformUtils.decode_content") as mock_decode_content:
             mock_decode_content.side_effect = Exception("Decoding failed")
             table = zip_to_table(self.mock_instance, test_file_path, True)
             self.assertEqual(len(table), 0)
@@ -108,7 +108,7 @@ class TestZipToTable(unittest.TestCase):
 
 class TestRawToParquet(unittest.TestCase):
     def setUp(self):
-        self.mock_data_access_factory_patcher = patch("data_processing.data_access.DataAccessFactory")
+        self.mock_data_access_factory_patcher = patch("data_processing_ray.data_access.DataAccessFactory")
         self.mock_data_access_factory = self.mock_data_access_factory_patcher.start()
         self.mock_data_access_factory_instance = self.mock_data_access_factory.return_value
         self.addCleanup(self.mock_data_access_factory_patcher.stop)
@@ -117,7 +117,7 @@ class TestRawToParquet(unittest.TestCase):
         self.mock_data_access_factory_instance.create_data_access.return_value = self.mock_data_access_instance
 
     def test_process_zip_sucessfully(self):
-        with patch("data_processing.utils.TransformUtils.add_column") as mock_add_column:
+        with patch("data_processing_ray.utils.TransformUtils.add_column") as mock_add_column:
             with patch("ingest2parquet.zip_to_table") as mock_zip_to_table:
                 mock_zip_to_table.return_value = pa.Table.from_pylist(
                     [

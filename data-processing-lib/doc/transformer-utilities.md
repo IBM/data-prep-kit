@@ -1,6 +1,6 @@
 # Transform Utilities
 
-A class [TransformUtils](../ray/src/data_processing/utils/transform_utils.py) provides several methods that simplify 
+A class [TransformUtils](../ray/src/data_processing_ray/utils/transform_utils.py) provides several methods that simplify 
 transformer's implementation. Currently it includes the following methods:
 
 * `deep_get_size` is the method to get the complete size of the Python object based on

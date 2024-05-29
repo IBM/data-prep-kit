@@ -38,7 +38,7 @@ found [here](../../transforms/universal/ededup/src/ededup_transform.py)
 
 First, let's define the transform class.  To do this we extend
 the base abstract/interface class
-[AbstractTableTransform](../ray/src/data_processing/transform/table_transform.py),
+[AbstractTableTransform](../ray/src/data_processing_ray/transform/table_transform.py),
 which requires definition of the following:
 
 * an initializer (i.e. `init()`) that accepts a dictionary of configuration
@@ -140,7 +140,7 @@ If there is no metadata then simply return an empty dictionary.
 
 First, let's define the transform runtime class.  To do this we extend
 the base abstract/interface class
-[DefaultTableTransformRuntime](../ray/src/data_processing/runtime/ray/transform_runtime.py),
+[DefaultTableTransformRuntime](../ray/src/data_processing_ray/runtime/ray/transform_runtime.py),
 which requires definition of the following:
 
 * an initializer (i.e. `init()`) that accepts a dictionary of configuration
