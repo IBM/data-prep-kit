@@ -11,27 +11,30 @@ on:
 jobs:
     build-code:
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         steps:
             - name: Checkout
               uses: actions/checkout@v4
             - name: Build and Test Code Transforms
               run: |
                   make -C data-processing-lib DOCKER=docker image 
-                  make -C transforms/code DOCKER=docker image test-image
+                  make -C transforms/code DOCKER=docker test-image
     build-universal:
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         steps:
             - name: Checkout
               uses: actions/checkout@v4
             - name: Build and Test Universal Transforms
               run: |
                   make -C data-processing-lib DOCKER=docker image 
-                  make -C transforms/universal DOCKER=docker image test-image
+                  make -C transforms/universal DOCKER=docker test-image
     build-tools:
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         steps:
             - name: Checkout
               uses: actions/checkout@v4
             - name: Build and Test Tool images
               run: |
-                  make -C tools/ingest2parquet DOCKER=docker image test-image
+                  make -C tools/ingest2parquet DOCKER=docker test-image
