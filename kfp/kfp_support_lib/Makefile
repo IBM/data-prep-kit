@@ -52,6 +52,7 @@ venv::	pyproject.toml .check-env
 	. ${VENV_ACTIVATE};     \
 	pip install -e .;		\
 	pip install ray==${RAY} \
+	pip install pre-commit  \
 	pip install pytest pytest-cov 
 
 test:: 	venv
