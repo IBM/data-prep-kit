@@ -10,6 +10,7 @@
 # limitations under the License.
 ################################################################################
 
+import os
 import kfp.dsl as dsl
 from data_processing.utils import get_logger
 from kubernetes import client as k8s_client
@@ -73,6 +74,24 @@ class ComponentUtils:
                     ),
                 )
             )
+
+    @staticmethod
+    def add_cm_volume_to_com_function(component: dsl.ContainerOp, cmName: str, mountPoint: str, optional=False):
+        last_folder = os.path.basename(os.path.normpath(mountPoint))
+        vol = k8s_client.V1Volume(
+            name=last_folder,
+            config_map=k8s_client.V1ConfigMapVolumeSource(name=cmName, optional=optional),
+        )
+        component.add_pvolumes({mountPoint: vol})
+
+    @staticmethod
+    def add_secret_volume_to_com_function(component: dsl.ContainerOp, secretName: str, mountPoint: str, optional=False):
+        last_folder = os.path.basename(os.path.normpath(mountPoint))
+        vol = k8s_client.V1Volume(
+            name=last_folder,
+            secret=k8s_client.V1SecretVolumeSource(secret_name=secretName, optional=optional),
+        )
+        component.add_pvolumes({mountPoint: vol})
 
     @staticmethod
     def default_compute_execution_params(
