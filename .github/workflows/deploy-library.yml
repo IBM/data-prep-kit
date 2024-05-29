@@ -24,6 +24,8 @@ jobs:
             - name: Build Packages for pypi
               run: |
                   make -C data-processing-lib build
+                  make -C data-processing-lib/ray build
+                  make -C data-processing-lib/spark build
     publish-test-pypi:
         name: Publish packages to test.pypi.org
         # disabled

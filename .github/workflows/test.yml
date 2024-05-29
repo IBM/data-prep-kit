@@ -9,6 +9,14 @@ on:
         branches:
             - "dev"
 jobs:
+    test-python-lib:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Test data-processing-lib
+              run: |
+                  make -C data-processing-lib DOCKER=docker venv test
     test-ray-lib:
         runs-on: ubuntu-latest
         steps:

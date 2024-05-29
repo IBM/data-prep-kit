@@ -9,6 +9,18 @@ on:
         branches:
             - "dev"
 jobs:
+    build-python-lib:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python:
+                    - "3.11"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Build data-processing-lib/python
+              run: |
+                  make -C data-processing-lib/python DOCKER=docker venv build
     build-ray-lib:
         runs-on: ubuntu-latest
         strategy:

@@ -9,20 +9,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
 import time
-from argparse import ArgumentParser, Namespace
 from typing import Any
 
-import pyarrow as pa
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.test_support.transform.noop_transform import (
     NOOPTransformConfiguration,
 )
-from data_processing.transform import TransformConfiguration
-from data_processing.utils import CLIArgumentProvider, get_logger
+from data_processing.utils import get_logger
+from data_processing_spark.runtime.spark import SparkTransformRuntimeConfiguration
 from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
 from data_processing_spark.runtime.spark.spark_transform import AbstractSparkTransform
 
@@ -39,40 +36,41 @@ from pyspark.sql import DataFrame
 
 
 #
-# class NOOPTransform(AbstractSparkTransform):
-#     """
-#     Implements a simple copy of a data frame.
-#     """
-#
-#     def __init__(self, config: dict[str, Any]):
-#         """
-#         Initialize based on the dictionary of configuration information.
-#         This is generally called with configuration parsed from the CLI arguments defined
-#         by the companion runtime, NOOPTransformRuntime.  If running inside the RayMutatingDriver,
-#         these will be provided by that class with help from the RayMutatingDriver.
-#         """
-#         # Make sure that the param name corresponds to the name used in apply_input_params method
-#         # of NOOPTransformConfiguration class
-#         super().__init__(config)
-#         self.sleep = config.get("sleep_sec", 1)
-#
-#     def transform(self, data: DataFrame) -> tuple[list[DataFrame], dict[str, Any]]:
-#         """
-#         Put Transform-specific to convert one DataFrame to 0 or more. It also returns
-#         a dictionary of execution statistics - arbitrary dictionary
-#         This implementation makes no modifications so effectively implements a copy of the
-#         input parquet to the output folder, without modification.
-#         """
-#         logger.debug(f"Transforming one data with {data.count()} rows")
-#         if self.sleep is not None:
-#             logger.info(f"Sleep for {self.sleep} seconds")
-#             time.sleep(self.sleep)
-#             logger.info("Sleep completed - continue")
-#         # Add some sample metadata.
-#         logger.debug(f"Transformed one data with {data.count()} rows")
-#         metadata = {"nfiles": 1, "nrows": data.count()}
-#         return [data], metadata
-#
+class NOOPTransform(AbstractSparkTransform):
+    """
+    Implements a simple copy of a data frame.
+    """
+
+    def __init__(self, config: dict[str, Any]):
+        """
+        Initialize based on the dictionary of configuration information.
+        This is generally called with configuration parsed from the CLI arguments defined
+        by the companion runtime, NOOPTransformRuntime.  If running inside the RayMutatingDriver,
+        these will be provided by that class with help from the RayMutatingDriver.
+        """
+        # Make sure that the param name corresponds to the name used in apply_input_params method
+        # of NOOPTransformConfiguration class
+        super().__init__(config)
+        self.sleep = config.get("sleep_sec", 1)
+
+    def transform(self, data: DataFrame) -> tuple[list[DataFrame], dict[str, Any]]:
+        """
+        Put Transform-specific to convert one DataFrame to 0 or more. It also returns
+        a dictionary of execution statistics - arbitrary dictionary
+        This implementation makes no modifications so effectively implements a copy of the
+        input parquet to the output folder, without modification.
+        """
+        logger.debug(f"Transforming one data with {data.count()} rows")
+        if self.sleep is not None:
+            logger.info(f"Sleep for {self.sleep} seconds")
+            time.sleep(self.sleep)
+            logger.info("Sleep completed - continue")
+        # Add some sample metadata.
+        logger.debug(f"Transformed one data with {data.count()} rows")
+        metadata = {"nfiles": 1, "nrows": data.count()}
+        return [data], metadata
+
+
 #
 # class NOOPTransformConfiguration(TransformConfiguration):
 #
@@ -127,7 +125,7 @@ from pyspark.sql import DataFrame
 #         return True
 
 
-class NOOPSparkRuntimeConfiguration(PythonTransformRuntimeConfiguration):
+class NOOPSparkRuntimeConfiguration(SparkTransformRuntimeConfiguration):
     """
     Implements the PythonTransformConfiguration for NOOP as required by the PythonTransformLauncher.
     NOOP does not use a RayRuntime class so the superclass only needs the base
