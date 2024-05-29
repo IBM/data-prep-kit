@@ -17,10 +17,12 @@ include $(REPOROOT)/.make.defaults
 
 .PHONY: .lib-src-image
 .lib-src-image:: 
-	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib
+	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray
+	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib LIB_NAME=kfp_support_lib
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
-	rm -rf data-processing-lib
+	rm -rf data-processing-lib-ray
+	rm -rf data-processing-lib-python
 	rm -rf kfp_support_lib
 
 .PHONY: image
