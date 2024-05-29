@@ -45,10 +45,10 @@ image: Dockerfile Dockerfile_v2 requirements.txt
 .PHONY: reconcile-requirements
 reconcile-requirements:
 ifeq ($(KFPv2), 1)
-	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION_v2}/" createRayClusterComponent.yaml
-	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION_v2}/" deleteRayClusterComponent.yaml
-	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION_v2}/" executeRayJobComponent.yaml
-	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION_v2}/" executeRayJobComponent_multi_s3.yaml
+	sed -i.back "s/kfp-data-processing_v2*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION_v2}/" createRayClusterComponent.yaml
+	sed -i.back "s/kfp-data-processing_v2*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION_v2}/" deleteRayClusterComponent.yaml
+	sed -i.back "s/kfp-data-processing_v2*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION_v2}/" executeRayJobComponent.yaml
+	sed -i.back "s/kfp-data-processing_v2*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION_v2}/" executeRayJobComponent_multi_s3.yaml
 else
 	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
 	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" createRayClusterComponent.yaml
