@@ -38,7 +38,7 @@ This pipeline combines several transforms, `doc_id`, `ededup`, and `fdedup`, can
 
 The input parameters of the super pipelines are described in this [section](#super-pipeline-Input-Parameters).
 
-### Programming languages Super pipeline <a name = "code"></a>
+### Programming languages super pipeline <a name = "code"></a>
 
 This pipeline combines transforms for programming languages data preprocessing: `ededup`, `doc_id`, `fdedup`, `proglang_select`, `code_quality`,  `malware` and `tokenization`. It can be found in [superworkflow_code_wf.py](../superworkflows/ray/kfp_v1/superworkflow_code_sample_wf.py).
 

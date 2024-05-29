@@ -26,8 +26,8 @@ tokenizer_image = "quay.io/dataprep1/data-prep-kit/tokenization:0.3.0"
 
 # Pipeline to invoke execution on remote resource
 @dsl.pipeline(
-    name="sample-super-kubeflow-pipeline",
-    description="Pipeline to show how to run combine several transformer pipelines",
+    name="super-kubeflow-pipeline-code",
+    description="Super pipeline for programming languages data preprocessing",
 )
 def sample_code_ray_orchestrator(
     # the super pipeline parameters
