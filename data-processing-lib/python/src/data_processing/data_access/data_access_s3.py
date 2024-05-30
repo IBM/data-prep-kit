@@ -86,7 +86,7 @@ class DataAccessS3(DataAccess):
         self.arrS3 = ArrowS3(access_key, secret_key, endpoint=endpoint, region=region)
 
     def get_access_key(self):
-        self.s3_credentials.get("access_key", None)
+        return self.s3_credentials.get("access_key", None)
 
     def get_secret_key(self):
         return self.s3_credentials.get("secret_key", None)
