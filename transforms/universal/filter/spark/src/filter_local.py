@@ -36,11 +36,6 @@ filter_criteria = [
     "ibmkenlm_docq_perplex_score < 230",
 ]
 
-filter_criteria = [
-    "date_acquired BETWEEN CAST(CAST('2023-07-04 05:00:00' AS timestamp) AS bigint) AND CAST(CAST('2023-07-08 05:00:00' AS timestamp) AS bigint)",
-    "title LIKE 'https://%'",
-]
-
 filter_logical_operator = "AND"
 filter_columns_to_drop = ["extra", "cluster"]
 
