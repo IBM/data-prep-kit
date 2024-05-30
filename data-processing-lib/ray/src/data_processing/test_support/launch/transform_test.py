@@ -65,7 +65,7 @@ class AbstractTransformLauncherTest(AbstractTest):
             launcher.launch()
             self._validate_directory_contents_match(temp_dir, expected_out_table_path, drop_columns)
 
-    def _validate_directory_contents_match(self, dir: str, expected: str, drop_columns: list[str]):
+    def _validate_directory_contents_match(self, dir: str, expected: str, drop_columns: list[str] = []):
         """
         Confirm that the two directories contains the same files.
         Stubbed out like this to allow spark tests to override this since spark tends to rename the files.
