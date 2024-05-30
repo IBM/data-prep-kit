@@ -32,7 +32,7 @@ tutorial can be found in the
 
 Finally, we show how to use the command line to run the transform in a local ray cluster.
 
-> **Note:** You will need to run the setup commands in the [`../README`](..) before running the following examples.
+> **Note:** You will need to run the setup commands in the [`README`](../ray/README.md) before running the following examples.
 
 
 ## `NOOPTransform`
@@ -196,7 +196,7 @@ Assuming the above `main` code is placed in `noop_main.py` we can run the transf
 and create a temporary directory to hold the output:
 ```shell
 export DPK_REPOROOT=...
-export NOOP_INPUT=$DPK_REPOROOT/transforms/universal/noop/test-data/input
+export NOOP_INPUT=$DPK_REPOROOT/transforms/universal/noop/ray/test-data/input
 ```
 To run
 ```shell

@@ -32,7 +32,7 @@ Finally, we show to use the command line to run the transform in a local ray clu
 
 One of the basic components of exact dedup implementation is a cache of hashes. That is why we will start
 from implementing this support actor. The implementation is fairly straight forward and can be
-found [here](../../transforms/universal/ededup/src/ededup_transform.py)
+found [here](../../transforms/universal/ededup/ray/src/ededup_transform.py)
 
 ## EdedupTransform
 
@@ -287,15 +287,14 @@ A single method `launch()` is then invoked to run the transform in a Ray cluster
 
 ## Running
 
-Assuming the above `main()` is placed in `ededup_transform.py` we can run the transform on data
-in COS as follows:
+> **Note:** You will need to run the setup commands in the [`README`](../ray/README.md) before running the following examples.
+
+Assuming the above `main()` is placed in `ededup_transform.py` we can run the transform on local data 
+as follows:
+
 
 ```shell
-python ededup_transform.py --hash_cpu 0.5 --num_hashes 2 --doc_column "contents" \
-  --run_locally True  \
-  --s3_cred "{'access_key': 'KEY', 'secret_key': 'SECRET', 'cos_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}" \
-  --s3_config "{'input_folder': 'cos-optimal-llm-pile/test/david/input/', 'output_folder': 'cos-optimal-llm-pile/test/david/output/'}"
+make run-cli-ray-sample
 ```
-This is a minimal set of options to run locally.
-See the [launcher options](ray-launcher-options) for a complete list of
+See the [launcher options](ray-launcher-options.md) for a complete list of
 transform-independent command line options.
