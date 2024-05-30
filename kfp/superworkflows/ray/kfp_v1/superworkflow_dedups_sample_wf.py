@@ -6,13 +6,13 @@ from kfp_support.workflow_support.utils import ONE_WEEK_SEC
 
 # Components
 # path to kfp component specifications files
-component_spec_path = "../../kfp_ray_components/"
+component_spec_path = "../../../kfp_ray_components/"
 # For every sub workflow we need a separate components, that knows about this subworkflow.
 run_doc_id_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_exact_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_fuzzy_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 
-doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.0"
+doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.1"
 ededup_image = "quay.io/dataprep1/data-prep-kit/ededup:0.3.0"
 fdedup_image = "quay.io/dataprep1/data-prep-kit/fdedup:0.3.0"
 
@@ -36,14 +36,14 @@ def sample_ray_orchestrator(
     p2_pipeline_additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
     p2_pipeline_data_s3_access_secret: str = "s3-secret",
     p2_pipeline_runtime_code_location: str = '{"github": "github", "commit_hash": "12345", "path": "path"}',
+    p2_pipeline_runtime_actor_options: str = '{"num_cpus": 0.8}',
+    # data access.
+    p2_pipeline_data_max_files: int = -1,
+    p2_pipeline_data_num_samples: int = -1,
     # Document ID step parameters
     p3_name: str = "doc_id",
     p3_skip: bool = False,
-    # data access.
-    p3_data_max_files: int = -1,
-    p3_data_num_samples: int = -1,
     # orchestrator
-    p3_runtime_actor_options: str = '{"num_cpus": 0.8}',
     # doc id parameters
     p3_doc_id_doc_column: str = "contents",
     p3_doc_id_hash_column: str = "hash_column",
@@ -59,10 +59,6 @@ def sample_ray_orchestrator(
     p4_skip: bool = False,
     p4_ededup_doc_column: str = "contents",
     p4_ededup_hash_cpu: float = 0.5,
-    p4_runtime_actor_options: str = '{"num_cpus": 0.8}',
-    # data access.
-    p4_data_max_files: int = -1,
-    p4_data_num_samples: int = -1,
     # data sampling
     p4_ededup_n_samples: int = 10,
     # overriding parameters
@@ -78,11 +74,6 @@ def sample_ray_orchestrator(
     p5_fdedup_doc_column: str = "contents",
     p5_fdedup_id_column: str = "int_id_column",
     p5_fdedup_cluster_column: str = "cluster",
-    # orchestrator
-    p5_runtime_actor_options: str = '{"num_cpus": 0.8}',
-    # data access. checkpointing is not supported by dedup
-    p5_data_num_samples: int = -1,
-    p5_data_max_files: int = -1,
     # infrastructure
     p5_fdedup_bucket_cpu: float = 0.5,
     p5_fdedup_doc_cpu: float = 0.5,

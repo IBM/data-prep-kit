@@ -23,7 +23,7 @@ from kfp_support.workflow_support.utils import (
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "tokenization_transform.py"
 
-task_image = "quay.io/dataprep1/data-prep-kit/tokenization:0.2.0"
+task_image = "quay.io/dataprep1/data-prep-kit/tokenization:0.3.0"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0"
