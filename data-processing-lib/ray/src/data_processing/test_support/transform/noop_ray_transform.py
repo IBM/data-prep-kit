@@ -11,14 +11,14 @@
 ################################################################################
 
 
-from data_processing.test_support.transform.noop_transform import (
-    NOOPTransformConfiguration,
-)
-from data_processing.utils import get_logger
-from data_processing_ray.runtime.ray import (
+from data_processing.runtime.ray import (
     RayTransformLauncher,
     RayTransformRuntimeConfiguration,
 )
+from data_processing.test_support.transform.noop_ray_transform import (
+    NOOPTransformConfiguration,
+)
+from data_processing.utils import get_logger
 
 
 logger = get_logger(__name__)

@@ -11,8 +11,8 @@
 ################################################################################
 
 from data_processing.runtime import TransformRuntimeConfiguration
+from data_processing.runtime.ray import DefaultRayTransformRuntime
 from data_processing.transform import TransformConfiguration
-from data_processing_ray.runtime.ray import DefaultRayTransformRuntime
 
 
 class RayTransformRuntimeConfiguration(TransformRuntimeConfiguration):

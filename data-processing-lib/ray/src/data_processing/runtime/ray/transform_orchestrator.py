@@ -16,14 +16,14 @@ from datetime import datetime
 
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.utils import get_logger
-from data_processing_ray.runtime.ray import (
+from data_processing.runtime.ray import (
     RayTransformExecutionConfiguration,
     RayTransformFileProcessor,
     RayTransformRuntimeConfiguration,
     RayUtils,
     TransformStatisticsRay,
 )
+from data_processing.utils import get_logger
 from ray.util import ActorPool
 from ray.util.metrics import Gauge
 

@@ -1,3 +1,3 @@
-from .noop_transform import (
+from .noop_ray_transform import (
     NOOPRayTransformConfiguration,
 )

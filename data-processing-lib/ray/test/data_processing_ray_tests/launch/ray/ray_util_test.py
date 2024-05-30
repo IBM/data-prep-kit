@@ -12,8 +12,8 @@
 
 import pyarrow as pa
 import ray
+from data_processing.runtime.ray import RayUtils, TransformStatisticsRay
 from data_processing.utils import GB, TransformUtils
-from data_processing_ray.runtime.ray import RayUtils, TransformStatisticsRay
 
 
 params = {}

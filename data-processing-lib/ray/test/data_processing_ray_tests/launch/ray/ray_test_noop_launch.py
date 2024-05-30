@@ -13,11 +13,11 @@
 import os
 
 import pyarrow as pa
+from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from data_processing_ray.runtime.ray import RayTransformLauncher
-from data_processing_ray.test_support.transform import NOOPRayTransformConfiguration
+from data_processing.test_support.transform import NOOPRayTransformConfiguration
 
 
 table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})

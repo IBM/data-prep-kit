@@ -16,13 +16,13 @@ import time
 
 import ray
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
-from data_processing.runtime.transform_launcher import AbstractTransformLauncher
-from data_processing.utils import get_logger, str2bool
-from data_processing_ray.runtime.ray import (
+from data_processing.runtime.ray import (
     RayTransformExecutionConfiguration,
     RayTransformRuntimeConfiguration,
     orchestrate,
 )
+from data_processing.runtime.transform_launcher import AbstractTransformLauncher
+from data_processing.utils import get_logger, str2bool
 
 
 logger = get_logger(__name__)

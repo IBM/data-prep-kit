@@ -35,7 +35,7 @@ dev = [
 package_dir = ["src","test"]
 
 [options.packages.find]
-where = ["src/data_processing_ray"]
+where = ["src/data_processing"]
 
 [tool.pytest.ini_options]
 # Currently we use low coverage since we have to run tests separately (see makefile)

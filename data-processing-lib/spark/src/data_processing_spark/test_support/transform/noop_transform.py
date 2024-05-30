@@ -16,7 +16,7 @@ from typing import Any
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
-from data_processing.test_support.transform.noop_transform import (
+from data_processing.test_support.transform.noop_ray_transform import (
     NOOPTransformConfiguration,
 )
 from data_processing.transform import TransformConfiguration
