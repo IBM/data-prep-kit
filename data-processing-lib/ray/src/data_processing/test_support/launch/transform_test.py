@@ -82,12 +82,15 @@ class AbstractTransformLauncherTest(AbstractTest):
             and "ignore_columns" in metafunc.fixturenames
         ):
             # Let the sub-class define the specific tests and test data for the transform under test.
-            f = self.get_test_transform_fixtures()
+            fixtures = self.get_test_transform_fixtures()
             # for backward compatibility to make ignore_columns optional
-            if len(f[0]) == 4:
-                f[0] = f[0] + ([],)
+            fi = 0
+            for f in fixtures:
+                if len(f) == 4:
+                    fixtures[fi] = f + ([],)
+                fi += 1
             # Install the fixture, matching the parameter names used by test_transform() method.
-            metafunc.parametrize("launcher,cli_params,in_table_path,expected_out_table_path,ignore_columns", f)
+            metafunc.parametrize("launcher,cli_params,in_table_path,expected_out_table_path,ignore_columns", fixtures)
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         """
