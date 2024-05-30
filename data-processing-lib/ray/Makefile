@@ -5,10 +5,9 @@ include $(REPOROOT)/.make.defaults
 TAG := "v${DPK_LIB_VERSION}"
 
 
-clean::
+clean:: .defaults.clean
 	@# Help: Clean up the distribution build and the venv 
-	rm -rf dist venv
-	rm -rf src/*egg-info
+	-rm -rf dist > /dev/null 2>&1
 
 .check-env::
 	@echo "Checks passed"
