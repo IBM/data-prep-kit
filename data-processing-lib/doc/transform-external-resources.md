@@ -12,7 +12,7 @@ In the next sections we cover the following:
    1. How to define the transform-specific resource location(s) as command line arguments
    2. How to load the transform-specific resources, either or both of:
       1. During transform initialization - this is useful for testing outside of ray, and optionally
-      2. During transform configuration in the Ray orchestrator.  This may not be feasible if a resource 
+      2. During transform configuration in the Ray runtime.  This may not be feasible if a resource 
          is not picklable.
 
 
@@ -55,7 +55,7 @@ class BlockListTransformConfiguration(DefaultTransformConfiguration):
         # Add the DataAccessFactory parameters to the transform's configuration parameters.
         self.daf.add_input_params(parser)
 ```
-We are creating an the `DataAccessFactory` using
+We are creating the `DataAccessFactory` using
 a transform-specific prefix to define the transform-specific command line options to configure the 
 transform's factory instance.
 In this case, all the transform's DataAccessFactory parameters are prepended with 

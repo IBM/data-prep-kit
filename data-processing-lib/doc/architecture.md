@@ -2,7 +2,7 @@
 
 In this section we cover the high-level architecture, some of the core components.  
 
-Transform implementation and examples are provided in the [tutorial](transform-tutorials.md).
+Transform implementation and examples are provided in the [tutorial](transforms.md).
 
 ## Architecture
 
@@ -90,7 +90,7 @@ Some of the core components used by the architecture are definfed here:
  
 ## Transforms
 A brief discussion of the Transform components are provided here.
-For a more complete discussion, see the [tutorials](transform-tutorials.md).
+For a more complete discussion, see the [tutorials](transforms.md).
 
 * [Transform](../ray/src/data_processing_ray/transform/table_transform.py) - defines the methods required
 of any transform implementation - `transform()` and `flush()` - and provides the bulk of any transform implementation

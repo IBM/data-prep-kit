@@ -1,20 +1,28 @@
-# Transform Tutorials
+# Transforms 
 
-All transforms operate on a [pyarrow Table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
-and produce zero or more transformed tables and transform specific metadata.
-The Transform itself need only be concerned with the conversion of one in memory table at a time.  
+[All transforms](../python/src/data_processing/transform/abstract_transform.py)
+are generalized to operate on generically typed `DATA.`
+[Ray](ray-runtime.md) and [Python](python-runtime.md) runtimes 
+currently support `DATA` as both byte arrays 
+and [pyarrow Tables](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html). 
+The [Spark runtime](spark-runtime.md) currently supports the native Spark `DataFrame`.
 
-When running in the Ray worker (i.e. [TransformFileProcessor](../ray/src/data_processing_ray/runtime/ray/transform_file_processor.py) ), the input
-files are read from parquet files and are converted to tables. The transform table(s) is/are stored in destination parquet files.
-Metadata accumulated across calls to all transforms is stored in the destination.
+All transforms convert their input `DATA` to a list of transformed `DATA` objects
+and optional metadata about the transformation of the `DATA` instance.
+The Transform itself need only be concerned with the conversion 
+of one `DATA` instance at a time.
 
-### Transform Basics
-In support of this model the there are two primary classes
-defined and discussed below
+In the discussion that follows, we'll focus on the transformation of pyarrow Tables
+using the `AbstractTableTransform` class (see below), supported by both
+the Ray and Python runtimes.
+Mapping from this tutorial to a Spark runtime can be done by using 
+`data-prep-kit-spark`'s [AbstractSparkTransform](../spark/src/data_processing_spark/runtime/spark/spark_transform.py)
+which operates on a Spark DataFrame instead of a pyarrow Table.
+
 
 #### AbstractTableTransform class
 [AbstractTableTransform](../ray/src/data_processing_ray/transform/table_transform.py) 
-is expected to be extended when implementing a transform.
+is expected to be extended when implementing a transform of pyarrow Tables.
 The following methods are defined:
 
 * ```__init__(self, config:dict)``` - an initializer through which the transform can be created 
@@ -64,7 +72,4 @@ be made available in the dictionary provided to the transform's initializer.
 * ```get_input_params(self ) -> dict[str,Anny]``` - returns the dictionary of configuration values that
 should be used to initialize the transform.
 
-### Runtimes
-Runtimes provide a mechanism to run a transform over a set of input files to produce a set of
-output files.  Each runtime is started using a _launcher_.  
-The available runtimes are discussed [here](transform-runtimes.md].
+

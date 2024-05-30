@@ -41,7 +41,7 @@ the `DataAccess` instance (see below) according to the CLI parameters.
 
 To learn more consider the following:
 
-* [Transform Tutorials](transform-tutorials.md)
+* [Transforms](transforms.md)
 * [Transform Runtimes](transform-runtimes.md)
 * [Transform Examples](transform-tutorial-examples.md)
 * [Testing Transforms](transform-testing.md)

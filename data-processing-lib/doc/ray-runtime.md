@@ -1,5 +1,6 @@
 # Ray Runtime 
-The Ray runtime includes the following set of components:
+The Ray runtime provides the ability to run in either a local or Kubernetes cluster,
+and includes the following set of components:
 
 * [RayTransformLauncher](../ray/src/data_processing_ray/runtime/ray/transform_launcher.py) - this is a 
 class generally used to implement `main()` that makes use of a `TransformConfiguration` to 
@@ -12,7 +13,9 @@ class extends transform's base TransformConfiguration implementation to add an o
 this provides the ability for the transform implementor to create additional Ray resources 
 and include them in the configuration used to create a transform
 (see, for example, [exact dedup](../../transforms/universal/ededup/ray/src/ededup_transform.py)).
-This also provide the ability to supplement the statics collected by
+Many transforms will not need additional resources and can use
+the [DefaultRayTransformRuntime](../ray/src/data_processing_ray/runtime/ray/transform_runtime.py).
+`TransformRuntime` also provide the ability to supplement the statics collected by
 [Statistics](../ray/src/data_processing_ray/runtime/ray/transform_statistics.py) (see below).
 
 Roughly speaking the following steps are completed to establish transforms in the RayWorkers
@@ -84,15 +87,15 @@ Details are covered in the [advanced transform tutorial](advanced-transform-tuto
 
 ## Transform Runtime
 The 
-[DefaultTableTransformRuntime](../ray/src/data_processing_ray/runtime/ray/transform_runtime.py)
+[DefaultRayTransformRuntime](../ray/src/data_processing_ray/runtime/ray/transform_runtime.py)
 class is provided and will be 
 sufficient for many use cases, especially 1:1 table transformation.
 However, some transforms will require use of the Ray environment, for example,
 to create additional workers, establish a shared memory object, etc.
-Of course, these transforms will generally not run outside of Ray environment. 
+Of course, these transforms will generally not run outside of a Ray environment. 
 
 ```python
-class DefaultTableTransformRuntime:
+class DefaultRayTransformRuntime:
 
     def __init__(self, params: dict[str, Any]):
         ...
@@ -124,20 +127,19 @@ after all files have been processed.
 ## Exceptions
 A transform may find that it needs to signal error conditions.
 For example, if a referenced model could not be loaded or
-a given table does not have the expected column.
+a given input data (e.g., pyarrow Table) does not have the expected format (.e.g, columns).
 In general, it should identify such conditions by raising an exception. 
 With this in mind, there are two types of exceptions:
 
-1. Those that would not allow any tables to be processed (e.g. model loading problem).
-2. Those that would not allow a specific table to be processed (e.g. missing column).
+1. Those that would not allow any data to be processed (e.g. model loading problem).
+2. Those that would not allow a specific datum to be processed (e.g. missing column).
 
 In the first situation the transform should throw an exception from the initializer, which
-will cause the Ray framework to terminate processing of all tables. 
+will cause the Ray framework to terminate processing of all data. 
 In the second situation (identified in the `transform()` or `flush()` methods), the transform
-should throw an exception from the associated method.  This will cause only the
-error-causing
-table to be ignored and not written out, but allow continued processing of tables by 
-the transform.
+should throw an exception from the associated method.
+This will cause only the error-causing datume to be ignored and not written out,
+but allow continued processing of tables by the transform.
 In both cases, the framework will log the exception as an error.
 
 
