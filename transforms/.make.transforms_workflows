@@ -6,7 +6,6 @@ include ${REPOROOT}/kfp/requirements.env
 include ${REPOROOT}/.make.defaults
 
 USE_DEV_IMAGES ?= 1
-KFPv2 ?= 1
 
 define set_env_var
 	$(eval export $(1)=$(2))
@@ -65,6 +64,9 @@ ifeq ($(KFPv2), 1)
 else
 	. ${WORKFLOW_VENV_ACTIVATE}  && pip install -e $(REPOROOT)/kfp/kfp_support_lib/
 endif
+	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple; \
+	pip install -e $($DPK_RAY_LIB_DIR); \
+	pip install -e $(REPOROOT)/kfp/kfp_support_lib/;
 
 #TODO KFPv2
 ${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt
