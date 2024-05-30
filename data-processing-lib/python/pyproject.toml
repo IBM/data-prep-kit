@@ -15,8 +15,9 @@ dependencies = [
     "argparse",
     "mmh3",
     # These two are to fix security issue
-    "fastapi>=0.109.1",
-    "pillow>=10.2.0",
+    # These do not seem to be referenced through any transitive dependencies, so removing for now - 5/30/2024
+    #"fastapi>=0.109.1",
+    #"pillow>=10.2.0",
 ]
 
 [build-system]
