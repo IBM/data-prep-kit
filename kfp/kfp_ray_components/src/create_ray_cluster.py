@@ -12,8 +12,7 @@
 
 import sys
 
-from kfp_support.workflow_support.runtime_utils import KFPUtils, RayRemoteJobs
-
+from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
 
 def start_ray_cluster(
     name: str,  # name of Ray cluster

@@ -23,7 +23,7 @@ endef
 		sed -i.back "s/data-prep-kit\/$$DOCKER_IMAGE_NAME:.*/data-prep-kit\/$$DOCKER_IMAGE_NAME:$$DOCKER_IMAGE_VERSION\"/" $$PIPELINE_FILE ;\
 	done < ${REPOROOT}/.make.versions
 ifeq ($(KFPv2), 1)
-	@sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION_v2}\"/" ${PIPELINE_FILE}
+	@sed -i.back "s/kfp-data-processing_v2:.*/kfp-data-processing_v2:${KFP_DOCKER_VERSION_v2}\"/" ${PIPELINE_FILE}
 else
 	@sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION}\"/" ${PIPELINE_FILE}
 endif

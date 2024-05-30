@@ -12,8 +12,7 @@
 
 import sys
 
-from kfp_support.workflow_support.runtime_utils import KFPUtils, RayRemoteJobs
-
+from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
 
 # Cleans and shutdowns the Ray cluster
 def cleanup_ray_cluster(

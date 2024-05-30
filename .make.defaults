@@ -209,7 +209,7 @@ __check_defined = \
 	cp -p -R ${LIB_PATH}/README.md ${LIB_NAME}
 
 # Build and image using the local Dockerfile and make the data-processing-lib/python
-# available in the current directory for use by the Dockerfile (i.e. to install the library). 
+# available in the current directory for use by the Dockerfile (i.e. to install the library).
 .PHONY: .defaults.python-lib-src-image
 .defaults.python-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
 	@# Help: Build the Python $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-lib/python source
@@ -242,8 +242,8 @@ __check_defined = \
 .defaults.python-lib-src-venv:: .defaults.venv .defaults.install-python-lib-src-venv
 
 .PHONY: .defaults.install-python-lib-src-venv
-.defaults.install-python-lib-src-venv:: 
-	@# Help: Install Python data processing library source into existing venv 
+.defaults.install-python-lib-src-venv::
+	@# Help: Install Python data processing library source into existing venv
 	@echo Installing Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
@@ -256,15 +256,15 @@ __check_defined = \
 		echo Installed source from Python processing library for `which $(PYTHON)`;       \
 	else 								\
 		echo ERROR installing source into `which $(PYTHON)`;    \
-	fi  
+	fi
 
 .PHONY: .defaults.ray-lib-src-venv
 .defaults.ray-lib-src-venv:: .defaults.venv .defaults.install-ray-lib-src-venv
 
-# Install the python-based lib BEFORE spark assuming spark depends on the same version as python source. 
+# Install the python-based lib BEFORE spark assuming spark depends on the same version as python source.
 .PHONY: .defaults.install-ray-lib-src-venv
-.defaults.install-ray-lib-src-venv:: 
-	@# Help: Install Ray and Python data processing library source into existing venv 
+.defaults.install-ray-lib-src-venv::
+	@# Help: Install Ray and Python data processing library source into existing venv
 	@echo Installing Ray and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
@@ -284,10 +284,10 @@ __check_defined = \
 .PHONY: .defaults.spark-lib-src-venv
 .defaults.spark-lib-src-venv:: .defaults.venv .defaults.install-spark-lib-src-venv
 
-# Install the python-based lib BEFORE spark assuming spark depends on the same version as python source. 
+# Install the python-based lib BEFORE spark assuming spark depends on the same version as python source.
 .PHONY: .defaults.install-spark-lib-src-venv
-.defaults.install-spark-lib-src-venv:: 
-	@# Help: Install Spark and Python data processing library source into existing venv 
+.defaults.install-spark-lib-src-venv::
+	@# Help: Install Spark and Python data processing library source into existing venv
 	@echo Installing Spark and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
