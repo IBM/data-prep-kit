@@ -51,19 +51,17 @@ class DataAccessS3(DataAccess):
         self.s3_credentials = {} | s3_credentials
         access_key = self.get_access_key()
         if access_key is None:
+            logger.warning("S3 access key not provided. Defaulting to ''")
             access_key = ""
         secret_key = self.get_secret_key()
         if secret_key is None:
+            logger.warning("S3 secret key not provided. Defaulting to ''")
             secret_key = ""
-        self.arrS3 = ArrowS3(
-            access_key,
-            secret_key,
-            endpoint=s3_credentials.get("url", None),
-            region=s3_credentials.get("region", None),
-        )
+        endpoint = self.get_endpoint()
+        region = self.get_region()
         if s3_config is None:
             self.input_folder = None
-            self.input_folder = None
+            self.output_folder = None
         else:
             self.input_folder = TransformUtils.clean_path(s3_config["input_folder"])
             self.output_folder = TransformUtils.clean_path(s3_config["output_folder"])
@@ -73,17 +71,31 @@ class DataAccessS3(DataAccess):
         self.n_samples = n_samples
         self.files_to_use = files_to_use
 
+        logger.debug(f"S3 access key provided: {access_key}")
+        logger.debug(f"S3 secret key provided: no soup for you!")
+        logger.debug(f"S3 region {region}")
+        logger.debug(f"S3 endpoint/url: {endpoint}")
+        logger.debug(f"S input folder: {self.input_folder}")
+        logger.debug(f"S3 output folder: {self.output_folder}")
+        logger.debug(f"S3 data sets: {self.d_sets}")
+        logger.debug(f"S3 checkpoint: {self.checkpoint}")
+        logger.debug(f"S3 m_files: {self.m_files}")
+        logger.debug(f"S3 n_samples: {self.n_samples}")
+        logger.debug(f"S3 files_to_use: {self.files_to_use}")
+
+        self.arrS3 = ArrowS3(access_key, secret_key, endpoint=endpoint, region=region)
+
     def get_access_key(self):
-        self.s3_credentials.get("access_key", None),
+        self.s3_credentials.get("access_key", None)
 
     def get_secret_key(self):
-        return (self.s3_credentials.get("secret_key", None),)
+        return self.s3_credentials.get("secret_key", None)
 
     def get_endpoint(self):
-        return (self.s3_credentials.get("url", None),)
+        return self.s3_credentials.get("url", None)
 
     def get_region(self):
-        return (self.s3_credentials.get("region", None),)
+        return self.s3_credentials.get("region", None)
 
     def get_num_samples(self) -> int:
         """

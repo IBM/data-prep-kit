@@ -55,6 +55,14 @@ class DataAccessLocal(DataAccess):
         self.n_samples = n_samples
         self.files_to_use = files_to_use
 
+        logger.debug(f"Local input folder: {self.input_folder}")
+        logger.debug(f"Local output folder: {self.output_folder}")
+        logger.debug(f"Local data sets: {self.d_sets}")
+        logger.debug(f"Local checkpoint: {self.checkpoint}")
+        logger.debug(f"Local m_files: {self.m_files}")
+        logger.debug(f"Local n_samples: {self.n_samples}")
+        logger.debug(f"Local files_to_use: {self.files_to_use}")
+
     def get_num_samples(self) -> int:
         """
         Get number of samples for input
