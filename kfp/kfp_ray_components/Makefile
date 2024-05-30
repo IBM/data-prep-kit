@@ -8,8 +8,6 @@ include makeenv
 DOCKER_FILE=Dockerfile
 DOCKER_IMAGE_NAME=kfp-data-processing
 DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
-#DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}
-DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 
 # Include the common rules.
 # Use "make help" to see them.
@@ -20,7 +18,7 @@ include $(REPOROOT)/.make.defaults
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib LIB_NAME=kfp_support_lib
-	$(MAKE) DOCKER_IMAGE=$(DOCKER_IMAGE) .defaults.image
+	$(MAKE) .defaults.image
 	rm -rf data-processing-lib-ray
 	rm -rf data-processing-lib-python
 	rm -rf kfp_support_lib
@@ -42,7 +40,7 @@ reconcile-requirements:
 .PHONY: load-image
 load-image:
 	@# Help: Load the image to the kind cluster created with make setup.
-	kind load docker-image $(DOCKER_IMG) --name=$(KIND_CLUSTER_NAME)
+	kind load docker-image $(DOCKER_REMOTE_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
 .PHONY: build
 build: image
