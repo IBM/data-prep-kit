@@ -10,6 +10,8 @@ from kfp_support.workflow_support.utils import (
 )
 __compute_import__
 
+task_image = "__transform_image__"
+
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "__script_name__"
 PREFIX: str = "__prefix_name__"
@@ -43,10 +45,10 @@ TASK_NAME: str = "__pipeline_name__"
 )
 def __pipeline_name__(
     ray_name: str = "__pipeline_name__-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "__transform_image__",\
-             "image_pull_secret": "__image_pull_secret__",  "image_pull_policy": "Always"}',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "__image_pull_secret__",\
-            "image": "__transform_image__", "image_pull_policy": "Always"}',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "__image_pull_secret__", '
+        '"image": "' + task_image + '", "image_pull_policy": "Always" }',
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
+        '"image_pull_secret": "__image_pull_secret__", "image": "' + task_image + '", "image_pull_policy": "Always" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': '__input_folder__', 'output_folder': '__output_folder__'}",
