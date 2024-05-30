@@ -224,7 +224,7 @@ class ProgLangSelectTransformConfiguration(TransformConfiguration):
 
 class ProgLangSelectPythonConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime)
+        super().__init__(transform_config=ProgLangSelectTransformConfiguration())
 
 
 class ProgLangSelectRayConfiguration(RayTransformRuntimeConfiguration):

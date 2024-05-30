@@ -47,6 +47,7 @@ class AbstractTransformLauncherTest(AbstractTest):
         cli_params: dict[str, Any],
         in_table_path: str,
         expected_out_table_path: str,
+        drop_columns: list[str],
     ):
         """
         Test the given transform and its runtime using the given CLI arguments, input directory of data files and expected output directory.
@@ -62,14 +63,14 @@ class AbstractTransformLauncherTest(AbstractTest):
             print(f"Using temporary output path {temp_dir}")
             sys.argv = self._get_argv(launcher, cli_params, in_table_path, temp_dir)
             launcher.launch()
-            self._validate_directory_contents_match(temp_dir, expected_out_table_path)
+            self._validate_directory_contents_match(temp_dir, expected_out_table_path, drop_columns)
 
-    def _validate_directory_contents_match(self, dir: str, expected: str):
+    def _validate_directory_contents_match(self, dir: str, expected: str, drop_columns: list[str]):
         """
         Confirm that the two directories contains the same files.
         Stubbed out like this to allow spark tests to override this since spark tends to rename the files.
         """
-        AbstractTest.validate_directory_contents(dir, expected)
+        AbstractTest.validate_directory_contents(dir, expected, drop_columns)
 
     def _install_test_fixtures(self, metafunc):
         # Apply the fixtures for the method with these input names (i.e. test_transform()).
@@ -78,11 +79,14 @@ class AbstractTransformLauncherTest(AbstractTest):
             and "cli_params" in metafunc.fixturenames
             and "in_table_path" in metafunc.fixturenames
             and "expected_out_table_path" in metafunc.fixturenames
+            and "drop_columns" in metafunc.fixturenames
         ):
             # Let the sub-class define the specific tests and test data for the transform under test.
             f = self.get_test_transform_fixtures()
+            if len(f[0]) == 4:
+                f[0] = f[0] + ([],)
             # Install the fixture, matching the parameter names used by test_transform() method.
-            metafunc.parametrize("launcher,cli_params,in_table_path,expected_out_table_path", f)
+            metafunc.parametrize("launcher,cli_params,in_table_path,expected_out_table_path,drop_columns", f)
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         """
@@ -92,6 +96,7 @@ class AbstractTransformLauncherTest(AbstractTest):
             |  Item 1: The dictionary of command line args to simulate when running the transform.
             |  Item 2: The input path to the parquet files to process.
             |  Item 3: the output path holding the expected results of the transform including parquet and metadata.json
+            |  Item 4: columns to drop for table comparison (optional), if omitted an empty array is used
         :return:  a list of Tuples, to test. Each tuple contains the test inputs for test_transform() method.
         """
         raise NotImplemented()

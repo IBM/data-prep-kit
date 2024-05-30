@@ -13,7 +13,7 @@
 import os
 
 import pyarrow as pa
-from data_processing.test_support.transform import AbstractTransformTest
+from data_processing.test_support.transform import AbstractTableTransformTest
 from data_processing.transform import get_transform_config
 from proglang_select_transform import (
     ProgLangSelectTransform,
@@ -24,7 +24,7 @@ from proglang_select_transform import (
 )
 
 
-class TestProgLangSelectTransform(AbstractTransformTest):
+class TestProgLangSelectTransform(AbstractTableTransformTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
