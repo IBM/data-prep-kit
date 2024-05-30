@@ -168,14 +168,17 @@ __check_defined = \
 	@# Help: Clean up the virtual environment.
 	rm -rf venv
 
+# We create both local and remote tags.  Local seems to be needed when using our spark
+# base image.  Remote seems to be needed by kfp.
 .PHONY: .defaults.image
 .defaults.image:: # Must be called with a DOCKER_IMAGE= settings.
-	@# Help: Create the docker image $(DOCKER_LOCAL_IMAGE)
+	@# Help: Create the docker image $(DOCKER_LOCAL_IMAGE) and a tag for $(DOCKER_REMOTE_IMAGE)
 	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE)		\
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\
 		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . 
+	$(DOCKER) tag $(DOCKER_LOCAL_IMAGE)  $(DOCKER_REMOTE_IMAGE)
 
 # Copy a source tree in LIB_PATH, including src, pyproject.toml to LIB_NAME
 # Generally used to copy source from within the repo into a local directory for use by a Dockerfile
@@ -337,7 +340,6 @@ __check_defined = \
 .PHONY: .defaults.publish
 .defaults.publish:: 
 	@# Help: Publish the $(DOCKER_LOCAL_IMAGE) to $(DOCKER_HOSTNAME) container registry
-	$(DOCKER) tag $(DOCKER_LOCAL_IMAGE)  $(DOCKER_REMOTE_IMAGE)
 	-$(DOCKER) logout $(DOCKER_HOSTNAME)
 	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
 	$(DOCKER) push  $(DOCKER_REMOTE_IMAGE)
