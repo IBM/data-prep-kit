@@ -121,8 +121,8 @@ class TestSparkFilterTransform(AbstractSparkTransformLauncherTest):
         )
         return fixtures
 
-    def _validate_directory_contents_match(self, dir: str, expected: str):
-        super()._validate_directory_contents_match(dir, expected)
+    def _validate_directory_contents_match(self, dir: str, expected: str, ignore_columns: list[str] = []):
+        super()._validate_directory_contents_match(dir, expected, ignore_columns)
         with open(os.path.join(dir, "metadata.json"), "r") as meta_fp:
             meta_dict = json.load(meta_fp)
         #     with open(os.path.join(expected, "metadata.json")) as expected_meta_fp:
