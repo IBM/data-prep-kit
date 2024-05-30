@@ -83,6 +83,7 @@ class AbstractTransformLauncherTest(AbstractTest):
         ):
             # Let the sub-class define the specific tests and test data for the transform under test.
             f = self.get_test_transform_fixtures()
+            # for backward compatibilty to make drop_columns optional
             if len(f[0]) == 4:
                 f[0] = f[0] + ([],)
             # Install the fixture, matching the parameter names used by test_transform() method.
