@@ -192,7 +192,7 @@ test-locals:: .transforms.test-locals
 .PHONY: .transforms.load-image
 .transforms.load-image:
 	@# Help:  Load the transform image to the kind cluster created with make setup.
-	kind load docker-image $(DOCKER_LOCAL_IMAGE) --name=$(KIND_CLUSTER_NAME)
+	kind load docker-image $(DOCKER_REMOTE_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
 .PHONY: conventions
 conventions:
