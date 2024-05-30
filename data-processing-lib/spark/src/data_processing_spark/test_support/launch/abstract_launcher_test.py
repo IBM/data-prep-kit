@@ -17,7 +17,7 @@ class AbstractSparkTransformLauncherTest(AbstractTransformLauncherTest):
         """
         pass
 
-    def _validate_directory_contents_match(self, dir: str, expected: str):
+    def _validate_directory_contents_match(self, dir: str, expected: str, drop_columns: list[str] = []):
         # we assume launch is completed and stopped,
         # therefore we are creating a new session and want to stop it below
         spark = SparkSession.builder.getOrCreate()
