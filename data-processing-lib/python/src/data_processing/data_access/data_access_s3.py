@@ -51,12 +51,10 @@ class DataAccessS3(DataAccess):
         self.s3_credentials = {} | s3_credentials
         access_key = self.get_access_key()
         if access_key is None:
-            logger.warning("S3 access key not provided. Defaulting to ''")
-            access_key = ""
+            raise ValueError("S3 access key not provided")
         secret_key = self.get_secret_key()
         if secret_key is None:
-            logger.warning("S3 secret key not provided. Defaulting to ''")
-            secret_key = ""
+            raise ValueError("S3 secret key not provided")
         endpoint = self.get_endpoint()
         region = self.get_region()
         if s3_config is None:
