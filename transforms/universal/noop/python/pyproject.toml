@@ -1,5 +1,5 @@
 [project]
-name = "dpk_noop_ransform_python"
+name = "dpk_noop_transform_python"
 version = "0.2.0"
 requires-python = ">=3.10"
 description = "NOOP Python Transform"
