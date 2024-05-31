@@ -14,12 +14,16 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=spark:root data-processing-spark/ data-processing-spark/
 RUN cd data-processing-spark && pip install --no-cache-dir -e .
 
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+#COPY requirements.txt requirements.txt
+#RUN pip install --no-cache-dir -r requirements.txt
+
+COPY --chown=root:root src/ src/
+COPY --chown=root:root pyproject.toml pyproject.toml 
+RUN pip install --no-cache-dir -e .
 
 # copy source data
-COPY ./src/noop_transform.py .
-COPY ./src/noop_local.py local/
+COPY ./src/noop_transform_spark.py .
+COPY ./src/noop_local_spark.py local/
 
 # copy test
 COPY test/ test/
@@ -38,3 +42,5 @@ ARG BUILD_DATE
 ARG GIT_COMMIT
 LABEL build-date=$BUILD_DATE
 LABEL git-commit=$GIT_COMMIT
+
+

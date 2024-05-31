@@ -15,7 +15,7 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
-from noop_transform import NOOPSparkRuntimeConfiguration
+from noop_transform_spark import NOOPSparkRuntimeConfiguration
 
 
 # create parameters

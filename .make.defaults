@@ -207,30 +207,58 @@ __check_defined = \
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
 	rm -rf data-processing-lib-python
 
-# Build and image using the local Dockerfile and make the data-processing-lib/ray
+# Build an image using the local Dockerfile and make the data-processing-lib/ray
 # available in the current directory for use by the Dockerfile (i.e. to install the library). 
+# Note that this looks for the ../python directory, which is currently only used in the transform projects,
+# but we add it here as a convenience to avoid duplicating a lot of this in transforms/.make.transforms.
 .PHONY: .defaults.ray-lib-src-image
 .defaults.ray-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
 	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
-	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray .defaults.copy-lib
 	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
+	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray .defaults.copy-lib
+	if [ -e ../python ]; then								\
+		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
+	fi
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
 	rm -rf data-processing-lib-python
 	rm -rf data-processing-lib-ray
+	rm -rf python-transform 
 
+# Note that this looks for the ../python directory, which is currently only used in the transform projects,
+# but we add it here as a convenience to avoid duplicating a lot of this in transforms/.make.transforms.
 .PHONY: .defaults.spark-lib-src-image
 .defaults.spark-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
 	@# Help: Build the Spark $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
 	$(MAKE) IMAGE_NAME_TO_VERIFY=$(DOCKER_SPARK_BASE_IMAGE_NAME) .defaults.verify-image-availability
-	$(MAKE) LIB_PATH=$(DPK_SPARK_LIB_DIR) LIB_NAME=data-processing-spark .defaults.copy-lib
 	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
+	$(MAKE) LIB_PATH=$(DPK_SPARK_LIB_DIR) LIB_NAME=data-processing-spark .defaults.copy-lib
+	if [ -e ../python ]; then								\
+		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
+	fi
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE) .defaults.image
 	rm -rf data-processing-lib-python
 	rm -rf data-processing-spark
+	rm -rf python-transform 
 
+# Install the source from the given directory into an existing venv
+# Expected PYTHON_PROJECT_DIR and uses EXTRA_INDEX_URL if set.
+# PROJECT_DIR is expected to have src and pyproject.toml
+.PHONY: .defaults.install-src-venv
+.defaults.install-src-venv:: 
+	@# Help: Install Ray and Python data processing library source into existing venv 
+	@echo Installing Ray and Python data processing library source to existing venv
+	@source venv/bin/activate;				      	\
+	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
+		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
+	fi;								\
+	pip install $${extra_url}  -e $(PYTHON_PROJECT_DIR);		
+	@echo Installed python project source in $(PYTHON_PROJECT_DIR) into venv
+
+# Install local requirements last as it generally includes our lib source
 .PHONY: .defaults.python-lib-src-venv
-.defaults.python-lib-src-venv:: .defaults.venv .defaults.install-python-lib-src-venv
+.defaults.python-lib-src-venv:: .defaults.create-venv .defaults.install-python-lib-src-venv .defaults.install-local-requirements-venv
 
+# Install all source from the repo for a python runtime transform into an existing venv 
 .PHONY: .defaults.install-python-lib-src-venv
 .defaults.install-python-lib-src-venv:: 
 	@# Help: Install Python data processing library source into existing venv 
@@ -238,20 +266,14 @@ __check_defined = \
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
 	pip uninstall -y data-prep-toolkit;		 		\
-	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
-		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
-	fi;								\
-	pip install $${extra_url}  -e $(DPK_PYTHON_LIB_DIR);		\
-	if [ $$? -eq 0 ]; then  					\
-		echo Installed source from Python processing library for `which $(PYTHON)`;       \
-	else 								\
-		echo ERROR installing source into `which $(PYTHON)`;    \
-	fi  
+	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;	\
+	echo Installed source from Python processing library for `which $(PYTHON)`
 
+# Install local requirements last as it generally includes our lib source
 .PHONY: .defaults.ray-lib-src-venv
-.defaults.ray-lib-src-venv:: .defaults.venv .defaults.install-ray-lib-src-venv
+.defaults.ray-lib-src-venv:: .defaults.create-venv .defaults.install-ray-lib-src-venv .defaults.install-local-requirements-venv
 
-# Install the python-based lib BEFORE spark assuming spark depends on the same version as python source. 
+# Install all source from the repo for a ray runtime transform into an existing venv 
 .PHONY: .defaults.install-ray-lib-src-venv
 .defaults.install-ray-lib-src-venv:: 
 	@# Help: Install Ray and Python data processing library source into existing venv 
@@ -260,39 +282,27 @@ __check_defined = \
 	pip install pytest;						\
 	pip uninstall -y data-prep-toolkit;		 		\
 	pip uninstall -y data-prep-toolkit-ray;		 		\
-	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
-		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
-	fi;								\
-	pip install $${extra_url}  -e $(DPK_PYTHON_LIB_DIR);		\
-	pip install $${extra_url}  -e $(DPK_RAY_LIB_DIR);		\
-	if [ $$? -eq 0 ]; then  					\
-		echo Installed source from Ray data processing library for `which $(PYTHON)`;       \
-	else 								\
-		echo ERROR installing source into `which $(PYTHON)`;    \
-	fi  
+	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;		\
+	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_RAY_LIB_DIR) .defaults.install-src-venv;		\
+	echo Installed source from Ray data processing library for `which $(PYTHON)`
 
+# Install local requirements last as it generally includes our lib source
 .PHONY: .defaults.spark-lib-src-venv
-.defaults.spark-lib-src-venv:: .defaults.venv .defaults.install-spark-lib-src-venv
+.defaults.spark-lib-src-venv:: .defaults.create-venv .defaults.install-spark-lib-src-venv .defaults.install-local-requirements-venv
 
-# Install the python-based lib BEFORE spark assuming spark depends on the same version as python source. 
+# Install all source from the repo for a spark runtime transform into an existing venv 
 .PHONY: .defaults.install-spark-lib-src-venv
 .defaults.install-spark-lib-src-venv:: 
 	@# Help: Install Spark and Python data processing library source into existing venv 
+	@echo ""
 	@echo Installing Spark and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
 	pip uninstall -y data-prep-toolkit;	 			\
 	pip uninstall -y data-prep-toolkit-spark;	 		\
-	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
-		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
-	fi;								\
-	pip install $${extra_url}  -e $(DPK_PYTHON_LIB_DIR);		\
-	pip install $${extra_url}  -e $(DPK_SPARK_LIB_DIR);		\
-	if [ $$? -eq 0 ]; then  					\
-		echo Installed source from Spark processing library for `which $(PYTHON)`;       \
-	else 								\
-		echo ERROR installing source into `which $(PYTHON)`;    \
-	fi  
+	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;	\
+	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_SPARK_LIB_DIR) .defaults.install-src-venv;	\
+	echo Installed source from Spark processing library for `which $(PYTHON)`
 
 .PHONY: .defaults.test-src
 .defaults.test-src:: 
@@ -357,17 +367,29 @@ __check_defined = \
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
 .PHONY: .defaults.venv
-.defaults.venv::	.check_python_version
-	@# Help: Create the virtual environment using requirements.txt
+.defaults.venv::	.check_python_version .defaults.create-venv .defaults.install-local-requirements-venv
+
+.PHONY: .defaults.create-venv
+.defaults.create-venv:
+	@# Help: Create the virtual environment using requirements.txt or pyproject.toml
 	$(PYTHON) -m venv venv
 	@source venv/bin/activate;		\
 	pip install --upgrade pip;		\
 	pip install wheel;			\
+
+# Install requirements defined in the current directory into an existing venv
+.PHONY: .defaults.install-local-requirements-venv
+.defaults.install-local-requirements-venv:
+	@source venv/bin/activate;					\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
 	if [ -e requirements.txt ]; then				\
+		echo Install requirements from requirements.txt;	\
 		pip install $$extra_url -r requirements.txt;		\
+	elif [ -e pypproject.toml ]; then				\
+		echo Install requirements using pyproject.toml;		\
+		pip install $$extra_url -e .;				\
 	fi
 
 .PHONY: .defaults.check.installed

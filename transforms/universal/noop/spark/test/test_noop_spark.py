@@ -18,7 +18,7 @@ from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLau
 from data_processing_spark.test_support.launch.abstract_launcher_test import (
     AbstractSparkTransformLauncherTest,
 )
-from noop_transform import NOOPSparkRuntimeConfiguration, sleep_cli_param
+from noop_transform_spark import NOOPSparkRuntimeConfiguration, sleep_cli_param
 from pyspark.sql import DataFrame, SparkSession
 
 

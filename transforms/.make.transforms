@@ -86,7 +86,8 @@ extra-help:
 .PHONY: .transforms.clean
 .transforms.clean:: .defaults.clean
 	$(MAKE) minio-stop  
-	-rm -rf output > /dev/null 2>&1
+	-rm -rf output > /dev/null 2>&1			# Created when running local samples
+	-rm -rf python-transform > /dev/null 2>&1	# Created when build ray and spark image 
 	@# Help: Normal cleanups plus stop minio server and rm output dir
 
 
@@ -95,9 +96,18 @@ extra-help:
 # We install wheel, because it seems to be required for fasttext install on redhat.
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
+.PHONY: .transforms.python-venv
+.transforms.python-venv:: .defaults.python-lib-src-venv
+
 .PHONY: .transforms.ray-venv
 .transforms.ray-venv:: .defaults.ray-lib-src-venv
+	if [ -d ../python ]; then						\
+	    $(MAKE) PYTHON_PROJECT_DIR=../python .defaults.install-src-venv;	\
+	fi
 
+# For now we do NOT install ../python source as we do for ray, since for now
+# spark implementations do not use the pure python transform.  If/when
+# that changes, we can start installing ../python source as is done for ray.
 .PHONY: .transforms.spark-venv
 .transforms.spark-venv:: .defaults.spark-lib-src-venv
 
@@ -105,14 +115,34 @@ extra-help:
 .transforms.check_env::
 	@true
 
-# Create the docker image making sure the preloaded models are available to copy into the image
-# We copy the library/framework source here so it can be installed into the docker image and
-# pip installed inside the Dockerfile
+.PHONY: .transforms.python-image
+.transforms.python-image:: .defaults.python-lib-src-image
+
+# This is eventually to be deprecated in favor of transforms.ray-image-split-runtimes
 .PHONY: .transforms.ray-image
 .transforms.ray-image:: .defaults.ray-lib-src-image
 
+.PHONY: .transforms.ray-image-split-runtimes
+.transforms.ray-image-split-runtimes:: 
+	$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib
+	$(MAKE) .defaults.ray-lib-src-image
+	rm -rf python-transform
+	@# Help: Build the ray image including transform src from adjacent python project 
+
+# This is eventually to be deprecated in favor of transforms.spark-image-split-runtimes
 .PHONY: .transforms.spark-image
 .transforms.spark-image:: .defaults.spark-lib-src-image
+
+.PHONY: .transforms.spark-image-split-runtimes
+.transforms.spark-image-split-runtimes:: 
+	$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib
+	$(MAKE) .defaults.ray-lib-src-image
+	rm -rf python-transform
+	@# Help: Build the ray image including transform src from adjacent python project 
+
+.PHONY: .transforms.python-build
+.transforms.python-build:: .transforms.python-venv .transforms.python-image	
+	@# Help: Create the venv and build the transform image 
 
 .PHONY: .transforms.ray-build
 .transforms.ray-build:: .transforms.ray-venv .transforms.ray-image	
@@ -121,6 +151,10 @@ extra-help:
 .PHONY: .transforms.spark-build
 .transforms.spark-build:: .transforms.spark-venv .transforms.spark-image	
 	@# Help: Create the venv and build the transform image 
+
+.PHONY: .transforms.python-test 
+.transforms.python-test::  .transforms.test-src .transforms.python-test-image
+	@# Help: Run both source and image level tests.
 
 .PHONY: .transforms.ray-test 
 .transforms.ray-test::  .transforms.test-src .transforms.ray-test-image
@@ -134,6 +168,9 @@ extra-help:
 .PHONY: .transforms.test-src
 .transforms.test-src::  .defaults.test-src .transforms.test-locals
 	@# Help: Run the transform's tests and any '*local' .py files
+
+.PHONY: .transforms.python-test-image
+.transforms.python-test-image:: .transforms.python-image .defaults.test-image-pytest 
 
 .PHONY: .transforms.ray-test-image
 .transforms.ray-test-image:: .transforms.ray-image .defaults.test-image-pytest 
@@ -156,6 +193,9 @@ test-locals:: .transforms.test-locals
 .transforms.test-locals:: .defaults.test-locals
 
 # Build the image the transform way and then use the default publishing
+.PHONY: .transforms.python-publish
+.transforms.python-publish:: .transforms.python-image .defaults.publish 
+
 .PHONY: .transforms.ray-publish
 .transforms.ray-publish:: .transforms.ray-image .defaults.publish 
 
@@ -192,7 +232,7 @@ test-locals:: .transforms.test-locals
 
 .PHONY: .transforms.load-image
 .transforms.load-image:
-	@# Help:  Load the transform image to the kind cluster created with make setup.
+	@# Help: Load the transform image to the kind cluster created with make setup.
 	kind load docker-image $(DOCKER_REMOTE_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
 .PHONY: conventions
@@ -221,6 +261,11 @@ conventions:
 	fi
 	@echo Done checking transform project conventions.
 
+.PHONY: .transforms.run-local-python-sample
+.transforms.run-local-python-sample:
+	@# Help: Run the $(TRANSFORM_NAME)_local_python.py file (if it exists).
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_local_python.py .transforms.run-src-file
+
 .PHONY: .transforms.run-local-ray-sample
 .transforms.run-local-ray-sample:
 	@# Help: Run the $(TRANSFORM_NAME)_local_ray.py file (if it exists).
@@ -240,9 +285,14 @@ conventions:
 .transforms.run-local-sample:
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_local.py .transforms.run-src-file
 
+.PHONY: .transforms.run-cli-python-sample 
+.transforms.run-cli-python-sample:
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+		RUN_ARGS=" --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" " .transforms.run-src-file
+
 .PHONY: .transforms.run-cli-ray-sample 
 .transforms.run-cli-ray-sample:
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
 		RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" " .transforms.run-src-file
 
 .PHONY: .transforms.run-cli-spark-sample 
