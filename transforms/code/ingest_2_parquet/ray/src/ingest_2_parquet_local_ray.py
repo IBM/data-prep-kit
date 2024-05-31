@@ -61,7 +61,6 @@ params = {
 
 if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=(params | ingest_config))
-    print(sys.argv)
     # create launcher
     launcher = RayTransformLauncher(IngestToParquetRayConfiguration())
     # launch

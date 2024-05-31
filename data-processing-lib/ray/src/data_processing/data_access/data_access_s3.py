@@ -48,22 +48,12 @@ class DataAccessS3(DataAccess):
         :param n_samples: amount of files to randomly sample
         :param files_to_use: files extensions of files to include
         """
-        self.s3_credentials = {} | s3_credentials
-        access_key = self.get_access_key()
-        if access_key is None:
-            access_key = ""
-        secret_key = self.get_secret_key()
-        if secret_key is None:
-            secret_key = ""
-        self.arrS3 = ArrowS3(
-            access_key,
-            secret_key,
-            endpoint=s3_credentials.get("url", None),
-            region=s3_credentials.get("region", None),
-        )
+        if (s3_credentials is None or s3_credentials.get("access_key", None) is None
+                or s3_credentials.get("secret_key", None) is None):
+            raise "S3 credentials is not defined"
         if s3_config is None:
             self.input_folder = None
-            self.input_folder = None
+            self.output_folder = None
         else:
             self.input_folder = TransformUtils.clean_path(s3_config["input_folder"])
             self.output_folder = TransformUtils.clean_path(s3_config["output_folder"])
@@ -72,18 +62,12 @@ class DataAccessS3(DataAccess):
         self.m_files = m_files
         self.n_samples = n_samples
         self.files_to_use = files_to_use
-
-    def get_access_key(self):
-        self.s3_credentials.get("access_key", None),
-
-    def get_secret_key(self):
-        return (self.s3_credentials.get("secret_key", None),)
-
-    def get_endpoint(self):
-        return (self.s3_credentials.get("url", None),)
-
-    def get_region(self):
-        return (self.s3_credentials.get("region", None),)
+        self.arrS3 = ArrowS3(
+            access_key=s3_credentials.get("access_key"),
+            secret_key=s3_credentials.get("secret_key"),
+            endpoint=s3_credentials.get("url", None),
+            region=s3_credentials.get("region", None),
+        )
 
     def get_num_samples(self) -> int:
         """

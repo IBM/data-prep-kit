@@ -14,6 +14,7 @@ import os
 import ast
 
 from data_processing.data_access import DataAccessFactory, DataAccessLocal
+from data_processing.utils import TransformUtils
 from ingest_2_parquet_transform import (
     IngestToParquetTransform,
     ingest_supported_langs_file_key,
@@ -44,8 +45,10 @@ if __name__ == "__main__":
     transform = IngestToParquetTransform(params)
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
-    byte_array = data_access.get_file(os.path.join(input_folder, "application-java.zip"))
+    file_to_process = os.path.join(input_folder, "application-java.zip")
+    byte_array = data_access.get_file(file_to_process)
     # Transform the table
-    files_list, metadata = transform.transform_binary(byte_array, ".zip")
+    files_list, metadata = transform.transform_binary(
+        base_name=TransformUtils.get_file_basename(file_to_process), byte_array=byte_array)
     print(f"Got {len(files_list)} output files")
     print(f"output metadata : {metadata}")

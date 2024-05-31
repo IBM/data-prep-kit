@@ -22,7 +22,7 @@ from data_processing.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import CLIArgumentProvider, get_logger
+from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 
 
 logger = get_logger(__name__)
@@ -52,24 +52,24 @@ class NOOPFileTransform(AbstractTableTransform):
         super().__init__(config)
         self.sleep = config.get("sleep_sec", 1)
 
-    def transform_binary(self, byte_array: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def transform_binary(self, base_name: str, byte_array: bytes) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         Converts input file into o or more output files.
         If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
         :param byte_array: input file
-        :param ext: file extension
+        :param base_name: file base name
         :return: a tuple of a list of 0 or more converted file and a dictionary of statistics that will be
                  propagated to metadata
         """
-        logger.debug(f"Transforming one file with len {len(byte_array)} and extension {ext}")
+        logger.debug(f"Transforming one file with name {base_name}, len {len(byte_array)}")
         if self.sleep is not None:
             logger.info(f"Sleep for {self.sleep} seconds")
             time.sleep(self.sleep)
             logger.info("Sleep completed - continue")
         # Add some sample metadata.
-        logger.debug(f"Transformed one file with len {len(byte_array)} and extension {ext}")
+        logger.debug(f"Transformed one file with name {base_name}, len {len(byte_array)}")
         metadata = {"nfiles": 1, "size": len(byte_array)}
-        return [(byte_array, ext)], metadata
+        return [(byte_array, TransformUtils.get_file_extension(base_name)[1])], metadata
 
 
 class NOOPFileTransformConfiguration(TransformConfiguration):

@@ -15,6 +15,7 @@ import os
 from data_processing.test_support.transform import AbstractBinaryTransformTest
 from data_processing.test_support import get_files_in_folder
 from data_processing.data_access import DataAccessFactory
+from data_processing.utils import TransformUtils
 from ingest_2_parquet_transform import (
     IngestToParquetTransform,
     ingest_supported_langs_file_key,
@@ -36,7 +37,7 @@ class TestIngestToParquetTransform(AbstractBinaryTransformTest):
         lang_supported_file = os.path.abspath(os.path.join(basedir, "languages/lang_extensions.json"))
         input_dir = os.path.join(basedir, "input")
         input_files = get_files_in_folder(input_dir, ".zip")
-        input_files = [(file, ".zip") for file in input_files]
+        input_files = [(TransformUtils.get_file_basename(name), binary) for name, binary in input_files.items()]
         expected_metadata_list = [{'number of rows': 2}, {'number of rows': 52}, {}]
         config = {
             ingest_supported_langs_file_key: lang_supported_file,
@@ -47,7 +48,8 @@ class TestIngestToParquetTransform(AbstractBinaryTransformTest):
         }
 
         expected_files = get_files_in_folder(os.path.join(basedir, "expected"), ".parquet")
-        expected_files = [(file, ".parquet") for file in expected_files]
+        expected_files = [(binary, TransformUtils.get_file_extension(name)[1])
+                          for name, binary in expected_files.items()]
         return [(IngestToParquetTransform(config), input_files, expected_files, expected_metadata_list)]
 
 

@@ -35,7 +35,7 @@ def get_tables_in_folder(dir: str) -> list[pa.Table]:
     return [TransformUtils.convert_binary_to_arrow(data) for data in files.values()]
 
 
-def get_files_in_folder(dir: str, ext: str) -> list[bytes]:
+def get_files_in_folder(dir: str, ext: str) -> dict[str, bytes]:
     """
     Get  list of Tables loaded from the parquet files in the given directory.  The returned
     list is sorted lexigraphically by the name of the file.
@@ -43,8 +43,7 @@ def get_files_in_folder(dir: str, ext: str) -> list[bytes]:
     :return:
     """
     dal = DataAccessLocal()
-    files = dal.get_folder_files(dir, extensions=[ext])
-    return [data for data in files.values()]
+    return dal.get_folder_files(dir, extensions=[ext])
 
 
 class AbstractTest:

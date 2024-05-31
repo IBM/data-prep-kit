@@ -41,7 +41,7 @@ class AbstractBinaryTransformTest(AbstractTest):
     def test_transform(
         self,
         transform: AbstractBinaryTransform,
-        in_binary_list: list[tuple[bytes, str]],
+        in_binary_list: list[tuple[str, bytes]],
         expected_binary_list: list[tuple[bytes, str]],
         expected_metadata_list: list[dict[str, float]],
     ):
@@ -63,14 +63,13 @@ class AbstractBinaryTransformTest(AbstractTest):
         all_files_list = []
         all_metadata_list = []
         for in_file in in_binary_list:
-            files_list, metadata = transform.transform_binary(in_file[0], in_file[1])
+            files_list, metadata = transform.transform_binary(base_name=in_file[0], byte_array=in_file[1])
             all_files_list.extend(files_list)
             all_metadata_list.append(metadata)
 
         files_list, metadata = transform.flush_binary()
         all_files_list.extend(files_list)
         all_metadata_list.append(metadata)
-
 
         AbstractBinaryTransformTest.validate_expected_files(all_files_list, expected_binary_list)
         AbstractBinaryTransformTest.validate_expected_metadata_lists(all_metadata_list, expected_metadata_list)

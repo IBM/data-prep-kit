@@ -95,13 +95,13 @@ class IngestToParquetTransform(AbstractBinaryTransform):
             lang = self.languages_supported.get(ext, lang)
         return lang
 
-    def transform_binary(self, byte_array: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def transform_binary(self, base_name: str, byte_array: bytes) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         Converts raw data file (ZIP) to Parquet format
         """
         # We currently only process .zip files
-        if ext != ".zip":
-            logger.warning(f"Got unsupported file with extension {zip}, skipping")
+        if TransformUtils.get_file_extension(base_name)[1] != ".zip":
+            logger.warning(f"Got unsupported file type {base_name}, skipping")
             return [], {}
         data = []
         number_of_rows = 0
@@ -119,7 +119,7 @@ class IngestToParquetTransform(AbstractBinaryTransform):
                                 ext = TransformUtils.get_file_extension(member.filename)[1]
                                 row_data = {
                                     "title": member.filename,
-                                    "document": "zip files",
+                                    "document": base_name,
                                     "contents": content_string,
                                     "document_id": TransformUtils.str_to_hash(content_string),
                                     "ext": ext,
