@@ -21,3 +21,9 @@ workflow-upload:
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:
 	$(MAKE) -C ray/kfp_v1 workflow-reconcile-requirements
+
+clean::
+
+build::
+
+test::

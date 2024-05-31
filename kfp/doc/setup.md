@@ -74,7 +74,7 @@ You can create a Kind cluster with all required software installed using the fol
 from this main package directory or from the `kind` directory.
 If you do not want to upload the testing data into the locally deployed Minio, and reduce memory footprint, please set:
 ```bash
-export POPULATE_TEST_DATA ?= 0
+export POPULATE_TEST_DATA=0
 ```
 You can access the KFP dashboard at http://localhost:8080/ and the MinIO dashboard at http://localhost:8090/
 
