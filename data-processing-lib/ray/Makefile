@@ -15,7 +15,8 @@ clean::
 
 update-toml:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml 
-	sed -e 's/^version[ ]*=.*/version = "'${DPK_LIB_VERSION}'"/' pyproject.toml > tt.toml
+	sed -e 's/^version[ ]*=.*/version = "'${DPK_LIB_VERSION}'"/' \
+	    -e 's/"data-prep-toolkit=.*",/"data-prep-toolkit==$(DPK_LIB_VERSION)",/' pyproject.toml > tt.toml
 	mv tt.toml pyproject.toml
 
 setup::

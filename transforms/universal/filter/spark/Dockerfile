@@ -9,13 +9,10 @@ WORKDIR ${SPARK_HOME}/work-dir
 
 # Copy in the data processing framework source/project and install it
 # This is expected to be placed in the docker context before this is run (see the make image).
-
-COPY --chown=spark:root data-processing-spark/ data-processing-spark/
-RUN cd data-processing-spark && pip install --no-cache-dir -e .
-
-# Install the base library 2nd to overwrite the data-prep-kit dependency from data-prep-kit-spark
 COPY --chown=spark:root data-processing-lib-python/ data-processing-lib-python/
 RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
+COPY --chown=spark:root data-processing-spark/ data-processing-spark/
+RUN cd data-processing-spark && pip install --no-cache-dir -e .
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt

@@ -14,10 +14,6 @@ dependencies = [
     "boto3==1.34.69",
     "argparse",
     "mmh3",
-    # These two are to fix security issue
-    # These do not seem to be referenced through any transitive dependencies, so removing for now - 5/30/2024
-    #"fastapi>=0.109.1",
-    #"pillow>=10.2.0",
 ]
 
 [build-system]

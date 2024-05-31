@@ -271,4 +271,14 @@ minio-stop:
 	$(MAKE) .defaults.minio.stop
 
 
+# Make sure the given image is found in local image listing
+# Expects IMAGE_NAME_TO_VERIFY 
+.PHONY: .defaults.verify-image-availability
+.defaults.verify-image-availability:
+	@z=$$($(DOCKER) images | fgrep $(IMAGE_NAME_TO_VERIFY));	\
+	if [ -z "$$z" ]; then					\
+	    echo Image $(IMAGE_NAME_TO_VERIFY) is not available locally.;	\
+	    exit 1;						\
+	fi	
+
 
