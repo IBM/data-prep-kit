@@ -1,11 +1,25 @@
 # Simplest Transform Tutorial
-In this example, we implement a [noop](../../transforms/universal/noop) transform that takes no action
-on the input table and returns it unmodified - a _no operation_ (noop).
+In this example, we implement a [noop](../../transforms/universal/noop) 
+transform that takes no action
+on the input datum and returns it unmodified - a _no operation_ (noop).
 This effectively enables a copy of a directory tree of
-parquet files to an output directory.
+files to an output directory.
 This is functionally not too powerful, but allows us to focus
-on the minimum requirements for a simple transform that converts
-one table to another.  That said, we will show the following:
+on the minimum requirements for a transform. 
+
+**NOTE**: What follows is a discussion of pyarrow Table transform that
+will run in either the Ray or Python [runtimes](transform-runtimes.md).
+Mapping the tutorial to byte arrays would use the 
+[AbstractBinaryTransform](../python/src/data_processing/transform/binary_transform.py)
+instead of `AbstractTableTransform` (a sub-class of the former).
+Mapping the tutorial to a Spark runtime would use 
+[AbstractSparkTransform](../spark/src/data_processing_spark/runtime/spark/spark_transform.py)
+instead of `AbstractTableTransform` and use `DataFrame` instead of pyarrow Table as
+the `DATA` type.  In addition, the 
+[SparkTransformLauncher](../spark/src/data_processing_spark/runtime/spark/spark_launcher.py)
+would be used in place of the `RayTransformLauncher` and `PythonTransformLauncher` shown below.
+
+That said, we will show the following:
 
 * How to write the _noop_ transform to generate the output table.
 * How to define transform-specific metadata that can be associated
@@ -189,8 +203,6 @@ if __name__ == "__main__":
     launcher = PythonTransformLauncher(transform_config=NOOPTransformConfiguration())
     launcher.launch()
 ```
-
-## Running
 
 Assuming the above `main` code is placed in `noop_main.py` we can run the transform on some test data. We'll use data in the repo for the noop transform
 and create a temporary directory to hold the output:

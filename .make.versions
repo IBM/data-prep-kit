@@ -1,29 +1,31 @@
 ################################################################################
 # Here we attempt to capture/define all the version numbers used across the 
-# repository in Makefile format.
+# repository in Makefile format.  These are generally considered the version
+# numbers to be published on the next release/publishing of artifacts.
 ################################################################################
 
 # Data prep lab wheel version
-DPK_LIB_VERSION=0.1.1
-DPK_LIB_KFP_VERSION=0.1.1
+DPK_LIB_VERSION=0.2.0
+DPK_LIB_KFP_VERSION=0.2.0
 
 # Begin transform versions/tags
-BLOCKLIST_VERSION=0.3.0
-DOC_ID_VERSION=0.3.1
-DOC_ID_SPARK_VERSION=0.1.0
-EDEDUP_VERSION=0.3.0
-FDEDUP_VERSION=0.3.0
-FILTER_VERSION=0.3.0
-FILTER_SPARK_VERSION=0.1.0
-NOOP_VERSION=0.8.0
-NOOP_SPARK_VERSION=0.1.0
-RESIZE_VERSION=0.3.0
-LANG_ID_VERSION=0.3.0
-TOKENIZATION_VERSION=0.3.0
-MALWARE_VERSION=0.4.0
-PROGLANG_SELECT_VERSION=0.3.0
-CODE_QUALITY_VERSION=0.3.0
-DOC_QUALITY_VERSION=0.3.0
-INGEST_TO_PARQUET_VERSION=0.3.0
+BLOCKLIST_VERSION=0.4.0
+DOC_ID_VERSION=0.4.0
+DOC_ID_SPARK_VERSION=0.2.0
+EDEDUP_VERSION=0.4.0
+FDEDUP_VERSION=0.4.0
+FILTER_VERSION=0.4.0
+FILTER_SPARK_VERSION=0.2.0
+NOOP_VERSION=0.9.0
+NOOP_SPARK_VERSION=0.2.0
+RESIZE_VERSION=0.4.0
+LANG_ID_VERSION=0.4.0
+TOKENIZATION_VERSION=0.4.0
+MALWARE_VERSION=0.5.0
+PROGLANG_SELECT_VERSION=0.4.0
+CODE_QUALITY_VERSION=0.4.0
+DOC_QUALITY_VERSION=0.4.0
+INGEST_TO_PARQUET_VERSION=0.4.0
 
-KFP_DOCKER_VERSION=0.1.1
+
+KFP_DOCKER_VERSION=0.2.0

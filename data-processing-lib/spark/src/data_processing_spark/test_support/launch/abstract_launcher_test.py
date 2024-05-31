@@ -36,6 +36,7 @@ class AbstractSparkTransformLauncherTest(AbstractTransformLauncherTest):
         dal = DataAccessLocal()
         test_generated_files = dal._get_all_files_ext(dir, [".parquet"])
         expected_files = dal._get_all_files_ext(expected, [".parquet"])
+        assert len(test_generated_files) > 0
         result_df = spark.read.parquet(*test_generated_files)
         expected_df = spark.read.parquet(*expected_files)
         result_length = result_df.count()

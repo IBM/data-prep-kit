@@ -1,4 +1,4 @@
-#######################################################################################
+########################################################################################
 # Include this to get access to a common set of rules for reuse in Makefile-based projects.
 # include ../../.make.defaults
 #
@@ -44,12 +44,13 @@ DOCKER_REGISTRY_KEY?=$(DPK_DOCKER_REGISTRY_KEY)
 DOCKER_REGISTRY_ENDPOINT?=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)
 DOCKER_LOCAL_IMAGE=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 DOCKER_REMOTE_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
-DOCKER_SPARK_BASE_IMAGE=data-prep-kit-spark-3.5.1:$(DPK_LIB_VERSION)
+DOCKER_SPARK_BASE_IMAGE_NAME=data-prep-kit-spark-3.5.1
+DOCKER_SPARK_BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE_NAME):$(DPK_LIB_VERSION)
 # Deprecated in favor of DOCKER_REMOTE_IMAGE
 DOCKER_IMAGE?=$(DOCKER_REMOTE_IMAGE)
-
-
 KIND_CLUSTER_NAME=dataprep
+
+DPK_PYTHON_LIB_DIR=$(REPOROOT)/data-processing-lib/python
 DPK_RAY_LIB_DIR=$(REPOROOT)/data-processing-lib/ray
 DPK_SPARK_LIB_DIR=$(REPOROOT)/data-processing-lib/spark
 #######################################################################################
@@ -168,14 +169,17 @@ __check_defined = \
 	@# Help: Clean up the virtual environment.
 	rm -rf venv
 
+# We create both local and remote tags.  Local seems to be needed when using our spark
+# base image.  Remote seems to be needed by kfp.
 .PHONY: .defaults.image
 .defaults.image:: # Must be called with a DOCKER_IMAGE= settings.
-	@# Help: Create the docker image $(DOCKER_LOCAL_IMAGE)
+	@# Help: Create the docker image $(DOCKER_LOCAL_IMAGE) and a tag for $(DOCKER_REMOTE_IMAGE)
 	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE)		\
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\
 		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . 
+	$(DOCKER) tag $(DOCKER_LOCAL_IMAGE)  $(DOCKER_REMOTE_IMAGE)
 
 # Copy a source tree in LIB_PATH, including src, pyproject.toml to LIB_NAME
 # Generally used to copy source from within the repo into a local directory for use by a Dockerfile
@@ -187,58 +191,98 @@ __check_defined = \
 	cp -p -R ${LIB_PATH}/pyproject.toml ${LIB_NAME}
 	cp -p -R ${LIB_PATH}/README.md ${LIB_NAME}
 
-# Build and image using the local Dockerfile and make the data-processing-lib 
+# Build and image using the local Dockerfile and make the data-processing-lib/python
+# available in the current directory for use by the Dockerfile (i.e. to install the library). 
+.PHONY: .defaults.python-lib-src-image
+.defaults.python-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
+	@# Help: Build the Python $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-lib/python source
+	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
+	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
+	rm -rf data-processing-lib-python
+
+# Build and image using the local Dockerfile and make the data-processing-lib/ray
 # available in the current directory for use by the Dockerfile (i.e. to install the library). 
 .PHONY: .defaults.ray-lib-src-image
 .defaults.ray-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
-	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and install data-processing-lib source
-	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib .defaults.copy-lib
+	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
+	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray .defaults.copy-lib
+	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
-	rm -rf data-processing-lib
+	rm -rf data-processing-lib-python
+	rm -rf data-processing-lib-ray
 
 .PHONY: .defaults.spark-lib-src-image
 .defaults.spark-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
-	@# Help: Build the Spark $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and install data-processing-lib source
+	@# Help: Build the Spark $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
+	$(MAKE) IMAGE_NAME_TO_VERIFY=$(DOCKER_SPARK_BASE_IMAGE_NAME) .defaults.verify-image-availability
 	$(MAKE) LIB_PATH=$(DPK_SPARK_LIB_DIR) LIB_NAME=data-processing-spark .defaults.copy-lib
-	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib .defaults.copy-lib
+	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE) .defaults.image
-	rm -rf data-processing-lib
+	rm -rf data-processing-lib-python
 	rm -rf data-processing-spark
 
+.PHONY: .defaults.python-lib-src-venv
+.defaults.python-lib-src-venv:: .defaults.venv .defaults.install-python-lib-src-venv
 
-.PHONY: .defaults.ray-lib-src-venv
-.defaults.ray-lib-src-venv:: .defaults.venv
-	@# Help: Install the source from the Ray data processing library for $(PYTHON)
-	@echo Installing source from Ray data processing library for venv
+.PHONY: .defaults.install-python-lib-src-venv
+.defaults.install-python-lib-src-venv:: 
+	@# Help: Install Python data processing library source into existing venv 
+	@echo Installing Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
 	pip uninstall -y data-prep-toolkit;		 		\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
-	pip install $${extra_url}  -e $(DPK_RAY_LIB_DIR);			\
+	pip install $${extra_url}  -e $(DPK_PYTHON_LIB_DIR);		\
+	if [ $$? -eq 0 ]; then  					\
+		echo Installed source from Python processing library for `which $(PYTHON)`;       \
+	else 								\
+		echo ERROR installing source into `which $(PYTHON)`;    \
+	fi  
+
+.PHONY: .defaults.ray-lib-src-venv
+.defaults.ray-lib-src-venv:: .defaults.venv .defaults.install-ray-lib-src-venv
+
+# Install the python-based lib BEFORE spark assuming spark depends on the same version as python source. 
+.PHONY: .defaults.install-ray-lib-src-venv
+.defaults.install-ray-lib-src-venv:: 
+	@# Help: Install Ray and Python data processing library source into existing venv 
+	@echo Installing Ray and Python data processing library source to existing venv
+	@source venv/bin/activate;				      	\
+	pip install pytest;						\
+	pip uninstall -y data-prep-toolkit;		 		\
+	pip uninstall -y data-prep-toolkit-ray;		 		\
+	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
+		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
+	fi;								\
+	pip install $${extra_url}  -e $(DPK_PYTHON_LIB_DIR);		\
+	pip install $${extra_url}  -e $(DPK_RAY_LIB_DIR);		\
 	if [ $$? -eq 0 ]; then  					\
 		echo Installed source from Ray data processing library for `which $(PYTHON)`;       \
 	else 								\
 		echo ERROR installing source into `which $(PYTHON)`;    \
 	fi  
 
-# Install the ray-based lib AFTER spark since the latter had pypi depenency on data-prep-kit
-# so we want to overwrite with the source and not use pypi
 .PHONY: .defaults.spark-lib-src-venv
-.defaults.spark-lib-src-venv:: .defaults.venv
-	@# Help: Install the source from the Spark data processing library for $(PYTHON)
-	@echo Installing source from Spark data processing library for venv
+.defaults.spark-lib-src-venv:: .defaults.venv .defaults.install-spark-lib-src-venv
+
+# Install the python-based lib BEFORE spark assuming spark depends on the same version as python source. 
+.PHONY: .defaults.install-spark-lib-src-venv
+.defaults.install-spark-lib-src-venv:: 
+	@# Help: Install Spark and Python data processing library source into existing venv 
+	@echo Installing Spark and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
-	pip uninstall -y data-prep-toolkit;		 		\
+	pip uninstall -y data-prep-toolkit;	 			\
+	pip uninstall -y data-prep-toolkit-spark;	 		\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
+	pip install $${extra_url}  -e $(DPK_PYTHON_LIB_DIR);		\
 	pip install $${extra_url}  -e $(DPK_SPARK_LIB_DIR);		\
-	pip install $${extra_url}  -e $(DPK_RAY_LIB_DIR);		\
 	if [ $$? -eq 0 ]; then  					\
-		echo Installed source from data Spark processing library for `which $(PYTHON)`;       \
+		echo Installed source from Spark processing library for `which $(PYTHON)`;       \
 	else 								\
 		echo ERROR installing source into `which $(PYTHON)`;    \
 	fi  
@@ -296,7 +340,6 @@ __check_defined = \
 .PHONY: .defaults.publish
 .defaults.publish:: 
 	@# Help: Publish the $(DOCKER_LOCAL_IMAGE) to $(DOCKER_HOSTNAME) container registry
-	$(DOCKER) tag $(DOCKER_LOCAL_IMAGE)  $(DOCKER_REMOTE_IMAGE)
 	-$(DOCKER) logout $(DOCKER_HOSTNAME)
 	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
 	$(DOCKER) push  $(DOCKER_REMOTE_IMAGE)
@@ -307,7 +350,7 @@ __check_defined = \
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
 .PHONY: .defaults.venv
-.defaults.venv::	requirements.txt .check_python_version
+.defaults.venv::	.check_python_version
 	@# Help: Create the virtual environment using requirements.txt
 	$(PYTHON) -m venv venv
 	@source venv/bin/activate;		\
@@ -316,7 +359,9 @@ __check_defined = \
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
-	pip install $$extra_url -r requirements.txt;	
+	if [ -e requirements.txt ]; then				\
+		pip install $$extra_url -r requirements.txt;		\
+	fi
 
 .PHONY: .defaults.check.installed
 .defaults.check.installed::

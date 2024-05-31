@@ -9,21 +9,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
 import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-import pyarrow as pa
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
-from data_processing.runtime.ray import RayTransformLauncher
-from data_processing.runtime.ray.runtime_configuration import (
-    RayTransformRuntimeConfiguration,
+from data_processing.test_support.transform.noop_transform import (
+    NOOPTransformConfiguration,
 )
 from data_processing.transform import TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
+from data_processing_spark.runtime.spark import SparkTransformRuntimeConfiguration
 from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
 from data_processing_spark.runtime.spark.spark_transform import AbstractSparkTransform
 
@@ -39,7 +37,8 @@ pwd_cli_param = f"{cli_prefix}{pwd_key}"
 from pyspark.sql import DataFrame
 
 
-class NOOPTransform(AbstractSparkTransform):
+#
+class NOOPSparkTransform(AbstractSparkTransform):
     """
     Implements a simple copy of a data frame.
     """
@@ -63,7 +62,7 @@ class NOOPTransform(AbstractSparkTransform):
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
-        logger.debug(f"Transforming one data with {data.count()} rows")
+        logger.debug(f"Transforming one dataframe with {data.count()} rows")
         if self.sleep is not None:
             logger.info(f"Sleep for {self.sleep} seconds")
             time.sleep(self.sleep)
@@ -74,7 +73,7 @@ class NOOPTransform(AbstractSparkTransform):
         return [data], metadata
 
 
-class NOOPTransformConfiguration(TransformConfiguration):
+class NOOPSparkTransformConfiguration(TransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
@@ -84,7 +83,7 @@ class NOOPTransformConfiguration(TransformConfiguration):
     def __init__(self):
         super().__init__(
             name=short_name,
-            transform_class=NOOPTransform,
+            transform_class=NOOPSparkTransform,
             remove_from_metadata=[pwd_key],
         )
 
@@ -127,22 +126,19 @@ class NOOPTransformConfiguration(TransformConfiguration):
         return True
 
 
-class NOOPSparkRuntimeConfiguration(PythonTransformRuntimeConfiguration):
+class NOOPSparkRuntimeConfiguration(SparkTransformRuntimeConfiguration):
     """
-    Implements the PythonTransformConfiguration for NOOP as required by the PythonTransformLauncher.
-    NOOP does not use a RayRuntime class so the superclass only needs the base
-    python-only configuration.
+    Implements the SparkTransformRuntimeConfiguration for NOOP as required by the SparkTransformLauncher.
     """
 
     def __init__(self):
         """
         Initialization
         """
-        super().__init__(transform_config=NOOPTransformConfiguration())
+        super().__init__(transform_config=NOOPSparkTransformConfiguration())
 
 
 if __name__ == "__main__":
-    # launcher = NOOPRayLauncher()
     launcher = SparkTransformLauncher(NOOPSparkRuntimeConfiguration())
     logger.info("Launching noop transform")
     launcher.launch()

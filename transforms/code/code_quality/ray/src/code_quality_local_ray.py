@@ -15,8 +15,8 @@ import sys
 from pathlib import Path
 
 from code_quality_transform import CodeQualityRayTransformConfiguration
-from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
+from data_processing_ray.runtime.ray import RayTransformLauncher
 
 
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))

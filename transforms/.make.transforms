@@ -192,7 +192,7 @@ test-locals:: .transforms.test-locals
 .PHONY: .transforms.load-image
 .transforms.load-image:
 	@# Help:  Load the transform image to the kind cluster created with make setup.
-	kind load docker-image $(DOCKER_LOCAL_IMAGE) --name=$(KIND_CLUSTER_NAME)
+	kind load docker-image $(DOCKER_REMOTE_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
 .PHONY: conventions
 conventions:
@@ -270,5 +270,15 @@ conventions:
 minio-stop:	
 	$(MAKE) .defaults.minio.stop
 
+
+# Make sure the given image is found in local image listing
+# Expects IMAGE_NAME_TO_VERIFY 
+.PHONY: .defaults.verify-image-availability
+.defaults.verify-image-availability:
+	@z=$$($(DOCKER) images | fgrep $(IMAGE_NAME_TO_VERIFY));	\
+	if [ -z "$$z" ]; then					\
+	    echo Image $(IMAGE_NAME_TO_VERIFY) is not available locally.;	\
+	    exit 1;						\
+	fi	
 
 

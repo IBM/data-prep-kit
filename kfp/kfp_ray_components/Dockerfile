@@ -10,11 +10,13 @@ LABEL git-commit=$GIT_COMMIT
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
-# install data processing and kfp support libs
-# Copy in the frameworks source/project and install them
-# This is expected to be placed in the docker context before this is run (see the make image).
-COPY --chown=ray:users data-processing-lib/ data-processing-lib/
-RUN cd data-processing-lib && pip install --no-cache-dir -e .
+# Copy and install data processing libraries 
+# These are expected to be placed in the docker context before this is run (see the make image).
+COPY --chown=ray:users data-processing-lib-python/ data-processing-lib-python/
+RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
+COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/ 
+RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
+
 COPY --chown=ray:users kfp_support_lib/ kfp_support_lib/
 RUN cd kfp_support_lib && pip install --no-cache-dir -e .
 # remove credentials-containing file

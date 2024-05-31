@@ -24,10 +24,10 @@ from src.ededup_compute_execution_params import ededup_compute_execution_params
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "ededup_transform.py"
 
-task_image = "quay.io/dataprep1/data-prep-kit/ededup:0.3.0"
+task_image = "quay.io/dataprep1/data-prep-kit/ededup:0.4.0"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../../kfp/kfp_ray_components/"

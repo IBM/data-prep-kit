@@ -29,6 +29,7 @@ update-toml:: .check-env
 	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_VERSION}'"/' pyproject.toml
 	sed -i.back 's/data-prep-toolkit==[0-9].*/data-prep-toolkit==${DPK_LIB_VERSION}",/' pyproject.toml
 	sed -i.back 's/kfp==[0-9].*/kfp==${KFP}",/' pyproject.toml
+	sed -i.back 's/ray==[0-9].*/ray==${RAY}",/' pyproject.toml
 
 build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi 
@@ -45,14 +46,12 @@ publish::
 	${PYTHON} -m twine check dist/*
 	${PYTHON} -m twine upload --verbose --non-interactive dist/*
 
-venv::	pyproject.toml .check-env
-	@# Help: Create the virtual environment using pyproject.toml 
-	rm -rf venv
-	$(PYTHON) -m venv venv
+venv::	pyproject.toml .check-env .defaults.venv
+	$(MAKE) .defaults.install-python-lib-src-venv
 	. ${VENV_ACTIVATE};     \
-	pip install -e .;		\
-	pip install ray==${RAY} \
-	pip install pytest pytest-cov 
+	pip install -e .;	\
+	pip install pytest pytest-cov;
+	@# Help: Create the virtual environment using pyproject.toml 
 
 test:: 	venv
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.

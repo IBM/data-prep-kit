@@ -20,13 +20,13 @@ from kfp_support.workflow_support.utils import (
 )
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
+task_image = "quay.io/dataprep1/data-prep-kit/noop:0.9.0"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../../kfp/kfp_ray_components/"
@@ -54,9 +54,9 @@ def noop(
     # Ray cluster
     ray_name: str = "noop-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", '
-    '"image": "' + task_image + '", "image_pull_policy": "Always" }',
+    '"image": "' + task_image + '"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image_pull_secret": "", "image": "' + task_image + '", "image_pull_policy": "Always" }',
+    '"image_pull_secret": "", "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/noop/input/', 'output_folder': 'test/noop/output/'}",

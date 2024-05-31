@@ -1,10 +1,13 @@
 # Data Processing Using Multiple Transforms
 
-The transformation framework is designed to operate on rows of columnar data, generally contained
-in [parquet](https://arrow.apache.org/docs/python/parquet.html) files 
-and read as [pyarrow tables](https://arrow.apache.org/docs/python/index.html).
+The transformation framework is designed to operate on arbitrary arrays of
+bytes with a specialization for columnar data, generally contained
+in [parquet](https://arrow.apache.org/docs/python/parquet.html) files and read as [pyarrow tables](https://arrow.apache.org/docs/python/index.html).
 
-Transforms are written to process the [table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
+In general, transforms can be written to process any type of
+binary data, to be interpreted by the transform.
+
+The table-specific transforms are written to process a [table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
 to, for example:
 
 * Remove duplicates or non supported documents, for example, exact and fuzzy dedup, or language selection
@@ -19,7 +22,8 @@ The table is generally expected to have something like the following minimal set
 * Document id
 * Contents of the actual document to be used for LLM training
 
-The following might be an example sequence of transforms.
+The following might be an example sequence of transforms (applied to tables,
+though the model is equivalent for binary data transformations)
 
 ![Data Transformation](data-transformation.jpg)
 
@@ -32,6 +36,7 @@ previous transform in the sequence.
 
 ![Data Transformation Flow](data-flow.jpg)
 
-To address scalability, a transform is generally run in a dedicated Ray cluster
-deployed into a kubernetes cluster.  
+Transforms are generally executed in one of the available 
+["runtimes"](../data-processing-lib/doc/transform-runtimes.md) with
+scalability provided by the Ray and Spark runtimes.
 

@@ -2,6 +2,7 @@ test-data/output
 output/*
 /output/
 data-processing-lib/
+data-processing-lib-ray/
 
 
 # Byte-compiled / optimized / DLL files

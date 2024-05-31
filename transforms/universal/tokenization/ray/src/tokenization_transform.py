@@ -23,12 +23,12 @@ import pyarrow as pa
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
-from data_processing.runtime.ray import RayTransformLauncher
-from data_processing.runtime.ray.runtime_configuration import (
-    RayTransformRuntimeConfiguration,
-)
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import get_logger
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from data_processing_ray.runtime.ray.runtime_configuration import (
+    RayTransformRuntimeConfiguration,
+)
 from tokenization_utils import is_valid_argument_string, load_tokenizer, split_text
 
 

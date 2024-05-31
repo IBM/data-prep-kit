@@ -18,7 +18,6 @@ from data_processing_spark.test_support.launch.abstract_launcher_test import (
 )
 from data_processing_spark.test_support.transform.noop_transform import (
     NOOPSparkRuntimeConfiguration,
-    NOOPTransformConfiguration,
 )
 
 

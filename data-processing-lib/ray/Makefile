@@ -15,7 +15,8 @@ clean::
 
 update-toml:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml 
-	sed -e 's/^version[ ]*=.*/version = "'${DPK_LIB_VERSION}'"/' pyproject.toml > tt.toml
+	sed -e 's/^version[ ]*=.*/version = "'${DPK_LIB_VERSION}'"/' \
+	    -e 's/"data-prep-toolkit=.*",/"data-prep-toolkit==$(DPK_LIB_VERSION)",/' pyproject.toml > tt.toml
 	mv tt.toml pyproject.toml
 
 setup::
@@ -36,6 +37,10 @@ publish:: .check-env update-toml
 	#@git push origin ${TAG}
 
 venv::	pyproject.toml
+	$(MAKE) .defaults.ray-lib-src-venv
+	pip install moto==5.0.5 markupsafe==2.0.1
+
+venvold::	pyproject.toml
 	@# Help: Create the virtual environment using pyproject.toml 
 	rm -r dist venv || true
 	rm -rf src/*egg-info || true
@@ -55,14 +60,9 @@ image::
 # pytest-forked was tried, but then we get SIGABRT in pytest when running the s3 tests, some of which are skipped.. 
 test::  
 	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/data_access;
-	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/transform;
-	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/launch/pure_python/launcher_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/launch/pure_python/multi_launcher_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/launch/pure_python/test_noop_launch.py;
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/ray_util_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/ray_launcher_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/ray_test_noop_launch.py;
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/ray_multi_launcher_test.py;
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_ray_tests/launch/ray/ray_util_test.py;
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_ray_tests/launch/ray/ray_launcher_test.py;
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_ray_tests/launch/ray/ray_test_noop_launch.py;
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_ray_tests/launch/ray/ray_multi_launcher_test.py;
 
 

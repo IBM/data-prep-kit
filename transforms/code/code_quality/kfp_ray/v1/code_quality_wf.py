@@ -26,10 +26,10 @@ from kfp_support.workflow_support.utils import (
 EXEC_SCRIPT_NAME: str = "code_quality_transform.py"
 PREFIX: str = ""
 
-task_image = "quay.io/dataprep1/data-prep-kit/code_quality:0.3.0"
+task_image = "quay.io/dataprep1/data-prep-kit/code_quality:0.4.0"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0"
 
 component_spec_path = "../../../../../kfp/kfp_ray_components/"
 

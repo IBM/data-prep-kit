@@ -13,8 +13,8 @@
 import sys
 
 from code_quality_transform import CodeQualityRayTransformConfiguration
-from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
+from data_processing_ray.runtime.ray import RayTransformLauncher
 
 
 s3_cred = {
