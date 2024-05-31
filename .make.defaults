@@ -167,7 +167,14 @@ __check_defined = \
 .PHONY: .defaults.clean
 .defaults.clean:: 
 	@# Help: Clean up the virtual environment.
-	rm -rf venv
+	rm -rf venv > /dev/null 2>&1
+	# This are created during image builds and may get left over if killed in the middle
+	-rm -rf data-processing-lib-python > /dev/null 2>&1
+	-rm -rf data-processing-lib-ray> /dev/null 2>&1
+	-rm -rf data-processing-lib-spark > /dev/null 2>&1
+	# Left over python stuff
+	-find . -name '*.egg-info' | xargs rm -rf
+	-find . -name '__pycache__' | xargs rm -rf
 
 # We create both local and remote tags.  Local seems to be needed when using our spark
 # base image.  Remote seems to be needed by kfp.

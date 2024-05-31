@@ -85,8 +85,9 @@ extra-help:
 
 .PHONY: .transforms.clean
 .transforms.clean:: .defaults.clean
-	$(MAKE) minio-stop 
-	@# Help: Normal cleanups plus stop minio server
+	$(MAKE) minio-stop  
+	-rm -rf output > /dev/null 2>&1
+	@# Help: Normal cleanups plus stop minio server and rm output dir
 
 
 # Create the local virtual environment, assuming python is already installed and available
