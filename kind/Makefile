@@ -1,12 +1,17 @@
 # Define the root of the local git clone for the common rules to be able
 # know where they are running from.
-export REPOROOT=${CURDIR}/../
+export ROOT_DIR=${CURDIR}/../
 
-IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kind/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
+
+ifneq ($(KFPv2), 1)
+	GREP_V=KFP_V2
+else
+	GREP_V=KFP_V1
+endif
+IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kind/requirements.env | sed 's/=/:=/;/$(GREP_V)/d;s/KFP_V._//;s/^/export /'  > makeenv")
 
 include makeenv
 
-export ROOT_DIR=${CURDIR}
 # Include the common rules.
 # Use "make help" to see them.
 include ../.make.defaults
