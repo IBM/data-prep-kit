@@ -118,27 +118,11 @@ extra-help:
 .PHONY: .transforms.python-image
 .transforms.python-image:: .defaults.python-lib-src-image
 
-# This is eventually to be deprecated in favor of transforms.ray-image-split-runtimes
 .PHONY: .transforms.ray-image
 .transforms.ray-image:: .defaults.ray-lib-src-image
 
-.PHONY: .transforms.ray-image-split-runtimes
-.transforms.ray-image-split-runtimes:: 
-	$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib
-	$(MAKE) .defaults.ray-lib-src-image
-	rm -rf python-transform
-	@# Help: Build the ray image including transform src from adjacent python project 
-
-# This is eventually to be deprecated in favor of transforms.spark-image-split-runtimes
 .PHONY: .transforms.spark-image
 .transforms.spark-image:: .defaults.spark-lib-src-image
-
-.PHONY: .transforms.spark-image-split-runtimes
-.transforms.spark-image-split-runtimes:: 
-	$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib
-	$(MAKE) .defaults.ray-lib-src-image
-	rm -rf python-transform
-	@# Help: Build the ray image including transform src from adjacent python project 
 
 .PHONY: .transforms.python-build
 .transforms.python-build:: .transforms.python-venv .transforms.python-image	
