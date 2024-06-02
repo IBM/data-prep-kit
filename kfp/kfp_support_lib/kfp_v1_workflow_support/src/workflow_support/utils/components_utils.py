@@ -107,7 +107,7 @@ class ComponentUtils:
         import sys
 
         from data_processing.utils import GB, get_logger
-        from kfp_support.workflow_support.utils import KFPUtils
+        from workflow_support.utils import KFPUtils
 
         logger = get_logger(__name__)
 
