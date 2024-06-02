@@ -54,7 +54,7 @@ DPK_PYTHON_LIB_DIR=$(REPOROOT)/data-processing-lib/python
 DPK_RAY_LIB_DIR=$(REPOROOT)/data-processing-lib/ray
 DPK_SPARK_LIB_DIR=$(REPOROOT)/data-processing-lib/spark
 
-KFPv2?=1
+KFPv2?=0
 
 ifeq ($(KFPv2), 0)
 	PIPELINE_PATH="kfp_ray/v1"

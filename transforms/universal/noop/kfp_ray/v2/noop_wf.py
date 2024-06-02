@@ -29,23 +29,23 @@ task_image = "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
 EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0-kfp-v21"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1-kfp-v21"
+
+# path to kfp component specifications files
+component_spec_path = "../../../../../kfp/kfp_ray_components/"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 @dsl.component(base_image=base_kfp_image)
-def compute_exec_params_op(worker_options: str, actor_options: str) -> str:
-    from kfp_support.workflow_support.runtime_utils import ComponentUtils
-
-    return ComponentUtils.default_compute_execution_params(worker_options, actor_options)
-
-
+compute_exec_params_op = comp.func_to_container_op(
+    func=ComponentUtils.default_compute_execution_params
+)
 # create Ray cluster
-create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
+create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
 # execute job
-execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayJobComponent.yaml")
+execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "executeRayJobComponent.yaml")
 # clean up Ray
-cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
+cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
 TASK_NAME: str = "noop"
 
@@ -115,11 +115,11 @@ def noop(
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
         # compute execution params
-#        compute_exec_params = compute_exec_params_op(
- #           worker_options=ray_worker_options,
-  #          actor_options=runtime_actor_options,
-   #     )
-    #    ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2,image_pull_policy="Always")
+        compute_exec_params = compute_exec_params_op(
+           worker_options=ray_worker_options,
+           actor_options=runtime_actor_options,
+       )
+       ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2,image_pull_policy="Always")
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
@@ -139,14 +139,14 @@ def noop(
             # note that the parameters below are specific for NOOP transform
             exec_params={
                 "data_s3_config": "{'input_folder': 'dev-code-datasets/data-prep-labs/kfp-v2/noop/input/', 'output_folder': 'dev-code-datasets/data-prep-labs/kfp-v2/noop/output/'}",
-                "data_max_files": -1,
-                "data_num_samples": -1,
+                "data_max_files": data_max_files,
+                "data_num_samples": data_num_samples,
                 "runtime_num_workers": "1",
                 "runtime_worker_options": "{'num_cpus': 0.8}",
-                "runtime_pipeline_id": "pipeline_id",
+                "runtime_pipeline_id": runtime_actor_options,
                 "runtime_job_id": RUN_ID,
-                "runtime_code_location": "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-                "noop_sleep_sec": 10,
+                "runtime_code_location": runtime_code_location,
+                "noop_sleep_sec": noop_sleep_sec,
             },
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,

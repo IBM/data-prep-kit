@@ -10,16 +10,16 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed '
 
 include makeenv
 
-ifeq ($(KFPv2), 0)
-DOCKER_FILE=Dockerfile
-DOCKER_IMAGE_NAME=kfp-data-processing
-DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
-KFP_SUPPORT_LIB=kfp_support_lib
-else
+ifeq ($(KFPv2), 1)
 DOCKER_FILE=Dockerfile_v2
 DOCKER_IMAGE_NAME=kfp-data-processing_v2
 DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
 KFP_SUPPORT_LIB=kfp_support_lib_v2
+else
+DOCKER_FILE=Dockerfile
+DOCKER_IMAGE_NAME=kfp-data-processing
+DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
+KFP_SUPPORT_LIB=kfp_support_lib
 endif
 
 
@@ -31,11 +31,11 @@ DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 .lib-src-image:: 
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python
-	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib LIB_NAME=kfp_support_lib
+	# $(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib LIB_NAME=kfp_support_lib
 	$(MAKE) .defaults.image
 	rm -rf data-processing-lib-ray
 	rm -rf data-processing-lib-python
-	rm -rf kfp_support_lib
+	# rm -rf kfp_support_lib
 
 .PHONY: image
 image: Dockerfile Dockerfile_v2 requirements.txt
@@ -45,10 +45,10 @@ image: Dockerfile Dockerfile_v2 requirements.txt
 .PHONY: reconcile-requirements
 reconcile-requirements:
 	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
-	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" createRayClusterComponent.yaml
-	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" deleteRayClusterComponent.yaml
-	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" executeRayJobComponent.yaml
-	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" executeRayJobComponent_multi_s3.yaml
+	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" createRayClusterComponent.yaml
+	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" deleteRayClusterComponent.yaml
+	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" executeRayJobComponent.yaml
+	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" executeRayJobComponent_multi_s3.yaml
 	# TODO remove it for KFPv2
 	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" executeSubWorkflowComponent.yaml
 

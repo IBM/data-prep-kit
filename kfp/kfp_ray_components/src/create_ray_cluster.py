@@ -9,11 +9,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
+import os
 import sys
 
-from kfp_support.workflow_support.runtime_utils import KFPUtils, RayRemoteJobs
-
+kfp_v2 = os.getenv("KFP_v2", 0)
+if kfp_v2 == 1:
+    from kfp_v1_workflow_support.utils import KFPUtils, RayRemoteJobs
+    print(f"Load KFPv2 libs")
+else:
+    from kfp_v1_workflow_support.utils import KFPUtils, RayRemoteJobs
+    print(f"Load KFPv1 libs")
 
 def start_ray_cluster(
     name: str,  # name of Ray cluster
