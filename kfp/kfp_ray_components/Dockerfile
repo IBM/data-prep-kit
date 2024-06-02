@@ -17,8 +17,12 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/
 RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
 
-COPY --chown=ray:users kfp_support_lib/ kfp_support_lib/
-RUN cd kfp_support_lib && pip install --no-cache-dir -e .
+COPY --chown=ray:users python_apiserver_client python_apiserver_client/
+RUN cd python_apiserver_client && pip install --no-cache-dir -e .
+
+COPY --chown=ray:users python_apiserver_client workflow_support_lib/
+RUN cd workflow_support_lib && pip install --no-cache-dir -e .
+
 # remove credentials-containing file
 RUN rm requirements.txt
 # components

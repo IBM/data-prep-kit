@@ -11,15 +11,15 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed '
 include makeenv
 
 ifeq ($(KFPv2), 1)
-DOCKER_FILE=Dockerfile_v2
+DOCKER_FILE=Dockerfile
 DOCKER_IMAGE_NAME=kfp-data-processing_v2
 DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
-KFP_SUPPORT_LIB=kfp_support_lib_v2
+WORKFLOW_SUPPORT_LIB=kfp_v2_workflow_support
 else
 DOCKER_FILE=Dockerfile
 DOCKER_IMAGE_NAME=kfp-data-processing
 DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
-KFP_SUPPORT_LIB=kfp_support_lib
+WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
 endif
 
 
@@ -31,11 +31,13 @@ DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 .lib-src-image:: 
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python
-	# $(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib LIB_NAME=kfp_support_lib
+	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/python_apiserver_client LIB_NAME=python_apiserver_client
+	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB) LIB_NAME=workflow_support_lib
 	$(MAKE) .defaults.image
 	rm -rf data-processing-lib-ray
 	rm -rf data-processing-lib-python
-	# rm -rf kfp_support_lib
+	rm -rf python_api_server_client
+	rm -rf workflow_support_lib
 
 .PHONY: image
 image: Dockerfile Dockerfile_v2 requirements.txt
