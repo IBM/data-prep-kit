@@ -55,28 +55,12 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requiremen
 	rm -rf ${REPOROOT}/transforms/venv
 	$(MAKE) -C ${REPOROOT}/transforms .defaults.python-lib-src-venv
 	. ${WORKFLOW_VENV_ACTIVATE};     \
-	pip install -e $(REPOROOT)/kfp/kfp_support_lib/;
+	pip install -e $(REPOROOT)/kfp/kfp_support_lib/python_apiserver_client; \
+    pip install -e $(DPK_PYTHON_LIB_DIR); \
+	pip install -e $(DPK_RAY_LIB_DIR); \
+	pip install kfp==$(KFP) --extra-index-url https://pypi.org/simple; \
+	pip install -e $(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB);
 	@# Help: Create the virtual environment common to all workflows
-
-	pip install -e $(DPK_RAY_LIB_DIR)
-ifeq ($(KFPv2), 1)
-	. ${WORKFLOW_VENV_ACTIVATE} && pip install -e $(REPOROOT)/kfp/kfp_support_lib_v2/
-else
-	. ${WORKFLOW_VENV_ACTIVATE}  && pip install -e $(REPOROOT)/kfp/kfp_support_lib/
-endif
-	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple; \
-	pip install -e $($DPK_RAY_LIB_DIR); \
-	pip install -e $(REPOROOT)/kfp/kfp_support_lib/;
-
-#TODO KFPv2
-${VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt
-	@# Help: Create the virtual environment common to all workflows
-	rm -rf ${REPOROOT}/kfp/transform_workflows/venv
-	$(PYTHON) -m venv ${REPOROOT}/kfp/transform_workflows/venv
-	. ${VENV_ACTIVATE};     \
-	pip install kfp==${KFP} --extra-index-url https://pypi.org/simple; \
-	pip install kfp-kubernetes --extra-index-url https://pypi.org/simple; \
-	pip install -e $(REPOROOT)/kfp/kfp_support_lib/
 
 .PHONY: .transforms_workflows.upload-pipeline
 .transforms_workflows.upload-pipeline:

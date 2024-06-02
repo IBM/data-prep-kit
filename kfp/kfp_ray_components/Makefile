@@ -36,7 +36,7 @@ DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 	$(MAKE) .defaults.image
 	rm -rf data-processing-lib-ray
 	rm -rf data-processing-lib-python
-	rm -rf python_api_server_client
+	rm -rf python_apiserver_client
 	rm -rf workflow_support_lib
 
 .PHONY: image

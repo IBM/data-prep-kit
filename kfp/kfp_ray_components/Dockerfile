@@ -20,7 +20,7 @@ RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
 COPY --chown=ray:users python_apiserver_client python_apiserver_client/
 RUN cd python_apiserver_client && pip install --no-cache-dir -e .
 
-COPY --chown=ray:users python_apiserver_client workflow_support_lib/
+COPY --chown=ray:users workflow_support_lib workflow_support_lib/
 RUN cd workflow_support_lib && pip install --no-cache-dir -e .
 
 # remove credentials-containing file

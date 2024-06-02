@@ -10,7 +10,7 @@
 # limitations under the License.
 ################################################################################
 
-from kfp_support.utils import PipelinesUtils
+from workflow_support.utils import PipelinesUtils
 
 
 def test_pipelines():
