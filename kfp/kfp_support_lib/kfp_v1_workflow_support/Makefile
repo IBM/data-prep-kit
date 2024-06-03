@@ -49,6 +49,8 @@ venv::	pyproject.toml .check-env
 	rm -rf venv
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
+	pip install -e ../python_apiserver_client;	\
+	pip install -e ../../../data-processing-lib/python; \
 	pip install -e .;		\
 	pip install ray==${RAY} \
 	pip install pytest pytest-cov
@@ -56,7 +58,6 @@ venv::	pyproject.toml .check-env
 test:: 	venv
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.
 ifeq ($(DEPLOY_KUBEFLOW),1)
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) kuberay_api_test.py;
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) ray_remote_jobs_test.py;
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) pipeline_utils_test.py;
 endif

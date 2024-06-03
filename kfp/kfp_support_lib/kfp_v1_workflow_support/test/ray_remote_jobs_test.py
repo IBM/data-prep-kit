@@ -14,6 +14,7 @@ from configmaps import ConfigmapsManager
 from python_apiserver_client.params import ConfigMapVolume
 from workflow_support.utils import RayRemoteJobs
 
+server_url = "http:localhost:8080/ray/"
 
 def test_ray_remote_jobs():
     """
@@ -56,7 +57,7 @@ def test_ray_remote_jobs():
     cm_manager.create_code_map()
 
     # create cluster
-    remote_jobs = RayRemoteJobs(server_url="http://alexy100.sl.cloud9.ibm.com:8080/ray")
+    remote_jobs = RayRemoteJobs(server_url=server_url)
     status, error = remote_jobs.create_ray_cluster(
         name="job-test", namespace="default", head_node=head_node, worker_nodes=[worker_node]
     )

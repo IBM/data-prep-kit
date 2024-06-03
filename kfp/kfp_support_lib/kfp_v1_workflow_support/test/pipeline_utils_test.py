@@ -12,12 +12,13 @@
 
 from workflow_support.utils import PipelinesUtils
 
+server_url = "http://localhost:8080/"
 
 def test_pipelines():
     """
     Test pipelines utils
     """
-    utils = PipelinesUtils(host="http://localhost:8080")
+    utils = PipelinesUtils(host=server_url)
     # get pipeline by name
     pipeline = utils.get_pipeline_by_name("[Tutorial] Data passing in python components")
     assert pipeline is not None
