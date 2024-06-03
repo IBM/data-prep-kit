@@ -133,7 +133,7 @@ def noop(
             additional_params=additional_params,
        )
        ComponentUtils.add_settings_to_component(ray_cluster, ONE_HOUR_SEC * 2)
-        #ray_cluster.after(compute_exec_params)
+       ray_cluster.after(compute_exec_params)
         # Execute job
        execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
