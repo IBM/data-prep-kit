@@ -219,7 +219,7 @@ test-locals:: .transforms.test-locals
 	kind load docker-image $(DOCKER_REMOTE_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
 .PHONY: conventions
-conventions:
+conventions: .transforms.check_required_macros
 	@# Help: Check transform project conventions and make recommendations, if needed.
 	@echo "Begin checking transform conventions for $(TRANSFORM_RUNTIME) runtime project.  Recommendations/issues, if any, follow..."
 	@if [ "$(TRANSFORM_RUNTIME)" = "python" ]; then	\
@@ -322,9 +322,10 @@ minio-stop:
 
 # Update the toml file to version from .make.version which is expected to be set into DOCKER_IMAGE_VERSION
 # Note that the image and distribution versions will be the same.
+# Requires version number of Python image as TRANSFORM_PYTHON_VERSION to be set when called
 .transforms.set-versions: 
 	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
 	cat pyproject.toml | sed 	\
-	    -e 's/dpk-$(TRANSFORM_NAME)-transform-python\(..\).*/dpk-$(TRANSFORM_NAME)-transform-python\1$(DOCKER_IMAGE_VERSION)",/'	\
+	    -e 's/dpk-$(TRANSFORM_NAME)-transform-python\([=<>][=<>]\).*/dpk-$(TRANSFORM_NAME)-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
 	    > tt.toml
 	mv tt.toml pyproject.toml

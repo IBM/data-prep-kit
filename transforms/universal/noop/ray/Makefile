@@ -8,7 +8,7 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=noop
-DOCKER_IMAGE_VERSION=${NOOP_VERSION}
+DOCKER_IMAGE_VERSION=${NOOP_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
@@ -32,7 +32,9 @@ publish-image:: .transforms.publish-image-ray
 
 setup:: .transforms.setup
 
-set-versions: .transforms.set-versions 
+# set the version of python transform that this depends on.
+set-versions: 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(NOOP_PYTHON_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 

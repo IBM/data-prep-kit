@@ -28,9 +28,9 @@ publish:: publish-dist publish-image
 
 publish-image:: .transforms.publish-image-spark
 
-# distribution versions is the same as image version.
-set-versions:
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+# set the version of python transform that this depends on.
+set-versions: 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(NOOP_PYTHON_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 
