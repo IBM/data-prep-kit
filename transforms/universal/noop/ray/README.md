@@ -1,4 +1,4 @@
-# NOOP Transform 
+# NOOP Ray Transform 
 Please see the set of
 [transform project conventions](../../../README.md#transform-project-conventions)
 for details on general project conventions, transform configuration,
@@ -32,7 +32,7 @@ Use the `-n` option of `make` to see the detail of what is done to run the sampl
 
 For example, 
 ```shell
-make run-cli-ray-sample
+make run-cli-sample
 ...
 ```
 Then 

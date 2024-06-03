@@ -5,10 +5,8 @@ REPOROOT=../../../..
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
 
-TRANSFORM_RUNTIME=spark
 include $(REPOROOT)/transforms/.make.transforms
 
-# This is included in the image name, if defined
 TRANSFORM_NAME=noop
 DOCKER_IMAGE_VERSION=${NOOP_SPARK_VERSION}
 

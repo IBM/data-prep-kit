@@ -119,25 +119,3 @@ class NOOPTransformConfiguration(TransformConfiguration):
         self.params = self.params | captured
         logger.info(f"noop parameters are : {self.params}")
         return True
-
-
-class NOOPPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
-    """
-    Implements the PythonTransformConfiguration for NOOP as required by the PythonTransformLauncher.
-    NOOP does not use a RayRuntime class so the superclass only needs the base
-    python-only configuration.
-    """
-
-    def __init__(self):
-        """
-        Initialization
-        :param base_configuration - base configuration class
-        """
-        super().__init__(transform_config=NOOPTransformConfiguration())
-
-
-if __name__ == "__main__":
-    # launcher = NOOPRayLauncher()
-    launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
-    logger.info("Launching noop transform")
-    launcher.launch()

@@ -19,7 +19,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # copy source data
-COPY ./src/doc_id_transform.py .
+COPY ./src/doc_id_transform_spark.py .
 COPY ./src/doc_id_local.py local/
 
 # copy test

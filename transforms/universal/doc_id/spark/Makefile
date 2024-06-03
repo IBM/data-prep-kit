@@ -4,11 +4,8 @@ REPOROOT=../../../..
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
-
-# This is included in the image name, if defined
-TRANSFORM_RUNTIME=spark
-
 include $(REPOROOT)/transforms/.make.transforms
+
 TRANSFORM_NAME=doc_id
 # $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${DOC_ID_SPARK_VERSION}

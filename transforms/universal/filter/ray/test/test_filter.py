@@ -17,7 +17,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from data_processing.test_support.transform import AbstractTransformTest
 from data_processing.transform import get_transform_config
-from filter_transform import (
+from filter_transform_ray import (
     FilterTransform,
     FilterTransformConfiguration,
     filter_columns_to_drop_cli_param,

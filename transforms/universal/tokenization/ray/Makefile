@@ -29,19 +29,19 @@ test-image:: .transforms.ray-test-image
 
 publish:: .transforms.ray-publish
 
-run-cli-ray-sample: 
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+run-cli-sample: 
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/ds01/input', 'output_folder' : '../output'}\"  \
                 "  .transforms.run-src-file
 
 
-run-local-sample: #.transforms.run-local-sample
+run-local-python-only-sample: #.transforms.run-local-sample
 	@# Help: Not implemented yet
 	@echo "No src/tokenization_local.py yet :("
 
-run-local-ray-sample: .transforms.run-local-ray-sample
+run-local-sample: .transforms.run-local-sample
 
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+run-s3-sample: .transforms.run-s3-sample
 
 minio-start:	.minio-start
 

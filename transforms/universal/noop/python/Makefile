@@ -5,8 +5,9 @@ REPOROOT=../../../..
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
 
-TRANSFORM_RUNTIME=python
 # $(REPOROOT)/.make.versions file contains the versions
+
+TRANSFORM_RUNTIME=python
 TRANSFORM_NAME=noop
 DOCKER_IMAGE_VERSION=${NOOP_VERSION}
 

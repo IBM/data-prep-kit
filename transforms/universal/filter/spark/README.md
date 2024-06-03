@@ -12,7 +12,7 @@ Filtering cleans up data by:
 
 ## Configuration and command line Options
 
-The set of dictionary keys holding [FilterTransform](src/filter_transform.py) 
+The set of dictionary keys holding [FilterTransform](src/filter_transform_spark.py) 
 configuration for values are as follows:
 
 * _filter_criteria_list_ - specifies the list of row filter criteria (in SQL WHERE clause format). Each filter criterion is a string. The default value of this parameter is `[]` (an empty list, meaning that all the rows in the input table will be kept). 
@@ -203,7 +203,7 @@ To see results of the transform.
 
 When running filtering on a local terminal, double quotes need to be escaped accordingly. For example, to find documents that are written in Java or Python programming languages, a SQL query using the `IN` keyword is needed in the `filter_criteria_list` argument. The example below shows how to properly pass this argument to the filter app:
 ```    
-python filter_transform.py --filter_criteria_list "[\"language IN ('Java', 'Python')\"]" ...
+python filter_transform_spark.py --filter_criteria_list "[\"language IN ('Java', 'Python')\"]" ...
 ```
 When filter runs from the command line, it needs to include the entire `filter_criteria_list` parameter within double quotes (`"`), so that the command line parser can determine where the parameter begins and ends. This, however, will conflict with the internal double quotes that are used to specify the conditions inside the list (`language IN ('Java', 'Python')`). To resolve this problem, the internal double quotes need to be escaped, as in the \"language IN ('Java', 'Python')\" notation.
 

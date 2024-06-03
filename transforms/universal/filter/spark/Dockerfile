@@ -18,7 +18,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 # copy source data
-COPY ./src/filter_transform.py .
+COPY ./src/filter_transform_spark.py .
 COPY ./src/filter_local.py local/
 
 # copy test

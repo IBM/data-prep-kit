@@ -12,7 +12,7 @@
 
 import os
 
-from code_quality_transform import CodeQualityTransform
+from code_quality_transform_ray import CodeQualityTransform
 from data_processing.data_access import DataAccessLocal
 
 

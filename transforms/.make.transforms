@@ -5,14 +5,14 @@
 # REPOROOT points to the top of the git repository. 
 # 	For example REPOROOT=../../..
 # TRANSFORM_NAME defines the name of the transform and is used to derive
-#  	DOCKER_IMAGE_NAME  and TRANSFORM_SRC_FILE if not already defined.
+#  	DOCKER_IMAGE_NAME  and TRANSFORM_RUNTIME_SRC_FILE if not already defined.
 
 # Optional inputs (that have defaults)
-# TRANSFORM_SRC_FILE is the base name of the python source file containing the main()
+# TRANSFORM_RUNTIME_SRC_FILE is the base name of the python source file containing the main()
 #	that is used to launch the transform in Ray.  
 #       By convention this name defaults to $(TRANSFORM_NAME)_transform.py.
 #	This file is then assumed to be in the home dir of the docker image and
-#	can be run with "python $(TRANSFORM_SRC_FILE) --help"
+#	can be run with "python $(TRANSFORM_RUNTIME_SRC_FILE) --help"
 # DOCKER_IMAGE_NAME  is the name of the docker image.  
 #	By default its value is $(TRANSFORM_NAME).
 #
@@ -28,15 +28,11 @@
 #######################################################################################
 include $(REPOROOT)/.make.defaults
 
-ifeq ($(origin TRANSFORM_RUNTIME), undefined)
-#$(error TRANSFORM_RUNTIME must be defined before including this file)
-DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
-else
+TRANSFORM_RUNTIME?=$(shell basename $$(pwd))
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)-$(TRANSFORM_RUNTIME)
-endif
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
-TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_transform.py
+TRANSFORM_RUNTIME_SRC_FILE?=$(TRANSFORM_NAME)_transform_$(TRANSFORM_RUNTIME).py
 TRANSFORM_TEST_FILE?=test/test_$(TRANSFORM_NAME).py
 
 # The following taken from https://stackoverflow.com/a/65243296/45375
@@ -55,7 +51,7 @@ extra-help:
 	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
 	@echo DOCKER_REGISTRY_KEY - the docker user to use.  DOCKER_REGISTRY_KEY=secret
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
-	@echo "TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_local_ray.py)"
+	@echo "TRANSFORM_RUNTIME_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_local_ray.py)"
 	@echo ""
 
 
@@ -67,6 +63,9 @@ extra-help:
 
 .PHONY: .transforms.check_required_macros
 .transforms.check_required_macros::
+	@if [ -z "$(TRANSFORM_RUNTIME)" ]; then	\
+	    echo ERROR: TRANSFORM_RUNTIME must be defined.;	\
+	fi			
 	@if [ -z "$(TRANSFORM_NAME)" ]; then	\
 	    echo ERROR: TRANSFORM_NAME must be defined.;	\
 	fi			
@@ -168,7 +167,7 @@ extra-help:
 .PHONY: .transforms.test-image-help
 .transforms.test-image-help::
 	@# Help: Test an already-built image (use make image) to be sure the --help option works
-	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) python $(TRANSFORM_SRC_FILE) --help
+	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) python $(TRANSFORM_RUNTIME_SRC_FILE) --help
 
 .PHONY: test-locals
 test-locals:: .transforms.test-locals
@@ -222,12 +221,17 @@ test-locals:: .transforms.test-locals
 .PHONY: conventions
 conventions:
 	@# Help: Check transform project conventions and make recommendations, if needed.
-	@echo "Begin checking transform project conventions.  Recommendations/issues, if any, follow..."
+	@echo "Begin checking transform conventions for $(TRANSFORM_RUNTIME) runtime project.  Recommendations/issues, if any, follow..."
+	@if [ "$(TRANSFORM_RUNTIME)" = "python" ]; then	\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_transform.py .transforms-check-exists;		\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists;	\
+		$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py .transforms-check-exists;	\
+	else	\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME).py .transforms-check-not-exists;		\
+	fi
+	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_$(TRANSFORM_RUNTIME).py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_$(TRANSFORM_RUNTIME).py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  .transforms-check-not-exists
-	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists
-	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_ray.py .transforms-check-exists
-	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py .transforms-check-exists
-	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_ray.py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=. CHECK_FILE_NAME=.dockerignore  .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test-data .transforms-check-dir-size
 	@$(MAKE) CHECK_TARGET=build .transforms-check-target
@@ -271,7 +275,7 @@ conventions:
 
 .PHONY: .transforms.run-cli-python-sample 
 .transforms.run-cli-python-sample:
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_python.py \
 		RUN_ARGS=" --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" " .transforms.run-src-file
 
 .PHONY: .transforms.run-cli-ray-sample 
@@ -281,7 +285,7 @@ conventions:
 
 .PHONY: .transforms.run-cli-spark-sample 
 .transforms.run-cli-spark-sample:
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_spark.py \
 		RUN_ARGS="--data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" --spark_local_config_filepath ../config/spark_profile_local.yml " .transforms.run-src-file
 
 # Expects RUN_FILE

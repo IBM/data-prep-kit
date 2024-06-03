@@ -30,7 +30,7 @@ publish:: .transforms.ray-publish
 
 
 run-cli-ray-sample: .transforms.run-cli-ray-sample
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
 		--proglang_select_language_column language							\
     		--proglang_select_output_column lang_selected							\

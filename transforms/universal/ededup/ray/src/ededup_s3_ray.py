@@ -14,7 +14,7 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from ededup_transform import EdedupRayTransformConfiguration
+from ededup_transform_ray import EdedupRayTransformConfiguration
 
 
 # create launcher

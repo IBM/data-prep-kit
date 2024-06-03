@@ -12,7 +12,7 @@
 
 import os
 
-from code_quality_transform import CodeQualityRayTransformConfiguration
+from code_quality_transform_ray import CodeQualityRayTransformConfiguration
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )

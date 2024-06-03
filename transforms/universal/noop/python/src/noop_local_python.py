@@ -15,7 +15,7 @@ import sys
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
-from noop_transform import NOOPPythonTransformConfiguration
+from noop_transform_python import NOOPPythonTransformConfiguration
 
 
 # create parameters

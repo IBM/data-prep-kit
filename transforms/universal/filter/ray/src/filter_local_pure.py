@@ -15,7 +15,7 @@ import sys
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
-from filter_transform import (
+from filter_transform_ray import (
     FilterTransformConfiguration,
     filter_columns_to_drop_cli_param,
     filter_criteria_cli_param,
