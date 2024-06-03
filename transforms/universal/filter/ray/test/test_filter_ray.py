@@ -69,51 +69,52 @@ class TestRayFilterTransform(AbstractTransformLauncherTest):
             )
         )
 
-        fixtures.append(
-            (
-                RayTransformLauncher(FilterRayTransformConfiguration()),
-                {
-                    "run_locally": True,
-                    filter_criteria_cli_param: [],
-                    filter_logical_operator_cli_param: filter_logical_operator_default,
-                    filter_columns_to_drop_cli_param: [],
-                },
-                os.path.join(basedir, "input"),
-                os.path.join(basedir, "expected", "test-default"),
-            )
-        )
-
-        fixtures.append(
-            (
-                RayTransformLauncher(FilterRayTransformConfiguration()),
-                {
-                    "run_locally": True,
-                    filter_criteria_cli_param: [
-                        "date_acquired BETWEEN '2023-07-04' AND '2023-07-08'",
-                        "title LIKE 'https://%'",
-                    ],
-                    filter_logical_operator_cli_param: filter_logical_operator_default,
-                    filter_columns_to_drop_cli_param: [],
-                },
-                os.path.join(basedir, "input"),
-                os.path.join(basedir, "expected", "test-datetime-like"),
-            )
-        )
-
-        fixtures.append(
-            (
-                RayTransformLauncher(FilterRayTransformConfiguration()),
-                {
-                    "run_locally": True,
-                    filter_criteria_cli_param: [
-                        "document IN ('CC-MAIN-20190221132217-20190221154217-00305.warc.gz', 'CC-MAIN-20200528232803-20200529022803-00154.warc.gz', 'CC-MAIN-20190617103006-20190617125006-00025.warc.gz')",
-                    ],
-                    filter_logical_operator_cli_param: filter_logical_operator_default,
-                    filter_columns_to_drop_cli_param: [],
-                },
-                os.path.join(basedir, "input"),
-                os.path.join(basedir, "expected", "test-in"),
-            )
-        )
+        # These test are also done in the python-only tests, so no real need to duplicate here.  They slow down ci/cd builds.
+        # fixtures.append(
+        #     (
+        #         RayTransformLauncher(FilterRayTransformConfiguration()),
+        #         {
+        #             "run_locally": True,
+        #             filter_criteria_cli_param: [],
+        #             filter_logical_operator_cli_param: filter_logical_operator_default,
+        #             filter_columns_to_drop_cli_param: [],
+        #         },
+        #         os.path.join(basedir, "input"),
+        #         os.path.join(basedir, "expected", "test-default"),
+        #     )
+        # )
+        #
+        # fixtures.append(
+        #     (
+        #         RayTransformLauncher(FilterRayTransformConfiguration()),
+        #         {
+        #             "run_locally": True,
+        #             filter_criteria_cli_param: [
+        #                 "date_acquired BETWEEN '2023-07-04' AND '2023-07-08'",
+        #                 "title LIKE 'https://%'",
+        #             ],
+        #             filter_logical_operator_cli_param: filter_logical_operator_default,
+        #             filter_columns_to_drop_cli_param: [],
+        #         },
+        #         os.path.join(basedir, "input"),
+        #         os.path.join(basedir, "expected", "test-datetime-like"),
+        #     )
+        # )
+        #
+        # fixtures.append(
+        #     (
+        #         RayTransformLauncher(FilterRayTransformConfiguration()),
+        #         {
+        #             "run_locally": True,
+        #             filter_criteria_cli_param: [
+        #                 "document IN ('CC-MAIN-20190221132217-20190221154217-00305.warc.gz', 'CC-MAIN-20200528232803-20200529022803-00154.warc.gz', 'CC-MAIN-20190617103006-20190617125006-00025.warc.gz')",
+        #             ],
+        #             filter_logical_operator_cli_param: filter_logical_operator_default,
+        #             filter_columns_to_drop_cli_param: [],
+        #         },
+        #         os.path.join(basedir, "input"),
+        #         os.path.join(basedir, "expected", "test-in"),
+        #     )
+        # )
 
         return fixtures
