@@ -3,10 +3,10 @@ import sys
 
 kfp_v2 = os.getenv("KFP_v2", 0)
 if kfp_v2 == 1:
-    from kfp_v1_workflow_support.utils import KFPUtils, PipelinesUtils
+    from workflow_support.utils import KFPUtils, PipelinesUtils
     print(f"Load KFPv2 libs")
 else:
-    from kfp_v1_workflow_support.utils import KFPUtils, PipelinesUtils
+    from workflow_support.utils import KFPUtils, PipelinesUtils
     print(f"Load KFPv1 libs")
 
 from data_processing.utils import ParamsUtils
