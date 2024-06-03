@@ -10,9 +10,9 @@
 # limitations under the License.
 ################################################################################
 
-from kfp.kfp_support_lib.python_apiserver_client.test.configmaps import ConfigmapsManager
-from kfp.kfp_support_lib.python_apiserver_client.src.python_apiserver_client.params import ConfigMapVolume
-from kfp_support.workflow_support.utils import RayRemoteJobs
+from configmaps import ConfigmapsManager
+from python_apiserver_client.params import ConfigMapVolume
+from workflow_support.utils import RayRemoteJobs
 
 
 def test_ray_remote_jobs():
@@ -56,7 +56,7 @@ def test_ray_remote_jobs():
     cm_manager.create_code_map()
 
     # create cluster
-    remote_jobs = RayRemoteJobs(server_url="http://localhost:8080/ray")
+    remote_jobs = RayRemoteJobs(server_url="http://alexy100.sl.cloud9.ibm.com:8080/ray")
     status, error = remote_jobs.create_ray_cluster(
         name="job-test", namespace="default", head_node=head_node, worker_nodes=[worker_node]
     )

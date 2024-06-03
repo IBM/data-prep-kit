@@ -12,9 +12,9 @@
 
 import time
 
-from python_apiserver_client.test.configmaps import ConfigmapsManager
-from python_apiserver_client.src.api_server_client import KubeRayAPIs
-from python_apiserver_client.src.api_server_client.params import (
+from configmaps import ConfigmapsManager
+from python_apiserver_client import KubeRayAPIs
+from python_apiserver_client.params import (
     DEFAULT_WORKER_START_PARAMS,
     Cluster,
     ClusterSpec,
@@ -30,13 +30,15 @@ from python_apiserver_client.src.api_server_client.params import (
     WorkerNodeSpec,
 )
 
+server_url = "http://localhost:8080/ray"
+
 
 def test_templates():
     """
     Test template
     """
     # create API server
-    apis = KubeRayAPIs(server_url="http://localhost:8080/ray")
+    apis = KubeRayAPIs(server_url=server_url)
     # cleanup
     _, _ = apis.delete_compute_template(ns="default", name="default-template")
     # create
@@ -81,7 +83,7 @@ def test_cluster():
     Test cluster
     """
     # create API server
-    apis = KubeRayAPIs(server_url="http://localhost:8080/ray")
+    apis = KubeRayAPIs(server_url=server_url)
     # cleanup
     _, _ = apis.delete_compute_template(ns="default", name="default-template")
     _, _ = apis.delete_cluster(ns="default", name="test")
@@ -181,7 +183,7 @@ def test_job_submission():
     :return:
     """
     # create API server
-    apis = KubeRayAPIs(server_url="http://localhost:8080/ray")
+    apis = KubeRayAPIs(server_url=server_url)
     # cleanup
     _, _ = apis.delete_compute_template(ns="default", name="default-template")
     _, _ = apis.delete_cluster(ns="default", name="test-job")
