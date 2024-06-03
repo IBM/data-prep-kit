@@ -38,9 +38,9 @@ component_spec_path = "../../../../../kfp/kfp_ray_components/"
 # a result, instead of creating a component we are creating it in place here.
 @dsl.component(base_image=base_kfp_image)
 def compute_exec_params(worker_options: str, actor_options: str) -> str:
-    from workflow_support.compile_utils import ComponentUtils
+    from workflow_support.runtime_utils import KFPUtils
 
-    return ComponentUtils.default_compute_execution_params(worker_options, actor_options)
+    return KFPUtils.default_compute_execution_params(worker_options, actor_options)
 
 
 # create Ray cluster
