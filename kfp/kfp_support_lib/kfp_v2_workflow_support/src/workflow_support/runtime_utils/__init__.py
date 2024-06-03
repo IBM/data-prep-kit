@@ -1,2 +1,2 @@
-from kfp_support.workflow_support.runtime_utils.kfp_utils import KFPUtils
-from kfp_support.workflow_support.runtime_utils.remote_jobs_utils import RayRemoteJobs, execute_ray_jobs
+from workflow_support.runtime_utils.kfp_utils import KFPUtils
+from workflow_support.runtime_utils.remote_jobs_utils import RayRemoteJobs, execute_ray_jobs

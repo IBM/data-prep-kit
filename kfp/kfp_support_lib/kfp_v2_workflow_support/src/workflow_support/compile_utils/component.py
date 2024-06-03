@@ -4,6 +4,10 @@ from typing import Dict
 
 RUN_NAME = "KFP_RUN_NAME"
 
+ONE_HOUR_SEC = 60 * 60
+ONE_DAY_SEC = ONE_HOUR_SEC * 24
+ONE_WEEK_SEC = ONE_DAY_SEC * 7
+
 class ComponentUtils:
     """
     Class containing methods supporting building pipelines
@@ -67,7 +71,7 @@ class ComponentUtils:
         import sys
 
         from data_processing.utils import GB, get_logger
-        from kfp_support.workflow_support.runtime_utils import KFPUtils
+        from workflow_support.runtime_utils import KFPUtils
 
         logger = get_logger(__name__)
 

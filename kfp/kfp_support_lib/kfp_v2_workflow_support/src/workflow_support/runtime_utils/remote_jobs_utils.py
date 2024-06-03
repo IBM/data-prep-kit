@@ -17,8 +17,8 @@ from typing import Any
 
 from data_processing.data_access import DataAccess, DataAccessFactory
 from data_processing.utils import ParamsUtils, get_logger
-from kfp_support.api_server_client import KubeRayAPIs
-from kfp.kfp_support_lib.python_apiserver_client.src.python_apiserver_client.params import (
+from python_apiserver_client import KubeRayAPIs
+from python_apiserver_client.params import (
     DEFAULT_HEAD_START_PARAMS,
     DEFAULT_WORKER_START_PARAMS,
     Cluster,
@@ -30,7 +30,7 @@ from kfp.kfp_support_lib.python_apiserver_client.src.python_apiserver_client.par
     environment_variables_decoder,
     volume_decoder,
 )
-from kfp_support.workflow_support.runtime_utils import KFPUtils
+from workflow_support.runtime_utils import KFPUtils
 from ray.job_submission import JobStatus
 
 

@@ -47,15 +47,29 @@ workflow-venv:
 
 .PHONY: workflow-build
 workflow-build:
+ifeq ($(KFPv2), 0)
 	$(MAKE) -C kfp_ray/v1 workflow-build
+else
+	$(MAKE) -C kfp_ray/v2 workflow-build
+endif
+
 
 .PHONY: workflow-test
 workflow-test:
-	$(MAKE) -C $(PIPELINE_PATH) workflow-test
+ifeq ($(KFPv2), 0)
+	$(MAKE) -C kfp_ray/v2 workflow-test
+else
+	$(MAKE) -C kfp_ray/v2 workflow-test
+endif
 
 .PHONY: workflow-upload
 workflow-upload:
-	$(MAKE) -C $(PIPELINE_PATH) workflow-upload
+ifeq ($(KFPv2), 0)
+	$(MAKE) -C kfp_ray/v1 workflow-upload
+else
+	$(MAKE) -C kfp_ray/v2 workflow-upload
+endif
+
 
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:
