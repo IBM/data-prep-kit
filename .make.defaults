@@ -352,10 +352,10 @@ __check_defined = \
 	cd src;				\
 	python $(RUN_FILE) $(RUN_ARGS)
 
-# This expects the image to already be built and so does not depending on .defaults.publish.
+# This expects the image to already be built and so does not depending on .defaults.publish-image.
 # This allows others to define their own image building prior to publishing.
-.PHONY: .defaults.publish
-.defaults.publish:: 
+.PHONY: .defaults.publish-image
+.defaults.publish-image:: 
 	@# Help: Publish the $(DOCKER_LOCAL_IMAGE) to $(DOCKER_HOSTNAME) container registry
 	-$(DOCKER) logout $(DOCKER_HOSTNAME)
 	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'

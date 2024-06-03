@@ -47,7 +47,7 @@ build: image
 
 .PHONY: publish
 publish:
-	$(MAKE) image .defaults.publish
+	$(MAKE) image .defaults.publish-image
 
 test::
 

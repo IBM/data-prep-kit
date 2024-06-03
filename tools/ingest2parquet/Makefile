@@ -31,7 +31,7 @@ minio-stop:	.defaults.minio.stop
 
 test-local:: .defaults.test-locals
 
-publish:: image .defaults.publish
+publish:: image .defaults.publish-image
 
 run-local-sample:
 	$(MAKE) RUN_FILE=ingest2parquet_local.py  .defaults.run-src-file
