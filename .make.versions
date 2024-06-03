@@ -8,7 +8,7 @@
 # % make RELEASE_VERSION_SUFFIX= set-version 
 # % git push, tag, etc.
 # % make build, publish, etc.
-RELEASE_VERSION_SUFFIX=.dev0
+RELEASE_VERSION_SUFFIX=.dev6
 
 # Data prep lab wheel version
 DPK_LIB_VERSION=0.2.0$(RELEASE_VERSION_SUFFIX)

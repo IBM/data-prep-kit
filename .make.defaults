@@ -480,10 +480,10 @@ MINIO_ADMIN_PWD= localminiosecretkey
 .defaults.update-toml-lib-dep-versions:
 	@# Help: Update pyproject.toml to depend on lib versions defined in .make.versions 
 	cat pyproject.toml | sed 									\
-		-e 's/"data-prep-toolkit=.*",/"data-prep-toolkit==$(DPK_LIB_VERSION)",/' 		\
-		-e 's/"data-prep-toolkit-ray=.*",/"data-prep-toolkit-ray==$(DPK_LIB_VERSION)",/' 	\
-		-e 's/"data-prep-toolkit-spark=.*",/"data-prep-toolkit-spark==$(DPK_LIB_VERSION)",/' 	\
-		-e 's/"data-prep-toolkit-kfp=.*",/"data-prep-toolkit-spark==$(DPK_LIB_KFP_VERSION)",/' 	\
+		-e 's/"data-prep-toolkit-ray\(..\).*",/"data-prep-toolkit-ray\1$(DPK_LIB_VERSION)",/' 	\
+		-e 's/"data-prep-toolkit-spark\(..\).*",/"data-prep-toolkit-spark\1$(DPK_LIB_VERSION)",/' 	\
+		-e 's/"data-prep-toolkit-kfp\(..\).*",/"data-prep-toolkit-spark\1$(DPK_LIB_KFP_VERSION)",/' 	\
+		-e 's/"data-prep-toolkit\([=><][=><]\).*",/"data-prep-toolkit\1$(DPK_LIB_VERSION)",/' 		\
 		> tt.toml
 	mv tt.toml pyproject.toml
 

@@ -9,6 +9,7 @@ clean:: .defaults.clean
 	@# Help: Clean up the distribution build and the venv 
 	-rm -rf dist > /dev/null 2>&1
 
+.PHONY: .check-env
 .check-env::
 	@echo "Checks passed"
 
@@ -19,7 +20,7 @@ set-versions:: .check-env
 
 build:: build-dist 
 
-#build:: update-toml .defaults.build-dist 
+#build:: set-versions .defaults.build-dist 
 build-dist :: set-versions .defaults.build-dist 
 
 publish:: publish-dist  

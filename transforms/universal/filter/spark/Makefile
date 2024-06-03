@@ -13,8 +13,6 @@ DOCKER_IMAGE_VERSION=${FILTER_SPARK_VERSION}
 
 venv::	.transforms.spark-venv
 
-build::	.transforms.spark-build
-
 test::	.transforms.spark-test
 
 clean:: .transforms.clean
@@ -27,7 +25,19 @@ setup:: .transforms.setup
 
 test-image:: .transforms.spark-test-image
 
-publish:: .transforms.spark-publish
+build:: build-dist image
+
+publish:: publish-dist publish-image
+
+publish-image:: .transforms.publish-image-spark
+
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
 
 run-cli-sample: 
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_spark.py \

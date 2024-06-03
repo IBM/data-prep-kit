@@ -176,14 +176,14 @@ test-locals:: .transforms.test-locals
 .transforms.test-locals:: .defaults.test-locals
 
 # Build the image the transform way and then use the default publishing
-.PHONY: .transforms.python-publish
-.transforms.python-publish:: .transforms.python-image .defaults.publish-image
+.PHONY: .transforms.publish-image-python
+.transforms.publish-image-python:: .transforms.python-image .defaults.publish-image
 
-.PHONY: .transforms.ray-publish
-.transforms.ray-publish:: .transforms.ray-image .defaults.publish-image
+.PHONY: .transforms.publish-image-ray
+.transforms.publish-image-ray:: .transforms.ray-image .defaults.publish-image
 
-.PHONY: .transforms.spark-publish
-.transforms.spark-publish:: .transforms.spark-image .defaults.publish-image
+.PHONY: .transforms.publish-image-spark
+.transforms.publish-image-spark:: .transforms.spark-image .defaults.publish-image
 
 .PHONY: .transforms-check-exists
 .transforms-check-exists:
@@ -320,4 +320,11 @@ minio-stop:
 	    exit 1;						\
 	fi	
 
-
+# Update the toml file to version from .make.version which is expected to be set into DOCKER_IMAGE_VERSION
+# Note that the image and distribution versions will be the same.
+.transforms.set-versions: 
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	cat pyproject.toml | sed 	\
+	    -e 's/dpk-$(TRANSFORM_NAME)-transform-python\(..\).*/dpk-$(TRANSFORM_NAME)-transform-python\1$(DOCKER_IMAGE_VERSION)",/'	\
+	    > tt.toml
+	mv tt.toml pyproject.toml

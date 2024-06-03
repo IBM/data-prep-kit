@@ -15,8 +15,6 @@ include $(REPOROOT)/transforms/.make.transforms
 
 venv::	.transforms.python-venv
 
-build::	.transforms.python-build
-
 test::	.transforms.python-test
 
 clean:: .transforms.clean
@@ -27,9 +25,23 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-test-image:: .transforms.python-test-image
+build:: build-dist image
 
-publish:: .transforms.python-publish
+publish:: publish-dist publish-image
+
+publish-image:: .transforms.publish-image-python
+
+setup:: .transforms.setup
+
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
+test-image:: .transforms.python-test-image
 
 run-cli-sample: .transforms.run-cli-python-sample
 

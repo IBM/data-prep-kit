@@ -12,8 +12,6 @@ DOCKER_IMAGE_VERSION=${FDEDUP_VERSION}
 
 venv::	.transforms.ray-venv
 
-build::	.transforms.ray-build
-
 test::	.transforms.ray-test
 
 clean:: .transforms.clean
@@ -24,10 +22,22 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
+build:: build-dist image
+
+publish:: publish-dist publish-image
+
+publish-image:: .transforms.publish-image-ray
+
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
 test-image:: image .transforms.test-image-help
 	@echo WARNING: Skipping pytest test until we have a test/test_fdedup.py file.
-
-publish:: .transforms.ray-publish
 
 run-cli-sample: 
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \

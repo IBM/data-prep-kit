@@ -12,8 +12,6 @@ DOCKER_IMAGE_VERSION=${NOOP_VERSION}
 
 venv::	.transforms.ray-venv
 
-build::	.transforms.ray-build
-
 test::	.transforms.ray-test
 
 clean:: .transforms.clean
@@ -26,7 +24,19 @@ setup:: .transforms.setup
 
 test-image:: .transforms.ray-test-image
 
-publish:: .transforms.ray-publish
+build:: build-dist image
+
+publish:: publish-dist publish-image
+
+publish-image:: .transforms.publish-image-ray
+
+setup:: .transforms.setup
+
+set-versions: .transforms.set-versions 
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
 
 run-cli-sample: .transforms.run-cli-ray-sample
 
