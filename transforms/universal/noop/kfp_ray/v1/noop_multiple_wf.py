@@ -26,7 +26,7 @@ task_image = "quay.io/dataprep1/data-prep-kit/noop-ray:0.9.0"
 EXEC_SCRIPT_NAME: str = "noop_transform_ray.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../../kfp/kfp_ray_components/"
