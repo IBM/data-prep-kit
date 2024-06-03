@@ -13,27 +13,19 @@ clean::
 .check-env::
 	@echo "Checks passed"
 
-update-toml:: .check-env
-	@# Help: Copy the Makefile distribution version into the pyproject.toml 
-	sed -e 's/^version[ ]*=.*/version = "'${DPK_LIB_VERSION}'"/' pyproject.toml > tt.toml
-	mv tt.toml pyproject.toml
-
 setup::
 
-build:: update-toml venv
-	@# Help: Build the distribution for publishing to a pypi 
-	rm -r dist || true
-	rm -rf src/*egg-info || true
-	${PIP} install --upgrade build
-	${PYTHON} -m build
+set-versions:: .check-env
+	$(MAKE) TOML_VERSION=$(DPK_LIB_VERSION) .defaults.update-toml
 
-publish:: .check-env update-toml
-	@# Help: Publish project to pypi
-	${PYTHON} -m twine check dist/*
-	${PYTHON} -m twine upload --verbose --non-interactive dist/*
-	#@echo "create a git tag to reference published version"
-	#@git tag ${TAG}
-	#@git push origin ${TAG}
+build:: build-dist 
+
+#build:: update-toml .defaults.build-dist 
+build-dist :: set-versions .defaults.build-dist 
+
+publish:: publish-dist 
+
+publish-dist :: .check-env .defaults.publish-dist 
 
 venv::	pyproject.toml
 	@# Help: Create the virtual environment using pyproject.toml 

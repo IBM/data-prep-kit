@@ -175,6 +175,7 @@ __check_defined = \
 	# Left over python stuff
 	-find . -name '*.egg-info' | xargs rm -rf
 	-find . -name '__pycache__' | xargs rm -rf
+	-rm -rf dist
 
 # We create both local and remote tags.  Local seems to be needed when using our spark
 # base image.  Remote seems to be needed by kfp.
@@ -455,3 +456,60 @@ MINIO_ADMIN_PWD= localminiosecretkey
 	-mc mb  local/test > /dev/null 2>&1	# Igore if it already exists
 	mc cp --recursive $(MINIO_SRC) local/test/$(MINIO_DEST)
 
+
+# Changes the version field of the pyproject.toml file to the given version
+# and update the referenced library versions as defined in .make.versions.
+# Expects TOML_VERSION
+.PHONY: .defaults.update-toml
+.defaults.update-toml:
+	$(MAKE) TOML_VERSION=$(TOML_VERSION) .defaults.set-toml-version
+	$(MAKE) .defaults.update-toml-lib-dep-versions
+
+# Changes the version field of the pyproject.toml file to the given version
+# Expects TOML_VERSION
+.PHONY: .defaults.set-toml-version
+.defaults.set-toml-version:
+	@# Help: Set the version= field of pyproject.toml 
+	cat pyproject.toml | sed -e \
+		's/^version[ ]*=.*/version = "'${TOML_VERSION}'"/' \
+		> tt.toml
+	mv tt.toml pyproject.toml
+
+# Updates the versions references to our repo source as defined in .make.versions
+.PHONY: .defaults.update-toml-lib-dep-versions
+.defaults.update-toml-lib-dep-versions:
+	@# Help: Update pyproject.toml to depend on lib versions defined in .make.versions 
+	cat pyproject.toml | sed 									\
+		-e 's/"data-prep-toolkit=.*",/"data-prep-toolkit==$(DPK_LIB_VERSION)",/' 		\
+		-e 's/"data-prep-toolkit-ray=.*",/"data-prep-toolkit-ray==$(DPK_LIB_VERSION)",/' 	\
+		-e 's/"data-prep-toolkit-spark=.*",/"data-prep-toolkit-spark==$(DPK_LIB_VERSION)",/' 	\
+		-e 's/"data-prep-toolkit-kfp=.*",/"data-prep-toolkit-spark==$(DPK_LIB_KFP_VERSION)",/' 	\
+		> tt.toml
+	mv tt.toml pyproject.toml
+
+# Build the distribution, usually in preparation for publishing using ith the .defaults.publish-dist  target
+.PHONY: .defaults.build-dist 
+.defaults.build-dist :
+	@# Help: Build the distribution for publishing to pypi 
+	@if [ ! -e pyproject.toml ]; then						\
+		echo ERROR: Building a distribution requires a local pyproject.toml file;	\
+		exit 1;							\
+	fi
+	rm -rf dist || true
+	rm -rf src/*egg-info || true
+	${PIP} install --upgrade build
+	${PYTHON} -m build
+
+# Publish the distribution in the dist directory, usually created with .defaults.build-dist  target
+.PHONY: .defaults.publish-dist 
+.defaults.publish-dist :
+	@# Help: Publish existing project distribution to pypi
+	@if [ ! -e dist ]; then						\
+		echo ERROR: Publishing a distribution requires a local dist directory.  Did you build?;	\
+		exit 1;							\
+	fi
+	${PYTHON} -m twine check dist/*
+	${PYTHON} -m twine upload --verbose --non-interactive dist/*
+	#@echo "create a git tag to reference published version"
+	#@git tag ${TAG}
+	#@git push origin ${TAG}

@@ -3,15 +3,20 @@ REPOROOT=../
 include ../.make.defaults
 
 clean::
-	@# Help: clean, Recursively clean all subdirs 
-	$(MAKE) RULE=clean .recurse
+	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
 setup::
 
 build::
-	@# Help: build, Recursively build all subdirs 
-	$(MAKE) RULE=build .recurse
+	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
+
 test:: 
-	@# Help: test, Recursively build test in all subdirs 
-	@$(MAKE) RULE=test .recurse
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
+publish:: 
+	@# Help: Recursively make $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 

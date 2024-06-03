@@ -43,6 +43,10 @@ test::
 	@# Help: Recursively $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
+publish::  
+	@# Help: Recursively $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
 lib-release:
 	@# Help: Publish data-prep-kit $(DPK_LIB_VERSION) and data-prep-kit-kfp $(DPK_LIB_KFP_VERSION) libraries to pypi 
 	@$(MAKE) -C $(DPK_PYTHON_LIB_DIR) build publish
