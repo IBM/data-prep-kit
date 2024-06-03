@@ -14,7 +14,7 @@ import os
 import sys
 
 kfp_v2 = os.getenv("KFP_v2", 0)
-if kfp_v2 == 1:
+if kfp_v2 == "1":
     from workflow_support.runtime_utils import KFPUtils, RayRemoteJobs
     print(f"Load KFPv2 libs")
 else:

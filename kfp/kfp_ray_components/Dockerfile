@@ -2,6 +2,7 @@ FROM docker.io/rayproject/ray:2.9.3-py310
 
 ARG BUILD_DATE
 ARG GIT_COMMIT
+ARG KFP_v2
 
 LABEL build-date=$BUILD_DATE
 LABEL git-commit=$GIT_COMMIT
@@ -22,7 +23,7 @@ RUN cd python_apiserver_client && pip install --no-cache-dir -e .
 
 COPY --chown=ray:users workflow_support_lib workflow_support_lib/
 RUN cd workflow_support_lib && pip install --no-cache-dir -e .
-
+ENV KFP_v2=$KFP_v2
 # remove credentials-containing file
 RUN rm requirements.txt
 # components

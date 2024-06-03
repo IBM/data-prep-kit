@@ -13,6 +13,7 @@ authors = [
 ]
 dependencies = [
     "kfp==2.7.0",
+    "kfp-kubernetes==1.2.0",
     "ray==2.9.3",
     "requests",
     "data-prep-toolkit==0.2.0",
