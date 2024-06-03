@@ -49,6 +49,8 @@ venv::	pyproject.toml .check-env
 	rm -rf venv
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
+	pip install -e ../python_apiserver_client;	\
+	pip install -e ../../../data-processing-lib/python; \
 	pip install -e .;		\
 	pip install ray==${RAY} \
 	pip install pytest pytest-cov

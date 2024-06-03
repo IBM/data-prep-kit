@@ -14,7 +14,7 @@ import os
 
 kfp_v2 = os.getenv("KFP_v2", 0)
 if kfp_v2 == 1:
-    from workflow_support.utils import KFPUtils, execute_ray_jobs
+    from workflow_support.runtime_utils import KFPUtils, execute_ray_jobs
     print(f"Load KFPv2 libs")
 else:
     from workflow_support.utils import KFPUtils, execute_ray_jobs

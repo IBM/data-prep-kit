@@ -12,9 +12,11 @@ authors = [
     { name = "Revital Eres", email = "eres@il.ibm.com" },
 ]
 dependencies = [
-    "kfp==2.2.0",
+    "kfp==2.7.0",
+    "ray==2.9.3",
     "requests",
-    "data-prep-toolkit==0.1.1",
+    "data-prep-toolkit==0.2.0",
+    "python_apiserver_client",
 ]
 
 [build-system]
@@ -36,7 +38,7 @@ dev = [
 package_dir = ["src"]
 
 [options.packages.find]
-where = ["src/kfp_support"]
+where = ["src/workflow_support"]
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report term-missing --cov-fail-under 10"
