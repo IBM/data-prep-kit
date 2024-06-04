@@ -13,12 +13,11 @@
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from workflow_support.utils import (
-     ONE_HOUR_SEC,
-     ONE_WEEK_SEC,
-     ComponentUtils,
+from workflow_support.compile_utils import (
+    ONE_HOUR_SEC,
+    ONE_WEEK_SEC,
+    ComponentUtils,
 )
-
 
 task_image = "quay.io/dataprep1/data-prep-kit/noop:0.9.0"
 
