@@ -43,50 +43,105 @@ As such they each have their own virtual environments for development.
 
 ## Transform Project Conventions
 
-The transform projects all try to use a common set of conventions include code layout,
+The transform projects all try to use a common set of conventions including code layout,
 build, documentation and IDE recommendations.  For a transformed named `xyz`, it is
-expected to have its project located under on of
-`transforms/code/xyz`
-`transforms/language/xyz`, OR
-`transforms/universal/xyz`
+expected to have its project located under one of
 
-### Project Organization
+`transforms/code/xyz`   
+`transforms/language/xyz`, OR   
+`transforms/universal/xyz`.
+
+### Makefile
+The Makefile is the primary entry point for performing most functions
+for the build and management of a transform.
+This includes cleanup,
+testing, creating the virtual environment, building
+a docker image and more.
+Use `make help` in any directory with a Makefile to see the available targets.
+Each Makefile generally requires 
+the following macro definitions:
+
+* REPOROOT - specifies a relative path to the local directory
+that is the root of the repository.
+* TRANSFORM_NAME - specifies the simple name of the transform
+that will be used in creating pypi artifacts and docker images.
+* DOCKER_IMAGE_VERSION - sets the version of the docker image
+and is usually set from one of the macros in `.make.versions` at the top
+of the repository
+
+These are used with the project conventions outlined below to 
+build and manage the transform.
+
+### Runtime Organization
+
+Transforms support one or more _runtimes_ (e.,g python, Ray, Spark, KFP, etc).
+Each runtime implementation is placed in a sub-directory under the transform's
+primary directory, for example:
+
+`transforms/universal/xyz/python`  
+`transforms/universal/xyz/ray`  
+`transforms/universal/xyz/spark`  
+`transforms/universal/xyz/kfp`
+
+A transform only need implement the python runtime, and the others generally build on this.
+
+All runtime projects are structured as a _standard_ python project with the following:
+
+* `src` - directory contains all implementation code
+* `test` - directory contains test code
+* `test-data` - directory containing data used in the tests
+* `pyproject.toml` or `requirements.txt` (the latter is being phased out)
+* `Makefile`- runs most operations, try `make help` to see a list of targets.
+* `Dockerfile` to build the transform and runtime into a docker image 
+* `output` - temporary directory capturing any test/local run output.  Ignored by .gitignore.
+
+
+A virtual environment is created for the runtime project using `make venv`.
+
+In general, all runtime-specific python files use an `_<runtime>.py>` suffix,
+and docker images use a `-<runtime>` suffix in their names.  For example,
+
+* `noop_transform_python.py`
+* `test_noop_spark.py`
+* `dpk-noop-transform-ray`
+
+Finally, the command `make conventions` run from within a runtime
+directory will examine the runtime project structure and make recommendations.
+
+#### Python Runtime
+The python runtime project contains the core transform implementation and
+its configuration, along with the python-runtime classes to launch the transform.
+The following organization and  naming conventions are strongly recommended
+and in some cases required for the Makefile to do its work.
+
 1. `src` directory contain python source for the transform with the following naming conventions/requirements.
-    * `xyz_transform.py` generally contains the following:
-        * `XYZTransform` class
-        * `XYXTransformConfiguration` class
-        * `XYZTransformRuntime` class, if needed.
-        * main() to start the `TransformLauncher` with the above.
-    * `xyz_local.py` - runs the transform on input to produce output w/o ray
-    * `xyz_local_ray.py` - runs the transform in ray on data in `test-data/input` directory using the `TransformLauncher`
+    * `xyz_transform.py` generally contains the core transform implementation:
+        * `XYZTransform` class implementing the transformation
+        * `XYXTransformConfiguration` class that defines CLI configuration for the transform 
+   * `xyz_transform_python.py` - runs the transform on input using the python runtime 
+        * `XYZPythonTransformConfiguration` class
+        * main() to start the `PythonTransformLauncher` with the above.
 1. `test` directory contains pytest test sources
     * `test_xyz.py` - a standalone (non-ray launched) transform test.  This is best for initial debugging.
         * Inherits from an abstract test class so that to test one needs only to provide test data.
-    * `test_xyz_launch.py` - runs ray via launcher.
+    * `test_xyz_python.py` - runs the transform via the Python launcher. 
         * Again, inherits from an abstract test class so that to test one needs only to provide test data.
-
-   These are expected to be run from anywhere and so need to use
-   `__file__` location to create absolute directory paths to the data in the `../test-data` directory.
+         
+   Tests are expected to be run from anywhere and so need to use
+   `__file__` location to create absolute directory paths to the data in the `../test-data` directory.  
    From the command line, `make test` sets up the virtual environment and PYTHONPATH to include `src`
    From the IDE, you **must** add the `src` directory to the project's Sources Root (see below).
    Do **not** add `sys.path.append(...)` in the test python code.
    All test data should be referenced as `../test-data`.
-2. `test-data` contains any data file used by your tests.  Please don't put files over 5 MB here unless you really need to.
-3. `requirements.txt` - used to create both the `venv` directory and docker image
-4. A virtual environment (created in `venv` directory using `make venv`) is used for development and testing.
-5. A generic `Dockerfile` is available that should be sufficient for most transforms.
-6. `Makefile` is used for most common operations.
-    * Should define `TRANSFORM_NAME=xyz` (see 1 above) - allows automation to reference correct files defined above.
-    * Generally, defines the following targets for easy of operation.
-        * help - shows all targets and help text
-        * venv - builds the python virtual environment for CLI and IDE use
-        * image - creates the docker image
-        * test-src - sets up the virtual environment and runs test in the test directory.
-        * test-image - runs the tests from within the image.
-        * test - runs both test-src and test-image tests.
 
-   The `Makefile` also defines a number of macros/variables that can be set, including the version of the docker image,
-   python executable and more.
+#### Ray/Spark Runtimes
+These projects are structured in a similar way and replace the python 
+runtime source and test files with the following:
+
+`src/xyz_transform_[ray|spark].py` 
+    * `[Ray|Spark]TransformRuntimeConfiguration` - runtime configuration class
+    * contains a main() that launches the runtime
+`test/test_xyz_[ray|spark].py` - tests the transform running in the given runtime.
 
 ### Configuration and command line options
 A transform generally accepts a dictionary of configuration to
@@ -107,7 +162,9 @@ The transform versions are managed in a central file named [`.make.versions`](..
 This file is where the versions are automatically propagated to the Makefile rules when building and pushing the transform images.
 When a new transform version is created, the tag of the transform should be updated in this file.
 If there is no entry for the transform in the file yet, create a new one and add a reference to it in the transform Makefile,
- following the format used for other transforms. More specifically, the entry should be of the following format: `<transform image name>_VERSION=<version>`, for example: `FDEDUP_VERSION=0.2.77`
+ following the format used for other transforms.
+ore specifically, the entry should be of the following format: `<transform image name>_<RUNTIME>_VERSION=<version>`, 
+for example: `FDEDUP_RAY_VERSION=0.2.77`
 
 ### Building the docker image
 Generally to build a docker image, one uses the `make image` command, which uses
