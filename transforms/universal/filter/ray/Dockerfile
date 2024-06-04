@@ -14,7 +14,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY ./src/filter_transform.py .
+COPY ./src/filter_transform_ray.py .
 COPY src/filter_local_ray.py local/
 
 # copy test

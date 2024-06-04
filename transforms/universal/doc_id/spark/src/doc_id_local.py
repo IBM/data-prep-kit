@@ -15,7 +15,7 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
-from doc_id_transform import (
+from doc_id_transform_spark import (
     DocIDSparkRuntimeConfiguration,
     doc_id_column_name_cli_param,
 )

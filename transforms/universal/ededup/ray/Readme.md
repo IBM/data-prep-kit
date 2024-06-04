@@ -33,13 +33,13 @@ and pass it as a parameter to transforms.
 
 ## Transform runtime
 
-[Transform runtime](src/ededup_transform.py) is responsible for creation hash actors and sending their 
+[Transform runtime](src/ededup_transform_ray.py) is responsible for creation hash actors and sending their 
 handles to the transforms themselves
 Additionally it enhances statistics information with the information about hashes cache size and utilization
 
 ## Configuration and command line Options
 
-The set of dictionary keys holding [EdedupTransform](src/ededup_transform.py)
+The set of dictionary keys holding [EdedupTransform](src/ededup_transform_ray.py)
 configuration for values are as follows:
 
 * _hash_cpu_ - specifies an amount of CPUs per hash actor
@@ -69,9 +69,9 @@ These correspond to the configuration keys described above.
 ### Running the samples
 To run the samples, use the following `make` targets
 
-* `run-cli-ray-sample` - runs src/ededup_transform.py using command line args
-* `run-local-ray-sample` - runs src/ededup_local_ray.py
-* `run-s3-ray-sample` - runs src/ededup_s3_ray.py
+* `run-cli-sample` - runs src/ededup_transform_ray.py using command line args
+* `run-local-sample` - runs src/ededup_local_ray.py
+* `run-s3-sample` - runs src/ededup_s3_ray.py
     * Requires prior invocation of `make minio-start` to load data into local minio for S3 access.
 
 These targets will activate the virtual environment and set up any configuration needed.
@@ -79,7 +79,7 @@ Use the `-n` option of `make` to see the detail of what is done to run the sampl
 
 For example, 
 ```shell
-make run-cli-ray-sample
+make run-cli-sample
 ...
 ```
 Then 

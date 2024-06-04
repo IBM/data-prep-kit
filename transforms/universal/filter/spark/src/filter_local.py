@@ -15,7 +15,7 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
-from filter_transform import (
+from filter_transform_spark import (
     FilterSparkRuntimeConfiguration,
     filter_columns_to_drop_cli_param,
     filter_criteria_cli_param,

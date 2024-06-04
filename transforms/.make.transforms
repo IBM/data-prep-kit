@@ -5,14 +5,14 @@
 # REPOROOT points to the top of the git repository. 
 # 	For example REPOROOT=../../..
 # TRANSFORM_NAME defines the name of the transform and is used to derive
-#  	DOCKER_IMAGE_NAME  and TRANSFORM_SRC_FILE if not already defined.
+#  	DOCKER_IMAGE_NAME  and TRANSFORM_RUNTIME_SRC_FILE if not already defined.
 
 # Optional inputs (that have defaults)
-# TRANSFORM_SRC_FILE is the base name of the python source file containing the main()
+# TRANSFORM_RUNTIME_SRC_FILE is the base name of the python source file containing the main()
 #	that is used to launch the transform in Ray.  
 #       By convention this name defaults to $(TRANSFORM_NAME)_transform.py.
 #	This file is then assumed to be in the home dir of the docker image and
-#	can be run with "python $(TRANSFORM_SRC_FILE) --help"
+#	can be run with "python $(TRANSFORM_RUNTIME_SRC_FILE) --help"
 # DOCKER_IMAGE_NAME  is the name of the docker image.  
 #	By default its value is $(TRANSFORM_NAME).
 #
@@ -28,15 +28,11 @@
 #######################################################################################
 include $(REPOROOT)/.make.defaults
 
-ifeq ($(origin TRANSFORM_RUNTIME), undefined)
-#$(error TRANSFORM_RUNTIME must be defined before including this file)
-DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)
-else
+TRANSFORM_RUNTIME?=$(shell basename $$(pwd))
 DOCKER_IMAGE_NAME?=$(TRANSFORM_NAME)-$(TRANSFORM_RUNTIME)
-endif
 # By convention the name of the python file is as follows and contains a main to start the ray-based transform
 # This file is used when starting the transformers in the Docker image.
-TRANSFORM_SRC_FILE?=$(TRANSFORM_NAME)_transform.py
+TRANSFORM_RUNTIME_SRC_FILE?=$(TRANSFORM_NAME)_transform_$(TRANSFORM_RUNTIME).py
 TRANSFORM_TEST_FILE?=test/test_$(TRANSFORM_NAME).py
 
 # The following taken from https://stackoverflow.com/a/65243296/45375
@@ -55,7 +51,7 @@ extra-help:
 	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
 	@echo DOCKER_REGISTRY_KEY - the docker user to use.  DOCKER_REGISTRY_KEY=secret
 	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
-	@echo "TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_local_ray.py)"
+	@echo "TRANSFORM_RUNTIME_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_local_ray.py)"
 	@echo ""
 
 
@@ -67,6 +63,9 @@ extra-help:
 
 .PHONY: .transforms.check_required_macros
 .transforms.check_required_macros::
+	@if [ -z "$(TRANSFORM_RUNTIME)" ]; then	\
+	    echo ERROR: TRANSFORM_RUNTIME must be defined.;	\
+	fi			
 	@if [ -z "$(TRANSFORM_NAME)" ]; then	\
 	    echo ERROR: TRANSFORM_NAME must be defined.;	\
 	fi			
@@ -86,7 +85,8 @@ extra-help:
 .PHONY: .transforms.clean
 .transforms.clean:: .defaults.clean
 	$(MAKE) minio-stop  
-	-rm -rf output > /dev/null 2>&1
+	-rm -rf output > /dev/null 2>&1			# Created when running local samples
+	-rm -rf python-transform > /dev/null 2>&1	# Created when build ray and spark image 
 	@# Help: Normal cleanups plus stop minio server and rm output dir
 
 
@@ -95,9 +95,18 @@ extra-help:
 # We install wheel, because it seems to be required for fasttext install on redhat.
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
+.PHONY: .transforms.python-venv
+.transforms.python-venv:: .defaults.python-lib-src-venv
+
 .PHONY: .transforms.ray-venv
 .transforms.ray-venv:: .defaults.ray-lib-src-venv
+	if [ -d ../python ]; then						\
+	    $(MAKE) PYTHON_PROJECT_DIR=../python .defaults.install-src-venv;	\
+	fi
 
+# For now we do NOT install ../python source as we do for ray, since for now
+# spark implementations do not use the pure python transform.  If/when
+# that changes, we can start installing ../python source as is done for ray.
 .PHONY: .transforms.spark-venv
 .transforms.spark-venv:: .defaults.spark-lib-src-venv
 
@@ -105,14 +114,18 @@ extra-help:
 .transforms.check_env::
 	@true
 
-# Create the docker image making sure the preloaded models are available to copy into the image
-# We copy the library/framework source here so it can be installed into the docker image and
-# pip installed inside the Dockerfile
+.PHONY: .transforms.python-image
+.transforms.python-image:: .defaults.python-lib-src-image
+
 .PHONY: .transforms.ray-image
 .transforms.ray-image:: .defaults.ray-lib-src-image
 
 .PHONY: .transforms.spark-image
 .transforms.spark-image:: .defaults.spark-lib-src-image
+
+.PHONY: .transforms.python-build
+.transforms.python-build:: .transforms.python-venv .transforms.python-image	
+	@# Help: Create the venv and build the transform image 
 
 .PHONY: .transforms.ray-build
 .transforms.ray-build:: .transforms.ray-venv .transforms.ray-image	
@@ -121,6 +134,10 @@ extra-help:
 .PHONY: .transforms.spark-build
 .transforms.spark-build:: .transforms.spark-venv .transforms.spark-image	
 	@# Help: Create the venv and build the transform image 
+
+.PHONY: .transforms.python-test 
+.transforms.python-test::  .transforms.test-src .transforms.python-test-image
+	@# Help: Run both source and image level tests.
 
 .PHONY: .transforms.ray-test 
 .transforms.ray-test::  .transforms.test-src .transforms.ray-test-image
@@ -135,6 +152,9 @@ extra-help:
 .transforms.test-src::  .defaults.test-src .transforms.test-locals
 	@# Help: Run the transform's tests and any '*local' .py files
 
+.PHONY: .transforms.python-test-image
+.transforms.python-test-image:: .transforms.python-image .defaults.test-image-pytest 
+
 .PHONY: .transforms.ray-test-image
 .transforms.ray-test-image:: .transforms.ray-image .defaults.test-image-pytest 
 
@@ -147,7 +167,7 @@ extra-help:
 .PHONY: .transforms.test-image-help
 .transforms.test-image-help::
 	@# Help: Test an already-built image (use make image) to be sure the --help option works
-	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) python $(TRANSFORM_SRC_FILE) --help
+	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) python $(TRANSFORM_RUNTIME_SRC_FILE) --help
 
 .PHONY: test-locals
 test-locals:: .transforms.test-locals
@@ -156,11 +176,14 @@ test-locals:: .transforms.test-locals
 .transforms.test-locals:: .defaults.test-locals
 
 # Build the image the transform way and then use the default publishing
-.PHONY: .transforms.ray-publish
-.transforms.ray-publish:: .transforms.ray-image .defaults.publish 
+.PHONY: .transforms.publish-image-python
+.transforms.publish-image-python:: .transforms.python-image .defaults.publish-image
 
-.PHONY: .transforms.spark-publish
-.transforms.spark-publish:: .transforms.spark-image .defaults.publish 
+.PHONY: .transforms.publish-image-ray
+.transforms.publish-image-ray:: .transforms.ray-image .defaults.publish-image
+
+.PHONY: .transforms.publish-image-spark
+.transforms.publish-image-spark:: .transforms.spark-image .defaults.publish-image
 
 .PHONY: .transforms-check-exists
 .transforms-check-exists:
@@ -192,18 +215,23 @@ test-locals:: .transforms.test-locals
 
 .PHONY: .transforms.load-image
 .transforms.load-image:
-	@# Help:  Load the transform image to the kind cluster created with make setup.
+	@# Help: Load the transform image to the kind cluster created with make setup.
 	kind load docker-image $(DOCKER_REMOTE_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
 .PHONY: conventions
-conventions:
+conventions: .transforms.check_required_macros
 	@# Help: Check transform project conventions and make recommendations, if needed.
-	@echo "Begin checking transform project conventions.  Recommendations/issues, if any, follow..."
+	@echo "Begin checking transform conventions for $(TRANSFORM_RUNTIME) runtime project.  Recommendations/issues, if any, follow..."
+	@if [ "$(TRANSFORM_RUNTIME)" = "python" ]; then	\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_transform.py .transforms-check-exists;		\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists;	\
+		$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py .transforms-check-exists;	\
+	else	\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME).py .transforms-check-not-exists;		\
+	fi
+	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_$(TRANSFORM_RUNTIME).py .transforms-check-exists
+	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_$(TRANSFORM_RUNTIME).py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  .transforms-check-not-exists
-	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists
-	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_ray.py .transforms-check-exists
-	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py .transforms-check-exists
-	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_ray.py .transforms-check-exists
 	@$(MAKE) CHECK_DIR=. CHECK_FILE_NAME=.dockerignore  .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test-data .transforms-check-dir-size
 	@$(MAKE) CHECK_TARGET=build .transforms-check-target
@@ -220,6 +248,11 @@ conventions:
 		echo "Recommend not using 'annotator' in your transform name";	\
 	fi
 	@echo Done checking transform project conventions.
+
+.PHONY: .transforms.run-local-python-sample
+.transforms.run-local-python-sample:
+	@# Help: Run the $(TRANSFORM_NAME)_local_python.py file (if it exists).
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_local_python.py .transforms.run-src-file
 
 .PHONY: .transforms.run-local-ray-sample
 .transforms.run-local-ray-sample:
@@ -240,14 +273,19 @@ conventions:
 .transforms.run-local-sample:
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_local.py .transforms.run-src-file
 
+.PHONY: .transforms.run-cli-python-sample 
+.transforms.run-cli-python-sample:
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_python.py \
+		RUN_ARGS=" --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" " .transforms.run-src-file
+
 .PHONY: .transforms.run-cli-ray-sample 
 .transforms.run-cli-ray-sample:
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
 		RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" " .transforms.run-src-file
 
 .PHONY: .transforms.run-cli-spark-sample 
 .transforms.run-cli-spark-sample:
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_spark.py \
 		RUN_ARGS="--data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\" --spark_local_config_filepath ../config/spark_profile_local.yml " .transforms.run-src-file
 
 # Expects RUN_FILE
@@ -282,4 +320,12 @@ minio-stop:
 	    exit 1;						\
 	fi	
 
-
+# Update the toml file to version from .make.version which is expected to be set into DOCKER_IMAGE_VERSION
+# Note that the image and distribution versions will be the same.
+# Requires version number of Python image as TRANSFORM_PYTHON_VERSION to be set when called
+.transforms.set-versions: 
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	cat pyproject.toml | sed 	\
+	    -e 's/dpk-$(TRANSFORM_NAME)-transform-python\([=<>][=<>]\).*/dpk-$(TRANSFORM_NAME)-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
+	    > tt.toml
+	mv tt.toml pyproject.toml

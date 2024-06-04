@@ -16,7 +16,7 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from tokenization_transform import TokenizationRayConfiguration
+from tokenization_transform_ray import TokenizationRayConfiguration
 
 
 tkn_params = {

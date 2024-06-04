@@ -14,7 +14,7 @@ import os
 import sys
 from pathlib import Path
 
-from code_quality_transform import CodeQualityTransformConfiguration
+from code_quality_transform_ray import CodeQualityTransformConfiguration
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 

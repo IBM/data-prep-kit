@@ -12,28 +12,24 @@
 
 import os
 
-from code_quality_transform import CodeQualityRayTransformConfiguration
+from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from data_processing_ray.runtime.ray import RayTransformLauncher
+from noop_transform import sleep_cli_param
+from noop_transform_python import NOOPPythonTransformConfiguration
 
 
-class TestCodeQualityTransform(AbstractTransformLauncherTest):
+class TestPythonNOOPTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        cli = {
-            "run_locally": True,
-            "cq_contents_column_name": "contents",
-            "cq_language_column_name": "language",
-            "cq_tokenizer": "codeparrot/codeparrot",
-        }
         basedir = "../test-data"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
-        launcher = RayTransformLauncher(CodeQualityRayTransformConfiguration())
-        fixtures = [(launcher, cli, basedir + "/input", basedir + "/expected")]
+        fixtures = []
+        launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
+        fixtures.append((launcher, {sleep_cli_param: 0}, basedir + "/input", basedir + "/expected"))
         return fixtures

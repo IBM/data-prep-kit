@@ -15,7 +15,7 @@ import sys
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
-from doc_id_transform import DocIDTransformConfiguration
+from doc_id_transform_ray import DocIDTransformConfiguration
 
 
 # create parameters

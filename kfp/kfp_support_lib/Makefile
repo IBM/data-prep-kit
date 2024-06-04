@@ -24,27 +24,18 @@ clean::
 .check-env:: .check_python_version
 	@echo "Checks passed"
 
-update-toml:: .check-env
-	@# Help: Copy the Makefile distribution version into the pyproject.toml
-	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_VERSION}'"/' pyproject.toml
-	sed -i.back 's/data-prep-toolkit==[0-9].*/data-prep-toolkit==${DPK_LIB_VERSION}",/' pyproject.toml
+set-versions:: .check-env
+	$(MAKE) TOML_VERSION=$(DPK_LIB_KFP_VERSION) .defaults.update-toml
 	sed -i.back 's/kfp==[0-9].*/kfp==${KFP}",/' pyproject.toml
 	sed -i.back 's/ray==[0-9].*/ray==${RAY}",/' pyproject.toml
 
-build:: update-toml venv
-	@# Help: Build the distribution for publishing to a pypi 
-	rm -r dist || true
-	rm -rf src/*egg-info || true
-	${PYTHON} -m pip install --upgrade build
-	${PYTHON} -m build
+build-dist:: set-versions .defaults.build-dist
 
-publish:: .check-env
-publish::
-	@# Help: Publish the wheel to testpypi
-	if [ -d "dist"]; then rm -r dist; fi
-	${PYTHON} -m pip install --upgrade build
-	${PYTHON} -m twine check dist/*
-	${PYTHON} -m twine upload --verbose --non-interactive dist/*
+publish:: publish-dist
+
+publish-dist:: .check-env .defaults.publish-dist
+
+build:: build-dist 
 
 venv::	pyproject.toml .check-env .defaults.venv
 	$(MAKE) .defaults.install-python-lib-src-venv

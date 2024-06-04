@@ -14,7 +14,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY ./src/tokenization_transform.py .
+COPY ./src/tokenization_transform_ray.py .
 COPY ./src/tokenization_utils.py .
 COPY src/tokenization_local_ray.py local/
 

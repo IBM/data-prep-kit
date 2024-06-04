@@ -5,17 +5,12 @@ REPOROOT=../../../..
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
 
-# This is included in the image name, if defined
-TRANSFORM_RUNTIME=spark
-
 include $(REPOROOT)/transforms/.make.transforms
+
 TRANSFORM_NAME=noop
-# $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${NOOP_SPARK_VERSION}
 
 venv::	.transforms.spark-venv
-
-build::	.transforms.spark-build
 
 test::	.transforms.spark-test
 
@@ -27,9 +22,21 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-test-image:: .transforms.spark-test-image
+build:: build-dist image
 
-publish:: .transforms.spark-publish
+publish:: publish-dist publish-image
+
+publish-image:: .transforms.publish-image-spark
+
+# set the version of python transform that this depends on.
+set-versions: 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(NOOP_PYTHON_VERSION) .transforms.set-versions 
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
+test-image:: .transforms.spark-test-image
 
 run-cli-sample: .transforms.run-cli-spark-sample
 

@@ -18,7 +18,7 @@ from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLau
 from data_processing_spark.test_support.launch.abstract_launcher_test import (
     AbstractSparkTransformLauncherTest,
 )
-from filter_transform import (
+from filter_transform_spark import (
     FilterTransformConfiguration,
     filter_columns_to_drop_cli_param,
     filter_criteria_cli_param,
@@ -72,53 +72,53 @@ class TestSparkFilterTransform(AbstractSparkTransformLauncherTest):
                 os.path.join(basedir, "expected", "test-or"),
             )
         )
-
-        fixtures.append(
-            (
-                SparkTransformLauncher(FilterTransformConfiguration()),
-                {
-                    filter_criteria_cli_param: [],
-                    filter_logical_operator_cli_param: filter_logical_operator_default,
-                    filter_columns_to_drop_cli_param: [],
-                    local_config_path_cli: config_file_path,
-                },
-                os.path.join(basedir, "input"),
-                os.path.join(basedir, "expected", "test-default"),
-            )
-        )
-
-        fixtures.append(
-            (
-                SparkTransformLauncher(FilterTransformConfiguration()),
-                {
-                    filter_criteria_cli_param: [
-                        "date_acquired BETWEEN '2023-07-04' AND '2023-07-08'",
-                        "title LIKE 'https://%'",
-                    ],
-                    filter_logical_operator_cli_param: filter_logical_operator_default,
-                    filter_columns_to_drop_cli_param: [],
-                    local_config_path_cli: config_file_path,
-                },
-                os.path.join(basedir, "input"),
-                os.path.join(basedir, "expected", "test-datetime-like"),
-            )
-        )
-
-        fixtures.append(
-            (
-                SparkTransformLauncher(FilterTransformConfiguration()),
-                {
-                    filter_criteria_cli_param: [
-                        "document IN ('CC-MAIN-20190221132217-20190221154217-00305.warc.gz', 'CC-MAIN-20200528232803-20200529022803-00154.warc.gz', 'CC-MAIN-20190617103006-20190617125006-00025.warc.gz')",
-                    ],
-                    filter_logical_operator_cli_param: filter_logical_operator_default,
-                    filter_columns_to_drop_cli_param: [],
-                    local_config_path_cli: config_file_path,
-                },
-                os.path.join(basedir, "input"),
-                os.path.join(basedir, "expected", "test-in"),
-            )
-        )
+        # These test are also done in the python-only tests, so no real need to duplicate here.  They slow down ci/cd builds.
+        # fixtures.append(
+        #     (
+        #         SparkTransformLauncher(FilterTransformConfiguration()),
+        #         {
+        #             filter_criteria_cli_param: [],
+        #             filter_logical_operator_cli_param: filter_logical_operator_default,
+        #             filter_columns_to_drop_cli_param: [],
+        #             local_config_path_cli: config_file_path,
+        #         },
+        #         os.path.join(basedir, "input"),
+        #         os.path.join(basedir, "expected", "test-default"),
+        #     )
+        # )
+        #
+        # fixtures.append(
+        #     (
+        #         SparkTransformLauncher(FilterTransformConfiguration()),
+        #         {
+        #             filter_criteria_cli_param: [
+        #                 "date_acquired BETWEEN '2023-07-04' AND '2023-07-08'",
+        #                 "title LIKE 'https://%'",
+        #             ],
+        #             filter_logical_operator_cli_param: filter_logical_operator_default,
+        #             filter_columns_to_drop_cli_param: [],
+        #             local_config_path_cli: config_file_path,
+        #         },
+        #         os.path.join(basedir, "input"),
+        #         os.path.join(basedir, "expected", "test-datetime-like"),
+        #     )
+        # )
+        #
+        # fixtures.append(
+        #     (
+        #         SparkTransformLauncher(FilterTransformConfiguration()),
+        #         {
+        #             filter_criteria_cli_param: [
+        #                 "document IN ('CC-MAIN-20190221132217-20190221154217-00305.warc.gz', 'CC-MAIN-20200528232803-20200529022803-00154.warc.gz', 'CC-MAIN-20190617103006-20190617125006-00025.warc.gz')",
+        #             ],
+        #             filter_logical_operator_cli_param: filter_logical_operator_default,
+        #             filter_columns_to_drop_cli_param: [],
+        #             local_config_path_cli: config_file_path,
+        #         },
+        #         os.path.join(basedir, "input"),
+        #         os.path.join(basedir, "expected", "test-in"),
+        #     )
+        # )
         return fixtures
 
     def _validate_directory_contents_match(self, dir: str, expected: str):

@@ -22,8 +22,12 @@ workflow-upload:
 workflow-reconcile-requirements:
 	$(MAKE) -C ray/kfp_v1 workflow-reconcile-requirements
 
+set-versions::  #workflow-reconcile-requirements
+	@# Help: Nothing to do here yet.
+
 clean::
 
 build::
 
 test::
+

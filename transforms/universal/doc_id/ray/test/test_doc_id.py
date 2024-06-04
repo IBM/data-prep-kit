@@ -15,7 +15,7 @@ from typing import Tuple
 import pyarrow as pa
 from data_processing.test_support.transform.transform_test import AbstractTransformTest
 from data_processing.utils import TransformUtils
-from doc_id_transform import (
+from doc_id_transform_ray import (
     DocIDTransform,
     doc_column_name_key,
     hash_column_name_key,

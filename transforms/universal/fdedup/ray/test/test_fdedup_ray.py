@@ -16,7 +16,7 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from fdedup_transform import FdedupRayTransformConfiguration
+from fdedup_transform_ray import FdedupRayTransformConfiguration
 
 
 class TestRayBlocklistTransform(AbstractTransformLauncherTest):

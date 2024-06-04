@@ -15,15 +15,12 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
+from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
-from data_processing_ray.runtime.ray import RayTransformLauncher
-from data_processing_ray.runtime.ray.runtime_configuration import (
-    RayTransformRuntimeConfiguration,
-)
 
 
 logger = get_logger(__name__)
@@ -122,40 +119,3 @@ class NOOPTransformConfiguration(TransformConfiguration):
         self.params = self.params | captured
         logger.info(f"noop parameters are : {self.params}")
         return True
-
-
-class NOOPPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
-    """
-    Implements the PythonTransformConfiguration for NOOP as required by the PythonTransformLauncher.
-    NOOP does not use a RayRuntime class so the superclass only needs the base
-    python-only configuration.
-    """
-
-    def __init__(self):
-        """
-        Initialization
-        :param base_configuration - base configuration class
-        """
-        super().__init__(transform_config=NOOPTransformConfiguration())
-
-
-class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
-    """
-    Implements the RayTransformConfiguration for NOOP as required by the RayTransformLauncher.
-    NOOP does not use a RayRuntime class so the superclass only needs the base
-    python-only configuration.
-    """
-
-    def __init__(self):
-        """
-        Initialization
-        :param base_configuration - base configuration class
-        """
-        super().__init__(transform_config=NOOPTransformConfiguration())
-
-
-if __name__ == "__main__":
-    # launcher = NOOPRayLauncher()
-    launcher = RayTransformLauncher(NOOPRayTransformConfiguration())
-    logger.info("Launching noop transform")
-    launcher.launch()
