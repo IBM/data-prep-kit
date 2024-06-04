@@ -51,4 +51,7 @@ publish::
 	@# Help: Recursively $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
+set-versions::  
+	@# Help: Recursively $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 

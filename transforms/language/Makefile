@@ -34,6 +34,10 @@ publish::
 	@$(MAKE) RULE=$@ .recurse
 
 
+set-versions::  
+	@# Help: Recursively $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
 load-image::
 	@# Help: Recursively make $@ in all subdirs
 	@$(MAKE) RULE=$@ .recurse
@@ -57,4 +61,5 @@ workflow-upload::
 workflow-reconcile-requirements::
 	@# Help: Recursively make $@ in all subdirs
 	@$(MAKE) RULE=$@ .recurse
+
 

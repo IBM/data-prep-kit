@@ -47,6 +47,10 @@ publish::
 	@# Help: Recursively $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
+set-versions::  
+	@# Help: Recursively $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
 lib-release:
 	@# Help: Publish data-prep-kit $(DPK_LIB_VERSION) and data-prep-kit-kfp $(DPK_LIB_KFP_VERSION) libraries to pypi 
 	@$(MAKE) -C $(DPK_PYTHON_LIB_DIR) build publish
@@ -56,5 +60,6 @@ lib-release:
 	@echo ""
 	@echo "This modified files in the repo. Please be sure to commit/push back to the repository."
 	@echo ""
+
 
 
