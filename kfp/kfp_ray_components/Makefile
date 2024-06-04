@@ -51,7 +51,7 @@ DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 	rm -rf workflow_support_lib
 
 .PHONY: image
-image: Dockerfile Dockerfile_v2 requirements.txt
+image: Dockerfile requirements.txt
 	$(MAKE) reconcile-requirements
 	$(MAKE) .lib-src-image
 
