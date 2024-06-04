@@ -20,7 +20,7 @@ from kfp_support.workflow_support.utils import (
 )
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/noop-ray:0.9.0"
+task_image = "quay.io/dataprep1/data-prep-kit/noop-ray:0.9.0.dev6"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "noop_transform_ray.py"
