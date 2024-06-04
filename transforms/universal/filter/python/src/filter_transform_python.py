@@ -9,24 +9,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
-from data_processing.utils import get_logger
-from data_processing_ray.runtime.ray import RayTransformLauncher
-from data_processing_ray.runtime.ray.runtime_configuration import (
-    RayTransformRuntimeConfiguration,
+from data_processing.runtime.pure_python import PythonTransformLauncher
+from data_processing.runtime.pure_python.runtime_configuration import (
+    PythonTransformRuntimeConfiguration,
 )
+from data_processing.utils import get_logger
 from filter_transform import FilterTransformConfiguration
 
 
 logger = get_logger(__name__)
 
 
-class FilterRayTransformConfiguration(RayTransformRuntimeConfiguration):
+class FilterPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(transform_config=FilterTransformConfiguration())
 
 
 if __name__ == "__main__":
-    launcher = RayTransformLauncher(FilterRayTransformConfiguration())
+    launcher = PythonTransformLauncher(FilterPythonTransformConfiguration())
     logger.info("Launching filtering")
     launcher.launch()

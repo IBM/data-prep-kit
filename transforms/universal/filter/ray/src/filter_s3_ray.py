@@ -14,12 +14,12 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from filter_transform_ray import (
-    FilterRayTransformConfiguration,
+from filter_transform import (
     filter_columns_to_drop_cli_param,
     filter_criteria_cli_param,
     filter_logical_operator_cli_param,
 )
+from filter_transform_ray import FilterRayTransformConfiguration
 
 
 # create parameters
