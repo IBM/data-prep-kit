@@ -13,28 +13,20 @@
 import os
 
 from data_processing.runtime import AbstractTransformLauncher
-from data_processing.test_support.launch.transform_test import (
-    AbstractTransformLauncherTest,
-)
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from filter_transform import (
-    filter_columns_to_drop_cli_param,
-    filter_criteria_cli_param,
-    filter_logical_operator_cli_param,
-    filter_logical_operator_default,
-)
+from filter_test_support import AbstractPythonFilterTransformTest
 from filter_transform_ray import FilterRayTransformConfiguration
 
-from transforms.universal.filter.python.test.test_filter_python import (
-    TestPythonFilterTransform,
-)
 
-
-class TestRayFilterTransform(TestPythonFilterTransform):
+class TestPythonFilterTransform(AbstractPythonFilterTransformTest):
     """
     Extends the Python super-class to redefine the launcher as a RayTransformLauncher.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
 
-    def _get_launcher(self) -> AbstractTransformLauncher:
-        return RayTransformLauncher(FilterRayTransformConfiguration())
+    def _get_test_file_directory(self) -> str:
+        dir = os.path.abspath(os.path.dirname(__file__))
+        return dir
+
+    def _get_launcher(self) -> (AbstractTransformLauncher, dict):
+        return (RayTransformLauncher(FilterRayTransformConfiguration()), {"run_locally": True})
