@@ -11,8 +11,8 @@ WORKDIR ${SPARK_HOME}/work-dir
 # This is expected to be placed in the docker context before this is run (see the make image).
 COPY --chown=spark:root data-processing-lib-python/ data-processing-lib-python/
 RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
-COPY --chown=spark:root data-processing-spark/ data-processing-spark/
-RUN cd data-processing-spark && pip install --no-cache-dir -e .
+COPY --chown=spark:root data-processing-lib-spark/ data-processing-lib-spark/
+RUN cd data-processing-lib-spark && pip install --no-cache-dir -e .
 
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
