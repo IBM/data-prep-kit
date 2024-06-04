@@ -388,7 +388,7 @@ __check_defined = \
 	if [ -e requirements.txt ]; then				\
 		echo Install requirements from requirements.txt;	\
 		pip install $$extra_url -r requirements.txt;		\
-	elif [ -e pypproject.toml ]; then				\
+	elif [ -e pyproject.toml ]; then				\
 		echo Install requirements using pyproject.toml;		\
 		pip install $$extra_url -e .;				\
 	fi

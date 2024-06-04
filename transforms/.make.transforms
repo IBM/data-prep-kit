@@ -189,14 +189,14 @@ test-locals:: .transforms.test-locals
 .transforms-check-exists:
 	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
 	if  [ -z "$$exists" ]; then				\
-	    echo Recommend creating $(CHECK_FILE_NAME) in directory $(CHECK_DIR); 	\
+	    echo $$REQ create $(CHECK_FILE_NAME) in directory $(CHECK_DIR); 	\
 	fi
 
 .PHONY: .transforms-check-not-exists
 .transforms-check-not-exists:
 	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
 	if  [ ! -z "$$exists" ]; then				\
-	    echo Recommend removing file $(CHECK_FILE_NAME) from directory $(CHECK_DIR); 	\
+	    echo $REQ remove file $(CHECK_FILE_NAME) from directory $(CHECK_DIR); 	\
 	fi
 
 .PHONY: .transforms-check-target
@@ -223,16 +223,16 @@ conventions: .transforms.check_required_macros
 	@# Help: Check transform project conventions and make recommendations, if needed.
 	@echo "Begin checking transform conventions for $(TRANSFORM_RUNTIME) runtime project.  Recommendations/issues, if any, follow..."
 	@if [ "$(TRANSFORM_RUNTIME)" = "python" ]; then	\
-		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_transform.py .transforms-check-exists;		\
-		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py .transforms-check-exists;	\
-		$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py .transforms-check-exists;	\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_transform.py REQ=Must .transforms-check-exists;		\
+		$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME).py REQ=Must .transforms-check-exists;	\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local.py REQ=Should .transforms-check-exists;	\
 	else	\
-		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME).py .transforms-check-not-exists;		\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME).py REQ=Must .transforms-check-not-exists;		\
 	fi
-	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_$(TRANSFORM_RUNTIME).py .transforms-check-exists
-	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_$(TRANSFORM_RUNTIME).py .transforms-check-exists
-	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  .transforms-check-not-exists
-	@$(MAKE) CHECK_DIR=. CHECK_FILE_NAME=.dockerignore  .transforms-check-exists
+	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(TRANSFORM_NAME)_$(TRANSFORM_RUNTIME).py REQ=Must .transforms-check-exists
+	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(TRANSFORM_NAME)_local_$(TRANSFORM_RUNTIME).py REQ=Should .transforms-check-exists
+	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  REQ=Must .transforms-check-not-exists
+	@$(MAKE) CHECK_DIR=. CHECK_FILE_NAME=.dockerignore  REQ=Should .transforms-check-exists
 	@$(MAKE) CHECK_DIR=test-data .transforms-check-dir-size
 	@$(MAKE) CHECK_TARGET=build .transforms-check-target
 	@$(MAKE) CHECK_TARGET=clean .transforms-check-target
