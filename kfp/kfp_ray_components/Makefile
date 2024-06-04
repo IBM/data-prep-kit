@@ -34,8 +34,7 @@ DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)  \
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)            \
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\
-		--build-arg KFP_v2=$(KFPv2) 					\
-		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h) . 	
+		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h) .
 	$(DOCKER) tag $(DOCKER_LOCAL_IMAGE)  $(DOCKER_REMOTE_IMAGE)
 
 .PHONY: .lib-src-image
