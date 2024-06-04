@@ -56,9 +56,6 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requiremen
 	$(MAKE) -C ${REPOROOT}/transforms .defaults.python-lib-src-venv
 	. ${WORKFLOW_VENV_ACTIVATE};     \
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/python_apiserver_client; \
-    pip install -e $(DPK_PYTHON_LIB_DIR); \
-	pip install -e $(DPK_RAY_LIB_DIR); \
-	pip install kfp==$(KFP) --extra-index-url https://pypi.org/simple; \
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB);
 	@# Help: Create the virtual environment common to all workflows
 
