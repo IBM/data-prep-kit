@@ -24,3 +24,10 @@ workflow-reconcile-requirements:
 
 set-versions::  #workflow-reconcile-requirements
 	@# Help: Nothing to do here yet.
+
+clean::
+
+build::
+
+test::
+
