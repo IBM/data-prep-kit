@@ -232,13 +232,13 @@ __check_defined = \
 	@# Help: Build the Spark $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
 	$(MAKE) IMAGE_NAME_TO_VERIFY=$(DOCKER_SPARK_BASE_IMAGE_NAME) .defaults.verify-image-availability
 	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
-	$(MAKE) LIB_PATH=$(DPK_SPARK_LIB_DIR) LIB_NAME=data-processing-spark .defaults.copy-lib
+	$(MAKE) LIB_PATH=$(DPK_SPARK_LIB_DIR) LIB_NAME=data-processing-lib-spark .defaults.copy-lib
 	if [ -e ../python ]; then								\
 		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
 	fi
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE) .defaults.image
 	rm -rf data-processing-lib-python
-	rm -rf data-processing-spark
+	rm -rf data-processing-lib-spark
 	rm -rf python-transform 
 
 # Install the source from the given directory into an existing venv
