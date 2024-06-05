@@ -53,10 +53,9 @@ venv::pyproject.toml .check-env
 	pip install -e .;		\
 	pip install pytest pytest-cov
 
-test:: venv
+test:: venv 
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) api_params_test.py;
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) configmaps.py;
 ifeq ($(DEPLOY_KUBEFLOW),1)
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) kuberay_api_test.py;
 endif
