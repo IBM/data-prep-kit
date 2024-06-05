@@ -12,8 +12,6 @@ DOCKER_IMAGE_VERSION=${INGEST_TO_PARQUET_VERSION}
 
 venv::	.transforms.ray-venv
 
-build::	.transforms.ray-build
-
 test::	.transforms.ray-test
 
 clean:: .transforms.clean
@@ -26,8 +24,19 @@ setup:: .transforms.setup
 
 test-image:: .transforms.ray-test-image
 
-publish:: .transforms.ray-publish
+build:: build-dist image
 
+publish:: publish-dist publish-image
+
+publish-image:: .transforms.publish-image-ray
+
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+
+build-dist:: set-versions .defaults.build-dist
+
+publish-dist:: .defaults.publish-dist
 
 run-cli-ray-sample: .transforms.run-cli-ray-sample
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
