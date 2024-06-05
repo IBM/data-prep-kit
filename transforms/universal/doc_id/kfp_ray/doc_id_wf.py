@@ -37,10 +37,15 @@ def compute_exec_params_func(
     data_s3_config: str,
     data_max_files: int,
     data_num_samples: int,
+    data_checkpointing: bool,
+    data_data_sets: str,
+    data_files_to_use: str,
     runtime_pipeline_id: str,
     runtime_job_id: str,
     runtime_code_location: str,
-    noop_sleep_sec: int,
+    doc_id_doc_column: str,
+    doc_id_hash_column: str,
+    doc_id_int_column: str,
 ) -> dict:
     from workflow_support.runtime_utils import KFPUtils
 
@@ -48,12 +53,17 @@ def compute_exec_params_func(
         "data_s3_config": data_s3_config,
         "data_max_files": data_max_files,
         "data_num_samples": data_num_samples,
+        "data_checkpointing": data_checkpointing,
+        "data_data_sets": data_data_sets,
+        "data_files_to_use": data_files_to_use,
         "runtime_num_workers": KFPUtils.default_compute_execution_params(worker_options, actor_options),
         "runtime_worker_options": actor_options,
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": runtime_code_location,
-        "noop_sleep_sec": noop_sleep_sec,
+        "doc_id_doc_column": doc_id_doc_column,
+        "doc_id_hash_column": doc_id_hash_column,
+        "doc_id_int_column": doc_id_int_column,
     }
 
 
@@ -164,10 +174,15 @@ def doc_id(
             data_s3_config=data_s3_config,
             data_max_files=data_max_files,
             data_num_samples=data_num_samples,
+            data_checkpointing=data_checkpointing,
+            data_data_sets=data_data_sets,
+            data_files_to_use=data_files_to_use,
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            noop_sleep_sec=noop_sleep_sec,
+            doc_id_doc_column=doc_id_doc_column,
+            doc_id_hash_column=doc_id_hash_column,
+            doc_id_int_column=doc_id_int_column,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
