@@ -16,7 +16,7 @@ dependencies = [
     "ray==2.9.3",
     "requests",
     "data-prep-toolkit==0.2.0",
-    "python_apiserver_client",
+    "python_apiserver_client==0.1.0",
 ]
 
 [build-system]
