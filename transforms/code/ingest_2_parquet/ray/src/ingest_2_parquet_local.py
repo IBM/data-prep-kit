@@ -15,7 +15,7 @@ import ast
 
 from data_processing.data_access import DataAccessFactory, DataAccessLocal
 from data_processing.utils import TransformUtils
-from ingest_2_parquet_transform import (
+from ingest_2_parquet_transform_ray import (
     IngestToParquetTransform,
     ingest_supported_langs_file_key,
     ingest_detect_programming_lang_key,

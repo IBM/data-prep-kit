@@ -16,7 +16,7 @@ import ast
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils, GB
-from ingest_2_parquet_transform import (
+from ingest_2_parquet_transform_ray import (
     IngestToParquetPythonConfiguration,
     ingest_supported_langs_file_key,
     ingest_detect_programming_lang_key,

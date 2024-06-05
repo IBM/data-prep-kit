@@ -21,7 +21,7 @@ from data_processing.utils import ParamsUtils
 
 class AbstractTransformLauncherTest(AbstractTest):
     """
-    The Ray-based test class for all/most AbstractTransform implementations.
+    The launcher test class for all/most AbstractTransformLauncher implementations.
     Generic tests are provided here, and sub-classes must implement the _get*_fixture() method(s)
     to provide the test data for a given test method.  For example,  get_test_transform_fixtures()
     provides the test data for the test_transform() test method.
@@ -50,7 +50,7 @@ class AbstractTransformLauncherTest(AbstractTest):
         Test the given transform and its runtime using the given CLI arguments, input directory of data files and expected output directory.
         Data is processed into a temporary output directory which is then compared with the directory of expected output.
         :param launcher: launcher configured to run the transform being tested
-        :param cli_params: a map of the simulated CLI arguments (w/o --).  This includes both the transform-specific CLI parameters and  the Ray launching args.
+        :param cli_params: a map of the simulated CLI arguments (w/o --).  This includes both the transform-specific CLI parameters and the launching args.
         :param in_table_path: a directory containing the input parquet files to be processed and results compared against the expected output table path.
         :param expected_out_table_path: directory contain parquet and metadata.json that is expected to match the processed input directory.
         :return:
