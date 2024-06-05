@@ -13,7 +13,7 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-from filter_transform_ray import (
+from filter_transform import (
     FilterTransform,
     filter_columns_to_drop_key,
     filter_criteria_key,

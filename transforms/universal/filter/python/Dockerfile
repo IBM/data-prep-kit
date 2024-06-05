@@ -25,9 +25,9 @@ RUN pip install --no-cache-dir -e .
 #RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY ./src/noop_transform.py .
-COPY ./src/noop_transform_python.py .
-COPY ./src/noop_local.py local/
+COPY ./src/filter_transform.py .
+COPY ./src/filter_transform_python.py .
+COPY ./src/filter_local.py local/
 
 # copy test
 COPY test/ test/
