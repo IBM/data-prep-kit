@@ -16,12 +16,7 @@ from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, Component
 
 import kfp.compiler as compiler
 import kfp.dsl as dsl
-
-# if os.getenv("KFPv2", "0") == "1":
 import kfp.components as comp
-
-# else:
-#    import kfp.components as comp
 
 RUN_ID = uuid.uuid4().hex
 
@@ -31,11 +26,10 @@ task_image = "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
 EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0-v2"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0-v5"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../kfp/kfp_ray_components/"
-
 
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
@@ -64,7 +58,10 @@ def compute_exec_params_func(
         "noop_sleep_sec": noop_sleep_sec,
     }
 
-
+# KFPv1 and KFP2 uses different methods to create a component from a function. KFPv1 uses the
+# `create_component_from_func` function, but it is deprecated by KFPv2 and so has a different import path.
+# KFPv2 recommends using the `@dsl.component` decorator, which doesn't exist in KFPv1. Therefore, here we use
+# this if/else statement and explicitly call the decorator.
 if os.getenv("KFPv2", "0") == "1":
     compute_exec_params_op = dsl.component_decorator.component(func=compute_exec_params_func, base_image=base_kfp_image)
 else:
@@ -87,7 +84,8 @@ TASK_NAME: str = "noop"
 def noop(
         # Ray cluster
         ray_name: str = "noop-kfp-ray",  # name of Ray cluster
-        ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
+        ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", '
+        '"image": "' + task_image + '" }',
         ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
                                   '"image_pull_secret": "", "image": "' + task_image + '"}',
         server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
@@ -184,9 +182,7 @@ def noop(
 
     # TODO
     # Configure the pipeline level to one week (in seconds)
-
-
-#    dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
+    # dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 
 
 if __name__ == "__main__":

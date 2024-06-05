@@ -9,33 +9,64 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+import os
+import uuid
+
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 import kfp.compiler as compiler
-import kfp.components as comp
 import kfp.dsl as dsl
-from kfp_support.workflow_support.runtime_utils import (
-    ONE_HOUR_SEC,
-    ONE_WEEK_SEC,
-    ComponentUtils,
-)
+import kfp.components as comp
 
+RUN_ID = uuid.uuid4().hex
 
-task_image = "quay.io/dataprep1/data-prep-kit/noop:0.9.0"
+task_image = "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0-v2"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0-v5"
 
 # path to kfp component specifications files
-component_spec_path = "../../../../../kfp/kfp_ray_components/"
+component_spec_path = "../../../../kfp/kfp_ray_components/"
 
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
-compute_exec_params_op = comp.func_to_container_op(
-    func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
-)
+def compute_exec_params_func(
+        worker_options: str,
+        actor_options: str,
+        data_s3_config: str,
+        data_max_files: int,
+        data_num_samples: int,
+        runtime_pipeline_id: str,
+        runtime_job_id: str,
+        runtime_code_location: str,
+        noop_sleep_sec: int,
+) -> dict:
+    from workflow_support.runtime_utils import KFPUtils
+
+    return {
+        "data_s3_config": data_s3_config,
+        "data_max_files": data_max_files,
+        "data_num_samples": data_num_samples,
+        "runtime_num_workers": KFPUtils.default_compute_execution_params(worker_options, actor_options),
+        "runtime_worker_options": actor_options,
+        "runtime_pipeline_id": runtime_pipeline_id,
+        "runtime_job_id": runtime_job_id,
+        "runtime_code_location": runtime_code_location,
+        "noop_sleep_sec": noop_sleep_sec,
+    }
+
+# KFPv1 and KFP2 uses different methods to create a component from a function. KFPv1 uses the
+# `create_component_from_func` function, but it is deprecated by KFPv2 and so has a different import path.
+# KFPv2 recommends using the `@dsl.component` decorator, which doesn't exist in KFPv1. Therefore, here we use
+# this if/else statement and explicitly call the decorator.
+if os.getenv("KFPv2", "0") == "1":
+    compute_exec_params_op = dsl.component_decorator.component(func=compute_exec_params_func, base_image=base_kfp_image)
+else:
+    compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
+
 # create Ray cluster
 create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
 # execute job
@@ -107,7 +138,7 @@ def noop(
     :return: None
     """
     # create clean_up task
-    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=dsl.RUN_ID_PLACEHOLDER, server_url=server_url)
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=RUN_ID, server_url=server_url)
     ComponentUtils.add_settings_to_component(clean_up_task, 60)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
@@ -115,12 +146,19 @@ def noop(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=runtime_actor_options,
+            data_s3_config=data_s3_config,
+            data_max_files=data_max_files,
+            data_num_samples=data_num_samples,
+            runtime_pipeline_id=runtime_pipeline_id,
+            runtime_job_id=RUN_ID,
+            runtime_code_location=runtime_code_location,
+            noop_sleep_sec=noop_sleep_sec,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=RUN_ID,
             ray_head_options=ray_head_options,
             ray_worker_options=ray_worker_options,
             server_url=server_url,
@@ -131,20 +169,10 @@ def noop(
         # Execute job
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=RUN_ID,
             additional_params=additional_params,
             # note that the parameters below are specific for NOOP transform
-            exec_params={
-                "data_s3_config": data_s3_config,
-                "data_max_files": data_max_files,
-                "data_num_samples": data_num_samples,
-                "runtime_num_workers": compute_exec_params.output,
-                "runtime_worker_options": runtime_actor_options,
-                "runtime_pipeline_id": runtime_pipeline_id,
-                "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,
-                "runtime_code_location": runtime_code_location,
-                "noop_sleep_sec": noop_sleep_sec,
-            },
+            exec_params=compute_exec_params.output,
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
         )
@@ -152,8 +180,9 @@ def noop(
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
 
+    # TODO
     # Configure the pipeline level to one week (in seconds)
-    dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
+    # dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 
 
 if __name__ == "__main__":
