@@ -30,13 +30,11 @@ class AbstractTransformLauncherTest(AbstractTest):
 
     @staticmethod
     def _get_argv(
-            launcher: AbstractTransformLauncher, cli_params: dict[str, Any], in_table_path: str, out_table_path: str
+            cli_params: dict[str, Any], in_table_path: str, out_table_path: str
     ):
         args = {} | cli_params
         local_ast = {"input_folder": in_table_path, "output_folder": out_table_path}
         args["data_local_config"] = local_ast
-        if isinstance(launcher, RayTransformLauncher):
-            args["run_locally"] = "True"
         argv = ParamsUtils.dict_to_req(args)
         return argv
 
@@ -60,7 +58,7 @@ class AbstractTransformLauncherTest(AbstractTest):
         prefix = launcher.get_transform_name()
         with tempfile.TemporaryDirectory(prefix=prefix, dir="/tmp") as temp_dir:
             print(f"Using temporary output path {temp_dir}")
-            sys.argv = self._get_argv(launcher, cli_params, in_table_path, temp_dir)
+            sys.argv = self._get_argv(cli_params, in_table_path, temp_dir)
             launcher.launch()
             self._validate_directory_contents_match(temp_dir, expected_out_table_path, ignore_columns)
 
