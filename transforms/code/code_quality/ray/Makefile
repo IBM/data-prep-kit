@@ -18,19 +18,29 @@ test:: .transforms.ray-test
 image:: .transforms.ray-image
 
 # Use default rule inherited from makefile.common
-build:: .transforms.ray-build
-
-# Use default rule inherited from makefile.common
 venv:: .transforms.ray-venv
 
 test-src:: .transforms.test-src
 
 test-image:: .transforms.ray-test-image
 
-publish:: .transforms.ray-publish
+build:: build-dist image
+
+publish:: publish-dist publish-image
+
+publish-image:: .transforms.publish-image-ray
 
 setup:: .transforms.setup
 
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
+setup:: .transforms.setup
 
 run-cli-ray-sample: .transforms.run-cli-ray-sample
 

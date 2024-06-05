@@ -1,6 +1,6 @@
 REPOROOT=${CURDIR}/../../../../
 WORKFLOW_VENV_ACTIVATE=${REPOROOT}/transforms/venv/bin/activate
-include $(REPOROOT)/transforms/.make.transforms_workflows
+include $(REPOROOT)/transforms/.make.workflows
 
 SRC_DIR=${CURDIR}/../ray/
 
@@ -11,9 +11,7 @@ workflow-venv: .check_python_version ${WORKFLOW_VENV_ACTIVATE}
 
 .PHONY: workflow-build
 workflow-build: workflow-venv
-	@for file in $(YAML_WF); do \
-		$(MAKE) $$file; \
-	done
+	$(MAKE) $(YAML_WF)
 
 .PHONY: workflow-test
 workflow-test: workflow-build

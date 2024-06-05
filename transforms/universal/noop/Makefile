@@ -21,6 +21,10 @@ image::
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
+set-versions::  
+	@# Help: Recursively $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
 publish:: 
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
@@ -43,30 +47,20 @@ load-image::
 
 .PHONY: workflow-venv
 workflow-venv:
-	$(MAKE) -C kfp_ray/v1 workflow-venv
+	$(MAKE) -C kfp_ray workflow-venv
 
 .PHONY: workflow-build
 workflow-build:
 	$(MAKE) -C kfp_ray workflow-build
 
-
 .PHONY: workflow-test
 workflow-test:
-ifeq ($(KFPv2), 0)
-	$(MAKE) -C kfp_ray/v2 workflow-test
-else
-	$(MAKE) -C kfp_ray/v2 workflow-test
-endif
+	$(MAKE) -C kfp_ray workflow-test
 
 .PHONY: workflow-upload
 workflow-upload:
-ifeq ($(KFPv2), 0)
-	$(MAKE) -C kfp_ray/v1 workflow-upload
-else
-	$(MAKE) -C kfp_ray/v2 workflow-upload
-endif
-
+	$(MAKE) -C kfp_ray workflow-upload
 
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:
-	$(MAKE) -C $(PIPELINE_PATH) workflow-reconcile-requirements
+	$(MAKE) -C kfp_ray workflow-reconcile-requirements

@@ -14,7 +14,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY ./src/doc_id_transform.py .
+COPY ./src/doc_id_transform_ray.py .
 COPY src/doc_id_local_ray.py local/
 
 # copy test

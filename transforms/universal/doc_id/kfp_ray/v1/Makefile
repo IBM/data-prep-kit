@@ -1,6 +1,6 @@
 REPOROOT=${CURDIR}/../../../../../
 WORKFLOW_VENV_ACTIVATE=${REPOROOT}/transforms/venv/bin/activate
-include $(REPOROOT)/transforms/.make.transforms_workflows
+include $(REPOROOT)/transforms/.make.workflows
 
 SRC_DIR=${CURDIR}/../../ray/
 

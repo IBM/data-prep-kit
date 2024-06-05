@@ -4,15 +4,13 @@ REPOROOT=../../../..
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
+
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=noop
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${NOOP_VERSION}
+DOCKER_IMAGE_VERSION=${NOOP_RAY_VERSION}
 
 venv::	.transforms.ray-venv
-
-build::	.transforms.ray-build
 
 test::	.transforms.ray-test
 
@@ -26,15 +24,27 @@ setup:: .transforms.setup
 
 test-image:: .transforms.ray-test-image
 
-publish:: .transforms.ray-publish
+build:: build-dist image
 
-run-cli-ray-sample: .transforms.run-cli-ray-sample
+publish:: publish-dist publish-image
 
-run-local-sample: .transforms.run-local-sample
+publish-image:: .transforms.publish-image-ray
 
-run-local-ray-sample: .transforms.run-local-ray-sample
+setup:: .transforms.setup
 
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+# set the version of python transform that this depends on.
+set-versions: 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(NOOP_PYTHON_VERSION) .transforms.set-versions 
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
+run-cli-sample: .transforms.run-cli-ray-sample
+
+run-local-sample: .transforms.run-local-ray-sample
+
+run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 

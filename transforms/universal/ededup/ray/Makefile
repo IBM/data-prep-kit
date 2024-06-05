@@ -12,8 +12,6 @@ DOCKER_IMAGE_VERSION=${EDEDUP_VERSION}
 
 venv::	.transforms.ray-venv
 
-build::	.transforms.ray-build
-
 test::	.transforms.ray-test
 
 clean:: .transforms.clean
@@ -24,27 +22,38 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
+build:: build-dist image
+
+publish:: publish-dist publish-image
+
+publish-image:: .transforms.publish-image-ray
+
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
 test-image:: image .transforms.test-image-help
 	@echo WARNING: Skipping pytest version of this test until we have a test/test_ededup.py file.
 
-
-publish:: .transforms.ray-publish
-
-run-cli-ray-sample: 
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+run-cli-sample: 
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
                 --ededup_num_hashes 2"	\
                 .transforms.run-src-file
 
 
 
-run-local-sample: 
+run-local-python-only-sample: 
 	@# Help: Not implemented yet
 	@echo "No src/ededup_local.py yet :("
 
-run-local-ray-sample: .transforms.run-local-ray-sample
+run-local-python-only-sample: .transforms.run-local-sample
 
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+run-s3-sample: .transforms.run-s3-sample
 
 minio-start:	.minio-start
 

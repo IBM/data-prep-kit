@@ -14,7 +14,7 @@ from typing import Tuple
 
 import pyarrow as pa
 from data_processing.test_support.transform.transform_test import AbstractTransformTest
-from tokenization_transform import TokenizationTransform
+from tokenization_transform_ray import TokenizationTransform
 
 
 """

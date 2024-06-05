@@ -13,7 +13,7 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-from doc_id_transform import DocIDTransform
+from doc_id_transform_ray import DocIDTransform
 
 
 # create parameters

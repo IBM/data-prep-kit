@@ -10,10 +10,7 @@ TRANSFORM_NAME=tokenization
 # $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${TOKENIZATION_VERSION}
 
-
 venv::	.transforms.ray-venv
-
-build::	.transforms.ray-build
 
 test::	.transforms.ray-test
 
@@ -25,23 +22,37 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
+build:: build-dist image
+
+publish:: publish-dist publish-image
+
+publish-image:: .transforms.publish-image-ray
+
+setup:: .transforms.setup
+
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
 test-image:: .transforms.ray-test-image
 
-publish:: .transforms.ray-publish
-
-run-cli-ray-sample: 
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+run-cli-sample: 
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/ds01/input', 'output_folder' : '../output'}\"  \
                 "  .transforms.run-src-file
 
 
-run-local-sample: #.transforms.run-local-sample
+run-local-python-only-sample: #.transforms.run-local-sample
 	@# Help: Not implemented yet
 	@echo "No src/tokenization_local.py yet :("
 
-run-local-ray-sample: .transforms.run-local-ray-sample
+run-local-sample: .transforms.run-local-sample
 
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+run-s3-sample: .transforms.run-s3-sample
 
 minio-start:	.minio-start
 

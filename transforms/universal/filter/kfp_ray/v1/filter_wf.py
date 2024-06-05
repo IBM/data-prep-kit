@@ -23,10 +23,10 @@ from kfp_support.workflow_support.runtime_utils import (
 
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "filter_transform.py"
+EXEC_SCRIPT_NAME: str = "filter_transform_ray.py"
 PREFIX: str = ""
 
-task_image = "quay.io/dataprep1/data-prep-kit/filter:0.4.0"
+task_image = "quay.io/dataprep1/data-prep-kit/filter-ray:0.4.0"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0"

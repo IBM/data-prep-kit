@@ -4,18 +4,13 @@ REPOROOT=../../../..
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
-
-# This is included in the image name, if defined
-TRANSFORM_RUNTIME=spark
-
 include $(REPOROOT)/transforms/.make.transforms
+
 TRANSFORM_NAME=doc_id
 # $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${DOC_ID_SPARK_VERSION}
 
 venv::	.transforms.spark-venv
-
-build::	.transforms.spark-build
 
 test::	.transforms.spark-test
 
@@ -27,9 +22,21 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-test-image:: .transforms.spark-test-image
+build:: build-dist image
 
-publish:: .transforms.spark-publish
+publish:: publish-dist publish-image
+
+publish-image:: .transforms.publish-image-spark
+
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
+test-image:: .transforms.spark-test-image
 
 run-cli-sample: .transforms.run-cli-spark-sample
 

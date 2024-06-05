@@ -20,7 +20,7 @@ while a transform model is a single pass. The solution to this mismatch is to us
 first path and use the native transform pipeline to implement filtering.
 
 ## Transform runtime
-The [transform runtime](src/fdedup_transform.py) is implementing complete first path of the fuzzy deduping:
+The [transform runtime](src/fdedup_transform_ray.py) is implementing complete first path of the fuzzy deduping:
 * creates bucket and minhash collectors
 * implements initial file processing to populate bucket and minhash caches
 * creates doc collectors 
@@ -30,7 +30,7 @@ The main components of runtime are described below
 
 ### TableProcessor Actor
 
-[Table processing actor](src/fdedup_transform.py) is implemented following framework itself is implemented as a pair -
+[Table processing actor](src/fdedup_transform_ray.py) is implemented following framework itself is implemented as a pair -
 `FdedupTransform` implementing the actual transformation and and 
 [transform table processor](../../../../data-processing-lib/src/data_processing/runtime/ray/transform_table_processor.py) 
 (from the framework itself).
@@ -63,7 +63,7 @@ This [actor](src/fdedup_support.py) is a collector for unique documents
 
 ## Transformer
 
-In the fuzzy dedup implementation, the [transformer](src/fdedup_transform.py) only implements filtering. For every
+In the fuzzy dedup implementation, the [transformer](src/fdedup_transform_ray.py) only implements filtering. For every
 table, it checks document ids with the `DocumentsCollector` cache and removes all of the rows which do not have ids in 
 the hash 
 
@@ -164,9 +164,9 @@ These correspond to the configuration keys described above.
 ### Running the samples
 To run the samples, use the following `make` targets
 
-* `run-cli-ray-sample` - runs src/fdedup_transform.py using command line args
-* `run-local-ray-sample` - runs src/fdedup_local_ray.py
-* `run-s3-ray-sample` - runs src/fdedup_s3_ray.py
+* `run-cli-sample` - runs src/fdedup_transform_ray.py using command line args
+* `run-local-sample` - runs src/fdedup_local_ray.py
+* `run-s3-sample` - runs src/fdedup_s3_ray.py
     * Requires prior invocation of `make minio-start` to load data into local minio for S3 access.
 
 These targets will activate the virtual environment and set up any configuration needed.
@@ -174,7 +174,7 @@ Use the `-n` option of `make` to see the detail of what is done to run the sampl
 
 For example, 
 ```shell
-make run-cli-ray-sample
+make run-cli-sample
 ...
 ```
 Then 

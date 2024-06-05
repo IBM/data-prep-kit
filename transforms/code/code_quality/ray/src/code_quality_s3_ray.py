@@ -12,7 +12,7 @@
 
 import sys
 
-from code_quality_transform import CodeQualityRayTransformConfiguration
+from code_quality_transform_ray import CodeQualityRayTransformConfiguration
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
 

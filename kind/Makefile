@@ -85,3 +85,7 @@ endif
 ifeq ($(DEPLOY_KUBEFLOW),1)
 	cd $(TOOLS_DIR) && ./install_kubeflow.sh deploy-wait
 endif
+
+
+set-versions::  
+	@# Help: Nothing to see herej 

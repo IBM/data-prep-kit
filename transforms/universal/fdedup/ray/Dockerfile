@@ -14,7 +14,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY ./src/fdedup_transform.py .
+COPY ./src/fdedup_transform_ray.py .
 COPY ./src/fdedup_support.py .
 COPY src/fdedup_local_ray.py local/
 

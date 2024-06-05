@@ -9,7 +9,7 @@ version = "0.1.0"
 dependencies = [
     "requests",
     "kubernetes",
-    "data-prep-toolkit==0.2.0",
+    "data-prep-toolkit==0.2.0.dev6",
 ]
 authors = [
     { name="KubeRay project"},

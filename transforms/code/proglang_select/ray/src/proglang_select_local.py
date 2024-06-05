@@ -13,7 +13,7 @@
 import os
 
 from data_processing.data_access import DataAccessFactory, DataAccessLocal
-from proglang_select_transform import (
+from proglang_select_transform_ray import (
     ProgLangSelectTransform,
     lang_allowed_langs_file_key,
     lang_data_factory_key,

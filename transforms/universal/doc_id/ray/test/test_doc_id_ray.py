@@ -16,7 +16,7 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from doc_id_transform import (
+from doc_id_transform_ray import (
     DocIDRayTransformConfiguration,
     doc_column_name_cli_param,
     hash_column_name_cli_param,

@@ -6,6 +6,7 @@ include ${REPOROOT}/kfp/requirements.env
 include ${REPOROOT}/.make.defaults
 
 USE_DEV_IMAGES ?= 1
+TRANSFORM_RUNTIME = ray
 
 define set_env_var
 	$(eval export $(1)=$(2))
@@ -19,7 +20,7 @@ endef
 		[[ $$line == *#* ]] && continue; \
 		export DOCKER_IMAGE_NAME=$$(echo $$line |cut -d "=" -f 1 |sed "s/_VERSION//" |tr '[:upper:]' '[:lower:]'); \
 		export DOCKER_IMAGE_VERSION=$$(echo $$line |cut -d "=" -f 2); \
-		sed -i.back "s/data-prep-kit\/$$DOCKER_IMAGE_NAME:.*/data-prep-kit\/$$DOCKER_IMAGE_NAME:$$DOCKER_IMAGE_VERSION\"/" $$PIPELINE_FILE ;\
+		sed -i.back "s/data-prep-kit\/$$DOCKER_IMAGE_NAME\-${TRANSFORM_RUNTIME}:.*/data-prep-kit\/$$DOCKER_IMAGE_NAME\-${TRANSFORM_RUNTIME}:$$DOCKER_IMAGE_VERSION\"/" $$PIPELINE_FILE ;\
 	done < ${REPOROOT}/.make.versions
 ifeq ($(KFPv2), 1)
 	@sed -i.back "s/kfp-data-processing_v2:.*/kfp-data-processing_v2:${KFP_DOCKER_VERSION_v2}\"/" ${PIPELINE_FILE}

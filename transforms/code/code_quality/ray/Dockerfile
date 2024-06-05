@@ -14,7 +14,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY src/code_quality_transform.py .
+COPY src/code_quality_transform_ray.py .
 COPY src/code_quality_local_ray.py local/
 
 # copy test

@@ -14,7 +14,7 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY src/proglang_select_transform.py .
+COPY src/proglang_select_transform_ray.py .
 COPY src/proglang_select_local_ray.py local/
 
 # copy test

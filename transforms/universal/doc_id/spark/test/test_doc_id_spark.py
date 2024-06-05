@@ -18,7 +18,10 @@ from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLau
 from data_processing_spark.test_support.launch.abstract_launcher_test import (
     AbstractSparkTransformLauncherTest,
 )
-from doc_id_transform import DocIDTransformConfiguration, doc_id_column_name_cli_param
+from doc_id_transform_spark import (
+    DocIDTransformConfiguration,
+    doc_id_column_name_cli_param,
+)
 
 
 class TestSparkDocIDTransform(AbstractSparkTransformLauncherTest):

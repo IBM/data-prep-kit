@@ -21,6 +21,10 @@ image::
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
+set-versions::  
+	@# Help: Recursively $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
 publish:: 
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
@@ -58,5 +62,4 @@ workflow-upload:
 	$(MAKE) -C $(PIPELINE_PATH) workflow-upload
 
 .PHONY: workflow-reconcile-requirements
-workflow-reconcile-requirements:
 	$(MAKE) -C $(PIPELINE_PATH) workflow-reconcile-requirements

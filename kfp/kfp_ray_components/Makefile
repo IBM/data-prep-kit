@@ -41,6 +41,9 @@ image: Dockerfile requirements.txt
 	$(MAKE) reconcile-requirements
 	$(MAKE) .lib-src-image
 
+
+set-versions::  reconcile-requirements
+
 .PHONY: reconcile-requirements
 reconcile-requirements:
 	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
@@ -61,7 +64,7 @@ build: image
 
 .PHONY: publish
 publish:
-	$(MAKE) image .defaults.publish
+	$(MAKE) image .defaults.publish-image
 
 test::
 
