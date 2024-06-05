@@ -15,6 +15,8 @@ build::
 
 test::
 
+test-src::
+
 .PHONY: workflow-build
 workflow-build: workflow-venv
 	$(MAKE) $(YAML_WF)
