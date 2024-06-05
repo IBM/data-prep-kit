@@ -23,8 +23,6 @@ task_image = "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
-RUNTIME_JOB_ID = "runtime_job_id"
-
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6"
 
@@ -40,6 +38,7 @@ def compute_exec_params_func(
     data_max_files: int,
     data_num_samples: int,
     runtime_pipeline_id: str,
+    runtime_job_id: str,
     runtime_code_location: str,
     noop_sleep_sec: int,
 ) -> dict:
@@ -54,7 +53,7 @@ def compute_exec_params_func(
         "runtime_num_workers": KFPUtils.default_compute_execution_params(worker_options, actor_options),
         "runtime_worker_options": actor_options,
         "runtime_pipeline_id": runtime_pipeline_id,
-        RUNTIME_JOB_ID: uuid.uuid4().hex,
+        "runtime_job_id": runtime_job_id,
         "runtime_code_location": runtime_code_location,
         "noop_sleep_sec": noop_sleep_sec,
     }
@@ -65,11 +64,19 @@ def compute_exec_params_func(
 # KFPv2 recommends using the `@dsl.component` decorator, which doesn't exist in KFPv1. Therefore, here we use
 # this if/else statement and explicitly call the decorator.
 if os.getenv("KFPv2", "0") == "1":
+    # In KFPv2 dsl.RUN_ID_PLACEHOLDER is deprecated and cannot be used since SDK 2.5.0. On another hand we cannot create
+    # a unique string in a component (at runtime) and pass it to the `clean_up_task` of `ExitHandler`, due to
+    # https://github.com/kubeflow/pipelines/issues/10187. Therefore, meantime we use a unique string created at
+    # compilation time.
+    import uuid
+
     compute_exec_params_op = dsl.component_decorator.component(
         func=compute_exec_params_func, base_image=base_kfp_image
     )
+    run_id = uuid.uuid4().hex
 else:
     compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
+    run_id = dsl.RUN_ID_PLACEHOLDER
 
 # create Ray cluster
 create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
@@ -141,32 +148,28 @@ def noop(
     :param noop_sleep_sec - noop sleep time
     :return: None
     """
-
-    # compute execution params
-    compute_exec_params = compute_exec_params_op(
-        worker_options=ray_worker_options,
-        actor_options=runtime_actor_options,
-        data_s3_config=data_s3_config,
-        data_max_files=data_max_files,
-        data_num_samples=data_num_samples,
-        runtime_pipeline_id=runtime_pipeline_id,
-        runtime_code_location=runtime_code_location,
-        noop_sleep_sec=noop_sleep_sec,
-    )
-    ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
-
     # create clean_up task
-    clean_up_task = cleanup_ray_op(
-        ray_name=ray_name, run_id=compute_exec_params.output[RUNTIME_JOB_ID], server_url=server_url
-    )
-
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=run_id, server_url=server_url)
     ComponentUtils.add_settings_to_component(clean_up_task, 60)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
+        # compute execution params
+        compute_exec_params = compute_exec_params_op(
+            worker_options=ray_worker_options,
+            actor_options=runtime_actor_options,
+            data_s3_config=data_s3_config,
+            data_max_files=data_max_files,
+            data_num_samples=data_num_samples,
+            runtime_pipeline_id=runtime_pipeline_id,
+            runtime_job_id=run_id,
+            runtime_code_location=runtime_code_location,
+            noop_sleep_sec=noop_sleep_sec,
+        )
+        ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
-            run_id=compute_exec_params.output[RUNTIME_JOB_ID],
+            run_id=run_id,
             ray_head_options=ray_head_options,
             ray_worker_options=ray_worker_options,
             server_url=server_url,
@@ -177,7 +180,7 @@ def noop(
         # Execute job
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
-            run_id=compute_exec_params.output[RUNTIME_JOB_ID],
+            run_id=run_id,
             additional_params=additional_params,
             # note that the parameters below are specific for NOOP transform
             exec_params=compute_exec_params.output,

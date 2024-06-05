@@ -14,8 +14,9 @@ import os
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 import kfp.compiler as compiler
-import kfp.dsl as dsl
 import kfp.components as comp
+import kfp.dsl as dsl
+
 
 task_image = "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
 
@@ -23,7 +24,7 @@ task_image = "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
 EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0-v5"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0-v2"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../kfp/kfp_ray_components/"
@@ -31,15 +32,15 @@ component_spec_path = "../../../../kfp/kfp_ray_components/"
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 def compute_exec_params_func(
-        worker_options: str,
-        actor_options: str,
-        data_s3_config: str,
-        data_max_files: int,
-        data_num_samples: int,
-        runtime_pipeline_id: str,
-        runtime_job_id: str,
-        runtime_code_location: str,
-        noop_sleep_sec: int,
+    worker_options: str,
+    actor_options: str,
+    data_s3_config: str,
+    data_max_files: int,
+    data_num_samples: int,
+    runtime_pipeline_id: str,
+    runtime_job_id: str,
+    runtime_code_location: str,
+    noop_sleep_sec: int,
 ) -> dict:
     from workflow_support.runtime_utils import KFPUtils
 
@@ -56,13 +57,20 @@ def compute_exec_params_func(
     }
 
 
+# KFPv1 and KFP2 uses different methods to create a component from a function. KFPv1 uses the
+# `create_component_from_func` function, but it is deprecated by KFPv2 and so has a different import path.
+# KFPv2 recommends using the `@dsl.component` decorator, which doesn't exist in KFPv1. Therefore, here we use
+# this if/else statement and explicitly call the decorator.
 if os.getenv("KFPv2", "0") == "1":
     # In KFPv2 dsl.RUN_ID_PLACEHOLDER is deprecated and cannot be used since SDK 2.5.0. On another hand we cannot create
     # a unique string in a component (at runtime) and pass it to the `clean_up_task` of `ExitHandler`, due to
     # https://github.com/kubeflow/pipelines/issues/10187. Therefore, meantime we use a unique string created at
     # compilation time.
     import uuid
-    compute_exec_params_op = dsl.component_decorator.component(func=compute_exec_params_func, base_image=base_kfp_image)
+
+    compute_exec_params_op = dsl.component_decorator.component(
+        func=compute_exec_params_func, base_image=base_kfp_image
+    )
     run_id = uuid.uuid4().hex
 else:
     compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
@@ -83,25 +91,25 @@ TASK_NAME: str = "noop"
     description="Pipeline for noop",
 )
 def noop(
-        # Ray cluster
-        ray_name: str = "noop-kfp-ray",  # name of Ray cluster
-        ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
-        ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-                                  '"image_pull_secret": "", "image": "' + task_image + '"}',
-        server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-        # data access
-        data_s3_config: str = "{'input_folder': 'test/noop/input/', 'output_folder': 'test/noop/output/'}",
-        data_s3_access_secret: str = "s3-secret",
-        data_max_files: int = -1,
-        data_num_samples: int = -1,
-        # orchestrator
-        runtime_actor_options: str = "{'num_cpus': 0.8}",
-        runtime_pipeline_id: str = "pipeline_id",
-        runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-        # noop parameters
-        noop_sleep_sec: int = 10,
-        # additional parameters
-        additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
+    # Ray cluster
+    ray_name: str = "noop-kfp-ray",  # name of Ray cluster
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
+    '"image_pull_secret": "", "image": "' + task_image + '"}',
+    server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
+    # data access
+    data_s3_config: str = "{'input_folder': 'test/noop/input/', 'output_folder': 'test/noop/output/'}",
+    data_s3_access_secret: str = "s3-secret",
+    data_max_files: int = -1,
+    data_num_samples: int = -1,
+    # orchestrator
+    runtime_actor_options: str = "{'num_cpus': 0.8}",
+    runtime_pipeline_id: str = "pipeline_id",
+    runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    # noop parameters
+    noop_sleep_sec: int = 10,
+    # additional parameters
+    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
     Pipeline to execute NOOP transform
@@ -182,9 +190,7 @@ def noop(
 
     # TODO
     # Configure the pipeline level to one week (in seconds)
-
-
-#    dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
+    # dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 
 
 if __name__ == "__main__":
