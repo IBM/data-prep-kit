@@ -13,8 +13,8 @@
 import os
 import ast
 
-from data_processing.runtime.ray import RayTransformLauncher
-from data_processing.test_support.launch import AbstractTransformLauncherTest
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
 from ingest_2_parquet_transform import (
     IngestToParquetRayConfiguration,
     ingest_supported_langs_file_key,
@@ -35,6 +35,7 @@ class TestRayIngestToParquetTransform(AbstractTransformLauncherTest):
             os.path.join(basedir,"languages/lang_extensions.json",)
         )
         config = {
+            "run_locally": True,
             "data_files_to_use": ast.literal_eval("['.zip']"),
             ingest_supported_langs_file_key: lang_supported_file,
             ingest_detect_programming_lang_key: True,
