@@ -47,11 +47,7 @@ workflow-venv:
 
 .PHONY: workflow-build
 workflow-build:
-ifeq ($(KFPv2), 0)
-	$(MAKE) -C kfp_ray/v1 workflow-build
-else
-	$(MAKE) -C kfp_ray/v2 workflow-build
-endif
+	$(MAKE) -C kfp_ray workflow-build
 
 
 .PHONY: workflow-test

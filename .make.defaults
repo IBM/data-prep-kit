@@ -56,12 +56,6 @@ DPK_SPARK_LIB_DIR=$(REPOROOT)/data-processing-lib/spark
 
 KFPv2?=0
 
-ifeq ($(KFPv2), 0)
-	PIPELINE_PATH="kfp_ray/v1"
-else
-	PIPELINE_PATH="kfp_ray/v2"
-endif
-
 #######################################################################################
 # Lists all targets and optional help text found in the target.
 # Adapted from https://stackoverflow.com/a/65243296/45375
@@ -191,7 +185,6 @@ __check_defined = \
 .defaults.image:: # Must be called with a DOCKER_IMAGE= settings.
 	@# Help: Create the docker image $(DOCKER_LOCAL_IMAGE) and a tag for $(DOCKER_REMOTE_IMAGE)
 	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE)		\
-		-f $(DOCKER_FILE)				\
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\

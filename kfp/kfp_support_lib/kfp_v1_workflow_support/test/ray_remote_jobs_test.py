@@ -12,7 +12,7 @@
 
 from configmaps import ConfigmapsManager
 from python_apiserver_client.params import ConfigMapVolume
-from workflow_support.utils import RayRemoteJobs
+from workflow_support.runtime_utils import RayRemoteJobs
 
 server_url = "http:localhost:8080/ray/"
 

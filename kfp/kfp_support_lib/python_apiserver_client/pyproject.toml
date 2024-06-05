@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 package_dir = ["src"]
 [project]
 name = "python_apiserver_client"
-version = "0.0.1"
+version = "0.1.0"
 dependencies = [
     "requests",
     "kubernetes",

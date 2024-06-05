@@ -10,7 +10,7 @@
 # limitations under the License.
 ################################################################################
 
-from workflow_support.utils import PipelinesUtils
+from workflow_support.pipeline_utils import PipelinesUtils
 
 server_url = "http://localhost:8080/"
 

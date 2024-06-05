@@ -24,7 +24,12 @@ clean::
 .check-env:: .check_python_version
 	@echo "Checks passed"
 
-build:: .check-env venv
+update-toml:: .check-env
+	@# Help: Copy the Makefile distribution version into the pyproject.toml
+	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KUBERAY_CLIENT}'"/' pyproject.toml
+	sed -i.back 's/data-prep-toolkit==[0-9].*/data-prep-toolkit==${DPK_LIB_VERSION}",/' pyproject.toml
+
+build:: update-toml venv
 	@# Help: Build the distribution for publishing to a pypi
 	rm -r dist || true
 	rm -rf src/*egg-info || true
@@ -43,9 +48,8 @@ venv::pyproject.toml .check-env
 	rm -rf venv
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
-	pip install --upgrade pip;
-	pip install ray==${RAY}; \
-=	pip install -e ../../../data-processing-lib/python; \
+	pip install --upgrade pip; \
+	pip install -e ../../../data-processing-lib/python; \
 	pip install -e .;		\
 	pip install pytest pytest-cov
 

@@ -28,14 +28,20 @@ update-toml:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml
 	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_VERSION}'"/' pyproject.toml
 	sed -i.back 's/data-prep-toolkit==[0-9].*/data-prep-toolkit==${DPK_LIB_VERSION}",/' pyproject.toml
+	sed -i.back 's/python_apiserver_client==[0-9].*/python_apiserver_client==${DPK_LIB_KUBERAY_CLIENT}",/' pyproject.toml
 	sed -i.back 's/kfp==[0-9].*/kfp==${KFP_v1}",/' pyproject.toml
+	sed -i.back 's/ray=[0-9].*/ray==${RAY}",/' pyproject.toml
 
 build:: update-toml venv
+ifeq ($(KFPv2), 1)
+	echo "Skipping build as KFPv2 is defined"
+else
 	@# Help: Build the distribution for publishing to a pypi
 	rm -r dist || true
 	rm -rf src/*egg-info || true
 	${PYTHON} -m pip install --upgrade build
 	${PYTHON} -m build
+endif
 
 publish:: .check-env
 	@# Help: Publish the wheel to testpypi
@@ -49,15 +55,18 @@ venv::	pyproject.toml .check-env
 	rm -rf venv
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
-	pip install -e ../python_apiserver_client;	\
 	pip install -e ../../../data-processing-lib/python; \
-	pip install -e .;		\
-	pip install ray==${RAY} \
+	pip install -e ../python_apiserver_client;      \
+	pip install -e .;				\
 	pip install pytest pytest-cov
 
-test:: 	venv
+test:: venv 
+ifeq ($(KFPv2), 1)
+        echo "Skipping test as KFPv2 is defined"
+else
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.
 ifeq ($(DEPLOY_KUBEFLOW),1)
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) ray_remote_jobs_test.py;
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) pipeline_utils_test.py;
+endif
 endif
