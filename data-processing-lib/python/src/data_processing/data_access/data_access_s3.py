@@ -48,15 +48,9 @@ class DataAccessS3(DataAccess):
         :param n_samples: amount of files to randomly sample
         :param files_to_use: files extensions of files to include
         """
-        self.s3_credentials = {} | s3_credentials
-        access_key = self.get_access_key()
-        if access_key is None:
-            raise ValueError("S3 access key not provided")
-        secret_key = self.get_secret_key()
-        if secret_key is None:
-            raise ValueError("S3 secret key not provided")
-        endpoint = self.get_endpoint()
-        region = self.get_region()
+        if (s3_credentials is None or s3_credentials.get("access_key", None) is None
+                or s3_credentials.get("secret_key", None) is None):
+            raise "S3 credentials is not defined"
         if s3_config is None:
             self.input_folder = None
             self.output_folder = None
@@ -68,32 +62,12 @@ class DataAccessS3(DataAccess):
         self.m_files = m_files
         self.n_samples = n_samples
         self.files_to_use = files_to_use
-
-        logger.debug(f"S3 access key provided: {access_key}")
-        logger.debug(f"S3 secret key provided: no soup for you!")
-        logger.debug(f"S3 region {region}")
-        logger.debug(f"S3 endpoint/url: {endpoint}")
-        logger.debug(f"S input folder: {self.input_folder}")
-        logger.debug(f"S3 output folder: {self.output_folder}")
-        logger.debug(f"S3 data sets: {self.d_sets}")
-        logger.debug(f"S3 checkpoint: {self.checkpoint}")
-        logger.debug(f"S3 m_files: {self.m_files}")
-        logger.debug(f"S3 n_samples: {self.n_samples}")
-        logger.debug(f"S3 files_to_use: {self.files_to_use}")
-
-        self.arrS3 = ArrowS3(access_key, secret_key, endpoint=endpoint, region=region)
-
-    def get_access_key(self):
-        return self.s3_credentials.get("access_key", None)
-
-    def get_secret_key(self):
-        return self.s3_credentials.get("secret_key", None)
-
-    def get_endpoint(self):
-        return self.s3_credentials.get("url", None)
-
-    def get_region(self):
-        return self.s3_credentials.get("region", None)
+        self.arrS3 = ArrowS3(
+            access_key=s3_credentials.get("access_key"),
+            secret_key=s3_credentials.get("secret_key"),
+            endpoint=s3_credentials.get("url", None),
+            region=s3_credentials.get("region", None),
+        )
 
     def get_num_samples(self) -> int:
         """

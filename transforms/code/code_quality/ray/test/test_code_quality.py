@@ -17,11 +17,11 @@ from code_quality_transform_ray import (
     CodeQualityTransform,
     CodeQualityTransformConfiguration,
 )
-from data_processing.test_support.transform import AbstractTransformTest
+from data_processing.test_support.transform import AbstractTableTransformTest
 from data_processing.transform import get_transform_config
 
 
-class TestCodeQualityTransform(AbstractTransformTest):
+class TestCodeQualityTransform(AbstractTableTransformTest):
     def get_test_transform_fixtures(self) -> list[tuple]:
         cli = [
             "--cq_contents_column_name",
