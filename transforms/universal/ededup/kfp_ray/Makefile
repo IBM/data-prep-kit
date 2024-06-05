@@ -19,6 +19,10 @@ test-src::
 
 test-image::
 
+image::
+
+load-image::
+
 .PHONY: workflow-build
 workflow-build: workflow-venv
 	$(MAKE) $(YAML_WF)

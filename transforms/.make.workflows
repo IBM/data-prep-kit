@@ -6,27 +6,14 @@ include ${REPOROOT}/kfp/requirements.env
 include ${REPOROOT}/.make.defaults
 
 USE_DEV_IMAGES ?= 1
-TRANSFORM_RUNTIME = ray
 
 define set_env_var
 	$(eval export $(1)=$(2))
 endef
 
+# FIXME
 .PHONY: .transforms_workflows.reconcile-requirements
 .transforms_workflows.reconcile-requirements:
-	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) reconcile-requirements
-	@while IFS= read -r line; do \
-		[ -z "$$line" ] && continue; \
-		[[ $$line == *#* ]] && continue; \
-		export DOCKER_IMAGE_NAME=$$(echo $$line |cut -d "=" -f 1 |sed "s/_VERSION//" |tr '[:upper:]' '[:lower:]'); \
-		export DOCKER_IMAGE_VERSION=$$(echo $$line |cut -d "=" -f 2); \
-		sed -i.back "s/data-prep-kit\/$$DOCKER_IMAGE_NAME\-${TRANSFORM_RUNTIME}:.*/data-prep-kit\/$$DOCKER_IMAGE_NAME\-${TRANSFORM_RUNTIME}:$$DOCKER_IMAGE_VERSION\"/" $$PIPELINE_FILE ;\
-	done < ${REPOROOT}/.make.versions
-ifeq ($(KFPv2), 1)
-	@sed -i.back "s/kfp-data-processing_v2:.*/kfp-data-processing_v2:${KFP_DOCKER_VERSION_v2}\"/" ${PIPELINE_FILE}
-else
-	@sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION}\"/" ${PIPELINE_FILE}
-endif
 
 
 .PHONY: .transforms_workflows.compile-pipeline
