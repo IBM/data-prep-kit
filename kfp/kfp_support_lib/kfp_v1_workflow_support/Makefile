@@ -50,6 +50,9 @@ publish:: .check-env
 	${PYTHON} -m twine upload --verbose --non-interactive dist/*
 
 venv::	pyproject.toml .check-env
+ifeq ($(KFPv2), 1)
+	echo "Skipping test as KFPv2 is defined"
+else
 	@# Help: Create the virtual environment using pyproject.toml
 	rm -rf venv
 	$(PYTHON) -m venv venv
@@ -58,10 +61,11 @@ venv::	pyproject.toml .check-env
 	pip install -e ../python_apiserver_client;      \
 	pip install -e .;				\
 	pip install pytest pytest-cov
+endif
 
 test:: venv 
 ifeq ($(KFPv2), 1)
-        echo "Skipping test as KFPv2 is defined"
+	echo "Skipping test as KFPv2 is defined"
 else
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.
 ifeq ($(DEPLOY_KUBEFLOW),1)

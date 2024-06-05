@@ -50,6 +50,9 @@ publish:: .check-env
 	${PYTHON} -m twine upload --verbose --non-interactive dist/*
 
 venv::	pyproject.toml .check-env
+ifeq ($(KFPv2), 0)
+	echo "Skipping venv as KFPv2 is not defined"
+else
 	@# Help: Create the virtual environment using pyproject.toml
 	rm -rf venv
 	$(PYTHON) -m venv venv
@@ -58,6 +61,7 @@ venv::	pyproject.toml .check-env
 	pip install -e ../python_apiserver_client;	\
 	pip install -e .;		\
 	pip install pytest pytest-cov
+endif
 
 test:: 	venv
 ifeq ($(KFPv2), 0)
