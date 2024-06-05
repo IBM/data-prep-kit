@@ -24,14 +24,14 @@ clean::
 .check-env:: .check_python_version
 	@echo "Checks passed"
 
-update-toml:: .check-env
+set-versions:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml
 	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_VERSION}'"/' pyproject.toml
 	sed -i.back 's/data-prep-toolkit==[0-9].*/data-prep-toolkit==${DPK_LIB_VERSION}",/' pyproject.toml
 	sed -i.back 's/kfp==[0-9].*/kfp==${KFP_v1}",/' pyproject.toml
 	sed -i.back 's/ray=[0-9].*/ray==${RAY}",/' pyproject.toml
 
-build:: update-toml venv
+build:: set-versions venv
 ifeq ($(KFPv2), 1)
 	echo "Skipping build as KFPv2 is defined"
 else
@@ -57,7 +57,9 @@ else
 	rm -rf venv
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
+	cd ../../../data-processing-lib/python && make set-versions && cd -; \
 	pip install -e ../../../data-processing-lib/python; \
+	cd ../python_apiserver_client && make set-versions && cd -; \
 	pip install -e ../python_apiserver_client;      \
 	pip install -e .;				\
 	pip install pytest pytest-cov

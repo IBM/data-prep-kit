@@ -9,6 +9,12 @@ YAML_WF := $(patsubst %.py, %.yaml, ${PYTHON_WF})
 
 workflow-venv: .check_python_version ${WORKFLOW_VENV_ACTIVATE}
 
+venv::
+
+build::
+
+test::
+
 .PHONY: workflow-build
 workflow-build: workflow-venv
 	$(MAKE) $(YAML_WF)

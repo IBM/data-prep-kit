@@ -24,11 +24,11 @@ clean::
 .check-env:: .check_python_version
 	@echo "Checks passed"
 
-update-toml:: .check-env
+set-versions:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml
 	sed -i.back 's/data-prep-toolkit==[0-9].*/data-prep-toolkit==${DPK_LIB_VERSION}",/' pyproject.toml
 
-build:: update-toml venv
+build:: set-versions venv
 	@# Help: Build the distribution for publishing to a pypi
 	rm -r dist || true
 	rm -rf src/*egg-info || true
@@ -48,6 +48,7 @@ venv::pyproject.toml .check-env
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
 	pip install --upgrade pip; \
+	cd ../../../data-processing-lib/python && make set-versions && cd -; \
 	pip install -e ../../../data-processing-lib/python; \
 	pip install -e .;		\
 	pip install pytest pytest-cov
