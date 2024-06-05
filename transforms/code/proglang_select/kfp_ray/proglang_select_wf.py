@@ -22,7 +22,7 @@ import kfp.dsl as dsl
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "proglang_select_transform_ray.py"
 
-task_image = "quay.io/dataprep1/data-prep-kit/proglang_select-ray:0.4.0$(RELEASE_VERSION_SUFFIX)"
+task_image = "quay.io/dataprep1/data-prep-kit/proglang_select-ray:0.4.0.dev6"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6"
