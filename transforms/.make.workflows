@@ -50,7 +50,7 @@ ifeq ($(USE_DEV_IMAGES), 1)
 	cd ${TRANSFORM_SRC} && $(MAKE) image && $(MAKE) load-image
 	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) image && $(MAKE) load-image
 endif
-	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipelines_utils.pipelines_tests_utils -c "sanity-test" -p ${CURDIR}/${PIPELINE_FILE}
+	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipeline_utils.pipelines_tests_utils -c "sanity-test" -p ${CURDIR}/${PIPELINE_FILE}
 
 ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt ${DPK_RAY_LIB_DIR} ${REPOROOT}/kfp/kfp_support_lib/
 	rm -rf ${REPOROOT}/transforms/venv
@@ -66,5 +66,5 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requiremen
 	@if [ -z ${CLUSTER_EXISTS} ]; then \
 		cd ${REPOROOT} && make setup;  \
 	fi
-	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipelines_utils.pipelines_tests_utils -c "upload" -p ${CURDIR}/${PIPELINE_FILE}
+	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipeline_utils.pipelines_tests_utils -c "upload" -p ${CURDIR}/${PIPELINE_FILE}
 
