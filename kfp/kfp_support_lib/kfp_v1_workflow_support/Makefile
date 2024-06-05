@@ -28,7 +28,6 @@ update-toml:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml
 	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_VERSION}'"/' pyproject.toml
 	sed -i.back 's/data-prep-toolkit==[0-9].*/data-prep-toolkit==${DPK_LIB_VERSION}",/' pyproject.toml
-	sed -i.back 's/python_apiserver_client==[0-9].*/python_apiserver_client==${DPK_LIB_KUBERAY_CLIENT}",/' pyproject.toml
 	sed -i.back 's/kfp==[0-9].*/kfp==${KFP_v1}",/' pyproject.toml
 	sed -i.back 's/ray=[0-9].*/ray==${RAY}",/' pyproject.toml
 

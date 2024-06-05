@@ -26,7 +26,6 @@ clean::
 
 update-toml:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml
-	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KUBERAY_CLIENT}'"/' pyproject.toml
 	sed -i.back 's/data-prep-toolkit==[0-9].*/data-prep-toolkit==${DPK_LIB_VERSION}",/' pyproject.toml
 
 build:: update-toml venv
