@@ -3,7 +3,7 @@ import sys
 
 from data_processing.utils import get_logger, str2bool
 
-from workflow_support.utils import PipelinesUtils
+from workflow_support.pipeline_utils import PipelinesUtils
 
 
 logger = get_logger(__name__)
