@@ -18,10 +18,10 @@ import kfp.components as comp
 import kfp.dsl as dsl
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
+task_image = "quay.io/dataprep1/data-prep-kit/noop-ray:0.9.0.dev6"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "noop_transform.py"
+EXEC_SCRIPT_NAME: str = "noop_transform_ray.py"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6"
