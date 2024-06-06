@@ -11,6 +11,7 @@
 ################################################################################
 import os
 
+from src.ededup_compute_execution_params import ededup_compute_execution_params
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 import kfp.compiler as compiler
@@ -29,40 +30,6 @@ base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6
 # path to kfp component specifications files
 component_spec_path = "../../../../kfp/kfp_ray_components/"
 
-# compute execution parameters
-def compute_exec_params_func(
-    worker_options: str,
-    actor_options: str,
-    data_s3_config: str,
-    data_max_files: int,
-    data_num_samples: int,
-    runtime_pipeline_id: str,
-    runtime_job_id: str,
-    runtime_code_location: str,
-    ededup_doc_column: str,
-    ededup_hash_cpu: float,
-    ededup_n_samples: int,
-) -> dict:
-    from src.ededup_compute_execution_params import ededup_compute_execution_params
-    workers, hashes = ededup_compute_execution_params(worker_options=worker_options,
-            actor_options=actor_options,
-            params={"s3_config": data_s3_config, "hash_cpu": ededup_hash_cpu},
-            n_samples=ededup_n_samples)
-    return {
-        "data_s3_config": data_s3_config,
-        "data_max_files": data_max_files,
-        "data_num_samples": data_num_samples,
-        "runtime_num_workers": workers,
-        "runtime_worker_options": actor_options,
-        "runtime_pipeline_id": runtime_pipeline_id,
-        "runtime_job_id": runtime_job_id,
-        "runtime_code_location": runtime_code_location,
-        "ededup_doc_column": ededup_doc_column,
-        "ededup_hash_cpu": ededup_hash_cpu,
-        "ededup_num_hashes": hashes,
-    }
-
-
 # KFPv1 and KFP2 uses different methods to create a component from a function. KFPv1 uses the
 # `create_component_from_func` function, but it is deprecated by KFPv2 and so has a different import path.
 # KFPv2 recommends using the `@dsl.component` decorator, which doesn't exist in KFPv1. Therefore, here we use
@@ -79,7 +46,9 @@ if os.getenv("KFPv2", "0") == "1":
     )
     run_id = uuid.uuid4().hex
 else:
-    compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
+    compute_exec_params_op = comp.create_component_from_func(
+        func=ededup_compute_execution_params, base_image=base_kfp_image
+    )
     run_id = dsl.RUN_ID_PLACEHOLDER
 
 # create Ray cluster

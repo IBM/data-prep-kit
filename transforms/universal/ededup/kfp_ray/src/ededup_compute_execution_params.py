@@ -16,18 +16,31 @@ from typing import Any
 def ededup_compute_execution_params(
     worker_options: str,  # ray worker configuration
     actor_options: str,  # actor's resource requirements
-    params: dict[str, Any],  # exact dedup specific parameters
-    n_samples: int = 10,  # number of samples to use
-) -> (int, int):
+    data_s3_config: str,  # s3 configuration
+    data_max_files: int,  # max files to process
+    data_num_samples: int,  # num samples to process
+    runtime_pipeline_id: str,  # pipeline id
+    runtime_job_id: str,  # job id
+    runtime_code_location: str,  # code location
+    doc_column: str,  # key for accessing data
+    hash_cpu: float,  # number of CPUs per hash
+    n_samples: int,  # number of samples for parameters computation
+) -> dict:
     """
     Compute exact dedup execution parameters
     :param worker_options: cluster parameters
     :param actor_options: actor request requirements
     :param n_samples: number of samples to use
-    :param params: exact dedup specific parameters containing the following keys:
-        s3_config - s3 config
-        hash_cpu - hash cpu requirements
-    :return: json string, containing computed number of workers and hashes
+    :param data_s3_config - s3 config
+    :param data_max_files - max files to process
+    :param data_num_samples - num samples to process
+    :param runtime_pipeline_id - pipeline id
+    :param runtime_job_id - job id, or just a unique string
+    :param runtime_code_location - code location
+    :param doc_column - key for accessing data
+    :param hash_cpu - number of CPUs per hash
+    :param n_samples - umber of samples for parameters computation
+    :return: a dictionary with a Ray Job execution parameters
     """
     # required import
     import math
@@ -53,7 +66,7 @@ def ededup_compute_execution_params(
     # get credentials
     s3_key, s3_secret, s3_endpoint = KFPUtils.credentials()
     s3_creds = {"access_key": s3_key, "secret_key": s3_secret, "url": s3_endpoint}
-    s3_config = KFPUtils.load_from_json(params.get("s3_config", {}).replace("'", '"'))
+    s3_config = KFPUtils.load_from_json(data_s3_config.replace("'", '"'))
     if type(s3_config) is list:
         # S3 config is list. take the first element
         s3_config = s3_config[0]
@@ -71,7 +84,6 @@ def ededup_compute_execution_params(
     n_hashes = math.ceil(number_of_docs * 32 / GB)
     print(f"Estimated Required hashes {n_hashes}")
     print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_memory}")
-    hash_cpu: float = float(params.get("hash_cpu"))
     required_hash_cpu = n_hashes * hash_cpu
     required_hash_mem = n_hashes * 2
     if required_hash_cpu > cluster_cpu or required_hash_mem > cluster_memory:
@@ -97,5 +109,16 @@ def ededup_compute_execution_params(
         print(f"Try to increase the size of the cluster or increase size of the cpu per worker")
         sys.exit(1)
     print(f"Projected execution time {EXECUTION_OF_KB_DOC * avg_doc_size * number_of_docs / n_workers / 60} min")
-    # return json.dumps({"workers": n_workers, "hashes": n_hashes})
-    return n_workers, n_hashes
+    return {
+        "data_s3_config": data_s3_config,
+        "data_max_files": data_max_files,
+        "data_num_samples": data_num_samples,
+        "runtime_num_workers": n_workers,
+        "runtime_worker_options": actor_options,
+        "runtime_pipeline_id": runtime_pipeline_id,
+        "runtime_job_id": runtime_job_id,
+        "runtime_code_location": runtime_code_location,
+        "ededup_doc_column": doc_column,
+        "ededup_hash_cpu": hash_cpu,
+        "ededup_num_hashes": n_hashes,
+    }
