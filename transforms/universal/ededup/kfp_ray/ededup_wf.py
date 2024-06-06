@@ -141,9 +141,9 @@ def ededup(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            ededup_doc_column=ededup_doc_column,
-            ededup_hash_cpu=ededup_hash_cpu,
-            ededup_n_samples=ededup_n_samples,
+            doc_column=ededup_doc_column,
+            hash_cpu=ededup_hash_cpu,
+            n_samples=ededup_n_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
