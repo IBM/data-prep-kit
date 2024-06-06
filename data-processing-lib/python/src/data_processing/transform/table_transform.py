@@ -32,18 +32,19 @@ class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
         """
         super().__init__(config)
 
-    def transform_binary(self, byte_array: bytes, ext: str) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def transform_binary(self, base_name: str, byte_array: bytes) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         Converts input file into o or more output files.
-        If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
-        :param byte_array: input file
-        :param ext: file extension
-        :return: a tuple of a list of 0 or more converted file and a dictionary of statistics that will be
-                 propagated to metadata
+        If there is an error, an exception must be raised - exit()ing is not generally allowed.
+        :param byte_array: contents of the input file to be transformed.
+        :param base_name: the base name of the file containing the given byte_array.
+        :return: a tuple of a list of 0 or more tuples and a dictionary of statistics that will be propagated
+                to metadata.  Each element of the return list, is a tuple of the transformed bytes and a string
+                holding the extension to be used when writing out the new bytes.
         """
         # validate extension
-        if ext != ".parquet":
-            logger.warning(f"Get wrong file type {ext}")
+        if TransformUtils.get_file_extension(base_name)[1] != ".parquet":
+            logger.warning(f"Get wrong file type {base_name}")
             return [], {"wrong file type": 1}
         # convert to table
         table = TransformUtils.convert_binary_to_arrow(data=byte_array)
@@ -100,7 +101,7 @@ class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
 
     @staticmethod
     def _check_and_convert_tables(
-        out_tables: list[pa.Table], stats: dict[str, Any]
+            out_tables: list[pa.Table], stats: dict[str, Any]
     ) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
 
         out_files = [tuple[bytes, str]] * len(out_tables)

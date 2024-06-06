@@ -23,24 +23,27 @@ from data_processing.utils import get_logger
 logger = get_logger(__name__)
 
 
-def get_tables_in_folder(dir) -> list[pa.Table]:
+def get_tables_in_folder(dir: str) -> list[pa.Table]:
     """
     Get  list of Tables loaded from the parquet files in the given directory.  The returned
     list is sorted lexigraphically by the name of the file.
     :param dir:
     :return:
     """
-    tables = []
     dal = DataAccessLocal()
-    files = dal.get_folder_files(dir, extensions=["parquet"], return_data=False)
-    filenames = []
-    for filename in files:
-        filenames.append(filename)
-    filenames = sorted(filenames)
-    for filename in filenames:
-        t = dal.get_table(filename)
-        tables.append(t)
-    return tables
+    files = dal.get_folder_files(dir, extensions=[".parquet"])
+    return [TransformUtils.convert_binary_to_arrow(data) for data in files.values()]
+
+
+def get_files_in_folder(dir: str, ext: str) -> dict[str, bytes]:
+    """
+    Get  list of Tables loaded from the parquet files in the given directory.  The returned
+    list is sorted lexigraphically by the name of the file.
+    :param dir:
+    :return:
+    """
+    dal = DataAccessLocal()
+    return dal.get_folder_files(dir, extensions=[ext])
 
 
 class AbstractTest:
@@ -94,6 +97,27 @@ class AbstractTest:
                 assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {r2}"
 
     @staticmethod
+    def validate_expected_files(files_list: list[tuple[bytes, str]], expected_files_list: list[tuple[bytes, str]]):
+        """
+        Verify with assertion messages that the two lists of Tables are equivalent.
+        :param files_list:
+        :param expected_files_list:
+        :return:
+        """
+        assert files_list is not None, "Transform output table is None"
+        assert expected_files_list is not None, "Test misconfigured: expected table list is None"
+
+        l1 = len(files_list)
+        l2 = len(expected_files_list)
+        assert l1 == l2, f"Number of transformed files ({l1}) is not the expected number ({l2})"
+        for i in range(l1):
+            f1 = files_list[i]
+            f2 = expected_files_list[i]
+            assert f1[1] == f2[1], f"produced file extension {f1[1]} is different from  expected file extension {f2[1]}"
+            assert (len(f1[0]) - len(f2[0])) < 50, \
+                f"produced file length {len(f1[0])} is different from expected file extension {len(f2[0])}"
+
+    @staticmethod
     def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
         elen = len(expected_metadata)
         assert len(metadata) == elen, f"Number of metadata dictionaries not the expected of {elen}"
@@ -117,11 +141,12 @@ class AbstractTest:
         )
 
     @staticmethod
-    def validate_directory_contents(directory: str, expected_dir: str):
+    def validate_directory_contents(directory: str, expected_dir: str, drop_columns: list[str] = []):
         """
         Make sure the directory contents are the same.
         :param directory:
         :param expected_dir:
+        :param drop_columns: list of columns that might differ
         :return:
         """
         dir_cmp = dircmp(directory, expected_dir, ignore=[".DS_Store"])
@@ -138,24 +163,27 @@ class AbstractTest:
             expected_diffs = 0
         failed = len(dir_cmp.diff_files) != expected_diffs
         if failed:
-            AbstractTest.__confirm_diffs(directory, expected_dir, dir_cmp.diff_files, "/tmp")
+            AbstractTest.__confirm_diffs(directory, expected_dir, dir_cmp.diff_files, "/tmp", drop_columns)
 
         # Traverse into the subdirs since dircmp doesn't seem to do that.
         subdirs = [f.name for f in os.scandir(expected_dir) if f.is_dir()]
         for subdir in subdirs:
             d1 = os.path.join(directory, subdir)
             d2 = os.path.join(expected_dir, subdir)
-            AbstractTest.validate_directory_contents(d1, d2)
+            AbstractTest.validate_directory_contents(d1, d2, drop_columns)
 
     @staticmethod
-    def _validate_table_files(parquet1: str, parquet2: str):
+    def _validate_table_files(parquet1: str, parquet2: str, drop_columns: list[str] = []):
         da = DataAccessLocal()
         t1 = da.get_table(parquet1)
         t2 = da.get_table(parquet2)
+        if len(drop_columns) > 0:
+            t1 = t1.drop_columns(drop_columns)
+            t2 = t2.drop_columns(drop_columns)
         AbstractTest.validate_expected_tables([t1], [t2])
 
     @staticmethod
-    def __confirm_diffs(src_dir: str, expected_dir: str, diff_files: list, dest_dir: str):
+    def __confirm_diffs(src_dir: str, expected_dir: str, diff_files: list, dest_dir: str, drop_columns: list[str] = []):
         """
         Copy all files from the source dir to the dest dir.
         :param src_dir:
@@ -172,7 +200,7 @@ class AbstractTest:
                 # It seems file can be different on disk, but contain the same column/row values.
                 # so for these, do the inmemory comparison.
                 try:
-                    AbstractTest._validate_table_files(expected, src)
+                    AbstractTest._validate_table_files(expected, src, drop_columns)
                 except AssertionError as e:
                     logger.info(f"Copying file with difference: {src} to {dest}")
                     shutil.copyfile(src, dest)
@@ -180,6 +208,9 @@ class AbstractTest:
             elif "metadata" in file:
                 pass
             else:
-                logger.info(f"Copying file with difference: {src} to {dest}")
-                shutil.copyfile(src, dest)
-                assert False, "Files {src} and {dest} are different"
+                # These are binary files.
+                da = DataAccessLocal()
+                f1_bytes = da.get_file(src)
+                f2_bytes = da.get_file(dest)
+                assert (len(f1_bytes) - len(f2_bytes)) < 50, \
+                    f"produced file length {len(f1_bytes)} is different from expected file extension {len(f2_bytes)}"
