@@ -18,7 +18,7 @@ import kfp.components as comp
 import kfp.dsl as dsl
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.4.0"
+task_image = "quay.io/dataprep1/data-prep-kit/doc_id-ray:0.4.0.dev6"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "doc_id_transform.py"
