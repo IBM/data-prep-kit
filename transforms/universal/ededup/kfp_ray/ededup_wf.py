@@ -42,7 +42,7 @@ if os.getenv("KFPv2", "0") == "1":
     import uuid
 
     compute_exec_params_op = dsl.component_decorator.component(
-        func=compute_exec_params_func, base_image=base_kfp_image
+        func=ededup_compute_execution_params, base_image=base_kfp_image
     )
     run_id = uuid.uuid4().hex
 else:
