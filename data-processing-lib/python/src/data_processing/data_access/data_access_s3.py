@@ -51,6 +51,7 @@ class DataAccessS3(DataAccess):
         if (s3_credentials is None or s3_credentials.get("access_key", None) is None
                 or s3_credentials.get("secret_key", None) is None):
             raise "S3 credentials is not defined"
+        self.s3_credentials = s3_credentials
         if s3_config is None:
             self.input_folder = None
             self.output_folder = None
@@ -68,6 +69,19 @@ class DataAccessS3(DataAccess):
             endpoint=s3_credentials.get("url", None),
             region=s3_credentials.get("region", None),
         )
+
+
+    def get_access_key(self):
+        return self.s3_credentials.get("access_key", None)
+
+    def get_secret_key(self):
+        return self.s3_credentials.get("secret_key", None)
+
+    def get_endpoint(self):
+        return self.s3_credentials.get("url", None)
+
+    def get_region(self):
+        return self.s3_credentials.get("region", None)
 
     def get_num_samples(self) -> int:
         """
