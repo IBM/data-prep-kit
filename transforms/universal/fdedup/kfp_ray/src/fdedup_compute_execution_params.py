@@ -201,7 +201,7 @@ def fdedup_compute_execution_params(
 
     print(
         f"Required cpu : "
-        f"{b_actors * bucket_cpu + m_actors * min_hash_cpu + d_actors * doc_cpu + n_workers * actor_cpu}"
+        f"{b_actors * bucket_cpu + m_actors * mhash_cpu + d_actors * doc_cpu + n_workers * actor_cpu}"
     )
 
     projected_execution = EXECUTION_OF_KB_DOC * avg_doc_size * number_of_docs / n_workers / 60
