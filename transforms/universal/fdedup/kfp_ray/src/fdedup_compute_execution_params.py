@@ -16,37 +16,65 @@ from typing import Any, NamedTuple
 def fdedup_compute_execution_params(
     worker_options: str,  # ray worker configuration
     actor_options: str,  # actor's resource requirements
-    params: dict[str, Any],  # fuzzy dedup specific parameters
-    n_samples: int = 10,  # number of samples to use
-) -> NamedTuple(
-    "Output", [("workers", int), ("preprocessors", int), ("docs", int), ("buckets", int), ("min_hashes", int)]
-):
+    data_s3_config: str,  # s3 configuration
+    data_max_files: int,  # max files to process
+    data_num_samples: int,  # num samples to process
+    runtime_pipeline_id: str,  # pipeline id
+    runtime_job_id: str,  # job id
+    runtime_code_location: str,  # code location
+    doc_column: str,  # document column name
+    id_column: str,  # integer document id column name
+    cluster_column: str,  # cluster column name
+    bucket_cpu: float,  # number of CPUs per bucket hash
+    doc_cpu: float,  # number of CPUs per doc hash
+    mhash_cpu: float,  # number of CPUs per minhash hash
+    num_permutations: int,  # number of permutations
+    threshold: float,  # threshold,
+    shingles_size: int,  # number of words in shingle
+    delimiters: str,  # delimiter for splitting document
+    random_delay_limit: int,  # delay between reads to reduce S3 load.
+    # A random number between 0 and random_delay_limit is used
+    snapshot_delay: int,  # delay between restoring individual actors
+    use_doc_snapshot: bool,  # flag to skip documents building and start from existing snapshots
+    use_bucket_snapshot: bool,  # flag to skip buckets building and start from existing snapshots
+    n_samples: int,  # number of samples to use
+) -> dict:  # NamedTuple(
+    # "Output", [("workers", int), ("preprocessors", int), ("docs", int), ("buckets", int), ("min_hashes", int)]
+
     """
     Compute fuzzy dedup execution parameters
     :param worker_options: cluster parameters
     :param actor_options: actor request requirements
+    :param data_s3_config: s3 configuration
+    :param data_max_files: max files to process
+    :param data_num_samples: num samples to process
+    :param runtime_pipeline_id: pipeline id
+    :param runtime_job_id: job id
+    :param runtime_code_location: code location
+    :param doc_column: document column name
+    :param id_column: integer document id column name
+    :param cluster_column: cluster column name
+    :param bucket_cpu: number of CPUs per bucket hash
+    :param doc_cpu: number of CPUs per doc hash
+    :param mhash_cpu: number of CPUs per minhash hash
+    :param num_permutations: number of permutations
+    :param threshold: threshold,
+    :param shingles_size: number of words in shingle
+    :param delimiters: delimiter for splitting document
+    :param random_delay_limit: # delay between reads to reduce S3 load. A random number between 0 and random_delay_limit is used
+    :param snapshot_delay: delay between restoring individual actors
+    :param use_doc_snapshot: flag to skip documents building and start from existing snapshots
+    :param use_bucket_snapshot: flag to skip buckets building and start from existing snapshots
     :param n_samples: number of samples to use
-    :param params: fuzzy dedup specific parameters containing the following keys:
-        threshold - threshold for fuzzy computations
-        num_permutations - number of permutation
-        s3_config - s3 config
-        bucket_cpu - bucket actor cpu requirements
-        minhash_cpu - minhash actor cpu requirements
-        doc_cpu - doc actor cpu requirements
-    :return: json string, containing
-        workers - number of workers
-        preprocessors - number of preprocessors
-        docs - number of doc actors
-        buckets - number of bucket actors
-        min_hashes - number of minhash actors
+    :return: a dictionary with a Ray Job execution parameters
     """
     import math
     import sys
 
     from data_processing.data_access import DataAccessS3
     from data_processing.utils import GB, KB
-    from kfp_support.workflow_support.runtime_utils import KFPUtils
     from scipy.integrate import quad as integrate
+    from workflow_support.runtime_utils import KFPUtils
 
     EXECUTION_OF_KB_DOC = 0.003
 
@@ -104,8 +132,8 @@ def fdedup_compute_execution_params(
 
     # fuzzy parameters
     num_buckets, length_bucket = fuzzy_optimal_param(
-        threshold=float(params.get("threshold")),
-        num_perm=int(params.get("num_permutations")),
+        threshold=threshold,
+        num_perm=num_permutations,
         false_positive_weight=0.5,
         false_negative_weight=0.5,
     )
@@ -124,7 +152,7 @@ def fdedup_compute_execution_params(
     # get credentials
     s3_key, s3_secret, s3_endpoint = KFPUtils.credentials()
     s3_creds = {"access_key": s3_key, "secret_key": s3_secret, "url": s3_endpoint}
-    s3_config = KFPUtils.load_from_json(params.get("s3_config", {}).replace("'", '"'))
+    s3_config = KFPUtils.load_from_json(data_s3_config.replace("'", '"'))
     if type(s3_config) is list:
         # S3 config is list. take the first element
         s3_config = s3_config[0]
@@ -143,13 +171,10 @@ def fdedup_compute_execution_params(
     d_actors = math.ceil(number_of_docs * 48 * 1.1 / GB)
     m_actors = math.ceil(number_of_docs * 128 * 1.1 / GB)
     # compute cpu requirements
-    bucket_cpu = float(params.get("bucket_cpu"))
-    min_hash_cpu = float(params.get("minhash_cpu"))
-    doc_cpu = float(params.get("doc_cpu"))
     # Define number of preprocessors. We are assuming that preprocessors and workers are using the same amount
     # of CPUs
     n_preprocessors = int(
-        (0.85 * cluster_cpu - b_actors * bucket_cpu - m_actors * min_hash_cpu - d_actors * doc_cpu) / actor_cpu
+        (0.85 * cluster_cpu - b_actors * bucket_cpu - m_actors * mhash_cpu - d_actors * doc_cpu) / actor_cpu
     )
     if n_preprocessors < 0:
         print(f"Not enough CPUs to run fuzzy de duping, computed number of workers is {n_preprocessors}")
@@ -181,4 +206,31 @@ def fdedup_compute_execution_params(
 
     projected_execution = EXECUTION_OF_KB_DOC * avg_doc_size * number_of_docs / n_workers / 60
     print(f"Projected execution time {projected_execution} min")
-    return (n_workers, n_preprocessors, d_actors, b_actors, m_actors)
+    return {
+        "data_s3_config": data_s3_config,
+        "data_max_files": data_max_files,
+        "data_num_samples": data_num_samples,
+        "runtime_num_workers": n_workers,
+        "runtime_worker_options": actor_options,
+        "runtime_pipeline_id": runtime_pipeline_id,
+        "runtime_job_id": runtime_job_id,
+        "runtime_code_location": runtime_code_location,
+        "fdedup_doc_column": doc_column,
+        "fdedup_id_column": id_column,
+        "fdedup_cluster_column": cluster_column,
+        "fdedup_bucket_cpu": bucket_cpu,
+        "fdedup_doc_cpu": doc_cpu,
+        "fdedup_mhash_cpu": mhash_cpu,
+        "fdedup_num_doc_actors": d_actors,
+        "fdedup_num_bucket_actors": b_actors,
+        "fdedup_num_minhash_actors": m_actors,
+        "fdedup_num_preprocessors": n_preprocessors,
+        "fdedup_num_permutations": num_permutations,
+        "fdedup_threshold": threshold,
+        "fdedup_shingles_size": shingles_size,
+        "fdedup_delimiters": delimiters,
+        "fdedup_random_delay_limit": random_delay_limit,
+        "fdedup_snapshot_delay": snapshot_delay,
+        "fdedup_use_doc_snapshot": use_doc_snapshot,
+        "fdedup_use_bucket_snapshot": use_bucket_snapshot,
+    }

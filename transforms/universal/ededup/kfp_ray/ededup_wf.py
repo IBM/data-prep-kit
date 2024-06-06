@@ -164,7 +164,6 @@ def ededup(
             ray_name=ray_name,
             run_id=run_id,
             additional_params=additional_params,
-            # note that the parameters below are specific for NOOP transform
             exec_params=compute_exec_params.output,
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,

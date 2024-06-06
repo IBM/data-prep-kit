@@ -9,34 +9,55 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+import os
+
+from src.fdedup_compute_execution_params import fdedup_compute_execution_params
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from kfp_support.workflow_support.runtime_utils import (
-    ONE_HOUR_SEC,
-    ONE_WEEK_SEC,
-    ComponentUtils,
-)
-from src.fdedup_compute_execution_params import fdedup_compute_execution_params
 
+
+task_image = "quay.io/dataprep1/data-prep-kit/fdedup-ray:0.4.0.dev6"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "fdedup_transform.py"
-
-task_image = "quay.io/dataprep1/data-prep-kit/fdedup:0.3.0"
+EXEC_SCRIPT_NAME: str = "fdedup_transform_ray.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.0"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6"
 
-# compute execution parameters
-compute_exec_params_op = comp.func_to_container_op(func=fdedup_compute_execution_params, base_image=base_kfp_image)
+# path to kfp component specifications files
+component_spec_path = "../../../../kfp/kfp_ray_components/"
+
+# KFPv1 and KFP2 uses different methods to create a component from a function. KFPv1 uses the
+# `create_component_from_func` function, but it is deprecated by KFPv2 and so has a different import path.
+# KFPv2 recommends using the `@dsl.component` decorator, which doesn't exist in KFPv1. Therefore, here we use
+# this if/else statement and explicitly call the decorator.
+if os.getenv("KFPv2", "0") == "1":
+    # In KFPv2 dsl.RUN_ID_PLACEHOLDER is deprecated and cannot be used since SDK 2.5.0. On another hand we cannot create
+    # a unique string in a component (at runtime) and pass it to the `clean_up_task` of `ExitHandler`, due to
+    # https://github.com/kubeflow/pipelines/issues/10187. Therefore, meantime we use a unique string created at
+    # compilation time.
+    import uuid
+
+    compute_exec_params_op = dsl.component_decorator.component(
+        func=fdedup_compute_execution_params, base_image=base_kfp_image
+    )
+    run_id = uuid.uuid4().hex
+else:
+    compute_exec_params_op = comp.create_component_from_func(
+        func=fdedup_compute_execution_params, base_image=base_kfp_image
+    )
+    run_id = dsl.RUN_ID_PLACEHOLDER
+
 # create Ray cluster
-create_ray_op = comp.load_component_from_file("../../../kfp_ray_components/createRayComponent.yaml")
+create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
 # execute job
-execute_ray_jobs_op = comp.load_component_from_file("../../../kfp_ray_components/executeRayJobComponent.yaml")
+execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "executeRayJobComponent.yaml")
 # clean up Ray
-cleanup_ray_op = comp.load_component_from_file("../../../kfp_ray_components/cleanupRayComponent.yaml")
+cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
+
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
 TASK_NAME: str = "fdedup"
 
@@ -135,7 +156,7 @@ def fdedup(
     :return: None
     """
     # create clean_up task
-    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=dsl.RUN_ID_PLACEHOLDER, server_url=server_url)
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=run_id, server_url=server_url)
     ComponentUtils.add_settings_to_component(clean_up_task, 60)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
@@ -143,14 +164,26 @@ def fdedup(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=runtime_actor_options,
-            params={
-                "threshold": fdedup_threshold,
-                "num_permutations": fdedup_num_permutations,
-                "s3_config": data_s3_config,
-                "bucket_cpu": fdedup_bucket_cpu,
-                "doc_cpu": fdedup_doc_cpu,
-                "minhash_cpu": fdedup_mhash_cpu,
-            },
+            data_s3_config=data_s3_config,
+            data_max_files=data_max_files,
+            data_num_samples=data_num_samples,
+            runtime_pipeline_id=runtime_pipeline_id,
+            runtime_job_id=run_id,
+            runtime_code_location=runtime_code_location,
+            doc_column=fdedup_doc_column,
+            id_column=fdedup_id_column,
+            cluster_column=fdedup_cluster_column,
+            bucket_cpu=fdedup_bucket_cpu,
+            doc_cpu=fdedup_doc_cpu,
+            mhash_cpu=fdedup_mhash_cpu,
+            num_permutations=fdedup_num_permutations,
+            threshold=fdedup_threshold,
+            shingles_size=fdedup_shingles_size,
+            delimiters=fdedup_delimiters,
+            random_delay_limit=fdedup_random_delay_limit,
+            snapshot_delay=fdedup_snapshot_delay,
+            use_doc_snapshot=fdedup_use_doc_snapshot,
+            use_bucket_snapshot=fdedup_use_bucket_snapshot,
             n_samples=fdedup_n_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
@@ -159,7 +192,7 @@ def fdedup(
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             ray_head_options=ray_head_options,
             ray_worker_options=ray_worker_options,
             server_url=server_url,
@@ -170,36 +203,9 @@ def fdedup(
         # Execute job
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             additional_params=additional_params,
-            exec_params={
-                "data_s3_config": data_s3_config,
-                "data_max_files": data_max_files,
-                "data_num_samples": data_num_samples,
-                "runtime_num_workers": compute_exec_params.outputs["workers"],
-                "runtime_worker_options": runtime_actor_options,
-                "runtime_pipeline_id": runtime_pipeline_id,
-                "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,
-                "runtime_code_location": runtime_code_location,
-                "fdedup_doc_column": fdedup_doc_column,
-                "fdedup_id_column": fdedup_id_column,
-                "fdedup_cluster_column": fdedup_cluster_column,
-                "fdedup_bucket_cpu": fdedup_bucket_cpu,
-                "fdedup_doc_cpu": fdedup_doc_cpu,
-                "fdedup_mhash_cpu": fdedup_mhash_cpu,
-                "fdedup_num_doc_actors": compute_exec_params.outputs["docs"],
-                "fdedup_num_bucket_actors": compute_exec_params.outputs["buckets"],
-                "fdedup_num_minhash_actors": compute_exec_params.outputs["min_hashes"],
-                "fdedup_num_preprocessors": compute_exec_params.outputs["preprocessors"],
-                "fdedup_num_permutations": fdedup_num_permutations,
-                "fdedup_threshold": fdedup_threshold,
-                "fdedup_shingles_size": fdedup_shingles_size,
-                "fdedup_delimiters": fdedup_delimiters,
-                "fdedup_random_delay_limit": fdedup_random_delay_limit,
-                "fdedup_snapshot_delay": fdedup_snapshot_delay,
-                "fdedup_use_doc_snapshot": fdedup_use_doc_snapshot,
-                "fdedup_use_bucket_snapshot": fdedup_use_bucket_snapshot,
-            },
+            exec_params=compute_exec_params.output,
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
         )
@@ -207,8 +213,9 @@ def fdedup(
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
 
+    # TODO
     # Configure the pipeline level to one week (in seconds)
-    dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
+    # dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 
 
 if __name__ == "__main__":
