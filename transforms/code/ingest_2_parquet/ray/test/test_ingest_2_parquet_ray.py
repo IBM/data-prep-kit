@@ -10,17 +10,19 @@
 # limitations under the License.
 ################################################################################
 
-import os
 import ast
+import os
 
+from data_processing.test_support.launch.transform_test import (
+    AbstractTransformLauncherTest,
+)
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
 from ingest_2_parquet_transform_ray import (
     IngestToParquetRayConfiguration,
-    ingest_supported_langs_file_key,
     ingest_detect_programming_lang_key,
     ingest_domain_key,
     ingest_snapshot_key,
+    ingest_supported_langs_file_key,
 )
 
 
@@ -29,10 +31,14 @@ class TestRayIngestToParquetTransform(AbstractTransformLauncherTest):
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
+
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
         lang_supported_file = os.path.abspath(
-            os.path.join(basedir,"languages/lang_extensions.json",)
+            os.path.join(
+                basedir,
+                "languages/lang_extensions.json",
+            )
         )
         config = {
             "run_locally": True,
