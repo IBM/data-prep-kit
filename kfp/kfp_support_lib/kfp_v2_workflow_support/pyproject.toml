@@ -16,7 +16,7 @@ dependencies = [
     "kfp-kubernetes==1.2.0",
     "ray==2.9.3",
     "requests",
-    "data-prep-toolkit==0.2.0.dev6",
+    "data_prep_toolkit_ray==0.2.0.dev6",
     "python_apiserver_client",
 ]
 
