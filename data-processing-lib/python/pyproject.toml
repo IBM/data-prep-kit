@@ -2,6 +2,7 @@
 name = "data_prep_toolkit"
 version = "0.2.0.dev6"
 requires-python = ">=3.10"
+keywords = ["data", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
 description = "Data Preparation Toolkit Library"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
@@ -15,6 +16,11 @@ dependencies = [
     "argparse",
     "mmh3",
 ]
+
+[project_urls]
+Repository = "https://github.com/IBM/data-prep-kit"
+Issues = "https://github.com/IBM/data-prep-kit/issues"
+Documentation = "https://ibm.github.io/data-prep-kit/"
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
