@@ -4,6 +4,7 @@
 # sub-projects underneath this directory.  Currently, the common/standardized set of rules are as follows
 # and supported by .make.defaults 
 #
+# all: clean setup build test
 # setup: 
 # clean: 
 # build:
@@ -26,6 +27,8 @@ include .make.defaults
 ########## ########## ########## ########## ########## ########## ########## ########## 
 # Global rules that are generally to be implemented in the sub-directories and can
 # be overridden there (the double colon on the rule makes the overridable). 
+
+all: clean build test
 
 clean:: 
 	@# Help: Recursively $@ in all subdirs 
