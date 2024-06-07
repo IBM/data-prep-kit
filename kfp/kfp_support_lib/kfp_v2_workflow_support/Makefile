@@ -33,6 +33,7 @@ set-versions:: .check-env
 
 build:: set-versions venv
 ifneq ($(KFPv2), 1)
+	# we want to prevent execution of the rule, when we run `make build` in upper directories and KFPv2 is not set
 	echo "Skipping build as KFPv2 is not defined"
 else
 	@# Help: Build the distribution for publishing to a pypi
@@ -51,6 +52,7 @@ publish:: .check-env
 
 venv::	pyproject.toml .check-env
 ifneq ($(KFPv2), 1)
+	# we want to prevent execution of the rule, when we run `make venv` in upper directories and KFPv2 is not set
 	echo "Skipping venv as KFPv2 is not defined"
 else
 	@# Help: Create the virtual environment using pyproject.toml
@@ -69,6 +71,7 @@ endif
 
 test:: 	venv
 ifneq ($(KFPv2), 1)
+	# we want to prevent execution of the rule, when we run `make test` in upper directories and KFPv2 is not set
 	echo "Skipping test as KFPv2 is not defined"
 else
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.
