@@ -49,8 +49,8 @@ ingest_snapshot_key = f"{shortname}_snapshot"
 
 def _get_supported_languages(lang_file: str, data_access: DataAccess) -> dict[str, str]:
     logger.debug(f"Getting supported languages from file {lang_file}")
-    json_data, _ = data_access.get_file(lang_file).decode("utf-8")
-    lang_dict = json.loads(json_data)
+    json_data, _ = data_access.get_file(lang_file)
+    lang_dict = json.loads(json_data.decode("utf-8"))
     reversed_dict = {ext: langs for langs, exts in lang_dict.items() for ext in exts}
     logger.debug(f"Supported languages {reversed_dict}")
     return reversed_dict

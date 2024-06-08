@@ -249,7 +249,7 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         write_cmd(output_data_url)
 
     def _run_transform(self, data_access: DataAccess, transform: AbstractSparkTransform):
-        spark_df = self._read_data(data_access)
+        spark_df, _ = self._read_data(data_access)
         res_spark_df, metadata = transform.transform(spark_df)
         self._write_data(res_spark_df[0], data_access)
         data_access.save_job_metadata(metadata)
