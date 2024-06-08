@@ -62,7 +62,7 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Test KFP lib
+            - name: Test KFP v1 lib
               run: |
                   source kind/requirements.env
                   export PATH=$PATH:/tmp/
@@ -93,7 +93,7 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test KFP worflow run
+            - name: Test KFP v1 worflow run
               timeout-minutes: 120
               run: |
                   source kind/requirements.env
@@ -108,6 +108,8 @@ jobs:
                   chmod 777 /tmp/kubectl
                   curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
                   chmod +x /tmp/mc
+                  export DEPLOY_KUBEFLOW=1
                   make -C kind setup
-                  make -C transforms workflow-build
+                  make -C kfp/kfp_support_lib test
+                  make -C transforms/universal/noop/ workflow-build
                   make -C transforms/universal/noop workflow-test
