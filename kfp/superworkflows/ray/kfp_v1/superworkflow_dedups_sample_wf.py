@@ -1,7 +1,7 @@
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from kfp_support.workflow_support.utils import ONE_WEEK_SEC
+from kfp_support.workflow_support.runtime_utils import ONE_WEEK_SEC
 
 
 # Components
