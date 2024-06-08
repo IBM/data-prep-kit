@@ -47,12 +47,9 @@ run-cli-sample:
                 .transforms.run-src-file
 
 
+run-local-sample: .transforms.run-local-ray-sample
 
-run-local-python-only-sample: .transforms.run-local-sample
-
-run-local-sample: .transforms.run-local-sample
-
-run-s3-sample: .transforms.run-s3-sample
+run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
