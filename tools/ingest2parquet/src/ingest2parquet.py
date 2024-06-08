@@ -17,7 +17,7 @@ import uuid
 import zipfile
 from datetime import datetime
 from multiprocessing import Pool
-from typing import Any, List
+from typing import Any
 
 import pandas as pd
 import pyarrow as pa
@@ -122,7 +122,7 @@ def raw_to_parquet(
                 raise Exception("Failed to upload")
 
     except Exception as e:
-        return (False, {"path": file_path, "error": str(e)})
+        return False, {"path": file_path, "error": str(e)}
 
 
 def generate_stats(metadata: list) -> dict[str, Any]:
@@ -133,19 +133,19 @@ def generate_stats(metadata: list) -> dict[str, Any]:
     :return: Dictionary containing processing statistics
     """
     success = 0
-    sucess_details = []
+    success_details = []
     failures = 0
     failure_details = []
     for m in metadata:
         if m[0] == True:
             success += 1
-            sucess_details.append(m[1])
+            success_details.append(m[1])
         else:
             failures += 1
             failure_details.append(m[1])
 
     # Create DataFrame from success details to calculate total bytes in memory
-    success_df = pd.DataFrame(sucess_details, columns=["path", "bytes_in_memory", "row_count"])
+    success_df = pd.DataFrame(success_details, columns=["path", "bytes_in_memory", "row_count"])
     total_bytes_in_memory = success_df["bytes_in_memory"].sum()
     total_row_count = success_df["row_count"].sum()
 
@@ -198,7 +198,6 @@ def ingest2parquet():
 
     if len(file_paths) != 0:
         print(f"Number of files is {len(file_paths)} ")
-        metadata = []
         detect_prog_lang = detect_language.Detect_Programming_Lang() if args.detect_programming_lang else None
 
         with Pool() as p:
