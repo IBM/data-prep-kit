@@ -32,7 +32,7 @@ base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6
 # path to kfp component specifications files
 component_spec_path = "../../../../../kfp/kfp_ray_components/"
 
-# compute execution parameters. Here different tranforms might need different implementations. As
+# compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 compute_exec_params_op = comp.func_to_container_op(
     func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
