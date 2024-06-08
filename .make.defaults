@@ -91,7 +91,7 @@ help::
 # It enables the processing of  a common set of rules on all sub-projects underneath this directory.  
 # Currently, the common/standardized set of rules are as follows and supported by makefile.include
 #
-# all: clean setup build test
+# all: clean setup test build
 # clean:
 # setup: 
 # build:
