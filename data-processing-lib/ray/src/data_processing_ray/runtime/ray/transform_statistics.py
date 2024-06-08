@@ -36,6 +36,7 @@ class TransformStatisticsRay(TransformStatistics):
         self.failed_read_counter = Counter("failed_read_files", "Total read failed files")
         self.failed_write_counter = Counter("failed_write_files", "Total write failed files")
         self.transform_exceptions_counter = Counter("transform_exceptions", "Transform exception occurred")
+        self.data_retries_counter = Counter("data_access_retries", "Data access retries")
 
     def add_stats(self, stats=dict[str, Any]) -> None:
         """
@@ -64,3 +65,5 @@ class TransformStatisticsRay(TransformStatistics):
                     self.failed_write_counter.inc(val)
                 if key == "transform execution exception":
                     self.transform_exceptions_counter.inc(val)
+                if key == "data access retries":
+                    self.data_retries_counter.inc(val)

@@ -62,7 +62,7 @@ class DataAccess:
         logger.info(f"Using files {result} to sample data")
         return result
 
-    def get_files_to_process(self) -> tuple[list[str], dict[str, float]]:
+    def get_files_to_process(self) -> tuple[list[str], dict[str, float], int]:
         """
         Get files to process
         :return: list of files and a dictionary of the files profile:
@@ -70,18 +70,19 @@ class DataAccess:
             "min_file_size_MB",
             "avg_file_size_MB",
             "total_file_size_MB"
+        and the number of retries
         """
         if self.get_output_folder() is None:
             logger.warning("Input/Output are not defined, returning empty list")
-            return [], {}
-        path_list, path_profile = self.get_files_to_process_internal()
+            return [], {}, 0
+        path_list, path_profile, retries = self.get_files_to_process_internal()
         n_samples = self.get_num_samples()
         if n_samples > 0:
             files = self.get_random_file_set(n_samples=n_samples, files=path_list)
-            return files, path_profile
-        return path_list, path_profile
+            return files, path_profile, retries
+        return path_list, path_profile, retries
 
-    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float]]:
+    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float], int]:
         """
         Get files to process
         :return: list of files and a dictionary of the files profile:
@@ -89,26 +90,28 @@ class DataAccess:
             "min_file_size_MB",
             "avg_file_size_MB",
             "total_file_size_MB"
+        and number of retries
         """
         pass
 
-    def get_table(self, path: str) -> pa.table:
+    def get_table(self, path: str) -> tuple[pa.table, int]:
         """
         Get pyArrow table for a given path
         :param path - file path
-        :return: pyArrow table or None, if the table read failed
+        :return: pyArrow table or None, if the table read failed and number of retries
         """
         pass
 
-    def get_file(self, path: str) -> bytes:
+    def get_file(self, path: str) -> tuple[bytes, int]:
         """
         Get file as a byte array
         :param path: file path
-        :return: bytes array of file content
+        :return: bytes array of file content and number of retries
         """
         pass
 
-    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) -> dict[str, bytes]:
+    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) \
+            -> tuple[dict[str, bytes], int]:
         """
         Get a list of byte content of files. The path here is an absolute path and can be anywhere.
         The current limitation for S3 and Lakehouse is that it has to be in the same bucket
@@ -121,14 +124,14 @@ class DataAccess:
         """
         pass
 
-    def save_file(self, path: str, data: bytes) -> dict[str, Any]:
+    def save_file(self, path: str, data: bytes) -> tuple[dict[str, Any], int]:
         """
         Save byte array to the file
         :param path: file path
         :param data: byte array
         :return: a dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
+        in the case of failure dict is None and number of retries
         """
 
     def get_output_location(self, path: str) -> str:
@@ -139,18 +142,18 @@ class DataAccess:
         """
         return ""
 
-    def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
+    def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any], int]:
         """
         Save table to a given location
         :param path: location to save table
         :param table: table
         :return: size of table in memory and a dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
+        in the case of failure dict is None and number of retries
         """
         pass
 
-    def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
+    def save_job_metadata(self, metadata: dict[str, Any]) -> tuple[dict[str, Any], int]:
         """
         Save job metadata
         :param metadata: a dictionary, containing the following keys
@@ -167,11 +170,11 @@ class DataAccess:
         are filled bu implementation
         :return: a dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
+        in the case of failure dict is None and number of retries
         """
         pass
 
-    def sample_input_data(self, n_samples: int = 10) -> dict[str, Any]:
+    def sample_input_data(self, n_samples: int = 10) -> tuple[dict[str, Any], int]:
         """
         Sample input data set to get average table size, average doc size, number of docs, etc.
         Note that here we are not reading all of the input documents, but rather randomly pick
@@ -185,9 +188,10 @@ class DataAccess:
             average table size MB,
             average doc size KB,
             estimated number of docs
+        and number of retries
         """
         # get files to process
-        path_list, path_profile = self.get_files_to_process_internal()
+        path_list, path_profile, retries = self.get_files_to_process_internal()
         # Pick files to sample
         files = self.get_random_file_set(n_samples=n_samples, files=path_list)
         # Read table and compute number of docs and sizes
@@ -195,7 +199,8 @@ class DataAccess:
         table_sizes = []
         n_tables = 0
         for f in files:
-            table = self.get_table(path=f)
+            table, r = self.get_table(path=f)
+            retries += r
             if table is not None:
                 n_tables += 1
                 number_of_docs.append(table.num_rows)
@@ -225,4 +230,4 @@ class DataAccess:
             "average table size MB": av_table_size,
             "average doc size KB": av_doc_size,
             "estimated number of docs": number_of_docs,
-        }
+        }, retries

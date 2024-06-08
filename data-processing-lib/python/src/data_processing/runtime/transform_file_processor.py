@@ -46,7 +46,9 @@ class AbstractTransformFileProcessor:
             return
         t_start = time.time()
         # Read source file
-        filedata = self.data_access.get_file(path=f_name)
+        filedata, retries = self.data_access.get_file(path=f_name)
+        if retries > 0:
+            self._publish_stats({"data access retries", retries})
         if filedata is None:
             self.logger.warning(f"File read resulted in None for {f_name}. Returning.")
             self._publish_stats({"failed_reads": 1})
@@ -123,7 +125,9 @@ class AbstractTransformFileProcessor:
                 self.logger.debug(
                     f"Writing transformed file {self.last_file_name}{self.last_extension} to {output_name}"
                 )
-                save_res = self.data_access.save_file(path=output_name, data=file_ext[0])
+                save_res, retries = self.data_access.save_file(path=output_name, data=file_ext[0])
+                if retries > 0:
+                    self._publish_stats({"data access retries", retries})
                 if save_res is not None:
                     # Store execution statistics. Doing this async
                     self._publish_stats(
@@ -156,7 +160,9 @@ class AbstractTransformFileProcessor:
                         f"Writing transformed file {self.last_file_name}{self.last_extension}, {index + 1} "
                         f"of {count}  to {output_name_indexed}"
                     )
-                    save_res = self.data_access.save_file(path=output_name_indexed, data=file_ext[0])
+                    save_res, retries = self.data_access.save_file(path=output_name_indexed, data=file_ext[0])
+                    if retries > 0:
+                        self._publish_stats({"data access retries", retries})
                     if save_res is None:
                         self.logger.warning(f"Failed to write file {output_name_indexed}")
                         self._publish_stats({"failed_writes": 1})

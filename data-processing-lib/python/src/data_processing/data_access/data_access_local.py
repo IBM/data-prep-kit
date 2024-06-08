@@ -181,7 +181,7 @@ class DataAccessLocal(DataAccess):
             },
         )
 
-    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float]]:
+    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float], int]:
         """
         Get files to process
         :return: list of files and a dictionary of the files profile:
@@ -191,7 +191,7 @@ class DataAccessLocal(DataAccess):
         """
         if self.output_folder is None:
             logger.error("Get files to process. local configuration is not present, returning empty")
-            return [], {}
+            return [], {}, 0
         # Check if we are using data sets
         if self.d_sets is not None:
             # get a list of subdirectory paths matching d_sets
@@ -239,9 +239,9 @@ class DataAccessLocal(DataAccess):
                 output_path=self.output_folder,
                 cm_files=self.m_files,
             )
-        return path_list, profile
+        return path_list, profile, 0
 
-    def get_table(self, path: str) -> pa.table:
+    def get_table(self, path: str) -> tuple[pa.table, int]:
         """
         Attempts to read a PyArrow table from the given path.
 
@@ -254,10 +254,10 @@ class DataAccessLocal(DataAccess):
 
         try:
             table = pq.read_table(path)
-            return table
+            return table, 0
         except (FileNotFoundError, IOError, pa.ArrowException) as e:
             logger.error(f"Error reading table from {path}: {e}")
-            return None
+            return None, 0
 
     def get_output_location(self, path: str) -> str:
         """
@@ -270,7 +270,7 @@ class DataAccessLocal(DataAccess):
             return None
         return path.replace(self.input_folder, self.output_folder)
 
-    def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
+    def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any], int]:
         """
         Saves a pyarrow table to a file and returns information about the operation.
 
@@ -295,13 +295,13 @@ class DataAccessLocal(DataAccess):
 
             # Get file size and create file_info
             file_info = {"name": os.path.basename(path), "size": os.path.getsize(path)}
-            return size_in_memory, file_info
+            return size_in_memory, file_info, 0
 
         except Exception as e:
             logger.error(f"Error saving table to {path}: {e}")
-            return -1, None
+            return -1, None, 0
 
-    def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
+    def save_job_metadata(self, metadata: dict[str, Any]) -> tuple[dict[str, Any], int]:
         """
         Save metadata
         :param metadata: a dictionary, containing the following keys
@@ -322,7 +322,7 @@ class DataAccessLocal(DataAccess):
         """
         if self.output_folder is None:
             logger.error("local configuration is not defined, can't save metadata")
-            return None
+            return None, 0
         metadata["source"] = {"name": self.input_folder, "type": "path"}
         metadata["target"] = {"name": self.output_folder, "type": "path"}
         return self.save_file(
@@ -330,7 +330,7 @@ class DataAccessLocal(DataAccess):
             data=json.dumps(metadata, indent=2).encode(),
         )
 
-    def get_file(self, path: str) -> bytes:
+    def get_file(self, path: str) -> tuple[bytes, int]:
         """
         Gets the contents of a file as a byte array, decompressing gz files if needed.
 
@@ -348,13 +348,14 @@ class DataAccessLocal(DataAccess):
             else:
                 with open(path, "rb") as f:
                     data = f.read()
-            return data
+            return data, 0
 
         except (FileNotFoundError, gzip.BadGzipFile) as e:
             logger.error(f"Error reading file {path}: {e}")
             raise e
 
-    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) -> dict[str, bytes]:
+    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) \
+            -> tuple[dict[str, bytes], int]:
         """
         Get a list of byte content of files. The path here is an absolute path and can be anywhere.
         The current limitation for S3 and Lakehouse is that it has to be in the same bucket
@@ -366,7 +367,7 @@ class DataAccessLocal(DataAccess):
         :return: A dictionary of file names/binary content will be returned
         """
 
-        def _get_file_content(f_name: str, dt: bool) -> bytes:
+        def _get_file_content(f_name: str, dt: bool) -> tuple[bytes, int]:
             """
             return file content
             :param f_name: file name
@@ -375,14 +376,15 @@ class DataAccessLocal(DataAccess):
             """
             if dt:
                 return self.get_file(f_name)
-            return None
+            return None, 0
 
         matching_files = {}
         for filename in sorted(self._get_all_files_ext(path=path, extensions=extensions)):
-            matching_files[filename] = _get_file_content(filename, return_data)
-        return matching_files
+            b, _ = _get_file_content(filename, return_data)
+            matching_files[filename] = b
+        return matching_files, 0
 
-    def save_file(self, path: str, data: bytes) -> dict[str, Any]:
+    def save_file(self, path: str, data: bytes) -> tuple[dict[str, Any], int]:
         """
         Saves bytes to a file and returns a dictionary with file information.
 
@@ -400,8 +402,8 @@ class DataAccessLocal(DataAccess):
             with open(path, "wb") as f:
                 f.write(data)
             file_info = {"name": path, "size": os.path.getsize(path)}
-            return file_info
+            return file_info, 0
 
         except Exception as e:
             logger.error(f"Error saving bytes to file {path}: {e}")
-            return None
+            return None, 0
