@@ -13,6 +13,8 @@ authors = [
 ]
 dependencies = [
     "kfp==1.8.22",
+    "ray==2.9.3",
+    "requests",
     "data_prep_toolkit==0.2.0.dev6",
 ]
 
@@ -35,7 +37,7 @@ dev = [
 package_dir = ["src"]
 
 [options.packages.find]
-where = ["src/workflow_compile_utils"]
+where = ["src/workflow_support"]
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report term-missing --cov-fail-under 10"
