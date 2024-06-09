@@ -4,9 +4,9 @@
 REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_NAME=code_quality
+TRANSFORM_NAME=license_copyright_remove
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${CODE_QUALITY_VERSION}
+DOCKER_IMAGE_VERSION=${LICENSE_COPYRIGHT_REMOVE}
 
 # Use default rule inherited from makefile.common
 clean:: .transforms.clean
@@ -36,7 +36,7 @@ run-cli-ray-sample: .transforms.run-cli-ray-sample
 
 run-local-sample: #.transforms.run-local-sample
 	@# Help: Not implemented yet
-	@echo "No src/code_quality_local.py yet :("
+	@echo "No src/license_copyright_remove_local.py yet :("
 
 run-local-ray-sample: .transforms.run-local-ray-sample
 

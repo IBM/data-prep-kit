@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     pq.write_table(table_list[0], output_path)
     print(f"Output column : \n")
-    new_data = table_list[0].column('updated_content').to_pylist()
+    new_data = table_list[0].column('updated_contents').to_pylist()
     for data in new_data:
         for line in data.split('\n'):
             print(line)

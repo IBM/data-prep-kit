@@ -179,7 +179,7 @@ class LicenseCopyrightRemoveTransform(AbstractTableTransform):
 
         updated_content = pa.array(updated_content)
         
-        table = table.append_column('updated_content',updated_content)
+        table = table.append_column('updated_contents',updated_content)
 
         return [table], {'Removed code count' : remove_code_count}
 
