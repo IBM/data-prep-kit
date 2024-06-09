@@ -45,7 +45,7 @@ def compute_exec_params_func(
     cq_tokenizer: str,
     cq_hf_token: str,
 ) -> dict:
-    from workflow_utils.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
