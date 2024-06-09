@@ -126,7 +126,7 @@ class KFPUtils:
         import sys
 
         from data_processing.utils import GB, get_logger
-        from workflow_support.runtime_utils import KFPUtils
+        from workflow_utils.runtime_utils import KFPUtils
 
         logger = get_logger(__name__)
 

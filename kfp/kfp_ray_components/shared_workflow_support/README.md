@@ -1,13 +1,10 @@
-# KFP support library
+# Shared Workflow Support
 
 This provides support for implementing KFP pipelines automating transform's execution.
-It comprises 3 main modules
+It comprises 2 main modules
 
-* [shared_workflow_support](shared_workflow_support/README.md) 
-* [kfp_v1_workflow_support](kfp_v1_workflow_support//README.md)
-* [kfp_v2_workflow_support](kfp_v2_workflow_support//README.md)
-
-Depends on the using KFV version either `kfp_v1_workflow_support` or `kfp_v2_workflow_support` should be used.
+* [python apiserver client](src/python_apiserver_client/README.md) 
+* [workflow support](src/workflow_support/README.md)
 
 ## Development
 
@@ -22,7 +19,7 @@ Depends on the using KFV version either `kfp_v1_workflow_support` or `kfp_v2_wor
 Simple clone the repo and set up the pre-commit hooks.
 ```shell
 git clone git@github.com:IBM/data-prep-kit.git
-cd kfp/kfp_support_lib
+cd kfp/kfp_support_lib/shared_workflow_support
 pre-commit install
 ```
 If you don't have pre-commit, you can install from [here](https://pre-commit.com/)
@@ -33,7 +30,7 @@ The process of creating a release for `fm_data_processing_kfp` package  involves
 
 cd to the package directory.
 
-update the version in [requirements.env](../requirements.env) file.
+update the version in [requirements.env](../../requirements.env) file.
 
 run `make build` and `make publish`.
 
@@ -66,6 +63,6 @@ previous test runs resources are removed before starting new tests.
 
 ```bash
 kubectl delete workflows -n kubeflow --all
-```
 
-
+This is a copy of [Kuberay API server-client python APIs](https://github.com/ray-project/kuberay/tree/master/clients/python-apiserver-client)
+Because these APIs are not exposed by any PyPi, we added them to the project

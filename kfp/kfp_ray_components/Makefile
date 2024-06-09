@@ -28,12 +28,12 @@ DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 .lib-src-image:: 
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python
-	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/python_apiserver_client LIB_NAME=python_apiserver_client
+	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/shared_workflow_support LIB_NAME=shared_workflow_support
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB) LIB_NAME=workflow_support_lib
 	$(MAKE) .defaults.image
 	rm -rf data-processing-lib-ray
 	rm -rf data-processing-lib-python
-	rm -rf python_apiserver_client
+	rm -rf shared_workflow_support
 	rm -rf workflow_support_lib
 
 .PHONY: image

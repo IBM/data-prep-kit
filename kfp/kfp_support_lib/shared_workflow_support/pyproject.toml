@@ -1,5 +1,5 @@
 [project]
-name = "data_prep_toolkit_kfp_v1"
+name = "data_prep_toolkit_kfp_shared"
 version = "0.2.0.dev6"
 requires-python = ">=3.10,<3.12"
 description = "Data Preparation Kit Library. KFP support"
@@ -12,9 +12,9 @@ authors = [
     { name = "Revital Eres", email = "eres@il.ibm.com" },
 ]
 dependencies = [
-    "kfp==1.8.22",
     "ray==2.9.3",
     "requests",
+    "kubernetes",
     "data_prep_toolkit==0.2.0.dev6",
 ]
 
@@ -37,7 +37,8 @@ dev = [
 package_dir = ["src"]
 
 [options.packages.find]
-where = ["src/workflow_support"]
+where = ["src/runtime_utils", "src/python_apiserver_client"]
+
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report term-missing --cov-fail-under 10"

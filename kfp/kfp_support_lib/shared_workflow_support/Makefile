@@ -6,7 +6,7 @@ include ${REPOROOT}/kfp/requirements.env
 
 # Include the common rules.
 # Use "make help" to see them.
-include ../../../.make.defaults
+include ${REPOROOT}/.make.defaults
 
 # Command to run pytest
 PYTHON_VERSION=$(shell $(PYTHON) --version)
@@ -26,7 +26,9 @@ clean::
 
 set-versions:: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml
-	sed -i.back 's/data-prep-toolkit==[0-9].*/data-prep-toolkit==${DPK_LIB_VERSION}",/' pyproject.toml
+	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_SHARED}'"/' pyproject.toml
+	sed -i.back 's/data_prep_toolkit_ray==[0-9].*/data_prep_toolkit_ray==${DPK_LIB_VERSION}",/' pyproject.toml
+	sed -i.back 's/ray=[0-9].*/ray==${RAY}",/' pyproject.toml
 
 build:: set-versions venv
 	@# Help: Build the distribution for publishing to a pypi
@@ -42,7 +44,7 @@ publish:: .check-env
 	${PYTHON} -m twine check dist/*
 	${PYTHON} -m twine upload --verbose --non-interactive dist/*
 
-venv::pyproject.toml .check-env
+venv::	pyproject.toml .check-env
 	@# Help: Create the virtual environment using pyproject.toml
 	rm -rf venv
 	$(PYTHON) -m venv venv
@@ -53,10 +55,10 @@ venv::pyproject.toml .check-env
 	pip install -e .;		\
 	pip install pytest pytest-cov
 
-test:: venv 
+test:: 	venv
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) api_params_test.py;
 ifeq ($(DEPLOY_KUBEFLOW),1)
 	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) kuberay_api_test.py;
+	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) ray_remote_jobs_test.py;
 endif
-
