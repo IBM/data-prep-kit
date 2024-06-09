@@ -1,7 +1,9 @@
+from workflow_support.compile_utils import ONE_WEEK_SEC
+
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from kfp_support.workflow_support.utils import ONE_WEEK_SEC
+
 
 
 # Components
@@ -15,13 +17,13 @@ run_exact_dedup_op = comp.load_component_from_file(component_spec_path + "execut
 run_fuzzy_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_tokenization_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 
-proglang_select_image = "quay.io/dataprep1/data-prep-kit/proglang_select:0.3.0"
-code_quality_image = "quay.io/dataprep1/data-prep-kit/code_quality:0.3.0"
-malware_image = "quay.io/dataprep1/data-prep-kit/malware:0.4.0"
-doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.1"
-ededup_image = "quay.io/dataprep1/data-prep-kit/ededup:0.3.0"
-fdedup_image = "quay.io/dataprep1/data-prep-kit/fdedup:0.3.0"
-tokenizer_image = "quay.io/dataprep1/data-prep-kit/tokenization:0.3.0"
+proglang_select_image = "quay.io/dataprep1/data-prep-kit/proglang_select-ray:0.4.0.dev6"
+code_quality_image = "quay.io/dataprep1/data-prep-kit/code_quality-ray:0.4.0.dev6"
+malware_image = "quay.io/dataprep1/data-prep-kit/malware-ray:0.5.0.dev6"
+doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id-ray:0.4.0.dev6"
+ededup_image = "quay.io/dataprep1/data-prep-kit/ededup-ray:0.4.0.dev6"
+fdedup_image = "quay.io/dataprep1/data-prep-kit/fdedup-ray:0.4.0.dev6"
+tokenizer_image = "quay.io/dataprep1/data-prep-kit/tokenization-ray:0.4.0.dev6"
 
 
 # Pipeline to invoke execution on remote resource
