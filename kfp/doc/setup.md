@@ -66,10 +66,11 @@ choose your OS system, and process according to "(Optional) Install the MinIO Cl
 
 ## Installation steps <a name = "installation"></a>
 
-You can create a Kind cluster with all required software installed using the following command: 
+You can create a Kind cluster with all required software installed using the following command, run in the `kind` directory under the repo root: 
 
 ```shell
- make setup
+cd kind   # Assuming you are in the repo root directory.
+make setup
 ```
 from this main package directory or from the `kind` directory.
 If you do not want to upload the testing data into the locally deployed Minio, and reduce memory footprint, please set:
