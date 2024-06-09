@@ -37,7 +37,7 @@ dev = [
 package_dir = ["src"]
 
 [options.packages.find]
-where = ["src/workflow_support", "src/python_apiserver_client"]
+where = ["src/runtime_utils", "src/python_apiserver_client"]
 
 
 [tool.pytest.ini_options]
