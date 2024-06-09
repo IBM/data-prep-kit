@@ -33,7 +33,7 @@ test-local:: .defaults.test-locals
 
 publish:: image .defaults.publish-image
 
-set-versions::
+set-versions:
 	@# Help: Nothing to see/do here (yet). 
 
 run-local-sample:

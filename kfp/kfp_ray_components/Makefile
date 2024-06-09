@@ -42,7 +42,7 @@ image: Dockerfile requirements.txt
 	$(MAKE) .lib-src-image
 
 
-set-versions::  reconcile-requirements
+set-versions:  reconcile-requirements
 
 .PHONY: reconcile-requirements
 reconcile-requirements:

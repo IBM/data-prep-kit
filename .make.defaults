@@ -228,10 +228,16 @@ __check_defined = \
 	rm -rf data-processing-lib-ray
 	rm -rf python-transform 
 
+# Build the base spark image used by spark-based transforms
+.PHONY: .defaults.spark-lib-base-image
+.defaults.spark-lib-base-image-spark: 
+	$(MAKE) -C $(DPK_SPARK_LIB_DIR) image
+
 # Note that this looks for the ../python directory, which is currently only used in the transform projects,
 # but we add it here as a convenience to avoid duplicating a lot of this in transforms/.make.transforms.
+# Must be called with a DOCKER_LOCAL_IMAGE= settings.
 .PHONY: .defaults.spark-lib-src-image
-.defaults.spark-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
+.defaults.spark-lib-src-image:: .defaults.spark-lib-base-image
 	@# Help: Build the Spark $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
 	$(MAKE) IMAGE_NAME_TO_VERIFY=$(DOCKER_SPARK_BASE_IMAGE_NAME) .defaults.verify-image-availability
 	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
@@ -311,8 +317,10 @@ __check_defined = \
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_SPARK_LIB_DIR) .defaults.install-src-venv;	\
 	echo Installed source from Spark processing library for `which $(PYTHON)`
 
+# Run tests in test directory from that dir after adding ../src to PYTHONPATH
+# Assumes a Makefile target of venv to create the venv 
 .PHONY: .defaults.test-src
-.defaults.test-src:: 
+.defaults.test-src:: venv
 	@# Help: Run pytest on the test directory inside the venv 
 	source venv/bin/activate;       \
 	export PYTHONPATH=../src;       \
