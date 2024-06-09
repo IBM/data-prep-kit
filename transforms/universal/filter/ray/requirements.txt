@@ -1,4 +1,0 @@
-# transform runtime
-#data-prep-kit==0.1.2
-# filter
-duckdb==0.10.1

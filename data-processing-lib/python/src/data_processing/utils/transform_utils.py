@@ -104,6 +104,14 @@ class TransformUtils:
         """
         return os.path.splitext(file_path)
 
+    def get_file_basename(file_path) -> str:
+        """
+        Get the file's base name from the given file path.
+        :param file_path : The path of the file.
+        :return: str: file base name.
+        """
+        return os.path.basename(file_path)
+
     @staticmethod
     def validate_columns(table: pa.Table, required: list[str]) -> bool:
         """

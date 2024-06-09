@@ -8,7 +8,7 @@ inputs:
     - { name: server_url, type: String, default: "", description: "url of api server" }
     - { name: prefix, type: String, default: "", description: "prefix for extra credentials" }
     # The component converts the dictionary to json string
-    - { name: exec_params, type: dict, description: "job parameters" }
+    - { name: exec_params, type: JsonObject, description: "job parameters" }
     - { name: additional_params, type: String, description: "additional parameters" }
 
 implementation:

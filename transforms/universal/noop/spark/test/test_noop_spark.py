@@ -44,5 +44,5 @@ class TestSparkNOOPTransform(AbstractSparkTransformLauncherTest):
         )
         return fixtures
 
-    def _validate_metadata_content(self, test_generated: dict, expected: dict):
+    def _validate_metadata_content(self, test_generated: dict, expected: dict, ignore_columns: list[str] = []):
         assert "nrows" in test_generated and test_generated["nrows"] == expected["nrows"]
