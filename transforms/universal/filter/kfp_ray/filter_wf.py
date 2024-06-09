@@ -9,13 +9,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
 import os
+
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
 # the name of the job script
@@ -45,7 +45,7 @@ def compute_exec_params_func(
     filter_logical_operator: str,
     filter_columns_to_drop: str,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,

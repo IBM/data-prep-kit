@@ -12,7 +12,7 @@
 
 import os
 
-from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
+from workflow_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 import kfp.compiler as compiler
 import kfp.components as comp
@@ -45,7 +45,7 @@ def compute_exec_params_func(
     proglang_select_allowed_langs_file: str,
     proglang_select_language_column: str,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from workflow_utils.runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,

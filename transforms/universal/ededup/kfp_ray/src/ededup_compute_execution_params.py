@@ -48,7 +48,7 @@ def ededup_compute_execution_params(
 
     from data_processing.data_access import DataAccessS3
     from data_processing.utils import GB, KB
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     EXECUTION_OF_KB_DOC = 0.00025
 

@@ -10,7 +10,7 @@
 # limitations under the License.
 ################################################################################
 
-from workflow_support.runtime_utils import KFPUtils, execute_ray_jobs
+from runtime_utils import KFPUtils, execute_ray_jobs
 
 if __name__ == "__main__":
     import argparse
