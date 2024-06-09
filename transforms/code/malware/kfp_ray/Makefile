@@ -9,6 +9,10 @@ YAML_WF := $(patsubst %.py, %.yaml, ${PYTHON_WF})
 
 workflow-venv: .check_python_version ${WORKFLOW_VENV_ACTIVATE}
 
+clean:: .defaults.clean
+
+setup:: 
+
 venv::
 
 build::
@@ -19,9 +23,13 @@ test-src::
 
 test-image::
 
+publish::
+
 image::
 
 load-image::
+
+set-versions: workflow-reconcile-requirements
 
 .PHONY: workflow-build
 workflow-build: workflow-venv

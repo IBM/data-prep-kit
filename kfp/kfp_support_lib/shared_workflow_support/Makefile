@@ -24,7 +24,7 @@ clean::
 .check-env:: .check_python_version
 	@echo "Checks passed"
 
-set-versions:: .check-env
+set-versions: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml
 	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_SHARED}'"/' pyproject.toml
 	sed -i.back 's/data_prep_toolkit_ray==[0-9].*/data_prep_toolkit_ray==${DPK_LIB_VERSION}",/' pyproject.toml
