@@ -57,7 +57,8 @@ class AbstractTransformFileProcessor:
             # execute local processing
             name_extension = TransformUtils.get_file_extension(f_name)
             self.logger.debug(f"Begin transforming file {f_name}")
-            out_files, stats = self.transform.transform_binary(byte_array=filedata, ext=name_extension[1])
+            out_files, stats = self.transform.transform_binary(
+                base_name=TransformUtils.get_file_basename(f_name), byte_array=filedata)
             self.logger.debug(f"Done transforming file {f_name}, got {len(out_files)} files")
             self.last_file_name = name_extension[0]
             self.last_file_name_next_index = None

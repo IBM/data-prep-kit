@@ -6,7 +6,7 @@ inputs:
     - { name: run_id, type: String, description: "The KFP Run ID" }
     - { name: additional_params, type: String, description: "additional parameters" }
     # The component converts the dictionary to json string
-    - { name: exec_params, type: dict, description: "job parameters" }
+    - { name: exec_params, type: JsonObject, description: "job parameters" }
     - { name: exec_script_name, type: String, description: "transform script name" }
     - { name: server_url, type: String, default: "", description: "url of api server" }
 

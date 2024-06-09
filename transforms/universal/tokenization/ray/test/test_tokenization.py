@@ -13,7 +13,7 @@
 from typing import Tuple
 
 import pyarrow as pa
-from data_processing.test_support.transform.transform_test import AbstractTransformTest
+from data_processing.test_support.transform.table_transform_test import AbstractTableTransformTest
 from tokenization_transform_ray import TokenizationTransform
 
 
@@ -77,7 +77,7 @@ config = {
 }
 
 
-class TestTokenizationTransform(AbstractTransformTest):
+class TestTokenizationTransform(AbstractTableTransformTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.

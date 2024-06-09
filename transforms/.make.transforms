@@ -100,9 +100,6 @@ extra-help:
 
 .PHONY: .transforms.ray-venv
 .transforms.ray-venv:: .defaults.ray-lib-src-venv
-	if [ -d ../python ]; then						\
-	    $(MAKE) PYTHON_PROJECT_DIR=../python .defaults.install-src-venv;	\
-	fi
 
 # For now we do NOT install ../python source as we do for ray, since for now
 # spark implementations do not use the pure python transform.  If/when
@@ -153,13 +150,13 @@ extra-help:
 	@# Help: Run the transform's tests and any '*local' .py files
 
 .PHONY: .transforms.python-test-image
-.transforms.python-test-image:: .transforms.python-image .defaults.test-image-pytest 
+.transforms.python-test-image:: .transforms.python-image .transforms.test-image-help .defaults.test-image-pytest 
 
 .PHONY: .transforms.ray-test-image
-.transforms.ray-test-image:: .transforms.ray-image .defaults.test-image-pytest 
+.transforms.ray-test-image:: .transforms.ray-image .transforms.test-image-help .defaults.test-image-pytest 
 
 .PHONY: .transforms.spark-test-image
-.transforms.spark-test-image:: .transforms.spark-image .defaults.test-image-pytest 
+.transforms.spark-test-image:: .transforms.spark-image .transforms.test-image-help .defaults.test-image-pytest 
 
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest:: .defaults.test-image-pytest 
@@ -296,7 +293,7 @@ conventions: .transforms.check_required_macros
 .transforms.minio-load::
 	@# Help: Install the test-data/input files into minio for $(TRANSFORM_NAME)
 	dir=$$(find $(REPOROOT)/transforms -type d -name $(TRANSFORM_NAME));	\
-	$(MAKE) MINIO_SRC=$$dir/test-data/input MINIO_DEST=$(TRANSFORM_NAME)/ .defaults.minio.load-test-data
+	$(MAKE) MINIO_SRC=$$dir/ray/test-data/input MINIO_DEST=$(TRANSFORM_NAME)/ .defaults.minio.load-test-data
 
 
 .PHONY: .minio-start

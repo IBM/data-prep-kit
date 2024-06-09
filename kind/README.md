@@ -28,7 +28,10 @@ amount of node, modify [cluster configuration](hack/kind-cluster-config.yaml)
 Install [Kubeflow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/installation/standalone-deployment/#deploying-kubeflow-pipelines) and wait for it to be ready:
 
 ```shell
-cd $ROOT_DIR/hack/tools/ && PIPELINE_VERSION=1.8.5 ./install_kubeflow.sh deploy && cd -
+# Set required KFP version. You can reference to the latest supported version in the [requirements.env](./requirements.env) file.
+# Currently, we support 1.8.5 for KFPv1 and 2.2.0 for KFP v2
+export PIPELINE_VERSION=1.8.5
+cd $ROOT_DIR/hack/tools/ && ./install_kubeflow.sh deploy && cd -
 kubectl wait --for=condition=ready --all pod -n kubeflow --timeout=300s
 ```
 
@@ -56,7 +59,7 @@ kubectl wait --namespace ingress-nginx \
           --timeout=90s
 ```
 
-To deploy the ingress for ray apiserver, kfp and Minio execute the following:
+To deploy the ingress for Ray API Server, KFP and MinIO execute the following:
 ```shell
 kubectl apply -f $ROOT_DIR/hack/ray_api_server_ingress.yaml
 kubectl apply -f $ROOT_DIR/hack/kfp_ingress.yaml
