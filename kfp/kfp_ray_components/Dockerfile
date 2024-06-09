@@ -11,7 +11,7 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/
 RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
 
-COPY --chown=ray:users shared_workflow_support shared_workflow_support/
+COPY --chown=ray:users shared_workflow_support_lib shared_workflow_support_lib/
 RUN cd shared_workflow_support_lib && pip install --no-cache-dir -e .
 
 COPY --chown=ray:users workflow_support_lib workflow_support_lib/
