@@ -1,4 +1,5 @@
-# Filter Ray Transform 
+# Fltering Transform for Ray
+
 Please see the set of
 [transform project conventions](../../../README.md#transform-project-conventions)
 for details on general project conventions, transform configuration,
