@@ -70,7 +70,8 @@ class DataAccess:
             "min_file_size_MB",
             "avg_file_size_MB",
             "total_file_size_MB"
-        and the number of operation retries
+        and the number of operation retries.
+        Retries are performed on operation failures and are typically due to the resource overload.
         """
         if self.get_output_folder() is None:
             logger.warning("Input/Output are not defined, returning empty list")
@@ -90,7 +91,8 @@ class DataAccess:
             "min_file_size_MB",
             "avg_file_size_MB",
             "total_file_size_MB"
-        and number of operation retries
+        and number of operation retries.
+        Retries are performed on operation failures and are typically due to the resource overload.
         """
         pass
 
@@ -98,7 +100,8 @@ class DataAccess:
         """
         Get pyArrow table for a given path
         :param path - file path
-        :return: pyArrow table or None, if the table read failed and number of operation retries
+        :return: pyArrow table or None, if the table read failed and number of operation retries.
+                 Retries are performed on operation failures and are typically due to the resource overload.
         """
         pass
 
@@ -107,6 +110,8 @@ class DataAccess:
         Get file as a byte array
         :param path: file path
         :return: bytes array of file content and number of operation retries
+                 Retries are performed on operation failures and are typically due to the resource overload.
+
         """
         pass
 
@@ -132,6 +137,7 @@ class DataAccess:
         :return: a dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
         in the case of failure dict is None and number of operation retries
+        Retries are performed on operation failures and are typically due to the resource overload.
         """
 
     def get_output_location(self, path: str) -> str:
@@ -149,7 +155,8 @@ class DataAccess:
         :param table: table
         :return: size of table in memory and a dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None and number of operation retries
+        in the case of failure dict is None and number of operation retries.
+        Retries are performed on operation failures and are typically due to the resource overload.
         """
         pass
 
@@ -170,7 +177,8 @@ class DataAccess:
         are filled bu implementation
         :return: a dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None and number of operation retries
+        in the case of failure dict is None and number of operation retries.
+        Retries are performed on operation failures and are typically due to the resource overload.
         """
         pass
 
@@ -189,6 +197,7 @@ class DataAccess:
             average doc size KB,
             estimated number of docs
         and number of operation retries
+        Retries are performed on operation failures and are typically due to the resource overload.
         """
         # get files to process
         path_list, path_profile, retries = self.get_files_to_process_internal()
