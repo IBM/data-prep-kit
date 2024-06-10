@@ -1,6 +1,7 @@
 [project]
 name = "data_prep_toolkit_spark"
 version = "0.2.0.dev6"
+keywords = ["data", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
 requires-python = ">=3.10"
 description = "Data Preparation Toolkit Library for Spark"
 license = {text = "Apache-2.0"}
@@ -14,6 +15,12 @@ dependencies = [
     "pyspark>=3.5.1",
     "pyyaml>=6.0.1",
 ]
+
+[project_urls]
+Repository = "https://github.com/IBM/data-prep-kit"
+Issues = "https://github.com/IBM/data-prep-kit/issues"
+Documentation = "https://ibm.github.io/data-prep-kit/"
+"Transform project" = "https://github.com/IBM/data-prep-kit/tree/dev/transforms/universal/noop"
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
