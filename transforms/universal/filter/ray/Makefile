@@ -46,7 +46,6 @@ run-cli-sample:
 		--filter_columns_to_drop \"[ 'extra', 'cluster' ]\" "	\
                 .transforms.run-src-file
 
-
 run-local-sample: .transforms.run-local-ray-sample
 
 run-s3-sample: .transforms.run-s3-ray-sample
