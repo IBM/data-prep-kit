@@ -68,7 +68,7 @@ local git repository using the following command:
 git commit -s
 ```
 
-## Setup
+## Overall Setup
 Please install Python 3.10 or 3.11, then 
 
 ```
@@ -80,9 +80,8 @@ pre-commit install
 make help 
 ```
 
-## Testing
-Makefiles are use for most of the automation and you should be able to use `make test` in most
-directories.
+## Transform Setup and Testing
+Please note the many useful options of the make command, as shown by using make help, that will take care of manual steps that would have been needed for tasks such as building, publishing, setting up or testing transforms in most directories.
 
 ## Coding style guidelines
 Coding style as enforced by `pre-commit`.

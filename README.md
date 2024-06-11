@@ -135,6 +135,8 @@ git clone git@github.com:IBM/data-prep-kit.git
 cd data-prep-kit
 pre-commit install
 ```
+Please note that there are further installation steps for running the transforms on a local Kind cluster or on an existing Kubernetes cluster, as documented [here] (kfp/doc/setup.md).
+
 Below are a few demos to get you started.
 ### Build Your Own Transforms
 Follow the documentation [here](data-processing-lib/doc/overview.md) to build your own transform
