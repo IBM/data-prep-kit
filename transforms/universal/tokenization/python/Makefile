@@ -8,7 +8,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=tokenization
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${TOKENIZATION_VERSION}
+DOCKER_IMAGE_VERSION=${TOKENIZATION_PYTHON_VERSION}
 
 venv::	.transforms.python-venv
 
