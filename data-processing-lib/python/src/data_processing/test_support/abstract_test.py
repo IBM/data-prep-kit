@@ -17,7 +17,7 @@ from filecmp import dircmp
 
 import pyarrow as pa
 from data_processing.data_access import DataAccessLocal
-from data_processing.utils import get_logger
+from data_processing.utils import TransformUtils, get_logger
 
 
 logger = get_logger(__name__)
@@ -31,7 +31,7 @@ def get_tables_in_folder(dir: str) -> list[pa.Table]:
     :return:
     """
     dal = DataAccessLocal()
-    files = dal.get_folder_files(dir, extensions=[".parquet"])
+    files, _ = dal.get_folder_files(dir, extensions=[".parquet"])
     return [TransformUtils.convert_binary_to_arrow(data) for data in files.values()]
 
 
@@ -43,7 +43,8 @@ def get_files_in_folder(dir: str, ext: str) -> dict[str, bytes]:
     :return:
     """
     dal = DataAccessLocal()
-    return dal.get_folder_files(dir, extensions=[ext])
+    files, _ = dal.get_folder_files(dir, extensions=[ext])
+    return files
 
 
 class AbstractTest:
@@ -175,8 +176,8 @@ class AbstractTest:
     @staticmethod
     def _validate_table_files(parquet1: str, parquet2: str, drop_columns: list[str] = []):
         da = DataAccessLocal()
-        t1 = da.get_table(parquet1)
-        t2 = da.get_table(parquet2)
+        t1, _ = da.get_table(parquet1)
+        t2, _ = da.get_table(parquet2)
         if len(drop_columns) > 0:
             t1 = t1.drop_columns(drop_columns)
             t2 = t2.drop_columns(drop_columns)

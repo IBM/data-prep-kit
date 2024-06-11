@@ -38,6 +38,7 @@ class DataAccessFactoryBase(CLIArgumentProvider):
         self.max_files = -1
         self.n_samples = -1
         self.files_to_use = []
+        self.files_to_checkpoint = []
         self.cli_arg_prefix = cli_arg_prefix
         self.params = {}
         self.logger = get_logger(__name__ + str(uuid.uuid4()))

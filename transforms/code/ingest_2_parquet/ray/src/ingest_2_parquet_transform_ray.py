@@ -49,8 +49,8 @@ ingest_snapshot_key = f"{shortname}_snapshot"
 
 def _get_supported_languages(lang_file: str, data_access: DataAccess) -> dict[str, str]:
     logger.debug(f"Getting supported languages from file {lang_file}")
-    json_data = data_access.get_file(lang_file).decode("utf-8")
-    lang_dict = json.loads(json_data)
+    json_data, _ = data_access.get_file(lang_file)
+    lang_dict = json.loads(json_data.decode("utf-8"))
     reversed_dict = {ext: langs for langs, exts in lang_dict.items() for ext in exts}
     logger.debug(f"Supported languages {reversed_dict}")
     return reversed_dict
@@ -95,13 +95,13 @@ class IngestToParquetTransform(AbstractBinaryTransform):
             lang = self.languages_supported.get(ext, lang)
         return lang
 
-    def transform_binary(self, base_name: str, byte_array: bytes) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def transform_binary(self, file_name: str, byte_array: bytes) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         Converts raw data file (ZIP) to Parquet format
         """
         # We currently only process .zip files
-        if TransformUtils.get_file_extension(base_name)[1] != ".zip":
-            logger.warning(f"Got unsupported file type {base_name}, skipping")
+        if TransformUtils.get_file_extension(file_name)[1] != ".zip":
+            logger.warning(f"Got unsupported file type {file_name}, skipping")
             return [], {}
         data = []
         number_of_rows = 0
@@ -119,7 +119,7 @@ class IngestToParquetTransform(AbstractBinaryTransform):
                                 ext = TransformUtils.get_file_extension(member.filename)[1]
                                 row_data = {
                                     "title": member.filename,
-                                    "document": base_name,
+                                    "document": TransformUtils.get_file_basename(file_name),
                                     "contents": content_string,
                                     "document_id": TransformUtils.str_to_hash(content_string),
                                     "ext": ext,

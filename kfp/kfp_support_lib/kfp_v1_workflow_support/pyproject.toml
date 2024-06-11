@@ -15,8 +15,7 @@ dependencies = [
     "kfp==1.8.22",
     "ray==2.9.3",
     "requests",
-    "data_prep_toolkit_ray==0.2.0.dev6",
-    "python_apiserver_client==0.1.0",
+    "data_prep_toolkit==0.2.0.dev6",
 ]
 
 [build-system]
@@ -39,7 +38,6 @@ package_dir = ["src"]
 
 [options.packages.find]
 where = ["src/workflow_support"]
-
 
 [tool.pytest.ini_options]
 addopts = "--cov --cov-report term-missing --cov-fail-under 10"

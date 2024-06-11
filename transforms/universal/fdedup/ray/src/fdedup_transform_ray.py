@@ -168,7 +168,7 @@ class FdedupTransform(AbstractTableTransform):
         # wait for completion
         RayUtils.wait_for_execution_completion(replies=remote_replies)
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         Preprocessing table content.
         :param table: table
@@ -246,7 +246,7 @@ class FdedupFilter(AbstractTableTransform):
         self.docs = config.get("remote_docs", "")
         self.random_delay_limit = config.get("random_delay_limit", 10)
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         De duping (filtering) table content.
         :param table: table
@@ -349,7 +349,9 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             logger.info("continuing from the document actors snapshot")
             data_access = data_access_factory.create_data_access()
             path = f"{get_snapshot_folder(data_access)}docs"
-            files = data_access.get_folder_files(path=path)
+            files, retries = data_access.get_folder_files(path=path)
+            if retries > 0:
+                statistics.add_stats.remote({"data access retries", retries})
             logger.info(f"Found the following snapshot files {files.keys()}")
             self.document_collectors = [None] * len(files)
             for file in files.keys():
@@ -386,7 +388,9 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             data_access = data_access_factory.create_data_access()
             # recreate bucket collectors
             path = f"{get_snapshot_folder(data_access)}buckets"
-            files = data_access.get_folder_files(path=path)
+            files, retries = data_access.get_folder_files(path=path)
+            if retries > 0:
+                statistics.add_stats.remote({"data access retries", retries})
             logger.debug(f"Found the following bucket snapshot files {files.keys()}")
             bucket_collectors = [None] * len(files)
             for file in files.keys():
@@ -398,7 +402,9 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             logger.info(f"Created {len(bucket_collectors)} bucket collectors to continue processing")
             # recreate minhash collectors
             path = f"{get_snapshot_folder(data_access)}minhash"
-            files = data_access.get_folder_files(path=path)
+            files, retries = data_access.get_folder_files(path=path)
+            if retries > 0:
+                statistics.add_stats.remote({"data access retries", retries})
             logger.debug(f"Found the following minhash snapshot files {files.keys()}")
             minhash_collectors = [None] * len(files)
             for file in files.keys():

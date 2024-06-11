@@ -3,7 +3,7 @@
 This provides support for implementing KFP pipelines automating transform's execution.
 It comprises 3 main modules
 
-* [api server client](python_apiserver_client/README.md) 
+* [shared_workflow_support](shared_workflow_support/README.md) 
 * [kfp_v1_workflow_support](kfp_v1_workflow_support//README.md)
 * [kfp_v2_workflow_support](kfp_v2_workflow_support//README.md)
 

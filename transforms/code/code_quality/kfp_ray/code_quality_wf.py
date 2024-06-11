@@ -45,7 +45,7 @@ def compute_exec_params_func(
     cq_tokenizer: str,
     cq_hf_token: str,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
@@ -192,7 +192,7 @@ def code_quality(
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             ray_head_options=ray_head_options,
             ray_worker_options=ray_worker_options,
             server_url=server_url,
@@ -204,7 +204,7 @@ def code_quality(
         # Execute job
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             additional_params=additional_params,
             # note that the parameters below are specific for NOOP transform
             exec_params=compute_exec_params.output,

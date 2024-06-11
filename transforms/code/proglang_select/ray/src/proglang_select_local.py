@@ -43,7 +43,7 @@ if __name__ == "__main__":
     transform = ProgLangSelectTransform(params)
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
-    table = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
+    table, _ = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
     print(f"input table: {table}")
     # Transform the table
     table_list, metadata = transform.transform(table)

@@ -113,6 +113,15 @@ class DataAccessFactory(DataAccessFactoryBase):
             default=False,
             help="checkpointing flag",
         )
+        # In the case of binary files, the resulting extension can be different from the source extension
+        # The checkpointing extension is defined here. If multiple files (extensions) are produced from the
+        # source files, only the leading one is required here
+        parser.add_argument(
+            f"--{self.cli_arg_prefix}files_to_checkpoint",
+            type=ast.literal_eval,
+            default=ast.literal_eval("['.parquet']"),
+            help="list of file extensions to choose for checkpointing.",
+        )
         parser.add_argument(
             f"--{self.cli_arg_prefix}data_sets",
             type=ast.literal_eval,
@@ -150,6 +159,7 @@ class DataAccessFactory(DataAccessFactoryBase):
         data_sets = arg_dict.get(f"{self.cli_arg_prefix}data_sets", None)
         n_samples = arg_dict.get(f"{self.cli_arg_prefix}num_samples", -1)
         files_to_use = arg_dict.get(f"{self.cli_arg_prefix}files_to_use", [".parquet"])
+        files_to_checkpoint = arg_dict.get(f"{self.cli_arg_prefix}files_to_checkpoint", [".parquet"])
         # check which configuration (S3, LakeHouse, or Local) is specified
         s3_config_specified = 1 if s3_config is not None else 0
         local_config_specified = 1 if local_config is not None else 0
@@ -209,18 +219,19 @@ class DataAccessFactory(DataAccessFactoryBase):
         self.max_files = max_files
         self.n_samples = n_samples
         self.files_to_use = files_to_use
+        self.files_to_checkpoint = files_to_checkpoint
         self.dsets = data_sets
         if data_sets is None or len(data_sets) < 1:
             self.logger.info(
                 f"data factory {self.cli_arg_prefix} "
-                f"Not using data sets, checkpointing {self.checkpointing}, max files {self.max_files}, "
-                f"random samples {self.n_samples}, files to use {self.files_to_use}"
+                f"Not using data sets, checkpointing {checkpointing}, max files {max_files}, "
+                f"random samples {n_samples}, files to use {files_to_use}, files to checkpoint {files_to_checkpoint}"
             )
         else:
             self.logger.info(
                 f"data factory {self.cli_arg_prefix} "
-                f"Using data sets {self.dsets}, checkpointing {self.checkpointing}, max files {self.max_files}, "
-                f"random samples {self.n_samples}, files to use {self.files_to_use}"
+                f"Using data sets {self.dsets}, checkpointing {checkpointing}, max files {max_files}, "
+                f"random samples {n_samples}, files to use {files_to_use}, files to checkpoint {files_to_checkpoint}"
             )
         return True
 
@@ -239,14 +250,16 @@ class DataAccessFactory(DataAccessFactoryBase):
                 m_files=self.max_files,
                 n_samples=self.n_samples,
                 files_to_use=self.files_to_use,
+                files_to_checkpoint=self.files_to_checkpoint,
             )
         else:
             # anything else is local data
             return DataAccessLocal(
-                path_config=self.local_config,
+                local_config=self.local_config,
                 d_sets=self.dsets,
                 checkpoint=self.checkpointing,
                 m_files=self.max_files,
                 n_samples=self.n_samples,
                 files_to_use=self.files_to_use,
+                files_to_checkpoint=self.files_to_checkpoint,
             )

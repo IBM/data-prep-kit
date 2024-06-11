@@ -17,6 +17,8 @@ mc cp --recursive ${ROOT_DIR}/../transforms/code/ingest2parquet/ray/test-data/la
 mc cp --recursive ${ROOT_DIR}/../transforms/code/proglang_select/ray/test-data/input/ kfp/test/proglang_select/input
 mc cp --recursive ${ROOT_DIR}/../transforms/code/proglang_select/ray/test-data/languages/ kfp/test/proglang_select/languages
 mc cp --recursive ${ROOT_DIR}/../transforms/code/malware/ray/test-data/input/ kfp/test/malware/input
+# language
+mc cp --recursive ${ROOT_DIR}/../transforms/language/lang_id/ray/test-data/input/ kfp/test/lang_id/input
 # universal
 mc cp --recursive ${ROOT_DIR}/../transforms/universal/doc_id/ray/test-data/input/ kfp/test/doc_id/input
 mc cp --recursive ${ROOT_DIR}/../transforms/universal/ededup/ray/test-data/input/ kfp/test/ededup/input

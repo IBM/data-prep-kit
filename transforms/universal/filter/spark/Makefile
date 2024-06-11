@@ -47,8 +47,6 @@ run-cli-sample:
 		--filter_columns_to_drop \"[ 'extra', 'cluster' ]\" "   \
 		.transforms.run-src-file
 
-run-local-python-only-sample: .transforms.run-local-sample
-
 minio-start:	.minio-start
 
 load-image:: .transforms.load-image

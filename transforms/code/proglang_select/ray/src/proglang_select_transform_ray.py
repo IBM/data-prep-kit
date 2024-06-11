@@ -49,9 +49,10 @@ lang_default_output_column = "allowed_language"
 
 def _get_supported_languages(lang_file: str, data_access: DataAccess) -> list[str]:
     logger.info(f"Getting supported languages from file {lang_file}")
-    lang_list = data_access.get_file(lang_file).decode("utf-8").splitlines()
+    lang_list, _ = data_access.get_file(lang_file)
+    l_list = lang_list.decode("utf-8").splitlines()
     logger.info(f"Supported languages {lang_list}")
-    return lang_list
+    return l_list
 
 
 class ProgLangSelectTransform(AbstractTableTransform):
@@ -86,7 +87,7 @@ class ProgLangSelectTransform(AbstractTableTransform):
                 logger.info(f"Exception loading languages list from ray object storage {e}")
                 raise RuntimeError(f"exception loading from object storage for key {languages_include_ref}")
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict]:
         """
         Select the rows for which the column `self.lang_column` has a value in the list `self.languages_include`.
         """

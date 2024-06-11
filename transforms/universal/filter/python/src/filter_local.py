@@ -50,7 +50,7 @@ if __name__ == "__main__":
     # Create and configure the transform.
     transform = FilterTransform(filter_params)
     # Use the local data access to read a parquet table.
-    table = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
+    table, _ = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
     print(f"input table has {table.num_rows} rows")
     # Transform the table
     table_list, metadata = transform.transform(table)
