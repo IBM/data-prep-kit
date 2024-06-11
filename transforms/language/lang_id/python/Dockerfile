@@ -38,7 +38,6 @@ USER dpk
 #RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY ./src/lang_id_transform.py .
 COPY ./src/lang_id_transform_python.py .
 COPY ./src/lang_id_local.py local/
 
