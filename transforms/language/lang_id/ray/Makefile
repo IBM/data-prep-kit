@@ -8,7 +8,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=lang_id
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${LANG_ID_VERSION}
+DOCKER_IMAGE_VERSION=${LANG_ID_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
@@ -34,13 +34,20 @@ setup:: .transforms.setup
 
 # set the version of python transform that this depends on.
 set-versions: 
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(NOOP_PYTHON_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(LANG_ID_PYTHON_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 
-run-cli-sample: .transforms.run-cli-ray-sample
+run-cli-sample: 
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
+                RUN_ARGS=" --run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
+                --lang_id_model_credential \"ANY CREDENTIAL\"	\
+				--lang_id_model_kind \"fasttext\"	\
+				--lang_id_model_url \"facebook/fasttext-language-identification\" \
+				--lang_id_content_column_name \"text\" "	\
+                .transforms.run-src-file
 
 run-local-sample: .transforms.run-local-ray-sample
 

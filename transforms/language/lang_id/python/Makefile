@@ -9,7 +9,7 @@ REPOROOT=../../../..
 
 TRANSFORM_RUNTIME=python
 TRANSFORM_NAME=lang_id
-DOCKER_IMAGE_VERSION=${LANG_ID_VERSION}
+DOCKER_IMAGE_VERSION=${LANG_ID_PYTHON_VERSION}
 
 include $(REPOROOT)/transforms/.make.transforms
 
@@ -43,7 +43,14 @@ publish-dist:: .defaults.publish-dist
 
 test-image:: .transforms.python-test-image
 
-run-cli-sample: .transforms.run-cli-python-sample
+run-cli-sample: 
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_python.py \
+                RUN_ARGS=" --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
+                --lang_id_model_credential \"ANY CREDENTIAL\"	\
+				--lang_id_model_kind \"fasttext\"	\
+				--lang_id_model_url \"facebook/fasttext-language-identification\" \
+				--lang_id_content_column_name \"text\" "	\
+                .transforms.run-src-file
 
 run-local-sample: .transforms.run-local-sample
 
