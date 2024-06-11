@@ -19,7 +19,7 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 from data_processing.data_access import DataAccess
-from data_processing.utils import GB, MB, get_logger
+from data_processing.utils import TransformUtils, GB, MB, get_logger
 
 
 logger = get_logger(__name__)
@@ -32,28 +32,36 @@ class DataAccessLocal(DataAccess):
 
     def __init__(
         self,
-        path_config: dict[str, str] = None,
+        local_config: dict[str, str] = None,
         d_sets: list[str] = None,
         checkpoint: bool = False,
         m_files: int = -1,
         n_samples: int = -1,
         files_to_use: list[str] = [".parquet"],
+        files_to_checkpoint: list[str] = [".parquet"],
     ):
         """
         Create data access class for folder based configuration
-        :param path_config: dictionary of path info
+        :param local_config: dictionary of path info
+        :param d_sets list of the data sets to use
+        :param checkpoint: flag to return only files that do not exist in the output directory
+        :param m_files: max amount of files to return
+        :param n_samples: amount of files to randomly sample
+        :param files_to_use: files extensions of files to include
+        :param files_to_checkpoint: files extensions of files to use for checkpointing
         """
-        if path_config is None:
+        if local_config is None:
             self.input_folder = None
             self.output_folder = None
         else:
-            self.input_folder = path_config["input_folder"]
-            self.output_folder = path_config["output_folder"]
+            self.input_folder = local_config["input_folder"]
+            self.output_folder = local_config["output_folder"]
         self.d_sets = d_sets
         self.checkpoint = checkpoint
         self.m_files = m_files
         self.n_samples = n_samples
         self.files_to_use = files_to_use
+        self.files_to_checkpoint = files_to_checkpoint
 
         logger.debug(f"Local input folder: {self.input_folder}")
         logger.debug(f"Local output folder: {self.output_folder}")
@@ -62,6 +70,7 @@ class DataAccessLocal(DataAccess):
         logger.debug(f"Local m_files: {self.m_files}")
         logger.debug(f"Local n_samples: {self.n_samples}")
         logger.debug(f"Local files_to_use: {self.files_to_use}")
+        logger.debug(f"Local files_to_checkpoint: {self.files_to_checkpoint}")
 
     def get_num_samples(self) -> int:
         """
@@ -153,14 +162,17 @@ class DataAccessLocal(DataAccess):
             )
 
         input_files = self._get_all_files_ext(path=input_path, extensions=self.files_to_use)
-        output_files = self._get_all_files_ext(path=output_path, extensions=self.files_to_use)
+        output_files_ext = self._get_all_files_ext(path=output_path, extensions=self.files_to_checkpoint)
+        # In the case of binary transforms, an extension can be different, so just use the file names.
+        # Also remove duplicates
+        output_files = list(set([TransformUtils.get_file_extension(file)[0] for file in output_files_ext]))
 
         total_input_file_size = 0
         i = 0
         result_files = []
         for filename in sorted(input_files):
             out_f_name = self.get_output_location(filename)
-            if out_f_name in output_files:
+            if TransformUtils.get_file_extension(out_f_name)[0] in output_files:
                 continue
             if i >= cm_files > 0:
                 break

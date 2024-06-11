@@ -32,12 +32,12 @@ class AbstractBinaryTransform(AbstractTransform[DATA]):
         """
         self.config = config
 
-    def transform_binary(self, base_name: str, byte_array: bytes) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def transform_binary(self, file_name: str, byte_array: bytes) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         Converts input file into o or more output files.
         If there is an error, an exception must be raised - exit()ing is not generally allowed.
         :param byte_array: contents of the input file to be transformed.
-        :param base_name: the base name of the file containing the given byte_array.
+        :param file_name: the name of the file containing the given byte_array.
         :return: a tuple of a list of 0 or more tuples and a dictionary of statistics that will be propagated
                 to metadata.  Each element of the return list, is a tuple of the transformed bytes and a string
                 holding the extension to be used when writing out the new bytes.
