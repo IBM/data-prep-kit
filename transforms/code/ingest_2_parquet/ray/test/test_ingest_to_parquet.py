@@ -38,7 +38,7 @@ class TestIngestToParquetTransform(AbstractBinaryTransformTest):
         input_dir = os.path.join(basedir, "input")
         input_files = get_files_in_folder(input_dir, ".zip")
         input_files = [(name, binary) for name, binary in input_files.items()]
-        expected_metadata_list = [{'number of rows': 2}, {'number of rows': 52}, {}]
+        expected_metadata_list = [{'number of rows': 2}, {'number of rows': 20}, {'number of rows': 52}, {}]
         config = {
             ingest_supported_langs_file_key: lang_supported_file,
             ingest_detect_programming_lang_key: True,
