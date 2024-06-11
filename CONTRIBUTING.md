@@ -81,7 +81,7 @@ make help
 ```
 
 ## Transform Setup and Testing
-Please note the many useful options of the make command, as shown by using make help, that will take care of manual steps that would have been needed for tasks such as building, publishing, setting up or testing transforms in most directories.
+Please note the many useful options of the make command, as shown by using `make help`, that will take care of manual steps that would have been needed for tasks such as building, publishing, setting up or testing transforms in most directories.
 
 ## Coding style guidelines
 Coding style as enforced by `pre-commit`.
