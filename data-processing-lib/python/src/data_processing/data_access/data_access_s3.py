@@ -12,7 +12,6 @@
 
 import gzip
 import json
-import os
 from typing import Any
 
 import pyarrow
@@ -37,6 +36,7 @@ class DataAccessS3(DataAccess):
         m_files: int = -1,
         n_samples: int = -1,
         files_to_use: list[str] = [".parquet"],
+        files_to_checkpoint: list[str] = [".parquet"],
     ):
         """
         Create data access class for folder based configuration
@@ -47,6 +47,7 @@ class DataAccessS3(DataAccess):
         :param m_files: max amount of files to return
         :param n_samples: amount of files to randomly sample
         :param files_to_use: files extensions of files to include
+        :param files_to_checkpoint: files extensions of files to use for checkpointing
         """
         if (s3_credentials is None or s3_credentials.get("access_key", None) is None
                 or s3_credentials.get("secret_key", None) is None):
@@ -63,6 +64,7 @@ class DataAccessS3(DataAccess):
         self.m_files = m_files
         self.n_samples = n_samples
         self.files_to_use = files_to_use
+        self.files_to_checkpoint = files_to_checkpoint
         self.arrS3 = ArrowS3(
             access_key=s3_credentials.get("access_key"),
             secret_key=s3_credentials.get("secret_key"),
@@ -97,11 +99,12 @@ class DataAccessS3(DataAccess):
         return self.output_folder
 
     def _get_files_folder(
-        self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
+        self, path: str, files_to_use: list[str], cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
     ) -> tuple[list[str], dict[str, float], int]:
         """
         Support method to get list input files and their profile
         :param path: input path
+        :param files_to_use: file extensions to use
         :param max_file_size: max file size
         :param min_file_size: min file size
         :param cm_files: overwrite for the m_files in the class
@@ -117,8 +120,8 @@ class DataAccessS3(DataAccess):
                 break
             # Only use specified files
             f_name = str(file["name"])
-            _, extension = os.path.splitext(f_name)
-            if extension in self.files_to_use:
+            name_extension = TransformUtils.get_file_extension(f_name)
+            if name_extension[1] in files_to_use:
                 p_list.append(f_name)
                 size = file["size"]
                 total_input_file_size += size
@@ -150,10 +153,15 @@ class DataAccessS3(DataAccess):
         """
         if not self.checkpoint:
             return self._get_files_folder(
-                path=input_path, cm_files=cm_files, min_file_size=min_file_size, max_file_size=max_file_size
+                path=input_path, files_to_use=self.files_to_use, cm_files=cm_files,
+                min_file_size=min_file_size, max_file_size=max_file_size
             )
-        pout_list, _, retries1 = self._get_files_folder(path=output_path, cm_files=-1)
-        output_base_names = [file.replace(self.output_folder, self.input_folder) for file in pout_list]
+        pout_list, _, retries1 = self._get_files_folder(path=output_path,
+                                                        files_to_use=self.files_to_checkpoint, cm_files=-1)
+        output_base_names_ext = [file.replace(self.output_folder, self.input_folder) for file in pout_list]
+        # In the case of binary transforms, an extension can be different, so just use the file names.
+        # Also remove duplicates
+        output_base_names = list(set([TransformUtils.get_file_extension(file)[0] for file in output_base_names_ext]))
         p_list = []
         total_input_file_size = 0
         i = 0
@@ -164,8 +172,8 @@ class DataAccessS3(DataAccess):
                 break
             # Only use .parquet files
             f_name = str(file["name"])
-            _, extension = os.path.splitext(f_name)
-            if extension in self.files_to_use and f_name not in output_base_names:
+            name_extension = TransformUtils.get_file_extension(f_name)
+            if name_extension[1] in self.files_to_use and name_extension[0] not in output_base_names:
                 p_list.append(f_name)
                 size = file["size"]
                 total_input_file_size += size

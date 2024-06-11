@@ -168,7 +168,7 @@ class FdedupTransform(AbstractTableTransform):
         # wait for completion
         RayUtils.wait_for_execution_completion(replies=remote_replies)
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         Preprocessing table content.
         :param table: table
@@ -246,7 +246,7 @@ class FdedupFilter(AbstractTableTransform):
         self.docs = config.get("remote_docs", "")
         self.random_delay_limit = config.get("random_delay_limit", 10)
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         De duping (filtering) table content.
         :param table: table
