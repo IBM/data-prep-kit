@@ -87,7 +87,7 @@ class ProgLangSelectTransform(AbstractTableTransform):
                 logger.info(f"Exception loading languages list from ray object storage {e}")
                 raise RuntimeError(f"exception loading from object storage for key {languages_include_ref}")
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict]:
         """
         Select the rows for which the column `self.lang_column` has a value in the list `self.languages_include`.
         """

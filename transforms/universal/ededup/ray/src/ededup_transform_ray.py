@@ -88,7 +88,7 @@ class EdedupTransform(AbstractTableTransform):
         self.doc_column = config.get("doc_column", "")
         self.hashes = config.get("hashes", [])
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         De duping table content.
         :param table: table
