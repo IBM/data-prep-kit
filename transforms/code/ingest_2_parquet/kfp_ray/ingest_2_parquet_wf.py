@@ -12,11 +12,11 @@
 
 import os
 
-from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
+
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "ingest_2_parquet_transform_ray.py"
@@ -64,7 +64,7 @@ def compute_exec_params_func(
         "ingest_to_parquet_snapshot": ingest_to_parquet_snapshot,
         "ingest_to_parquet_detect_programming_lang": ingest_to_parquet_detect_programming_lang,
     }
-            
+
 
 # KFPv1 and KFP2 uses different methods to create a component from a function. KFPv1 uses the
 # `create_component_from_func` function, but it is deprecated by KFPv2 and so has a different import path.
@@ -81,13 +81,14 @@ if os.getenv("KFPv2", "0") == "1":
         func=compute_exec_params_func, base_image=base_kfp_image
     )
     print(
-        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the " +
-        "same version of the same pipeline !!!")
+        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the "
+        + "same version of the same pipeline !!!"
+    )
     run_id = uuid.uuid4().hex
 else:
     compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
     run_id = dsl.RUN_ID_PLACEHOLDER
-    
+
 
 # create Ray cluster
 create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
@@ -217,9 +218,6 @@ def ingest_to_parquet(
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, ingest_to_parquet_s3_access_secret, prefix=PREFIX)
         execute_job.after(ray_cluster)
-
-    # Configure the pipeline level to one week (in seconds)
-    dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 
 
 if __name__ == "__main__":
