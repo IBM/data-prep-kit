@@ -26,11 +26,16 @@ from data_processing.transform import AbstractTableTransform, TransformConfigura
 from data_processing.utils import TransformUtils
 from scancode import api
 
+cli_sufix = '_'
+LICENSE_COPYRIGHT_REMOVE_PARAMS = "license_copyright_removal_prams"
+COLUMN_KEY = "contents_column_name"
+LICENSE_KEY = "license"
+COPYRIGHT_KEY = "copyright"
 
-LICENSE_COPYRIGHT_REMOVE_PRAMS = "license_copyright_removal_prams"
-COLUMN_KEY = "lcr_contents_column_name"
-LICENSE_KEY = "lcr_license"
-COPYRIGHT_KEY = "lcr_copyright"
+column_cli_params = f'{cli_sufix}{COLUMN_KEY}'
+license_cli_params = f'{cli_sufix}{LICENSE_KEY}'
+copyright_cli_params = f'{cli_sufix}{COPYRIGHT_KEY}'
+
 DEFAULT_COLUMN = "contents"
 DEFAULT_LICENSE = True
 DEFAULT_COPYRIGHT = True
@@ -143,7 +148,7 @@ class LicenseCopyrightRemoveTransform(AbstractTableTransform):
     def __init__(self, config: dict):
         super().__init__(config)
 
-        self.license_copyright_remove = config.get(LICENSE_COPYRIGHT_REMOVE_PRAMS)
+        self.license_copyright_remove = config.get(LICENSE_COPYRIGHT_REMOVE_PARAMS)
         self.license_remove = self.license_copyright_remove.get('license',DEFAULT_LICENSE)
         self.copyright_remove = self.license_copyright_remove.get('copyright',DEFAULT_COPYRIGHT)
 
@@ -190,21 +195,21 @@ class LicenseCopyrightRemovalTransformConfiguration(TransformConfiguration):
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         parser.add_argument(
-            f"--{COLUMN_KEY}",
+            f"--{column_cli_params}",
             required=False,
             type=str,
             default=f"{DEFAULT_COLUMN}",
             help="Name of the column holds the data to process",
         )
         parser.add_argument(
-            f"--{LICENSE_KEY}",
+            f"--{license_cli_params}",
             required=False,
             type=bool,
             default=DEFAULT_LICENSE,
             help="Set False if license should not be removed",
         )
         parser.add_argument(
-            f"--{COPYRIGHT_KEY}",
+            f"--{copyright_cli_params}",
             required=False,
             type=bool,
             default=DEFAULT_COPYRIGHT,
@@ -215,7 +220,7 @@ class LicenseCopyrightRemovalTransformConfiguration(TransformConfiguration):
         dargs = vars(args)
 
         self.params = {
-            LICENSE_COPYRIGHT_REMOVE_PRAMS: {
+            LICENSE_COPYRIGHT_REMOVE_PARAMS: {
                 "contents_column_name": dargs.get("contents_column_name"),
                 "license": dargs.get("license"),
                 "copyright": dargs.get("copyright"),
@@ -224,17 +229,6 @@ class LicenseCopyrightRemovalTransformConfiguration(TransformConfiguration):
 
         return True
 
-
-class LicenseCopyrightRemovalRayTransformConfiguration(RayTransformRuntimeConfiguration):
-    def __init__(self):
-        super().__init__(transform_config=LicenseCopyrightRemovalTransformConfiguration())
-
-
 class LicenseCopyrightRemovalPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(transform_config=LicenseCopyrightRemovalTransformConfiguration())
-
-
-if __name__ == "__main__":
-    launcher = RayTransformLauncher(LicenseCopyrightRemovalPythonTransformConfiguration())
-    launcher.launch()

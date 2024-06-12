@@ -10,6 +10,7 @@
 # limitations under the License.
 ################################################################################
 
+import os
 import sys
 
 from data_processing.utils import ParamsUtils
@@ -23,14 +24,11 @@ from license_copyright_removal_transform_ray import LicenseCopyrightRemovalRayTr
 
 
 # create parameters
-s3_cred = {
-    "access_key": "localminioaccesskey",
-    "secret_key": "localminiosecretkey",
-    "url": "http://localhost:9000",
-}
-s3_conf = {
-    "input_folder": "test/filter/input",
-    "output_folder": "test/filter/output",
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
+local_conf = {
+    "input_folder": input_folder,
+    "output_folder": output_folder,
 }
 
 filter_params = {
@@ -45,8 +43,7 @@ launcher_params = {
     # where to run
     "run_locally": True,
     # Data access. Only required parameters are specified
-    "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
-    "data_s3_config": ParamsUtils.convert_to_ast(s3_conf),
+    "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # orchestrator
     "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
     "runtime_num_workers": 3,

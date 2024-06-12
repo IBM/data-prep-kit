@@ -14,7 +14,8 @@ RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
 COPY src/license_copyright_removal_transform.py .
-# COPY src/code_quality_local_ray.py local/
+COPY src/code_quality_local_ray.py local/
+COPY src/license_copyright_removal_local_ray.py local/
 
 # copy test
 COPY test/ test/
