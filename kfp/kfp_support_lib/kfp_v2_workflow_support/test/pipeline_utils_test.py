@@ -26,9 +26,8 @@ def test_pipelines():
     experiment = utils.get_experiment_by_name()
     assert experiment is not None
     # start pipeline
-    run = utils.start_pipeline(pipeline=pipeline, experiment=experiment, params={})
-    assert run is not None
+    run_id = utils.start_pipeline(pipeline=pipeline, experiment=experiment, params={})
+    assert run_id is not None
     # wait for completion
-    status, error = utils.wait_pipeline_completion(run_id=run, wait=10)
-    assert status.lower() == "succeeded"
-    assert error == ""
+    error_msg = utils.wait_pipeline_completion(run_id=run_id)
+    assert error_msg is None
