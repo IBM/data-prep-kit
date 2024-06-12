@@ -33,6 +33,10 @@ endif
 .transforms_workflows.compile-pipeline:
 	. ${WORKFLOW_VENV_ACTIVATE} && ${PYTHON} ${WF_NAME}.py
 
+KFP_LIB_SRC_FILES := $(shell find ${REPOROOT}/kfp/kfp_support_lib/${WORKFLOW_SUPPORT_LIB}/src/ -name '*.py')
+
+KFP_LIB_CONFIG_FILE := ${REPOROOT}/kfp/kfp_support_lib/${WORKFLOW_SUPPORT_LIB}/pyproject.toml
+
 FORCE:
 
 %.yaml: %.py FORCE
@@ -52,7 +56,8 @@ ifeq ($(USE_DEV_IMAGES), 1)
 endif
 	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipeline_utils.pipelines_tests_utils -c "sanity-test" -p ${CURDIR}/${PIPELINE_FILE}
 
-${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt ${DPK_RAY_LIB_DIR} ${REPOROOT}/kfp/kfp_support_lib/
+
+${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt ${DPK_RAY_LIB_DIR} ${KFP_LIB_SRC_FILES} ${KFP_LIB_CONFIG_FILE}
 	rm -rf ${REPOROOT}/transforms/venv
 	$(MAKE) -C ${REPOROOT}/transforms .defaults.python-lib-src-venv
 	. ${WORKFLOW_VENV_ACTIVATE};     \
