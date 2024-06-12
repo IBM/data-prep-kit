@@ -134,7 +134,7 @@ class SimpleTokenizer(AbstractTokenizer):
         :return: list of tokens (words)
         """
         # start from normalizing string
-        normal = text.replace("\n", "").lower().translate(str.maketrans("", "", string.punctuation))
+        normal = text.strip().lower().translate(str.maketrans("", "", string.punctuation))
         return normal.split()
 
 
