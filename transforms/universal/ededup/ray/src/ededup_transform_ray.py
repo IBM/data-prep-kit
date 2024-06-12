@@ -147,7 +147,7 @@ class EdedupTransform(AbstractTableTransform):
         i = 0
         for req in request:
             if len(req) > 0:  # Only submit if the length is greater then 0
-                remote_replies.append(self.hashes[i].get_unique.remote(req))
+                remote_replies.append(self.hashes[i].add_words.remote(req))
             i = i + 1
         # Process replies
         unique = []
@@ -207,7 +207,7 @@ class EdedupRuntime(DefaultRayTransformRuntime):
         # Get filters stats
         sum_hash = 0
         sum_hash_mem = 0
-        remote_replies = [f.get_hash_size.remote() for f in self.filters]
+        remote_replies = [f.get_size.remote() for f in self.filters]
         while remote_replies:
             # Wait for replies
             ready, not_ready = ray.wait(remote_replies)
