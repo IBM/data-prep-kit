@@ -51,8 +51,7 @@ class ComponentUtils:
         :param env2key: dict with mapping each env variable to a key in the secret
         :param prefix: prefix to add to env name
         """
-
         if prefix is not None:
             for env_name, _ in env2key.items():
                 env2key[prefix + "_" + env_name] = env2key.pop(env_name)
-        kubernetes.use_secret_as_env(task=task, secret_name='s3-secret', secret_key_to_env=env2key)
+        kubernetes.use_secret_as_env(task=task, secret_name=secret, secret_key_to_env=env2key)

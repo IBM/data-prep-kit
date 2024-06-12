@@ -10,19 +10,18 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed '
 
 include makeenv
 
-ifeq ($(KFPv2), 1)
-DOCKER_IMAGE_NAME=kfp-data-processing_v2
-DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
-WORKFLOW_SUPPORT_LIB=kfp_v2_workflow_support
-else
-DOCKER_IMAGE_NAME=kfp-data-processing
-DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
-WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
-endif
-
-
 #DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}
 DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
+
+ifeq ($(KFPv2), 1)
+        DOCKER_IMAGE_NAME=kfp-data-processing_v2
+        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
+        WORKFLOW_SUPPORT_LIB=kfp_v2_workflow_support
+else
+        DOCKER_IMAGE_NAME=kfp-data-processing
+        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
+        WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
+endif
 
 .PHONY: .lib-src-image
 .lib-src-image:: 
@@ -51,8 +50,10 @@ reconcile-requirements:
 	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" deleteRayClusterComponent.yaml
 	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" executeRayJobComponent.yaml
 	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" executeRayJobComponent_multi_s3.yaml
+ifneq ($(KFPv2), 1)
 	# TODO remove it for KFPv2
 	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" executeSubWorkflowComponent.yaml
+endif
 
 .PHONY: load-image
 load-image:

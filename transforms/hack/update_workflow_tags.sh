@@ -22,5 +22,3 @@ while IFS= read -r line; do
 	DOCKER_IMAGE_VERSION=$(eval echo ${!VERSION_NAME})
 	sed -i.back "s/data-prep-kit\/$DOCKER_IMAGE_NAME:.*/data-prep-kit\/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_VERSION\"/" $pipeline_path
 done < $versions_file
-# Update kfp component image tag 
-sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:$KFP_DOCKER_VERSION\"/" $pipeline_path
