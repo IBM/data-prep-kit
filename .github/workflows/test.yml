@@ -146,5 +146,5 @@ jobs:
                   export KFPv2=1
                   make -C kind setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms workflow-build
+                  make -C transforms/universal/noop workflow-build
                   make -C transforms/universal/noop workflow-test
