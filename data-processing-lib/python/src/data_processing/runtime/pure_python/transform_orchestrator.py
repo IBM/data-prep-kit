@@ -101,6 +101,7 @@ def orchestrate(
             "job_output_stats": stats,
         }
         logger.debug(f"Saving job metadata: {metadata}.")
+        data_access.save_job_metadata(metadata)
         logger.debug("Saved job metadata.")
         return 0
     except Exception as e:
