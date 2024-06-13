@@ -53,7 +53,7 @@ class LangIdentificationTransform(AbstractTableTransform):
         )
         self.column_name = config.get(content_column_name_key)
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         Put Transform-specific to convert one Table to 0 or more tables. It also returns
         a dictionary of execution statistics - arbitrary dictionary

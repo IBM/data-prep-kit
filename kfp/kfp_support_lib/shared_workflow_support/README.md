@@ -1,10 +1,15 @@
 # Shared Workflow Support
 
-This provides support for implementing KFP pipelines automating transform's execution.
-It comprises 2 main modules
+This provides support for implementing KFP pipelines automating transform's execution. This library is not dependent on 
+KFP version. KFP dependent modules are in [kfp_v1_workflow_support](../kfp_v1_workflow_support) and 
+[kfp_v2_workflow_support](../kfp_v2_workflow_support)
 
-* [python apiserver client](src/python_apiserver_client/README.md) 
-* [workflow support](src/runtime_utils/README.md)
+this module combines 2 inner modules
+
+* [python apiserver client](src/python_apiserver_client/README.md), which is a copy of
+[Kuberay API server-client python APIs](https://github.com/ray-project/kuberay/tree/master/clients/python-apiserver-client)
+We added it into the project, because these APIs are not exposed by any PyPi.
+* [runtime_utils](src/runtime_utils/README.md) 
 
 ## Development
 
@@ -26,13 +31,11 @@ If you don't have pre-commit, you can install from [here](https://pre-commit.com
 
 ## Library Artifact Build and Publish
 
-The process of creating a release for `fm_data_processing_kfp` package  involves the following steps:
+The process of creating a release for the package involves the following steps:
 
-cd to the package directory.
-
-update the version in [requirements.env](../../requirements.env) file.
-
-run `make build` and `make publish`.
+- cd to the package directory.
+- update the `DPK_LIB_KFP_SHARED` version in [.make.versions](../../../.make.versions) file.
+- run `make build` and `make publish`.
 
 ## Testing
 
@@ -64,5 +67,3 @@ previous test runs resources are removed before starting new tests.
 ```bash
 kubectl delete workflows -n kubeflow --all
 
-This is a copy of [Kuberay API server-client python APIs](https://github.com/ray-project/kuberay/tree/master/clients/python-apiserver-client)
-Because these APIs are not exposed by any PyPi, we added them to the project

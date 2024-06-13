@@ -40,6 +40,6 @@ if __name__ == "__main__":
     table = data_access.get_table(os.path.join(input_folder, "test_01.parquet"))
     print(f"input table: {table}")
     # Transform the table
-    table_list, metadata = transform.transform(table)
+    table_list, metadata = transform.transform(table[0])
     print(f"\noutput table: {table_list}")
     print(f"output metadata : {metadata}")
