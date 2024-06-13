@@ -18,12 +18,9 @@ workflow-test:
 workflow-upload:
 	$(MAKE) -C ray/kfp_v1 workflow-upload
 
-.PHONY: workflow-reconcile-requirements
-workflow-reconcile-requirements:
-	$(MAKE) -C ray/kfp_v1 workflow-reconcile-requirements
-
-set-versions:  #workflow-reconcile-requirements
-	@# Help: Nothing to do here yet.
+.PHONY: set-versions
+set-versions:
+	$(MAKE) -C ray/kfp_v1 set-versions
 
 clean::
 

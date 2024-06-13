@@ -23,8 +23,8 @@ workflow-upload: workflow-build
                 $(MAKE) .workflows.upload-pipeline PIPELINE_FILE=$$file; \
         done
 
-.PHONY: workflow-reconcile-requirements
-workflow-reconcile-requirements:
+.PHONY: set-versions
+set-versions:
 	@for file in $(PYTHON_WF); do \
 		$(MAKE) .workflows.set-versions PIPELINE_FILE=$$file; \
 	done

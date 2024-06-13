@@ -17,7 +17,7 @@ endef
 .workflows.set-versions:
 	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) set-versions
 	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) .reconcile-requirements FILE=${CURDIR}/${PIPELINE_FILE}
-	${REPOROOT}/transforms/hack/update_workflow_tags.sh ${REPOROOT}/.make.versions ${PIPELINE_FILE}
+	${REPOROOT}/transforms/hack/update_workflow_tags.sh ${REPOROOT}/.make.versions ${CURDIR}/${PIPELINE_FILE}
 
 .PHONY: .workflows.compile-pipeline
 .workflows.compile-pipeline:
