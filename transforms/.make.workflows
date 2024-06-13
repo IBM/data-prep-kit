@@ -1,4 +1,6 @@
-include ${REPOROOT}/.make.versions
+IGNORE := $(shell bash -c "sed -nr /^[^\#]*=/p ${REPOROOT}/.make.versions | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
+
+include makeenv
 include ${REPOROOT}/kfp/requirements.env
 
 # Include the common rules.
@@ -14,7 +16,8 @@ endef
 # FIXME
 .PHONY: .transforms_workflows.reconcile-requirements
 .transforms_workflows.reconcile-requirements:
-
+	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) reconcile-requirements
+	${REPOROOT}/transforms/hack/update_workflow_tags.sh ${REPOROOT}/.make.versions ${PIPELINE_FILE}
 
 .PHONY: .transforms_workflows.compile-pipeline
 .transforms_workflows.compile-pipeline:

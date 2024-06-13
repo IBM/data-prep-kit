@@ -9,7 +9,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=filter
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${FILTER_VERSION}
+DOCKER_IMAGE_VERSION=${FILTER_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 

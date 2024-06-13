@@ -33,9 +33,7 @@ set-versions: workflow-reconcile-requirements
 
 .PHONY: workflow-build
 workflow-build: workflow-venv
-	@for file in $(YAML_WF); do \
-		$(MAKE) $$file; \
-	done
+	$(MAKE) $(YAML_WF)
 
 .PHONY: workflow-test
 workflow-test: workflow-build

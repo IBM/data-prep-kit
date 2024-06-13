@@ -8,7 +8,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=proglang_select
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${PROGLANG_SELECT_VERSION}
+DOCKER_IMAGE_VERSION=${PROGLANG_SELECT_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 

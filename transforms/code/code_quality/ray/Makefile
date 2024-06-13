@@ -6,7 +6,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=code_quality
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${CODE_QUALITY_VERSION}
+DOCKER_IMAGE_VERSION=${CODE_QUALITY_RAY_VERSION}
 
 # Use default rule inherited from makefile.common
 clean:: .transforms.clean

@@ -27,6 +27,8 @@ image::
 
 test-image::
 
+load-image::
+
 set-versions: workflow-reconcile-requirements
 
 .PHONY: workflow-build
