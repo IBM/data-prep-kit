@@ -1,13 +1,13 @@
 REPOROOT=${CURDIR}/../../../..
 WORKFLOW_VENV_ACTIVATE=${REPOROOT}/transforms/venv/bin/activate
-include $(REPOROOT)/transforms/.make.transforms_workflows
+include $(REPOROOT)/transforms/.make.workflows
 
 PYTHON_WF := $(shell find ./ -name "*_wf.py")
 YAML_WF=$(patsubst %.py, %.yaml, ${PYTHON_WF})
 
 workflow-venv:: .check_python_version ${WORKFLOW_VENV_ACTIVATE}
 
-worflow-clean:: .transforms_workflows.clean
+worflow-clean:: .workflows.clean
 
 .PHONY: workflow-build
 workflow-build: workflow-venv
@@ -20,13 +20,13 @@ workflow-test::
 .PHONY: workflow-upload
 workflow-upload: workflow-build
 	@for file in $(YAML_WF); do \
-                $(MAKE) .transforms_workflows.upload-pipeline PIPELINE_FILE=$$file; \
+                $(MAKE) .workflows.upload-pipeline PIPELINE_FILE=$$file; \
         done
 
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:
 	@for file in $(PYTHON_WF); do \
-		$(MAKE) .transforms_workflows.reconcile-requirements PIPELINE_FILE=$$file; \
+		$(MAKE) .workflows.set-versions PIPELINE_FILE=$$file; \
 	done
 
 .PHONY: clean

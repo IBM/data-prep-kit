@@ -37,25 +37,23 @@ endif
 
 .PHONY: image
 image: Dockerfile requirements.txt
-	$(MAKE) reconcile-requirements
+	$(MAKE) set-versions 
 	$(MAKE) .lib-src-image
 
 
-set-versions: reconcile-requirements
-
-.PHONY: .reconcile-requirements-file
-.reconcile-requirements-file:
+.PHONY: .reconcile-requirements
+.reconcile-requirements:
 	@sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${FILE}
 
-.PHONY: reconcile-requirements
-reconcile-requirements:
+.PHONY: set-versions 
+set-versions:
 	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
-	@$(MAKE) .reconcile-requirements-file FILE=createRayClusterComponent.yaml
-	@$(MAKE) .reconcile-requirements-file FILE=deleteRayClusterComponent.yaml
-	@$(MAKE) .reconcile-requirements-file FILE=executeRayJobComponent.yaml
-	@$(MAKE) .reconcile-requirements-file FILE=executeRayJobComponent_multi_s3.yaml
+	@$(MAKE) .reconcile-requirements FILE=createRayClusterComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=deleteRayClusterComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent_multi_s3.yaml
 ifneq ($(KFPv2), 1)
-	@$(MAKE) .reconcile-requirements-file FILE=executeSubWorkflowComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=executeSubWorkflowComponent.yaml
 endif
 
 .PHONY: load-image

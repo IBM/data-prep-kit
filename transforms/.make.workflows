@@ -13,14 +13,14 @@ define set_env_var
 	$(eval export $(1)=$(2))
 endef
 
-.PHONY: .transforms_workflows.reconcile-requirements
-.transforms_workflows.reconcile-requirements:
-	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) reconcile-requirements
-	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) .reconcile-requirements-file FILE=${CURDIR}/${PIPELINE_FILE}
+.PHONY: .workflows.set-versions
+.workflows.set-versions:
+	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) set-versions
+	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) .reconcile-requirements FILE=${CURDIR}/${PIPELINE_FILE}
 	${REPOROOT}/transforms/hack/update_workflow_tags.sh ${REPOROOT}/.make.versions ${PIPELINE_FILE}
 
-.PHONY: .transforms_workflows.compile-pipeline
-.transforms_workflows.compile-pipeline:
+.PHONY: .workflows.compile-pipeline
+.workflows.compile-pipeline:
 	. ${WORKFLOW_VENV_ACTIVATE} && ${PYTHON} ${WF_NAME}.py
 
 KFP_LIB_SRC_FILES := $(shell find ${REPOROOT}/kfp/kfp_support_lib/${WORKFLOW_SUPPORT_LIB}/src/ -name '*.py')
@@ -30,11 +30,11 @@ KFP_LIB_CONFIG_FILE := ${REPOROOT}/kfp/kfp_support_lib/${WORKFLOW_SUPPORT_LIB}/p
 FORCE:
 
 %.yaml: %.py FORCE
-	$(MAKE) .transforms_workflows.reconcile-requirements PIPELINE_FILE=$<
-	$(MAKE) .transforms_workflows.compile-pipeline WF_NAME=$(shell (basename $< .py))
+	$(MAKE) .workflows.set-versions PIPELINE_FILE=$<
+	$(MAKE) .workflows.compile-pipeline WF_NAME=$(shell (basename $< .py))
 
-.PHONY: .transforms_workflows.test-pipeline
-.transforms_workflows.test-pipeline:
+.PHONY: .workflows.test-pipeline
+.workflows.test-pipeline:
 	@# Help: upload and run the workflow. Set export USE_DEV_IMAGES=0 to use release docker image versions.
 	$(call set_env_var, CLUSTER_EXISTS, $(shell kind get clusters | grep ${KIND_CLUSTER_NAME}))
 	@if [ -z ${CLUSTER_EXISTS} ]; then \
@@ -55,8 +55,8 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requiremen
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB);
 	@# Help: Create the virtual environment common to all workflows
 
-.PHONY: .transforms_workflows.upload-pipeline
-.transforms_workflows.upload-pipeline:
+.PHONY: .workflows.upload-pipeline
+.workflows.upload-pipeline:
 	$(call set_env_var, CLUSTER_EXISTS, $(shell kind get clusters | grep ${KIND_CLUSTER_NAME}))
 	@if [ -z ${CLUSTER_EXISTS} ]; then \
 		cd ${REPOROOT} && make setup;  \

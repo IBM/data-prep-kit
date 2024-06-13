@@ -37,16 +37,16 @@ workflow-build: workflow-venv
 
 .PHONY: workflow-test
 workflow-test: workflow-build
-	$(MAKE) .transforms_workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=ededup_wf.yaml
+	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=ededup_wf.yaml
 
 .PHONY: workflow-upload
 workflow-upload: workflow-build
 	@for file in $(YAML_WF); do \
-		$(MAKE) .transforms_workflows.upload-pipeline PIPELINE_FILE=$$file; \
+		$(MAKE) .workflows.upload-pipeline PIPELINE_FILE=$$file; \
 	done
 
 .PHONY: workflow-reconcile-requirements
 workflow-reconcile-requirements:
 	@for file in $(PYTHON_WF); do \
-		$(MAKE) .transforms_workflows.reconcile-requirements PIPELINE_FILE=$$file; \
+		$(MAKE) .workflows.set-versions PIPELINE_FILE=$$file; \
 	done
