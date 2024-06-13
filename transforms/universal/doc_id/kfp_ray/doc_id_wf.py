@@ -46,7 +46,7 @@ def compute_exec_params_func(
     doc_id_hash_column: str,
     doc_id_int_column: str,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,

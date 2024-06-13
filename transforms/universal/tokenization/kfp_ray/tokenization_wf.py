@@ -48,7 +48,7 @@ def compute_exec_params_func(
     tkn_text_lang: str,
     tkn_chunk_size: int,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,

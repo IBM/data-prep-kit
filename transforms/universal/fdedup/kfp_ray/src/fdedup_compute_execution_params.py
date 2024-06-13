@@ -74,7 +74,7 @@ def fdedup_compute_execution_params(
     from data_processing.data_access import DataAccessS3
     from data_processing.utils import GB, KB
     from scipy.integrate import quad as integrate
-    from workflow_support.runtime_utils import KFPUtils
+    from workflow_support.compile_utilsruntime_utils import KFPUtils
 
     EXECUTION_OF_KB_DOC = 0.003
 

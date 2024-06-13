@@ -1,6 +1,6 @@
 import sys
 
-from workflow_support.runtime_utils import KFPUtils
+from runtime_utils import KFPUtils
 from workflow_support.pipeline_utils import PipelinesUtils
 
 
