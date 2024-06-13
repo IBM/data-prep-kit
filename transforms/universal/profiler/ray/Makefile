@@ -6,9 +6,9 @@ REPOROOT=../../../..
 # to override/redefine the rules below. 
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_NAME=aggregator
+TRANSFORM_NAME=profiler
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${AGGREGATOR_VERSION}
+DOCKER_IMAGE_VERSION=${PROFILER_VERSION}
 
 venv::	.transforms.ray-venv
 

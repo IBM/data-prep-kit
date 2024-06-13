@@ -14,5 +14,5 @@
 # This is just a place holder t satisfy overall framework
 
 
-def test_aggregator():
+def test_profiler():
     pass

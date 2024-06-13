@@ -36,7 +36,7 @@ from ray.actor import ActorHandle
 logger = get_logger(__name__)
 REQUEST_LEN = 8192
 
-short_name = "aggregator"
+short_name = "profiler"
 cli_prefix = f"{short_name}_"
 
 

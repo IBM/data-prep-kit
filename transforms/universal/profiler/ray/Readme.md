@@ -26,13 +26,13 @@ and pass it as a parameter to transforms.
 
 ## Transform runtime
 
-[Transform runtime](src/aggregator_transform_ray.py) is responsible for creation cache actors and sending their 
+[Transform runtime](src/profiler_transform_ray.py) is responsible for creation cache actors and sending their 
 handles to the transforms themselves
 Additionally it writes created word counts to the data storage and enhances statistics information with the information about cache size and utilization
 
 ## Configuration and command line Options
 
-The set of dictionary keys holding [EdedupTransform](src/aggregator_transform_ray.py)
+The set of dictionary keys holding [EdedupTransform](src/profiler_transform_ray.py)
 configuration for values are as follows:
 
 * _aggregator_cpu_ - specifies an amount of CPUs per aggregator actor

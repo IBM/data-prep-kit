@@ -14,8 +14,8 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY src/aggregator_transform_ray.py .
-COPY src/aggregator_local_ray.py local/
+COPY src/profiler_transform_ray.py .
+COPY src/profiler_local_ray.py local/
 
 # copy test
 COPY test/ test/

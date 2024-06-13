@@ -11,7 +11,7 @@
 ################################################################################
 
 
-def aggregator_compute_execution_params(
+def profiler_compute_execution_params(
     worker_options: str,  # ray worker configuration
     actor_options: str,  # actor's resource requirements
     data_s3_config: str,  # s3 configuration

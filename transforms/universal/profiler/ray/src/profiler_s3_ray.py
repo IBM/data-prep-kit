@@ -14,7 +14,7 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from aggregator_transform_ray import AggregateRayTransformConfiguration
+from profiler_transform_ray import AggregateRayTransformConfiguration
 
 
 # create launcher
@@ -45,9 +45,9 @@ params = {
     "runtime_creation_delay": 0,
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # aggregator parameters
-    "aggregator_aggregator_cpu": 0.5,
-    "aggregator_num_aggregators": 2,
-    "aggregator_doc_column": "contents",
+    "profiler_aggregator_cpu": 0.5,
+    "profiler_num_aggregators": 2,
+    "profiler_doc_column": "contents",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

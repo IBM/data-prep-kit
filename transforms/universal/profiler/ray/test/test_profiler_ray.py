@@ -17,7 +17,7 @@ from data_processing.test_support.launch.transform_test import (
 )
 from data_processing.test_support import get_files_in_folder
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from aggregator_transform_ray import AggregateRayTransformConfiguration
+from profiler_transform_ray import AggregateRayTransformConfiguration
 
 
 class TestRayAggregatorTransform(AbstractTransformLauncherTest):
@@ -33,9 +33,9 @@ class TestRayAggregatorTransform(AbstractTransformLauncherTest):
             # When running in ray, our Runtime's get_transform_config() method  will load the domains using
             # the orchestrator's DataAccess/Factory. So we don't need to provide the bl_local_config configuration.
             # aggregator parameters
-            "aggregator_aggregator_cpu": 0.5,
-            "aggregator_num_aggregators": 2,
-            "aggregator_doc_column": "contents",
+            "profiler_aggregator_cpu": 0.5,
+            "profiler_num_aggregators": 2,
+            "profiler_doc_column": "contents",
         }
         launcher = RayTransformLauncher(AggregateRayTransformConfiguration())
         fixtures = [(launcher, config, basedir + "/input", basedir + "/expected")]

@@ -11,7 +11,7 @@
 ################################################################################
 import os
 
-from src.aggregator_compute_execution_params import aggregator_compute_execution_params
+from src.profiler_compute_execution_params import profiler_compute_execution_params
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 import kfp.compiler as compiler
@@ -19,10 +19,10 @@ import kfp.components as comp
 import kfp.dsl as dsl
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/aggregator-ray:0.4.0.dev6"
+task_image = "quay.io/dataprep1/data-prep-kit/profiler-ray:0.4.0.dev6"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "aggregator_transform_ray.py"
+EXEC_SCRIPT_NAME: str = "profiler_transform_ray.py"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6"
@@ -42,12 +42,12 @@ if os.getenv("KFPv2", "0") == "1":
     import uuid
 
     compute_exec_params_op = dsl.component_decorator.component(
-        func=aggregator_compute_execution_params, base_image=base_kfp_image
+        func=profiler_compute_execution_params, base_image=base_kfp_image
     )
     run_id = uuid.uuid4().hex
 else:
     compute_exec_params_op = comp.create_component_from_func(
-        func=aggregator_compute_execution_params, base_image=base_kfp_image
+        func=profiler_compute_execution_params, base_image=base_kfp_image
     )
     print(
         "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the " +
@@ -62,22 +62,22 @@ execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "execu
 cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
 
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "aggregator"
+TASK_NAME: str = "profiler"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for aggregator",
+    description="Pipeline for profiler",
 )
-def aggregator(
+def profiler(
     # Ray cluster
-    ray_name: str = "aggregator-kfp-ray",  # name of Ray cluster
+    ray_name: str = "profiler-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
     '"image_pull_secret": "", "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access. checkpointing is not supported by dedup
-    data_s3_config: str = "{'input_folder': 'test/aggregator/input/', 'output_folder': 'test/aggregator/output'}",
+    data_s3_config: str = "{'input_folder': 'test/profiler/input/', 'output_folder': 'test/profiler/output'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
@@ -85,11 +85,11 @@ def aggregator(
     runtime_actor_options: str = "{'num_cpus': 0.8}",
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # aggregator
-    aggregator_aggregator_cpu: float = 0.5,
-    aggregator_doc_column: str = "contents",
+    # profiler
+    profiler_aggregator_cpu: float = 0.5,
+    profiler_doc_column: str = "contents",
     # data sampling
-    aggregator_n_samples: int = 10,
+    profiler_n_samples: int = 10,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
@@ -124,9 +124,9 @@ def aggregator(
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    :param aggregator_aggregator_cpu - number of CPUs per aggregator
-    :param aggregator_doc_column - key for accessing data
-    :param aggregator_n_samples - number of samples for parameters computation
+    :param profiler_aggregator_cpu - number of CPUs per aggregator
+    :param profiler_doc_column - key for accessing data
+    :param profiler_n_samples - number of samples for parameters computation
     :return: None
     """
     # create clean_up task
@@ -144,9 +144,9 @@ def aggregator(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            doc_column=aggregator_doc_column,
-            aggregator_cpu=aggregator_aggregator_cpu,
-            n_samples=aggregator_n_samples,
+            doc_column=profiler_doc_column,
+            aggregator_cpu=profiler_aggregator_cpu,
+            n_samples=profiler_n_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
@@ -182,4 +182,4 @@ def aggregator(
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(aggregator, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(profiler, __file__.replace(".py", ".yaml"))
