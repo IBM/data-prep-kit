@@ -7,6 +7,7 @@ from kfp_support.workflow_support.utils import ONE_WEEK_SEC
 # Components
 # For every sub workflow we need a separate components, that knows about this subworkflow.
 component_spec_path = "../../../kfp_ray_components/"
+run_ingest_to_parquet_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_code_quality_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_malware_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_proglang_select_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
@@ -15,6 +16,7 @@ run_exact_dedup_op = comp.load_component_from_file(component_spec_path + "execut
 run_fuzzy_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_tokenization_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 
+ingest_to_parquet_image = "uay.io/dataprep1/data-prep-kit/ingest_2_parquet-ray:0.4.0.dev6"
 proglang_select_image = "quay.io/dataprep1/data-prep-kit/proglang_select:0.3.0"
 code_quality_image = "quay.io/dataprep1/data-prep-kit/code_quality:0.3.0"
 malware_image = "quay.io/dataprep1/data-prep-kit/malware:0.4.0"
@@ -31,6 +33,7 @@ tokenizer_image = "quay.io/dataprep1/data-prep-kit/tokenization:0.3.0"
 )
 def sample_code_ray_orchestrator(
     # the super pipeline parameters
+    p1_orch_ingest_to_parquet_name: str = "ingest_2_parquet_wf",
     p1_orch_code_quality_name: str = "code_quality_wf",
     p1_orch_malware_name: str = "malware_wf",
     p1_orch_proglang_select_name: str = "proglang_select_wf",
@@ -51,111 +54,126 @@ def sample_code_ray_orchestrator(
     p2_pipeline_runtime_actor_options: str = '{"num_cpus": 0.8}',
     p2_pipeline_data_max_files: int = -1,
     p2_pipeline_data_num_samples: int = -1,
-    # Exact dedup step parameters
-    p3_name: str = "ededup",
+    # ingest to parquet step parameters
+    p3_name: str = "ingest2parquet",
     p3_skip: bool = False,
-    p3_ededup_doc_column: str = "contents",
-    p3_ededup_hash_cpu: float = 0.5,
-    # data sampling
-    p3_ededup_n_samples: int = 10,
+    # ingest to parquet parameters
+    p3_ingest_to_parquet_supported_langs_file: str = "test/ingest_2_parquet/languages/lang_extensions.json",
+    p3_ingest_to_parquet_detect_programming_lang: bool = True,
+    p3_ingest_to_parquet_domain: str = "code",
+    ip3_ngest_to_parquet_snapshot: str = "github",
+    p3_ingest_to_parquet_s3_access_secret: str = "s3-secret",
     # overriding parameters
     p3_overriding_params: str = '{"ray_worker_options": {"image": "'
+    + ingest_to_parquet_image
+    + '"}, "ray_head_options": {"image": "'
+    + ingest_to_parquet_image
+    + '"}}',
+    # Exact dedup step parameters
+    p4_name: str = "ededup",
+    p4_skip: bool = False,
+    p4_ededup_doc_column: str = "contents",
+    p4_ededup_hash_cpu: float = 0.5,
+    # data sampling
+    p4_ededup_n_samples: int = 10,
+    # overriding parameters
+    p4_overriding_params: str = '{"ray_worker_options": {"image": "'
     + ededup_image
     + '"}, "ray_head_options": {"image": "'
     + ededup_image
     + '"}}',
     # Document ID step parameters
-    p4_name: str = "doc_id",
-    p4_skip: bool = False,
+    p5_name: str = "doc_id",
+    p5_skip: bool = False,
     # doc id parameters
-    p4_doc_id_doc_column: str = "contents",
-    p4_doc_id_hash_column: str = "hash_column",
-    p4_doc_id_int_column: str = "int_id_column",
+    p5_doc_id_doc_column: str = "contents",
+    p5_doc_id_hash_column: str = "hash_column",
+    p5_doc_id_int_column: str = "int_id_column",
     # overriding parameters
-    p4_overriding_params: str = '{"ray_worker_options": {"image": "'
+    p5_overriding_params: str = '{"ray_worker_options": {"image": "'
     + doc_id_image
     + '"}, "ray_head_options": {"image": "'
     + doc_id_image
     + '"}}',
     # Fuzzy dedup step parameters
-    p5_name: str = "fdedup",
-    p5_skip: bool = False,
+    p6_name: str = "fdedup",
+    p6_skip: bool = False,
     # columns used
-    p5_fdedup_doc_column: str = "contents",
-    p5_fdedup_id_column: str = "int_id_column",
-    p5_fdedup_cluster_column: str = "cluster",
+    p6_fdedup_doc_column: str = "contents",
+    p6_fdedup_id_column: str = "int_id_column",
+    p6_fdedup_cluster_column: str = "cluster",
     # orchestrator
     # infrastructure
-    p5_fdedup_bucket_cpu: float = 0.5,
-    p5_fdedup_doc_cpu: float = 0.5,
-    p5_fdedup_mhash_cpu: float = 0.5,
+    p6_fdedup_bucket_cpu: float = 0.5,
+    p6_fdedup_doc_cpu: float = 0.5,
+    p6_fdedup_mhash_cpu: float = 0.5,
     # fuzzy parameters
-    p5_fdedup_num_permutations: int = 64,
-    p5_fdedup_threshold: float = 0.8,
-    p5_fdedup_shingles_size: int = 5,
-    p5_fdedup_delimiters: str = " ",
+    p6_fdedup_num_permutations: int = 64,
+    p6_fdedup_threshold: float = 0.8,
+    p6_fdedup_shingles_size: int = 5,
+    p6_fdedup_delimiters: str = " ",
     # random delay between reads
-    p5_fdedup_random_delay_limit: int = 5,
+    p6_fdedup_random_delay_limit: int = 5,
     # snapshotting
-    p5_fdedup_snapshot_delay: int = 1,
-    p5_fdedup_use_doc_snapshot: bool = False,
-    p5_fdedup_use_bucket_snapshot: bool = False,
+    p6_fdedup_snapshot_delay: int = 1,
+    p6_fdedup_use_doc_snapshot: bool = False,
+    p6_fdedup_use_bucket_snapshot: bool = False,
     # data sampling
-    p5_fdedup_n_samples: int = 10,
+    p6_fdedup_n_samples: int = 10,
     # overriding parameters
-    p5_overriding_params: str = '{"ray_worker_options": {"image": "'
+    p6_overriding_params: str = '{"ray_worker_options": {"image": "'
     + fdedup_image
     + '"}, "ray_head_options": {"image": "'
     + fdedup_image
     + '"}}',
     # proglang_select step parameters
-    p6_name: str = "proglang_select",
-    p6_skip: bool = False,
-    p6_proglang_select_allowed_langs_file: str = "test/proglang_select/languages/allowed-code-languages.txt",
-    p6_proglang_select_language_column: str = "programming_language",
-    p6_proglang_select_s3_access_secret: str = "s3-secret",
+    p7_name: str = "proglang_select",
+    p7_skip: bool = False,
+    p7_proglang_select_allowed_langs_file: str = "test/proglang_select/languages/allowed-code-languages.txt",
+    p7_proglang_select_language_column: str = "programming_language",
+    p7_proglang_select_s3_access_secret: str = "s3-secret",
     # overriding parameters
-    p6_overriding_params: str = '{"ray_worker_options": {"image": "'
+    p7_overriding_params: str = '{"ray_worker_options": {"image": "'
     + proglang_select_image
     + '"}, "ray_head_options": {"image": "'
     + proglang_select_image
     + '"}}',
     # Code quality step parameters
-    p7_name: str = "code_quality",
-    p7_skip: bool = False,
-    p7_cq_contents_column_name: str = "contents",
-    p7_cq_language_column_name: str = "programming_language",
-    p7_cq_tokenizer: str = "codeparrot/codeparrot",
-    p7_cq_hf_token: str = "None",
+    p8_name: str = "code_quality",
+    p8_skip: bool = False,
+    p8_cq_contents_column_name: str = "contents",
+    p8_cq_language_column_name: str = "programming_language",
+    p8_cq_tokenizer: str = "codeparrot/codeparrot",
+    p8_cq_hf_token: str = "None",
     # orchestrator
     # overriding parameters
-    p7_overriding_params: str = '{"ray_worker_options": {"image": "'
+    p8_overriding_params: str = '{"ray_worker_options": {"image": "'
     + code_quality_image
     + '"}, "ray_head_options": {"image": "'
     + code_quality_image
     + '"}}',
     # malware step parameters
-    p8_name: str = "malware",
-    p8_skip: bool = False,
-    p8_malware_input_column: str = "contents",
-    p8_malware_output_column: str = "virus_detection",
+    p9_name: str = "malware",
+    p9_skip: bool = False,
+    p9_malware_input_column: str = "contents",
+    p9_malware_output_column: str = "virus_detection",
     # orchestrator
     # overriding parameters
-    p8_overriding_params: str = '{"ray_worker_options": {"image": "'
+    p9_overriding_params: str = '{"ray_worker_options": {"image": "'
     + malware_image
     + '"}, "ray_head_options": {"image": "'
     + malware_image
     + '"}}',
     # tokenization parameters
-    p9_name: str = "tokenization",
-    p9_skip: bool = False,
-    p9_tkn_tokenizer: str = "hf-internal-testing/llama-tokenizer",
-    p9_tkn_doc_id_column: str = "document_id",
-    p9_tkn_doc_content_column: str = "contents",
-    p9_tkn_text_lang: str = "en",
-    p9_tkn_tokenizer_args: str = "cache_dir=/tmp/hf",
-    p9_tkn_chunk_size: int = 0,
-    p9_overriding_params: str = '{"ray_worker_options": {"image": "'
+    p10_name: str = "tokenization",
+    p10_skip: bool = False,
+    p10_tkn_tokenizer: str = "hf-internal-testing/llama-tokenizer",
+    p10_tkn_doc_id_column: str = "document_id",
+    p10_tkn_doc_content_column: str = "contents",
+    p10_tkn_text_lang: str = "en",
+    p10_tkn_tokenizer_args: str = "cache_dir=/tmp/hf",
+    p10_tkn_chunk_size: int = 0,
+    p10_overriding_params: str = '{"ray_worker_options": {"image": "'
     + tokenizer_image
     + '"}, "ray_head_options": {"image": "'
     + tokenizer_image
@@ -181,30 +199,40 @@ def sample_code_ray_orchestrator(
         if prev_op is not None:
             op.after(prev_op)
 
-    # exact deduplication
-    exact_dedup = run_exact_dedup_op(
-        name=p1_orch_exact_dedup_name,
+    # ingest to parquet deduplication
+    ingest_to_parquet = run_exact_dedup_op(
+        name=p1_orch_ingest_to_parquet_name,
         prefix="p3_",
         params=args,
         host=orch_host,
         input_folder=p2_pipeline_input_parent_path,
     )
-    _set_component(exact_dedup, "exact dedup")
+    _set_component(ingest_to_parquet, "ingest to parquet")
+
+    # exact deduplication
+    exact_dedup = run_exact_dedup_op(
+        name=p1_orch_exact_dedup_name,
+        prefix="p4_",
+        params=args,
+        host=orch_host,
+        input_folder=ingest_to_parquet.output,
+    )
+    _set_component(exact_dedup, "exact dedup", ingest_to_parquet)
     # document ID
     doc_id = run_doc_id_op(
-        name=p1_orch_doc_id_name, prefix="p4_", params=args, host=orch_host, input_folder=exact_dedup.output
+        name=p1_orch_doc_id_name, prefix="p5_", params=args, host=orch_host, input_folder=exact_dedup.output
     )
     _set_component(doc_id, "doc ID", exact_dedup)
     # fuzzy deduplication
     fuzzy_dedup = run_fuzzy_dedup_op(
-        name=p1_orch_fuzzy_dedup_name, prefix="p5_", params=args, host=orch_host, input_folder=doc_id.output
+        name=p1_orch_fuzzy_dedup_name, prefix="p6_", params=args, host=orch_host, input_folder=doc_id.output
     )
     _set_component(fuzzy_dedup, "fuzzy dedup", doc_id)
 
     # proglang_select
     proglang_select = run_proglang_select_op(
         name=p1_orch_proglang_select_name,
-        prefix="p6_",
+        prefix="p7_",
         params=args,
         host=orch_host,
         input_folder=fuzzy_dedup.output,
@@ -213,18 +241,18 @@ def sample_code_ray_orchestrator(
 
     # code_quality
     code_quality = run_code_quality_op(
-        name=p1_orch_code_quality_name, prefix="p7_", params=args, host=orch_host, input_folder=proglang_select.output
+        name=p1_orch_code_quality_name, prefix="p8_", params=args, host=orch_host, input_folder=proglang_select.output
     )
     _set_component(code_quality, "code_quality", proglang_select)
 
     # malware
     malware = run_malware_op(
-        name=p1_orch_malware_name, prefix="p8_", params=args, host=orch_host, input_folder=code_quality.output
+        name=p1_orch_malware_name, prefix="p9_", params=args, host=orch_host, input_folder=code_quality.output
     )
     _set_component(malware, "malware", code_quality)
     # malware
     tokenization = run_tokenization_op(
-        name=p1_orch_tokenization_wf_name, prefix="p9_", params=args, host=orch_host, input_folder=malware.output
+        name=p1_orch_tokenization_wf_name, prefix="p10_", params=args, host=orch_host, input_folder=malware.output
     )
     _set_component(tokenization, "tokenization", malware)
 
