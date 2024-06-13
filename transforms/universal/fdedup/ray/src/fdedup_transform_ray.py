@@ -687,6 +687,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             available_gpus_gauge=available_gpus_gauge,
             available_memory_gauge=available_memory_gauge,
             object_memory_gauge=available_object_memory_gauge,
+            logger = logger
         )
         # Clean up processors
         for processor in processors_list:

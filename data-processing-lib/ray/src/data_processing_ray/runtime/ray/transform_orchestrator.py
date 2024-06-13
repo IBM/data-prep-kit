@@ -16,7 +16,6 @@ from datetime import datetime
 
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.utils import get_logger
 from data_processing_ray.runtime.ray import (
     RayTransformExecutionConfiguration,
     RayTransformFileProcessor,
@@ -25,11 +24,6 @@ from data_processing_ray.runtime.ray import (
     TransformStatisticsRay,
 )
 from ray.util import ActorPool
-from ray.util.metrics import Gauge
-
-
-logger = get_logger(__name__)
-
 
 @ray.remote(num_cpus=1, scheduling_strategy="SPREAD")
 def orchestrate(
@@ -44,6 +38,11 @@ def orchestrate(
     :param runtime_config: transformer runtime configuration
     :return: 0 - success or 1 - failure
     """
+
+    from data_processing.utils import get_logger
+    from ray.util.metrics import Gauge
+
+    logger = get_logger(__name__)
     start_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     logger.info(f"orchestrator started at {start_ts}")
     try:
@@ -112,6 +111,7 @@ def orchestrate(
             available_gpus_gauge=available_gpus_gauge,
             available_memory_gauge=available_memory_gauge,
             object_memory_gauge=available_object_memory_gauge,
+            logger=logger,
         )
         logger.debug("Done processing files, waiting for flush() completion.")
         # invoke flush to ensure that all results are returned

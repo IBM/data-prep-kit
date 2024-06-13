@@ -12,16 +12,13 @@
 
 import time
 from typing import Any
+import logging
 
 import ray
-from data_processing.utils import GB, get_logger
+from data_processing.utils import GB
 from ray.actor import ActorHandle
-from ray.types import ObjectRef
 from ray.util.actor_pool import ActorPool
 from ray.util.metrics import Gauge
-
-
-logger = get_logger(__name__)
 
 
 class RayUtils:
@@ -89,7 +86,7 @@ class RayUtils:
         :return: a list of actor handles
         """
 
-        def operator() -> ObjectRef:
+        def operator() -> ActorHandle:
             time.sleep(creation_delay)
             return clazz.options(**actor_options).remote(params)
 
@@ -106,6 +103,7 @@ class RayUtils:
         available_gpus_gauge: Gauge,
         available_memory_gauge: Gauge,
         object_memory_gauge: Gauge,
+        logger: logging.Logger,
     ) -> None:
         """
         Process files
@@ -118,6 +116,7 @@ class RayUtils:
         :param available_gpus_gauge: ray Gauge to report available GPU
         :param available_memory_gauge: ray Gauge to report available memory
         :param object_memory_gauge: ray Gauge to report available object memory
+        :param logger: logger
         :return:
         """
         logger.debug("Begin processing files")
