@@ -94,9 +94,6 @@ class KFPUtils:
                     if '"' in value:
                         logger.warning(f"can't parse inputs with double quotation marks, please use single quotation marks instead")
                     res += f'--{key}="{value}" '
-                elif isinstance(value, bool):
-                    if value:
-                        res += f"--{key} "
                 else:
                     res += f"--{key}={value} "
 

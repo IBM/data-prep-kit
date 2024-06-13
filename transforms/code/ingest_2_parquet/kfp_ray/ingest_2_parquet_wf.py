@@ -10,33 +10,86 @@
 # limitations under the License.
 ################################################################################
 
+import os
+
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from kfp_support.workflow_support.utils import (
-    ONE_HOUR_SEC,
-    ONE_WEEK_SEC,
-    ComponentUtils,
-)
-from data_processing.utils import GB
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "ingest_2_parquet_transform.py"
+EXEC_SCRIPT_NAME: str = "ingest_2_parquet_transform_ray.py"
 
-task_image = "quay.io/dataprep1/data-prep-kit/ingest_2_parquet:0.3.0"
+task_image = "quay.io/dataprep1/data-prep-kit/ingest_2_parquet-ray:0.4.0.dev6"
+
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6"
 
 # path to kfp component specifications files
-component_spec_path = "../../../../../kfp/kfp_ray_components/"
+component_spec_path = "../../../../kfp/kfp_ray_components/"
 
 # compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
-compute_exec_params_op = comp.func_to_container_op(
-    func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
-)
+def compute_exec_params_func(
+    worker_options: str,
+    actor_options: str,
+    data_s3_config: str,
+    data_max_files: int,
+    data_num_samples: int,
+    data_files_to_use: str,
+    runtime_pipeline_id: str,
+    runtime_job_id: str,
+    runtime_code_location: str,
+    ingest_to_parquet_supported_langs_file: str,
+    ingest_to_parquet_domain: str,
+    ingest_to_parquet_snapshot: str,
+    ingest_to_parquet_detect_programming_lang: bool,
+) -> dict:
+    from workflow_support.runtime_utils import KFPUtils
+
+    return {
+        "data_s3_config": data_s3_config,
+        "data_max_files": data_max_files,
+        "data_num_samples": data_num_samples,
+        "data_files_to_use": data_files_to_use,
+        "runtime_num_workers": KFPUtils.default_compute_execution_params(worker_options, actor_options),
+        "runtime_worker_options": actor_options,
+        "runtime_pipeline_id": runtime_pipeline_id,
+        "runtime_job_id": runtime_job_id,
+        "runtime_code_location": runtime_code_location,
+        "ingest_to_parquet_supported_langs_file": ingest_to_parquet_supported_langs_file,
+        "ingest_to_parquet_domain": ingest_to_parquet_domain,
+        "ingest_to_parquet_snapshot": ingest_to_parquet_snapshot,
+        "ingest_to_parquet_detect_programming_lang": ingest_to_parquet_detect_programming_lang,
+    }
+
+
+# KFPv1 and KFP2 uses different methods to create a component from a function. KFPv1 uses the
+# `create_component_from_func` function, but it is deprecated by KFPv2 and so has a different import path.
+# KFPv2 recommends using the `@dsl.component` decorator, which doesn't exist in KFPv1. Therefore, here we use
+# this if/else statement and explicitly call the decorator.
+if os.getenv("KFPv2", "0") == "1":
+    # In KFPv2 dsl.RUN_ID_PLACEHOLDER is deprecated and cannot be used since SDK 2.5.0. On another hand we cannot create
+    # a unique string in a component (at runtime) and pass it to the `clean_up_task` of `ExitHandler`, due to
+    # https://github.com/kubeflow/pipelines/issues/10187. Therefore, meantime we use a unique string created at
+    # compilation time.
+    import uuid
+
+    compute_exec_params_op = dsl.component_decorator.component(
+        func=compute_exec_params_func, base_image=base_kfp_image
+    )
+    print(
+        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the "
+        + "same version of the same pipeline !!!"
+    )
+    run_id = uuid.uuid4().hex
+else:
+    compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
+    run_id = dsl.RUN_ID_PLACEHOLDER
+
+
 # create Ray cluster
 create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
 # execute job
@@ -59,17 +112,17 @@ def ingest_to_parquet(
     '"image_pull_secret": "", "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'test/ingest2parquet/input', 'output_folder': 'test/ingest2parquet/output/'}",
+    data_s3_config: str = "{'input_folder': 'test/ingest_2_parquet/input', 'output_folder': 'test/ingest_2_parquet/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
     data_files_to_use: str = "['.zip']",
     # orchestrator
-    runtime_actor_options: str = f"{{'num_cpus': 0.8, 'memory': {2*GB}}}",
+    runtime_actor_options: str = "{'num_cpus': 0.8}",
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
     # Proglang match parameters
-    ingest_to_parquet_supported_langs_file: str = "test/ingest2parquet/languages/lang_extensions.json",
+    ingest_to_parquet_supported_langs_file: str = "test/ingest_2_parquet/languages/lang_extensions.json",
     ingest_to_parquet_detect_programming_lang: bool = True,
     ingest_to_parquet_domain: str = "code",
     ingest_to_parquet_snapshot: str = "github",
@@ -118,7 +171,7 @@ def ingest_to_parquet(
     :return: None
     """
     # create clean_up task
-    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=dsl.RUN_ID_PLACEHOLDER, server_url=server_url)
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=run_id, server_url=server_url)
     ComponentUtils.add_settings_to_component(clean_up_task, 60)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
@@ -126,12 +179,23 @@ def ingest_to_parquet(
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
             actor_options=runtime_actor_options,
+            data_s3_config=data_s3_config,
+            data_max_files=data_max_files,
+            data_num_samples=data_num_samples,
+            data_files_to_use=data_files_to_use,
+            runtime_pipeline_id=runtime_pipeline_id,
+            runtime_job_id=run_id,
+            runtime_code_location=runtime_code_location,
+            ingest_to_parquet_supported_langs_file=ingest_to_parquet_supported_langs_file,
+            ingest_to_parquet_domain=ingest_to_parquet_domain,
+            ingest_to_parquet_snapshot=ingest_to_parquet_snapshot,
+            ingest_to_parquet_detect_programming_lang=ingest_to_parquet_detect_programming_lang,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             ray_head_options=ray_head_options,
             ray_worker_options=ray_worker_options,
             server_url=server_url,
@@ -142,24 +206,10 @@ def ingest_to_parquet(
         # Execute job
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             additional_params=additional_params,
-            # note that the parameters below are specific for NOOP transform
-            exec_params={
-                "data_s3_config": data_s3_config,
-                "data_max_files": data_max_files,
-                "data_num_samples": data_num_samples,
-                "data_files_to_use": data_files_to_use,
-                "runtime_num_workers": compute_exec_params.output,
-                "runtime_worker_options": runtime_actor_options,
-                "runtime_pipeline_id": runtime_pipeline_id,
-                "runtime_job_id": dsl.RUN_ID_PLACEHOLDER,
-                "runtime_code_location": runtime_code_location,
-                "ingest_to_parquet_supported_langs_file": ingest_to_parquet_supported_langs_file,
-                "ingest_to_parquet_domain": ingest_to_parquet_domain,
-                "ingest_to_parquet_snapshot": ingest_to_parquet_snapshot,
-                "ingest_to_parquet_detect_programming_lang": ingest_to_parquet_detect_programming_lang,
-            },
+            # note that the parameters below are specific for this transform
+            exec_params=compute_exec_params.output,
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
             prefix=PREFIX,
@@ -168,9 +218,6 @@ def ingest_to_parquet(
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, ingest_to_parquet_s3_access_secret, prefix=PREFIX)
         execute_job.after(ray_cluster)
-
-    # Configure the pipeline level to one week (in seconds)
-    dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 
 
 if __name__ == "__main__":
