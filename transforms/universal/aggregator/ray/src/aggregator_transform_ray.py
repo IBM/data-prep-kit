@@ -159,6 +159,8 @@ class AggregateTransform(AbstractTableTransform):
         self.tokenizer = config.get("tokenizer", None)
         if self.tokenizer is None:
             raise RuntimeError("tokenizer is not provided")
+        if len(self.aggregators) == 0:
+            raise RuntimeError("No aggregators are available")
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
