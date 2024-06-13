@@ -13,8 +13,9 @@
 import os
 
 from data_processing.test_support.launch.transform_test import (
-    AbstractTransformLauncherTest,
+    AbstractTransformLauncherTest
 )
+from data_processing.test_support import get_files_in_folder
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from aggregator_transform_ray import AggregateRayTransformConfiguration
 
@@ -39,3 +40,14 @@ class TestRayAggregatorTransform(AbstractTransformLauncherTest):
         launcher = RayTransformLauncher(AggregateRayTransformConfiguration())
         fixtures = [(launcher, config, basedir + "/input", basedir + "/expected")]
         return fixtures
+
+    def _validate_directory_contents_match(self, dir: str, expected: str, ignore_columns: list[str] = []):
+        # Compare files
+        f_set1 = get_files_in_folder(dir=dir, ext=".csv", return_data=False)
+        f_set2 = get_files_in_folder(dir=expected, ext=".csv", return_data=False)
+        assert len(f_set1) == len(f_set2)
+
+        # Compare metadata
+        f_set1 = get_files_in_folder(dir=dir, ext=".json", return_data=False)
+        f_set2 = get_files_in_folder(dir=expected, ext=".json", return_data=False)
+        assert len(f_set1) == len(f_set2)

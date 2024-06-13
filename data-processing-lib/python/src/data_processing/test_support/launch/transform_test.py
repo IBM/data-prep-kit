@@ -15,7 +15,7 @@ import tempfile
 from typing import Any
 
 from data_processing.runtime.transform_launcher import AbstractTransformLauncher
-from data_processing.test_support.abstract_test import AbstractTest
+from data_processing.test_support import AbstractTest
 from data_processing.utils import ParamsUtils
 
 
