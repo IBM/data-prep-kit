@@ -73,8 +73,9 @@ def orchestrate(
             executor.process_file(path)
             completed += 1
             if completed % print_interval == 0:
-                logger.info(f"Completed {completed} files in {(time.time() - t_start)/60} min")
-        logger.debug("Done processing files, waiting for flush() completion.")
+                logger.info(f"Completed {completed} files ({100 * completed / len(files)}%) "
+                            f"in {(time.time() - t_start)/60} min")
+        logger.debug(f"Done processing {completed} files, waiting for flush() completion.")
         # invoke flush to ensure that all results are returned
         start = time.time()
         executor.flush()

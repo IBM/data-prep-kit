@@ -151,7 +151,8 @@ class RayUtils:
         # Wait for completion
         files_completed_gauge.set(completed)
         # Wait for completion
-        logger.info(f"Completed {completed} files in {(time.time() - t_start)/60} min. Waiting for completion")
+        logger.info(f"Completed {completed} files ({100 * completed / len(files)}%)  "
+                    f"in {(time.time() - t_start)/60} min. Waiting for completion")
         while executors.has_next():
             executors.get_next_unordered()
             running -= 1
@@ -165,7 +166,7 @@ class RayUtils:
                 object_memory_gauge=object_memory_gauge,
             )
 
-        logger.info(f"Completed processing in {(time.time() - t_start)/60.} min")
+        logger.info(f"Completed processing {completed} files in {(time.time() - t_start)/60.} min")
 
     @staticmethod
     def wait_for_execution_completion(replies: list[ray.ObjectRef]) -> None:
