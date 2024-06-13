@@ -13,20 +13,10 @@ define set_env_var
 	$(eval export $(1)=$(2))
 endef
 
-ifeq ($(KFPv2), 1)
-        DOCKER_IMAGE_NAME=kfp-data-processing_v2
-        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
-        WORKFLOW_SUPPORT_LIB=kfp_v2_workflow_support
-else
-        DOCKER_IMAGE_NAME=kfp-data-processing
-        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
-        WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
-endif
-
 .PHONY: .transforms_workflows.reconcile-requirements
 .transforms_workflows.reconcile-requirements:
 	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) reconcile-requirements
-	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${PIPELINE_FILE}
+	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) .reconcile-requirements-file FILE=${CURDIR}/${PIPELINE_FILE}
 	${REPOROOT}/transforms/hack/update_workflow_tags.sh ${REPOROOT}/.make.versions ${PIPELINE_FILE}
 
 .PHONY: .transforms_workflows.compile-pipeline
