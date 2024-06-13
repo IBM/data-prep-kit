@@ -160,18 +160,19 @@ class PipelinesUtils:
             logger.warning(f"Exception getting pipeline {e}")
             return None
 
-    def wait_pipeline_completion(self, run_id: str, timeout: int = -1, wait: int = 600) -> str:
+    def wait_pipeline_completion(self, run_id: str, timeout: int = None, wait: int = 5) -> str:
         """
         Waits for a pipeline run to complete
         :param run_id: run id
         :param timeout: timeout (sec) (-1 wait forever)
         :param wait: internal wait (sec)
-        :return: Completion status and an error message if such exists
+        :return: error message if such exists
         """
+        timeout = timeout or datetime.timedelta.max
         try:
             run_response = self.kfp_client.wait_for_run_completion(run_id, timeout=timeout, sleep_duration=wait)
             state = run_response.state.lower()
-            if state not in ["succeeded", "completed"]:
+            if state != "succeeded":
                 # Execution failed
                 logger.warning(f"Pipeline failed with status {state}")
                 return f"Run Failed with status {state}"
