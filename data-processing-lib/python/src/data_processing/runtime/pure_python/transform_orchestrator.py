@@ -60,7 +60,7 @@ def orchestrate(
         # create statistics
         statistics = TransformStatistics()
         if retries > 0:
-            statistics.add_stats({"data access retries", retries})
+            statistics.add_stats({"data access retries": retries})
         # create executor
         executor = PythonTransformFileProcessor(
             data_access_factory=data_access_factory, statistics=statistics, runtime_configuration=runtime_config

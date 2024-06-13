@@ -74,7 +74,7 @@ def orchestrate(
         # create statistics
         statistics = TransformStatisticsRay.remote({})
         if retries > 0:
-            statistics.add_stats.remote({"data access retries", retries})
+            statistics.add_stats.remote({"data access retries": retries})
         # create executors
         processor_params = {
             "data_access_factory": data_access_factory,
