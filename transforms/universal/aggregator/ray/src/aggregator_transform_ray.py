@@ -154,7 +154,7 @@ class AggregateTransform(AbstractTableTransform):
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of AggregateTableTransformConfiguration class
         super().__init__(config)
-        self.doc_column = config.get("doc_column", "")
+        self.doc_column = config.get("doc_column", "contents")
         self.aggregators = config.get("aggregators", [])
         self.tokenizer = config.get("tokenizer", None)
         if self.tokenizer is None:
