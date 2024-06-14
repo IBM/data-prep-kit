@@ -42,14 +42,14 @@ test-image:: image .transforms.test-image-help
 run-cli-sample: 
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
-                --aggregator_num_aggregators 2"	\
+                --profiler_num_aggregators 2"	\
                 .transforms.run-src-file
 
 
 
 run-local-python-only-sample: 
 	@# Help: Not implemented yet
-	@echo "No src/ededup_local.py yet :("
+	@echo "No src/profiler_local.py yet :("
 
 run-local-python-only-sample: .transforms.run-local-sample
 

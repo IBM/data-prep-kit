@@ -14,11 +14,11 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from profiler_transform_ray import AggregateRayTransformConfiguration
+from profiler_transform_ray import ProfilerRayTransformConfiguration
 
 
 # create launcher
-launcher = RayTransformLauncher(AggregateRayTransformConfiguration())
+launcher = RayTransformLauncher(ProfilerRayTransformConfiguration())
 # create parameters
 s3_cred = {
     "access_key": "localminioaccesskey",

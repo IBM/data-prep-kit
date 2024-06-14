@@ -17,7 +17,7 @@ from data_processing.test_support.launch.transform_test import (
 )
 from data_processing.test_support import get_files_in_folder
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from profiler_transform_ray import AggregateRayTransformConfiguration
+from profiler_transform_ray import ProfilerRayTransformConfiguration
 
 
 class TestRayAggregatorTransform(AbstractTransformLauncherTest):
@@ -37,7 +37,7 @@ class TestRayAggregatorTransform(AbstractTransformLauncherTest):
             "profiler_num_aggregators": 2,
             "profiler_doc_column": "contents",
         }
-        launcher = RayTransformLauncher(AggregateRayTransformConfiguration())
+        launcher = RayTransformLauncher(ProfilerRayTransformConfiguration())
         fixtures = [(launcher, config, basedir + "/input", basedir + "/expected")]
         return fixtures
 

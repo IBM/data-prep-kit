@@ -1,4 +1,4 @@
-# Aggregator
+# Profiler
 
 Please see the set of
 [transform project conventions](../../../README.md)
@@ -7,7 +7,7 @@ testing and IDE set up.
 
 ## Summary
 
-Aggregation implement a word count. Typical implementation of the word count is done using map reduce.
+Profiler implement a word count. Typical implementation of the word count is done using map reduce.
 * It’s O(N2) complexity
 * shuffling with lots of data movement
 
@@ -28,7 +28,7 @@ and pass it as a parameter to transforms.
 
 [Transform runtime](src/profiler_transform_ray.py) is responsible for creation cache actors and sending their 
 handles to the transforms themselves
-Additionally it writes created word counts to the data storage and enhances statistics information with the information about cache size and utilization
+Additionally it writes created word counts to the data storage (as .csv files) and enhances statistics information with the information about cache size and utilization
 
 ## Configuration and command line Options
 
@@ -47,11 +47,11 @@ the following command line arguments are available in addition to
 [the options provided by the launcher](../../../../data-processing-lib/doc/ray-launcher-options.md).
 
 ```shell
-  --aggregator_aggregator_cpu AGGREGATOR_AGGREGATOR_CPU
+  --profiler_aggregator_cpu PROFILER_AGGREGATOR_CPU
                         number of CPUs per aggrigator
-  --aggregator_num_aggregators AGGREGATOR_NUM_AGGREGATORS
-                        number of aggregator actors to use
-  ----aggregator_doc_column AGGREGATOR_DOC_COLUMN
+  --profiler_num_aggregators PROFILER_NUM_AGGREGATORS
+                        number of agregator actors to use
+  --profiler_doc_column PROFILER_DOC_COLUMN
                         key for accessing data
  ```
 

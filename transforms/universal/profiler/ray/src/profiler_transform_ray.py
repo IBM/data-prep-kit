@@ -138,7 +138,7 @@ class SimpleTokenizer(AbstractTokenizer):
         return normal.split()
 
 
-class AggregateTransform(AbstractTableTransform):
+class ProfilerTransform(AbstractTableTransform):
     """
     Implements Aggregator table transformer.
     """
@@ -209,7 +209,7 @@ class AggregateTransform(AbstractTableTransform):
         return
 
 
-class AggregateRuntime(DefaultRayTransformRuntime):
+class ProfilerRuntime(DefaultRayTransformRuntime):
     """
     Aggregator runtime support
     """
@@ -282,7 +282,7 @@ class AggregateRuntime(DefaultRayTransformRuntime):
         return {"number of words": sum_aggregators, "word memory, GB": sum_aggregator_mem} | stats
 
 
-class AggregateTableTransformConfiguration(TransformConfiguration):
+class ProfilerTableTransformConfiguration(TransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -291,7 +291,7 @@ class AggregateTableTransformConfiguration(TransformConfiguration):
     def __init__(self):
         super().__init__(
             name=short_name,
-            transform_class=AggregateTransform,
+            transform_class=ProfilerTransform,
         )
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -327,15 +327,15 @@ class AggregateTableTransformConfiguration(TransformConfiguration):
         if self.params["num_aggregators"] <= 0:
             logger.info(f"Number of aggregators should be greater then zero, provided {self.params['num_aggregators']}")
             return False
-        logger.info(f"aggregator params are {self.params}")
+        logger.info(f"profiler params are {self.params}")
         return True
 
 
-class AggregateRayTransformConfiguration(RayTransformRuntimeConfiguration):
+class ProfilerRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=AggregateTableTransformConfiguration(), runtime_class=AggregateRuntime)
+        super().__init__(transform_config=ProfilerTableTransformConfiguration(), runtime_class=ProfilerRuntime)
 
 
 if __name__ == "__main__":
-    launcher = RayTransformLauncher(AggregateRayTransformConfiguration())
+    launcher = RayTransformLauncher(ProfilerRayTransformConfiguration())
     launcher.launch()
