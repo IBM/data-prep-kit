@@ -19,10 +19,6 @@ from typing import Any
 import mmh3
 import pyarrow as pa
 import pyarrow.parquet as pq
-from data_processing.utils import get_logger
-
-
-logger = get_logger(__name__)
 
 
 RANDOM_SEED = 42
@@ -120,6 +116,8 @@ class TransformUtils:
         :param required: list of required columns
         :return: true, if all columns exist, false otherwise
         """
+        from data_processing.utils import get_logger
+        logger = get_logger(__name__)
         columns = table.schema.names
         result = True
         for r in required:
@@ -138,6 +136,8 @@ class TransformUtils:
         :param schema: optional Arrow table schema used for reading table, default None
         :return: table or None if the conversion failed
         """
+        from data_processing.utils import get_logger
+        logger = get_logger(__name__)
         try:
             reader = pa.BufferReader(data)
             table = pq.read_table(reader, schema=schema)
@@ -153,6 +153,8 @@ class TransformUtils:
         :param table: Arrow table
         :return: byte array or None if conversion fails
         """
+        from data_processing.utils import get_logger
+        logger = get_logger(__name__)
         try:
             # convert table to bytes
             writer = pa.BufferOutputStream()
@@ -185,6 +187,8 @@ class TransformUtils:
         :param file: file where we are saving the table
         :return: True, if there are no duplicates, False otherwise
         """
+        from data_processing.utils import get_logger
+        logger = get_logger(__name__)
         columns_list = table.schema.names
         columns_set = set(columns_list)
         if len(columns_set) != len(columns_list):

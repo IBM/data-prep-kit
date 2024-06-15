@@ -21,7 +21,6 @@ from data_processing_ray.runtime.ray import RayUtils
 from ray import cloudpickle
 from ray.actor import ActorHandle
 from ray.util import ActorPool
-from ray.util.metrics import Counter
 from scipy.integrate import quad as integrate
 
 
@@ -306,6 +305,7 @@ class BucketsHash:
         """
         Initialization
         """
+        from ray.util.metrics import Counter
         self.submitter = None
         self.n_buckets = 0
         self.bucket_memory = 0
@@ -438,6 +438,7 @@ class BucketsHashProcessor:
             threshold - threshold
             statistics - statistics actor
         """
+        from ray.util.metrics import Counter
         self.threshold = params["threshold"]
         self.mn_min_hash = params["mn_min_hash"]
         self.remote_docs = params["remote_docs"]

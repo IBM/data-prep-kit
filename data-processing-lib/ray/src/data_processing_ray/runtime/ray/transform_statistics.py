@@ -14,7 +14,6 @@ from typing import Any
 
 import ray
 from data_processing.transform import TransformStatistics
-from ray.util.metrics import Counter
 
 
 @ray.remote(num_cpus=0.25, scheduling_strategy="SPREAD")
@@ -25,6 +24,7 @@ class TransformStatisticsRay(TransformStatistics):
     """
 
     def __init__(self, params: dict[str, Any]):
+        from ray.util.metrics import Counter
         super().__init__()
         self.data_write_counter = Counter("data_written", "Total data written bytes")
         self.data_read_counter = Counter("data_read", "Total data read bytes")
