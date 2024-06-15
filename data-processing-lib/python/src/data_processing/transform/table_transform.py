@@ -55,7 +55,7 @@ class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
             self.logger.warning(f"table is empty, skipping processing")
             return [], {"skipped empty tables": 1}
         # transform table
-        out_tables, stats = self.transform(data=table, file_name=file_name)
+        out_tables, stats = self.transform(table=table, file_name=file_name)
         # Add number of rows to stats
         stats = stats | {"source_doc_count": table.num_rows}
         # convert tables to files
