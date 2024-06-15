@@ -47,14 +47,6 @@ export DOCKER_EMAIL=iamapikey
 export DOCKER_PASSWORD=<PASSWORD>
 ```
 
-As the Docker image utilizes libraries from Python Artifactory,
-set the Python Artifactory details as environment variables by executing the following commands:
-
-```bash
-export ARTIFACTORY_USER=<artifactory-user>
-export ARTIFACTORY_API_KEY=<artifactory-key>
-```
-
 Then build the image:
 
 ```bash
