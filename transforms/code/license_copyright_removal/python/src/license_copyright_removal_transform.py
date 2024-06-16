@@ -18,23 +18,20 @@ import pyarrow as pa
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
-from data_processing.runtime.ray import RayTransformLauncher
-from data_processing.runtime.ray.runtime_configuration import (
-    RayTransformRuntimeConfiguration,
-)
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import TransformUtils
+from data_processing.utils import TransformUtils,CLIArgumentProvider
 from scancode import api
 
-cli_sufix = '_'
+short_name = "license_copyright_removal"
+cli_prefix = short_name + "_"
 LICENSE_COPYRIGHT_REMOVE_PARAMS = "license_copyright_removal_prams"
 COLUMN_KEY = "contents_column_name"
 LICENSE_KEY = "license"
 COPYRIGHT_KEY = "copyright"
 
-column_cli_params = f'{cli_sufix}{COLUMN_KEY}'
-license_cli_params = f'{cli_sufix}{LICENSE_KEY}'
-copyright_cli_params = f'{cli_sufix}{COPYRIGHT_KEY}'
+column_cli_params = f'{cli_prefix}{COLUMN_KEY}'
+license_cli_params = f'{cli_prefix}{LICENSE_KEY}'
+copyright_cli_params = f'{cli_prefix}{COPYRIGHT_KEY}'
 
 DEFAULT_COLUMN = "contents"
 DEFAULT_LICENSE = True
@@ -148,16 +145,16 @@ class LicenseCopyrightRemoveTransform(AbstractTableTransform):
     def __init__(self, config: dict):
         super().__init__(config)
 
-        self.license_copyright_remove = config.get(LICENSE_COPYRIGHT_REMOVE_PARAMS)
-        self.license_remove = self.license_copyright_remove.get('license',DEFAULT_LICENSE)
-        self.copyright_remove = self.license_copyright_remove.get('copyright',DEFAULT_COPYRIGHT)
+        self.column_name = config.get(COLUMN_KEY,DEFAULT_COLUMN)
+        self.license_remove = config.get(LICENSE_KEY,DEFAULT_LICENSE)
+        self.copyright_remove = config.get(COPYRIGHT_KEY,DEFAULT_COPYRIGHT)
 
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
 
-        if not TransformUtils.validate_columns(table, [self.license_copyright_remove['contents_column_name']]):
+        if not TransformUtils.validate_columns(table, [self.column_name]):
             return [], {}
 
-        contents = table.column(self.license_copyright_remove['contents_column_name']).to_pylist()
+        contents = table.column(self.column_name).to_pylist()
         updated_content = []
         remove_code_count = 0
         for content in contents:
@@ -217,16 +214,17 @@ class LicenseCopyrightRemovalTransformConfiguration(TransformConfiguration):
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
-        dargs = vars(args)
+        # dargs = vars(args)
 
-        self.params = {
-            LICENSE_COPYRIGHT_REMOVE_PARAMS: {
-                "contents_column_name": dargs.get("contents_column_name"),
-                "license": dargs.get("license"),
-                "copyright": dargs.get("copyright"),
-            }
-        }
+        # self.params = {
+        #         "contents_column_name": dargs.get("contents_column_name"),
+        #         "license": dargs.get("license"),
+        #         "copyright": dargs.get("copyright"),
+        #     }
 
+        # return True
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        self.params = self.params | captured
         return True
 
 class LicenseCopyrightRemovalPythonTransformConfiguration(PythonTransformRuntimeConfiguration):

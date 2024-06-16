@@ -58,7 +58,22 @@ class AbstractPythonLicenseCopyrightRemovalTransformTest(AbstractTransformLaunch
                     copyright_cli_params: True,
                 },
                 os.path.join(basedir, "input"),
-                os.path.join(basedir, "expected", "test-and"),
+                os.path.join(basedir, "expected", "license-and-copyright"),
+            )
+        )
+
+        launcher, args = self._get_launcher()
+        fixtures.append(
+            (
+                launcher,
+                args
+                | {
+                    column_cli_params: 'contents',
+                    license_cli_params: False,
+                    copyright_cli_params: True,
+                },
+                os.path.join(basedir, "input"),
+                os.path.join(basedir, "expected", "copyright"),
             )
         )
 
@@ -70,10 +85,10 @@ class AbstractPythonLicenseCopyrightRemovalTransformTest(AbstractTransformLaunch
                 | {
                     column_cli_params: 'contents',
                     license_cli_params: True,
-                    copyright_cli_params: True,
+                    copyright_cli_params: False,
                 },
                 os.path.join(basedir, "input"),
-                os.path.join(basedir, "expected", "test-or"),
+                os.path.join(basedir, "expected", "license"),
             )
         )
         return fixtures

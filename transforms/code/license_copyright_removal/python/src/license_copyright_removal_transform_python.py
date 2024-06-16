@@ -27,5 +27,5 @@ class LicenseCopyrightRemovalPythonTransformConfiguration(PythonTransformRuntime
 
 if __name__ == "__main__":
     launcher = PythonTransformLauncher(LicenseCopyrightRemovalPythonTransformConfiguration())
-    logger.info("Launching filtering")
+    logger.info("Launching license copyright header removal")
     launcher.launch()

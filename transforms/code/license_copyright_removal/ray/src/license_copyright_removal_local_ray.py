@@ -15,7 +15,7 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from python.src.license_copyright_removal_transform import (
+from license_copyright_removal_transform import (
     column_cli_params,
     license_cli_params,
     copyright_cli_params,

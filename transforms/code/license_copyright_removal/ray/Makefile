@@ -4,43 +4,52 @@
 REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_NAME=license_copyright_remove
+TRANSFORM_NAME=license_copyright_removal
 # $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${LICENSE_COPYRIGHT_REMOVE}
 
-# Use default rule inherited from makefile.common
+venv::	.transforms.ray-venv
+
+test::	.transforms.ray-test
+
 clean:: .transforms.clean
 
-# Use default rule inherited from makefile.common
-test:: .transforms.ray-test
-
-# Use default rule inherited from makefile.common
 image:: .transforms.ray-image
-
-# Use default rule inherited from makefile.common
-build:: .transforms.ray-build
-
-# Use default rule inherited from makefile.common
-venv:: .transforms.ray-venv
 
 test-src:: .transforms.test-src
 
-test-image:: .transforms.ray-test-image
-
-publish:: .transforms.ray-publish
-
 setup:: .transforms.setup
 
+test-image:: .transforms.ray-test-image
 
-run-cli-ray-sample: .transforms.run-cli-ray-sample
+build:: build-dist image
 
-run-local-sample: #.transforms.run-local-sample
-	@# Help: Not implemented yet
-	@echo "No src/license_copyright_remove_local.py yet :("
+publish:: publish-dist publish-image
 
-run-local-ray-sample: .transforms.run-local-ray-sample
+publish-image:: .transforms.publish-image-ray
 
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
+run-cli-sample: 
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
+                RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
+                --license_copyright_removal_contents_column_name \"contents\"	\
+		--license_copyright_removal_license \"True\" "	\
+                .transforms.run-src-file
+
+
+
+run-local-python-only-sample: .transforms.run-local-sample
+
+run-local-sample: .transforms.run-local-sample
+
+run-s3-sample: .transforms.run-s3-sample
 
 minio-start:	.minio-start
 

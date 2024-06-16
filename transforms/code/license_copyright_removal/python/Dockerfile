@@ -1,4 +1,4 @@
-FROM docker.io/python:3.10.14-slim-bullseye
+FROM docker.io/python:3.11.9-slim-bullseye
 
 RUN pip install --upgrade pip 
 

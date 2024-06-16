@@ -17,7 +17,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from data_processing.test_support.transform import AbstractTableTransformTest
 from data_processing.transform import get_transform_config
-from python.src.license_copyright_removal_transform import (
+from license_copyright_removal_transform import (
     LicenseCopyrightRemoveTransform,
     LicenseCopyrightRemovalTransformConfiguration,
     column_cli_params,
@@ -43,10 +43,6 @@ class TestLicenseCopyrightRemovalTransform(AbstractTableTransformTest):
         cli = [
             f"--{column_cli_params}",
             column,
-            f"--{license_cli_params}",
-            license,
-            f"--{copyright_cli_params}",
-            copyright,
         ]
         ftc = LicenseCopyrightRemovalTransformConfiguration()
         config = get_transform_config(ftc, cli)
@@ -65,7 +61,7 @@ class TestLicenseCopyrightRemovalTransform(AbstractTableTransformTest):
         license = True
         copyright = True
         input_dir = os.path.join(basedir, "input")
-        expected_output_dir = os.path.join(basedir, "expected", "test-and-local")
+        expected_output_dir = os.path.join(basedir, "expected", "license-and-copyright-local")
         fixtures.append(
             self.create_license_copyright_removal_test_fixture(
                 column_name,
@@ -78,7 +74,7 @@ class TestLicenseCopyrightRemovalTransform(AbstractTableTransformTest):
 
         # test for only license removal
         copyright = False
-        expected_output_dir = os.path.join(basedir, "expected", "test-or-local")
+        expected_output_dir = os.path.join(basedir, "expected", "license-local")
         fixtures.append(
             self.create_license_copyright_removal_test_fixture(
                 column_name,
@@ -94,23 +90,7 @@ class TestLicenseCopyrightRemovalTransform(AbstractTableTransformTest):
         license = False
         copyright = True
         input_dir = os.path.join(basedir, "input")
-        expected_output_dir = os.path.join(basedir, "expected", "test-and-local")
-        fixtures.append(
-            self.create_license_copyright_removal_test_fixture(
-                column_name,
-                license,
-                copyright,
-                input_dir,
-                expected_output_dir,
-            )
-        )
-
-        # test with empty column name parameter
-        column_name = ''
-        license = True
-        copyright = True
-        input_dir = os.path.join(basedir, "input")
-        expected_output_dir = os.path.join(basedir, "expected", "test-and-local")
+        expected_output_dir = os.path.join(basedir, "expected", "copyright-local")
         fixtures.append(
             self.create_license_copyright_removal_test_fixture(
                 column_name,

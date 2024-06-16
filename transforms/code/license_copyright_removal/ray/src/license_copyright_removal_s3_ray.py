@@ -14,7 +14,7 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from python.src.license_copyright_removal_transform import (
+from license_copyright_removal_transform import (
     column_cli_params,
     license_cli_params,
     copyright_cli_params,
@@ -29,8 +29,8 @@ s3_cred = {
     "url": "http://localhost:9000",
 }
 s3_conf = {
-    "input_folder": "test/filter/input",
-    "output_folder": "test/filter/output",
+    "input_folder": "test/license_copyright_removal/input",
+    "output_folder": "test/license_copyright_removal/output",
 }
 
 filter_params = {

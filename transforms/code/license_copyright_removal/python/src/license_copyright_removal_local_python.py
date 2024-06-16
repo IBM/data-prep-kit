@@ -31,9 +31,9 @@ local_conf = {
     "output_folder": output_folder,
 }
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
-filter_params = {
+license_copyright_removal_params = {
     column_cli_params: 'contents',
-    license_cli_params: True,
+    license_cli_params: False,
     copyright_cli_params: True,
 }
 params = {
@@ -46,7 +46,7 @@ params = {
 }
 if __name__ == "__main__":
     # Set the simulated command line args
-    sys.argv = ParamsUtils.dict_to_req(d=params | filter_params)
+    sys.argv = ParamsUtils.dict_to_req(d=params | license_copyright_removal_params)
     # create launcher
     launcher = PythonTransformLauncher(LicenseCopyrightRemovalTransformConfiguration())
     # Launch the ray actor(s) to process the input

@@ -15,7 +15,7 @@ from data_processing_ray.runtime.ray import RayTransformLauncher
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
-from python.src.license_copyright_removal_transform import LicenseCopyrightRemovalTransformConfiguration
+from license_copyright_removal_transform import LicenseCopyrightRemovalTransformConfiguration
 
 
 logger = get_logger(__name__)
@@ -28,5 +28,5 @@ class LicenseCopyrightRemovalRayTransformConfiguration(RayTransformRuntimeConfig
 
 if __name__ == "__main__":
     launcher = RayTransformLauncher(LicenseCopyrightRemovalRayTransformConfiguration())
-    logger.info("Launching filtering")
+    logger.info("Launching license and copyright removal")
     launcher.launch()

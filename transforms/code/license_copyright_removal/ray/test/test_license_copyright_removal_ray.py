@@ -14,11 +14,11 @@ import os
 
 from data_processing.runtime import AbstractTransformLauncher
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from python.src.license_copyright_removal_test_support import AbstractPythonLicenseCopyrightRemovalTransformTest
-from src.license_copyright_removal_transform_ray import LicenseCopyrightRemovalRayTransformConfiguration
+from license_copyright_removal_test_support import AbstractPythonLicenseCopyrightRemovalTransformTest
+from license_copyright_removal_transform_ray import LicenseCopyrightRemovalRayTransformConfiguration
 
 
-class TestPythonLicenseCopyrightRemovalTransform(AbstractPythonFilterTransformTest):
+class TestPythonLicenseCopyrightRemovalTransform(AbstractPythonLicenseCopyrightRemovalTransformTest):
     """
     Extends the Python super-class to redefine the launcher as a RayTransformLauncher.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.

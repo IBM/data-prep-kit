@@ -11,10 +11,10 @@
 ################################################################################
 import os
 
-from python.src.license_copyright_removal_test_support import AbstractPythonFilterTransformTest
+from license_copyright_removal_test_support import AbstractPythonLicenseCopyrightRemovalTransformTest
 
 
-class TestPythonFilterTransform(AbstractPythonFilterTransformTest):
+class TestPythonFilterTransform(AbstractPythonLicenseCopyrightRemovalTransformTest):
     def _get_test_file_directory(self) -> str:
         dir = os.path.abspath(os.path.dirname(__file__))
         return dir
