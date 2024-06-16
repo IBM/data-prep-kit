@@ -9,6 +9,9 @@ It comprises 3 main modules
 
 Depends on the using KFV version either `kfp_v1_workflow_support` or `kfp_v2_workflow_support` should be used.
 
+See also how these libraries are used for [kfp components](../../kfp_ray_components/README.md) implementation
+and implementation of the actual [workflow](../../doc/simple_transform_pipeline.md)
+
 ## Development
 
 ### Requirements
