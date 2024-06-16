@@ -23,7 +23,7 @@ The KFP package build uses the following variables from the file:
 **Note:** The docker images are dependent on the libraries but use the python source code from the repository, so inorder 
 to build docker images, the python modules (libraries) do not have to be deployed. 
 
-### Choose the supported KFP version.
+### 2. Choose the supported KFP version.
 The docker images and some `workflow_support` libraries depend on KFP version. In order to build images and libraries for  
 KFP v2, run the following command:
 
@@ -36,7 +36,7 @@ export KFPv2=1
 Run the `make -C shared_workflow_support build` command to build the shared library.
 If you need a library for KFPv1
 Run `make -C kfp_v1_workflow_support build`
-Fir KFP v2 set the environment variable `KFPv2`, se above, and run `make -C kfp_v2_workflow_support build`
+For KFP v2 set the environment variable `KFPv2`, se above, and run `make -C kfp_v2_workflow_support build`
 
 ### 4. (Optional) Publish the library
 
