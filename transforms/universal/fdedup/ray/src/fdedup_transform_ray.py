@@ -314,7 +314,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             num_doc_actors - number of document actors
             num_bucket_actors - number of bucket actors
             num_minhash_actors - number of minhash actors
-            n_preprocessors - number of preprocessors
+            num_preprocessors - number of preprocessors
             snapshot_delay - delay (sec) in sending snapshot requests to actors
             use_bucket_snapshot - use bucket snapshot
             use_doc_snapshot - use doc snapshot
@@ -541,7 +541,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
                 "statistics": statistics,
             },
             actor_options=self.params.get("worker_options", None),
-            n_actors=self.params.get("n_preprocessors", 1),
+            n_actors=self.params.get("num_preprocessors", 1),
         )
         self.logger.info(f"created {len(bucket_processors_list)} bucket processor actors")
         # create bucket processors invoker
@@ -630,7 +630,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
         from ray.util.metrics import Gauge
         worker_options = self.params.get("worker_options", None)
         # Here we are limiting the number of readers not to overwhelm COS
-        n_readers = self.params.get("n_preprocessors", 1)
+        n_readers = self.params.get("num_preprocessors", 1)
         if n_readers > 1000:
             n_readers = 1000
         self.logger.info(f"Table preprocessing uses {n_readers} readers")
