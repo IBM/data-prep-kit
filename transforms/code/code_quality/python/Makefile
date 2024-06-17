@@ -44,11 +44,8 @@ setup:: .transforms.setup
 
 run-cli-sample: .transforms.run-cli-python-sample
 
-run-local-sample: #.transforms.run-local-sample
-	@# Help: Not implemented yet
-	@echo "No src/code_quality_local.py yet :("
+run-local-sample: .transforms.run-local-sample
 
-run-local-sample: .transforms.run-local-python-sample
-
+run-local-python-sample: .transforms.run-local-python-sample
 
 load-image:: .transforms.load-image
