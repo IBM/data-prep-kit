@@ -50,7 +50,7 @@ def compute_exec_params_func(
     lang_id_model_url: str,
     lang_id_content_column_name: str,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
