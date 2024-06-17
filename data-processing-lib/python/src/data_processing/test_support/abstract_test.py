@@ -37,11 +37,10 @@ def get_tables_in_folder(dir: str) -> list[pa.Table]:
 
 def get_files_in_folder(dir: str, ext: str, return_data: bool = True) -> dict[str, bytes]:
     """
-    Get  list of Tables loaded from the parquet files in the given directory.  The returned
-    list is sorted lexigraphically by the name of the file.
+    Get  list of files in folder. Always return file names and conditionally their content
     :param dir: directory
     :param ext: extension
-    :param return_data: flag to return data - default True
+    :param return_data: flag to return file's content - default True
     :return:
     """
     dal = DataAccessLocal()
