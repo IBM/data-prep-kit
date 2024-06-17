@@ -11,12 +11,11 @@
 ################################################################################
 import os
 
-from src.profiler_compute_execution_params import profiler_compute_execution_params
-from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
+from src.profiler_compute_execution_params import profiler_compute_execution_params
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
 task_image = "quay.io/dataprep1/data-prep-kit/profiler-ray:0.4.0.dev6"
@@ -50,8 +49,9 @@ else:
         func=profiler_compute_execution_params, base_image=base_kfp_image
     )
     print(
-        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the " +
-        "same version of the same pipeline !!!")
+        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the "
+        + "same version of the same pipeline !!!"
+    )
     run_id = dsl.RUN_ID_PLACEHOLDER
 
 # create Ray cluster

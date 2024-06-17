@@ -10,12 +10,12 @@
 # limitations under the License.
 ################################################################################
 
-from argparse import ArgumentParser, Namespace
-from typing import Any
-import uuid
 import csv
 import io
 import string
+import uuid
+from argparse import ArgumentParser, Namespace
+from typing import Any
 
 import pyarrow as pa
 import ray
@@ -102,18 +102,19 @@ class DataAggregator:
         s = io.StringIO()
         dict_writer = csv.DictWriter(s, ["word", "count"], extrasaction="ignore")
         for i, datum in enumerate(self.words.items()):
-            row = {'word': datum[0], 'count': datum[1]}
+            row = {"word": datum[0], "count": datum[1]}
             dict_writer.writerow(row)
         # reset cursor to the beginning of the StringIO stream
         s.seek(0)
         output_path = f"{output_folder}{self.id}.csv"
-        return self.data_access.save_file(path=output_path, data=s.read().encode('utf-8'))
+        return self.data_access.save_file(path=output_path, data=s.read().encode("utf-8"))
 
 
 class AbstractTokenizer:
     """
     Abstract tokenizer class
     """
+
     def tokenize(self, text: str) -> list[str]:
         """
         Tokenize string
@@ -127,6 +128,7 @@ class SimpleTokenizer(AbstractTokenizer):
     """
     Simple implementation of the abstract tokenizer
     """
+
     def tokenize(self, text: str) -> list[str]:
         """
         Tokenize string
@@ -299,22 +301,12 @@ class ProfilerTableTransformConfiguration(TransformConfiguration):
         Add Transform-specific arguments to the given  parser.
         """
         parser.add_argument(
-            f"--{cli_prefix}aggregator_cpu", 
-            type=float, 
-            default=0.5, 
-            help="number of CPUs per aggregator"
+            f"--{cli_prefix}aggregator_cpu", type=float, default=0.5, help="number of CPUs per aggregator"
         )
         parser.add_argument(
-            f"--{cli_prefix}num_aggregators", 
-            type=int, 
-            default=0, 
-            help="number of aggregator actors to use"
+            f"--{cli_prefix}num_aggregators", type=int, default=0, help="number of aggregator actors to use"
         )
-        parser.add_argument(
-            f"--{cli_prefix}doc_column", 
-            type=str, 
-            default="contents", 
-            help="key for accessing data")
+        parser.add_argument(f"--{cli_prefix}doc_column", type=str, default="contents", help="key for accessing data")
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -325,7 +317,9 @@ class ProfilerTableTransformConfiguration(TransformConfiguration):
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         self.params = self.params | captured
         if self.params["num_aggregators"] <= 0:
-            logger.info(f"Number of aggregators should be greater then zero, provided {self.params['num_aggregators']}")
+            logger.info(
+                f"Number of aggregators should be greater then zero, provided {self.params['num_aggregators']}"
+            )
             return False
         logger.info(f"profiler params are {self.params}")
         return True

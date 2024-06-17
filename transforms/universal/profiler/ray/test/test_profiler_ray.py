@@ -12,10 +12,10 @@
 
 import os
 
-from data_processing.test_support.launch.transform_test import (
-    AbstractTransformLauncherTest
-)
 from data_processing.test_support import get_files_in_folder
+from data_processing.test_support.launch.transform_test import (
+    AbstractTransformLauncherTest,
+)
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from profiler_transform_ray import ProfilerRayTransformConfiguration
 
