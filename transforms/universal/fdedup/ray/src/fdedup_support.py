@@ -53,10 +53,10 @@ def get_snapshot_folder(data_access: DataAccess) -> str:
 
 
 def fuzzy_optimal_param(
-        threshold: float,
-        num_perm: int,
-        false_positive_weight: float,
-        false_negative_weight: float,
+    threshold: float,
+    num_perm: int,
+    false_positive_weight: float,
+    false_negative_weight: float,
 ) -> tuple[int, int]:
     """
     Computes parameters for fuzzy dedup

@@ -134,7 +134,7 @@ class FdedupTransform(AbstractTableTransform):
         ]
 
     def _submit_buckets_minhashes(
-            self, buckets: dict[int, list[int]], minhashes: list[tuple[int, int, np.array]]
+        self, buckets: dict[int, list[int]], minhashes: list[tuple[int, int, np.array]]
     ) -> None:
         """
         Submit buckets to hash
@@ -339,7 +339,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
         self.random_delay_limit = self.params.get("random_delay_limit", 10)
 
     def get_transform_config(
-            self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
+        self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
     ) -> dict[str, Any]:
         """
         Set environment for filter execution
@@ -376,7 +376,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
         }
 
     def _create_doc_actors(
-            self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
+        self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
     ) -> None:
         """
         Create document actors
@@ -431,11 +431,11 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             )
 
     def _create_doc_actors_internal(
-            self,
-            data_access_factory: DataAccessFactoryBase,
-            statistics: ActorHandle,
-            mn_min_hash: MurmurMH,
-            files: list[str],
+        self,
+        data_access_factory: DataAccessFactoryBase,
+        statistics: ActorHandle,
+        mn_min_hash: MurmurMH,
+        files: list[str],
     ) -> None:
         """
         Create document actors
@@ -509,12 +509,12 @@ class FdedupRuntime(DefaultRayTransformRuntime):
         )
 
     def _process_buckets(
-            self,
-            data_access_factory: DataAccessFactoryBase,
-            statistics: ActorHandle,
-            bucket_collectors: list[ActorHandle],
-            minhash_collectors: list[ActorHandle],
-            mn_min_hash: MurmurMH,
+        self,
+        data_access_factory: DataAccessFactoryBase,
+        statistics: ActorHandle,
+        bucket_collectors: list[ActorHandle],
+        minhash_collectors: list[ActorHandle],
+        mn_min_hash: MurmurMH,
     ) -> None:
         """
         Process buckets
@@ -605,16 +605,16 @@ class FdedupRuntime(DefaultRayTransformRuntime):
         ray.kill(bucket_processor_invoker)
 
     def _preprocess_tables(
-            self,
-            data_access_factory: DataAccessFactoryBase,
-            statistics: ActorHandle,
-            files: list[str],
-            mn_min_hash: MurmurMH,
-            num_buckets: int,
-            length_bucket: int,
-            bucket_collectors: list[ActorHandle],
-            minhash_collectors: list[ActorHandle],
-            random_delay_limit: int,
+        self,
+        data_access_factory: DataAccessFactoryBase,
+        statistics: ActorHandle,
+        files: list[str],
+        mn_min_hash: MurmurMH,
+        num_buckets: int,
+        length_bucket: int,
+        bucket_collectors: list[ActorHandle],
+        minhash_collectors: list[ActorHandle],
+        random_delay_limit: int,
     ) -> None:
         """
         Preprocess tables - build, run and cleanup
