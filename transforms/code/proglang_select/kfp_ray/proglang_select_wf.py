@@ -45,7 +45,7 @@ def compute_exec_params_func(
     proglang_select_allowed_langs_file: str,
     proglang_select_language_column: str,
 ) -> dict:
-    from workflow_utils.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,

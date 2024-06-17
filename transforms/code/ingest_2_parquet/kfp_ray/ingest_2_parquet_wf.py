@@ -47,7 +47,7 @@ def compute_exec_params_func(
     ingest_to_parquet_snapshot: str,
     ingest_to_parquet_detect_programming_lang: bool,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
