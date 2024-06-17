@@ -54,8 +54,7 @@ By default, the value of `--tkn_chunk_size` is `0`, indicating that each documen
 ## Running
 
 ### CLI Options
-When running the transform with the Python launcher,
-the following command line arguments are available in addition to 
+The following command line arguments are available in addition to 
 the options provided by the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md)
 and the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 ```
