@@ -65,29 +65,7 @@ jobs:
             - name: Test tools
               run: |
                   make -C tools DOCKER=docker venv test
-    test-kfp-v1-lib:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Test KFP v1 lib
-              run: |
-                  source kind/requirements.env
-                  export PATH=$PATH:/tmp/
-                  curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-                  curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-                  chmod 700 /tmp/get_helm.sh
-                  HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
-                  chmod 777 /tmp/helm
-                  chmod 777 /tmp/kind
-                  curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
-                  chmod 777 /tmp/kubectl
-                  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
-                  chmod +x /tmp/mc
-                  export DEPLOY_KUBEFLOW=0
-                  make -C kind setup 
-                  make -C kfp/kfp_support_lib build test
-    test-kfp-v1-workflow-run:
+    test-kfp-v1:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -101,7 +79,7 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test KFP v1 worflow run
+            - name: Test KFP libs (shared and v1) and run a workflow
               timeout-minutes: 120
               run: |
                   source kind/requirements.env
@@ -121,7 +99,7 @@ jobs:
                   make -C kfp/kfp_support_lib test
                   make -C transforms workflow-build
                   make -C transforms/universal/noop workflow-test
-    test-kfp-v2-workflow-run:
+    test-kfp-v2:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -135,7 +113,7 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test KFP v1 worflow run
+            - name: Test KFP libs (shared and v2) and run a workflow
               timeout-minutes: 120
               run: |
                   source kind/requirements.env
