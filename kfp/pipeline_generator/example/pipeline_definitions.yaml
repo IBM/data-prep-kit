@@ -17,7 +17,7 @@ pipeline_common_input_parameters_values:
     output_folder: "test/noop/output/"
 
 pipeline_transform_input_parameters:
-   pipeline_arguments:
+    pipeline_arguments:
         - name: "noop_sleep_sec"
           type: "int"
           value: 10

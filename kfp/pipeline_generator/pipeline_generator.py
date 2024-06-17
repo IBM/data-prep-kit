@@ -73,7 +73,9 @@ if __name__ == "__main__":
     fout = open(f"{pipeline_parameters[NAME]}_wf.py", "wt")
 
     # define the generated pipeline input parameters
-    transform_input_parameters = get_pipeline_input_parameters(pipeline_definitions[PIPELINE_TRANSFORM_INPUT_PARAMETERS])
+    transform_input_parameters = get_pipeline_input_parameters(
+        pipeline_definitions[PIPELINE_TRANSFORM_INPUT_PARAMETERS]
+    )
 
     # define arguments to the Ray execution job
     execute_job_params = get_execute_job_params_guf(pipeline_definitions[PIPELINE_TRANSFORM_INPUT_PARAMETERS])
@@ -96,7 +98,9 @@ if __name__ == "__main__":
         execute_comp_file = "executeRayJobComponent_multi_s3.yaml"
         prefix_name = pipeline_parameters.get("prefix", "")
         prefix_execute = "prefix=PREFIX"
-        prefix_set_secret = f"ComponentUtils.set_s3_env_vars_to_component(execute_job, {prefix_name}_s3_access_secret, prefix=PREFIX)"
+        prefix_set_secret = (
+            f"ComponentUtils.set_s3_env_vars_to_component(execute_job, {prefix_name}_s3_access_secret, prefix=PREFIX)"
+        )
 
     # For each line in the template file
     for line in fin:

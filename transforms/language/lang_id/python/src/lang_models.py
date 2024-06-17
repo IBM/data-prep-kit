@@ -17,7 +17,9 @@ import fasttext
 from huggingface_hub import hf_hub_download
 from langcodes import standardize_tag
 
+
 KIND_FASTTEXT = "fasttext"
+
 
 class LangModel(metaclass=ABCMeta):
     @abstractmethod

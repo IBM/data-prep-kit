@@ -11,7 +11,9 @@
 ################################################################################
 
 import pyarrow as pa
-from data_processing.test_support.transform.table_transform_test import AbstractTableTransformTest
+from data_processing.test_support.transform.table_transform_test import (
+    AbstractTableTransformTest,
+)
 from lang_id_transform import LangIdentificationTransform
 from lang_models import KIND_FASTTEXT
 
@@ -27,7 +29,7 @@ class TestLangIdentificationTransform(AbstractTableTransformTest):
             "model_credential": "PUT YOUR OWN HUGGINGFACE CREDENTIAL",
             "model_kind": KIND_FASTTEXT,
             "model_url": "facebook/fasttext-language-identification",
-            "content_column_name": "contents"
+            "content_column_name": "contents",
         }
         table = pa.Table.from_arrays(
             [

@@ -1,12 +1,16 @@
-import kfp.dsl as dsl
-from kfp import kubernetes
 from typing import Dict
+
+import kfp.dsl as dsl
+
+from kfp import kubernetes
+
 
 RUN_NAME = "KFP_RUN_NAME"
 
 ONE_HOUR_SEC = 60 * 60
 ONE_DAY_SEC = ONE_HOUR_SEC * 24
 ONE_WEEK_SEC = ONE_DAY_SEC * 7
+
 
 class ComponentUtils:
     """
@@ -15,10 +19,10 @@ class ComponentUtils:
 
     @staticmethod
     def add_settings_to_component(
-            task: dsl.PipelineTask,
-            timeout: int,
-            image_pull_policy: str = "IfNotPresent",
-            cache_strategy: bool = False,
+        task: dsl.PipelineTask,
+        timeout: int,
+        image_pull_policy: str = "IfNotPresent",
+        cache_strategy: bool = False,
     ) -> None:
         """
         Add settings to kfp task
@@ -28,8 +32,9 @@ class ComponentUtils:
         :param cache_strategy: cache strategy
         """
 
-        kubernetes.use_field_path_as_env(task, env_name=RUN_NAME,
-                                         field_path="metadata.annotations['pipelines.kubeflow.org/run_name']")
+        kubernetes.use_field_path_as_env(
+            task, env_name=RUN_NAME, field_path="metadata.annotations['pipelines.kubeflow.org/run_name']"
+        )
         # Set cashing
         task.set_caching_options(enable_caching=cache_strategy)
         # image pull policy
@@ -39,10 +44,10 @@ class ComponentUtils:
 
     @staticmethod
     def set_s3_env_vars_to_component(
-            task: dsl.PipelineTask,
-            secret: str = '',
-            env2key: Dict[str, str] = {'s3-key': 'S3_KEY', 's3-secret': 'S3_SECRET', 's3-endpoint': 'ENDPOINT'},
-            prefix: str = None,
+        task: dsl.PipelineTask,
+        secret: str = "",
+        env2key: Dict[str, str] = {"s3-key": "S3_KEY", "s3-secret": "S3_SECRET", "s3-endpoint": "ENDPOINT"},
+        prefix: str = None,
     ) -> None:
         """
         Set S3 env variables to KFP component
@@ -57,4 +62,5 @@ class ComponentUtils:
                 env_name = env2key.pop(secret_key)
                 env_name = f"{prefix}_{env_name}"
                 env2key[secret_key] = env_name
+        # FIXME: see https://github.com/kubeflow/pipelines/issues/10914
         kubernetes.use_secret_as_env(task=task, secret_name='s3-secret', secret_key_to_env=env2key)

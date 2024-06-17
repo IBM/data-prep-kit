@@ -14,7 +14,9 @@ from typing import Tuple
 
 import pyarrow as pa
 from data_processing.test_support.transform.noop_transform import NOOPTransform
-from data_processing.test_support.transform.table_transform_test import AbstractTableTransformTest
+from data_processing.test_support.transform.table_transform_test import (
+    AbstractTableTransformTest,
+)
 
 
 table = pa.Table.from_pydict({"name": pa.array(["Tom", "Dick", "Harry"]), "age": pa.array([0, 1, 2])})

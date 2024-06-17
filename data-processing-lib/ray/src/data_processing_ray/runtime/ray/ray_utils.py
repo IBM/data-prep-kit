@@ -10,18 +10,15 @@
 # limitations under the License.
 ################################################################################
 
+import logging
 import time
 from typing import Any
 
 import ray
-from data_processing.utils import GB, get_logger
+from data_processing.utils import GB
 from ray.actor import ActorHandle
-from ray.types import ObjectRef
 from ray.util.actor_pool import ActorPool
 from ray.util.metrics import Gauge
-
-
-logger = get_logger(__name__)
 
 
 class RayUtils:
@@ -89,7 +86,7 @@ class RayUtils:
         :return: a list of actor handles
         """
 
-        def operator() -> ObjectRef:
+        def operator() -> ActorHandle:
             time.sleep(creation_delay)
             return clazz.options(**actor_options).remote(params)
 
@@ -106,6 +103,7 @@ class RayUtils:
         available_gpus_gauge: Gauge,
         available_memory_gauge: Gauge,
         object_memory_gauge: Gauge,
+        logger: logging.Logger,
     ) -> None:
         """
         Process files
@@ -118,6 +116,7 @@ class RayUtils:
         :param available_gpus_gauge: ray Gauge to report available GPU
         :param available_memory_gauge: ray Gauge to report available memory
         :param object_memory_gauge: ray Gauge to report available object memory
+        :param logger: logger
         :return:
         """
         logger.debug("Begin processing files")
@@ -151,7 +150,10 @@ class RayUtils:
         # Wait for completion
         files_completed_gauge.set(completed)
         # Wait for completion
-        logger.info(f"Completed {completed} files in {(time.time() - t_start)/60} min. Waiting for completion")
+        logger.info(
+            f"Completed {completed} files ({100 * completed / len(files)}%)  "
+            f"in {(time.time() - t_start)/60} min. Waiting for completion"
+        )
         while executors.has_next():
             executors.get_next_unordered()
             running -= 1
@@ -165,7 +167,7 @@ class RayUtils:
                 object_memory_gauge=object_memory_gauge,
             )
 
-        logger.info(f"Completed processing in {(time.time() - t_start)/60.} min")
+        logger.info(f"Completed processing {completed} files in {(time.time() - t_start)/60.} min")
 
     @staticmethod
     def wait_for_execution_completion(replies: list[ray.ObjectRef]) -> None:

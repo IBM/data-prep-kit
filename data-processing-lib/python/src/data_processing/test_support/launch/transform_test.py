@@ -29,9 +29,7 @@ class AbstractTransformLauncherTest(AbstractTest):
     """
 
     @staticmethod
-    def _get_argv(
-            cli_params: dict[str, Any], in_table_path: str, out_table_path: str
-    ):
+    def _get_argv(cli_params: dict[str, Any], in_table_path: str, out_table_path: str):
         args = {} | cli_params
         local_ast = {"input_folder": in_table_path, "output_folder": out_table_path}
         args["data_local_config"] = local_ast
@@ -39,12 +37,12 @@ class AbstractTransformLauncherTest(AbstractTest):
         return argv
 
     def test_transform(
-            self,
-            launcher: AbstractTransformLauncher,
-            cli_params: dict[str, Any],
-            in_table_path: str,
-            expected_out_table_path: str,
-            ignore_columns: list[str],
+        self,
+        launcher: AbstractTransformLauncher,
+        cli_params: dict[str, Any],
+        in_table_path: str,
+        expected_out_table_path: str,
+        ignore_columns: list[str],
     ):
         """
         Test the given transform and its runtime using the given CLI arguments, input directory of data files and expected output directory.
@@ -72,11 +70,11 @@ class AbstractTransformLauncherTest(AbstractTest):
     def _install_test_fixtures(self, metafunc):
         # Apply the fixtures for the method with these input names (i.e. test_transform()).
         if (
-                "launcher" in metafunc.fixturenames
-                and "cli_params" in metafunc.fixturenames
-                and "in_table_path" in metafunc.fixturenames
-                and "expected_out_table_path" in metafunc.fixturenames
-                and "ignore_columns" in metafunc.fixturenames
+            "launcher" in metafunc.fixturenames
+            and "cli_params" in metafunc.fixturenames
+            and "in_table_path" in metafunc.fixturenames
+            and "expected_out_table_path" in metafunc.fixturenames
+            and "ignore_columns" in metafunc.fixturenames
         ):
             # Let the sub-class define the specific tests and test data for the transform under test.
             fixtures = self.get_test_transform_fixtures()

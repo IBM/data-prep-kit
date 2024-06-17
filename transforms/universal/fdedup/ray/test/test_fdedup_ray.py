@@ -42,7 +42,7 @@ class TestRayBlocklistTransform(AbstractTransformLauncherTest):
             "fdedup_num_doc_actors": 2,
             "fdedup_num_bucket_actors": 1,
             "fdedup_num_minhash_actors": 1,
-            "fdedup_num_preprocessors": 2,
+            "fdedup_num_preprocessors": 1,
             # fuzzy parameters
             "fdedup_num_permutations": 64,
             "fdedup_threshold": 0.8,

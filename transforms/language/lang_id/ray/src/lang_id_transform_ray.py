@@ -39,13 +39,14 @@ class LangIdentificationRayTransformConfiguration(RayTransformRuntimeConfigurati
     Language Identification does not use a RayRuntime class so the superclass only needs the base
     python-only configuration.
     """
-    
+
     def __init__(self):
         """
         Initialization
         :param base_configuration - base configuration class
         """
         super().__init__(transform_config=LangIdentificationTransformConfiguration())
+
 
 if __name__ == "__main__":
     launcher = RayTransformLauncher(LangIdentificationRayTransformConfiguration())

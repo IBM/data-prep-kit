@@ -15,12 +15,13 @@ import os
 from data_processing.data_access import DataAccessLocal
 from lang_id_transform import (
     LangIdentificationTransform,
+    content_column_name_key,
     model_credential_key,
     model_kind_key,
     model_url_key,
-    content_column_name_key
 )
 from lang_models import KIND_FASTTEXT
+
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
@@ -29,7 +30,7 @@ lang_id_params = {
     model_credential_key: "PUT YOUR OWN HUGGINGFACE CREDENTIAL",
     model_kind_key: KIND_FASTTEXT,
     model_url_key: "facebook/fasttext-language-identification",
-    content_column_name_key: "text"
+    content_column_name_key: "text",
 }
 if __name__ == "__main__":
     # Here we show how to run outside of the runtime

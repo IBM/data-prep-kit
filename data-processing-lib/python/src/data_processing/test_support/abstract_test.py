@@ -114,9 +114,12 @@ class AbstractTest:
         for i in range(l1):
             f1 = files_list[i]
             f2 = expected_files_list[i]
-            assert f1[1] == f2[1], f"produced file extension {f1[1]} is different from  expected file extension {f2[1]}"
-            assert (len(f1[0]) - len(f2[0])) < 50, \
-                f"produced file length {len(f1[0])} is different from expected file extension {len(f2[0])}"
+            assert (
+                f1[1] == f2[1]
+            ), f"produced file extension {f1[1]} is different from  expected file extension {f2[1]}"
+            assert (
+                len(f1[0]) - len(f2[0])
+            ) < 50, f"produced file length {len(f1[0])} is different from expected file extension {len(f2[0])}"
 
     @staticmethod
     def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
@@ -184,7 +187,9 @@ class AbstractTest:
         AbstractTest.validate_expected_tables([t1], [t2])
 
     @staticmethod
-    def __confirm_diffs(src_dir: str, expected_dir: str, diff_files: list, dest_dir: str, drop_columns: list[str] = []):
+    def __confirm_diffs(
+        src_dir: str, expected_dir: str, diff_files: list, dest_dir: str, drop_columns: list[str] = []
+    ):
         """
         Copy all files from the source dir to the dest dir.
         :param src_dir:
@@ -213,5 +218,8 @@ class AbstractTest:
                 da = DataAccessLocal()
                 f1_bytes = da.get_file(src)
                 f2_bytes = da.get_file(dest)
-                assert (len(f1_bytes) - len(f2_bytes)) < 50, \
+                assert (
+                    len(f1_bytes) - len(f2_bytes)
+                ) < 50, (
                     f"produced file length {len(f1_bytes)} is different from expected file extension {len(f2_bytes)}"
+                )

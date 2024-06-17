@@ -14,7 +14,6 @@ Noop configuration and command line options are the same as for the base python 
 ## Running
 
 ### Launched Command Line Options 
-When running the transform with the Ray launcher (i.e. TransformLauncher),
 In addition to those available to the transform as defined in [here](../python/README.md),
 the set of 
 [ray launcher](../../../../data-processing-lib/doc/ray-launcher-options.md) are available.

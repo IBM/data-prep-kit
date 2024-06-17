@@ -92,7 +92,9 @@ class KFPUtils:
             if str(value) != "":
                 if isinstance(value, str):
                     if '"' in value:
-                        logger.warning(f"can't parse inputs with double quotation marks, please use single quotation marks instead")
+                        logger.warning(
+                            f"can't parse inputs with double quotation marks, please use single quotation marks instead"
+                        )
                     res += f'--{key}="{value}" '
                 else:
                     res += f"--{key}={value} "
@@ -111,8 +113,8 @@ class KFPUtils:
 
     @staticmethod
     def default_compute_execution_params(
-            worker_options: str,  # ray worker configuration
-            actor_options: str,  # cpus per actor
+        worker_options: str,  # ray worker configuration
+        actor_options: str,  # cpus per actor
     ) -> str:
         """
         This is the most simplistic transform execution parameters computation

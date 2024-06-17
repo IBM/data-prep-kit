@@ -41,6 +41,14 @@ jobs:
             - name: Test Code Transforms
               run: |
                   make -C transforms/code DOCKER=docker venv test-src
+    test-language:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Test Language Transforms
+              run: |
+                  make -C transforms/language DOCKER=docker venv test-src
     test-universal:
         runs-on: ubuntu-latest
         steps:
