@@ -49,10 +49,8 @@ and the [python launcher](../../../../data-processing-lib/doc/python-launcher-op
 ### Running the samples
 To run the samples, use the following `make` targets
 
-* `run-cli-sample` - runs src/code_quality_transform.py using command line args
-* `run-local-sample` - runs src/code_quality_local_ray.py
-* `run-s3-sample` - runs src/code_quality_s3_ray.py
-    * Requires prior invocation of `make minio-start` to load data into local minio for S3 access.
+* `run-cli-sample` - runs src/code_quality_transform_python.py using command line args
+* `run-local-sample` - runs src/code_quality_local_python.py
 
 These targets will activate the virtual environment and set up any configuration needed.
 Use the `-n` option of `make` to see the detail of what is done to run the sample.

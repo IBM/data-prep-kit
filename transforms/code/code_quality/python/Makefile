@@ -12,23 +12,23 @@ DOCKER_IMAGE_VERSION=${CODE_QUALITY_RAY_VERSION}
 clean:: .transforms.clean
 
 # Use default rule inherited from makefile.common
-test:: .transforms.ray-test
+test:: .transforms.python-test
 
 # Use default rule inherited from makefile.common
-image:: .transforms.ray-image
+image:: .transforms.python-image
 
 # Use default rule inherited from makefile.common
-venv:: .transforms.ray-venv
+venv:: .transforms.python-venv
 
 test-src:: .transforms.test-src
 
-test-image:: .transforms.ray-test-image
+test-image:: .transforms.python-test-image
 
 build:: build-dist image
 
 publish:: publish-dist publish-image
 
-publish-image:: .transforms.publish-image-ray
+publish-image:: .transforms.publish-image-python
 
 setup:: .transforms.setup
 
@@ -42,12 +42,13 @@ publish-dist:: .defaults.publish-dist
 
 setup:: .transforms.setup
 
-run-cli-sample: .transforms.run-cli-ray-sample
+run-cli-sample: .transforms.run-cli-python-sample
 
-run-local-sample: .transforms.run-local-ray-sample
+run-local-sample: #.transforms.run-local-sample
+	@# Help: Not implemented yet
+	@echo "No src/code_quality_local.py yet :("
 
-run-s3-sample: .transforms.run-s3-ray-sample
+run-local-sample: .transforms.run-local-python-sample
 
-minio-start:	.minio-start
 
 load-image:: .transforms.load-image
