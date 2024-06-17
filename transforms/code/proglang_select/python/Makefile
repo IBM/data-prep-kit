@@ -10,25 +10,25 @@ TRANSFORM_NAME=proglang_select
 # $(REPOROOT)/.make.versions file contains the versions
 DOCKER_IMAGE_VERSION=${PROGLANG_SELECT_RAY_VERSION}
 
-venv::	.transforms.ray-venv
+venv::	.transforms.python-venv
 
-test::	.transforms.ray-test
+test::	.transforms.python-test
 
 clean:: .transforms.clean
 
-image:: .transforms.ray-image
+image:: .transforms.python-image
 
 test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-test-image:: .transforms.ray-test-image
+test-image:: .transforms.python-test-image
 
 build:: build-dist image
 
 publish:: publish-dist publish-image
 
-publish-image:: .transforms.publish-image-ray
+publish-image:: .transforms.publish-image-python
 
 # distribution versions is the same as image version.
 set-versions:
@@ -39,20 +39,16 @@ build-dist:: set-versions .defaults.build-dist
 publish-dist:: .defaults.publish-dist
 
 
-run-cli-sample: .transforms.run-cli-ray-sample
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
-                RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
+run-cli-sample: #.transforms.run-cli-python-sample
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_python.py \
+                RUN_ARGS="--data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
 		--proglang_select_language_column language							\
     		--proglang_select_output_column lang_selected							\
 		--proglang_select_allowed_langs_file ../test-data/languages/allowed-code-languages.txt "	\
 		.transforms.run-src-file
 
-#run-local-sample: .transforms.run-local-sample
+run-local-sample: .transforms.run-local-sample
 
-run-local-ray-sample: .transforms.run-local-ray-sample
-
-#run-s3-ray-sample: .transforms.run-s3-ray-sample
-
-minio-start:	.minio-start
+run-local-python-sample: .transforms.run-local-python-sample
 
 load-image:: .transforms.load-image

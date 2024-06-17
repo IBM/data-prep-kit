@@ -11,12 +11,13 @@
 ################################################################################
 
 import os
+import sys
 
-from data_processing.data_access import DataAccessFactory, DataAccessLocal
-from proglang_select_transform_ray import (
-    ProgLangSelectTransform,
+from data_processing.runtime.pure_python import PythonTransformLauncher
+from data_processing.utils import ParamsUtils
+from proglang_select_transform import (
+    ProgLangSelectTransformConfiguration,
     lang_allowed_langs_file_key,
-    lang_data_factory_key,
     lang_lang_column_key,
     lang_output_column_key,
 )
@@ -30,22 +31,31 @@ selected_languages_file = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "../test-data/languages/allowed-code-languages.txt")
 )
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
-
-params = {
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
+local_conf = {
+    "input_folder": input_folder,
+    "output_folder": output_folder,
+}
+code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
+langselect_config = {
     lang_allowed_langs_file_key: selected_languages_file,
     lang_lang_column_key: language_column_name,
     lang_output_column_key: annotated_column_name,
-    lang_data_factory_key: DataAccessFactory(),  # Expect to create DataAccessLocal
 }
+params = {
+    # Data access. Only required parameters are specified
+    "data_local_config": ParamsUtils.convert_to_ast(local_conf),
+    # orchestrator
+    "runtime_pipeline_id": "pipeline_id",
+    "runtime_job_id": "job_id",
+    "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
+    # lanuage selection specific parameters
+    **langselect_config,
+}
+
 if __name__ == "__main__":
-    # Here we show how to run outside of ray
-    # Create and configure the transform.
-    transform = ProgLangSelectTransform(params)
-    # Use the local data access to read a parquet table.
-    data_access = DataAccessLocal()
-    table, _ = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
-    print(f"input table: {table}")
-    # Transform the table
-    table_list, metadata = transform.transform(table)
-    print(f"\noutput table: {table_list}")
-    print(f"output metadata : {metadata}")
+    sys.argv = ParamsUtils.dict_to_req(d=params)
+    # create launcher
+    launcher = PythonTransformLauncher(ProgLangSelectTransformConfiguration())
+    # launch
+    launcher.launch()

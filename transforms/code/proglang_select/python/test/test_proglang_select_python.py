@@ -12,19 +12,19 @@
 
 import os
 
+from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from data_processing_ray.runtime.ray import RayTransformLauncher
 from proglang_select_transform import (
     lang_allowed_langs_file_key,
     lang_lang_column_key,
     lang_output_column_key,
 )
-from proglang_select_transform_ray import ProgLangSelectRayConfiguration
+from proglang_select_transform_python import ProgLangSelectPythonConfiguration
 
 
-class TestRayProgLangSelectTransform(AbstractTransformLauncherTest):
+class TestPythonProgLangSelectTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -39,7 +39,6 @@ class TestRayProgLangSelectTransform(AbstractTransformLauncherTest):
             )
         )
         config = {
-            "run_locally": True,
             # When running in ray, our Runtime's get_transform_config() method  will load the domains using
             # the orchestrator's DataAccess/Factory. So we don't need to provide the lang_select_local_config configuration.
             lang_allowed_langs_file_key: languages_file,
@@ -48,7 +47,7 @@ class TestRayProgLangSelectTransform(AbstractTransformLauncherTest):
         }
         fixtures = [
             (
-                RayTransformLauncher(ProgLangSelectRayConfiguration()),
+                PythonTransformLauncher(ProgLangSelectPythonConfiguration()),
                 config,
                 basedir + "/input",
                 basedir + "/expected",
