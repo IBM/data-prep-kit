@@ -107,9 +107,10 @@ PREFIX: str = "ingest_to_parquet"
 )
 def ingest_to_parquet(
     ray_name: str = "ingest_to_parquet-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
+    # Add image_pull_secret and image_pull_policy to ray workers if needed
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image_pull_secret": "", "image": "' + task_image + '"}',
+    '"image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/ingest_2_parquet/input', 'output_folder': 'test/ingest_2_parquet/output/'}",
