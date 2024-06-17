@@ -306,6 +306,7 @@ class BucketsHash:
         Initialization
         """
         from ray.util.metrics import Counter
+
         self.submitter = None
         self.n_buckets = 0
         self.bucket_memory = 0
@@ -439,6 +440,7 @@ class BucketsHashProcessor:
             statistics - statistics actor
         """
         from ray.util.metrics import Counter
+
         self.threshold = params["threshold"]
         self.mn_min_hash = params["mn_min_hash"]
         self.remote_docs = params["remote_docs"]

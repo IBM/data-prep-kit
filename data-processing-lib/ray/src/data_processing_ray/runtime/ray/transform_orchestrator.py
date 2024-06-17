@@ -25,6 +25,7 @@ from data_processing_ray.runtime.ray import (
 )
 from ray.util import ActorPool
 
+
 @ray.remote(num_cpus=1, scheduling_strategy="SPREAD")
 def orchestrate(
     preprocessing_params: RayTransformExecutionConfiguration,

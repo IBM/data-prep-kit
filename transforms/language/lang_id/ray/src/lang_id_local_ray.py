@@ -17,10 +17,10 @@ from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from lang_id_transform_ray import (
     LangIdentificationRayTransformConfiguration,
+    content_column_name_cli_param,
     model_credential_cli_param,
     model_kind_cli_param,
     model_url_cli_param,
-    content_column_name_cli_param
 )
 from lang_models import KIND_FASTTEXT
 
@@ -50,7 +50,7 @@ params = {
     model_credential_cli_param: "PUT YOUR OWN HUGGINGFACE CREDENTIAL",
     model_kind_cli_param: KIND_FASTTEXT,
     model_url_cli_param: "facebook/fasttext-language-identification",
-    content_column_name_cli_param: "text"
+    content_column_name_cli_param: "text",
 }
 if __name__ == "__main__":
     # Set the simulated command line args

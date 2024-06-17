@@ -13,8 +13,8 @@
 from typing import Any
 
 import pyarrow as pa
-from data_processing.utils import TransformUtils
 from data_processing.transform import AbstractBinaryTransform
+from data_processing.utils import TransformUtils
 
 
 class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
@@ -28,6 +28,7 @@ class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
         Initialize based on the dictionary of configuration information.
         """
         from data_processing.utils import get_logger
+
         super().__init__(config)
         self.logger = get_logger(__name__)
 
@@ -98,8 +99,9 @@ class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
         """
         return [], {}
 
-    def _check_and_convert_tables(self, out_tables: list[pa.Table], stats: dict[str, Any]) \
-            -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+    def _check_and_convert_tables(
+        self, out_tables: list[pa.Table], stats: dict[str, Any]
+    ) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
 
         out_files = [tuple[bytes, str]] * len(out_tables)
         out_docs = 0

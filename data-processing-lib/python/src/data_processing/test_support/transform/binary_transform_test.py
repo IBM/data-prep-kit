@@ -12,7 +12,6 @@
 
 from typing import Tuple
 
-
 from data_processing.test_support.abstract_test import AbstractTest
 from data_processing.transform import AbstractBinaryTransform
 

@@ -17,12 +17,13 @@ from data_processing.test_support.launch.transform_test import (
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from lang_id_transform_ray import (
     LangIdentificationRayTransformConfiguration,
+    content_column_name_cli_param,
     model_credential_cli_param,
     model_kind_cli_param,
     model_url_cli_param,
-    content_column_name_cli_param
 )
 from lang_models import KIND_FASTTEXT
+
 
 class TestRayLangIdentificationTransform(AbstractTransformLauncherTest):
     """
@@ -38,13 +39,13 @@ class TestRayLangIdentificationTransform(AbstractTransformLauncherTest):
             model_kind_cli_param: KIND_FASTTEXT,
             model_url_cli_param: "facebook/fasttext-language-identification",
             content_column_name_cli_param: "text",
-            "run_locally": True
+            "run_locally": True,
         }
         return [
             (
                 RayTransformLauncher(LangIdentificationRayTransformConfiguration()),
                 config,
-                basedir + "/input", basedir + "/expected"
+                basedir + "/input",
+                basedir + "/expected",
             )
         ]
-

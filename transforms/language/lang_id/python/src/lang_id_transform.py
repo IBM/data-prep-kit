@@ -33,6 +33,7 @@ model_kind_cli_param = f"{cli_prefix}{model_kind_key}"
 model_url_cli_param = f"{cli_prefix}{model_url_key}"
 content_column_name_cli_param = f"{cli_prefix}{content_column_name_key}"
 
+
 class LangIdentificationTransform(AbstractTableTransform):
     """
     Implements a simple copy of a pyarrow Table.
@@ -69,12 +70,14 @@ class LangIdentificationTransform(AbstractTableTransform):
         logger.debug(f"Transformed one table with {len(table)} rows")
         return [table], stats
 
+
 class LangIdentificationTransformConfiguration(TransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args.
     """
+
     def __init__(self):
         super().__init__(
             name=short_name,
@@ -93,20 +96,10 @@ class LangIdentificationTransformConfiguration(TransformConfiguration):
             required=True,
             help="Credential to access model for language detection placed in url",
         )
+        parser.add_argument(f"--{model_kind_cli_param}", required=True, help="Kind of model for language detection")
+        parser.add_argument(f"--{model_url_cli_param}", required=True, help="Url to model for language detection")
         parser.add_argument(
-            f"--{model_kind_cli_param}",
-            required=True,
-            help="Kind of model for language detection"
-        )
-        parser.add_argument(
-            f"--{model_url_cli_param}",
-            required=True,
-            help="Url to model for language detection"
-        )
-        parser.add_argument(
-            f"--{content_column_name_cli_param}",
-            default="contents",
-            help="Column name to get content"
+            f"--{content_column_name_cli_param}", default="contents", help="Column name to get content"
         )
 
     def apply_input_params(self, args: Namespace) -> bool:

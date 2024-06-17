@@ -10,7 +10,8 @@
 # limitations under the License.
 ################################################################################
 import sys
-from runtime_utils import KFPUtils,  RayRemoteJobs
+
+from runtime_utils import KFPUtils, RayRemoteJobs
 
 
 def start_ray_cluster(

@@ -77,6 +77,7 @@ class FdedupTransform(AbstractTableTransform):
             random_delay_limit - random delay limit
         """
         from data_processing.utils import get_logger
+
         super().__init__(config)
         self.logger = get_logger(__name__)
         self.doc_column = config.get("doc_column", "")
@@ -101,7 +102,7 @@ class FdedupTransform(AbstractTableTransform):
             return [text]
         bounds = [-1] + separators + [len(text)]
         return [
-            text[bounds[i] + 1: bounds[i + self.word_shingle_size]]
+            text[bounds[i] + 1 : bounds[i + self.word_shingle_size]]
             for i in range(0, len(bounds) - self.word_shingle_size)
         ]
 
@@ -126,7 +127,7 @@ class FdedupTransform(AbstractTableTransform):
         :return:
         """
         return [
-            mmh3.hash64(min_hashes[i * self.length_band: (i + 1) * self.length_band], seed=RANDOM_SEED, signed=False)[
+            mmh3.hash64(min_hashes[i * self.length_band : (i + 1) * self.length_band], seed=RANDOM_SEED, signed=False)[
                 0
             ]
             for i in range(self.num_bands)
@@ -326,6 +327,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             delimiters - delimiter
         """
         from data_processing.utils import get_logger
+
         super().__init__(params)
         self.logger = get_logger(__name__)
         self.sum_buckets = 0
@@ -356,7 +358,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             self.logger.info(f"Found the following snapshot files {files.keys()}")
             self.document_collectors = [None] * len(files)
             for file in files.keys():
-                i = int(file[file.rfind("_") + 1:])
+                i = int(file[file.rfind("_") + 1 :])
                 self.document_collectors[i] = DocCollector.options(
                     **{"num_cpus": self.params.get("doc_cpu", 0.5)}
                 ).remote({"id": i, "data_access": data_access_factory, "snapshot": file})
@@ -395,7 +397,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             self.logger.debug(f"Found the following bucket snapshot files {files.keys()}")
             bucket_collectors = [None] * len(files)
             for file in files.keys():
-                i = int(file[file.rfind("_") + 1:])
+                i = int(file[file.rfind("_") + 1 :])
                 bucket_collectors[i] = BucketsHash.options(**{"num_cpus": self.params.get("bucket_cpu", 0.5)}).remote(
                     {"id": i, "data_access": data_access_factory, "snapshot": file}
                 )
@@ -409,7 +411,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             self.logger.debug(f"Found the following minhash snapshot files {files.keys()}")
             minhash_collectors = [None] * len(files)
             for file in files.keys():
-                i = int(file[file.rfind("_") + 1:])
+                i = int(file[file.rfind("_") + 1 :])
                 minhash_collectors[i] = DocsMinHash.options(**{"num_cpus": self.params.get("mhash_cpu", 0.5)}).remote(
                     {"id": i, "data_access": data_access_factory, "snapshot": file}
                 )
@@ -628,6 +630,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
         :return: None
         """
         from ray.util.metrics import Gauge
+
         worker_options = self.params.get("worker_options", None)
         # Here we are limiting the number of readers not to overwhelm COS
         n_readers = self.params.get("num_preprocessors", 1)
@@ -689,7 +692,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             available_gpus_gauge=available_gpus_gauge,
             available_memory_gauge=available_memory_gauge,
             object_memory_gauge=available_object_memory_gauge,
-            logger=self.logger
+            logger=self.logger,
         )
         # Clean up processors
         for processor in processors_list:
@@ -740,6 +743,7 @@ class FdedupTableTransformConfiguration(TransformConfiguration):
             transform_class=FdedupFilter,
         )
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:

@@ -1,10 +1,9 @@
 import sys
 
+from data_processing.utils import ParamsUtils
 from runtime_utils import KFPUtils
 from workflow_support.pipeline_utils import PipelinesUtils
 
-
-from data_processing.utils import ParamsUtils
 
 def invoke_sub_workflow(
     name: str,  # workflow name

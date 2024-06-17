@@ -17,10 +17,10 @@ from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from lang_id_transform_ray import (
     LangIdentificationRayTransformConfiguration,
+    content_column_name_cli_param,
     model_credential_cli_param,
     model_kind_cli_param,
     model_url_cli_param,
-    content_column_name_cli_param
 )
 from lang_models import KIND_FASTTEXT
 

@@ -25,6 +25,7 @@ class TransformStatisticsRay(TransformStatistics):
 
     def __init__(self, params: dict[str, Any]):
         from ray.util.metrics import Counter
+
         super().__init__()
         self.data_write_counter = Counter("data_written", "Total data written bytes")
         self.data_read_counter = Counter("data_read", "Total data read bytes")

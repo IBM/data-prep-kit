@@ -28,10 +28,10 @@ class AbstractTableTransformTest(AbstractTest):
     def _install_test_fixtures(self, metafunc):
         # Apply the fixtures for the method with these input names (i.e. test_transform()).
         if (
-                "transform" in metafunc.fixturenames
-                and "in_table_list" in metafunc.fixturenames
-                and "expected_table_list" in metafunc.fixturenames
-                and "expected_metadata_list" in metafunc.fixturenames
+            "transform" in metafunc.fixturenames
+            and "in_table_list" in metafunc.fixturenames
+            and "expected_table_list" in metafunc.fixturenames
+            and "expected_metadata_list" in metafunc.fixturenames
         ):
             # Let the sub-class define the specific tests and test data for the transform under test.
             f = self.get_test_transform_fixtures()
@@ -39,11 +39,11 @@ class AbstractTableTransformTest(AbstractTest):
             metafunc.parametrize("transform,in_table_list,expected_table_list,expected_metadata_list", f)
 
     def test_transform(
-            self,
-            transform: AbstractTableTransform,
-            in_table_list: list[pa.Table],
-            expected_table_list: list[pa.Table],
-            expected_metadata_list: list[dict[str, float]],
+        self,
+        transform: AbstractTableTransform,
+        in_table_list: list[pa.Table],
+        expected_table_list: list[pa.Table],
+        expected_metadata_list: list[dict[str, float]],
     ):
         """
         Use the given transform to transform() the given table(s) and compare the results (list of tables and metadata)

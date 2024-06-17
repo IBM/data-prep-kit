@@ -117,6 +117,7 @@ class TransformUtils:
         :return: true, if all columns exist, false otherwise
         """
         from data_processing.utils import get_logger
+
         logger = get_logger(__name__)
         columns = table.schema.names
         result = True
@@ -137,6 +138,7 @@ class TransformUtils:
         :return: table or None if the conversion failed
         """
         from data_processing.utils import get_logger
+
         logger = get_logger(__name__)
         try:
             reader = pa.BufferReader(data)
@@ -154,6 +156,7 @@ class TransformUtils:
         :return: byte array or None if conversion fails
         """
         from data_processing.utils import get_logger
+
         logger = get_logger(__name__)
         try:
             # convert table to bytes
@@ -188,6 +191,7 @@ class TransformUtils:
         :return: True, if there are no duplicates, False otherwise
         """
         from data_processing.utils import get_logger
+
         logger = get_logger(__name__)
         columns_list = table.schema.names
         columns_set = set(columns_list)

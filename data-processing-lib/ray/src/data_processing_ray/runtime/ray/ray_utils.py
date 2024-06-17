@@ -10,9 +10,9 @@
 # limitations under the License.
 ################################################################################
 
+import logging
 import time
 from typing import Any
-import logging
 
 import ray
 from data_processing.utils import GB
@@ -150,8 +150,10 @@ class RayUtils:
         # Wait for completion
         files_completed_gauge.set(completed)
         # Wait for completion
-        logger.info(f"Completed {completed} files ({100 * completed / len(files)}%)  "
-                    f"in {(time.time() - t_start)/60} min. Waiting for completion")
+        logger.info(
+            f"Completed {completed} files ({100 * completed / len(files)}%)  "
+            f"in {(time.time() - t_start)/60} min. Waiting for completion"
+        )
         while executors.has_next():
             executors.get_next_unordered()
             running -= 1

@@ -19,4 +19,3 @@ from .noop_transform import (
     pwd_cli_param,
     NOOPSparkTransform,
 )
-

@@ -83,7 +83,7 @@ class ArrowS3:
         retries = 0
         for page in pages:
             # For every page
-            retries += page.get('ResponseMetadata', {}).get('RetryAttempts', 0)
+            retries += page.get("ResponseMetadata", {}).get("RetryAttempts", 0)
             for obj in page.get("Contents", []):
                 # Get both file name and size
                 files.append({"name": f"{bucket}/{obj['Key']}", "size": obj["Size"]})
@@ -106,7 +106,7 @@ class ArrowS3:
             internal_retries = 0
             for page in page_iterator:
                 # for every page
-                internal_retries += page.get('ResponseMetadata', {}).get('RetryAttempts', 0)
+                internal_retries += page.get("ResponseMetadata", {}).get("RetryAttempts", 0)
                 for p in page.get("CommonPrefixes", []):
                     sub_folders.append(p["Prefix"])
                     # apply recursively
@@ -130,7 +130,7 @@ class ArrowS3:
         for n in range(self.retries):
             try:
                 obj = self.s3_client.get_object(Bucket=bucket, Key=prefix)
-                retries += obj.get('ResponseMetadata', {}).get('RetryAttempts', 0)
+                retries += obj.get("ResponseMetadata", {}).get("RetryAttempts", 0)
                 return obj["Body"].read(), retries
             except Exception as e:
                 logger.error(f"failed to read file {key}, exception {e}, attempt {n}")
@@ -152,7 +152,7 @@ class ArrowS3:
         for n in range(self.retries):
             try:
                 res = self.s3_client.put_object(Bucket=bucket, Key=prefix, Body=data)
-                retries += res.get('ResponseMetadata', {}).get('RetryAttempts', 0)
+                retries += res.get("ResponseMetadata", {}).get("RetryAttempts", 0)
                 return res, retries
             except Exception as e:
                 logger.error(f"Failed to upload file to to key {key}, exception {e}")
@@ -201,7 +201,7 @@ class ArrowS3:
         for n in range(self.retries):
             try:
                 res = self.s3_client.delete_object(Bucket=bucket, Key=prefix)
-                retries += res.get('ResponseMetadata', {}).get('RetryAttempts', 0)
+                retries += res.get("ResponseMetadata", {}).get("RetryAttempts", 0)
                 return retries
             except Exception as e:
                 logger.error(f"failed to delete file {key}, exception {e}")
@@ -223,7 +223,7 @@ class ArrowS3:
         for n in range(self.retries):
             try:
                 res = self.s3_client.copy_object(CopySource=copy_source, Bucket=d_bucket, Key=d_prefix)
-                retries += res.get('ResponseMetadata', {}).get('RetryAttempts', 0)
+                retries += res.get("ResponseMetadata", {}).get("RetryAttempts", 0)
                 retries += self.delete_file(source)
                 return retries
             except Exception as e:

@@ -115,8 +115,9 @@ class DataAccess:
         """
         pass
 
-    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) \
-            -> tuple[dict[str, bytes], int]:
+    def get_folder_files(
+        self, path: str, extensions: list[str] = None, return_data: bool = True
+    ) -> tuple[dict[str, bytes], int]:
         """
         Get a list of byte content of files. The path here is an absolute path and can be anywhere.
         The current limitation for S3 and Lakehouse is that it has to be in the same bucket
@@ -235,8 +236,12 @@ class DataAccess:
         # compute number of docs
         number_of_docs = av_number_docs * len(path_list)
         logger.info(f"Estimated number of docs {number_of_docs}")
-        return path_profile | {
-            "average table size MB": av_table_size,
-            "average doc size KB": av_doc_size,
-            "estimated number of docs": number_of_docs,
-        }, retries
+        return (
+            path_profile
+            | {
+                "average table size MB": av_table_size,
+                "average doc size KB": av_doc_size,
+                "estimated number of docs": number_of_docs,
+            },
+            retries,
+        )

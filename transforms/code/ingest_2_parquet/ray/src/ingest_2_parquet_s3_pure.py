@@ -10,18 +10,18 @@
 # limitations under the License.
 ################################################################################
 
+import ast
 import os
 import sys
-import ast
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
-from data_processing.utils import ParamsUtils, GB
+from data_processing.utils import GB, ParamsUtils
 from ingest_2_parquet_transform_ray import (
     IngestToParquetPythonConfiguration,
-    ingest_supported_langs_file_key,
     ingest_detect_programming_lang_key,
     ingest_domain_key,
     ingest_snapshot_key,
+    ingest_supported_langs_file_key,
 )
 
 
@@ -35,7 +35,7 @@ s3_conf = {
     "input_folder": "test/ingest_2_parquet/input",
     "output_folder": "test/ingest_2_parquet/output",
 }
-worker_options = {"num_cpus": 0.8, "memory": 2*GB}
+worker_options = {"num_cpus": 0.8, "memory": 2 * GB}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 ingest_config = {
     ingest_supported_langs_file_key: "test/ingest_2_parquet/languages/lang_extensions.json",
