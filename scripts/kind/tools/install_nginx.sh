@@ -5,10 +5,10 @@ op=$1
 SLEEP_TIME="${SLEEP_TIME:-30}"
 MAX_RETRIES="${MAX_RETRIES:-20}"
 EXIT_CODE=0
-NGINX_INSTALLATION_FILE="${ROOT_DIR}/hack/nginx_deploy.yaml"
-NGINX_MINIO_INSTALLATION_FILE="${ROOT_DIR}/hack/nginx_deploy_minio.yaml"
+NGINX_INSTALLATION_FILE="${REPOROOT}/scripts/kind/nginx_deploy.yaml"
+NGINX_MINIO_INSTALLATION_FILE="${REPOROOT}/scripts/kind/nginx_deploy_minio.yaml"
 
-source ${ROOT_DIR}/hack/common.sh
+source ${REPOROOT}/scripts/kind/common.sh
 
 deploy() {
 	kubectl apply -f "$NGINX_INSTALLATION_FILE"

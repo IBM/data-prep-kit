@@ -9,8 +9,8 @@ MAX_RETRIES="${MAX_RETRIES:-20}"
 EXIT_CODE=0
 
 deploy() {
-  kubectl apply -f ${ROOT_DIR}/hack/s3_secret.yaml
-	kubectl apply -f ${ROOT_DIR}/hack/minio_ingress.yaml
+  kubectl apply -f ${REPOROOT}/scripts/kind/s3_secret.yaml
+	kubectl apply -f ${REPOROOT}/scripts/kind/minio_ingress.yaml
 }
 
 wait(){
@@ -24,8 +24,8 @@ echo "ingress minio is ready"
 }
 
 delete(){
-  kubectl delete -f ${ROOT_DIR}/hack/s3_secret.yaml
-	kubectl delete -f ${ROOT_DIR}/hack/minio_ingress.yaml
+  kubectl delete -f ${REPOROOT}/scripts/kind/s3_secret.yaml
+	kubectl delete -f ${REPOROOT}/scripts/kind/minio_ingress.yaml
 }
 
 usage(){
