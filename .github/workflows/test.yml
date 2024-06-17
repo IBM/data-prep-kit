@@ -85,11 +85,11 @@ jobs:
                   source kind/requirements.env
                   export PATH=$PATH:/tmp/
                   curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+                  chmod 777 /tmp/kind
                   curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
                   chmod 700 /tmp/get_helm.sh
                   HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
                   chmod 777 /tmp/helm
-                  chmod 777 /tmp/kind
                   curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
                   chmod 777 /tmp/kubectl
                   curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
@@ -98,7 +98,15 @@ jobs:
                   make -C kind setup
                   make -C kfp/kfp_support_lib test
                   make -C transforms workflow-build
-                  make -C transforms/universal/noop workflow-test
+                  dir=("code"  "universal") && index=$(($RANDOM % 2)) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs/ -type d  -maxdepth 1 ))
+                  # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
+                  set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
+                  export ROOT_DIR=kind
+                  source kind/hack/common.sh
+                  header_text "Running ${transforms[$index]} workflow test"
+                  make -C ${transforms[$index]} workflow-test
+                  header_text "Run ${transforms[$index]} completed"
+                  
     test-kfp-v2:
         runs-on: ubuntu-latest
         steps:
@@ -119,11 +127,11 @@ jobs:
                   source kind/requirements.env
                   export PATH=$PATH:/tmp/
                   curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+                  chmod 777 /tmp/kind
                   curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
                   chmod 700 /tmp/get_helm.sh
                   HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
                   chmod 777 /tmp/helm
-                  chmod 777 /tmp/kind
                   curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
                   chmod 777 /tmp/kubectl
                   curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
