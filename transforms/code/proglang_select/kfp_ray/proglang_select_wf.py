@@ -204,9 +204,6 @@ def lang_select(
         ComponentUtils.set_s3_env_vars_to_component(execute_job, proglang_select_s3_access_secret, prefix=PREFIX)
         execute_job.after(ray_cluster)
 
-    # Configure the pipeline level to one week (in seconds)
-    # dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
-
 
 if __name__ == "__main__":
     # Compiling the pipeline

@@ -176,10 +176,6 @@ def ededup(
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
 
-    # TODO
-    # Configure the pipeline level to one week (in seconds)
-    # dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
-
 
 if __name__ == "__main__":
     # Compiling the pipeline
