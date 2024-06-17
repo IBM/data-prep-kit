@@ -49,8 +49,11 @@ class DataAccessS3(DataAccess):
         :param files_to_use: files extensions of files to include
         :param files_to_checkpoint: files extensions of files to use for checkpointing
         """
-        if (s3_credentials is None or s3_credentials.get("access_key", None) is None
-                or s3_credentials.get("secret_key", None) is None):
+        if (
+            s3_credentials is None
+            or s3_credentials.get("access_key", None) is None
+            or s3_credentials.get("secret_key", None) is None
+        ):
             raise "S3 credentials is not defined"
         self.s3_credentials = s3_credentials
         if s3_config is None:
@@ -130,11 +133,15 @@ class DataAccessS3(DataAccess):
                 if max_file_size < size:
                     max_file_size = size
                 i += 1
-        return p_list, {
-            "max_file_size": max_file_size / MB,
-            "min_file_size": min_file_size / MB,
-            "total_file_size": total_input_file_size / MB,
-        }, retries
+        return (
+            p_list,
+            {
+                "max_file_size": max_file_size / MB,
+                "min_file_size": min_file_size / MB,
+                "total_file_size": total_input_file_size / MB,
+            },
+            retries,
+        )
 
     def _get_input_files(
         self,
@@ -153,11 +160,15 @@ class DataAccessS3(DataAccess):
         """
         if not self.checkpoint:
             return self._get_files_folder(
-                path=input_path, files_to_use=self.files_to_use, cm_files=cm_files,
-                min_file_size=min_file_size, max_file_size=max_file_size
+                path=input_path,
+                files_to_use=self.files_to_use,
+                cm_files=cm_files,
+                min_file_size=min_file_size,
+                max_file_size=max_file_size,
             )
-        pout_list, _, retries1 = self._get_files_folder(path=output_path,
-                                                        files_to_use=self.files_to_checkpoint, cm_files=-1)
+        pout_list, _, retries1 = self._get_files_folder(
+            path=output_path, files_to_use=self.files_to_checkpoint, cm_files=-1
+        )
         output_base_names_ext = [file.replace(self.output_folder, self.input_folder) for file in pout_list]
         # In the case of binary transforms, an extension can be different, so just use the file names.
         # Also remove duplicates
@@ -182,11 +193,15 @@ class DataAccessS3(DataAccess):
                 if max_file_size < size:
                     max_file_size = size
                 i += 1
-        return p_list, {
-            "max_file_size": max_file_size / MB,
-            "min_file_size": min_file_size / MB,
-            "total_file_size": total_input_file_size / MB,
-            }, retries
+        return (
+            p_list,
+            {
+                "max_file_size": max_file_size / MB,
+                "min_file_size": min_file_size / MB,
+                "total_file_size": total_input_file_size / MB,
+            },
+            retries,
+        )
 
     def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float], int]:
         """
@@ -316,8 +331,9 @@ class DataAccessS3(DataAccess):
             filedata = gzip.decompress(filedata)
         return filedata, retries
 
-    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) \
-            -> tuple[dict[str, bytes], int]:
+    def get_folder_files(
+        self, path: str, extensions: list[str] = None, return_data: bool = True
+    ) -> tuple[dict[str, bytes], int]:
         """
         Get a list of byte content of files. The path here is an absolute path and can be anywhere.
         The current limitation for S3 and Lakehouse is that it has to be in the same bucket

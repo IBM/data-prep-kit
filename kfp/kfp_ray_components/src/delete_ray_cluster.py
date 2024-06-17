@@ -10,7 +10,9 @@
 # limitations under the License.
 ################################################################################
 import sys
+
 from runtime_utils import KFPUtils, RayRemoteJobs
+
 
 # Cleans and shutdowns the Ray cluster
 def cleanup_ray_cluster(

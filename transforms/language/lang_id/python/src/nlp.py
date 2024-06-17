@@ -19,6 +19,7 @@ from lang_models import LangModel
 
 logger = get_logger(__name__)
 
+
 def get_lang_ds_pa(table: pa.table, nlp: LangModel, col_name: str = "contents") -> tuple[pa.table, dict[str, Any]]:
     try:
         detected_language = pa.Table.from_pylist(

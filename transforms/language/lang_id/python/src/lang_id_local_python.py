@@ -16,13 +16,14 @@ import sys
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 from lang_id_transform import (
+    content_column_name_cli_param,
     model_credential_cli_param,
     model_kind_cli_param,
     model_url_cli_param,
-    content_column_name_cli_param
 )
 from lang_id_transform_python import LangIdentificationPythonTransformConfiguration
 from lang_models import KIND_FASTTEXT
+
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))

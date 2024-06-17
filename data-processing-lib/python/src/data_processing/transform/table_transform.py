@@ -10,14 +10,11 @@
 # limitations under the License.
 ################################################################################
 
-from typing import Any, TypeVar
+from typing import Any
 
 import pyarrow as pa
 from data_processing.transform import AbstractBinaryTransform
-from data_processing.utils import TransformUtils, get_logger
-
-
-logger = get_logger(__name__)
+from data_processing.utils import TransformUtils
 
 
 class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
@@ -30,7 +27,10 @@ class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
         """
         Initialize based on the dictionary of configuration information.
         """
+        from data_processing.utils import get_logger
+
         super().__init__(config)
+        self.logger = get_logger(__name__)
 
     def transform_binary(self, file_name: str, byte_array: bytes) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
@@ -44,16 +44,16 @@ class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
         """
         # validate extension
         if TransformUtils.get_file_extension(file_name)[1] != ".parquet":
-            logger.warning(f"Get wrong file type {file_name}")
+            self.logger.warning(f"Get wrong file type {file_name}")
             return [], {"wrong file type": 1}
         # convert to table
         table = TransformUtils.convert_binary_to_arrow(data=byte_array)
         if table is None:
-            logger.warning("Transformation of file to table failed")
+            self.logger.warning("Transformation of file to table failed")
             return [], {"failed_reads": 1}
         # Ensure that table is not empty
         if table.num_rows == 0:
-            logger.warning(f"table is empty, skipping processing")
+            self.logger.warning(f"table is empty, skipping processing")
             return [], {"skipped empty tables": 1}
         # transform table
         out_tables, stats = self.transform(table=table, file_name=file_name)
@@ -99,20 +99,19 @@ class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
         """
         return [], {}
 
-    @staticmethod
     def _check_and_convert_tables(
-            out_tables: list[pa.Table], stats: dict[str, Any]
+        self, out_tables: list[pa.Table], stats: dict[str, Any]
     ) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
 
         out_files = [tuple[bytes, str]] * len(out_tables)
         out_docs = 0
         for i in range(len(out_tables)):
             if not TransformUtils.verify_no_duplicate_columns(table=out_tables[i], file=""):
-                logger.warning("Transformer created file with the duplicate columns")
+                self.logger.warning("Transformer created file with the duplicate columns")
                 return [], {"duplicate columns result": 1}
             out_binary = TransformUtils.convert_arrow_to_binary(table=out_tables[i])
             if out_binary is None:
-                logger.warning("Failed to convert table to binary")
+                self.logger.warning("Failed to convert table to binary")
                 return [], {"failed_writes": 1}
             out_docs += out_tables[i].num_rows
             out_files[i] = (out_binary, ".parquet")

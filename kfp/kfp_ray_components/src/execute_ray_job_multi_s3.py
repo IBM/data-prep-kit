@@ -12,6 +12,7 @@
 
 from runtime_utils import KFPUtils, execute_ray_jobs
 
+
 if __name__ == "__main__":
     import argparse
 

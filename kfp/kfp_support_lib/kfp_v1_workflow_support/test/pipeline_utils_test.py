@@ -12,7 +12,9 @@
 
 from workflow_support.pipeline_utils import PipelinesUtils
 
+
 server_url = "http://localhost:8080/"
+
 
 def test_pipelines():
     """

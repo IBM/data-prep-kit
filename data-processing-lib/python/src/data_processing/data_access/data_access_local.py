@@ -19,7 +19,7 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 from data_processing.data_access import DataAccess
-from data_processing.utils import TransformUtils, GB, MB, get_logger
+from data_processing.utils import GB, MB, TransformUtils, get_logger
 
 
 logger = get_logger(__name__)
@@ -366,8 +366,9 @@ class DataAccessLocal(DataAccess):
             logger.error(f"Error reading file {path}: {e}")
             raise e
 
-    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) \
-            -> tuple[dict[str, bytes], int]:
+    def get_folder_files(
+        self, path: str, extensions: list[str] = None, return_data: bool = True
+    ) -> tuple[dict[str, bytes], int]:
         """
         Get a list of byte content of files. The path here is an absolute path and can be anywhere.
         The current limitation for S3 and Lakehouse is that it has to be in the same bucket
