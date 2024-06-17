@@ -26,8 +26,7 @@ as an example of metadata that we want to not include in logging.
 ## Running
 
 ### Launched Command Line Options 
-When running the transform with the Ray launcher (i.e. TransformLauncher),
-the following command line arguments are available in addition to 
+The following command line arguments are available in addition to 
 the options provided by 
 the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 ```
