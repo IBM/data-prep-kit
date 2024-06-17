@@ -105,6 +105,7 @@ TASK_NAME: str = "doc_id"
 def doc_id(
     # Ray cluster
     ray_name: str = "doc_id-kfp-ray",  # name of Ray cluster
+    # Add image_pull_secret and image_pull_policy to ray workers if needed
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
     '"image": "' + task_image + '"}',
