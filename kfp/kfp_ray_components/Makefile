@@ -28,12 +28,12 @@ DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 .lib-src-image:: 
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python
-	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/python_apiserver_client LIB_NAME=python_apiserver_client
+	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/shared_workflow_support LIB_NAME=shared_workflow_support_lib
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB) LIB_NAME=workflow_support_lib
 	$(MAKE) .defaults.image
 	rm -rf data-processing-lib-ray
 	rm -rf data-processing-lib-python
-	rm -rf python_apiserver_client
+	rm -rf shared_workflow_support_lib
 	rm -rf workflow_support_lib
 
 .PHONY: image
@@ -42,17 +42,17 @@ image: Dockerfile requirements.txt
 	$(MAKE) .lib-src-image
 
 
-set-versions::  reconcile-requirements
+set-versions:  reconcile-requirements
 
 .PHONY: reconcile-requirements
 reconcile-requirements:
 	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
-	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" createRayClusterComponent.yaml
-	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" deleteRayClusterComponent.yaml
-	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" executeRayJobComponent.yaml
-	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" executeRayJobComponent_multi_s3.yaml
+	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}/" createRayClusterComponent.yaml
+	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}/" deleteRayClusterComponent.yaml
+	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}/" executeRayJobComponent.yaml
+	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}/" executeRayJobComponent_multi_s3.yaml
 	# TODO remove it for KFPv2
-	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${KFP_DOCKER_VERSION}/" executeSubWorkflowComponent.yaml
+	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}/" executeSubWorkflowComponent.yaml
 
 .PHONY: load-image
 load-image:

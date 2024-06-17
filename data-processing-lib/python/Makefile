@@ -15,7 +15,7 @@ clean::
 
 setup::
 
-set-versions:: .check-env
+set-versions: .check-env
 	$(MAKE) TOML_VERSION=$(DPK_LIB_VERSION) .defaults.update-toml
 
 build:: build-dist 
@@ -46,7 +46,7 @@ image::
 # it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.
 # pytest-forked was tried, but then we get SIGABRT in pytest when running the s3 tests, some of which are skipped.. 
 # TODO: the following fails.  Why?  source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  . 
-test::  
+test::   venv
 	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
 	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/data_access;
 	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/transform;

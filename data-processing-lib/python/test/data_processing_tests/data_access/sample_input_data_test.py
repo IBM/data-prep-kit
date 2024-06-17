@@ -27,7 +27,7 @@ def test_table_sampling_data():
     output_folder = "/tmp"
     print(input_folder)
     data_access = DataAccessLocal({"input_folder": input_folder, "output_folder": output_folder})
-    profile = data_access.sample_input_data()
+    profile, _ = data_access.sample_input_data()
     print(f"\nprofiled directory {input_folder}")
     print(f"profile {profile}")
     assert profile["estimated number of docs"] == 15.0

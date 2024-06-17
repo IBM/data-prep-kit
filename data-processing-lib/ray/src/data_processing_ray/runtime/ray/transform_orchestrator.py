@@ -53,7 +53,7 @@ def orchestrate(
             logger.error("No DataAccess instance provided - exiting")
             return 1
         # Get files to process
-        files, profile = data_access.get_files_to_process()
+        files, profile, retries = data_access.get_files_to_process()
         if len(files) == 0:
             logger.error("No input files to process - exiting")
             return 0
@@ -73,6 +73,8 @@ def orchestrate(
         runtime = runtime_config.create_transform_runtime()
         # create statistics
         statistics = TransformStatisticsRay.remote({})
+        if retries > 0:
+            statistics.add_stats.remote({"data access retries", retries})
         # create executors
         processor_params = {
             "data_access_factory": data_access_factory,
@@ -135,7 +137,9 @@ def orchestrate(
             "job_output_stats": stats,
         }
         logger.debug(f"Saved job metadata: {metadata}.")
-        data_access.save_job_metadata(metadata)
+        _, retries = data_access.save_job_metadata(metadata)
+        if retries > 0:
+            statistics.add_stats.remote({"data access retries", retries})
         logger.debug("Saved job metadata.")
         return 0
     except Exception as e:

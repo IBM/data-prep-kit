@@ -8,7 +8,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=fdedup
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${FDEDUP_VERSION}
+DOCKER_IMAGE_VERSION=${FDEDUP_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 

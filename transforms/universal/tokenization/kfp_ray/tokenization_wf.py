@@ -11,11 +11,11 @@
 ################################################################################
 import os
 
-from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
+
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "tokenization_transform_ray.py"
@@ -30,7 +30,7 @@ base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6
 component_spec_path = "../../../../kfp/kfp_ray_components/"
 
 
-# compute execution parameters. Here different tranforms might need different implementations. As
+# compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 def compute_exec_params_func(
     worker_options: str,
@@ -46,11 +46,9 @@ def compute_exec_params_func(
     tkn_doc_id_column: str,
     tkn_doc_content_column: str,
     tkn_text_lang: str,
-    tkn_chunk_size: int
-    
-    
+    tkn_chunk_size: int,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
@@ -68,7 +66,7 @@ def compute_exec_params_func(
         "tkn_text_lang": tkn_text_lang,
         "tkn_chunk_size": tkn_chunk_size,
     }
-            
+
 
 # KFPv1 and KFP2 uses different methods to create a component from a function. KFPv1 uses the
 # `create_component_from_func` function, but it is deprecated by KFPv2 and so has a different import path.
@@ -85,41 +83,15 @@ if os.getenv("KFPv2", "0") == "1":
         func=compute_exec_params_func, base_image=base_kfp_image
     )
     print(
-        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the " +
-        "same version of the same pipeline !!!")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the "
+        + "same version of the same pipeline !!!"
+    )
 
     run_id = uuid.uuid4().hex
 else:
     compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
     run_id = dsl.RUN_ID_PLACEHOLDER
-    
+
 # create Ray cluster
 create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
 # execute job
@@ -222,7 +194,7 @@ def tokenization(
             tkn_text_lang=tkn_text_lang,
             tkn_chunk_size=tkn_chunk_size,
         )
-        
+
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
         ray_cluster = create_ray_op(

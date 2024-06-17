@@ -31,7 +31,7 @@ base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6
 component_spec_path = "../../../../kfp/kfp_ray_components/"
 
 
-# compute execution parameters. Here different tranforms might need different implementations. As
+# compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 def compute_exec_params_func(
     worker_options: str,
@@ -45,7 +45,7 @@ def compute_exec_params_func(
     proglang_select_allowed_langs_file: str,
     proglang_select_language_column: str,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from workflow_utils.runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
@@ -82,6 +82,7 @@ if os.getenv("KFPv2", "0") == "1":
 else:
     compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
     run_id = dsl.RUN_ID_PLACEHOLDER
+
 # create Ray cluster
 create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
 # execute job
@@ -178,7 +179,7 @@ def lang_select(
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             ray_head_options=ray_head_options,
             ray_worker_options=ray_worker_options,
             server_url=server_url,
@@ -189,7 +190,7 @@ def lang_select(
         # Execute job
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             additional_params=additional_params,
             # note that the parameters below are specific for this transform
             exec_params=compute_exec_params.output,
@@ -203,7 +204,7 @@ def lang_select(
         execute_job.after(ray_cluster)
 
     # Configure the pipeline level to one week (in seconds)
-    dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
+    # dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 
 
 if __name__ == "__main__":

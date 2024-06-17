@@ -8,7 +8,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=tokenization
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${TOKENIZATION_VERSION}
+DOCKER_IMAGE_VERSION=${TOKENIZATION_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
@@ -45,14 +45,9 @@ run-cli-sample:
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/ds01/input', 'output_folder' : '../output'}\"  \
                 "  .transforms.run-src-file
 
+#run-local-sample: .transforms.run-local-sample
 
-run-local-python-only-sample: #.transforms.run-local-sample
-	@# Help: Not implemented yet
-	@echo "No src/tokenization_local.py yet :("
-
-run-local-sample: .transforms.run-local-sample
-
-run-s3-sample: .transforms.run-s3-sample
+run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 

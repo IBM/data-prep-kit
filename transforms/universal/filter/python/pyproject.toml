@@ -2,12 +2,11 @@
 name = "dpk_filter_transform_python"
 version = "0.9.0.dev6"
 requires-python = ">=3.10"
-description = "Filter Python Transform"
+description = "Filter Transform for Python"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
-    { name = "David Wood", email = "dawood@us.ibm.com" },
-    { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
+    { name = "Constantin Adam", email = "cmadam@us.ibm.com" },
 ]
 dependencies = [
     "data-prep-toolkit==0.2.0.dev6",

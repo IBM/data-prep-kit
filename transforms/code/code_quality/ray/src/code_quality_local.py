@@ -30,7 +30,7 @@ if __name__ == "__main__":
     transform = CodeQualityTransform(codequality_params)
 
     data_access = DataAccessLocal()
-    table = data_access.get_table(os.path.join(input_folder, "sample_1.parquet"))
+    table, _ = data_access.get_table(os.path.join(input_folder, "sample_1.parquet"))
     print(f"input table: {table}")
     # Transform the table
     table_list, metadata = transform.transform(table)

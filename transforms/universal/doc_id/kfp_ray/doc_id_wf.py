@@ -28,7 +28,7 @@ base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6
 # path to kfp component specifications files
 component_spec_path = "../../../../kfp/kfp_ray_components/"
 
-# compute execution parameters. Here different tranforms might need different implementations. As
+# compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 def compute_exec_params_func(
     worker_options: str,
@@ -46,7 +46,7 @@ def compute_exec_params_func(
     doc_id_hash_column: str,
     doc_id_int_column: str,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,

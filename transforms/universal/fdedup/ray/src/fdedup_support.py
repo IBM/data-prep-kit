@@ -160,7 +160,7 @@ class DocCollector:
             self.ids = {}
         else:
             try:
-                bids = self.data_access.get_file(snapshot)
+                bids, _ = self.data_access.get_file(snapshot)
                 self.ids = cloudpickle.loads(bids)
             except Exception as e:
                 self.logger.warning(f"Failed to load doc collector {self.actor_id} with exception {e}")
@@ -247,7 +247,7 @@ class DocsMinHash:
             self.docs = {}
         else:
             try:
-                bdocs = self.data_access.get_file(snapshot)
+                bdocs, _ = self.data_access.get_file(snapshot)
                 self.docs = cloudpickle.loads(bdocs)
             except Exception as e:
                 self.logger.warning(f"Failed to load minhash collector {self.actor_id} with exception {e}")
@@ -318,7 +318,7 @@ class BucketsHash:
             self.buckets = {}
         else:
             try:
-                b_buckets = self.data_access.get_file(snapshot)
+                b_buckets, _ = self.data_access.get_file(snapshot)
                 self.buckets = cloudpickle.loads(b_buckets)
             except Exception as e:
                 self.logger.warning(f"Failed to load buckets collector {self.actor_id} with exception {e}")
