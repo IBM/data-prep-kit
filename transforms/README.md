@@ -176,7 +176,7 @@ To build individual transform image use `make -C <path to transform directory>`,
 To push all the images run `make push`, or `make -C <path to transform directory> push` for individual transform.
 
 ### IDE Setup
-When running in an IDE, such as PyCharm, the following are generally required:
+When running in an IDE, such as PyCharm or VS Code, the following are generally required:
 
 * From the command line, build the venv using `make venv`.
 * In the IDE
