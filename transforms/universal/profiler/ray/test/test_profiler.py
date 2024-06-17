@@ -10,7 +10,7 @@
 # limitations under the License.
 ################################################################################
 
-# There is no local test for fdedup
+# There is no local test for profiler
 # This is just a place holder t satisfy overall framework
 
 
