@@ -34,16 +34,16 @@ Note: the project and the explanation below are based on [KFPv1](https://www.kub
 * Pipeline wiring - definition of the sequence of invocation (with parameter passing) of participating components
 * Additional configuration
 
-### Imports definition <a name = "imports"></a> 
+### Imports definition <a name = "imports"></a>
 
 ```python
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from kfp_support.workflow_support.utils import (
-    ONE_HOUR_SEC,
-    ONE_WEEK_SEC,
-    ComponentUtils,
+from kfp_support.workflow_support.runtime_utils import (
+  ONE_HOUR_SEC,
+  ONE_WEEK_SEC,
+  ComponentUtils,
 )
 from kubernetes import client as k8s_client
 ```
@@ -56,7 +56,7 @@ Ray cluster. For each step we have to define a component that will execute them:
 ```python
     # components
     base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.0.2"
-    # compute execution parameters. Here different tranforms might need different implementations. As
+    # compute execution parameters. Here different transforms might need different implementations. As
     # a result, instead of creating a component we are creating it in place here.
     compute_exec_params_op = comp.func_to_container_op(
       func=ComponentUtils.default_compute_execution_params, base_image=base_kfp_image
@@ -73,8 +73,8 @@ Ray cluster. For each step we have to define a component that will execute them:
 Note: here we are using shared components described in this [document](../kfp_ray_components/README.md) for `create_ray_op`, 
 `execute_ray_jobs_op` and `cleanup_ray_op`,  while `compute_exec_params_op` component is built inline, because it might
 differ significantly. For "simple" pipeline cases we can use the 
-[default implementation](../kfp_support_lib/src/kfp_support/workflow_support/utils/remote_jobs_utils.py),
-while, for example for exact dedup, we are using a very [specialized one](../transform_workflows/universal/ededup/src/ededup_compute_execution_params.py).
+[default implementation](../kfp_support_lib/src/kfp_support/workflow_support/runtime_utils/remote_jobs_utils.py),
+while, for example for exact dedup, we are using a very [specialized one](../../transforms/universal/ededup/kfp_ray/v2/src/ededup_compute_execution_params.py).
 
 ### Input parameters definition <a name = "inputs"></a> 
 
@@ -83,9 +83,9 @@ The input parameters section defines all the parameters required for the pipelin
 ```python
     # Ray cluster
     ray_name: str = "noop-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
+    ray_head_options: str = '{"cpu": 1, "memory": 4, \
                  "image": "' + task_image + '" }',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, \
                 "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access

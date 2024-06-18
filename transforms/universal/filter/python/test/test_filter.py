@@ -15,7 +15,7 @@ import os
 
 import pyarrow as pa
 import pyarrow.parquet as pq
-from data_processing.test_support.transform import AbstractTransformTest
+from data_processing.test_support.transform import AbstractTableTransformTest
 from data_processing.transform import get_transform_config
 from filter_transform import (
     FilterTransform,
@@ -27,7 +27,7 @@ from filter_transform import (
 )
 
 
-class TestFilterTransform(AbstractTransformTest):
+class TestFilterTransform(AbstractTableTransformTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.

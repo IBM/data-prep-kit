@@ -1,4 +1,5 @@
 # KFP components
+# KFP components
 
 All data processing pipelines have the same `shape`. They all compute execution parameters, create Ray cluster,
 execute Ray job and then delete the cluster. With the exception of computing execution parameters all of the steps,
@@ -45,14 +46,6 @@ export DOCKER_SERVER=<> # for example us.icr.io
 export DOCKER_USERNAME=iamapikey
 export DOCKER_EMAIL=iamapikey
 export DOCKER_PASSWORD=<PASSWORD>
-```
-
-As the Docker image utilizes libraries from Python Artifactory,
-set the Python Artifactory details as environment variables by executing the following commands:
-
-```bash
-export ARTIFACTORY_USER=<artifactory-user>
-export ARTIFACTORY_API_KEY=<artifactory-key>
 ```
 
 Then build the image:

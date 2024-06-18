@@ -1,10 +1,16 @@
 # KFP support library
 
 This provides support for implementing KFP pipelines automating transform's execution.
-It comprises 2 main modules
+It comprises 3 main modules
 
-* [api server client](src/kfp_support/api_server_client/README.md) 
-* [workflow support](src/kfp_support/workflow_support/README.md)
+* [shared_workflow_support](shared_workflow_support/README.md) 
+* [kfp_v1_workflow_support](kfp_v1_workflow_support//README.md)
+* [kfp_v2_workflow_support](kfp_v2_workflow_support//README.md)
+
+Depends on the using KFV version either `kfp_v1_workflow_support` or `kfp_v2_workflow_support` should be used.
+
+See also how these libraries are used for [kfp components](../../kfp_ray_components/README.md) implementation
+and implementation of the actual [workflow](../../doc/simple_transform_pipeline.md)
 
 ## Development
 

@@ -21,7 +21,6 @@ from data_processing_ray.runtime.ray import RayUtils
 from ray import cloudpickle
 from ray.actor import ActorHandle
 from ray.util import ActorPool
-from ray.util.metrics import Counter
 from scipy.integrate import quad as integrate
 
 
@@ -160,7 +159,7 @@ class DocCollector:
             self.ids = {}
         else:
             try:
-                bids = self.data_access.get_file(snapshot)
+                bids, _ = self.data_access.get_file(snapshot)
                 self.ids = cloudpickle.loads(bids)
             except Exception as e:
                 self.logger.warning(f"Failed to load doc collector {self.actor_id} with exception {e}")
@@ -247,7 +246,7 @@ class DocsMinHash:
             self.docs = {}
         else:
             try:
-                bdocs = self.data_access.get_file(snapshot)
+                bdocs, _ = self.data_access.get_file(snapshot)
                 self.docs = cloudpickle.loads(bdocs)
             except Exception as e:
                 self.logger.warning(f"Failed to load minhash collector {self.actor_id} with exception {e}")
@@ -306,6 +305,8 @@ class BucketsHash:
         """
         Initialization
         """
+        from ray.util.metrics import Counter
+
         self.submitter = None
         self.n_buckets = 0
         self.bucket_memory = 0
@@ -318,7 +319,7 @@ class BucketsHash:
             self.buckets = {}
         else:
             try:
-                b_buckets = self.data_access.get_file(snapshot)
+                b_buckets, _ = self.data_access.get_file(snapshot)
                 self.buckets = cloudpickle.loads(b_buckets)
             except Exception as e:
                 self.logger.warning(f"Failed to load buckets collector {self.actor_id} with exception {e}")
@@ -438,6 +439,8 @@ class BucketsHashProcessor:
             threshold - threshold
             statistics - statistics actor
         """
+        from ray.util.metrics import Counter
+
         self.threshold = params["threshold"]
         self.mn_min_hash = params["mn_min_hash"]
         self.remote_docs = params["remote_docs"]

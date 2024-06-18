@@ -9,7 +9,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=filter
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${FILTER_VERSION}
+DOCKER_IMAGE_VERSION=${FILTER_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
@@ -34,6 +34,10 @@ publish-image:: .transforms.publish-image-ray
 # distribution versions is the same as image version.
 set-versions:
 	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	cat pyproject.toml | sed                                                                        \
+                -e 's/"dpk-filter-transform-python\(..\).*",/"dpk-filter-transform-python\1$(FILTER_PYTHON_VERSION)",/'   \
+                > tt.toml
+	mv tt.toml pyproject.toml
         
 build-dist:: set-versions .defaults.build-dist 
 
@@ -46,13 +50,9 @@ run-cli-sample:
 		--filter_columns_to_drop \"[ 'extra', 'cluster' ]\" "	\
                 .transforms.run-src-file
 
+run-local-sample: .transforms.run-local-ray-sample
 
-
-run-local-python-only-sample: .transforms.run-local-sample
-
-run-local-sample: .transforms.run-local-sample
-
-run-s3-sample: .transforms.run-s3-sample
+run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 

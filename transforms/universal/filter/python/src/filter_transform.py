@@ -73,7 +73,7 @@ class FilterTransform(AbstractTableTransform):
         self.logical_operator = config.get(filter_logical_operator_key, filter_logical_operator_default)
         self.columns_to_drop = config.get(filter_columns_to_drop_key, filter_columns_to_drop_default)
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict]:
         """
         This implementation filters the input table using a SQL statement and
         returns the filtered table and execution stats

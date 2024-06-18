@@ -1,4 +1,4 @@
-# Filtering
+# Filtering Transform for Python Runtim
 Please see the set of
 [transform project conventions](../../../README.md)
 for details on general project conventions, transform configuration,
@@ -233,10 +233,9 @@ As shown in the output of the local run of filtering, the metadata contains seve
 ## Running
 
 ### Launched Command Line Options 
-When running the transform with the Ray launcher (i.e. TransformLauncher),
-the following command line arguments are available in addition to 
-the options provided by the [ray launcher](../../../../data-processing-lib/doc/ray-launcher-options.md)
-and the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
+The following command line arguments are available in addition to 
+the options provided by 
+the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 
 ```
   --filter_criteria_list FILTER_CRITERIA_LIST

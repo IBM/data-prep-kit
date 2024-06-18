@@ -14,7 +14,9 @@ from typing import Tuple
 
 import pyarrow as pa
 from data_processing.test_support.transform.noop_transform import NOOPTransform
-from data_processing.test_support.transform.transform_test import AbstractTransformTest
+from data_processing.test_support.transform.table_transform_test import (
+    AbstractTableTransformTest,
+)
 
 
 table = pa.Table.from_pydict({"name": pa.array(["Tom", "Dick", "Harry"]), "age": pa.array([0, 1, 2])})
@@ -22,7 +24,7 @@ expected_table = table  # We're a noop after all.
 expected_metadata_list = [{"nfiles": 1, "nrows": 3}, {}]  # transform() result  # flush() result
 
 
-class TestNOOPTransform(AbstractTransformTest):
+class TestNOOPTransform(AbstractTableTransformTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.

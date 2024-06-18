@@ -63,7 +63,7 @@ mc cp --recursive code/proglang_select/test-data/languages/ local/test/proglang_
 mc cp --recursive code/malware/test-data/input/ local/test/malware/input
 
 mc cp --recursive language/doc_quality/test-data/input/ local/test/doc_quality/input
-mc cp --recursive language/language_id/test-data/input/ local/test/language_id/input
+mc cp --recursive language/lang_id/ray/test-data/input/ local/test/lang_id/input
 
 mc cp --recursive universal/blocklist/test-data/input/ local/test/blocklist/input
 mc cp --recursive universal/blocklist/test-data/domains/ local/test/blocklist/domains

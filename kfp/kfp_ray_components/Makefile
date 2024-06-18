@@ -2,43 +2,59 @@
 # # know where they are running from.
 REPOROOT=../..
 
-IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
-
-include makeenv
-DOCKER_FILE=Dockerfile
-DOCKER_IMAGE_NAME=kfp-data-processing
-DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
-
 # Include the common rules.
 # Use "make help" to see them.
 include $(REPOROOT)/.make.defaults
+
+IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
+
+include makeenv
+
+#DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}
+DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
+
+ifeq ($(KFPv2), 1)
+        DOCKER_IMAGE_NAME=kfp-data-processing_v2
+        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
+        WORKFLOW_SUPPORT_LIB=kfp_v2_workflow_support
+else
+        DOCKER_IMAGE_NAME=kfp-data-processing
+        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
+        WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
+endif
 
 .PHONY: .lib-src-image
 .lib-src-image:: 
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python
-	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib LIB_NAME=kfp_support_lib
+	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/shared_workflow_support LIB_NAME=shared_workflow_support_lib
+	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB) LIB_NAME=workflow_support_lib
 	$(MAKE) .defaults.image
 	rm -rf data-processing-lib-ray
 	rm -rf data-processing-lib-python
-	rm -rf kfp_support_lib
+	rm -rf shared_workflow_support_lib
+	rm -rf workflow_support_lib
 
 .PHONY: image
 image: Dockerfile requirements.txt
-	$(MAKE) reconcile-requirements
+	$(MAKE) set-versions 
 	$(MAKE) .lib-src-image
 
 
-set-versions::  reconcile-requirements
+.PHONY: .reconcile-requirements
+.reconcile-requirements:
+	@sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${FILE}
 
-.PHONY: reconcile-requirements
-reconcile-requirements:
+.PHONY: set-versions 
+set-versions:
 	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
-	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_VERSION}/" createRayClusterComponent.yaml
-	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_VERSION}/" deleteRayClusterComponent.yaml
-	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_VERSION}/" executeRayJobComponent.yaml
-	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_VERSION}/" executeRayJobComponent_multi_s3.yaml
-	sed -i.back "s/kfp-data-processing:[0-9].*/kfp-data-processing:${KFP_DOCKER_VERSION}/" executeSubWorkflowComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=createRayClusterComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=deleteRayClusterComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent_multi_s3.yaml
+ifneq ($(KFPv2), 1)
+	@$(MAKE) .reconcile-requirements FILE=executeSubWorkflowComponent.yaml
+endif
 
 .PHONY: load-image
 load-image:

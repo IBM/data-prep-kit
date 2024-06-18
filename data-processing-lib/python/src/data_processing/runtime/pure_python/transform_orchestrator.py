@@ -48,7 +48,7 @@ def orchestrate(
             logger.error("No DataAccess instance provided - exiting")
             return 1
         # Get files to process
-        files, profile = data_access.get_files_to_process()
+        files, profile, retries = data_access.get_files_to_process()
         if len(files) == 0:
             logger.error("No input files to process - exiting")
             return 0
@@ -59,6 +59,8 @@ def orchestrate(
             print_interval = 1
         # create statistics
         statistics = TransformStatistics()
+        if retries > 0:
+            statistics.add_stats({"data access retries": retries})
         # create executor
         executor = PythonTransformFileProcessor(
             data_access_factory=data_access_factory, statistics=statistics, runtime_configuration=runtime_config
@@ -71,8 +73,11 @@ def orchestrate(
             executor.process_file(path)
             completed += 1
             if completed % print_interval == 0:
-                logger.info(f"Completed {completed} files in {(time.time() - t_start)/60} min")
-        logger.debug("Done processing files, waiting for flush() completion.")
+                logger.info(
+                    f"Completed {completed} files ({100 * completed / len(files)}%) "
+                    f"in {(time.time() - t_start)/60} min"
+                )
+        logger.debug(f"Done processing {completed} files, waiting for flush() completion.")
         # invoke flush to ensure that all results are returned
         start = time.time()
         executor.flush()
@@ -95,7 +100,7 @@ def orchestrate(
             "job_input_params": input_params | data_access_factory.get_input_params(),
             "job_output_stats": stats,
         }
-        logger.debug(f"Saved job metadata: {metadata}.")
+        logger.debug(f"Saving job metadata: {metadata}.")
         data_access.save_job_metadata(metadata)
         logger.debug("Saved job metadata.")
         return 0

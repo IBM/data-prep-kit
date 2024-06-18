@@ -239,6 +239,7 @@ conventions: .transforms.check_required_macros
 	@$(MAKE) CHECK_TARGET=test .transforms-check-target
 	@$(MAKE) CHECK_TARGET=test-src .transforms-check-target
 	@$(MAKE) CHECK_TARGET=test-image .transforms-check-target
+	@$(MAKE) CHECK_TARGET=set-versions .transforms-check-target
 	@$(MAKE) CHECK_TARGET=venv .transforms-check-target
 	@z=$$(echo $(TRANSFORM_NAME) | grep annotator);				\
 	if [ ! -z "$$z" ]; then	 					\
@@ -293,7 +294,7 @@ conventions: .transforms.check_required_macros
 .transforms.minio-load::
 	@# Help: Install the test-data/input files into minio for $(TRANSFORM_NAME)
 	dir=$$(find $(REPOROOT)/transforms -type d -name $(TRANSFORM_NAME));	\
-	$(MAKE) MINIO_SRC=$$dir/test-data/input MINIO_DEST=$(TRANSFORM_NAME)/ .defaults.minio.load-test-data
+	$(MAKE) MINIO_SRC=$$dir/ray/test-data/input MINIO_DEST=$(TRANSFORM_NAME)/ .defaults.minio.load-test-data
 
 
 .PHONY: .minio-start

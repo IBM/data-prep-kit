@@ -12,7 +12,6 @@
 
 import gzip
 import json
-import os
 from typing import Any
 
 import pyarrow
@@ -37,6 +36,7 @@ class DataAccessS3(DataAccess):
         m_files: int = -1,
         n_samples: int = -1,
         files_to_use: list[str] = [".parquet"],
+        files_to_checkpoint: list[str] = [".parquet"],
     ):
         """
         Create data access class for folder based configuration
@@ -47,16 +47,15 @@ class DataAccessS3(DataAccess):
         :param m_files: max amount of files to return
         :param n_samples: amount of files to randomly sample
         :param files_to_use: files extensions of files to include
+        :param files_to_checkpoint: files extensions of files to use for checkpointing
         """
-        self.s3_credentials = {} | s3_credentials
-        access_key = self.get_access_key()
-        if access_key is None:
-            raise ValueError("S3 access key not provided")
-        secret_key = self.get_secret_key()
-        if secret_key is None:
-            raise ValueError("S3 secret key not provided")
-        endpoint = self.get_endpoint()
-        region = self.get_region()
+        if (
+            s3_credentials is None
+            or s3_credentials.get("access_key", None) is None
+            or s3_credentials.get("secret_key", None) is None
+        ):
+            raise "S3 credentials is not defined"
+        self.s3_credentials = s3_credentials
         if s3_config is None:
             self.input_folder = None
             self.output_folder = None
@@ -68,20 +67,13 @@ class DataAccessS3(DataAccess):
         self.m_files = m_files
         self.n_samples = n_samples
         self.files_to_use = files_to_use
-
-        logger.debug(f"S3 access key provided: {access_key}")
-        logger.debug(f"S3 secret key provided: no soup for you!")
-        logger.debug(f"S3 region {region}")
-        logger.debug(f"S3 endpoint/url: {endpoint}")
-        logger.debug(f"S input folder: {self.input_folder}")
-        logger.debug(f"S3 output folder: {self.output_folder}")
-        logger.debug(f"S3 data sets: {self.d_sets}")
-        logger.debug(f"S3 checkpoint: {self.checkpoint}")
-        logger.debug(f"S3 m_files: {self.m_files}")
-        logger.debug(f"S3 n_samples: {self.n_samples}")
-        logger.debug(f"S3 files_to_use: {self.files_to_use}")
-
-        self.arrS3 = ArrowS3(access_key, secret_key, endpoint=endpoint, region=region)
+        self.files_to_checkpoint = files_to_checkpoint
+        self.arrS3 = ArrowS3(
+            access_key=s3_credentials.get("access_key"),
+            secret_key=s3_credentials.get("secret_key"),
+            endpoint=s3_credentials.get("url", None),
+            region=s3_credentials.get("region", None),
+        )
 
     def get_access_key(self):
         return self.s3_credentials.get("access_key", None)
@@ -110,27 +102,29 @@ class DataAccessS3(DataAccess):
         return self.output_folder
 
     def _get_files_folder(
-        self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
-    ) -> tuple[list[str], dict[str, float]]:
+        self, path: str, files_to_use: list[str], cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
+    ) -> tuple[list[str], dict[str, float], int]:
         """
         Support method to get list input files and their profile
         :param path: input path
+        :param files_to_use: file extensions to use
         :param max_file_size: max file size
         :param min_file_size: min file size
         :param cm_files: overwrite for the m_files in the class
-        :return: tuple of file list and profile
+        :return: tuple of file list, profile and number of retries
         """
         # Get files list.
         p_list = []
         total_input_file_size = 0
         i = 0
-        for file in self.arrS3.list_files(path):
+        files, retries = self.arrS3.list_files(path)
+        for file in files:
             if i >= cm_files > 0:
                 break
             # Only use specified files
             f_name = str(file["name"])
-            _, extension = os.path.splitext(f_name)
-            if extension in self.files_to_use:
+            name_extension = TransformUtils.get_file_extension(f_name)
+            if name_extension[1] in files_to_use:
                 p_list.append(f_name)
                 size = file["size"]
                 total_input_file_size += size
@@ -146,6 +140,7 @@ class DataAccessS3(DataAccess):
                 "min_file_size": min_file_size / MB,
                 "total_file_size": total_input_file_size / MB,
             },
+            retries,
         )
 
     def _get_input_files(
@@ -155,30 +150,41 @@ class DataAccessS3(DataAccess):
         cm_files: int,
         max_file_size: int = 0,
         min_file_size: int = MB * GB,
-    ) -> tuple[list[str], dict[str, float]]:
+    ) -> tuple[list[str], dict[str, float], int]:
         """
         Get list and size of files from input path, that do not exist in the output path
         :param input_path: input path
         :param output_path: output path
         :param cm_files: max files to get
-        :return: tuple of file list and and profile
+        :return: tuple of file list, profile and number of retries
         """
         if not self.checkpoint:
             return self._get_files_folder(
-                path=input_path, cm_files=cm_files, min_file_size=min_file_size, max_file_size=max_file_size
+                path=input_path,
+                files_to_use=self.files_to_use,
+                cm_files=cm_files,
+                min_file_size=min_file_size,
+                max_file_size=max_file_size,
             )
-        pout_list, _ = self._get_files_folder(path=output_path, cm_files=-1)
-        output_base_names = [file.replace(self.output_folder, self.input_folder) for file in pout_list]
+        pout_list, _, retries1 = self._get_files_folder(
+            path=output_path, files_to_use=self.files_to_checkpoint, cm_files=-1
+        )
+        output_base_names_ext = [file.replace(self.output_folder, self.input_folder) for file in pout_list]
+        # In the case of binary transforms, an extension can be different, so just use the file names.
+        # Also remove duplicates
+        output_base_names = list(set([TransformUtils.get_file_extension(file)[0] for file in output_base_names_ext]))
         p_list = []
         total_input_file_size = 0
         i = 0
-        for file in self.arrS3.list_files(input_path):
+        files, retries = self.arrS3.list_files(input_path)
+        retries += retries1
+        for file in files:
             if i >= cm_files > 0:
                 break
             # Only use .parquet files
             f_name = str(file["name"])
-            _, extension = os.path.splitext(f_name)
-            if extension in self.files_to_use and f_name not in output_base_names:
+            name_extension = TransformUtils.get_file_extension(f_name)
+            if name_extension[1] in self.files_to_use and name_extension[0] not in output_base_names:
                 p_list.append(f_name)
                 size = file["size"]
                 total_input_file_size += size
@@ -194,24 +200,26 @@ class DataAccessS3(DataAccess):
                 "min_file_size": min_file_size / MB,
                 "total_file_size": total_input_file_size / MB,
             },
+            retries,
         )
 
-    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float]]:
+    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float], int]:
         """
         Get files to process
-        :return: list of files and a dictionary of the files profile:
+        :return: list of files a dictionary of the files profile:
             "max_file_size",
             "min_file_size",
             "total_file_size"
+        and retries
         """
         if self.output_folder is None:
             logger.error("Get files to process. S3 configuration is not present, returning empty")
-            return [], {}
+            return [], {}, 0
         # Check if we are using data sets
         if self.d_sets is not None:
             # get folders for the input
             folders_to_use = []
-            folders = self.arrS3.list_folders(self.input_folder)
+            folders, retries = self.arrS3.list_folders(self.input_folder)
             # Only use valid folders
             for ds in self.d_sets:
                 suffix = ds + "/"
@@ -228,13 +236,14 @@ class DataAccessS3(DataAccess):
                 total_file_size = 0
                 cm_files = self.m_files
                 for folder in folders_to_use:
-                    plist, profile = self._get_input_files(
+                    plist, profile, retries1 = self._get_input_files(
                         input_path=self.input_folder + folder,
                         output_path=self.output_folder + folder,
                         cm_files=cm_files,
                         min_file_size=min_file_size,
                         max_file_size=max_file_size,
                     )
+                    retries += retries1
                     path_list += plist
                     total_file_size += profile["total_file_size"]
                     if len(path_list) >= cm_files > 0:
@@ -248,18 +257,18 @@ class DataAccessS3(DataAccess):
                 path_list = []
         else:
             # Get input files list
-            path_list, profile = self._get_input_files(
+            path_list, profile, retries = self._get_input_files(
                 input_path=self.input_folder,
                 output_path=self.output_folder,
                 cm_files=self.m_files,
             )
-        return path_list, profile
+        return path_list, profile, retries
 
-    def get_table(self, path: str) -> pyarrow.table:
+    def get_table(self, path: str) -> tuple[pyarrow.table, int]:
         """
         Get pyArrow table for a given path
         :param path - file path
-        :return: pyArrow table or None, if the table read failed
+        :return: pyArrow table or None, if the table read failed and number of retries
         """
         return self.arrS3.read_table(path)
 
@@ -274,18 +283,18 @@ class DataAccessS3(DataAccess):
             return None
         return path.replace(self.input_folder, self.output_folder)
 
-    def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any]]:
+    def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any], int]:
         """
         Save table to a given location
         :param path: location to save table
         :param table: table
-        :return: size of table in memory and a dictionary as
+        :return: size of table in memory, a dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
+        in the case of failure dict is None and number of retries
         """
         return self.arrS3.save_table(key=path, table=table)
 
-    def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
+    def save_job_metadata(self, metadata: dict[str, Any]) -> tuple[dict[str, Any], int]:
         """
         Save metadata
         :param metadata: a dictionary, containing the following keys
@@ -302,27 +311,29 @@ class DataAccessS3(DataAccess):
         are filled bu implementation
         :return: a dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
+        in the case of failure dict is None and number of retries
         """
         if self.output_folder is None:
             logger.error("S3 configuration is not provided, can't save metadata")
-            return None
+            return None, 0
         metadata["source"] = {"name": self.input_folder, "type": "path"}
         metadata["target"] = {"name": self.output_folder, "type": "path"}
         return self.save_file(path=f"{self.output_folder}metadata.json", data=json.dumps(metadata, indent=2).encode())
 
-    def get_file(self, path: str) -> bytes:
+    def get_file(self, path: str) -> tuple[bytes, int]:
         """
         Get file as a byte array
         :param path: file path
-        :return: bytes array of file content
+        :return: bytes array of file content and amount of retries
         """
-        filedata = self.arrS3.read_file(path)
+        filedata, retries = self.arrS3.read_file(path)
         if path.endswith("gz"):
             filedata = gzip.decompress(filedata)
-        return filedata
+        return filedata, retries
 
-    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) -> dict[str, bytes]:
+    def get_folder_files(
+        self, path: str, extensions: list[str] = None, return_data: bool = True
+    ) -> tuple[dict[str, bytes], int]:
         """
         Get a list of byte content of files. The path here is an absolute path and can be anywhere.
         The current limitation for S3 and Lakehouse is that it has to be in the same bucket
@@ -331,43 +342,47 @@ class DataAccessS3(DataAccess):
                            child ones will be returned
         :param return_data: flag specifying whether the actual content of files is returned (True), or just
                             directory is returned (False)
-        :return: A dictionary of file names/binary content will be returned
+        :return: A dictionary of file names/binary content will be returned and number of retries
         """
 
-        def _get_file_content(name: str, dt: bool) -> bytes:
+        def _get_file_content(name: str, dt: bool) -> tuple[bytes, int]:
             """
             return file content
             :param name: file name
             :param dt: flag to return data or None
-            :return: file content
+            :return: file content, number of retries
             """
             if dt:
                 return self.get_file(name)
-            return None
+            return None, 0
 
         result = {}
-        files = self.arrS3.list_files(key=TransformUtils.clean_path(path))
+        files, retries = self.arrS3.list_files(key=TransformUtils.clean_path(path))
         for file in files:
             f_name = str(file["name"])
             if extensions is None:
                 if not f_name.endswith("/"):
                     # skip folders
-                    result[f_name] = _get_file_content(f_name, return_data)
+                    b, retries1 = _get_file_content(f_name, return_data)
+                    retries += retries1
+                    result[f_name] = b
             else:
                 for ext in extensions:
                     if f_name.endswith(ext):
                         # include the file
-                        result[f_name] = _get_file_content(f_name, return_data)
+                        b, retries1 = _get_file_content(f_name, return_data)
+                        retries += retries1
+                        result[f_name] = b
                         break
-        return result
+        return result, retries
 
-    def save_file(self, path: str, data: bytes) -> dict[str, Any]:
+    def save_file(self, path: str, data: bytes) -> tuple[dict[str, Any], int]:
         """
         Save byte array to the file
         :param path: file path
         :param data: byte array
         :return: a dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
+        in the case of failure dict is None and number of retries
         """
         return self.arrS3.save_file(key=path, data=data)

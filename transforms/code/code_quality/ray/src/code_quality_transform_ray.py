@@ -206,7 +206,7 @@ class CodeQualityTransform(AbstractTableTransform):
             self.code_quality["tokenizer"], use_auth_token=self.code_quality["hf_token"]
         )
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict]:
         """
         Chain all preprocessing steps into one function to not fill cache.
         """

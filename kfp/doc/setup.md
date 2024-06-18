@@ -66,7 +66,14 @@ choose your OS system, and process according to "(Optional) Install the MinIO Cl
 
 ## Installation steps <a name = "installation"></a>
 
-You can create a Kind cluster with all required software installed using the following command, run in the `kind` directory under the repo root: 
+Before installation, you have to decide which KFP version do you want to use. 
+In order to use KFP v2, please set the following environment variable:
+
+```shell
+export KFPv2=1
+```
+
+Now, you can create a Kind cluster with all required software installed using the following command: 
 
 ```shell
 cd kind   # Assuming you are in the repo root directory.

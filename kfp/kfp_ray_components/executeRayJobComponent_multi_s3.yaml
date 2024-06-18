@@ -8,12 +8,12 @@ inputs:
     - { name: server_url, type: String, default: "", description: "url of api server" }
     - { name: prefix, type: String, default: "", description: "prefix for extra credentials" }
     # The component converts the dictionary to json string
-    - { name: exec_params, type: dict, description: "job parameters" }
+    - { name: exec_params, type: JsonObject, description: "job parameters" }
     - { name: additional_params, type: String, description: "additional parameters" }
 
 implementation:
     container:
-        image: quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6
+        image: "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6"
         # command is a list of strings (command-line arguments).
         # The YAML language has two syntaxes for lists and you can use either of them.
         # Here we use the "flow syntax" - comma-separated strings inside square brackets.

@@ -2,15 +2,14 @@
 name = "dpk_filter_transform_ray"
 version = "0.4.0.dev6"
 requires-python = ">=3.10"
-description = "Filter Ray Transform"
+description = "Filter Transform for Ray"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
-    { name = "David Wood", email = "dawood@us.ibm.com" },
-    { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
+    { name = "Constantin Adam", email = "cmadam@us.ibm.com" },
 ]
 dependencies = [
-    "dpk-filter-transform-python==0.9.0.dev6",
+    "dpk-filter-transform-python==0.4.0.dev6",
     "data-prep-toolkit-ray==0.2.0.dev6",
 ]
 

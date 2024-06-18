@@ -1,4 +1,6 @@
-include ${REPOROOT}/.make.versions
+IGNORE := $(shell bash -c "sed -nr /^[^\#]*=/p ${REPOROOT}/.make.versions | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
+
+include makeenv
 include ${REPOROOT}/kfp/requirements.env
 
 # Include the common rules.
@@ -6,36 +8,33 @@ include ${REPOROOT}/kfp/requirements.env
 include ${REPOROOT}/.make.defaults
 
 USE_DEV_IMAGES ?= 1
-TRANSFORM_RUNTIME = ray
 
 define set_env_var
 	$(eval export $(1)=$(2))
 endef
 
-.PHONY: .transforms_workflows.reconcile-requirements
-.transforms_workflows.reconcile-requirements:
-	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) reconcile-requirements
-	@while IFS= read -r line; do \
-		[ -z "$$line" ] && continue; \
-		[[ $$line == *#* ]] && continue; \
-		export DOCKER_IMAGE_NAME=$$(echo $$line |cut -d "=" -f 1 |sed "s/_VERSION//" |tr '[:upper:]' '[:lower:]'); \
-		export DOCKER_IMAGE_VERSION=$$(echo $$line |cut -d "=" -f 2); \
-		sed -i.back "s/data-prep-kit\/$$DOCKER_IMAGE_NAME\-${TRANSFORM_RUNTIME}:.*/data-prep-kit\/$$DOCKER_IMAGE_NAME\-${TRANSFORM_RUNTIME}:$$DOCKER_IMAGE_VERSION\"/" $$PIPELINE_FILE ;\
-	done < ${REPOROOT}/.make.versions
-	@sed -i.back "s/kfp-data-processing:.*/kfp-data-processing:${KFP_DOCKER_VERSION}\"/" ${PIPELINE_FILE}
+.PHONY: .workflows.set-versions
+.workflows.set-versions:
+	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) set-versions
+	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) .reconcile-requirements FILE=${CURDIR}/${PIPELINE_FILE}
+	${REPOROOT}/transforms/hack/update_workflow_tags.sh ${REPOROOT}/.make.versions ${CURDIR}/${PIPELINE_FILE}
 
-.PHONY: .transforms_workflows.compile-pipeline
-.transforms_workflows.compile-pipeline:
+.PHONY: .workflows.compile-pipeline
+.workflows.compile-pipeline:
 	. ${WORKFLOW_VENV_ACTIVATE} && ${PYTHON} ${WF_NAME}.py
+
+KFP_LIB_SRC_FILES := $(shell find ${REPOROOT}/kfp/kfp_support_lib/${WORKFLOW_SUPPORT_LIB}/src/ -name '*.py')
+
+KFP_LIB_CONFIG_FILE := ${REPOROOT}/kfp/kfp_support_lib/${WORKFLOW_SUPPORT_LIB}/pyproject.toml
 
 FORCE:
 
 %.yaml: %.py FORCE
-	$(MAKE) .transforms_workflows.reconcile-requirements PIPELINE_FILE=$<
-	$(MAKE) .transforms_workflows.compile-pipeline WF_NAME=$(shell (basename $< .py))
+	$(MAKE) .workflows.set-versions PIPELINE_FILE=$<
+	$(MAKE) .workflows.compile-pipeline WF_NAME=$(shell (basename $< .py))
 
-.PHONY: .transforms_workflows.test-pipeline
-.transforms_workflows.test-pipeline:
+.PHONY: .workflows.test-pipeline
+.workflows.test-pipeline:
 	@# Help: upload and run the workflow. Set export USE_DEV_IMAGES=0 to use release docker image versions.
 	$(call set_env_var, CLUSTER_EXISTS, $(shell kind get clusters | grep ${KIND_CLUSTER_NAME}))
 	@if [ -z ${CLUSTER_EXISTS} ]; then \
@@ -45,20 +44,22 @@ ifeq ($(USE_DEV_IMAGES), 1)
 	cd ${TRANSFORM_SRC} && $(MAKE) image && $(MAKE) load-image
 	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) image && $(MAKE) load-image
 endif
-	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m kfp_support.workflow_support.utils.pipelines_tests_utils -c "sanity-test" -p ${CURDIR}/${PIPELINE_FILE}
+	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipeline_utils.pipelines_tests_utils -c "sanity-test" -p ${CURDIR}/${PIPELINE_FILE}
 
-${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt ${DPK_RAY_LIB_DIR} ${REPOROOT}/kfp/kfp_support_lib/
+
+${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/requirements.env ${REPOROOT}/kfp/kfp_ray_components/requirements.txt ${DPK_RAY_LIB_DIR} ${KFP_LIB_SRC_FILES} ${KFP_LIB_CONFIG_FILE}
 	rm -rf ${REPOROOT}/transforms/venv
 	$(MAKE) -C ${REPOROOT}/transforms .defaults.python-lib-src-venv
 	. ${WORKFLOW_VENV_ACTIVATE};     \
-	pip install -e $(REPOROOT)/kfp/kfp_support_lib/;
+	pip install -e $(REPOROOT)/kfp/kfp_support_lib/shared_workflow_support; \
+	pip install -e $(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB);
 	@# Help: Create the virtual environment common to all workflows
-	
-.PHONY: .transforms_workflows.upload-pipeline
-.transforms_workflows.upload-pipeline:
+
+.PHONY: .workflows.upload-pipeline
+.workflows.upload-pipeline:
 	$(call set_env_var, CLUSTER_EXISTS, $(shell kind get clusters | grep ${KIND_CLUSTER_NAME}))
 	@if [ -z ${CLUSTER_EXISTS} ]; then \
 		cd ${REPOROOT} && make setup;  \
 	fi
-	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m kfp_support.workflow_support.utils.pipelines_tests_utils -c "upload" -p ${CURDIR}/${PIPELINE_FILE}
+	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipeline_utils.pipelines_tests_utils -c "upload" -p ${CURDIR}/${PIPELINE_FILE}
 
