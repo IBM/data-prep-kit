@@ -18,13 +18,14 @@ import ray
 from data_processing.utils import GB
 from ray.actor import ActorHandle
 from ray.util.actor_pool import ActorPool
-from ray.util.metrics import Gauge
 
 
 class RayUtils:
     """
     Class implementing support methods for Ray execution
     """
+
+    from ray.util.metrics import Gauge
 
     @staticmethod
     def get_available_resources(

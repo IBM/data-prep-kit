@@ -157,6 +157,7 @@ class DocIDTransformConfiguration(TransformConfiguration):
             transform_class=DocIDTransform,
         )
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:

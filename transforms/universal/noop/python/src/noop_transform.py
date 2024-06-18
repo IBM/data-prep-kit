@@ -43,6 +43,7 @@ class NOOPTransform(AbstractTableTransform):
         # of NOOPTransformConfiguration class
         super().__init__(config)
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
         self.sleep = config.get("sleep_sec", 1)
 
@@ -78,6 +79,7 @@ class NOOPTransformConfiguration(TransformConfiguration):
             remove_from_metadata=[pwd_key],
         )
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:

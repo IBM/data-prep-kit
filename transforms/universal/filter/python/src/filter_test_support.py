@@ -23,9 +23,7 @@ from filter_transform import (
     filter_logical_operator_cli_param,
     filter_logical_operator_default,
 )
-
 from filter_transform_python import FilterPythonTransformConfiguration
-
 
 
 class AbstractPythonFilterTransformTest(AbstractTransformLauncherTest):

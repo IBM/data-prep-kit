@@ -43,6 +43,7 @@ class TokenizationTransform(AbstractTableTransform):
 
         super().__init__(config)
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
         self.tokenizer = config.get("tokenizer", "hf-internal-testing/llama-tokenizer")
         self.tokenizer_args = config.get("tokenizer_args", None)
@@ -162,6 +163,7 @@ class TokenizationTransformConfiguration(TransformConfiguration):
             transform_class=TokenizationTransform,
         )
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:

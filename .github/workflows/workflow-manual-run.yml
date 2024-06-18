@@ -1,28 +1,27 @@
-name: Workflow Manual Run 
+name: Workflow Manual Run
 
 on:
-  workflow_dispatch:
-    inputs:
-      workflow-path:
-        description: 'Specify the workflow path to run'
-        required: true
-        default: 'transforms/universal/noop'
-      kfp_v2:
-        description: '1 if kfp version v2 should be used. Otherwise false.'
-        required: false
-        default: '0'
-      debug:
-         description: 'True if use debug mode.'
-         required: false
-         default: 'false'
-
+    workflow_dispatch:
+        inputs:
+            workflow-path:
+                description: "Specify the workflow path to run"
+                required: true
+                default: "transforms/universal/noop"
+            kfp_v2:
+                description: "1 if kfp version v2 should be used. Otherwise false."
+                required: false
+                default: "0"
+            debug:
+                description: "True if use debug mode."
+                required: false
+                default: "false"
 
 jobs:
     test-kfp-workflow-run:
         env:
-          KFPv2 : ${{ github.event.inputs.kfp_v1 }}
-          WORKFLOW_PATH: ${{ github.event.inputs.workflow-path }}
-          DEBUG_MODE: ${{ github.event.inputs.debug }}
+            KFPv2: ${{ github.event.inputs.kfp_v1 }}
+            WORKFLOW_PATH: ${{ github.event.inputs.workflow-path }}
+            DEBUG_MODE: ${{ github.event.inputs.debug }}
         runs-on: ubuntu-latest
         steps:
             - name: Checkout

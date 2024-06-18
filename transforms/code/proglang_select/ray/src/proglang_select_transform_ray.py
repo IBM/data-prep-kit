@@ -47,6 +47,7 @@ lang_default_output_column = "allowed_language"
 
 def _get_supported_languages(lang_file: str, data_access: DataAccess) -> list[str]:
     from data_processing.utils import get_logger
+
     logger = get_logger(__name__)
     logger.info(f"Getting supported languages from file {lang_file}")
     lang_list, _ = data_access.get_file(lang_file)
@@ -68,6 +69,7 @@ class ProgLangSelectTransform(AbstractTableTransform):
 
         super().__init__(config)
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
         self.lang_column = config.get(lang_lang_column_key, "")
         self.output_column = config.get(lang_output_column_key, lang_default_output_column)
@@ -83,7 +85,9 @@ class ProgLangSelectTransform(AbstractTableTransform):
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
             try:
-                self.logger.info(f"Loading languages to include from Ray storage under reference {languages_include_ref}")
+                self.logger.info(
+                    f"Loading languages to include from Ray storage under reference {languages_include_ref}"
+                )
                 self.languages_include = ray.get(languages_include_ref)
             except Exception as e:
                 self.logger.info(f"Exception loading languages list from ray object storage {e}")
@@ -130,6 +134,7 @@ class ProgLangSelectRuntime(DefaultRayTransformRuntime):
         """
         super().__init__(params)
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
 
     def get_transform_config(
@@ -173,6 +178,7 @@ class ProgLangSelectTransformConfiguration(TransformConfiguration):
             remove_from_metadata=[lang_data_factory_key],
         )
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
         self.daf = None
 
@@ -234,7 +240,7 @@ class ProgLangSelectTransformConfiguration(TransformConfiguration):
 
 class ProgLangSelectPythonConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=ProgLangSelectTransformConfiguration(), runtime_class=ProgLangSelectRuntime)
+        super().__init__(transform_config=ProgLangSelectTransformConfiguration())
 
 
 class ProgLangSelectRayConfiguration(RayTransformRuntimeConfiguration):

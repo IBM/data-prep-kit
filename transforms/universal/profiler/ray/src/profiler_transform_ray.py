@@ -226,6 +226,7 @@ class ProfilerRuntime(DefaultRayTransformRuntime):
         super().__init__(params)
         self.aggregators = []
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
 
     def get_transform_config(
@@ -297,6 +298,7 @@ class ProfilerTableTransformConfiguration(TransformConfiguration):
             transform_class=ProfilerTransform,
         )
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:

@@ -44,8 +44,6 @@ def compute_exec_params_func(
     lang_id_model_url: str,
     lang_id_content_column_name: str,
 ) -> dict:
-    import uuid
-
     from runtime_utils import KFPUtils
 
     return {
@@ -105,8 +103,7 @@ def lang_id(
     # Ray cluster
     ray_name: str = "lang_id-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
-    ray_head_options: str = '{"cpu": 1, "memory": 4, '
-    '"image": "' + task_image + '"}',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, ' '"image": "' + task_image + '"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
     '"image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",

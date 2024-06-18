@@ -28,7 +28,7 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
-from data_processing.utils import TransformUtils,str2bool
+from data_processing.utils import TransformUtils, str2bool
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
@@ -51,6 +51,7 @@ ingest_snapshot_key = f"{shortname}_snapshot"
 
 def _get_supported_languages(lang_file: str, data_access: DataAccess) -> dict[str, str]:
     from data_processing.utils import get_logger
+
     logger = get_logger(__name__)
     logger.debug(f"Getting supported languages from file {lang_file}")
     json_data, _ = data_access.get_file(lang_file)
@@ -73,6 +74,7 @@ class IngestToParquetTransform(AbstractBinaryTransform):
 
         super().__init__(config)
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
         self.domain = config.get(ingest_domain_key, "")
         self.snapshot = config.get(ingest_snapshot_key, "")
@@ -89,7 +91,9 @@ class IngestToParquetTransform(AbstractBinaryTransform):
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
             try:
-                self.logger.info(f"Loading languages to include from Ray storage under reference {supported_languages_ref}")
+                self.logger.info(
+                    f"Loading languages to include from Ray storage under reference {supported_languages_ref}"
+                )
                 self.languages_supported = ray.get(supported_languages_ref)
             except Exception as e:
                 self.logger.warning(f"Exception loading languages list from ray object storage {e}")
@@ -139,7 +143,9 @@ class IngestToParquetTransform(AbstractBinaryTransform):
                                 data.append(row_data)
                                 number_of_rows += 1
                             else:
-                                self.logger.warning(f"file {member.filename} is empty. content {content_string}, skipping")
+                                self.logger.warning(
+                                    f"file {member.filename} is empty. content {content_string}, skipping"
+                                )
                         except Exception as e:
                             self.logger.warning(f"Exception {str(e)} processing file {member.filename}, skipping")
         table = pa.Table.from_pylist(data)
@@ -162,6 +168,7 @@ class IngestToParquetRuntime(DefaultRayTransformRuntime):
         """
         super().__init__(params)
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
 
     def get_transform_config(
@@ -205,6 +212,7 @@ class IngestToParquetTransformConfiguration(TransformConfiguration):
             remove_from_metadata=[ingest_data_factory_key],
         )
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
         self.daf = None
 

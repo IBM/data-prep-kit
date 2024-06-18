@@ -64,6 +64,7 @@ class FilterTransform(AbstractTableTransform):
 
         super().__init__(config)
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
         self.filter_criteria = config.get(filter_criteria_key, filter_criteria_default)
         self.logical_operator = config.get(filter_logical_operator_key, filter_logical_operator_default)

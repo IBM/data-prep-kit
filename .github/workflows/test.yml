@@ -106,7 +106,7 @@ jobs:
                   header_text "Running ${transforms[$index]} workflow test"
                   make -C ${transforms[$index]} workflow-test
                   header_text "Run ${transforms[$index]} completed"
-                  
+
     test-kfp-v2:
         runs-on: ubuntu-latest
         steps:

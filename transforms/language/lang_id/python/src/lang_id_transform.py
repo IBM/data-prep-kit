@@ -47,6 +47,7 @@ class LangIdentificationTransform(AbstractTableTransform):
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of LangIdentificationTransformConfiguration class
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
         super().__init__(config)
         self.nlp_langid = LangModelFactory.create_model(
@@ -84,6 +85,7 @@ class LangIdentificationTransformConfiguration(TransformConfiguration):
             transform_class=LangIdentificationTransform,
         )
         from data_processing.utils import get_logger
+
         self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:
