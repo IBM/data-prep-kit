@@ -268,6 +268,13 @@ __check_defined = \
 .PHONY: .defaults.python-lib-src-venv
 .defaults.python-lib-src-venv:: .defaults.create-venv .defaults.install-python-lib-src-venv .defaults.install-local-requirements-venv
 
+# Provided to work around issue #274 in which make seems to be running the command despite -n make argument
+# This resulted in corrupting pre-existing venv.
+# Expects PIP_TARGET
+.PHONY: .defaults.pip-uninstall
+.defaults.pip-uninstall:
+	pip uninstall -y $(PIP_TARGET) 
+	
 # Install all source from the repo for a python runtime transform into an existing venv 
 .PHONY: .defaults.install-python-lib-src-venv
 .defaults.install-python-lib-src-venv::
@@ -275,7 +282,7 @@ __check_defined = \
 	@echo Installing Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
-	pip uninstall -y data-prep-toolkit;		 		\
+	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;	\
 	echo Installed source from Python processing library for `which $(PYTHON)`
 
@@ -292,8 +299,8 @@ __check_defined = \
 	@echo Installing Ray and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
-	pip uninstall -y data-prep-toolkit;		 		\
-	pip uninstall -y data-prep-toolkit-ray;		 		\
+	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
+	$(MAKE) PIP_TARGET=data-prep-toolkit-ray .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;		\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_RAY_LIB_DIR) .defaults.install-src-venv;		\
 	if [ -d ../python ]; then                                               \
@@ -313,8 +320,8 @@ __check_defined = \
 	@echo Installing Spark and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
-	pip uninstall -y data-prep-toolkit;	 			\
-	pip uninstall -y data-prep-toolkit-spark;	 		\
+	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
+	$(MAKE) PIP_TARGET=data-prep-toolkit-spark .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_SPARK_LIB_DIR) .defaults.install-src-venv;	\
 	echo Installed source from Spark processing library for `which $(PYTHON)`
