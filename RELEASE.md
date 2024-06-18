@@ -16,21 +16,26 @@ If YES, maybe we can combine all these variables into a single one.
 - Update transformers versions
 - Set `RELEASE_VERSION_SUFFIX` to the empty string, or comment out the entry.
 
-## 2. Run local tests
+## 2. Update versions
+From the project root directory execute
+```shell
+make versions
+```
+## 3. Run local tests
 TODO
-## 3. Create a `releases/X.Y.Z` branch
+## 4. Create a `releases/X.Y.Z` branch
 The `releases/X.Y.Z` branch should be created from a base branch. 
 
 For major and minor releases the base is `master` and for patch releases (fixes) the base is `releases/X.Y.(Z-1)`.
 You can do that [directly from GitHub](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-and-deleting-branches-within-your-repository#creating-a-branch).
 
-## 4. Create a [new release](https://github.com/fybrik/fybrik/releases/new)
+## 5. Create a [new release](https://github.com/fybrik/fybrik/releases/new)
 
 Use `vX.Y.Z` tag and set `releases/X.Y.Z` as the target.
 
 Ensure that the release notes explicitly mention upgrade instructions and any breaking change.
 
-## 5. Publish the data-processing-lib Python modules
+## 6. Publish the data-processing-lib Python modules
 
 From the project root directory execute
 ```shell
@@ -38,7 +43,7 @@ make -C data-processing-lib publish
 ```
 Provide relevant [PyPi](https://pypi.org/) username and password (token) when it will be asked.
 
-## 6. Publish KFP support Python modules and KFP Components Container images
+## 7. Publish KFP support Python modules and KFP Components Container images
 
 From the project root directory execute
 ```shell
@@ -48,13 +53,13 @@ Provide relevant [PyPi](https://pypi.org/) and [quay](https://quay.io/) username
 
 _Note:_ The step should be executed twice, when the environment variable `KFPv2` is not set and when it is equals to "1"
 
-## 7. Publish transformers images
+## 8. Publish transformers images
 
 From the project root directory execute
 ```shell
 make -C transformers publish
 ```
-## 8. Prepare the .make.versions file for the next release
+## 9. Prepare the .make.versions file for the next release
 
 Set  `RELEASE_VERSION_SUFFIX` to "dev1"
 **Note:** better to set the next release versions, so the images/modules will be X.Y.Z+1.dev1, but we don't know if 
