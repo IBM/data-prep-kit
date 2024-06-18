@@ -252,7 +252,7 @@ __check_defined = \
 
 # Install the source from the given directory into an existing venv
 # Expected PYTHON_PROJECT_DIR and uses EXTRA_INDEX_URL if set.
-# PROJECT_DIR is expected to have src and pyproject.toml
+# PYTHON_PROJECT_DIR is expected to have src and pyproject.toml
 .PHONY: .defaults.install-src-venv
 .defaults.install-src-venv:: 
 	@# Help: Install Ray and Python data processing library source into existing venv 
@@ -274,6 +274,12 @@ __check_defined = \
 .PHONY: .defaults.pip-uninstall
 .defaults.pip-uninstall:
 	pip uninstall -y $(PIP_TARGET) 
+
+# Provided for similar reasons as the .defaults.pip-uninstall target.
+# Expects PIP_TARGET
+.PHONY: .defaults.pip-install
+.defaults.pip-install:
+	pip install -y $(PIP_TARGET) 
 	
 # Install all source from the repo for a python runtime transform into an existing venv 
 .PHONY: .defaults.install-python-lib-src-venv
@@ -281,7 +287,7 @@ __check_defined = \
 	@# Help: Install Python data processing library source into existing venv
 	@echo Installing Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
-	pip install pytest;						\
+	$(MAKE) PIP_TARGET=pytest .defaults.pip-install;		\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;	\
 	echo Installed source from Python processing library for `which $(PYTHON)`
@@ -298,7 +304,7 @@ __check_defined = \
 	@# Help: Install Ray and Python data processing library source into existing venv
 	@echo Installing Ray and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
-	pip install pytest;						\
+	$(MAKE) PIP_TARGET=pytest .defaults.pip-install;		\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit-ray .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;		\
@@ -319,7 +325,7 @@ __check_defined = \
 	@# Help: Install Spark and Python data processing library source into existing venv
 	@echo Installing Spark and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
-	pip install pytest;						\
+	$(MAKE) PIP_TARGET=pytest .defaults.pip-install;		\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit-spark .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;	\
