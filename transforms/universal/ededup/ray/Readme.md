@@ -72,7 +72,9 @@ To run the samples, use the following `make` targets
 * `run-cli-sample` - runs src/ededup_transform_ray.py using command line args
 * `run-local-sample` - runs src/ededup_local_ray.py
 * `run-s3-sample` - runs src/ededup_s3_ray.py
-    * Requires prior invocation of `make minio-start` to load data into local minio for S3 access.
+    * Requires prior installation of minio, depending on your platform (e.g., from [here](https://min.io/docs/minio/macos/index.html)
+     and [here](https://min.io/docs/minio/linux/index.html) 
+     and invocation of `make minio-start` to load data into local minio for S3 access.
 
 These targets will activate the virtual environment and set up any configuration needed.
 Use the `-n` option of `make` to see the detail of what is done to run the sample.
