@@ -11,7 +11,9 @@
 ################################################################################
 
 import pyarrow as pa
-from data_processing.test_support.transform.table_transform_test import AbstractTableTransformTest
+from data_processing.test_support.transform.table_transform_test import (
+    AbstractTableTransformTest,
+)
 from noop_transform import NOOPTransform, sleep_key
 
 

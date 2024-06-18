@@ -11,6 +11,7 @@
 ################################################################################
 
 import os
+
 import kfp.dsl as dsl
 from data_processing.utils import get_logger
 from kubernetes import client as k8s_client
@@ -85,7 +86,9 @@ class ComponentUtils:
         component.add_pvolumes({mountPoint: vol})
 
     @staticmethod
-    def add_secret_volume_to_com_function(component: dsl.ContainerOp, secretName: str, mountPoint: str, optional=False):
+    def add_secret_volume_to_com_function(
+        component: dsl.ContainerOp, secretName: str, mountPoint: str, optional=False
+    ):
         last_folder = os.path.basename(os.path.normpath(mountPoint))
         vol = k8s_client.V1Volume(
             name=last_folder,

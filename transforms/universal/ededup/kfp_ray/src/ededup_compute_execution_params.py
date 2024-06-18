@@ -48,7 +48,7 @@ def ededup_compute_execution_params(
 
     from data_processing.data_access import DataAccessS3
     from data_processing.utils import GB, KB
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     EXECUTION_OF_KB_DOC = 0.00025
 
@@ -73,7 +73,7 @@ def ededup_compute_execution_params(
     # because S3 is the only viable version for kfp-based implementation, we are here creating DataAccess S3 directly
     data_access = DataAccessS3(s3_credentials=s3_creds, s3_config=s3_config, d_sets=None, checkpoint=False, m_files=-1)
     # sample input data
-    sampling = data_access.sample_input_data(n_samples=n_samples)
+    sampling, _ = data_access.sample_input_data(n_samples=n_samples)
     avg_doc_size = sampling.get("average doc size KB")
     number_of_docs = sampling.get("estimated number of docs")
     if number_of_docs == 0:

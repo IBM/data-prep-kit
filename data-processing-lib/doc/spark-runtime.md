@@ -4,7 +4,7 @@ The Spark runtime extends the base framework with the following set of component
 ## Transforms
 
 * [AbstractSparkTransform](../spark/src/data_processing_spark/runtime/spark/spark_transform.py) - this
-  is the base class for all spark-based tranforms over spark DataFrames.
+  is the base class for all spark-based transforms over spark DataFrames.
 * [SparkTransformConfiguration](../spark/src/data_processing_spark/runtime/spark/spark_transform_config.py) - this
   is simple extension of the base  TransformConfiguration class to hold the transformation class
   (an extension of AbstractSpartTransform).

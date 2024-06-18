@@ -41,6 +41,14 @@ jobs:
             - name: Test Code Transforms
               run: |
                   make -C transforms/code DOCKER=docker venv test-src
+    test-language:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Test Language Transforms
+              run: |
+                  make -C transforms/language DOCKER=docker venv test-src
     test-universal:
         runs-on: ubuntu-latest
         steps:
@@ -111,5 +119,5 @@ jobs:
                   export DEPLOY_KUBEFLOW=1
                   make -C kind setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms/universal/noop/ workflow-build
+                  make -C transforms workflow-build
                   make -C transforms/universal/noop workflow-test

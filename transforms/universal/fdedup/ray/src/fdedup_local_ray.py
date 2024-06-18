@@ -36,7 +36,7 @@ params = {
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # Orchestration parameters
     "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "runtime_num_workers": 3,
+    "runtime_num_workers": 1,
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_creation_delay": 0,
@@ -49,7 +49,7 @@ params = {
     "fdedup_bucket_cpu": 0.5,
     "fdedup_doc_cpu": 0.5,
     "fdedup_mhash_cpu": 0.5,
-    "fdedup_num_doc_actors": 2,
+    "fdedup_num_doc_actors": 1,
     "fdedup_num_bucket_actors": 1,
     "fdedup_num_minhash_actors": 1,
     "fdedup_num_preprocessors": 2,

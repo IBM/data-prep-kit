@@ -11,12 +11,11 @@
 ################################################################################
 import os
 
-from src.fdedup_compute_execution_params import fdedup_compute_execution_params
-from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
+from src.fdedup_compute_execution_params import fdedup_compute_execution_params
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
 task_image = "quay.io/dataprep1/data-prep-kit/fdedup-ray:0.4.0.dev6"
@@ -45,8 +44,9 @@ if os.getenv("KFPv2", "0") == "1":
         func=fdedup_compute_execution_params, base_image=base_kfp_image
     )
     print(
-        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the " +
-        "same version of the same pipeline !!!")
+        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the "
+        + "same version of the same pipeline !!!"
+    )
     run_id = uuid.uuid4().hex
 else:
     compute_exec_params_op = comp.create_component_from_func(

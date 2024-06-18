@@ -198,7 +198,7 @@ class SparkTransformLauncher(AbstractTransformLauncher):
             hconf.set("fs.s3a.endpoint", value)
 
     def _read_data(self, data_access: DataAccess) -> DataFrame:
-        input_data_url, _ = data_access.get_files_to_process()
+        input_data_url, _, _ = data_access.get_files_to_process()
         logger.info(f"files = {input_data_url}")
         data_type = "parquet"  # This should come from the extensions in data_access,
 

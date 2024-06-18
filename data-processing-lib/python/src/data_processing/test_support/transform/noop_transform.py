@@ -50,7 +50,7 @@ class NOOPTransform(AbstractTableTransform):
         super().__init__(config)
         self.sleep = config.get("sleep_sec", 1)
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         Put Transform-specific to convert one Table to 0 or more tables. It also returns
         a dictionary of execution statistics - arbitrary dictionary

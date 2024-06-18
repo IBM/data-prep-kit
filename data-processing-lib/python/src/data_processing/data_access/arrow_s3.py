@@ -56,6 +56,7 @@ class ArrowS3:
             config=Config(retries={"max_attempts": s3_max_attempts, "mode": "standard"}),
         )
         self.retries = s3_retries
+        self.s3_max_attempts = s3_max_attempts
 
     @staticmethod
     def _get_bucket_key(key: str) -> tuple[str, str]:
@@ -68,144 +69,164 @@ class ArrowS3:
         return prefixes[0], "/".join(prefixes[1:])
 
     # get list of the files (names and sizes) for a given prefix (including bucket name)
-    def list_files(self, key: str) -> list[dict[str, Any]]:
+    def list_files(self, key: str) -> tuple[list[dict[str, Any]], int]:
         """
         List files in the folder (hierarchically going through all sub-folders)
         :param key: complete folder name
-        :return: list of dictionaries, containing file names and length
+        :return: list of dictionaries, containing file names and length and number of retries
         """
         bucket, prefix = self._get_bucket_key(key)
         # Use paginator here to get all the files rather then 1 page
         paginator = self.s3_client.get_paginator("list_objects_v2")
         pages = paginator.paginate(Bucket=bucket, Prefix=prefix)
         files = []
+        retries = 0
         for page in pages:
             # For every page
+            retries += page.get("ResponseMetadata", {}).get("RetryAttempts", 0)
             for obj in page.get("Contents", []):
                 # Get both file name and size
                 files.append({"name": f"{bucket}/{obj['Key']}", "size": obj["Size"]})
-        return files
+        return files, retries
 
-    def list_folders(self, key: str) -> list[str]:
+    def list_folders(self, key: str) -> tuple[list[str], int]:
         """
         Get list of folders for folder
         :param key: complete folder
-        :return: list of folders within a given folder
+        :return: list of folders within a given folder and number of retries
         """
         bucket, prefix = self._get_bucket_key(key)
 
-        def _get_sub_folders(bck: str, p: str) -> list[str]:
+        def _get_sub_folders(bck: str, p: str) -> tuple[list[str], int]:
             # use paginator
             paginator = self.s3_client.get_paginator("list_objects_v2")
             # use Delimiter to get folders just folders
             page_iterator = paginator.paginate(Bucket=bck, Prefix=p, Delimiter="/")
             sub_folders = []
+            internal_retries = 0
             for page in page_iterator:
                 # for every page
+                internal_retries += page.get("ResponseMetadata", {}).get("RetryAttempts", 0)
                 for p in page.get("CommonPrefixes", []):
                     sub_folders.append(p["Prefix"])
                     # apply recursively
-                    sub_folders.extend(_get_sub_folders(bck, p["Prefix"]))
-            return sub_folders
+                    sf, r = _get_sub_folders(bck, p["Prefix"])
+                    internal_retries += r
+                    sub_folders.extend(sf)
+            return sub_folders, internal_retries
 
-        prefixes = _get_sub_folders(bck=bucket, p=prefix)
+        prefixes, retries = _get_sub_folders(bck=bucket, p=prefix)
         # remove base prefix
-        return [p.removeprefix(prefix) for p in prefixes]
+        return [p.removeprefix(prefix) for p in prefixes], retries
 
-    def read_file(self, key: str) -> bytes:
+    def read_file(self, key: str) -> tuple[bytes, int]:
         """
         Read an s3 file by name
         :param key: complete path
-        :return: byte array of file content or None if the file does not exist
+        :return: byte array of file content or None if the file does not exist and a number of retries
         """
         bucket, prefix = self._get_bucket_key(key)
+        retries = 0
         for n in range(self.retries):
             try:
                 obj = self.s3_client.get_object(Bucket=bucket, Key=prefix)
-                return obj["Body"].read()
+                retries += obj.get("ResponseMetadata", {}).get("RetryAttempts", 0)
+                return obj["Body"].read(), retries
             except Exception as e:
                 logger.error(f"failed to read file {key}, exception {e}, attempt {n}")
+                retries += self.s3_max_attempts
         logger.error(f"failed to read file {key} in {self.retries} attempts. Skipping it")
-        return None
+        return None, retries
 
-    def save_file(self, key: str, data: bytes) -> dict[str, Any]:
+    def save_file(self, key: str, data: bytes) -> tuple[dict[str, Any], int]:
         """
         Save file to S3
         :param key: complete path
         :param data: byte array of the file content
         :return: dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None
+        in the case of failure dict is None and the number of retries
         """
         bucket, prefix = self._get_bucket_key(key)
+        retries = 0
         for n in range(self.retries):
             try:
-                return self.s3_client.put_object(Bucket=bucket, Key=prefix, Body=data)
+                res = self.s3_client.put_object(Bucket=bucket, Key=prefix, Body=data)
+                retries += res.get("ResponseMetadata", {}).get("RetryAttempts", 0)
+                return res, retries
             except Exception as e:
                 logger.error(f"Failed to upload file to to key {key}, exception {e}")
+                retries += self.s3_max_attempts
         logger.error(f"Failed to upload file {key}, skipping it")
-        return None
+        return None, retries
 
-    def read_table(self, key: str, schema: pa.schema = None) -> pa.Table:
+    def read_table(self, key: str, schema: pa.schema = None) -> tuple[pa.Table, int]:
         """
         Get an arrow table from a file with a given name
         :param key: complete path
         :param schema: Schema used for reading table, default None
-        :return: table or None if the read failed
+        :return: table or None if the read failed and the number of retries
         """
         # Read file as bytes
-        data = self.read_file(key)
+        data, retries = self.read_file(key)
         if data is None:
-            return None
-        return TransformUtils.convert_binary_to_arrow(data=data, schema=schema)
+            return None, retries
+        return TransformUtils.convert_binary_to_arrow(data=data, schema=schema), retries
 
-    def save_table(self, key: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
+    def save_table(self, key: str, table: pa.Table) -> tuple[int, dict[str, Any], int]:
         """
         Save an arrow table to a file with a name
         :param key: complete path
         :param table: table to save
         :return: table size and a dictionary as
         defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure len is -1 and dict is None
+        in the case of failure len is -1 and dict is None and the number of retries
         """
         # convert to bytes
         data = TransformUtils.convert_arrow_to_binary(table=table)
         if data is None:
             return -1, None
         # save bytes
-        return len(data), self.save_file(key, data)
+        res, retries = self.save_file(key, data)
+        return len(data), res, retries
 
-    def delete_file(self, key: str) -> None:
+    def delete_file(self, key: str) -> int:
         """
         Delete file from S3
         :param key: complete path
-        :return: None
+        :return: the number of retries
         """
         bucket, prefix = self._get_bucket_key(key)
+        retries = 0
         for n in range(self.retries):
             try:
-                self.s3_client.delete_object(Bucket=bucket, Key=prefix)
-                return None
+                res = self.s3_client.delete_object(Bucket=bucket, Key=prefix)
+                retries += res.get("ResponseMetadata", {}).get("RetryAttempts", 0)
+                return retries
             except Exception as e:
                 logger.error(f"failed to delete file {key}, exception {e}")
-        return None
+                retries += self.s3_max_attempts
+        return retries
 
-    def move_file(self, source: str, dest: str) -> None:
+    def move_file(self, source: str, dest: str) -> int:
         """
         move file from source to destination
         :param source: complete source path
         :param dest: complete destination path
-        :return: None
+        :return: number of retries
         """
         s_bucket, s_prefix = self._get_bucket_key(source)
         d_bucket, d_prefix = self._get_bucket_key(dest)
         # copy source to destination and then delete source
         copy_source = {"Bucket": s_bucket, "Key": s_prefix}
+        retries = 0
         for n in range(self.retries):
             try:
-                self.s3_client.copy_object(CopySource=copy_source, Bucket=d_bucket, Key=d_prefix)
-                self.delete_file(source)
-                return None
+                res = self.s3_client.copy_object(CopySource=copy_source, Bucket=d_bucket, Key=d_prefix)
+                retries += res.get("ResponseMetadata", {}).get("RetryAttempts", 0)
+                retries += self.delete_file(source)
+                return retries
             except Exception as e:
                 logger.error(f"failed to copy file {source} to {dest}, exception {e}")
-        return None
+                retries += self.s3_max_attempts
+        return retries

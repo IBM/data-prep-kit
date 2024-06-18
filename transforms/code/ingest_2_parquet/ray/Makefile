@@ -8,7 +8,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=ingest_2_parquet
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${INGEST_TO_PARQUET_VERSION}
+DOCKER_IMAGE_VERSION=${INGEST_TO_PARQUET_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
