@@ -12,6 +12,7 @@
 
 import io
 import json
+import logging
 import zipfile
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
@@ -49,10 +50,7 @@ ingest_domain_key = f"{shortname}_domain"
 ingest_snapshot_key = f"{shortname}_snapshot"
 
 
-def _get_supported_languages(lang_file: str, data_access: DataAccess) -> dict[str, str]:
-    from data_processing.utils import get_logger
-
-    logger = get_logger(__name__)
+def _get_supported_languages(lang_file: str, data_access: DataAccess, logger: logging.Logger) -> dict[str, str]:
     logger.debug(f"Getting supported languages from file {lang_file}")
     json_data, _ = data_access.get_file(lang_file)
     lang_dict = json.loads(json_data.decode("utf-8"))
@@ -86,7 +84,9 @@ class IngestToParquetTransform(AbstractBinaryTransform):
                 raise RuntimeError(f"Missing configuration value for key {ingest_supported_langs_file_key}")
             daf = config.get(ingest_data_factory_key, None)
             data_access = daf.create_data_access()
-            self.languages_supported = _get_supported_languages(lang_file=path, data_access=data_access)
+            self.languages_supported = _get_supported_languages(
+                lang_file=path, data_access=data_access, logger=self.logger
+            )
         else:
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
@@ -193,6 +193,7 @@ class IngestToParquetRuntime(DefaultRayTransformRuntime):
         lang_dict = _get_supported_languages(
             lang_file=lang_file,
             data_access=lang_data_access_factory.create_data_access(),
+            logger=self.logger,
         )
         lang_refs = ray.put(lang_dict)
         self.logger.debug(f"Placed language list into Ray object storage under reference{lang_refs}")

@@ -10,6 +10,7 @@
 # limitations under the License.
 ################################################################################
 
+import logging
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
@@ -45,10 +46,7 @@ lang_output_column_key = f"{shortname}_output_column"
 lang_default_output_column = "allowed_language"
 
 
-def _get_supported_languages(lang_file: str, data_access: DataAccess) -> list[str]:
-    from data_processing.utils import get_logger
-
-    logger = get_logger(__name__)
+def _get_supported_languages(lang_file: str, data_access: DataAccess, logger: logging.Logger) -> list[str]:
     logger.info(f"Getting supported languages from file {lang_file}")
     lang_list, _ = data_access.get_file(lang_file)
     l_list = lang_list.decode("utf-8").splitlines()
@@ -80,7 +78,9 @@ class ProgLangSelectTransform(AbstractTableTransform):
                 raise RuntimeError(f"Missing configuration value for key {lang_allowed_langs_file_key}")
             daf = config.get(lang_data_factory_key, None)
             data_access = daf.create_data_access()
-            self.languages_include = _get_supported_languages(lang_file=path, data_access=data_access)
+            self.languages_include = _get_supported_languages(
+                lang_file=path, data_access=data_access, logger=self.logger
+            )
         else:
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
@@ -159,6 +159,7 @@ class ProgLangSelectRuntime(DefaultRayTransformRuntime):
         lang_list = _get_supported_languages(
             lang_file=lang_file,
             data_access=lang_data_access_factory.create_data_access(),
+            logger=self.logger,
         )
         lang_refs = ray.put(list(lang_list))
         self.logger.info(f"Placed language list into Ray object storage under reference{lang_refs}")
