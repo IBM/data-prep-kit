@@ -8,7 +8,7 @@ testing and IDE set up.
 
 This module is designed to detect and remove license and copyright information from code files. It leverages the [ScanCode Toolkit](https://pypi.org/project/scancode-toolkit/) to accurately identify and process licenses and copyrights in various programming languages.
 
-After detecting license and copyright position new column names updated_contents has been created. Now lines which doesn't contain license or copyright copied to new column updated_column.
+After detecting license and copyright position new column names "updated_contents" has been created. Now lines which doesn't contain license or copyright copied to new column updated_column.
 
 ## Configuration and command line Options
 
