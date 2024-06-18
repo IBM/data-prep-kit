@@ -149,7 +149,7 @@ class PipelinesUtils:
                     ]
                 }
             )
-            result = self.kfp_client.list_pipelines(filter=pipeline_filter)
+            result = self.kfp_client.list_pipelines(filter=pipeline_filter, page_size=np, sort_by="created_at desc")
             if result.pipelines is None:
                 return None
             if len(result.pipelines) == 1:
