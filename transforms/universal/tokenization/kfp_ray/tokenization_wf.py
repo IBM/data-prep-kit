@@ -110,9 +110,10 @@ TASK_NAME: str = "tokenization"
 def tokenization(
     # Ray cluster
     ray_name: str = "tkn-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
+    # Add image_pull_secret and image_pull_policy to ray workers if needed
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image_pull_secret": "", "image": "' + task_image + '"}',
+    '"image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/tokenization/ds01/input/', 'output_folder': 'test/tokenization/ds01/output/'}",
@@ -199,7 +200,7 @@ def tokenization(
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             ray_head_options=ray_head_options,
             ray_worker_options=ray_worker_options,
             server_url=server_url,
@@ -210,7 +211,7 @@ def tokenization(
         # Execute job
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             additional_params=additional_params,
             exec_params=compute_exec_params.output,
             exec_script_name=EXEC_SCRIPT_NAME,

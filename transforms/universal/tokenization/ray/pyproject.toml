@@ -9,7 +9,7 @@ authors = [
     { name = "Xuan-Hong Dang", email = "xuan-hong.dang@ibm.com"},
 ]
 dependencies = [
-    "dpk-tokenization-transform-python==0.9.0.dev6",
+    "dpk-tokenization-transform-python==0.4.0.dev6",
     "data-prep-toolkit-ray==0.2.0.dev6",
 ]
 

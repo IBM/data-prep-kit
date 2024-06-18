@@ -83,9 +83,9 @@ The input parameters section defines all the parameters required for the pipelin
 ```python
     # Ray cluster
     ray_name: str = "noop-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "",\
+    ray_head_options: str = '{"cpu": 1, "memory": 4, \
                  "image": "' + task_image + '" }',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "",\
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, \
                 "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
