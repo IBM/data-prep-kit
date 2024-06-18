@@ -34,6 +34,10 @@ publish-image:: .transforms.publish-image-ray
 # distribution versions is the same as image version.
 set-versions:
 	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	cat pyproject.toml | sed                                                                        \
+                -e 's/"dpk-filter-transform-python\(..\).*",/"dpk-filter-transform-python\1$(FILTER_PYTHON_VERSION)",/'   \
+                > tt.toml
+	mv tt.toml pyproject.toml
         
 build-dist:: set-versions .defaults.build-dist 
 
