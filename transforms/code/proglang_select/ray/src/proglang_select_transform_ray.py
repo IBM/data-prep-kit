@@ -24,7 +24,7 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import TransformUtils, get_logger
+from data_processing.utils import TransformUtils
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
@@ -34,8 +34,6 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
 )
 from ray.actor import ActorHandle
 
-
-logger = get_logger(__name__)
 
 shortname = "proglang_select"
 cli_prefix = f"{shortname}_"
@@ -48,6 +46,8 @@ lang_default_output_column = "allowed_language"
 
 
 def _get_supported_languages(lang_file: str, data_access: DataAccess) -> list[str]:
+    from data_processing.utils import get_logger
+    logger = get_logger(__name__)
     logger.info(f"Getting supported languages from file {lang_file}")
     lang_list, _ = data_access.get_file(lang_file)
     l_list = lang_list.decode("utf-8").splitlines()
@@ -67,6 +67,8 @@ class ProgLangSelectTransform(AbstractTableTransform):
         """
 
         super().__init__(config)
+        from data_processing.utils import get_logger
+        self.logger = get_logger(__name__)
         self.lang_column = config.get(lang_lang_column_key, "")
         self.output_column = config.get(lang_output_column_key, lang_default_output_column)
         languages_include_ref = config.get(lang_allowed_languages, None)
@@ -81,10 +83,10 @@ class ProgLangSelectTransform(AbstractTableTransform):
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
             try:
-                logger.info(f"Loading languages to include from Ray storage under reference {languages_include_ref}")
+                self.logger.info(f"Loading languages to include from Ray storage under reference {languages_include_ref}")
                 self.languages_include = ray.get(languages_include_ref)
             except Exception as e:
-                logger.info(f"Exception loading languages list from ray object storage {e}")
+                self.logger.info(f"Exception loading languages list from ray object storage {e}")
                 raise RuntimeError(f"exception loading from object storage for key {languages_include_ref}")
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict]:
@@ -152,7 +154,7 @@ class ProgLangSelectRuntime(DefaultRayTransformRuntime):
             data_access=lang_data_access_factory.create_data_access(),
         )
         lang_refs = ray.put(list(lang_list))
-        logger.info(f"Placed language list into Ray object storage under reference{lang_refs}")
+        self.logger.info(f"Placed language list into Ray object storage under reference{lang_refs}")
         return {lang_allowed_languages: lang_refs} | self.params
 
 
@@ -168,6 +170,8 @@ class ProgLangSelectTransformConfiguration(TransformConfiguration):
             transform_class=ProgLangSelectTransform,
             remove_from_metadata=[lang_data_factory_key],
         )
+        from data_processing.utils import get_logger
+        self.logger = get_logger(__name__)
         self.daf = None
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -211,10 +215,10 @@ class ProgLangSelectTransformConfiguration(TransformConfiguration):
         """
         dargs = vars(args)
         if dargs.get(lang_allowed_langs_file_key, None) is None:
-            logger.info(f"{lang_allowed_langs_file_key} is required, but got None")
+            self.logger.info(f"{lang_allowed_langs_file_key} is required, but got None")
             return False
         if dargs.get(lang_lang_column_key, None) is None:
-            logger.info(f"{lang_lang_column_key} is required, but got None")
+            self.logger.info(f"{lang_lang_column_key} is required, but got None")
             return False
         self.params = {
             lang_lang_column_key: dargs.get(lang_lang_column_key, None),

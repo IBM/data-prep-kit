@@ -28,7 +28,7 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
-from data_processing.utils import TransformUtils, get_logger, str2bool
+from data_processing.utils import TransformUtils,str2bool
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
@@ -38,8 +38,6 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
 )
 from ray.actor import ActorHandle
 
-
-logger = get_logger(__name__)
 
 shortname = "ingest_to_parquet"
 cli_prefix = f"{shortname}_"
@@ -52,6 +50,8 @@ ingest_snapshot_key = f"{shortname}_snapshot"
 
 
 def _get_supported_languages(lang_file: str, data_access: DataAccess) -> dict[str, str]:
+    from data_processing.utils import get_logger
+    logger = get_logger(__name__)
     logger.debug(f"Getting supported languages from file {lang_file}")
     json_data, _ = data_access.get_file(lang_file)
     lang_dict = json.loads(json_data.decode("utf-8"))
@@ -72,6 +72,8 @@ class IngestToParquetTransform(AbstractBinaryTransform):
         """
 
         super().__init__(config)
+        from data_processing.utils import get_logger
+        self.logger = get_logger(__name__)
         self.domain = config.get(ingest_domain_key, "")
         self.snapshot = config.get(ingest_snapshot_key, "")
         self.detect_programming_lang = config.get(ingest_detect_programming_lang_key, "")
@@ -87,10 +89,10 @@ class IngestToParquetTransform(AbstractBinaryTransform):
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
             try:
-                logger.info(f"Loading languages to include from Ray storage under reference {supported_languages_ref}")
+                self.logger.info(f"Loading languages to include from Ray storage under reference {supported_languages_ref}")
                 self.languages_supported = ray.get(supported_languages_ref)
             except Exception as e:
-                logger.warning(f"Exception loading languages list from ray object storage {e}")
+                self.logger.warning(f"Exception loading languages list from ray object storage {e}")
                 raise RuntimeError(f"exception loading from object storage for key {supported_languages_ref}")
 
     def _get_lang_from_ext(self, ext):
@@ -105,7 +107,7 @@ class IngestToParquetTransform(AbstractBinaryTransform):
         """
         # We currently only process .zip files
         if TransformUtils.get_file_extension(file_name)[1] != ".zip":
-            logger.warning(f"Got unsupported file type {file_name}, skipping")
+            self.logger.warning(f"Got unsupported file type {file_name}, skipping")
             return [], {}
         data = []
         number_of_rows = 0
@@ -137,9 +139,9 @@ class IngestToParquetTransform(AbstractBinaryTransform):
                                 data.append(row_data)
                                 number_of_rows += 1
                             else:
-                                logger.warning(f"file {member.filename} is empty. content {content_string}, skipping")
+                                self.logger.warning(f"file {member.filename} is empty. content {content_string}, skipping")
                         except Exception as e:
-                            logger.warning(f"Exception {str(e)} processing file {member.filename}, skipping")
+                            self.logger.warning(f"Exception {str(e)} processing file {member.filename}, skipping")
         table = pa.Table.from_pylist(data)
         return [(TransformUtils.convert_arrow_to_binary(table=table), ".parquet")], {"number of rows": number_of_rows}
 
@@ -159,6 +161,8 @@ class IngestToParquetRuntime(DefaultRayTransformRuntime):
             ingest_snapshot_key: snapshot
         """
         super().__init__(params)
+        from data_processing.utils import get_logger
+        self.logger = get_logger(__name__)
 
     def get_transform_config(
         self,
@@ -184,7 +188,7 @@ class IngestToParquetRuntime(DefaultRayTransformRuntime):
             data_access=lang_data_access_factory.create_data_access(),
         )
         lang_refs = ray.put(lang_dict)
-        logger.debug(f"Placed language list into Ray object storage under reference{lang_refs}")
+        self.logger.debug(f"Placed language list into Ray object storage under reference{lang_refs}")
         return {ingest_supported_languages: lang_refs} | self.params
 
 
@@ -200,6 +204,8 @@ class IngestToParquetTransformConfiguration(TransformConfiguration):
             transform_class=IngestToParquetTransform,
             remove_from_metadata=[ingest_data_factory_key],
         )
+        from data_processing.utils import get_logger
+        self.logger = get_logger(__name__)
         self.daf = None
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -241,7 +247,7 @@ class IngestToParquetTransformConfiguration(TransformConfiguration):
         """
         dargs = vars(args)
         if dargs.get(ingest_supported_langs_file_key, None) is None:
-            logger.warning(f"{ingest_supported_langs_file_key} is required, but got None")
+            self.logger.warning(f"{ingest_supported_langs_file_key} is required, but got None")
             return False
         self.params = {
             ingest_detect_programming_lang_key: dargs.get(ingest_detect_programming_lang_key, None),
@@ -250,7 +256,7 @@ class IngestToParquetTransformConfiguration(TransformConfiguration):
             ingest_snapshot_key: dargs.get(ingest_snapshot_key, ""),
             ingest_data_factory_key: self.daf,
         }
-        logger.info(f"Transform configuration {self.params}")
+        self.logger.info(f"Transform configuration {self.params}")
 
         # Validate and populate the transform's DataAccessFactory
         return self.daf.apply_input_params(args)

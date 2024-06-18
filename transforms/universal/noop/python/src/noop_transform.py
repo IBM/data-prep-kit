@@ -15,15 +15,9 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.runtime.pure_python import PythonTransformLauncher
-from data_processing.runtime.pure_python.runtime_configuration import (
-    PythonTransformRuntimeConfiguration,
-)
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import CLIArgumentProvider, get_logger
+from data_processing.utils import CLIArgumentProvider
 
-
-logger = get_logger(__name__)
 
 short_name = "noop"
 cli_prefix = f"{short_name}_"
@@ -48,6 +42,8 @@ class NOOPTransform(AbstractTableTransform):
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of NOOPTransformConfiguration class
         super().__init__(config)
+        from data_processing.utils import get_logger
+        self.logger = get_logger(__name__)
         self.sleep = config.get("sleep_sec", 1)
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
@@ -57,13 +53,13 @@ class NOOPTransform(AbstractTableTransform):
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
-        logger.debug(f"Transforming one table with {len(table)} rows")
+        self.logger.debug(f"Transforming one table with {len(table)} rows")
         if self.sleep is not None:
-            logger.info(f"Sleep for {self.sleep} seconds")
+            self.logger.info(f"Sleep for {self.sleep} seconds")
             time.sleep(self.sleep)
-            logger.info("Sleep completed - continue")
+            self.logger.info("Sleep completed - continue")
         # Add some sample metadata.
-        logger.debug(f"Transformed one table with {len(table)} rows")
+        self.logger.debug(f"Transformed one table with {len(table)} rows")
         metadata = {"nfiles": 1, "nrows": len(table)}
         return [table], metadata
 
@@ -81,6 +77,8 @@ class NOOPTransformConfiguration(TransformConfiguration):
             transform_class=NOOPTransform,
             remove_from_metadata=[pwd_key],
         )
+        from data_processing.utils import get_logger
+        self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -117,5 +115,5 @@ class NOOPTransformConfiguration(TransformConfiguration):
             return False
 
         self.params = self.params | captured
-        logger.info(f"noop parameters are : {self.params}")
+        self.logger.info(f"noop parameters are : {self.params}")
         return True

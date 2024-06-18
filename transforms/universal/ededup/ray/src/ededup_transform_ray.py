@@ -17,7 +17,7 @@ import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger
+from data_processing.utils import GB, CLIArgumentProvider, TransformUtils
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
@@ -29,7 +29,6 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
 from ray.actor import ActorHandle
 
 
-logger = get_logger(__name__)
 REQUEST_LEN = 8192
 
 short_name = "ededup"
@@ -231,6 +230,9 @@ class EdedupTableTransformConfiguration(TransformConfiguration):
             name=short_name,
             transform_class=EdedupTransform,
         )
+        from data_processing.utils import get_logger
+        self.logger = get_logger(__name__)
+
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -249,9 +251,9 @@ class EdedupTableTransformConfiguration(TransformConfiguration):
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         self.params = self.params | captured
         if self.params["num_hashes"] <= 0:
-            logger.info(f"Number of hashes should be greater then zero, provided {self.params['num_hashes']}")
+            self.logger.info(f"Number of hashes should be greater then zero, provided {self.params['num_hashes']}")
             return False
-        logger.info(f"exact dedup params are {self.params}")
+        self.logger.info(f"exact dedup params are {self.params}")
         return True
 
 

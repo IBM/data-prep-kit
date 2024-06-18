@@ -20,7 +20,7 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
+from data_processing.utils import CLIArgumentProvider, TransformUtils
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
@@ -29,9 +29,6 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
 from ray.actor import ActorHandle
-
-
-logger = get_logger(__name__)
 
 
 @ray.remote(num_cpus=0.25, scheduling_strategy="SPREAD")
@@ -159,6 +156,8 @@ class DocIDTransformConfiguration(TransformConfiguration):
             name=short_name,
             transform_class=DocIDTransform,
         )
+        from data_processing.utils import get_logger
+        self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -191,11 +190,11 @@ class DocIDTransformConfiguration(TransformConfiguration):
         """
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         if captured.get(hash_column_name_key) is None and captured.get(int_column_name_key) is None:
-            logger.info("One of hash or int id column names must be specified.")
+            self.logger.info("One of hash or int id column names must be specified.")
             return False
 
         self.params = self.params | captured
-        logger.info(f"Doc id parameters are : {self.params}")
+        self.logger.info(f"Doc id parameters are : {self.params}")
         return True
 
 

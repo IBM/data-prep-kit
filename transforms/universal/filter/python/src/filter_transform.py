@@ -16,14 +16,8 @@ import json
 
 import duckdb
 import pyarrow as pa
-from data_processing.runtime.pure_python.runtime_configuration import (
-    PythonTransformRuntimeConfiguration,
-)
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import CLIArgumentProvider, get_logger
-
-
-logger = get_logger(__name__)
+from data_processing.utils import CLIArgumentProvider
 
 
 short_name = "filter"
@@ -69,6 +63,8 @@ class FilterTransform(AbstractTableTransform):
         """
 
         super().__init__(config)
+        from data_processing.utils import get_logger
+        self.logger = get_logger(__name__)
         self.filter_criteria = config.get(filter_criteria_key, filter_criteria_default)
         self.logical_operator = config.get(filter_logical_operator_key, filter_logical_operator_default)
         self.columns_to_drop = config.get(filter_columns_to_drop_key, filter_columns_to_drop_default)
@@ -115,7 +111,7 @@ class FilterTransform(AbstractTableTransform):
             try:
                 filtered_table = duckdb.execute(sql_statement).arrow()
             except Exception as ex:
-                logger.error(f"FilterTransform::transform failed: {ex}")
+                self.logger.error(f"FilterTransform::transform failed: {ex}")
                 raise ex
         else:
             filtered_table = table
@@ -196,8 +192,3 @@ class FilterTransformConfiguration(TransformConfiguration):
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         self.params = self.params | captured
         return True
-
-
-class FilterPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
-    def __init__(self):
-        super().__init__(transform_config=FilterTransformConfiguration())
