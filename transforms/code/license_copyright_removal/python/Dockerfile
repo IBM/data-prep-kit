@@ -21,8 +21,8 @@ COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
-#COPY requirements.txt requirements.txt
-#RUN pip install --no-cache-dir -r  requirements.txt
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
 COPY ./src/license_copyright_removal_transform.py .
