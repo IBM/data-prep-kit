@@ -10,18 +10,18 @@
 # limitations under the License.
 ################################################################################
 
-import os
 import ast
+import os
 
 from data_processing.data_access import DataAccessFactory, DataAccessLocal
 from data_processing.utils import TransformUtils
 from ingest_2_parquet_transform_ray import (
     IngestToParquetTransform,
-    ingest_supported_langs_file_key,
+    ingest_data_factory_key,
     ingest_detect_programming_lang_key,
     ingest_domain_key,
     ingest_snapshot_key,
-    ingest_data_factory_key,
+    ingest_supported_langs_file_key,
 )
 
 
@@ -46,9 +46,8 @@ if __name__ == "__main__":
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
     file_to_process = os.path.join(input_folder, "application-java.zip")
-    byte_array = data_access.get_file(file_to_process)
+    byte_array, _ = data_access.get_file(file_to_process)
     # Transform the table
-    files_list, metadata = transform.transform_binary(
-        base_name=TransformUtils.get_file_basename(file_to_process), byte_array=byte_array)
+    files_list, metadata = transform.transform_binary(file_name=file_to_process, byte_array=byte_array)
     print(f"Got {len(files_list)} output files")
     print(f"output metadata : {metadata}")

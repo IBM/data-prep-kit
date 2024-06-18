@@ -250,9 +250,10 @@ class TestGetFilesToProcess(TestInit):
         os.makedirs(self.dal.output_folder, exist_ok=True)
         original_d_sets = self.dal.d_sets
         self.dal.d_sets = None
-        result = self.dal.get_files_to_process()
+        files, profiles, _ = self.dal.get_files_to_process()
         self.dal.d_sets = original_d_sets
-        assert result == ([], self.size_stat_dict_empty)
+        assert files == []
+        assert profiles == self.size_stat_dict_empty
 
     def test_missing_files(self):
         """
@@ -264,13 +265,13 @@ class TestGetFilesToProcess(TestInit):
 
         in_file_1 = in_path_1 / "file1.parquet"
         in_file_1.touch()
-        result = self.dal.get_files_to_process()
-        print(f"result {result}")
+        files, profiles, _ = self.dal.get_files_to_process()
         self.cleanup(
             directories_to_remove=[in_path_1, out_path_1, in_path_2, out_path_2],
             files_to_remove=[in_file_1],
         )
-        assert result == ([str(in_file_1.absolute())], self.size_stat_dict)
+        assert files == [str(in_file_1.absolute())]
+        assert profiles == self.size_stat_dict
 
     def multiple_missing_files_setup(self):
         # create the data set sub-directories
@@ -286,7 +287,7 @@ class TestGetFilesToProcess(TestInit):
         out_file_2.touch()
         with open(in_files_1[0], "w") as fp:
             fp.write(" " * MB)
-        file_list, size_dict = self.dal.get_files_to_process()
+        file_list, size_dict, _ = self.dal.get_files_to_process()
         result = (file_list, size_dict)
         return result, in_files_1, in_files_2, out_file_2, in_path_1, out_path_1, in_path_2, out_path_2
 
@@ -369,9 +370,10 @@ class TestGetFilesToProcess(TestInit):
         self.dal.d_sets = None
         with patch("pathlib.Path.rglob") as mock_rglob:
             mock_rglob.return_value = []
-            result = self.dal.get_files_to_process()
+            files, profiles, _ = self.dal.get_files_to_process()
             self.dal.d_sets = original_d_sets
-            assert result == ([], self.size_stat_dict_empty)
+            assert files == []
+            assert profiles == self.size_stat_dict_empty
 
     def test_non_parquet_files(self):
         """
@@ -388,13 +390,14 @@ class TestGetFilesToProcess(TestInit):
         for file in in_files_2:
             file.touch()
         out_file_2.touch()
-        result = self.dal.get_files_to_process()
+        files, profiles, _ = self.dal.get_files_to_process()
         files_to_remove = in_files_1 + in_files_2 + [out_file_2]
         self.cleanup(
             directories_to_remove=[in_path_1, out_path_1, in_path_2, out_path_2],
             files_to_remove=files_to_remove,
         )
-        assert result == ([], self.size_stat_dict_empty)
+        assert files == []
+        assert profiles == self.size_stat_dict_empty
 
 
 class TestReadPyarrowTable(TestInit):
@@ -422,12 +425,12 @@ class TestReadPyarrowTable(TestInit):
     def test_error_handling(self, path, expected_error):
         with patch("pyarrow.parquet.read_table") as mock_read_table:
             mock_read_table.side_effect = expected_error
-            table = self.dal.get_table(path)
+            table, _ = self.dal.get_table(path)
             assert table is None
             assert mock_read_table.called_once_with(path)
 
     def test_successful_read(self):
-        table = self.dal.get_table(self.pq_file_path)
+        table, _ = self.dal.get_table(self.pq_file_path)
         os.remove(self.pq_file_path)
         assert isinstance(table, pyarrow.Table)
 
@@ -453,7 +456,7 @@ class TestSavePyarrowTable(TestInit):
         with patch("os.path.getsize") as mock_getsize, patch("os.path.basename") as mock_basename:
             mock_getsize.return_value = 1024
             mock_basename.return_value = "test_file.parquet"
-            size_in_memory, file_info = self.dal.save_table(self.pq_file_path, self.table)
+            size_in_memory, file_info, _ = self.dal.save_table(self.pq_file_path, self.table)
             os.remove(self.pq_file_path)
             # Assertions about return values
             assert size_in_memory == self.table.nbytes
@@ -464,7 +467,7 @@ class TestSavePyarrowTable(TestInit):
         with patch("pyarrow.parquet.write_table") as mock_write_table:
             mock_write_table.side_effect = Exception("Write error")
 
-            _, file_info = self.dal.save_table(self.pq_file_path, self.table)
+            _, file_info, _ = self.dal.save_table(self.pq_file_path, self.table)
 
             # Assertions about return values
             assert file_info is None
@@ -498,7 +501,7 @@ class TestSaveJobMetadata(TestInit):
                 print(f"Failed to remove directory {directory_to_remove}: {ex}")
 
     def test_save_job_metadata(self):
-        file_info = self.dal.save_job_metadata(metadata=self.metadata)
+        file_info, _ = self.dal.save_job_metadata(metadata=self.metadata)
         metadata_file_path = file_info.get("name", "")
         with open(metadata_file_path, "r") as fp:
             metadata_dict = json.load(fp)
@@ -525,12 +528,12 @@ class TestGetFile(TestInit):
         f.write(b"This is a compressed test file.")
 
     def test_existing_txt_file(self):
-        data = self.dal.get_file(self.text_file_path)
+        data, _ = self.dal.get_file(self.text_file_path)
         os.remove(self.text_file_path)
         assert data == b"This is a test file."
 
     def test_existing_gz_file(self):
-        data = self.dal.get_file(self.gzip_file_path)
+        data, _ = self.dal.get_file(self.gzip_file_path)
         os.remove(self.gzip_file_path)
         assert data == b"This is a compressed test file."
 
@@ -548,7 +551,7 @@ class TestGetFile(TestInit):
     def test_mock_open(self):
         with patch("builtins.open") as mock_open:
             mock_open.return_value.__enter__.return_value.read.return_value = b"Mock data"
-            data = self.dal.get_file("some_file.txt")
+            data, _ = self.dal.get_file("some_file.txt")
             assert data == b"Mock data"
 
 
@@ -573,17 +576,17 @@ class TestGetFolderFiles(TestInit):
         f.write(b"asdf.qwer.com")
 
     def test_one_extension(self):
-        contents_txt = self.dal.get_folder_files(self.test_dir, [".txt"])
+        contents_txt, _ = self.dal.get_folder_files(self.test_dir, [".txt"])
         assert len(contents_txt) == 1
         assert self.text_file_path in contents_txt
         assert contents_txt[self.text_file_path] == b"This is text content."
 
     def test_one_non_existing_extension(self):
-        contents_jpg = self.dal.get_folder_files(self.test_dir, [".jpg"])
+        contents_jpg, _ = self.dal.get_folder_files(self.test_dir, [".jpg"])
         assert not contents_jpg
 
     def test_all_files(self):
-        contents_all = self.dal.get_folder_files(self.test_dir)
+        contents_all, _ = self.dal.get_folder_files(self.test_dir)
         assert len(contents_all) == 4
         assert contents_all[self.text_file_path] == b"This is text content."
         assert contents_all[self.pdf_file_path][:4] == b"\x25\x50\x44\x46"
@@ -591,13 +594,13 @@ class TestGetFolderFiles(TestInit):
         assert contents_all[self.domain_file_path] == b"asdf.qwer.com"
 
     def test_multiple_extensions(self):
-        contents_txt_pdf = self.dal.get_folder_files(self.test_dir, [".txt", ".pdf"])
+        contents_txt_pdf, _ = self.dal.get_folder_files(self.test_dir, [".txt", ".pdf"])
         assert len(contents_txt_pdf) == 2
         assert contents_txt_pdf[self.text_file_path] == b"This is text content."
         assert contents_txt_pdf[self.pdf_file_path][:4] == b"\x25\x50\x44\x46"  # Check PDF header
 
     def test_nonexistent_files(self):
-        contents = self.dal.get_folder_files("nonexistent_dir", ["txt"])
+        contents, _ = self.dal.get_folder_files("nonexistent_dir", ["txt"])
         os.remove(self.text_file_path)
         os.remove(self.pdf_file_path)
         os.remove(self.bin_file_path)
@@ -612,10 +615,10 @@ class TestSaveFile(TestInit):
     new_file_path = os.path.join(os.sep, "tmp", "new_file.bin")
 
     def test_successful_save(self):
-        file_info = self.dal.save_file(self.new_file_path, b"This is new data")
+        file_info, _ = self.dal.save_file(self.new_file_path, b"This is new data")
         assert file_info == {"name": self.new_file_path, "size": os.path.getsize(self.new_file_path)}
         os.remove(self.new_file_path)
 
     def test_invalid_filename(self):
-        file_info = self.dal.save_file("", b"Data")
+        file_info, _ = self.dal.save_file("", b"Data")
         assert file_info is None

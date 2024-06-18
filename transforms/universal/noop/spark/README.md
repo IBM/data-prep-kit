@@ -14,7 +14,6 @@ Noop configuration and command line options are the same as for the base python 
 ## Running
 
 ### Launched Command Line Options
-When running the transform with the Ray launcher (i.e. TransformLauncher),
 In addition to those available to the transform as defined in [here](../python/README.md),
 the set of
 [spark launcher](../../../../data-processing-lib/doc/spark-launcher-options.md) are available.
@@ -23,8 +22,7 @@ the set of
 To run the samples, use the following `make` targets
 
 * `run-cli-sample` - runs src/noop_transform.py using command line args
-* `run-local-sample` - runs src/noop_local_ray.py
-* `run-s3-sample` - runs src/noop_s3_ray.py
+* `run-local-sample` - runs src/noop_local_spark.py
     * Requires prior invocation of `make minio-start` to load data into local minio for S3 access.
 
 These targets will activate the virtual environment and set up any configuration needed.

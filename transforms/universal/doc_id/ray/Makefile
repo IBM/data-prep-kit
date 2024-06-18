@@ -8,7 +8,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=doc_id
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${DOC_ID_VERSION}
+DOCKER_IMAGE_VERSION=${DOC_ID_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 

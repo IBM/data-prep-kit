@@ -19,7 +19,7 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 from data_processing.data_access import DataAccess
-from data_processing.utils import GB, MB, get_logger
+from data_processing.utils import GB, MB, TransformUtils, get_logger
 
 
 logger = get_logger(__name__)
@@ -32,28 +32,36 @@ class DataAccessLocal(DataAccess):
 
     def __init__(
         self,
-        path_config: dict[str, str] = None,
+        local_config: dict[str, str] = None,
         d_sets: list[str] = None,
         checkpoint: bool = False,
         m_files: int = -1,
         n_samples: int = -1,
         files_to_use: list[str] = [".parquet"],
+        files_to_checkpoint: list[str] = [".parquet"],
     ):
         """
         Create data access class for folder based configuration
-        :param path_config: dictionary of path info
+        :param local_config: dictionary of path info
+        :param d_sets list of the data sets to use
+        :param checkpoint: flag to return only files that do not exist in the output directory
+        :param m_files: max amount of files to return
+        :param n_samples: amount of files to randomly sample
+        :param files_to_use: files extensions of files to include
+        :param files_to_checkpoint: files extensions of files to use for checkpointing
         """
-        if path_config is None:
+        if local_config is None:
             self.input_folder = None
             self.output_folder = None
         else:
-            self.input_folder = path_config["input_folder"]
-            self.output_folder = path_config["output_folder"]
+            self.input_folder = local_config["input_folder"]
+            self.output_folder = local_config["output_folder"]
         self.d_sets = d_sets
         self.checkpoint = checkpoint
         self.m_files = m_files
         self.n_samples = n_samples
         self.files_to_use = files_to_use
+        self.files_to_checkpoint = files_to_checkpoint
 
         logger.debug(f"Local input folder: {self.input_folder}")
         logger.debug(f"Local output folder: {self.output_folder}")
@@ -62,6 +70,7 @@ class DataAccessLocal(DataAccess):
         logger.debug(f"Local m_files: {self.m_files}")
         logger.debug(f"Local n_samples: {self.n_samples}")
         logger.debug(f"Local files_to_use: {self.files_to_use}")
+        logger.debug(f"Local files_to_checkpoint: {self.files_to_checkpoint}")
 
     def get_num_samples(self) -> int:
         """
@@ -153,14 +162,17 @@ class DataAccessLocal(DataAccess):
             )
 
         input_files = self._get_all_files_ext(path=input_path, extensions=self.files_to_use)
-        output_files = self._get_all_files_ext(path=output_path, extensions=self.files_to_use)
+        output_files_ext = self._get_all_files_ext(path=output_path, extensions=self.files_to_checkpoint)
+        # In the case of binary transforms, an extension can be different, so just use the file names.
+        # Also remove duplicates
+        output_files = list(set([TransformUtils.get_file_extension(file)[0] for file in output_files_ext]))
 
         total_input_file_size = 0
         i = 0
         result_files = []
         for filename in sorted(input_files):
             out_f_name = self.get_output_location(filename)
-            if out_f_name in output_files:
+            if TransformUtils.get_file_extension(out_f_name)[0] in output_files:
                 continue
             if i >= cm_files > 0:
                 break
@@ -181,7 +193,7 @@ class DataAccessLocal(DataAccess):
             },
         )
 
-    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float]]:
+    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float], int]:
         """
         Get files to process
         :return: list of files and a dictionary of the files profile:
@@ -191,7 +203,7 @@ class DataAccessLocal(DataAccess):
         """
         if self.output_folder is None:
             logger.error("Get files to process. local configuration is not present, returning empty")
-            return [], {}
+            return [], {}, 0
         # Check if we are using data sets
         if self.d_sets is not None:
             # get a list of subdirectory paths matching d_sets
@@ -239,9 +251,9 @@ class DataAccessLocal(DataAccess):
                 output_path=self.output_folder,
                 cm_files=self.m_files,
             )
-        return path_list, profile
+        return path_list, profile, 0
 
-    def get_table(self, path: str) -> pa.table:
+    def get_table(self, path: str) -> tuple[pa.table, int]:
         """
         Attempts to read a PyArrow table from the given path.
 
@@ -254,10 +266,10 @@ class DataAccessLocal(DataAccess):
 
         try:
             table = pq.read_table(path)
-            return table
+            return table, 0
         except (FileNotFoundError, IOError, pa.ArrowException) as e:
             logger.error(f"Error reading table from {path}: {e}")
-            return None
+            return None, 0
 
     def get_output_location(self, path: str) -> str:
         """
@@ -270,7 +282,7 @@ class DataAccessLocal(DataAccess):
             return None
         return path.replace(self.input_folder, self.output_folder)
 
-    def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any]]:
+    def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any], int]:
         """
         Saves a pyarrow table to a file and returns information about the operation.
 
@@ -295,13 +307,13 @@ class DataAccessLocal(DataAccess):
 
             # Get file size and create file_info
             file_info = {"name": os.path.basename(path), "size": os.path.getsize(path)}
-            return size_in_memory, file_info
+            return size_in_memory, file_info, 0
 
         except Exception as e:
             logger.error(f"Error saving table to {path}: {e}")
-            return -1, None
+            return -1, None, 0
 
-    def save_job_metadata(self, metadata: dict[str, Any]) -> dict[str, Any]:
+    def save_job_metadata(self, metadata: dict[str, Any]) -> tuple[dict[str, Any], int]:
         """
         Save metadata
         :param metadata: a dictionary, containing the following keys
@@ -322,7 +334,7 @@ class DataAccessLocal(DataAccess):
         """
         if self.output_folder is None:
             logger.error("local configuration is not defined, can't save metadata")
-            return None
+            return None, 0
         metadata["source"] = {"name": self.input_folder, "type": "path"}
         metadata["target"] = {"name": self.output_folder, "type": "path"}
         return self.save_file(
@@ -330,7 +342,7 @@ class DataAccessLocal(DataAccess):
             data=json.dumps(metadata, indent=2).encode(),
         )
 
-    def get_file(self, path: str) -> bytes:
+    def get_file(self, path: str) -> tuple[bytes, int]:
         """
         Gets the contents of a file as a byte array, decompressing gz files if needed.
 
@@ -348,13 +360,15 @@ class DataAccessLocal(DataAccess):
             else:
                 with open(path, "rb") as f:
                     data = f.read()
-            return data
+            return data, 0
 
         except (FileNotFoundError, gzip.BadGzipFile) as e:
             logger.error(f"Error reading file {path}: {e}")
             raise e
 
-    def get_folder_files(self, path: str, extensions: list[str] = None, return_data: bool = True) -> dict[str, bytes]:
+    def get_folder_files(
+        self, path: str, extensions: list[str] = None, return_data: bool = True
+    ) -> tuple[dict[str, bytes], int]:
         """
         Get a list of byte content of files. The path here is an absolute path and can be anywhere.
         The current limitation for S3 and Lakehouse is that it has to be in the same bucket
@@ -366,7 +380,7 @@ class DataAccessLocal(DataAccess):
         :return: A dictionary of file names/binary content will be returned
         """
 
-        def _get_file_content(f_name: str, dt: bool) -> bytes:
+        def _get_file_content(f_name: str, dt: bool) -> tuple[bytes, int]:
             """
             return file content
             :param f_name: file name
@@ -375,14 +389,15 @@ class DataAccessLocal(DataAccess):
             """
             if dt:
                 return self.get_file(f_name)
-            return None
+            return None, 0
 
         matching_files = {}
         for filename in sorted(self._get_all_files_ext(path=path, extensions=extensions)):
-            matching_files[filename] = _get_file_content(filename, return_data)
-        return matching_files
+            b, _ = _get_file_content(filename, return_data)
+            matching_files[filename] = b
+        return matching_files, 0
 
-    def save_file(self, path: str, data: bytes) -> dict[str, Any]:
+    def save_file(self, path: str, data: bytes) -> tuple[dict[str, Any], int]:
         """
         Saves bytes to a file and returns a dictionary with file information.
 
@@ -400,8 +415,8 @@ class DataAccessLocal(DataAccess):
             with open(path, "wb") as f:
                 f.write(data)
             file_info = {"name": path, "size": os.path.getsize(path)}
-            return file_info
+            return file_info, 0
 
         except Exception as e:
             logger.error(f"Error saving bytes to file {path}: {e}")
-            return None
+            return None, 0

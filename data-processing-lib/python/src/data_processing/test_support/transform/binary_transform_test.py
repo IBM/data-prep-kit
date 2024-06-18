@@ -12,7 +12,6 @@
 
 from typing import Tuple
 
-
 from data_processing.test_support.abstract_test import AbstractTest
 from data_processing.transform import AbstractBinaryTransform
 
@@ -63,7 +62,7 @@ class AbstractBinaryTransformTest(AbstractTest):
         all_files_list = []
         all_metadata_list = []
         for in_file in in_binary_list:
-            files_list, metadata = transform.transform_binary(base_name=in_file[0], byte_array=in_file[1])
+            files_list, metadata = transform.transform_binary(file_name=in_file[0], byte_array=in_file[1])
             all_files_list.extend(files_list)
             all_metadata_list.append(metadata)
 

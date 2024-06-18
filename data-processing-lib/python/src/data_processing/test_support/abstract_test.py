@@ -17,7 +17,7 @@ from filecmp import dircmp
 
 import pyarrow as pa
 from data_processing.data_access import DataAccessLocal
-from data_processing.utils import get_logger
+from data_processing.utils import TransformUtils, get_logger
 
 
 logger = get_logger(__name__)
@@ -31,7 +31,7 @@ def get_tables_in_folder(dir: str) -> list[pa.Table]:
     :return:
     """
     dal = DataAccessLocal()
-    files = dal.get_folder_files(dir, extensions=[".parquet"])
+    files, _ = dal.get_folder_files(dir, extensions=[".parquet"])
     return [TransformUtils.convert_binary_to_arrow(data) for data in files.values()]
 
 
@@ -43,7 +43,8 @@ def get_files_in_folder(dir: str, ext: str) -> dict[str, bytes]:
     :return:
     """
     dal = DataAccessLocal()
-    return dal.get_folder_files(dir, extensions=[ext])
+    files, _ = dal.get_folder_files(dir, extensions=[ext])
+    return files
 
 
 class AbstractTest:
@@ -113,9 +114,12 @@ class AbstractTest:
         for i in range(l1):
             f1 = files_list[i]
             f2 = expected_files_list[i]
-            assert f1[1] == f2[1], f"produced file extension {f1[1]} is different from  expected file extension {f2[1]}"
-            assert (len(f1[0]) - len(f2[0])) < 50, \
-                f"produced file length {len(f1[0])} is different from expected file extension {len(f2[0])}"
+            assert (
+                f1[1] == f2[1]
+            ), f"produced file extension {f1[1]} is different from  expected file extension {f2[1]}"
+            assert (
+                len(f1[0]) - len(f2[0])
+            ) < 50, f"produced file length {len(f1[0])} is different from expected file extension {len(f2[0])}"
 
     @staticmethod
     def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
@@ -175,15 +179,17 @@ class AbstractTest:
     @staticmethod
     def _validate_table_files(parquet1: str, parquet2: str, drop_columns: list[str] = []):
         da = DataAccessLocal()
-        t1 = da.get_table(parquet1)
-        t2 = da.get_table(parquet2)
+        t1, _ = da.get_table(parquet1)
+        t2, _ = da.get_table(parquet2)
         if len(drop_columns) > 0:
             t1 = t1.drop_columns(drop_columns)
             t2 = t2.drop_columns(drop_columns)
         AbstractTest.validate_expected_tables([t1], [t2])
 
     @staticmethod
-    def __confirm_diffs(src_dir: str, expected_dir: str, diff_files: list, dest_dir: str, drop_columns: list[str] = []):
+    def __confirm_diffs(
+        src_dir: str, expected_dir: str, diff_files: list, dest_dir: str, drop_columns: list[str] = []
+    ):
         """
         Copy all files from the source dir to the dest dir.
         :param src_dir:
@@ -212,5 +218,8 @@ class AbstractTest:
                 da = DataAccessLocal()
                 f1_bytes = da.get_file(src)
                 f2_bytes = da.get_file(dest)
-                assert (len(f1_bytes) - len(f2_bytes)) < 50, \
+                assert (
+                    len(f1_bytes) - len(f2_bytes)
+                ) < 50, (
                     f"produced file length {len(f1_bytes)} is different from expected file extension {len(f2_bytes)}"
+                )

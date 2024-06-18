@@ -45,7 +45,6 @@ spec:
         app.kubernetes.io/name: ingress-nginx-minio
     type: NodePort
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:

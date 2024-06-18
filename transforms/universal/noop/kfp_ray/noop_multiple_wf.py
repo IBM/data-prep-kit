@@ -11,11 +11,10 @@
 ################################################################################
 import os
 
-from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
 task_image = "quay.io/dataprep1/data-prep-kit/noop-ray:0.9.0.dev6"
@@ -29,7 +28,7 @@ base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6
 # path to kfp component specifications files
 component_spec_path = "../../../../kfp/kfp_ray_components/"
 
-# compute execution parameters. Here different tranforms might need different implementations. As
+# compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 def compute_exec_params_func(
     worker_options: str,
@@ -42,9 +41,7 @@ def compute_exec_params_func(
     runtime_code_location: str,
     noop_sleep_sec: int,
 ) -> dict:
-    import uuid
-
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
@@ -74,8 +71,9 @@ if os.getenv("KFPv2", "0") == "1":
         func=compute_exec_params_func, base_image=base_kfp_image
     )
     print(
-        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the " +
-        "same version of the same pipeline !!!")
+        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the "
+        + "same version of the same pipeline !!!"
+    )
     run_id = uuid.uuid4().hex
 else:
     compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)

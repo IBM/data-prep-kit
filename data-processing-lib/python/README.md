@@ -18,7 +18,7 @@ source venv/bin/activate
 or set up your IDE to use the venv directory when developing in this project
 
 ## Library Artifact Build and Publish
-To test, build and publish the library to artifactory
+To test, build and publish the library 
 ```shell
 make test build publish
 ```

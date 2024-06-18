@@ -15,7 +15,7 @@ clean:: .defaults.clean
 
 setup::
 
-set-versions:: .check-env
+set-versions: .check-env
 	$(MAKE) TOML_VERSION=$(DPK_LIB_VERSION) .defaults.update-toml
 	sed -e 's/"pyspark...*",/"pyspark>=${SPARK_VERSION}",/'				\
 	    pyproject.toml > tt.toml
@@ -49,6 +49,6 @@ image-spark:: Dockerfile
 # Here we run each test directory of tests and each ray launched test separately, because
 # it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.
 # pytest-forked was tried, but then we get SIGABRT in pytest when running the s3 tests, some of which are skipped.. 
-test::  
+test::  venv
 	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
 	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_spark_tests/launch/spark/test_noop_launch.py;

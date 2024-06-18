@@ -54,7 +54,7 @@ def test_table_read_write():
         _create_and_populate_bucket(d_a=d_a, input_location=input_location, n_files=1)
         # read the table
         input_location = f"{input_location}sample0.parquet"
-        r_table = d_a.get_table(path=input_location)
+        r_table, _ = d_a.get_table(path=input_location)
         r_columns = r_table.column_names
         print(f"\nnumber of columns in the read table {len(r_columns)}, number of rows {r_table.num_rows}")
         assert 5 == r_table.num_rows
@@ -64,10 +64,11 @@ def test_table_read_write():
         print(f"Output location {output_location}")
         assert "test/table_read_write/output/sample0.parquet" == output_location
         # save the table
-        l, result = d_a.save_table(path=output_location, table=r_table)
+        l, result, _ = d_a.save_table(path=output_location, table=r_table)
         print(f"length of saved table {l}, result {result}")
         assert 36132 == l
-        s_columns = d_a.get_table(output_location).column_names
+        table, _ = d_a.get_table(output_location)
+        s_columns = table.column_names
         assert len(r_columns) == len(s_columns)
         assert r_columns == s_columns
 
@@ -84,7 +85,7 @@ def test_get_folder():
         input_location = "test/table_read_write/input/"
         _create_and_populate_bucket(d_a=d_a, input_location=input_location, n_files=3)
         # get the folder
-        files = d_a.get_folder_files(path=input_location, extensions=["parquet"])
+        files, _ = d_a.get_folder_files(path=input_location, extensions=["parquet"])
         print(f"\ngot {len(files)} files")
         assert 3 == len(files)
 
@@ -101,7 +102,7 @@ def test_files_to_process():
         _create_and_populate_bucket(d_a=d_a, input_location=f"{s3_conf['input_folder']}dataset=d1/", n_files=4)
         _create_and_populate_bucket(d_a=d_a, input_location=f"{s3_conf['input_folder']}dataset=d2/", n_files=4)
         # get files to process
-        files, profile = d_a.get_files_to_process()
+        files, profile, _ = d_a.get_files_to_process()
         print(f"\nfiles {len(files)}, profile {profile}")
         assert 8 == len(files)
         assert 0.034458160400390625 == profile["max_file_size"]
@@ -111,7 +112,7 @@ def test_files_to_process():
         # populate bucket
         _create_and_populate_bucket(d_a=d_a, input_location=f"{s3_conf['output_folder']}dataset=d2/", n_files=2)
         d_a.checkpoint = True
-        files, profile = d_a.get_files_to_process()
+        files, profile, _ = d_a.get_files_to_process()
         print(f"files with checkpointing {len(files)}, profile {profile}")
         assert 6 == len(files)
         assert 0.034458160400390625 == profile["max_file_size"]
@@ -120,7 +121,7 @@ def test_files_to_process():
         # using data sets
         d_a.checkpoint = False
         d_a.d_sets = ["dataset=d1"]
-        files, profile = d_a.get_files_to_process()
+        files, profile, _ = d_a.get_files_to_process()
         print(f"using data sets files {len(files)}, profile {profile}")
         assert 4 == len(files)
         assert 0.034458160400390625 == profile["max_file_size"]
@@ -129,7 +130,7 @@ def test_files_to_process():
         # using data sets with checkpointing
         d_a.checkpoint = True
         d_a.d_sets = ["dataset=d2"]
-        files, profile = d_a.get_files_to_process()
+        files, profile, _ = d_a.get_files_to_process()
         print(f"using data sets with checkpointing files {len(files)}, profile {profile}")
         assert 2 == len(files)
         assert 0.034458160400390625 == profile["max_file_size"]

@@ -16,7 +16,7 @@ import os
 from data_processing.utils import DPKConfig
 
 
-def get_log_level(name: str = None):
+def get_log_level(name: str = None) -> str:
     if name is None:
         level_name = DPKConfig.DEFAULT_LOG_LEVEL
     else:
@@ -26,7 +26,7 @@ def get_log_level(name: str = None):
     return level_name
 
 
-def get_logger(name: str, level=None, file=None):
+def get_logger(name: str, level=None, file=None) -> logging.Logger:
     logger = logging.getLogger(name)
     if level is None:
         level = get_log_level(name)

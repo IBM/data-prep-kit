@@ -29,7 +29,7 @@ base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6
 # path to kfp component specifications files
 component_spec_path = "../../../../kfp/kfp_ray_components/"
 
-# compute execution parameters. Here different tranforms might need different implementations. As
+# compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 def compute_exec_params_func(
     worker_options: str,
@@ -45,7 +45,7 @@ def compute_exec_params_func(
     cq_tokenizer: str,
     cq_hf_token: str,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
@@ -78,8 +78,9 @@ if os.getenv("KFPv2", "0") == "1":
         func=compute_exec_params_func, base_image=base_kfp_image
     )
     print(
-        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the " +
-        "same version of the same pipeline !!!")
+        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the "
+        + "same version of the same pipeline !!!"
+    )
     run_id = uuid.uuid4().hex
 else:
     compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
@@ -192,7 +193,7 @@ def code_quality(
         # start Ray cluster
         ray_cluster = create_ray_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             ray_head_options=ray_head_options,
             ray_worker_options=ray_worker_options,
             server_url=server_url,
@@ -204,7 +205,7 @@ def code_quality(
         # Execute job
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
-            run_id=dsl.RUN_ID_PLACEHOLDER,
+            run_id=run_id,
             additional_params=additional_params,
             # note that the parameters below are specific for NOOP transform
             exec_params=compute_exec_params.output,
