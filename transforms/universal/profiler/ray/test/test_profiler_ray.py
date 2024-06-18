@@ -12,14 +12,15 @@
 
 import os
 
+from data_processing.test_support import get_files_in_folder
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from ededup_transform_ray import EdedupRayTransformConfiguration
+from profiler_transform_ray import ProfilerRayTransformConfiguration
 
 
-class TestRayEdedupTransform(AbstractTransformLauncherTest):
+class TestRayAggregatorTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -31,10 +32,23 @@ class TestRayEdedupTransform(AbstractTransformLauncherTest):
             "run_locally": True,
             # When running in ray, our Runtime's get_transform_config() method  will load the domains using
             # the orchestrator's DataAccess/Factory. So we don't need to provide the bl_local_config configuration.
-            "ededup_hash_cpu": 0.5,
-            "ededup_num_hashes": 2,
-            "ededup_doc_column": "contents",
+            # aggregator parameters
+            "profiler_aggregator_cpu": 0.5,
+            "profiler_num_aggregators": 2,
+            "profiler_doc_column": "contents",
         }
-        launcher = RayTransformLauncher(EdedupRayTransformConfiguration())
+        launcher = RayTransformLauncher(ProfilerRayTransformConfiguration())
         fixtures = [(launcher, config, basedir + "/input", basedir + "/expected")]
         return fixtures
+
+    def _validate_directory_contents_match(self, dir: str, expected: str, ignore_columns: list[str] = []):
+        # TODO add checking file content
+        # Compare files
+        f_set1 = get_files_in_folder(dir=dir, ext=".csv", return_data=False)
+        f_set2 = get_files_in_folder(dir=expected, ext=".csv", return_data=False)
+        assert len(f_set1) == len(f_set2)
+
+        # Compare metadata
+        f_set1 = get_files_in_folder(dir=dir, ext=".json", return_data=False)
+        f_set2 = get_files_in_folder(dir=expected, ext=".json", return_data=False)
+        assert len(f_set1) == len(f_set2)
