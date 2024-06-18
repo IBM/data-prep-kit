@@ -16,8 +16,6 @@ dependencies = [
     # These two are to fix security issues identified by quay.io
     "fastapi>=0.109.1",
     "pillow>=10.2.0",
-    "bs4>=0.0.2",
-    "transformers>=4.41.2",
 ]
 
 [project_urls]
