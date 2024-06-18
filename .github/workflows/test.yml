@@ -102,6 +102,7 @@ jobs:
                   # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
                   set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
                   export REPOROOT=$PWD
+                  export KIND_SCRIPTS=$PWD/scripts/kind
                   source scripts/kind/common.sh
                   header_text "Running ${transforms[$index]} workflow test"
                   make -C ${transforms[$index]} workflow-test
