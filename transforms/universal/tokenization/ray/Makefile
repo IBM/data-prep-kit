@@ -33,6 +33,10 @@ setup:: .transforms.setup
 # distribution versions is the same as image version.
 set-versions:
 	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	cat pyproject.toml | sed                                                                   \
+                -e 's/"dpk-tokenization-transform-python\(..\).*",/"dpk-tokenization-transform-python\1$(TOKENIZATION_PYTHON_VERSION)",/'   \
+                > tt.toml
+	mv tt.toml pyproject.toml
         
 build-dist:: set-versions .defaults.build-dist 
 
