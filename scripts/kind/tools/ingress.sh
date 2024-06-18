@@ -2,19 +2,20 @@
 
 op=$1
 
-source ${REPOROOT}/scripts/kind/common.sh
+source ${KIND_SCRIPTS}/common.sh
 
 deploy() {
-  kubectl apply -f ${REPOROOT}/scripts/kind/ray_api_server_ingress.yaml
+  sleep 10
+  kubectl apply -f ${KIND_SCRIPTS}/ray_api_server_ingress.yaml
 if [[ "${DEPLOY_KUBEFLOW}" -eq 1 ]]; then
-	kubectl apply -f ${REPOROOT}/scripts/kind/kfp_ingress.yaml
+	kubectl apply -f ${KIND_SCRIPTS}/kfp_ingress.yaml
 fi
 }
 
 delete(){
-  kubectl delete -f ${REPOROOT}/scripts/kind/ray_api_server_ingress.yaml
+  kubectl delete -f ${KIND_SCRIPTS}/ray_api_server_ingress.yaml
 if [[ "${DEPLOY_KUBEFLOW}" -eq 1 ]]; then
-	kubectl delete -f ${REPOROOT}/scripts/kind/kfp_ingress.yaml
+	kubectl delete -f ${KIND_SCRIPTS}/kfp_ingress.yaml
 fi
 }
 

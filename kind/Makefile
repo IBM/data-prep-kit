@@ -17,6 +17,7 @@ include makeenv
 include ../.make.defaults
 
 export TOOLS_DIR=${REPOROOT}/scripts/kind/tools
+export KIND_SCRIPTS=${REPOROOT}/scripts/kind
 
 export EXTERNAL_CLUSTER ?= 0
 export DEPLOY_KUBEFLOW ?= 1
@@ -34,7 +35,7 @@ endif
 
 populate-data::
 	@# Help: Populate test data in Minio
-	cd ${REPOROOT}/scripts/kind && ./populate_minio.sh
+	cd ${KIND_SCRIPTS} && ./populate_minio.sh
 
 cluster-deploy::
 	@# Help: Deploy all required tools on existing cluster
