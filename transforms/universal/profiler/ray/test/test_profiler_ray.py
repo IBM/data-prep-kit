@@ -42,6 +42,7 @@ class TestRayAggregatorTransform(AbstractTransformLauncherTest):
         return fixtures
 
     def _validate_directory_contents_match(self, dir: str, expected: str, ignore_columns: list[str] = []):
+        # TODO add checking file content
         # Compare files
         f_set1 = get_files_in_folder(dir=dir, ext=".csv", return_data=False)
         f_set2 = get_files_in_folder(dir=expected, ext=".csv", return_data=False)
