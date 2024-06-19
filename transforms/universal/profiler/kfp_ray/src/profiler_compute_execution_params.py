@@ -116,7 +116,7 @@ def profiler_compute_execution_params(
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": runtime_code_location,
-        "aggregator_aggregator_cpu": aggregator_cpu,
-        "aggregator_num_aggregators": n_aggregators,
-        "aggregator_doc_column": doc_column,
+        "profiler_aggregator_cpu": aggregator_cpu,
+        "profiler_num_aggregators": n_aggregators,
+        "profiler_doc_column": doc_column,
     }
