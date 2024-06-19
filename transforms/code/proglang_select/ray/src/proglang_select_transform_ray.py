@@ -13,7 +13,6 @@
 from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.utils import TransformUtils, get_logger
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
@@ -31,9 +30,6 @@ from proglang_select_transform import (
 from ray.actor import ActorHandle
 
 
-logger = get_logger(__name__)
-
-
 class ProgLangSelectRuntime(DefaultRayTransformRuntime):
     """
     Language selector runtime support
@@ -48,6 +44,9 @@ class ProgLangSelectRuntime(DefaultRayTransformRuntime):
             ls_known_selector: A flag on whether return rows with valid or invalid languages
         """
         super().__init__(params)
+        from data_processing.utils import get_logger
+
+        self.logger = get_logger(__name__)
 
     def get_transform_config(
         self,
@@ -71,6 +70,7 @@ class ProgLangSelectRuntime(DefaultRayTransformRuntime):
         lang_list = _get_supported_languages(
             lang_file=lang_file,
             data_access=lang_data_access_factory.create_data_access(),
+            logger=self.logger,
         )
         # lang_refs = ray.put(list(lang_list))
         # logger.info(f"Placed language list into Ray object storage under reference{lang_refs}")

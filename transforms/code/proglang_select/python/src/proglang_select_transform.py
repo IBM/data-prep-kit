@@ -15,10 +15,8 @@ from argparse import ArgumentParser, Namespace
 import pyarrow as pa
 from data_processing.data_access import DataAccess, DataAccessFactory
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import TransformUtils, get_logger
+from data_processing.utils import TransformUtils
 
-
-logger = get_logger(__name__)
 
 shortname = "proglang_select"
 cli_prefix = f"{shortname}_"
@@ -30,7 +28,7 @@ lang_output_column_key = f"{shortname}_output_column"
 lang_default_output_column = "allowed_language"
 
 
-def _get_supported_languages(lang_file: str, data_access: DataAccess) -> list[str]:
+def _get_supported_languages(lang_file: str, data_access: DataAccess, logger) -> list[str]:
     logger.info(f"Getting supported languages from file {lang_file}")
     lang_list, _ = data_access.get_file(lang_file)
     l_list = lang_list.decode("utf-8").splitlines()
@@ -50,6 +48,9 @@ class ProgLangSelectTransform(AbstractTableTransform):
         """
 
         super().__init__(config)
+        from data_processing.utils import get_logger
+
+        self.logger = get_logger(__name__)
         self.lang_column = config.get(lang_lang_column_key, "")
         self.output_column = config.get(lang_output_column_key, lang_default_output_column)
         # languages_include_ref = config.get(lang_allowed_languages, None)
@@ -61,7 +62,9 @@ class ProgLangSelectTransform(AbstractTableTransform):
                 raise RuntimeError(f"Missing configuration value for key {lang_allowed_langs_file_key}")
             daf = config.get(lang_data_factory_key, None)
             data_access = daf.create_data_access()
-            self.languages_include = _get_supported_languages(lang_file=path, data_access=data_access)
+            self.languages_include = _get_supported_languages(
+                lang_file=path, data_access=data_access, logger=self.logger
+            )
             #  Ray now passes the list of strings instead of a reference.
         # else:
         #     # This is recommended for production approach. In this case domain list is build by the
