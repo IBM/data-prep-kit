@@ -12,10 +12,8 @@ requirement_files=(
 "$REPO_ROOT/transforms/code/proglang_select/ray/requirements.txt"
 "$REPO_ROOT/transforms/universal/ededup/ray/requirements.txt"
 "$REPO_ROOT/transforms/universal/fdedup/ray/requirements.txt"
-"$REPO_ROOT/transforms/universal/filter/ray/requirements.txt"
 "$REPO_ROOT/tools/ingest2parquet/requirements.txt"
 "$REPO_ROOT/transforms/universal/doc_id/ray/requirements.txt"
-"$REPO_ROOT/transforms/universal/tokenization/ray/requirements.txt"
 )
 
 # Iterate through the list and install requirements from each file
@@ -24,3 +22,5 @@ do
   echo "Install packages from $requirements_file"
   pip install -r "$requirements_file"
 done
+
+pip install duckdb
