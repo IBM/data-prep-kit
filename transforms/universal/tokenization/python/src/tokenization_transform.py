@@ -21,11 +21,8 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import get_logger
 from tokenization_utils import is_valid_argument_string, load_tokenizer, split_text
 
-
-logger = get_logger(__name__)
 
 CHUNK_CHECKPOINT_INTERVAL = 100
 
@@ -38,12 +35,16 @@ class TokenizationTransform(AbstractTableTransform):
         This class is used to transform an input table to an output table utilizing a tokenizer.
         The input table must contain at least two columns, with default names set as `document_id` and `contents`.
         The tokenizer will tokenize each row in `contents` into a sequence of token_ids and write it to `tokens` column
-        in the output table, along with the document id and token count stored respectively in `document_id` and `token_count` column.
+        in the output table, along with the document id and token count stored respectively in `document_id`
+        and `token_count` column.
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of TokenizationTransformConfiguration class
 
         super().__init__(config)
+        from data_processing.utils import get_logger
+
+        self.logger = get_logger(__name__)
         self.tokenizer = config.get("tokenizer", "hf-internal-testing/llama-tokenizer")
         self.tokenizer_args = config.get("tokenizer_args", None)
         self.doc_id_column = config.get("doc_id_column", "document_id")
@@ -51,9 +52,9 @@ class TokenizationTransform(AbstractTableTransform):
         self.chunk_size = config.get("chunk_size", 0)
         self.text_lang = config.get("text_lang", "en")
 
-        logger.debug(f"\n*** `config` to run:")
+        self.logger.debug(f"\n*** `config` to run:")
         for k, v in config.items():
-            logger.debug(f"{k:20s}: {v}")
+            self.logger.debug(f"{k:20s}: {v}")
 
         # overwrite tokenizer:
         self.tokenizer = load_tokenizer(tokenizer_name=self.tokenizer, tokenizer_args=self.tokenizer_args)
@@ -65,7 +66,7 @@ class TokenizationTransform(AbstractTableTransform):
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
-        logger.debug(f"Transforming one table with {len(table)} rows using tokenizer {self.tokenizer}")
+        self.logger.debug(f"Transforming one table with {len(table)} rows using tokenizer {self.tokenizer}")
 
         # Tracking token count + document_id for non-empty row/doc:
         token_count = []
@@ -102,18 +103,18 @@ class TokenizationTransform(AbstractTableTransform):
 
                         if (chunk_idx + 1) % CHUNK_CHECKPOINT_INTERVAL == 0 or (doc_len_so_far == doc_length):
                             elapse_time = int(time.time() - start_time)
-                            logger.info(
+                            self.logger.info(
                                 f"row_idx: {idx:5,} "
                                 f"(doc_id: {doc_id}) "
-                                f"chunk_idx: {chunk_idx:6,} ({doc_len_so_far:11,}/{doc_length:11,} {100*doc_len_so_far/doc_length:5.1f}%) "
-                                f"#tokens: {len(token_line):9,} "
+                                f"chunk_idx: {chunk_idx:6,} ({doc_len_so_far:11,}/{doc_length:11,} "
+                                f"{100*doc_len_so_far/doc_length:5.1f}%) #tokens: {len(token_line):9,} "
                                 f"elapse_time:{elapse_time: .1f}(s)"
                             )
                 else:
                     token_line = self.tokenizer(doc_content)["input_ids"]
             except Exception as e:
                 # skip failed row/doc, treat it as `empty` and move on:
-                logger.warning(f"Failed in tokenizing `{doc_content}` due to:\n {e}")
+                self.logger.warning(f"Failed in tokenizing `{doc_content}` due to:\n {e}")
                 empty_doc_ids.append(doc_id)
                 continue
 
@@ -136,7 +137,7 @@ class TokenizationTransform(AbstractTableTransform):
                 "token_count": token_count,
             }
         )
-        logger.debug(f"Done with the transformed table with {table.num_rows:,} rows")
+        self.logger.debug(f"Done with the transformed table with {table.num_rows:,} rows")
 
         metadata = {
             "num_files": 1,
@@ -161,6 +162,9 @@ class TokenizationTransformConfiguration(TransformConfiguration):
             name="Tokenization",
             transform_class=TokenizationTransform,
         )
+        from data_processing.utils import get_logger
+
+        self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -219,8 +223,9 @@ class TokenizationTransformConfiguration(TransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         if args.tkn_tokenizer is None:
-            logger.error(
-                f"Parameter --tkn_tokenizer must be a valid tokenizer for tokenization, you specified {args.tkn_tokenizer}"
+            self.logger.error(
+                f"Parameter --tkn_tokenizer must be a valid tokenizer for "
+                f"tokenization, you specified {args.tkn_tokenizer}"
             )
             return False
 
@@ -230,18 +235,18 @@ class TokenizationTransformConfiguration(TransformConfiguration):
 
         if args.tkn_tokenizer_args is not None:
             if not is_valid_argument_string(args.tkn_tokenizer_args):
-                logger.error(
+                self.logger.error(
                     f"Parameter --tkn_tokenizer_args must be a valid argument string of `key1=value1,key2=value2`, you specified {args.tkn_tokenizer_args}"
                 )
                 return False
 
         if args.tkn_doc_id_column is None or args.tkn_doc_content_column is None:
-            logger.error(f"Values for `--tkn_doc_id_column` and `--tkn_doc_content_column` must be provided")
+            self.logger.error(f"Values for `--tkn_doc_id_column` and `--tkn_doc_content_column` must be provided")
             return False
 
         # For MVP1: only support english text:
         if args.tkn_text_lang != "en":
-            logger.error(
+            self.logger.error(
                 f"This version has not supported languages other than `en` yet, you specified {args.tkn_text_lang}"
             )
             return False

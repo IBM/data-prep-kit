@@ -88,7 +88,8 @@ class RayTransformLauncher(AbstractTransformLauncher):
             if self.run_locally:
                 # Will create a local Ray cluster
                 logger.debug("running locally creating Ray cluster")
-                ray.init()
+                # enable metrics for local Ray
+                ray.init(_metrics_export_port=8088)
             else:
                 # connect to the existing cluster
                 logger.info("Connecting to the existing Ray cluster")

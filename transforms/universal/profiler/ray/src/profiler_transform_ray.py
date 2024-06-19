@@ -21,7 +21,7 @@ import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import GB, CLIArgumentProvider, TransformUtils, get_logger
+from data_processing.utils import GB, CLIArgumentProvider, TransformUtils
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
@@ -33,7 +33,6 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
 from ray.actor import ActorHandle
 
 
-logger = get_logger(__name__)
 REQUEST_LEN = 8192
 
 short_name = "profiler"
@@ -226,6 +225,9 @@ class ProfilerRuntime(DefaultRayTransformRuntime):
         """
         super().__init__(params)
         self.aggregators = []
+        from data_processing.utils import get_logger
+
+        self.logger = get_logger(__name__)
 
     def get_transform_config(
         self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
@@ -264,7 +266,7 @@ class ProfilerRuntime(DefaultRayTransformRuntime):
                 res, ret = ray.get(r)
                 retries += ret
                 if res is None:
-                    logger.warning("Failed to write aggregation file")
+                    self.logger.warning("Failed to write aggregation file")
             remote_replies = not_ready
 
         # Get aggregator's stats
@@ -295,6 +297,9 @@ class ProfilerTableTransformConfiguration(TransformConfiguration):
             name=short_name,
             transform_class=ProfilerTransform,
         )
+        from data_processing.utils import get_logger
+
+        self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -317,11 +322,11 @@ class ProfilerTableTransformConfiguration(TransformConfiguration):
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         self.params = self.params | captured
         if self.params["num_aggregators"] <= 0:
-            logger.info(
+            self.logger.info(
                 f"Number of aggregators should be greater then zero, provided {self.params['num_aggregators']}"
             )
             return False
-        logger.info(f"profiler params are {self.params}")
+        self.logger.info(f"profiler params are {self.params}")
         return True
 
 
