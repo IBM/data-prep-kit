@@ -13,8 +13,6 @@ authors = [
 ]
 dependencies = [
     "kfp==1.8.22",
-    "ray==2.9.3",
-    "requests",
     "data_prep_toolkit==0.2.0.dev6",
 ]
 

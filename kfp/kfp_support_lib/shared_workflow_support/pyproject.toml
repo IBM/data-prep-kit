@@ -12,7 +12,6 @@ authors = [
     { name = "Revital Eres", email = "eres@il.ibm.com" },
 ]
 dependencies = [
-    "ray==2.9.3",
     "requests",
     "kubernetes",
     "data_prep_toolkit==0.2.0.dev6",
