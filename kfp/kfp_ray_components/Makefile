@@ -10,19 +10,18 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed '
 
 include makeenv
 
-ifeq ($(KFPv2), 1)
-DOCKER_IMAGE_NAME=kfp-data-processing_v2
-DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
-WORKFLOW_SUPPORT_LIB=kfp_v2_workflow_support
-else
-DOCKER_IMAGE_NAME=kfp-data-processing
-DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
-WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
-endif
-
-
 #DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}
 DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
+
+ifeq ($(KFPv2), 1)
+        DOCKER_IMAGE_NAME=kfp-data-processing_v2
+        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
+        WORKFLOW_SUPPORT_LIB=kfp_v2_workflow_support
+else
+        DOCKER_IMAGE_NAME=kfp-data-processing
+        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
+        WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
+endif
 
 .PHONY: .lib-src-image
 .lib-src-image:: 
@@ -38,21 +37,24 @@ DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 
 .PHONY: image
 image: Dockerfile requirements.txt
-	$(MAKE) reconcile-requirements
+	$(MAKE) set-versions 
 	$(MAKE) .lib-src-image
 
 
-set-versions:  reconcile-requirements
+.PHONY: .reconcile-requirements
+.reconcile-requirements:
+	@sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${FILE}
 
-.PHONY: reconcile-requirements
-reconcile-requirements:
+.PHONY: set-versions 
+set-versions:
 	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
-	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}/" createRayClusterComponent.yaml
-	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}/" deleteRayClusterComponent.yaml
-	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}/" executeRayJobComponent.yaml
-	sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}/" executeRayJobComponent_multi_s3.yaml
-	# TODO remove it for KFPv2
-	sed -i.back "s/kfp-data-processing*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}/" executeSubWorkflowComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=createRayClusterComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=deleteRayClusterComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent.yaml
+	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent_multi_s3.yaml
+ifneq ($(KFPv2), 1)
+	@$(MAKE) .reconcile-requirements FILE=executeSubWorkflowComponent.yaml
+endif
 
 .PHONY: load-image
 load-image:

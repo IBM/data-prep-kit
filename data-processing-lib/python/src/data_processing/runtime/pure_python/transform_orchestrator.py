@@ -60,7 +60,7 @@ def orchestrate(
         # create statistics
         statistics = TransformStatistics()
         if retries > 0:
-            statistics.add_stats({"data access retries", retries})
+            statistics.add_stats({"data access retries": retries})
         # create executor
         executor = PythonTransformFileProcessor(
             data_access_factory=data_access_factory, statistics=statistics, runtime_configuration=runtime_config
@@ -100,10 +100,8 @@ def orchestrate(
             "job_input_params": input_params | data_access_factory.get_input_params(),
             "job_output_stats": stats,
         }
-        logger.debug(f"Saved job metadata: {metadata}.")
-        _, retries = data_access.save_job_metadata(metadata)
-        if retries > 0:
-            statistics.add_stats({"data access retries", retries})
+        logger.debug(f"Saving job metadata: {metadata}.")
+        data_access.save_job_metadata(metadata)
         logger.debug("Saved job metadata.")
         return 0
     except Exception as e:

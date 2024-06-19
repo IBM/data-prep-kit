@@ -41,6 +41,14 @@ jobs:
             - name: Test Code Transforms
               run: |
                   make -C transforms/code DOCKER=docker venv test-src
+    test-language:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Test Language Transforms
+              run: |
+                  make -C transforms/language DOCKER=docker venv test-src
     test-universal:
         runs-on: ubuntu-latest
         steps:
@@ -57,29 +65,7 @@ jobs:
             - name: Test tools
               run: |
                   make -C tools DOCKER=docker venv test
-    test-kfp-lib:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Test KFP v1 lib
-              run: |
-                  source kind/requirements.env
-                  export PATH=$PATH:/tmp/
-                  curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-                  curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-                  chmod 700 /tmp/get_helm.sh
-                  HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
-                  chmod 777 /tmp/helm
-                  chmod 777 /tmp/kind
-                  curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
-                  chmod 777 /tmp/kubectl
-                  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
-                  chmod +x /tmp/mc
-                  export DEPLOY_KUBEFLOW=0
-                  make -C kind setup 
-                  make -C kfp/kfp_support_lib build test
-    test-kfp-workflow-run:
+    test-kfp-v1:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -93,17 +79,17 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test KFP v1 worflow run
+            - name: Test KFP libs (shared and v1) and run a workflow
               timeout-minutes: 120
               run: |
                   source kind/requirements.env
                   export PATH=$PATH:/tmp/
                   curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+                  chmod 777 /tmp/kind
                   curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
                   chmod 700 /tmp/get_helm.sh
                   HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
                   chmod 777 /tmp/helm
-                  chmod 777 /tmp/kind
                   curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
                   chmod 777 /tmp/kubectl
                   curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
@@ -112,4 +98,47 @@ jobs:
                   make -C kind setup
                   make -C kfp/kfp_support_lib test
                   make -C transforms workflow-build
+                  dir=("code"  "universal") && index=$(($RANDOM % 2)) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs/ -type d  -maxdepth 1 ))
+                  # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
+                  set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
+                  export ROOT_DIR=kind
+                  source kind/hack/common.sh
+                  header_text "Running ${transforms[$index]} workflow test"
+                  make -C ${transforms[$index]} workflow-test
+                  header_text "Run ${transforms[$index]} completed"
+
+    test-kfp-v2:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Free up space in github runner
+              # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
+              run: |
+                  df -h
+                  sudo rm -rf "/usr/local/share/boost"
+                  sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+                  sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
+                  sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
+                  df -h
+            - name: Test KFP libs (shared and v2) and run a workflow
+              timeout-minutes: 120
+              run: |
+                  source kind/requirements.env
+                  export PATH=$PATH:/tmp/
+                  curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+                  chmod 777 /tmp/kind
+                  curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+                  chmod 700 /tmp/get_helm.sh
+                  HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
+                  chmod 777 /tmp/helm
+                  curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
+                  chmod 777 /tmp/kubectl
+                  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
+                  chmod +x /tmp/mc
+                  export DEPLOY_KUBEFLOW=1
+                  export KFPv2=1
+                  make -C kind setup
+                  make -C kfp/kfp_support_lib test
+                  make -C transforms/universal/noop workflow-build
                   make -C transforms/universal/noop workflow-test

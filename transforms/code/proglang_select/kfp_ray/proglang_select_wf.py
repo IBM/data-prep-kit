@@ -44,7 +44,7 @@ def compute_exec_params_func(
     proglang_select_allowed_langs_file: str,
     proglang_select_language_column: str,
 ) -> dict:
-    from workflow_utils.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
@@ -100,9 +100,10 @@ PREFIX: str = "proglang_select"
 )
 def lang_select(
     ray_name: str = "proglang-match-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
+    # Add image_pull_secret and image_pull_policy to ray workers if needed
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image_pull_secret": "", "image": "' + task_image + '"}',
+    '"image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/proglang_select/input/', 'output_folder': 'test/proglang_select/output/'}",
@@ -202,9 +203,6 @@ def lang_select(
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, proglang_select_s3_access_secret, prefix=PREFIX)
         execute_job.after(ray_cluster)
-
-    # Configure the pipeline level to one week (in seconds)
-    # dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 
 
 if __name__ == "__main__":

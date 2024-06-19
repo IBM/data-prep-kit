@@ -29,7 +29,7 @@ def run_test(pipeline_package_path: str, endpoint: str = "http://localhost:8080/
     if pipeline is None:
         return None
     experiment = utils.get_experiment_by_name()
-    run_id = utils.start_pipeline(pipeline, experiment, params=[])
+    run_id = utils.start_pipeline(pipeline, experiment, params={})
     status, error = utils.wait_pipeline_completion(run_id=run_id, timeout=tmout, wait=wait)
     if status.lower() not in ["succeeded", "completed"]:
         # Execution failed

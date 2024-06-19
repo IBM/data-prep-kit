@@ -41,6 +41,10 @@ load-image::
 	@# Help: Recursively make $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
+set-versions:
+	@# Help: Recursively $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
+
 .PHONY: workflow-venv
 workflow-venv:
 	$(MAKE) -C kfp_ray workflow-venv
@@ -56,8 +60,4 @@ workflow-test:
 .PHONY: workflow-upload
 workflow-upload:
 	$(MAKE) -C kfp_ray workflow-upload
-
-.PHONY: workflow-reconcile-requirements
-workflow-reconcile-requirements:
-	$(MAKE) -C kfp_ray workflow-reconcile-requirements
 
