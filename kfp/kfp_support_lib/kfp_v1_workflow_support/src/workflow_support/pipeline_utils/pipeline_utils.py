@@ -130,7 +130,7 @@ class PipelinesUtils:
         """
         try:
             # Get all pipelines
-            pipelines = self.kfp_client.list_pipelines(page_size=np).pipelines
+            pipelines = self.kfp_client.list_pipelines(page_size=np, sort_by="created_at desc").pipelines
             required = list(filter(lambda p: name in p.name, pipelines))
             if len(required) != 1:
                 logger.warning(f"Failure to get pipeline. Number of pipelines with name {name} is {len(required)}")

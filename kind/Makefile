@@ -12,12 +12,12 @@ IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kind/requirements.env | sed 
 
 include makeenv
 
-export ROOT_DIR=${CURDIR}
 # Include the common rules.
 # Use "make help" to see them.
 include ../.make.defaults
 
-export TOOLS_DIR=${ROOT_DIR}/hack/tools
+export TOOLS_DIR=${REPOROOT}/scripts/kind/tools
+export KIND_SCRIPTS=${REPOROOT}/scripts/kind
 
 export EXTERNAL_CLUSTER ?= 0
 export DEPLOY_KUBEFLOW ?= 1
@@ -35,7 +35,7 @@ endif
 
 populate-data::
 	@# Help: Populate test data in Minio
-	cd hack && ./populate_minio.sh
+	cd ${KIND_SCRIPTS} && ./populate_minio.sh
 
 cluster-deploy::
 	@# Help: Deploy all required tools on existing cluster
