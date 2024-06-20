@@ -61,10 +61,6 @@ else
 	cd $(TOOLS_DIR) && ./install_kubeflow.sh cleanup
 endif
 
-build::
-
-test::
-
 .create-kind-cluster::
 	cd $(TOOLS_DIR); ./kind_management.sh create_cluster ${KIND_CLUSTER_NAME}
 
@@ -85,7 +81,3 @@ endif
 ifeq ($(DEPLOY_KUBEFLOW),1)
 	cd $(TOOLS_DIR) && ./install_kubeflow.sh deploy-wait
 endif
-
-
-set-versions::  
-	@# Help: Nothing to see herej 

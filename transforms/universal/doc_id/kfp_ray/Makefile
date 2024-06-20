@@ -9,26 +9,6 @@ YAML_WF := $(patsubst %.py, %.yaml, ${PYTHON_WF})
 
 workflow-venv: .check_python_version ${WORKFLOW_VENV_ACTIVATE}
 
-clean:: .defaults.clean
-
-setup:: 
-
-venv::
-
-build::
-
-test::
-
-test-src::
-
-test-image::
-
-publish::
-
-image::
-
-load-image::
-
 .PHONY: workflow-build
 workflow-build: workflow-venv
 	$(MAKE) $(YAML_WF)
