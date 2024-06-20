@@ -28,7 +28,6 @@ set-versions: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml
 	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_SHARED}'"/' pyproject.toml
 	sed -i.back 's/data_prep_toolkit_ray==[0-9].*/data_prep_toolkit_ray==${DPK_LIB_VERSION}",/' pyproject.toml
-	sed -i.back 's/ray=[0-9].*/ray==${RAY}",/' pyproject.toml
 
 build:: set-versions venv
 	@# Help: Build the distribution for publishing to a pypi
@@ -50,6 +49,8 @@ venv::	pyproject.toml .check-env
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
 	pip install --upgrade pip; \
+	cd ../../../data-processing-lib/python && make set-versions && cd -; \
+	pip install -e ../../../data-processing-lib/python; \
 	cd ../../../data-processing-lib/ray && make set-versions && cd -; \
 	pip install -e ../../../data-processing-lib/ray; \
 	pip install -e .;		\
