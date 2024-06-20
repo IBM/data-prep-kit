@@ -74,7 +74,7 @@ git push origin $tag
 if [ -z "$debug" ]; then
     make build publish
 else
-    echo make -C transforms/universal/noop build publish
+    make -C transforms/universal/noop build publish
 fi
 
 # Now go back to the default branch so we can bump the minor version number and reset the version suffix
@@ -89,5 +89,6 @@ cat .make.versions | sed -e "s/^DPK_MINOR_VERSION=.*/DPK_MINOR_VERSION=$minor/" 
 mv tt .make.versions
 
 # Push the version change back to the origin
-# git commit -s -a -m "Bump minor version to $minor after cutting release $version"
-# git push origin
+git commit -s -a -m "Bump minor version to $minor after cutting release $version into branch $release_branch"
+git diff $DEFAULT_BRANCH origin/$DEFAULT_BRANCH
+#git push origin
