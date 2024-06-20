@@ -18,7 +18,7 @@ from src.profiler_compute_execution_params import profiler_compute_execution_par
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/profiler-ray:0.4.0.dev6"
+task_image = "quay.io/dataprep1/data-prep-kit/profiler-ray:0.2.0.dev6"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "profiler_transform_ray.py"
@@ -72,9 +72,10 @@ TASK_NAME: str = "profiler"
 def profiler(
     # Ray cluster
     ray_name: str = "profiler-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
+    # Add image_pull_secret and image_pull_policy to ray workers if needed
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image_pull_secret": "", "image": "' + task_image + '"}',
+    '"image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access. checkpointing is not supported by dedup
     data_s3_config: str = "{'input_folder': 'test/profiler/input/', 'output_folder': 'test/profiler/output'}",
