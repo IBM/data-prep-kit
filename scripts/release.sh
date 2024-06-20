@@ -74,7 +74,8 @@ git push origin $tag
 if [ -z "$debug" ]; then
     make build publish
 else
-    make -C transforms/universal/noop build publish
+    # make -C data-processing-lib/spark image # Build the base image required by spark
+    make -C transforms/universal/noop/python build publish
 fi
 
 # Now go back to the default branch so we can bump the minor version number and reset the version suffix
