@@ -32,7 +32,7 @@ git checkout $DEFAULT_BRANCH
 # Get the currently defined version w/o any suffix.  This is the next release version
 version=$(make DPK_VERSION_SUFFIX= show-version)
 
-if [ -z "$debug"]; then
+if [ -z "$debug" ]; then
     tag=v$version
 else
     tag=test$version
@@ -40,7 +40,7 @@ fi
 
 # Create a new branch for this version and switch to it
 release_branch=release/$tag
-if [ ! -z "$debug"]; then
+if [ ! -z "$debug" ]; then
     # delete local tag and branch
     git tag --delete $tag
     git branch --delete $release_branch
@@ -52,7 +52,7 @@ git checkout -b $release_branch
 
 
 # Remove the release suffix in this branch
-if [ -z "$debug"]; then
+if [ -z "$debug" ]; then
     cat .make.versions | sed -e 's/^DPK_VERSION_SUFFIX.*/DPK_VERSION_SUFFIX=/' > tt
     mv tt .make.versions
 else
