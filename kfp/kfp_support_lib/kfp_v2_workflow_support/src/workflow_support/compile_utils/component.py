@@ -63,4 +63,4 @@ class ComponentUtils:
                 env_name = f"{prefix}_{env_name}"
                 env2key[secret_key] = env_name
         # FIXME: see https://github.com/kubeflow/pipelines/issues/10914
-        kubernetes.use_secret_as_env(task=task, secret_name='s3-secret', secret_key_to_env=env2key)
+        kubernetes.use_secret_as_env(task=task, secret_name="s3-secret", secret_key_to_env=env2key)

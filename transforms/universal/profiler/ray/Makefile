@@ -8,7 +8,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=profiler
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${PROFILER_VERSION}
+DOCKER_IMAGE_VERSION=${PROFILER_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 

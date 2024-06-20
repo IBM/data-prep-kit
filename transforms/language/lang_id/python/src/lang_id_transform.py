@@ -15,12 +15,10 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
+from data_processing.utils import CLIArgumentProvider, TransformUtils
 from lang_models import LangModelFactory
 from nlp import get_lang_ds_pa
 
-
-logger = get_logger(__name__)
 
 short_name = "lang_id"
 cli_prefix = f"{short_name}_"
@@ -48,6 +46,9 @@ class LangIdentificationTransform(AbstractTableTransform):
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of LangIdentificationTransformConfiguration class
+        from data_processing.utils import get_logger
+
+        self.logger = get_logger(__name__)
         super().__init__(config)
         self.nlp_langid = LangModelFactory.create_model(
             config.get(model_kind_key), config.get(model_url_key), config.get(model_credential_key)
@@ -63,11 +64,11 @@ class LangIdentificationTransform(AbstractTableTransform):
         """
         if TransformUtils.validate_columns(table, ["ft_lang", "ft_score"]):
             return [], {}
-        logger.debug(f"Transforming one table with {len(table)} rows")
+        self.logger.debug(f"Transforming one table with {len(table)} rows")
         table, stats = get_lang_ds_pa(table, self.nlp_langid, self.column_name)
         if table is None:
             return [], {}
-        logger.debug(f"Transformed one table with {len(table)} rows")
+        self.logger.debug(f"Transformed one table with {len(table)} rows")
         return [table], stats
 
 
@@ -83,6 +84,9 @@ class LangIdentificationTransformConfiguration(TransformConfiguration):
             name=short_name,
             transform_class=LangIdentificationTransform,
         )
+        from data_processing.utils import get_logger
+
+        self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -110,5 +114,5 @@ class LangIdentificationTransformConfiguration(TransformConfiguration):
         """
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         self.params = self.params | captured
-        logger.info(f"lang_id parameters are : {self.params}")
+        self.logger.info(f"lang_id parameters are : {self.params}")
         return True
