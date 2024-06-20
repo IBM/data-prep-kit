@@ -35,12 +35,12 @@ workflow-build: workflow-venv
 
 .PHONY: workflow-test
 workflow-test: workflow-build
-	$(MAKE) .transforms_workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=profiler_wf.yaml
+	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=profiler_wf.yaml
 
 .PHONY: workflow-upload
 workflow-upload: workflow-build
 	@for file in $(YAML_WF); do \
-		$(MAKE) .transforms_workflows.upload-pipeline PIPELINE_FILE=$$file; \
+		$(MAKE) .workflows.upload-pipeline PIPELINE_FILE=$$file; \
 	done
 
 .PHONY: set-versions

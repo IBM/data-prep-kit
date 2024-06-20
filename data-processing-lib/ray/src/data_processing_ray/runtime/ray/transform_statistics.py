@@ -27,17 +27,23 @@ class TransformStatisticsRay(TransformStatistics):
         from ray.util.metrics import Counter
 
         super().__init__()
-        self.data_write_counter = Counter("data_written", "Total data written bytes")
-        self.data_read_counter = Counter("data_read", "Total data read bytes")
-        self.source_files_counter = Counter("source_files_processed", "Total source files processed")
-        self.result_files_counter = Counter("result_files_written", "Total result files written")
-        self.source_documents_counter = Counter("source_documents_processed", "Total source document processed")
-        self.result_documents_counter = Counter("result_documents_written", "Total result documents written")
-        self.empty_table_counter = Counter("empty_tables", "Total empty tables read")
-        self.failed_read_counter = Counter("failed_read_files", "Total read failed files")
-        self.failed_write_counter = Counter("failed_write_files", "Total write failed files")
-        self.transform_exceptions_counter = Counter("transform_exceptions", "Transform exception occurred")
-        self.data_retries_counter = Counter("data_access_retries", "Data access retries")
+        self.data_write_counter = Counter(name="data_written", description="Total data written bytes")
+        self.data_read_counter = Counter(name="data_read", description="Total data read bytes")
+        self.source_files_counter = Counter(name="source_files_processed", description="Total source files processed")
+        self.result_files_counter = Counter(name="result_files_written", description="Total result files written")
+        self.source_documents_counter = Counter(
+            name="source_documents_processed", description="Total source document processed"
+        )
+        self.result_documents_counter = Counter(
+            name="result_documents_written", description="Total result documents written"
+        )
+        self.empty_table_counter = Counter(name="empty_tables", description="Total empty tables read")
+        self.failed_read_counter = Counter(name="failed_read_files", description="Total read failed files")
+        self.failed_write_counter = Counter(name="failed_write_files", description="Total write failed files")
+        self.transform_exceptions_counter = Counter(
+            name="transform_exceptions", description="Transform exception occurred"
+        )
+        self.data_retries_counter = Counter(name="data_access_retries", description="Data access retries")
 
     def add_stats(self, stats=dict[str, Any]) -> None:
         """
