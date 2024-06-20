@@ -50,8 +50,8 @@ venv::	pyproject.toml .check-env
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
 	pip install --upgrade pip; \
-	cd ../../../data-processing-lib/python && make set-versions && cd -; \
-	pip install -e ../../../data-processing-lib/python; \
+	cd ../../../data-processing-lib/ray && make set-versions && cd -; \
+	pip install -e ../../../data-processing-lib/ray; \
 	pip install -e .;		\
 	pip install pytest pytest-cov
 
