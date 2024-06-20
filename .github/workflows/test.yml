@@ -9,6 +9,14 @@ on:
         branches:
             - "dev"
 jobs:
+    test-make:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Test top-level recursive make targets.
+              run: |
+                  make -n clean test build publish set-versions
     test-python-lib:
         runs-on: ubuntu-latest
         steps:
