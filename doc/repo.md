@@ -41,7 +41,7 @@ Each directory has access to a `make help` target that will show all available t
 Generally, administrators will issue make commands from the top of the repository to, for example
 publish a new release.  The top level make file provides a set of targets that 
 are executed recursively, which as a result are expected to be implementd by
-sub-directories.  These and their semantics as expected to be implemented,
+sub-directories.  These and their semantics are expected to be implemented,
 as appropriate, in the sub-directories are as follows:
 
 * clean - Restore the directory to as close to initial repository clone state as possible. 
@@ -49,8 +49,8 @@ as appropriate, in the sub-directories are as follows:
 This might include pypi distributions, images, etc.
 * test -  Test all components contained in a given sub-directory. 
 * publish - Publish any components in sub-directory. 
-* set-versions - apply the DPK_VERSION to all published components. 
 This might include things published to pypi or the docker registry.
+* set-versions - apply the DPK_VERSION to all published components. 
 
 Sub-directories are free to define these as empty/no-op targets, but generally are required
 to define them unless a parent directory does not recurse into the directory.
@@ -58,7 +58,8 @@ to define them unless a parent directory does not recurse into the directory.
 ## Developers
 Generally, developers will be working in a python project directory
 (e.g., data-processing-lib/python, transforms/universal/filter, etc.) 
-and can issue the administrator's make targets or others that might be defined locally
+and can issue the administrator's make targets (e g., build, test, etc)
+or others that might be defined locally
 (e.g., venv, test-image, test-src in transform projects).
 Key targets are as follows:
 
@@ -66,8 +67,8 @@ Key targets are as follows:
 * publish - publish libraries or docker images as appropriate.  
 This is generally only used during release generation.
  
-If working with an IDE, one generally make the venv, then configures the IDE to 
-reference the venv and src directories.
+If working with an IDE, one generally makes the venv, then configures the IDE to 
+reference the venv, src and test directories.
 
 Transform projects generally include these transform project-specific targets for convenience,
 which are triggered with the the `test` target.
