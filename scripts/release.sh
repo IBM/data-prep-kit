@@ -1,4 +1,5 @@
 debug=echo
+dbg_suffix=.dev7
 # Assume this file is in the reporoot/scripts directory
 reporoot=$(dirname $0)/..
 cd $reporoot
@@ -43,6 +44,9 @@ git checkout -b release/$tag
 # Remove the release suffix in this branch
 if [ -z "$debug"]; then
     cat .make.versions | sed -e 's/^DPK_VERSION_SUFFIX.*/DPK_VERSION_SUFFIX=/' > tt
+    mv tt .make.version
+else
+    cat .make.versions | sed -e "s/^DPK_VERSION_SUFFIX.*/DPK_VERSION_SUFFIX=$dbg_suffix/" > tt
     mv tt .make.version
 fi
 
