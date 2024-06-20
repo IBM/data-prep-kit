@@ -1,4 +1,4 @@
-FROM docker.io/rayproject/ray:2.9.3-py310
+FROM docker.io/rayproject/ray:2.24.0-py310
 
 # install pytest
 RUN pip install --no-cache-dir pytest
