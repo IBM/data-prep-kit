@@ -44,10 +44,10 @@ git checkout -b release/$tag
 # Remove the release suffix in this branch
 if [ -z "$debug"]; then
     cat .make.versions | sed -e 's/^DPK_VERSION_SUFFIX.*/DPK_VERSION_SUFFIX=/' > tt
-    mv tt .make.version
+    mv tt .make.versions
 else
     cat .make.versions | sed -e "s/^DPK_VERSION_SUFFIX.*/DPK_VERSION_SUFFIX=$dbg_suffix/" > tt
-    mv tt .make.version
+    mv tt .make.versions
 fi
 
 # Apply the unsuffixed version to the repo and check it into this release branch
