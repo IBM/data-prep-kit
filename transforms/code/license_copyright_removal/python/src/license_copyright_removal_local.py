@@ -19,6 +19,7 @@ from license_copyright_removal_transform import (
     LICENSE_KEY,
     COPYRIGHT_KEY,
 )
+import pyarrow.parquet as pq
 
 
 # create parameters
@@ -31,8 +32,8 @@ local_conf = {
 
 license_copyright_removal_params = {
     COLUMN_KEY: 'contents',
-    COPYRIGHT_KEY: True,
-    LICENSE_KEY: True,
+    COPYRIGHT_KEY: 'true',
+    LICENSE_KEY: 'true',
 }
 
 if __name__ == "__main__":
@@ -42,9 +43,10 @@ if __name__ == "__main__":
     # Create and configure the transform.
     transform = LicenseCopyrightRemoveTransform(license_copyright_removal_params)
     # Use the local data access to read a parquet table.
-    table = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
+    table,_ = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
     print(f"input table has {table.num_rows} rows")
     # Transform the table
     table_list, metadata = transform.transform(table)
+    # pq.write_table(table_list[0], '/home/yash/git_fork/data-prep-kit/transforms/code/license_copyright_removal/python/test-data/expected/license/test1.parquet')
     print(f"\noutput table has {table_list[0].num_rows} rows")
     print(f"output metadata : {metadata}")

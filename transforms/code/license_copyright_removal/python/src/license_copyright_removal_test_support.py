@@ -54,8 +54,8 @@ class AbstractPythonLicenseCopyrightRemovalTransformTest(AbstractTransformLaunch
                 args
                 | {
                     column_cli_params: 'contents',
-                    license_cli_params: True,
-                    copyright_cli_params: True,
+                    license_cli_params: 'true',
+                    copyright_cli_params: 'true',
                 },
                 os.path.join(basedir, "input"),
                 os.path.join(basedir, "expected", "license-and-copyright"),
@@ -69,8 +69,8 @@ class AbstractPythonLicenseCopyrightRemovalTransformTest(AbstractTransformLaunch
                 args
                 | {
                     column_cli_params: 'contents',
-                    license_cli_params: False,
-                    copyright_cli_params: True,
+                    license_cli_params: 'false',
+                    copyright_cli_params: 'true',
                 },
                 os.path.join(basedir, "input"),
                 os.path.join(basedir, "expected", "copyright"),
@@ -84,8 +84,8 @@ class AbstractPythonLicenseCopyrightRemovalTransformTest(AbstractTransformLaunch
                 args
                 | {
                     column_cli_params: 'contents',
-                    license_cli_params: True,
-                    copyright_cli_params: False,
+                    license_cli_params: 'true',
+                    copyright_cli_params: 'false',
                 },
                 os.path.join(basedir, "input"),
                 os.path.join(basedir, "expected", "license"),

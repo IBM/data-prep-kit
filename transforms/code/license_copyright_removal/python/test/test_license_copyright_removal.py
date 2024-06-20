@@ -35,14 +35,18 @@ class TestLicenseCopyrightRemovalTransform(AbstractTableTransformTest):
     def create_license_copyright_removal_test_fixture(
         self,
         column: str,
-        license: bool,
-        copyright: bool,
+        license: str,
+        copyright: str,
         input_dir: str,
         expected_output_dir: str,
     ) -> tuple[LicenseCopyrightRemoveTransform, pa.Table, pa.Table, list[dict]]:
         cli = [
             f"--{column_cli_params}",
             column,
+            f"--{license_cli_params}",
+            license,
+            f"--{copyright_cli_params}",
+            copyright,
         ]
         ftc = LicenseCopyrightRemovalTransformConfiguration()
         config = get_transform_config(ftc, cli)
@@ -58,8 +62,8 @@ class TestLicenseCopyrightRemovalTransform(AbstractTableTransformTest):
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/"))
         # test for both license and copyright removal
         column_name = 'contents'
-        license = True
-        copyright = True
+        license = 'true'
+        copyright = 'true'
         input_dir = os.path.join(basedir, "input")
         expected_output_dir = os.path.join(basedir, "expected", "license-and-copyright-local")
         fixtures.append(
@@ -73,7 +77,7 @@ class TestLicenseCopyrightRemovalTransform(AbstractTableTransformTest):
         )
 
         # test for only license removal
-        copyright = False
+        copyright = 'false'
         expected_output_dir = os.path.join(basedir, "expected", "license-local")
         fixtures.append(
             self.create_license_copyright_removal_test_fixture(
@@ -87,8 +91,8 @@ class TestLicenseCopyrightRemovalTransform(AbstractTableTransformTest):
 
         # test for only copyright removal
         column_name = 'contents'
-        license = False
-        copyright = True
+        license = 'false'
+        copyright = 'true'
         input_dir = os.path.join(basedir, "input")
         expected_output_dir = os.path.join(basedir, "expected", "copyright-local")
         fixtures.append(

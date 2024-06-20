@@ -33,8 +33,8 @@ local_conf = {
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 license_copyright_removal_params = {
     column_cli_params: 'contents',
-    license_cli_params: False,
-    copyright_cli_params: True,
+    license_cli_params: 'false',
+    copyright_cli_params: 'true',
 }
 params = {
     # Data access. Only required parameters are specified

@@ -16,8 +16,8 @@
   },
   "job_input_params": {
     "contents_column_name": "contents",
-    "license": true,
-    "copyright": true,
+    "license": "true",
+    "copyright": "true",
     "checkpointing": false,
     "max_files": -1,
     "random_samples": -1,

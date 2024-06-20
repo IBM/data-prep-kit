@@ -19,8 +19,10 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import TransformUtils,CLIArgumentProvider
+from data_processing.utils import TransformUtils,get_logger,CLIArgumentProvider
 from scancode import api
+
+logger = get_logger(__name__)
 
 short_name = "license_copyright_removal"
 cli_prefix = short_name + "_"
@@ -34,8 +36,8 @@ license_cli_params = f'{cli_prefix}{LICENSE_KEY}'
 copyright_cli_params = f'{cli_prefix}{COPYRIGHT_KEY}'
 
 DEFAULT_COLUMN = "contents"
-DEFAULT_LICENSE = True
-DEFAULT_COPYRIGHT = True
+DEFAULT_LICENSE = "true"
+DEFAULT_COPYRIGHT = "true"
 
 def file_generate(content):
     """
@@ -149,7 +151,7 @@ class LicenseCopyrightRemoveTransform(AbstractTableTransform):
         self.license_remove = config.get(LICENSE_KEY,DEFAULT_LICENSE)
         self.copyright_remove = config.get(COPYRIGHT_KEY,DEFAULT_COPYRIGHT)
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict]:
+    def transform(self, table: pa.Table,file_name: str = None) -> tuple[list[pa.Table], dict]:
 
         if not TransformUtils.validate_columns(table, [self.column_name]):
             return [], {}
@@ -158,19 +160,19 @@ class LicenseCopyrightRemoveTransform(AbstractTableTransform):
         updated_content = []
         remove_code_count = 0
         for content in contents:
-            if self.license_remove and self.copyright_remove:
+            if self.license_remove=="true" and self.copyright_remove=="true":
                 new_content,detect = remove_license_copyright(content)
                 if detect:
                     remove_code_count+=1
                 updated_content.append(new_content)
 
-            elif self.copyright_remove and not self.license_remove:
+            elif self.copyright_remove=="true" and self.license_remove!="true":
                 new_content,detect = remove_copyright(content)
                 if detect:
                     remove_code_count+=1
                 updated_content.append(new_content)
 
-            elif self.license_remove and not self.copyright_remove:
+            elif self.license_remove=='true' and self.copyright_remove!="true":
                 new_content,detect = remove_license(content)
                 if detect:
                     remove_code_count+=1
@@ -181,7 +183,7 @@ class LicenseCopyrightRemoveTransform(AbstractTableTransform):
 
         updated_content = pa.array(updated_content)
         
-        table = table.append_column('updated_contents',updated_content)
+        table = table.set_column(table.column_names.index(self.column_name), self.column_name, updated_content_array)
 
         return [table], {'Removed code count' : remove_code_count}
 
@@ -201,15 +203,15 @@ class LicenseCopyrightRemovalTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{license_cli_params}",
             required=False,
-            type=bool,
-            default=DEFAULT_LICENSE,
+            type=str,
+            default=f'{DEFAULT_LICENSE}',
             help="Set False if license should not be removed",
         )
         parser.add_argument(
             f"--{copyright_cli_params}",
             required=False,
-            type=bool,
-            default=DEFAULT_COPYRIGHT,
+            type=str,
+            default=f'{DEFAULT_COPYRIGHT}',
             help="Set False if copyright should not be removed ",
         )
 
