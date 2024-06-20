@@ -26,12 +26,20 @@ cd $reporoot
 # git push origin $tag 
 
 # Now build with the updated version
+# Requires quay credentials in the environment!
+# DPL_DOCKER_REGISTRY_USER=dataprep1
+# DPK_DOCKER_REGISTRY_KEY=...
+# Requires pypi credentials in the environment!
+# DPK_PYPI_USER=__token__
+# DPK_PYPI_TOKEN=...
+# make -C transforms/noop DPK_VERSION_SUFFIX=.dev7 build publish
 # make build publish
 
 # Now go back to the default branch so we can bump the minor version number and reset the version suffix
 # git branch $DEFAULT_BRANCH
 
 # Change to the next development version (bumped minor version with suffix).
+# Do we want to control major vs minor bump
 minor=$(cat .make.versions | grep '^DPK_MINOR_VERSION=' | sed -e 's/DPK_MINOR_VERSION=\([0-9]*\).*/\1/') 
 minor=$(($minor + 1))
 #cat .make.versions | sed -e "s/^DPK_MINOR_VERSION=.*/DPK_MINOR_VERSION=$minor/"  \
