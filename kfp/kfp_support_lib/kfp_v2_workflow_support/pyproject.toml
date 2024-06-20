@@ -14,9 +14,7 @@ authors = [
 dependencies = [
     "kfp==2.7.0",
     "kfp-kubernetes==1.2.0",
-    "ray==2.9.3",
-    "requests",
-    "data_prep_toolkit_ray==0.2.0.dev6",
+    "data_prep_toolkit_kfp_shared==0.2.0.dev6",
 ]
 
 [build-system]
