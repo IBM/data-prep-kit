@@ -540,6 +540,3 @@ MINIO_ADMIN_PWD= localminiosecretkey
 	fi
 	${PYTHON} -m twine check dist/*
 	${PYTHON} -m twine upload --verbose --non-interactive dist/*
-	#@echo "create a git tag to reference published version"
-	#@git tag ${TAG}
-	#@git push origin ${TAG}

@@ -4,13 +4,15 @@
 # numbers TO BE published on the NEXT release/publishing of artifacts.
 ################################################################################
 
-# do 
-# % make RELEASE_VERSION_SUFFIX= set-version 
-# % git push, tag, etc.
-# % make build, publish, etc.
+
+# This major versions is generally changed manually when a breaking change to apis is made in the libraries, for example.
 DPK_MAJOR_VERSION=0
+# The minor version is incremented manually when significant features have been added that are backward compatible with the previous major.minor release.
 DPK_MINOR_VERSION=2
+# The minor version is incremented AUTOMATICALLY by the release.sh script when a new release is set.
 DPK_MICRO_VERSION=0
+# The suffix is generally always set in the main/development branch and only nulled out when creating release branches.
+# It can be manually incremented, for example, to allow publishing a new intermediate version wheel to pypi. 
 DPK_VERSION_SUFFIX=.dev6
 
 DPK_VERSION=$(DPK_MAJOR_VERSION).$(DPK_MINOR_VERSION).$(DPK_MICRO_VERSION)$(DPK_VERSION_SUFFIX)

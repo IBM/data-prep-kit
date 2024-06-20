@@ -11,13 +11,15 @@ if [ -z "$DPK_DOCKER_REGISTRY_USER" ]; then
 elif [ -z "$DPK_DOCKER_REGISTRY_KEY" ]; then
     echo DPK_DOCKER_REGISTRY_KEY env var must be set
     exit 1
-elif [ -z "$DPK_PYPI_USER" ]; then
-    echo DPK_PYPI_USER env var must be set
-    exit 1
-elif [ -z "$DPK_PYPI_TOKEN" ]; then
-    echo DPK_DPYP_TOKEN env var must be set
-    exit 1
 fi
+if [ ! -e ~/.pypirc ]; then
+   cat << EOF
+You need a ~/.pypirc containing pypi.org credentials.
+See https://packaging.python.org/en/latest/specifications/pypirc/ for details.
+EOF
+    exit
+fi
+exit
 
 if [ -z "$debug" ]; then
     DEFAULT_BRANCH=dev
@@ -39,7 +41,7 @@ else
 fi
 
 # Create a new branch for this version and switch to it
-release_branch=release/$tag
+release_branch=releases/$tag
 if [ ! -z "$debug" ]; then
     # delete local tag and branch
     git tag --delete $tag
@@ -83,13 +85,16 @@ git checkout $DEFAULT_BRANCH
 
 # Change to the next development version (bumped minor version with suffix).
 # Do we want to control major vs minor bump
-minor=$(cat .make.versions | grep '^DPK_MINOR_VERSION=' | sed -e 's/DPK_MINOR_VERSION=\([0-9]*\).*/\1/') 
-minor=$(($minor + 1))
-cat .make.versions | sed -e "s/^DPK_MINOR_VERSION=.*/DPK_MINOR_VERSION=$minor/"  \
+micro=$(cat .make.versions | grep '^DPK_MICRO_VERSION=' | sed -e 's/DPK_MICRO_VERSION=\([0-9]*\).*/\1/') 
+micro=$(($micro + 1))
+cat .make.versions | sed -e "s/^DPK_MICRO_VERSION=.*/DPK_MICRO_VERSION=$micro/"  \
  			 -e "s/^DPK_VERSION_SUFFIX=.*/DPK_VERSION_SUFFIX=.dev0/"  > tt
 mv tt .make.versions
 
 # Push the version change back to the origin
-git commit -s -a -m "Bump minor version to $minor after cutting release $version into branch $release_branch"
-git diff $DEFAULT_BRANCH origin/$DEFAULT_BRANCH
-#git push origin
+next_version=$(make show-version)
+git commit -s -a -m "Bump micro version to $next_version after cutting release $version into branch $release_branch"
+git diff origin/$DEFAULT_BRANCH $DEFAULT_BRANCH
+if [ -z "$debug" ]; then
+    git push origin
+fi
