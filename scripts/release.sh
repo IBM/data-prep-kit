@@ -22,7 +22,7 @@ fi
 if [ -z "$debug" ]; then
     DEFAULT_BRANCH=dev
 else
-    DEFAULT_BRANCH=releasing
+    DEFAULT_BRANCH=releasing-copy
 fi
 
 # Make sure we're starting from the base branch
