@@ -62,11 +62,10 @@ fi
 
 # Apply the unsuffixed version to the repo and check it into this release branch
 make set-versions
-git add -A
-git commit -s -m "Cut release $version"
-git push origin
-git tag -a -s -m "Cut release $version" $tag 
+git status
+git commit -s -a -m "Cut release $version"
 git push --set-upstream origin $release_branch 
+git tag -a -s -m "Cut release $version" $tag 
 git push origin $tag 
 
 # Now build with the updated version
@@ -90,6 +89,5 @@ cat .make.versions | sed -e "s/^DPK_MINOR_VERSION=.*/DPK_MINOR_VERSION=$minor/" 
 mv tt .make.versions
 
 # Push the version change back to the origin
-# git add -A
-# git commit -s -m "Bump minor version to $minor after cutting release $version"
+# git commit -s -a -m "Bump minor version to $minor after cutting release $version"
 # git push origin
