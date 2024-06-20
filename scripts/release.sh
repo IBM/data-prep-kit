@@ -39,7 +39,17 @@ else
 fi
 
 # Create a new branch for this version and switch to it
-git checkout -b release/$tag
+release_branch=release/$tag
+if [ ! -z "$debug"]; then
+    # delete local tag and branch
+    git tag --delete $tag
+    git branch --delete $release_branch
+    # delete remote tag and branch
+    git push --delete origin $tag
+    git push --delete origin $release_branch
+fi
+git checkout -b $release_branch 
+
 
 # Remove the release suffix in this branch
 if [ -z "$debug"]; then
@@ -56,7 +66,7 @@ git add -A
 git commit -s -m "Cut release $version"
 git push origin
 git tag -a -s -m "Cut release $version" $tag 
-git push --set-upstream origin release/$tag
+git push --set-upstream origin $release_branch 
 git push origin $tag 
 
 # Now build with the updated version
