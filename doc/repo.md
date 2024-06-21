@@ -1,5 +1,7 @@
 # Repository Structure and Use 
 
+Here we discuss the structure, use and approach to code management in the repo.
+
 # Repository structure
 * data_processing_lib - provides the core transform framework and library 
 supporting data transformations in 3 runtimes
@@ -75,6 +77,9 @@ which are triggered with the the `test` target.
 
 * test-src - test python tests in the test directory
 * test-image - build and test the docker image for the transform
+
+Please also consult [transform project conventions](../transforms#transform-project-conventions) for 
+additional considerations when developing transforms.
 
 ### Transforms and KFP 
 The kfp_ray directories in the transform projects provide 
