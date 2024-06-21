@@ -135,7 +135,10 @@ def orchestrate(
             "job_input_params": runtime_config.get_transform_metadata()
             | data_access_factory.get_input_params()
             | preprocessing_params.get_input_params(),
-            "execution_stats": resources | {"execution time, min": (time.time() - start_time)/60, },
+            "execution_stats": resources
+            | {
+                "execution time, min": (time.time() - start_time) / 60,
+            },
             "job_output_stats": stats,
         }
         logger.debug(f"Saving job metadata: {metadata}.")
