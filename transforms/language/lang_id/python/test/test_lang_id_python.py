@@ -33,8 +33,7 @@ class TestPythonLangIdentificationTransform(AbstractTransformLauncherTest):
             "lang_id_model_url": "facebook/fasttext-language-identification",
             "lang_id_content_column_name": "text",
         }
-        basedir = "../test-data"
-        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
         fixtures = []
         launcher = PythonTransformLauncher(LangIdentificationPythonTransformConfiguration())
         fixtures.append((launcher, cli_params, basedir + "/input", basedir + "/expected"))
