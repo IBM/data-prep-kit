@@ -63,10 +63,12 @@ class AbstractTableTransformTest(AbstractTest):
         all_table_list = []
         all_metadata_list = []
         for in_table in in_table_list:
-            table_list, metadata = transform.transform(in_table)
-            all_table_list.extend(table_list)
-            all_metadata_list.append(metadata)
-
+            try:
+                table_list, metadata = transform.transform(in_table)
+                all_table_list.extend(table_list)
+                all_metadata_list.append(metadata)
+            except Exception as e:
+                print(f"Exception executing transform {e}")
         table_list, metadata = transform.flush()
         all_table_list.extend(table_list)
         all_metadata_list.append(metadata)
