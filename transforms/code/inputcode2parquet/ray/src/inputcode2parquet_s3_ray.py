@@ -13,15 +13,15 @@
 import ast
 import sys
 
-from inputcode2parquet_transform_ray import (
-    CodeToParquetRayConfiguration,
+from data_processing.utils import GB, ParamsUtils
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from inputcode2parquet_transform import (
     detect_programming_lang_key,
     domain_key,
     snapshot_key,
     supported_langs_file_key,
 )
-from data_processing.utils import GB, ParamsUtils
-from data_processing_ray.runtime.ray import RayTransformLauncher
+from inputcode2parquet_transform_ray import CodeToParquetRayConfiguration
 
 
 # create parameters

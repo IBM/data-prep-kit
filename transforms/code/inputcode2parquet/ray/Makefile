@@ -8,7 +8,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=inputcode2parquet
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${INPUT_CODE_TO_PARQUET_VERSION}
+DOCKER_IMAGE_VERSION=${INPUT_CODE_TO_PARQUET_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
@@ -30,31 +30,21 @@ publish:: publish-dist publish-image
 
 publish-image:: .transforms.publish-image-ray
 
-# distribution versions is the same as image version.
+setup:: .transforms.setup
+
+# set the version of python transform that this depends on.
 set-versions:
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(NOOP_PYTHON_VERSION) .transforms.set-versions
 
 build-dist:: set-versions .defaults.build-dist
 
 publish-dist:: .defaults.publish-dist
 
-run-cli-ray-sample: .transforms.run-cli-ray-sample
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
-                RUN_ARGS="--run_locally True \
-                --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
-                --data_files_to_use \"['.zip']\"  \
-                --runtime_num_workers 3 \
-				--code2parquet_supported_langs_file ../test-data/languages/lang_extensions.json	\
-    			--code2parquet_detect_programming_lang True	\
-				--code2parquet_snapshot github	\
-				--code2parquet_domain code " \
-			    .transforms.run-src-file
+run-cli-sample: .transforms.run-cli-ray-sample
 
-run-local-sample: .transforms.run-local-sample
+run-local-sample: .transforms.run-local-ray-sample
 
-run-local-ray-sample: .transforms.run-local-ray-sample
-
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
