@@ -28,7 +28,7 @@ from data_processing.transform import (
 from data_processing.utils import TransformUtils, str2bool
 
 
-shortname = "code2parquet"
+shortname = "inputcode2parquet"
 cli_prefix = f"{shortname}_"
 supported_langs_file_key = f"{shortname}_supported_langs_file"
 supported_languages = f"{shortname}_supported_languages"

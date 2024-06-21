@@ -42,10 +42,10 @@ def compute_exec_params_func(
     runtime_pipeline_id: str,
     runtime_job_id: str,
     runtime_code_location: str,
-    code2parquet_supported_langs_file: str,
-    code2parquet_domain: str,
-    code2parquet_snapshot: str,
-    code2parquet_detect_programming_lang: bool,
+    inputcode2parquet_supported_langs_file: str,
+    inputcode2parquet_domain: str,
+    inputcode2parquet_snapshot: str,
+    inputcode2parquet_detect_programming_lang: bool,
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -59,10 +59,10 @@ def compute_exec_params_func(
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": runtime_code_location,
-        "code2parquet_supported_langs_file": code2parquet_supported_langs_file,
-        "code2parquet_domain": code2parquet_domain,
-        "code2parquet_snapshot": code2parquet_snapshot,
-        "code2parquet_detect_programming_lang": code2parquet_detect_programming_lang,
+        "inputcode2parquet_supported_langs_file": inputcode2parquet_supported_langs_file,
+        "inputcode2parquet_domain": inputcode2parquet_domain,
+        "inputcode2parquet_snapshot": inputcode2parquet_snapshot,
+        "inputcode2parquet_detect_programming_lang": inputcode2parquet_detect_programming_lang,
     }
 
 
@@ -106,7 +106,7 @@ PREFIX: str = "inputcode2parquet"
     description="Pipeline for converting zip files to parquet",
 )
 def inputcode2parquet(
-    ray_name: str = "code2parquet-kfp-ray",  # name of Ray cluster
+    ray_name: str = "inputcode2parquet-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
@@ -123,11 +123,11 @@ def inputcode2parquet(
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
     # code to parquet
-    code2parquet_supported_langs_file: str = "test/inputcode2parquet/languages/lang_extensions.json",
-    code2parquet_detect_programming_lang: bool = True,
-    code2parquet_domain: str = "code",
-    code2parquet_snapshot: str = "github",
-    code2parquet_s3_access_secret: str = "s3-secret",
+    inputcode2parquet_supported_langs_file: str = "test/inputcode2parquet/languages/lang_extensions.json",
+    inputcode2parquet_detect_programming_lang: bool = True,
+    inputcode2parquet_domain: str = "code",
+    inputcode2parquet_snapshot: str = "github",
+    inputcode2parquet_s3_access_secret: str = "s3-secret",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ) -> None:
@@ -163,11 +163,11 @@ def inputcode2parquet(
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    :param code2parquet_supported_langs_file - file to store allowed languages
-    :param code2parquet_detect_programming_lang - detect programming language flag
-    :param code2parquet_domain: domain
-    :param code2parquet_snapshot: snapshot
-    :param code2parquet_s3_access_secret - ingest to parquet s3 access secret
+    :param inputcode2parquet_supported_langs_file - file to store allowed languages
+    :param inputcode2parquet_detect_programming_lang - detect programming language flag
+    :param inputcode2parquet_domain: domain
+    :param inputcode2parquet_snapshot: snapshot
+    :param inputcode2parquet_s3_access_secret - ingest to parquet s3 access secret
                     (here we are assuming that select language info is in S3, but potentially in the different bucket)
     :return: None
     """
@@ -187,10 +187,10 @@ def inputcode2parquet(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            code2parquet_supported_langs_file=code2parquet_supported_langs_file,
-            code2parquet_domain=code2parquet_domain,
-            code2parquet_snapshot=code2parquet_snapshot,
-            code2parquet_detect_programming_lang=code2parquet_detect_programming_lang,
+            inputcode2parquet_supported_langs_file=inputcode2parquet_supported_langs_file,
+            inputcode2parquet_domain=inputcode2parquet_domain,
+            inputcode2parquet_snapshot=inputcode2parquet_snapshot,
+            inputcode2parquet_detect_programming_lang=inputcode2parquet_detect_programming_lang,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
@@ -217,7 +217,7 @@ def inputcode2parquet(
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
-        ComponentUtils.set_s3_env_vars_to_component(execute_job, code2parquet_s3_access_secret, prefix=PREFIX)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, inputcode2parquet_s3_access_secret, prefix=PREFIX)
         execute_job.after(ray_cluster)
 
 

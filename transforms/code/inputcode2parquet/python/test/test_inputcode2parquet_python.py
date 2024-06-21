@@ -51,8 +51,8 @@ class TestPythonIngestToParquetTransform(AbstractTransformLauncherTest):
             (
                 PythonTransformLauncher(CodeToParquetPythonConfiguration()),
                 config,
-                basedir + "/input",
-                basedir + "/expected",
+                os.path.join(basedir, "input"),
+                os.path.join(basedir, "expected"),
                 # this is added as a fixture to remove these 2 columns from comparison
                 ["size", "date_acquired"],
             )

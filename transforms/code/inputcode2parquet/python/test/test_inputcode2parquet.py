@@ -33,7 +33,7 @@ class TestIngestToParquetTransform(AbstractBinaryTransformTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../ray/test-data"))
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
         lang_supported_file = os.path.abspath(os.path.join(basedir, "languages/lang_extensions.json"))
         input_dir = os.path.join(basedir, "input")
         input_files = get_files_in_folder(input_dir, ".zip")
