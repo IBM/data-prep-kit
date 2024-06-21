@@ -54,6 +54,7 @@ git checkout -b $release_branch
 
 
 # Remove the release suffix in this branch
+# Apply the unsuffixed version to the repo and check it into this release branch
 if [ -z "$debug" ]; then
     cat .make.versions | sed -e 's/^DPK_VERSION_SUFFIX.*/DPK_VERSION_SUFFIX=/' > tt
     mv tt .make.versions
@@ -61,9 +62,10 @@ else
     cat .make.versions | sed -e "s/^DPK_VERSION_SUFFIX.*/DPK_VERSION_SUFFIX=$dbg_suffix/" > tt
     mv tt .make.versions
 fi
-
-# Apply the unsuffixed version to the repo and check it into this release branch
+# Apply the version change to all files in the repo 
 make set-versions
+
+# Commit the changes to the release branch and tag it
 git status
 git commit -s -a -m "Cut release $version"
 git push --set-upstream origin $release_branch 
@@ -72,7 +74,6 @@ git push origin $tag
 
 # Now build with the updated version
 # Requires quay credentials in the environment, DPL_DOCKER_REGISTRY_USER, DPK_DOCKER_REGISTRY_KEY
-# Requires pypi credentials in the environment, DPK_PYPI_USER=, DPK_PYPI_TOKEN
 if [ -z "$debug" ]; then
     make build publish
 else
@@ -84,12 +85,13 @@ fi
 git checkout $DEFAULT_BRANCH
 
 # Change to the next development version (bumped minor version with suffix).
-# Do we want to control major vs minor bump
 micro=$(cat .make.versions | grep '^DPK_MICRO_VERSION=' | sed -e 's/DPK_MICRO_VERSION=\([0-9]*\).*/\1/') 
 micro=$(($micro + 1))
 cat .make.versions | sed -e "s/^DPK_MICRO_VERSION=.*/DPK_MICRO_VERSION=$micro/"  \
  			 -e "s/^DPK_VERSION_SUFFIX=.*/DPK_VERSION_SUFFIX=.dev0/"  > tt
 mv tt .make.versions
+# Apply the version change to all files in the repo 
+make set-versions
 
 # Push the version change back to the origin
 next_version=$(make show-version)
