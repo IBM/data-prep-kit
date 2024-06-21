@@ -13,7 +13,7 @@
 import os
 
 import pyarrow.parquet as pq
-from code_quality_transform_ray import (
+from code_quality_transform import (
     CodeQualityTransform,
     CodeQualityTransformConfiguration,
 )

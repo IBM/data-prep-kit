@@ -15,7 +15,7 @@ import os
 import pyarrow as pa
 from data_processing.test_support.transform import AbstractTableTransformTest
 from data_processing.transform import get_transform_config
-from proglang_select_transform_ray import (
+from proglang_select_transform import (
     ProgLangSelectTransform,
     ProgLangSelectTransformConfiguration,
     lang_allowed_langs_file_key,
