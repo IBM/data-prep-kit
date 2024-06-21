@@ -10,7 +10,7 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
 ]
 dependencies = [
-    "dpk-noop-transform-python==0.9.0.dev6",
+    "dpk-noop-transform-python==0.2.0.dev6",
     "data-prep-toolkit-spark==0.2.0.dev6",
 ]
 

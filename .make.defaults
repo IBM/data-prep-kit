@@ -515,7 +515,7 @@ MINIO_ADMIN_PWD= localminiosecretkey
 	cat pyproject.toml | sed 									\
 		-e 's/"data-prep-toolkit-ray\(..\).*",/"data-prep-toolkit-ray\1$(DPK_LIB_VERSION)",/' 	\
 		-e 's/"data-prep-toolkit-spark\(..\).*",/"data-prep-toolkit-spark\1$(DPK_LIB_VERSION)",/' 	\
-		-e 's/"data-prep-toolkit-kfp\(..\).*",/"data-prep-toolkit-spark\1$(DPK_LIB_KFP_VERSION)",/' 	\
+		-e 's/"data-prep-toolkit-kfp\(..\).*",/"data-prep-toolkit-kfp\1$(DPK_LIB_KFP_VERSION)",/' 	\
 		-e 's/"data-prep-toolkit\([=><][=><]\).*",/"data-prep-toolkit\1$(DPK_LIB_VERSION)",/' 		\
 		> tt.toml
 	mv tt.toml pyproject.toml
