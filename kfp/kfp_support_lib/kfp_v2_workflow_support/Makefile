@@ -54,11 +54,9 @@ ifneq ($(KFPv2), 1)
 	echo "Skipping venv as KFPv2 is not defined"
 else
 	@# Help: Create the virtual environment using pyproject.toml
-	$(MAKE) .defaults.ray-lib-src-venv
-	. ${VENV_ACTIVATE};     \
-	cd ../shared_workflow_support && make set-versions && cd -; \
-	pip install -e ../shared_workflow_support;	\
-	pip install -e .;	
+	$(MAKE) .defaults.create-venv .defaults.install-ray-lib-src-venv
+	@source venv/bin/activate; pip install -e ${REPOROOT}/kfp/kfp_support_lib/shared_workflow_support
+	$(MAKE) .defaults.install-local-requirements-venv
 endif
 
 test:: 	venv

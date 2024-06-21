@@ -43,7 +43,7 @@ venv:
 	rm -rf venv
 	@# Help: Create the virtual environment using pyproject.toml
 	$(MAKE) .defaults.ray-lib-src-venv
-	. ${VENV_ACTIVATE}; pip install -e .;	
+	. ${VENV_ACTIVATE}; pip install -e .	
 
 test:: 	venv
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.
