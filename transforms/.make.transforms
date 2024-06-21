@@ -323,7 +323,11 @@ minio-stop:
 # Requires version number of Python image as TRANSFORM_PYTHON_VERSION to be set when called
 .transforms.set-versions: 
 	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
-	cat pyproject.toml | sed 	\
+	if [ -e pyproject.toml ]; then	\
+	    dash_name=$$(echo $(TRANSFORM_NAME) | sed -e 's/_/-/g');		\
+	    cat pyproject.toml | sed 	\
 	    -e 's/"dpk-$(TRANSFORM_NAME)-transform-python\([=<>][=<>]\).*",/"dpk-$(TRANSFORM_NAME)-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
-	    > tt.toml
-	mv tt.toml pyproject.toml
+	    -e 's/"dpk-'$${dash_name}'-transform-python\([=<>][=<>]\).*",/"dpk-'$${dash_name}'-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
+	    > tt.toml;			\
+	    mv tt.toml pyproject.toml;	\
+	fi
