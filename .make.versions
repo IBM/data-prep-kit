@@ -2,6 +2,10 @@
 # Here we attempt to capture/define all the version numbers used across the 
 # repository in Makefile format.  These are generally considered the version
 # numbers TO BE published on the NEXT release/publishing of artifacts.
+#
+# NOTE: If you modify any of the version numbers, you MUST run "make set-versions"
+# from the top of the repo to have the new versions applied throughout the repo.
+#
 ################################################################################
 
 

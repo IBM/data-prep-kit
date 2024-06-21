@@ -493,30 +493,36 @@ MINIO_ADMIN_PWD= localminiosecretkey
 # Expects TOML_VERSION
 .PHONY: .defaults.update-toml
 .defaults.update-toml:
-	$(MAKE) TOML_VERSION=$(TOML_VERSION) .defaults.set-toml-version
-	$(MAKE) .defaults.update-toml-lib-dep-versions
+	if [ -e pyproject.toml ]; then						\
+	    $(MAKE) TOML_VERSION=$(TOML_VERSION) .defaults.__set-toml-version;	\
+	    $(MAKE) .defaults.__update-toml-lib-dep-versions;			\
+	fi
 
 # Changes the version field of the pyproject.toml file to the given version
 # Expects TOML_VERSION
-.PHONY: .defaults.set-toml-version
-.defaults.set-toml-version:
+.PHONY: .defaults.__set-toml-version
+.defaults.__set-toml-version:
 	@# Help: Set the version= field of pyproject.toml 
-	cat pyproject.toml | sed -e \
-		's/^version[ ]*=.*/version = "'${TOML_VERSION}'"/' \
-		> tt.toml
-	mv tt.toml pyproject.toml
+	if [ -e pyproject.toml ]; then					\
+	    cat pyproject.toml | sed -e 				\
+		's/^version[ ]*=.*/version = "'${TOML_VERSION}'"/' 	\
+		> tt.toml;						\
+	    mv tt.toml pyproject.toml;					\
+	fi
 
 # Updates the versions references to our repo source as defined in .make.versions
-.PHONY: .defaults.update-toml-lib-dep-versions
-.defaults.update-toml-lib-dep-versions:
+.PHONY: .defaults.__update-toml-lib-dep-versions
+.defaults.__update-toml-lib-dep-versions:
 	@# Help: Update pyproject.toml to depend on lib versions defined in .make.versions 
-	cat pyproject.toml | sed 									\
+	if [ -e pyproject.toml ]; then					\
+	    cat pyproject.toml | sed 									\
 		-e 's/"data-prep-toolkit-ray\(..\).*",/"data-prep-toolkit-ray\1$(DPK_LIB_VERSION)",/' 	\
 		-e 's/"data-prep-toolkit-spark\(..\).*",/"data-prep-toolkit-spark\1$(DPK_LIB_VERSION)",/' 	\
 		-e 's/"data-prep-toolkit-kfp\(..\).*",/"data-prep-toolkit-kfp\1$(DPK_LIB_KFP_VERSION)",/' 	\
 		-e 's/"data-prep-toolkit\([=><][=><]\).*",/"data-prep-toolkit\1$(DPK_LIB_VERSION)",/' 		\
-		> tt.toml
-	mv tt.toml pyproject.toml
+		> tt.toml;						\
+	    mv tt.toml pyproject.toml;					\
+	fi
 
 # Build the distribution, usually in preparation for publishing using ith the .defaults.publish-dist  target
 .PHONY: .defaults.build-dist 
