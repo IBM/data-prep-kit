@@ -78,7 +78,7 @@ which are triggered with the the `test` target.
 * test-src - test python tests in the test directory
 * test-image - build and test the docker image for the transform
 
-Please also consult [transform project conventions](../transforms#transform-project-conventions) for 
+Please also consult [transform project conventions](../transforms/README.md#transform-project-conventions) for 
 additional considerations when developing transforms.
 
 ### Transforms and KFP 
