@@ -6,9 +6,9 @@ REPOROOT=../../../..
 # to override/redefine the rules below. 
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_NAME=inputcode2parquet
+TRANSFORM_NAME=code2parquet
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${INPUT_CODE_TO_PARQUET_RAY_VERSION}
+DOCKER_IMAGE_VERSION=${CODE2PARQUET_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
@@ -34,7 +34,7 @@ setup:: .transforms.setup
 
 # set the version of python transform that this depends on.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(NOOP_PYTHON_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(CODE2PARQUET_PYTHON_VERSION) .transforms.set-versions
 
 build-dist:: set-versions .defaults.build-dist
 

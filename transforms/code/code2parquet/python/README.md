@@ -1,4 +1,4 @@
-# INGEST2PARQUET  
+# CODE2PARQUET  
 
 ## Summary 
 This Python script is designed to convert raw data files, particularly ZIP files, into Parquet format. It is built to handle concurrent processing of multiple files using multiprocessing for efficient execution.
@@ -63,7 +63,7 @@ Each file contained within the ZIP is transformed into a distinct row within the
 
 ## Configuration and command line Options
 
-The set of dictionary keys holding [ingest2parquet](src/ingest2parquet.py) 
+The set of dictionary keys holding [code2parquet](src/code2parquet.py) 
 configuration for values are as follows:
 ```
   --detect_programming_lang DETECT_PROGRAMMING_LANG
@@ -97,12 +97,12 @@ configuration for values are as follows:
 We provide several demos of the script usage for different data storage options: 
 
 
-#[local file system](src/ingest2parquet_local.py)
-This script processes data stored locally on the system. It sets up parameters for local file paths and invokes the ingest2parquet() function from ingest2parquet.py to convert raw data files to Parquet format.
+#[local file system](src/code2parquet_local.py)
+This script processes data stored locally on the system. It sets up parameters for local file paths and invokes the code2parquet() function from code2parquet.py to convert raw data files to Parquet format.
 
 **Run using make targets.**
 
-```run-local-sample``` - runs src/ingest2parquet_local.py
+```run-local-sample``` - runs src/code2parquet_local.py
 
 **Run the script without any command-line arguments.**
 
@@ -110,13 +110,13 @@ This script processes data stored locally on the system. It sets up parameters f
 make venv
 source venv/bin/activate
 cd src
-python ingest2parquet_local.py
+python code2parquet_local.py
 ```
 
 **Run the script via command-line** 
 
 ```
-python ingest2parquet.py \
+python code2parquet.py \
     --detect_programming_lang True \
     --snapshot github \
     --domain code \
@@ -125,8 +125,8 @@ python ingest2parquet.py \
 ```
 
 
-#[s3](src/ingest2parquet_s3.py) 
-This script is designed to process data stored on an S3 bucket. It sets up necessary parameters for accessing the S3 bucket and invokes the ingest2parquet() function from ingest2parquet.py to convert raw data files to Parquet format.
+#[s3](src/code2parquet_s3.py) 
+This script is designed to process data stored on an S3 bucket. It sets up necessary parameters for accessing the S3 bucket and invokes the code2parquet() function from code2parquet.py to convert raw data files to Parquet format.
 
 To execute the script with S3 functionality, we utilize minio. 
 
@@ -137,7 +137,7 @@ To execute the script with S3 functionality, we utilize minio.
 Please consult the documentation for further guidance: [transform-s3-testing](../../data-processing-lib/doc/transform-s3-testing.md) 
 
 ** Run script using make targets **
-```run-s3-sample``` : Starts minio server and load data from [test-data](test-data/input/) into local minio for S3 access and runs src/ ingest2parquet_s3.py
+```run-s3-sample``` : Starts minio server and load data from [test-data](test-data/input/) into local minio for S3 access and runs src/ code2parquet_s3.py
 
 
 **Run the script without any command-line arguments.**
@@ -146,18 +146,18 @@ Please consult the documentation for further guidance: [transform-s3-testing](..
 make venv
 source venv/bin/activate
 cd src
-python ingest2parquet_s3.py
+python code2parquet_s3.py
 ```
 
 **Run the script via command-line** 
 
 ```
-python ingest2parquet.py \
+python code2parquet.py \
     --detect_programming_lang True \
     --snapshot github \
     --domain code \
     --data_s3_cred '{"access_key": "localminioaccesskey", "secret_key": "localminiosecretkey", "url": "http://localhost:9000"}' \
-    --data_s3_config '{"input_folder": "test/ingest2parquet/input", "output_folder": "test/ingest2parquet/output"}' \
+    --data_s3_config '{"input_folder": "test/code2parquet/input", "output_folder": "test/code2parquet/output"}' \
     --data_files_to_use '[".zip"]'
 ```
 
@@ -181,7 +181,7 @@ The metadata.json file contains following essential information regarding the pr
 ## Run using docker image
 
 ```
-docker run -it -v $(pwd)/test-data/input:/test-data/input -v $(pwd)/test-data/output:/test-data/output quay.io/dataprep1/data-prep-kit/ingest2parquet:0.1 sh -c "python ingest2parquet.py \
+docker run -it -v $(pwd)/test-data/input:/test-data/input -v $(pwd)/test-data/output:/test-data/output quay.io/dataprep1/data-prep-kit/code2parquet:0.1 sh -c "python code2parquet.py \
     --detect_programming_lang True \
     --snapshot github \
     --domain code \

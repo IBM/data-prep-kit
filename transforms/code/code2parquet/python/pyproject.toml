@@ -1,8 +1,8 @@
 [project]
-name = "dpk_inputcode2parquet_transform_python"
+name = "dpk_code2parquet_transform_python"
 version = "0.4.0.dev6"
 requires-python = ">=3.10"
-description = "inputcode2parquet Python Transform"
+description = "code2parquet Python Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [

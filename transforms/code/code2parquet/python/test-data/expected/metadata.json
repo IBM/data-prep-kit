@@ -16,7 +16,7 @@
     },
     "job_input_params": {
         "ingest_to_parquet_detect_programming_lang": true,
-        "ingest_to_parquet_supported_langs_file": "/Users/boris/Projects/data-prep-kit/transforms/code/ingest2parquet/ray/test-data/languages/lang_extensions.json",
+        "ingest_to_parquet_supported_langs_file": "/Users/boris/Projects/data-prep-kit/transforms/code/code2parquet/ray/test-data/languages/lang_extensions.json",
         "ingest_to_parquet_domain": "code",
         "ingest_to_parquet_snapshot": "github",
         "checkpointing": false,
@@ -33,11 +33,11 @@
         "number of rows": 54
     },
     "source": {
-        "name": "/Users/boris/Projects/data-prep-kit/transforms/code/ingest2parquet/ray/test-data/input",
+        "name": "/Users/boris/Projects/data-prep-kit/transforms/code/code2parquet/ray/test-data/input",
         "type": "path"
     },
     "target": {
-        "name": "/Users/boris/Projects/data-prep-kit/transforms/code/ingest2parquet/ray/output",
+        "name": "/Users/boris/Projects/data-prep-kit/transforms/code/code2parquet/ray/output",
         "type": "path"
     }
 }

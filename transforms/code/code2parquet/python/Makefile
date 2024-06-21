@@ -8,8 +8,8 @@ REPOROOT=../../../..
 # $(REPOROOT)/.make.versions file contains the versions
 
 TRANSFORM_RUNTIME=python
-TRANSFORM_NAME=inputcode2parquet
-DOCKER_IMAGE_VERSION=${NOOP_PYTHON_VERSION}
+TRANSFORM_NAME=code2parquet
+DOCKER_IMAGE_VERSION=${CODE2PARQUET_PYTHON_VERSION}
 
 include $(REPOROOT)/transforms/.make.transforms
 

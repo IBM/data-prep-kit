@@ -25,9 +25,9 @@ RUN pip install --no-cache-dir -e .
 #RUN pip install --no-cache-dir -r  requirements.txt
 
 # copy source data
-COPY ./src/inputcode2parquet_transform.py .
-COPY ./src/inputcode2parquet_transform_python.py .
-COPY ./src/inputcode2parquet_local.py local/
+COPY ./src/code2parquet_transform.py .
+COPY ./src/code2parquet_transform_python.py .
+COPY ./src/code2parquet_local.py local/
 
 # copy test
 COPY test/ test/

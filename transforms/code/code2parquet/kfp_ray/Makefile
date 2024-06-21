@@ -36,7 +36,7 @@ workflow-build: workflow-venv
 
 .PHONY: workflow-test
 workflow-test: workflow-build
-	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=inputcode2parquet_wf.yaml
+	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=code2parquet_wf.yaml
 
 .PHONY: workflow-upload
 workflow-upload: workflow-build
