@@ -9,8 +9,10 @@ YAML_WF := $(patsubst %.py, %.yaml, ${PYTHON_WF})
 
 workflow-venv: .check_python_version ${WORKFLOW_VENV_ACTIVATE}
 
-clean:: .defaults.clean
-
+.PHONY: clean
+clean:
+	@# Help: Clean up the virtual environment.
+	rm -rf ${REPOROOT}/transforms/venv
 
 venv::
 

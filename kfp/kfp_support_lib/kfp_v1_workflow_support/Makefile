@@ -54,7 +54,7 @@ ifeq ($(KFPv2), 1)
 	echo "Skipping as KFPv2 is defined"
 else
 	@# Help: Create the virtual environment using pyproject.toml
-	$(MAKE) -C ${REPOROOT}/transforms .defaults.ray-lib-src-venv
+	$(MAKE) .defaults.ray-lib-src-venv
 	. ${VENV_ACTIVATE};     \
 	cd ../shared_workflow_support && make set-versions && cd -; \
 	pip install -e ../shared_workflow_support;	\

@@ -42,7 +42,7 @@ publish:: .check-env
 venv:
 	rm -rf venv
 	@# Help: Create the virtual environment using pyproject.toml
-	$(MAKE) -C ${REPOROOT}/transforms .defaults.ray-lib-src-venv
+	$(MAKE) .defaults.ray-lib-src-venv
 	. ${VENV_ACTIVATE}; pip install -e .;	
 
 test:: 	venv
