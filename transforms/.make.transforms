@@ -324,6 +324,6 @@ minio-stop:
 .transforms.set-versions: 
 	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
 	cat pyproject.toml | sed 	\
-	    -e 's/dpk-$(TRANSFORM_NAME)-transform-python\([=<>][=<>]\).*/dpk-$(TRANSFORM_NAME)-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
+	    -e 's/"dpk-$(TRANSFORM_NAME)-transform-python\([=<>][=<>]\).*",/"dpk-$(TRANSFORM_NAME)-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
 	    > tt.toml
 	mv tt.toml pyproject.toml
