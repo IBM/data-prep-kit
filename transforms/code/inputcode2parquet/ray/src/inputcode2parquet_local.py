@@ -13,16 +13,16 @@
 import ast
 import os
 
+from inputcode2parquet_transform_ray import (
+    CodeToParquetTransform,
+    data_factory_key,
+    detect_programming_lang_key,
+    domain_key,
+    snapshot_key,
+    supported_langs_file_key,
+)
 from data_processing.data_access import DataAccessFactory, DataAccessLocal
 from data_processing.utils import TransformUtils
-from ingest_2_parquet_transform_ray import (
-    IngestToParquetTransform,
-    ingest_data_factory_key,
-    ingest_detect_programming_lang_key,
-    ingest_domain_key,
-    ingest_snapshot_key,
-    ingest_supported_langs_file_key,
-)
 
 
 supported_languages_file = os.path.abspath(
@@ -31,18 +31,18 @@ supported_languages_file = os.path.abspath(
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 
 params = {
-    ingest_supported_langs_file_key: supported_languages_file,
-    ingest_detect_programming_lang_key: True,
-    ingest_snapshot_key: "github",
-    ingest_domain_key: "code",
+    supported_langs_file_key: supported_languages_file,
+    detect_programming_lang_key: True,
+    snapshot_key: "github",
+    domain_key: "code",
     "data_files_to_use": ast.literal_eval("['.zip']"),
-    ingest_data_factory_key: DataAccessFactory(),  # Expect to create DataAccessLocal
+    data_factory_key: DataAccessFactory(),  # Expect to create DataAccessLocal
 }
 
 if __name__ == "__main__":
     # Here we show how to run outside of ray
     # Create and configure the transform.
-    transform = IngestToParquetTransform(params)
+    transform = CodeToParquetTransform(params)
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
     file_to_process = os.path.join(input_folder, "application-java.zip")

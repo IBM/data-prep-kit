@@ -14,15 +14,15 @@ import ast
 import os
 import sys
 
-from data_processing.utils import GB, ParamsUtils
-from data_processing_ray.runtime.ray import RayTransformLauncher
-from ingest_2_parquet_transform_ray import (
-    IngestToParquetRayConfiguration,
-    ingest_detect_programming_lang_key,
-    ingest_domain_key,
-    ingest_snapshot_key,
-    ingest_supported_langs_file_key,
+from inputcode2parquet_transform_ray import (
+    CodeToParquetPythonConfiguration,
+    detect_programming_lang_key,
+    domain_key,
+    snapshot_key,
+    supported_langs_file_key,
 )
+from data_processing.runtime.pure_python import PythonTransformLauncher
+from data_processing.utils import ParamsUtils
 
 
 # create parameters
@@ -35,33 +35,28 @@ local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
-worker_options = {"num_cpus": 0.8, "memory": 2 * GB}
+worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 ingest_config = {
-    ingest_supported_langs_file_key: supported_languages_file,
-    ingest_detect_programming_lang_key: True,
-    ingest_snapshot_key: "github",
-    ingest_domain_key: "code",
+    supported_langs_file_key: supported_languages_file,
+    detect_programming_lang_key: True,
+    snapshot_key: "github",
+    domain_key: "code",
 }
 
 params = {
-    # where to run
-    "run_locally": True,
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     "data_files_to_use": ast.literal_eval("['.zip']"),
     # orchestrator
-    "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "runtime_num_workers": 3,
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
-    "runtime_creation_delay": 0,
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
 }
 
 if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=(params | ingest_config))
     # create launcher
-    launcher = RayTransformLauncher(IngestToParquetRayConfiguration())
+    launcher = PythonTransformLauncher(CodeToParquetPythonConfiguration())
     # launch
     launcher.launch()

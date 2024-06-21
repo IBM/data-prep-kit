@@ -13,15 +13,15 @@
 import ast
 import sys
 
+from inputcode2parquet_transform_ray import (
+    CodeToParquetRayConfiguration,
+    detect_programming_lang_key,
+    domain_key,
+    snapshot_key,
+    supported_langs_file_key,
+)
 from data_processing.utils import GB, ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from ingest_2_parquet_transform_ray import (
-    IngestToParquetRayConfiguration,
-    ingest_detect_programming_lang_key,
-    ingest_domain_key,
-    ingest_snapshot_key,
-    ingest_supported_langs_file_key,
-)
 
 
 # create parameters
@@ -37,11 +37,11 @@ s3_conf = {
 worker_options = {"num_cpus": 0.8, "memory": 2 * GB}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 ingest_config = {
-    ingest_supported_langs_file_key: "test/ingest_2_parquet/languages/lang_extensions.json",
-    ingest_detect_programming_lang_key: True,
-    ingest_snapshot_key: "github",
-    ingest_domain_key: "code",
-    "ingest_to_parquet_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
+    supported_langs_file_key: "test/ingest_2_parquet/languages/lang_extensions.json",
+    detect_programming_lang_key: True,
+    snapshot_key: "github",
+    domain_key: "code",
+    "code2parquet_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
 }
 
 params = {
@@ -63,6 +63,6 @@ params = {
 if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=(params | ingest_config))
     # create launcher
-    launcher = RayTransformLauncher(IngestToParquetRayConfiguration())
+    launcher = RayTransformLauncher(CodeToParquetRayConfiguration())
     # launch
     launcher.launch()

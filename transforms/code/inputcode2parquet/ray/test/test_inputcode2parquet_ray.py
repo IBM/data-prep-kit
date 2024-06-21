@@ -13,17 +13,17 @@
 import ast
 import os
 
+from inputcode2parquet_transform_ray import (
+    CodeToParquetRayConfiguration,
+    detect_programming_lang_key,
+    domain_key,
+    snapshot_key,
+    supported_langs_file_key,
+)
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from ingest_2_parquet_transform_ray import (
-    IngestToParquetRayConfiguration,
-    ingest_detect_programming_lang_key,
-    ingest_domain_key,
-    ingest_snapshot_key,
-    ingest_supported_langs_file_key,
-)
 
 
 class TestRayIngestToParquetTransform(AbstractTransformLauncherTest):
@@ -43,14 +43,14 @@ class TestRayIngestToParquetTransform(AbstractTransformLauncherTest):
         config = {
             "run_locally": True,
             "data_files_to_use": ast.literal_eval("['.zip']"),
-            ingest_supported_langs_file_key: lang_supported_file,
-            ingest_detect_programming_lang_key: True,
-            ingest_snapshot_key: "github",
-            ingest_domain_key: "code",
+            supported_langs_file_key: lang_supported_file,
+            detect_programming_lang_key: True,
+            snapshot_key: "github",
+            domain_key: "code",
         }
         fixtures = [
             (
-                RayTransformLauncher(IngestToParquetRayConfiguration()),
+                RayTransformLauncher(CodeToParquetRayConfiguration()),
                 config,
                 basedir + "/input",
                 basedir + "/expected",

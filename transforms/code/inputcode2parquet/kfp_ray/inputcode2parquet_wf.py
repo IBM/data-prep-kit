@@ -19,9 +19,9 @@ from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, Component
 
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "ingest_2_parquet_transform_ray.py"
+EXEC_SCRIPT_NAME: str = "inputcode2parquet_transform_ray.py"
 
-task_image = "quay.io/dataprep1/data-prep-kit/ingest_2_parquet-ray:0.4.0.dev6"
+task_image = "quay.io/dataprep1/data-prep-kit/inputcode2parquet-ray:0.4.0.dev6"
 
 
 # components
@@ -42,10 +42,10 @@ def compute_exec_params_func(
     runtime_pipeline_id: str,
     runtime_job_id: str,
     runtime_code_location: str,
-    ingest_to_parquet_supported_langs_file: str,
-    ingest_to_parquet_domain: str,
-    ingest_to_parquet_snapshot: str,
-    ingest_to_parquet_detect_programming_lang: bool,
+    code2parquet_supported_langs_file: str,
+    code2parquet_domain: str,
+    code2parquet_snapshot: str,
+    code2parquet_detect_programming_lang: bool,
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -59,10 +59,10 @@ def compute_exec_params_func(
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": runtime_code_location,
-        "ingest_to_parquet_supported_langs_file": ingest_to_parquet_supported_langs_file,
-        "ingest_to_parquet_domain": ingest_to_parquet_domain,
-        "ingest_to_parquet_snapshot": ingest_to_parquet_snapshot,
-        "ingest_to_parquet_detect_programming_lang": ingest_to_parquet_detect_programming_lang,
+        "code2parquet_supported_langs_file": code2parquet_supported_langs_file,
+        "code2parquet_domain": code2parquet_domain,
+        "code2parquet_snapshot": code2parquet_snapshot,
+        "code2parquet_detect_programming_lang": code2parquet_detect_programming_lang,
     }
 
 
@@ -97,23 +97,23 @@ execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "execu
 # clean up Ray
 cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "ingest_to_parquet"
-PREFIX: str = "ingest_to_parquet"
+TASK_NAME: str = "inputcode2parquet"
+PREFIX: str = "inputcode2parquet"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
     description="Pipeline for converting zip files to parquet",
 )
-def ingest_to_parquet(
-    ray_name: str = "ingest_to_parquet-kfp-ray",  # name of Ray cluster
+def inputcode2parquet(
+    ray_name: str = "code2parquet-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
     '"image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'test/ingest_2_parquet/input', 'output_folder': 'test/ingest_2_parquet/output/'}",
+    data_s3_config: str = "{'input_folder': 'test/inputcode2parquet/input', 'output_folder': 'test/inputcode2parquet/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
@@ -122,12 +122,12 @@ def ingest_to_parquet(
     runtime_actor_options: str = "{'num_cpus': 0.8}",
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # Proglang match parameters
-    ingest_to_parquet_supported_langs_file: str = "test/ingest_2_parquet/languages/lang_extensions.json",
-    ingest_to_parquet_detect_programming_lang: bool = True,
-    ingest_to_parquet_domain: str = "code",
-    ingest_to_parquet_snapshot: str = "github",
-    ingest_to_parquet_s3_access_secret: str = "s3-secret",
+    # code to parquet
+    code2parquet_supported_langs_file: str = "test/inputcode2parquet/languages/lang_extensions.json",
+    code2parquet_detect_programming_lang: bool = True,
+    code2parquet_domain: str = "code",
+    code2parquet_snapshot: str = "github",
+    code2parquet_s3_access_secret: str = "s3-secret",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ) -> None:
@@ -163,11 +163,11 @@ def ingest_to_parquet(
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    :param ingest_to_parquet_supported_langs_file - file to store allowed languages
-    :param ingest_to_parquet_detect_programming_lang - detect programming language flag
-    :param ingest_to_parquet_domain: domain
-    :param ingest_to_parquet_snapshot: snapshot
-    :param ingest_to_parquet_s3_access_secret - ingest to parquet s3 access secret
+    :param code2parquet_supported_langs_file - file to store allowed languages
+    :param code2parquet_detect_programming_lang - detect programming language flag
+    :param code2parquet_domain: domain
+    :param code2parquet_snapshot: snapshot
+    :param code2parquet_s3_access_secret - ingest to parquet s3 access secret
                     (here we are assuming that select language info is in S3, but potentially in the different bucket)
     :return: None
     """
@@ -187,10 +187,10 @@ def ingest_to_parquet(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            ingest_to_parquet_supported_langs_file=ingest_to_parquet_supported_langs_file,
-            ingest_to_parquet_domain=ingest_to_parquet_domain,
-            ingest_to_parquet_snapshot=ingest_to_parquet_snapshot,
-            ingest_to_parquet_detect_programming_lang=ingest_to_parquet_detect_programming_lang,
+            code2parquet_supported_langs_file=code2parquet_supported_langs_file,
+            code2parquet_domain=code2parquet_domain,
+            code2parquet_snapshot=code2parquet_snapshot,
+            code2parquet_detect_programming_lang=code2parquet_detect_programming_lang,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
@@ -217,10 +217,10 @@ def ingest_to_parquet(
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
-        ComponentUtils.set_s3_env_vars_to_component(execute_job, ingest_to_parquet_s3_access_secret, prefix=PREFIX)
+        ComponentUtils.set_s3_env_vars_to_component(execute_job, code2parquet_s3_access_secret, prefix=PREFIX)
         execute_job.after(ray_cluster)
 
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(ingest_to_parquet, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(inputcode2parquet, __file__.replace(".py", ".yaml"))

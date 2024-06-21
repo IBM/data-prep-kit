@@ -40,14 +40,14 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
 from ray.actor import ActorHandle
 
 
-shortname = "ingest_to_parquet"
+shortname = "code2parquet"
 cli_prefix = f"{shortname}_"
-ingest_supported_langs_file_key = f"{shortname}_supported_langs_file"
-ingest_supported_languages = f"{shortname}_supported_languages"
-ingest_data_factory_key = f"{shortname}_data_factory"
-ingest_detect_programming_lang_key = f"{shortname}_detect_programming_lang"
-ingest_domain_key = f"{shortname}_domain"
-ingest_snapshot_key = f"{shortname}_snapshot"
+supported_langs_file_key = f"{shortname}_supported_langs_file"
+supported_languages = f"{shortname}_supported_languages"
+data_factory_key = f"{shortname}_data_factory"
+detect_programming_lang_key = f"{shortname}_detect_programming_lang"
+domain_key = f"{shortname}_domain"
+snapshot_key = f"{shortname}_snapshot"
 
 
 def _get_supported_languages(lang_file: str, data_access: DataAccess, logger: logging.Logger) -> dict[str, str]:
@@ -59,7 +59,7 @@ def _get_supported_languages(lang_file: str, data_access: DataAccess, logger: lo
     return reversed_dict
 
 
-class IngestToParquetTransform(AbstractBinaryTransform):
+class CodeToParquetTransform(AbstractBinaryTransform):
     """ """
 
     def __init__(self, config: dict):
@@ -74,15 +74,15 @@ class IngestToParquetTransform(AbstractBinaryTransform):
         from data_processing.utils import get_logger
 
         self.logger = get_logger(__name__)
-        self.domain = config.get(ingest_domain_key, "")
-        self.snapshot = config.get(ingest_snapshot_key, "")
-        self.detect_programming_lang = config.get(ingest_detect_programming_lang_key, "")
-        supported_languages_ref = config.get(ingest_supported_languages, None)
+        self.domain = config.get(domain_key, "")
+        self.snapshot = config.get(snapshot_key, "")
+        self.detect_programming_lang = config.get(detect_programming_lang_key, "")
+        supported_languages_ref = config.get(supported_languages, None)
         if supported_languages_ref is None:
-            path = config.get(ingest_supported_langs_file_key, None)
+            path = config.get(supported_langs_file_key, None)
             if path is None:
-                raise RuntimeError(f"Missing configuration value for key {ingest_supported_langs_file_key}")
-            daf = config.get(ingest_data_factory_key, None)
+                raise RuntimeError(f"Missing configuration value for key {supported_langs_file_key}")
+            daf = config.get(data_factory_key, None)
             data_access = daf.create_data_access()
             self.languages_supported = _get_supported_languages(
                 lang_file=path, data_access=data_access, logger=self.logger
@@ -152,7 +152,7 @@ class IngestToParquetTransform(AbstractBinaryTransform):
         return [(TransformUtils.convert_arrow_to_binary(table=table), ".parquet")], {"number of rows": number_of_rows}
 
 
-class IngestToParquetRuntime(DefaultRayTransformRuntime):
+class CodeToParquetRuntime(DefaultRayTransformRuntime):
     """
     Ingest to Parquet runtime support
     """
@@ -184,12 +184,12 @@ class IngestToParquetRuntime(DefaultRayTransformRuntime):
         :param files - list of files to process
         :return: dictionary of filter init params
         """
-        lang_file = self.params.get(ingest_supported_langs_file_key, None)
+        lang_file = self.params.get(supported_langs_file_key, None)
         if lang_file is None:
-            raise RuntimeError(f"Missing configuration key {ingest_supported_langs_file_key}")
-        lang_data_access_factory = self.params.get(ingest_data_factory_key, None)
+            raise RuntimeError(f"Missing configuration key {supported_langs_file_key}")
+        lang_data_access_factory = self.params.get(data_factory_key, None)
         if lang_data_access_factory is None:
-            raise RuntimeError(f"Missing configuration key {ingest_data_factory_key}")
+            raise RuntimeError(f"Missing configuration key {data_factory_key}")
         lang_dict = _get_supported_languages(
             lang_file=lang_file,
             data_access=lang_data_access_factory.create_data_access(),
@@ -197,10 +197,10 @@ class IngestToParquetRuntime(DefaultRayTransformRuntime):
         )
         lang_refs = ray.put(lang_dict)
         self.logger.debug(f"Placed language list into Ray object storage under reference{lang_refs}")
-        return {ingest_supported_languages: lang_refs} | self.params
+        return {supported_languages: lang_refs} | self.params
 
 
-class IngestToParquetTransformConfiguration(TransformConfiguration):
+class CodeToParquetTransformConfiguration(TransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -209,8 +209,8 @@ class IngestToParquetTransformConfiguration(TransformConfiguration):
     def __init__(self):
         super().__init__(
             name=shortname,
-            transform_class=IngestToParquetTransform,
-            remove_from_metadata=[ingest_data_factory_key],
+            transform_class=CodeToParquetTransform,
+            remove_from_metadata=[data_factory_key],
         )
         from data_processing.utils import get_logger
 
@@ -225,20 +225,20 @@ class IngestToParquetTransformConfiguration(TransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            f"--{ingest_supported_langs_file_key}",
+            f"--{supported_langs_file_key}",
             type=str,
             default=None,
             help="Path to file containing the list of supported languages",
         )
         parser.add_argument(
-            f"--{ingest_detect_programming_lang_key}",
+            f"--{detect_programming_lang_key}",
             type=lambda x: bool(str2bool(x)),
             default=True,
             help="generate programming lang",
         )
-        parser.add_argument(f"--{ingest_snapshot_key}", type=str, help="Name the dataset", default="")
+        parser.add_argument(f"--{snapshot_key}", type=str, help="Name the dataset", default="")
         parser.add_argument(
-            f"--{ingest_domain_key}",
+            f"--{domain_key}",
             type=str,
             help="To identify whether data is code or natural language",
             default="",
@@ -255,15 +255,15 @@ class IngestToParquetTransformConfiguration(TransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         dargs = vars(args)
-        if dargs.get(ingest_supported_langs_file_key, None) is None:
-            self.logger.warning(f"{ingest_supported_langs_file_key} is required, but got None")
+        if dargs.get(supported_langs_file_key, None) is None:
+            self.logger.warning(f"{supported_langs_file_key} is required, but got None")
             return False
         self.params = {
-            ingest_detect_programming_lang_key: dargs.get(ingest_detect_programming_lang_key, None),
-            ingest_supported_langs_file_key: dargs.get(ingest_supported_langs_file_key, ""),
-            ingest_domain_key: dargs.get(ingest_domain_key, ""),
-            ingest_snapshot_key: dargs.get(ingest_snapshot_key, ""),
-            ingest_data_factory_key: self.daf,
+            detect_programming_lang_key: dargs.get(detect_programming_lang_key, None),
+            supported_langs_file_key: dargs.get(supported_langs_file_key, ""),
+            domain_key: dargs.get(domain_key, ""),
+            snapshot_key: dargs.get(snapshot_key, ""),
+            data_factory_key: self.daf,
         }
         self.logger.info(f"Transform configuration {self.params}")
 
@@ -271,18 +271,16 @@ class IngestToParquetTransformConfiguration(TransformConfiguration):
         return self.daf.apply_input_params(args)
 
 
-class IngestToParquetPythonConfiguration(PythonTransformRuntimeConfiguration):
+class CodeToParquetPythonConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=IngestToParquetTransformConfiguration())
+        super().__init__(transform_config=CodeToParquetTransformConfiguration())
 
 
-class IngestToParquetRayConfiguration(RayTransformRuntimeConfiguration):
+class CodeToParquetRayConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(
-            transform_config=IngestToParquetTransformConfiguration(), runtime_class=IngestToParquetRuntime
-        )
+        super().__init__(transform_config=CodeToParquetTransformConfiguration(), runtime_class=CodeToParquetRuntime)
 
 
 if __name__ == "__main__":
-    launcher = RayTransformLauncher(IngestToParquetRayConfiguration())
+    launcher = RayTransformLauncher(CodeToParquetRayConfiguration())
     launcher.launch()

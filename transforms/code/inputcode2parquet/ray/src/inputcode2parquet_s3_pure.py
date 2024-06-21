@@ -14,39 +14,41 @@ import ast
 import os
 import sys
 
-from data_processing.runtime.pure_python import PythonTransformLauncher
-from data_processing.utils import ParamsUtils
-from ingest_2_parquet_transform_ray import (
-    IngestToParquetPythonConfiguration,
-    ingest_detect_programming_lang_key,
-    ingest_domain_key,
-    ingest_snapshot_key,
-    ingest_supported_langs_file_key,
+from inputcode2parquet_transform_ray import (
+    CodeToParquetPythonConfiguration,
+    detect_programming_lang_key,
+    domain_key,
+    snapshot_key,
+    supported_langs_file_key,
 )
+from data_processing.runtime.pure_python import PythonTransformLauncher
+from data_processing.utils import GB, ParamsUtils
 
 
 # create parameters
-supported_languages_file = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "../test-data/languages/lang_extensions.json")
-)
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
-local_conf = {
-    "input_folder": input_folder,
-    "output_folder": output_folder,
+s3_cred = {
+    "access_key": "localminioaccesskey",
+    "secret_key": "localminiosecretkey",
+    "url": "http://localhost:9000",
 }
-worker_options = {"num_cpus": 0.8}
+s3_conf = {
+    "input_folder": "test/ingest_2_parquet/input",
+    "output_folder": "test/ingest_2_parquet/output",
+}
+worker_options = {"num_cpus": 0.8, "memory": 2 * GB}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 ingest_config = {
-    ingest_supported_langs_file_key: supported_languages_file,
-    ingest_detect_programming_lang_key: True,
-    ingest_snapshot_key: "github",
-    ingest_domain_key: "code",
+    supported_langs_file_key: "test/ingest_2_parquet/languages/lang_extensions.json",
+    detect_programming_lang_key: True,
+    snapshot_key: "github",
+    domain_key: "code",
+    "code2parquet_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
 }
 
 params = {
     # Data access. Only required parameters are specified
-    "data_local_config": ParamsUtils.convert_to_ast(local_conf),
+    "data_s3_cred": ParamsUtils.convert_to_ast(s3_cred),
+    "data_s3_config": ParamsUtils.convert_to_ast(s3_conf),
     "data_files_to_use": ast.literal_eval("['.zip']"),
     # orchestrator
     "runtime_pipeline_id": "pipeline_id",
@@ -57,6 +59,6 @@ params = {
 if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=(params | ingest_config))
     # create launcher
-    launcher = PythonTransformLauncher(IngestToParquetPythonConfiguration())
+    launcher = PythonTransformLauncher(CodeToParquetPythonConfiguration())
     # launch
     launcher.launch()
