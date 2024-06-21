@@ -1,7 +1,6 @@
 # Define the root of the local git clone for the common rules to be able
 # know where they are running from.
 REPOROOT=../../..
-include ${REPOROOT}/.make.versions
 
 # Include the common rules.
 # Use "make help" to see them.

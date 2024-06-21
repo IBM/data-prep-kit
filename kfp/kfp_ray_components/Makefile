@@ -12,11 +12,9 @@ DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 ifeq ($(KFPv2), 1)
         DOCKER_IMAGE_NAME=kfp-data-processing_v2
         DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
-        WORKFLOW_SUPPORT_LIB=kfp_v2_workflow_support
 else
         DOCKER_IMAGE_NAME=kfp-data-processing
         DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
-        WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
 endif
 
 .PHONY: .lib-src-image
@@ -48,7 +46,7 @@ set-versions:
 	@$(MAKE) .reconcile-requirements FILE=deleteRayClusterComponent.yaml
 	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent.yaml
 	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent_multi_s3.yaml
-	$(REPOROOT)/scripts/transforms/update_dockerfile.sh ${RAY}
+	@$(REPOROOT)/scripts/transforms/update_dockerfile.sh ${RAY}
 ifneq ($(KFPv2), 1)
 	@$(MAKE) .reconcile-requirements FILE=executeSubWorkflowComponent.yaml
 endif
