@@ -15,8 +15,7 @@ import sys
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
-from proglang_select_transform_ray import (
-    ProgLangSelectRuntime,
+from proglang_select_transform import (
     ProgLangSelectTransformConfiguration,
     lang_allowed_langs_file_key,
     lang_lang_column_key,

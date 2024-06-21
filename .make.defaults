@@ -310,10 +310,10 @@ __check_defined = \
 	$(MAKE) PIP_TARGET=data-prep-toolkit-ray .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;		\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_RAY_LIB_DIR) .defaults.install-src-venv;		\
-	if [ -d ../python ]; then                                               \
-		$(MAKE) PYTHON_PROJECT_DIR=../python .defaults.install-src-venv;    \
+	echo Installed source from Ray data processing library for `which $(PYTHON)`;		\
+	if [ -d ../python ]; then                                               		\
+		$(MAKE) PYTHON_PROJECT_DIR=../python .defaults.install-src-venv;    		\
 	fi 
-	echo Installed source from Ray data processing library for `which $(PYTHON)`
 
 # Install local requirements last as it generally includes our lib source
 .PHONY: .defaults.spark-lib-src-venv
