@@ -89,6 +89,8 @@ REPO_LVL_ORDER_RAY_VERSION=$(DPK_VERSION)
 PDF2PARQUET_PYTHON_VERSION=$(DPK_VERSION)
 PDF2PARQUET_RAY_VERSION=$(DPK_VERSION)
 
+LICENSE_COPYRIGHT_REMOVAL_VERSION=0.4.0$(RELEASE_VERSION_SUFFIX) 
+
 ################## ################## ################## ################## ################## ##################
 # Begin versions that the repo depends on. 
 
@@ -103,5 +105,4 @@ ifeq ($(KFPv2), 1)
 else
         WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
 endif
-
 
