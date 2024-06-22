@@ -15,6 +15,8 @@ import ray
 from data_processing.utils import GB, TransformUtils
 from data_processing_ray.runtime.ray import RayUtils, TransformStatisticsRay
 
+import pytest
+
 
 params = {}
 actor_options = {"num_cpus": 1, "memory": GB, "max_task_retries": 10}
@@ -47,10 +49,9 @@ def create_duplicate_column() -> pa.Table:
 
 def test_column_validation():
     table = _create_table()
-    res = TransformUtils.validate_columns(table=table, required=["foo"])
-    assert res == False
-    res = TransformUtils.validate_columns(table=table, required=["language"])
-    assert res == True
+    with pytest.raises(Exception) as ex:
+        TransformUtils.validate_columns(table=table, required=["foo"])
+    TransformUtils.validate_columns(table=table, required=["language"])
 
 
 def test_duplicates():

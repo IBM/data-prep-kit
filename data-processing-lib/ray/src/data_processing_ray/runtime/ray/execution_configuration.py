@@ -88,6 +88,9 @@ class RayTransformExecutionConfiguration(TransformExecutionConfiguration):
             "job type": "ray",
             "job id": captured["job_id"],
         }
+        # if the user did not define actor max_restarts set it up for fault tolerance
+        if "max_restarts" not in self.worker_options:
+            self.worker_options["max_restarts"] = -1
 
         # print them
         logger.info(f"number of workers {self.n_workers} worker options {self.worker_options}")

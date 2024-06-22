@@ -385,7 +385,7 @@ class BucketsHash:
                 # For very long buckets, split them
                 self.logger.info(f"Splitting bucket of length len(bucket) into chunks")
                 smaller_bucket = [
-                    bucket[i * LONG_BUCKET : (i + 1) * LONG_BUCKET]
+                    bucket[i * LONG_BUCKET: (i + 1) * LONG_BUCKET]
                     for i in range((len(bucket) + LONG_BUCKET - 1) // LONG_BUCKET)
                 ]
                 for b in smaller_bucket:
@@ -397,7 +397,7 @@ class BucketsHash:
         self.logger.info("Done submitting long buckets")
 
         # And now the rest of buckets
-        bucket_chunks = [short_buckets[i * 100 : (i + 1) * 100] for i in range((len(short_buckets) + 99) // 100)]
+        bucket_chunks = [short_buckets[i * 100: (i + 1) * 100] for i in range((len(short_buckets) + 99) // 100)]
         for b in bucket_chunks:
             ray.get(self.submitter.submit_for_processing.remote(b))
             self.short_bucket_submit_counter.inc(len(b))
@@ -475,7 +475,7 @@ class BucketsHashProcessor:
                 remote_replies.append(self.remote_docs[i].add_documents.remote(req))
             i += 1
         # Process replies
-        RayUtils.wait_for_execution_completion(replies=remote_replies)
+        RayUtils.wait_for_execution_completion(logger=self.logger, replies=remote_replies)
 
     # get minhashes and length for docs in the bucket
     def _get_minhashes_docs(self, doc_ids: list[int]) -> dict[int, tuple[int, list[int]]]:
@@ -600,7 +600,9 @@ class BucketsHashProcessorInvoker(object):
         self.n_processors = len(bucket_processors)
         self.pool = ActorPool(bucket_processors)
         self.submitted = 0
+        self.processed = 0
         self.logger = get_logger(__name__)
+        self.start = time.time()
 
     def submit_for_processing(self, buckets: list[Union[int, list[int]]]) -> None:
         # Get completed results
@@ -610,13 +612,30 @@ class BucketsHashProcessorInvoker(object):
             self.submitted += 1
             return
         else:
-            self.pool.get_next_unordered()
+            while True:
+                # we can have several workers fail here
+                try:
+                    self.pool.get_next_unordered()
+                    break
+                except Exception as e:
+                    self.logger.error(f"Failed to process request worker exception {e}")
+                    self.processed += 1
+            self.processed += 1
+            if self.processed % 100 == 0:
+                self.logger.info(f"processed {self.processed} buckets in {(time.time() - self.start)/60} min")
             self.logger.debug("Completed bucket processing request")
             self.pool.submit(lambda a, v: a.process_buckets.remote(v), buckets)
+            self.submitted += 1
             self.logger.debug("Submitted bucket processing request")
             return
 
     def wait_for_completion(self) -> None:
-        self.logger.info("Waiting bucket processing completion")
+        self.logger.info(f"Waiting bucket processing completion. Submitted requests {self.submitted}")
         while self.pool.has_next():
-            self.pool.get_next_unordered()
+            try:
+                self.pool.get_next_unordered()
+            except Exception as e:
+                self.logger.error(f"Failed to process request worker exception {e}")
+            self.processed += 1
+            if self.processed % 100 == 0:
+                self.logger.info(f"processed {self.processed} buckets in {(time.time() - self.start)/60} min")

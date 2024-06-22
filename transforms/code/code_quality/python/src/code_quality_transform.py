@@ -204,10 +204,9 @@ class CodeQualityTransform(AbstractTableTransform):
         Chain all preprocessing steps into one function to not fill cache.
         """
 
-        if not TransformUtils.validate_columns(
+        TransformUtils.validate_columns(
             table, [self.code_quality["contents_column_name"], self.code_quality["language_column_name"]]
-        ):
-            return [], {}
+        )
 
         line_mean_values = []
         line_max_values = []
