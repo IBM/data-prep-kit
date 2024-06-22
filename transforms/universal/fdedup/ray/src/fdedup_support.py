@@ -385,7 +385,7 @@ class BucketsHash:
                 # For very long buckets, split them
                 self.logger.info(f"Splitting bucket of length len(bucket) into chunks")
                 smaller_bucket = [
-                    bucket[i * LONG_BUCKET: (i + 1) * LONG_BUCKET]
+                    bucket[i * LONG_BUCKET : (i + 1) * LONG_BUCKET]
                     for i in range((len(bucket) + LONG_BUCKET - 1) // LONG_BUCKET)
                 ]
                 for b in smaller_bucket:
@@ -397,7 +397,7 @@ class BucketsHash:
         self.logger.info("Done submitting long buckets")
 
         # And now the rest of buckets
-        bucket_chunks = [short_buckets[i * 100: (i + 1) * 100] for i in range((len(short_buckets) + 99) // 100)]
+        bucket_chunks = [short_buckets[i * 100 : (i + 1) * 100] for i in range((len(short_buckets) + 99) // 100)]
         for b in bucket_chunks:
             ray.get(self.submitter.submit_for_processing.remote(b))
             self.short_bucket_submit_counter.inc(len(b))

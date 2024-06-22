@@ -124,8 +124,9 @@ class TransformUtils:
                 result = False
                 break
         if not result:
-            raise Exception(f"Not all required columns are present in the table - "
-                            f"required {required}, present {columns}")
+            raise Exception(
+                f"Not all required columns are present in the table - " f"required {required}, present {columns}"
+            )
 
     @staticmethod
     def convert_binary_to_arrow(data: bytes, schema: pa.schema = None) -> pa.Table:

@@ -11,11 +11,10 @@
 ################################################################################
 
 import pyarrow as pa
+import pytest
 import ray
 from data_processing.utils import GB, TransformUtils
 from data_processing_ray.runtime.ray import RayUtils, TransformStatisticsRay
-
-import pytest
 
 
 params = {}
