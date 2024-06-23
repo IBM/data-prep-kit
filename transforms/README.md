@@ -176,12 +176,13 @@ To build individual transform image use `make -C <path to transform directory>`,
 To push all the images run `make push`, or `make -C <path to transform directory> push` for individual transform.
 
 ### IDE Setup
-When running in an IDE, such as PyCharm, the following are generally required:
+When running in an IDE, such as PyCharm or VS Code, the following are generally required:
 
 * From the command line, build the venv using `make venv`.
 * In the IDE
     * Set your project/run configuration to use the venv/bin/python as your runtime virtual environment.
-        * In Pycharm this can be done through the PyCharm->Settings->Project...->Python Interpreter page
+        * In PyCharm, this can be done through the PyCharm->Settings->Project...->Python Interpreter page
+        * In VS Code, click on the current Python Interpreter in the bottom right corner and make sure that the Interpreter path is venv/bin/python
     * Mark the `src` as a _source root_ so that it is included in your PYTHONPATH when running .py files in the IDE
         * In Pycharm this can be done by selecting the `src` directory, and then selecting `Mark Directory as` -> `Sources Root`
  

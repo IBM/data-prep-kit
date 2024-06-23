@@ -205,9 +205,6 @@ def filtering(
 
         execute_job.after(ray_cluster)
 
-    # Configure the pipeline level to one week (in seconds)
-    dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
-
 
 if __name__ == "__main__":
     # Compiling the pipeline

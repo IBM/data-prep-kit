@@ -27,9 +27,8 @@ clean::
 set-versions: .check-env
 	@# Help: Copy the Makefile distribution version into the pyproject.toml
 	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_VERSION_v2}'"/' pyproject.toml
-	sed -i.back 's/data_prep_toolkit==[0-9].*/data_prep_toolkit==${DPK_LIB_VERSION}",/' pyproject.toml
+	sed -i.back 's/data_prep_toolkit_kfp_shared==[0-9].*/data_prep_toolkit_kfp_shared==${DPK_LIB_KFP_SHARED}",/' pyproject.toml
 	sed -i.back 's/kfp==[0-9].*/kfp==${KFP_v2}",/' pyproject.toml
-	sed -i.back 's/ray=[0-9].*/ray==${RAY}",/' pyproject.toml
 
 build:: set-versions venv
 ifneq ($(KFPv2), 1)
@@ -60,8 +59,10 @@ else
 	$(PYTHON) -m venv venv
 	. ${VENV_ACTIVATE};     \
 	cd ../../../data-processing-lib/python && make set-versions && cd -; \
+	cd ../../../data-processing-lib/ray && make set-versions && cd -; \
 	pip install --upgrade pip; \
 	pip install -e ../../../data-processing-lib/python; \
+	pip install -e ../../../data-processing-lib/ray; \
 	cd ../shared_workflow_support && make set-versions && cd -; \
 	pip install -e ../shared_workflow_support;	\
 	pip install -e .;	\

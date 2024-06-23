@@ -97,8 +97,7 @@ def noop(
     # Ray cluster
     ray_name: str = "noop-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
-    ray_head_options: str = '{"cpu": 1, "memory": 4, '
-    '"image": "' + task_image + '"}',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, ' '"image": "' + task_image + '"}',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
     '"image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
@@ -192,10 +191,6 @@ def noop(
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
-
-    # TODO
-    # Configure the pipeline level to one week (in seconds)
-    # dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 
 
 if __name__ == "__main__":

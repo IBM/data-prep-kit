@@ -45,6 +45,7 @@ def orchestrate(
 
     logger = get_logger(__name__)
     start_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    start_time = time.time()
     logger.info(f"orchestrator started at {start_ts}")
     try:
         # create data access
@@ -74,7 +75,7 @@ def orchestrate(
         # create statistics
         statistics = TransformStatisticsRay.remote({})
         if retries > 0:
-            statistics.add_stats.remote({"data access retries", retries})
+            statistics.add_stats.remote({"data access retries": retries})
         # create executors
         processor_params = {
             "data_access_factory": data_access_factory,
@@ -134,13 +135,14 @@ def orchestrate(
             "job_input_params": runtime_config.get_transform_metadata()
             | data_access_factory.get_input_params()
             | preprocessing_params.get_input_params(),
-            "execution_stats": resources,
+            "execution_stats": resources
+            | {
+                "execution time, min": (time.time() - start_time) / 60,
+            },
             "job_output_stats": stats,
         }
-        logger.debug(f"Saved job metadata: {metadata}.")
-        _, retries = data_access.save_job_metadata(metadata)
-        if retries > 0:
-            statistics.add_stats.remote({"data access retries", retries})
+        logger.debug(f"Saving job metadata: {metadata}.")
+        data_access.save_job_metadata(metadata)
         logger.debug("Saved job metadata.")
         return 0
     except Exception as e:

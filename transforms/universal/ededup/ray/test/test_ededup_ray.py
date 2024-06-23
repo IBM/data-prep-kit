@@ -19,7 +19,7 @@ from data_processing_ray.runtime.ray import RayTransformLauncher
 from ededup_transform_ray import EdedupRayTransformConfiguration
 
 
-class TestRayBlocklistTransform(AbstractTransformLauncherTest):
+class TestRayEdedupTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.

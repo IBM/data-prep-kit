@@ -10,8 +10,6 @@
 # limitations under the License.
 ################################################################################
 
-from typing import Any, NamedTuple
-
 
 def fdedup_compute_execution_params(
     worker_options: str,  # ray worker configuration
@@ -73,8 +71,8 @@ def fdedup_compute_execution_params(
 
     from data_processing.data_access import DataAccessS3
     from data_processing.utils import GB, KB
-    from scipy.integrate import quad as integrate
     from runtime_utils import KFPUtils
+    from scipy.integrate import quad as integrate
 
     EXECUTION_OF_KB_DOC = 0.003
 

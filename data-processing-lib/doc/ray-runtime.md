@@ -124,22 +124,6 @@ The `computed_execution_stats()` provides an opportunity to augment the statisti
 collected and aggregated by the TransformStatistics actor. It is called by the RayOrchestrator
 after all files have been processed.
 
-## Exceptions
-A transform may find that it needs to signal error conditions.
-For example, if a referenced model could not be loaded or
-a given input data (e.g., pyarrow Table) does not have the expected format (.e.g, columns).
-In general, it should identify such conditions by raising an exception. 
-With this in mind, there are two types of exceptions:
 
-1. Those that would not allow any data to be processed (e.g. model loading problem).
-2. Those that would not allow a specific datum to be processed (e.g. missing column).
-
-In the first situation the transform should throw an exception from the initializer, which
-will cause the Ray framework to terminate processing of all data. 
-In the second situation (identified in the `transform()` or `flush()` methods), the transform
-should throw an exception from the associated method.
-This will cause only the error-causing datume to be ignored and not written out,
-but allow continued processing of tables by the transform.
-In both cases, the framework will log the exception as an error.
 
 

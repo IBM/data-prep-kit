@@ -166,14 +166,16 @@ adds their handles to the transform parameters
 ```python
     def get_transform_config(
         self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
-    ) -> dict[str, Any]:
-        self.filters = RayUtils.create_actors(
-            clazz=HashFilter,
-            params={},
-            actor_options={"num_cpus": self.params.get("hash_cpu", 0.5)},
-            n_actors=self.params.get("num_hashes", 1),
-        )
-        return {"hashes": self.filters} | self.params
+) -> dict[str, Any]:
+
+
+self.aggregators = RayUtils.create_actors(
+  clazz=HashFilter,
+  params={},
+  actor_options={"num_cpus": self.params.get("hash_cpu", 0.5)},
+  n_actors=self.params.get("num_hashes", 1),
+)
+return {"hashes": self.aggregators} | self.params
 ```
 Inputs to this method includes a set of parameters, that moght not be needed for this transformer, but
 rather a superset of all parameters that can be used by different implementations of transform runtime (
@@ -187,20 +189,22 @@ class
 
 ```python
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
-    # Get filters stats
-    sum_hash = 0
-    sum_hash_mem = 0
-    remote_replies = [f.get_hash_size.remote() for f in self.filters]
-    while remote_replies:
-        # Wait for replies
-        ready, not_ready = ray.wait(remote_replies)
-        for r in ready:
-            h_size, h_memory = ray.get(r)
-            sum_hash = sum_hash + h_size
-            sum_hash_mem = sum_hash_mem + h_memory
-        remote_replies = not_ready
-    dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 1))
-    return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
+
+
+# Get filters stats
+sum_hash = 0
+sum_hash_mem = 0
+remote_replies = [f.get_size.remote() for f in self.aggregators]
+while remote_replies:
+  # Wait for replies
+  ready, not_ready = ray.wait(remote_replies)
+  for r in ready:
+    h_size, h_memory = ray.get(r)
+    sum_hash = sum_hash + h_size
+    sum_hash_mem = sum_hash_mem + h_memory
+  remote_replies = not_ready
+dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 1))
+return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
 ```
 Input to this method is a dictionary of metadata collected by statistics object. It then enhances it by information
 collected by hash actors and custom computations based on statistics data.
