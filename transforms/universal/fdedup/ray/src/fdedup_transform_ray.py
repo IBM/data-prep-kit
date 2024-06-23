@@ -164,7 +164,7 @@ class FdedupTransform(AbstractTableTransform):
                 remote_replies.append(self.minhashes[i].add_minhashes.remote(req))
             i += 1
         # wait for completion
-        RayUtils.wait_for_execution_completion(replies=remote_replies)
+        RayUtils.wait_for_execution_completion(logger=self.logger, replies=remote_replies)
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -190,8 +190,7 @@ class FdedupTransform(AbstractTableTransform):
                 minhashes.clear()
 
         # make sure that the doc column exists
-        if not TransformUtils.validate_columns(table=table, required=[self.doc_column, self.doc_id_column]):
-            return [], {}
+        TransformUtils.validate_columns(table=table, required=[self.doc_column, self.doc_id_column])
         # Inner variables
         buckets = {}
         minhashes = []
@@ -253,8 +252,7 @@ class FdedupFilter(AbstractTableTransform):
         :return: resulting table, statistics
         """
         # make sure that the doc column exists
-        if not TransformUtils.validate_columns(table=table, required=[self.doc_column, self.doc_id_column]):
-            return [], {}
+        TransformUtils.validate_columns(table=table, required=[self.doc_column, self.doc_id_column])
         # inner variables
         ids = table.column(self.doc_id_column)
         # Submit requests to an appropriate doc collectors
@@ -556,12 +554,12 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             collector.add_processing_submitter.remote(submitter=bucket_processor_invoker)
             for collector in bucket_collectors
         ]
-        RayUtils.wait_for_execution_completion(replies=bucket_replies)
+        RayUtils.wait_for_execution_completion(logger=self.logger, replies=bucket_replies)
         self.logger.info(f"added invoker to bucket collectors")
         # start bucket processing and wait for completion
         start = time.time()
         bucket_replies = [collector.process_buckets.remote() for collector in bucket_collectors]
-        RayUtils.wait_for_execution_completion(replies=bucket_replies)
+        RayUtils.wait_for_execution_completion(logger=self.logger, replies=bucket_replies)
         # Wait for pool to complete
         ray.get(bucket_processor_invoker.wait_for_completion.remote())
         self.logger.info(f"Done processing buckets in {(time.time() - start) / 60} min")
@@ -682,7 +680,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             print_interval = 1
         # process data
         processors = ActorPool(processors_list)
-        RayUtils.process_files(
+        failures = RayUtils.process_files(
             executors=processors,
             files=files,
             print_interval=print_interval,
@@ -694,6 +692,8 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             object_memory_gauge=available_object_memory_gauge,
             logger=self.logger,
         )
+        if failures > 0:
+            statistics.add_stats.remote({"actor failures": failures})
         # Clean up processors
         for processor in processors_list:
             ray.kill(actor=processor, no_restart=True)
