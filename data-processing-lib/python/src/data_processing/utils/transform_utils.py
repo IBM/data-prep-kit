@@ -100,6 +100,7 @@ class TransformUtils:
         """
         return os.path.splitext(file_path)
 
+    @staticmethod
     def get_file_basename(file_path) -> str:
         """
         Get the file's base name from the given file path.
@@ -109,16 +110,13 @@ class TransformUtils:
         return os.path.basename(file_path)
 
     @staticmethod
-    def validate_columns(table: pa.Table, required: list[str]) -> bool:
+    def validate_columns(table: pa.Table, required: list[str]) -> None:
         """
         Check if required columns exist in the table
         :param table: table
         :param required: list of required columns
-        :return: true, if all columns exist, false otherwise
+        :return: None
         """
-        from data_processing.utils import get_logger
-
-        logger = get_logger(__name__)
         columns = table.schema.names
         result = True
         for r in required:
@@ -126,8 +124,9 @@ class TransformUtils:
                 result = False
                 break
         if not result:
-            logger.error(f"Not all required columns are present in the table - required {required}, present {columns}")
-        return result
+            raise Exception(
+                f"Not all required columns are present in the table - " f"required {required}, present {columns}"
+            )
 
     @staticmethod
     def convert_binary_to_arrow(data: bytes, schema: pa.schema = None) -> pa.Table:

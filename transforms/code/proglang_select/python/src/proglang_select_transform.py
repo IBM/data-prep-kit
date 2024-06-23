@@ -81,9 +81,7 @@ class ProgLangSelectTransform(AbstractTableTransform):
         Select the rows for which the column `self.lang_column` has a value in the list `self.languages_include`.
         """
         # Ensure that the column exists
-        if not TransformUtils.validate_columns(table=table, required=[self.lang_column]):
-            return [], {}
-
+        TransformUtils.validate_columns(table=table, required=[self.lang_column])
         mask_known = [False] * table.num_rows
 
         index = 0
