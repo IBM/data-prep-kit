@@ -304,8 +304,8 @@ __check_defined = \
 	@echo Installing Ray and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
-	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit-ray .defaults.pip-uninstall;	\
+	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;		\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_RAY_LIB_DIR) .defaults.install-src-venv;		\
 	echo Installed source from Ray data processing library for `which $(PYTHON)`;		\
@@ -325,8 +325,8 @@ __check_defined = \
 	@echo Installing Spark and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
-	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit-spark .defaults.pip-uninstall;	\
+	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_SPARK_LIB_DIR) .defaults.install-src-venv;	\
 	if [ -d ../python ]; then                                               \
