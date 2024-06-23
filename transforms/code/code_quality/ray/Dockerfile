@@ -3,6 +3,10 @@ FROM docker.io/rayproject/ray:2.9.3-py310
 # install pytest
 RUN pip install --no-cache-dir pytest
 
+USER root
+RUN mkdir -p /home/ray/.cache && chmod -R 777 /home/ray/.cache
+USER ray
+
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
 COPY --chown=ray:users data-processing-lib-python/ data-processing-lib-python/
@@ -29,4 +33,3 @@ ARG BUILD_DATE
 ARG GIT_COMMIT
 LABEL build-date=$BUILD_DATE
 LABEL git-commit=$GIT_COMMIT
-
