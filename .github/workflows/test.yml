@@ -97,7 +97,7 @@ jobs:
                   export DEPLOY_KUBEFLOW=1
                   make -C kind setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms workflow-build
+                  make -C transforms setup
                   dir=("code"  "universal") && index=$(($RANDOM % 2)) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs/ -type d  -maxdepth 1 ))
                   # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
                   set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
@@ -141,5 +141,5 @@ jobs:
                   export KFPv2=1
                   make -C kind setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms/universal/noop workflow-build
+                  make setup
                   make -C transforms/universal/noop workflow-test

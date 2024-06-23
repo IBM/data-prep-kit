@@ -9,8 +9,8 @@ workflow-venv:: .check_python_version ${WORKFLOW_VENV_ACTIVATE}
 
 worflow-clean:: .workflows.clean
 
-.PHONY: workflow-build
-workflow-build: workflow-venv
+.PHONY: setup
+setup: workflow-venv
 	@for file in $(YAML_WF); do \
 		$(MAKE) $$file;       \
 	done
@@ -18,16 +18,10 @@ workflow-build: workflow-venv
 workflow-test::
 
 .PHONY: workflow-upload
-workflow-upload: workflow-build
+workflow-upload: setup
 	@for file in $(YAML_WF); do \
                 $(MAKE) .workflows.upload-pipeline PIPELINE_FILE=$$file; \
         done
-
-.PHONY: set-versions
-set-versions:
-	@for file in $(PYTHON_WF); do \
-		$(MAKE) .workflows.set-versions PIPELINE_FILE=$$file; \
-	done
 
 .PHONY: clean
 clean:

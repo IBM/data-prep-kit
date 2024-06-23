@@ -6,10 +6,6 @@ REPOROOT=../..
 # Use "make help" to see them.
 include $(REPOROOT)/.make.defaults
 
-IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kfp/requirements.env | sed 's/=/:=/' | sed 's/^/export /' > makeenv")
-
-include makeenv
-
 #DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}
 DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 
@@ -52,6 +48,7 @@ set-versions:
 	@$(MAKE) .reconcile-requirements FILE=deleteRayClusterComponent.yaml
 	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent.yaml
 	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent_multi_s3.yaml
+	$(REPOROOT)/scripts/transforms/update_dockerfile.sh ${RAY}
 ifneq ($(KFPv2), 1)
 	@$(MAKE) .reconcile-requirements FILE=executeSubWorkflowComponent.yaml
 endif

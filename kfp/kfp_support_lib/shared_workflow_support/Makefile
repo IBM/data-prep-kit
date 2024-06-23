@@ -2,7 +2,6 @@
 # know where they are running from.
 REPOROOT=../../..
 include ${REPOROOT}/.make.versions
-include ${REPOROOT}/kfp/requirements.env
 
 # Include the common rules.
 # Use "make help" to see them.
@@ -20,21 +19,17 @@ clean::
 	rm -rf src/*egg-info || true
 	rm -rf *.back || true
 
-
-.check-env:: .check_python_version
+.PHONY: .check-env
+.check-env::
 	@echo "Checks passed"
 
-set-versions: .check-env
-	@# Help: Copy the Makefile distribution version into the pyproject.toml
-	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_SHARED}'"/' pyproject.toml
-	sed -i.back 's/data_prep_toolkit_ray==[0-9].*/data_prep_toolkit_ray==${DPK_LIB_VERSION}",/' pyproject.toml
+.PHONY: set-versions
+set-versions:
+	$(MAKE) TOML_VERSION=$(DPK_LIB_KFP_VERSION) .defaults.update-toml
 
-build:: set-versions venv
-	@# Help: Build the distribution for publishing to a pypi
-	rm -r dist || true
-	rm -rf src/*egg-info || true
-	${PYTHON} -m pip install --upgrade build
-	${PYTHON} -m build
+build:: build-dist
+
+build-dist :: set-versions .defaults.build-dist
 
 publish:: .check-env
 	@# Help: Publish the wheel to testpypi
@@ -43,18 +38,12 @@ publish:: .check-env
 	${PYTHON} -m twine check dist/*
 	${PYTHON} -m twine upload --verbose --non-interactive dist/*
 
-venv::	pyproject.toml .check-env
-	@# Help: Create the virtual environment using pyproject.toml
+.PHONY: venv
+venv:
 	rm -rf venv
-	$(PYTHON) -m venv venv
-	. ${VENV_ACTIVATE};     \
-	pip install --upgrade pip; \
-	cd ../../../data-processing-lib/python && make set-versions && cd -; \
-	pip install -e ../../../data-processing-lib/python; \
-	cd ../../../data-processing-lib/ray && make set-versions && cd -; \
-	pip install -e ../../../data-processing-lib/ray; \
-	pip install -e .;		\
-	pip install pytest pytest-cov
+	@# Help: Create the virtual environment using pyproject.toml
+	$(MAKE) -C ${REPOROOT}/transforms .defaults.ray-lib-src-venv
+	. ${VENV_ACTIVATE}; pip install -e .;	
 
 test:: 	venv
 	@# Help: Use the already-built virtual environment to run pytest on the test directory.

@@ -11,8 +11,6 @@ workflow-venv: .check_python_version ${WORKFLOW_VENV_ACTIVATE}
 
 clean:: .defaults.clean
 
-setup:: 
-
 venv::
 
 build::
@@ -29,24 +27,16 @@ image::
 
 load-image::
 
-
-
-.PHONY: workflow-build
-workflow-build: workflow-venv
+.PHONY: setup
+setup: workflow-venv
 	$(MAKE) $(YAML_WF)
 
 .PHONY: workflow-test
-workflow-test: workflow-build
+workflow-test: setup
 	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=tokenization_wf.yaml
 
 .PHONY: workflow-upload
-workflow-upload: workflow-build
+workflow-upload: setup
 	@for file in $(YAML_WF); do \
 		$(MAKE) .workflows.upload-pipeline PIPELINE_FILE=$$file; \
-	done
-
-.PHONY: set-versions
-set-versions:
-	@for file in $(PYTHON_WF); do \
-		$(MAKE) .workflows.set-versions PIPELINE_FILE=$$file; \
 	done

@@ -305,7 +305,7 @@ __check_defined = \
 	@# Help: Install Ray and Python data processing library source into existing venv
 	@echo Installing Ray and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
-	pip install pytest;						\
+	pip install pytest pytest-cov;					\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit-ray .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;		\
@@ -503,20 +503,22 @@ MINIO_ADMIN_PWD= localminiosecretkey
 .PHONY: .defaults.set-toml-version
 .defaults.set-toml-version:
 	@# Help: Set the version= field of pyproject.toml 
-	cat pyproject.toml | sed -e \
+	@cat pyproject.toml | sed -e \
 		's/^version[ ]*=.*/version = "'${TOML_VERSION}'"/' \
 		> tt.toml
-	mv tt.toml pyproject.toml
+	@mv tt.toml pyproject.toml
 
 # Updates the versions references to our repo source as defined in .make.versions
 .PHONY: .defaults.update-toml-lib-dep-versions
 .defaults.update-toml-lib-dep-versions:
 	@# Help: Update pyproject.toml to depend on lib versions defined in .make.versions 
-	cat pyproject.toml | sed 									\
+	@cat pyproject.toml | sed 									\
 		-e 's/"data-prep-toolkit-ray\(..\).*",/"data-prep-toolkit-ray\1$(DPK_LIB_VERSION)",/' 	\
 		-e 's/"data-prep-toolkit-spark\(..\).*",/"data-prep-toolkit-spark\1$(DPK_LIB_VERSION)",/' 	\
-		-e 's/"data-prep-toolkit-kfp\(..\).*",/"data-prep-toolkit-spark\1$(DPK_LIB_KFP_VERSION)",/' 	\
+		-e 's/"data-prep-toolkit-kfp\([=><][=><]\).*",/"data-prep-toolkit-kfp\1$(DPK_LIB_KFP_VERSION)",/' 	\
 		-e 's/"data-prep-toolkit\([=><][=><]\).*",/"data-prep-toolkit\1$(DPK_LIB_VERSION)",/' 		\
+		-e 's/"ray\[default\]\([=><][=><]\).*",/"ray\[default\]\1$(RAY)",/'				\
+		-e 's/"data-prep-toolkit-kfp-shared\(..\).*",/"data-prep-toolkit-kfp-shared\1$(DPK_LIB_KFP_VERSION)",/'     \
 		> tt.toml
 	mv tt.toml pyproject.toml
 

@@ -321,9 +321,16 @@ minio-stop:
 # Update the toml file to version from .make.version which is expected to be set into DOCKER_IMAGE_VERSION
 # Note that the image and distribution versions will be the same.
 # Requires version number of Python image as TRANSFORM_PYTHON_VERSION to be set when called
+# In addition, update Dockerfile with versions
 .transforms.set-versions: 
+ifneq ("$(wildcard pyproject.toml)","")
+	$(call check_defined,DOCKER_IMAGE_VERSION)
+	$(call check_defined, TRANSFORM_PYTHON_VERSION)
 	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
-	cat pyproject.toml | sed 	\
-	    -e 's/dpk-$(TRANSFORM_NAME)-transform-python\([=<>][=<>]\).*/dpk-$(TRANSFORM_NAME)-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
-	    > tt.toml
-	mv tt.toml pyproject.toml
+	@cat pyproject.toml | sed	\
+		-e 's/dpk-$(TRANSFORM_NAME)-transform-python\([=<>][=<>]\).*/dpk-$(TRANSFORM_NAME)-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'        \
+		> tt.toml
+	@mv tt.toml pyproject.toml
+endif
+	$(REPOROOT)/scripts/transforms/update_dockerfile.sh ${RAY}
+
