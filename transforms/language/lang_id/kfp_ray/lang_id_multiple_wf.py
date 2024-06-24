@@ -17,7 +17,7 @@ import kfp.dsl as dsl
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/lang_id-ray:0.4.0.dev6"
+task_image = "quay.io/dataprep1/data-prep-kit/lang_id-ray:0.2.0.dev6"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "lang_id_transform_ray.py"

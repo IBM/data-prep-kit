@@ -4,6 +4,9 @@ include ${REPOROOT}/.make.defaults
 
 KFPv2 ?= 0
 
+.PHONY: publish
+publish:
+
 .PHONY: workflow-venv
 workflow-venv:
 ifeq ($(KFPv2), 1)

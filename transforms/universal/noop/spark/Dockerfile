@@ -13,8 +13,7 @@ COPY --chown=spark:root data-processing-lib-python/ data-processing-lib-python/
 RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=spark:root data-processing-lib-spark/ data-processing-lib-spark/
 RUN cd data-processing-lib-spark && pip install --no-cache-dir -e .
-
-COPY --chown=ray:users python-transform/  python-transform/
+COPY --chown=spark:root python-transform/  python-transform/
 RUN cd python-transform && pip install --no-cache-dir -e .
 
 COPY --chown=root:root src/ src/
