@@ -42,15 +42,11 @@ publish-dist:: .defaults.publish-dist
 
 setup:: .transforms.setup
 
-run-cli-ray-sample: .transforms.run-cli-ray-sample
+run-cli-sample: .transforms.run-cli-ray-sample
 
-run-local-sample: #.transforms.run-local-sample
-	@# Help: Not implemented yet
-	@echo "No src/code_quality_local.py yet :("
+run-local-sample: .transforms.run-local-ray-sample
 
-run-local-ray-sample: .transforms.run-local-ray-sample
-
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 

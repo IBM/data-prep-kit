@@ -97,8 +97,7 @@ class DocIDTransform(AbstractTableTransform):
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
-        if not TransformUtils.validate_columns(table=table, required=[self.doc_column]):
-            raise RuntimeError(f"Table does not contain column with name {self.doc_column}")
+        TransformUtils.validate_columns(table=table, required=[self.doc_column])
 
         if self.hash_column is not None:
             # add doc id column

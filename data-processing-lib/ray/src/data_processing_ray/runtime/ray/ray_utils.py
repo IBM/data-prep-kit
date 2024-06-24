@@ -105,7 +105,7 @@ class RayUtils:
         available_memory_gauge: Gauge,
         object_memory_gauge: Gauge,
         logger: logging.Logger,
-    ) -> None:
+    ) -> int:
         """
         Process files
         :param executors: actor pool of executors
@@ -118,9 +118,10 @@ class RayUtils:
         :param available_memory_gauge: ray Gauge to report available memory
         :param object_memory_gauge: ray Gauge to report available object memory
         :param logger: logger
-        :return:
+        :return: number of actors failures
         """
         logger.debug("Begin processing files")
+        actor_failures = 0
         RayUtils.get_available_resources(
             available_cpus_gauge=available_cpus_gauge,
             available_gpus_gauge=available_gpus_gauge,
@@ -133,12 +134,20 @@ class RayUtils:
         for path in files:
             if executors.has_free():  # still have room
                 executors.submit(lambda a, v: a.process_file.remote(v), path)
-                running = running + 1
+                running += 1
                 files_in_progress_gauge.set(running)
             else:  # need to wait for some actors
-                executors.get_next_unordered()
+                while True:
+                    # we can have several workers fail here
+                    try:
+                        executors.get_next_unordered()
+                        break
+                    except Exception as e:
+                        logger.error(f"Failed to process request worker exception {e}")
+                        actor_failures += 1
+                        completed += 1
                 executors.submit(lambda a, v: a.process_file.remote(v), path)
-                completed = completed + 1
+                completed += 1
                 files_completed_gauge.set(completed)
                 RayUtils.get_available_resources(
                     available_cpus_gauge=available_cpus_gauge,
@@ -156,7 +165,15 @@ class RayUtils:
             f"in {(time.time() - t_start)/60} min. Waiting for completion"
         )
         while executors.has_next():
-            executors.get_next_unordered()
+            while True:
+                # we can have several workers fail here
+                try:
+                    executors.get_next_unordered()
+                    break
+                except Exception as e:
+                    logger.error(f"Failed to process request worker exception {e}")
+                    actor_failures += 1
+                    completed += 1
             running -= 1
             completed += 1
             files_in_progress_gauge.set(running)
@@ -169,15 +186,22 @@ class RayUtils:
             )
 
         logger.info(f"Completed processing {completed} files in {(time.time() - t_start)/60.} min")
+        return actor_failures
 
     @staticmethod
-    def wait_for_execution_completion(replies: list[ray.ObjectRef]) -> None:
+    def wait_for_execution_completion(logger: logging.Logger, replies: list[ray.ObjectRef]) -> int:
         """
         Wait for all requests completed
         :param replies: list of request futures
         :return: None
         """
+        actor_failures = 0
         while replies:
             # Wait for replies
-            ready, not_ready = ray.wait(replies)
+            try:
+                ready, not_ready = ray.wait(replies)
+            except Exception as e:
+                logger.error(f"Failed to process request worker exception {e}")
+                actor_failures += 1
             replies = not_ready
+        return actor_failures
