@@ -216,15 +216,6 @@ class LicenseCopyrightRemovalTransformConfiguration(TransformConfiguration):
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
-        # dargs = vars(args)
-
-        # self.params = {
-        #         "contents_column_name": dargs.get("contents_column_name"),
-        #         "license": dargs.get("license"),
-        #         "copyright": dargs.get("copyright"),
-        #     }
-
-        # return True
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         self.params = self.params | captured
         return True
