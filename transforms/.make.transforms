@@ -323,14 +323,16 @@ minio-stop:
 # Requires version number of Python image as TRANSFORM_PYTHON_VERSION to be set when called
 # In addition, update Dockerfile with versions
 .transforms.set-versions: 
-ifneq ("$(wildcard pyproject.toml)","")
 	$(call check_defined,DOCKER_IMAGE_VERSION)
 	$(call check_defined, TRANSFORM_PYTHON_VERSION)
 	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
-	@cat pyproject.toml | sed	\
-		-e 's/dpk-$(TRANSFORM_NAME)-transform-python\([=<>][=<>]\).*/dpk-$(TRANSFORM_NAME)-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'        \
-		> tt.toml
-	@mv tt.toml pyproject.toml
-endif
+	if [ -e pyproject.toml ]; then	\
+	    dash_name=$$(echo $(TRANSFORM_NAME) | sed -e 's/_/-/g');		\
+	    cat pyproject.toml | sed 	\
+	    -e 's/"dpk-$(TRANSFORM_NAME)-transform-python\([=<>][=<>]\).*",/"dpk-$(TRANSFORM_NAME)-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
+	    -e 's/"dpk-'$${dash_name}'-transform-python\([=<>][=<>]\).*",/"dpk-'$${dash_name}'-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
+	    > tt.toml;			\
+	    mv tt.toml pyproject.toml;	\
+	fi
 	$(REPOROOT)/scripts/transforms/update_dockerfile.sh ${RAY}
 
