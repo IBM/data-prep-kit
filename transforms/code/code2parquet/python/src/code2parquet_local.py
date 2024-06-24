@@ -13,14 +13,12 @@
 import ast
 import os
 
-from code2parquet_transform import (
+from code2parquet_transform import (  # domain_key,; snapshot_key,
+    CodeToParquetTransform,
     data_factory_key,
     detect_programming_lang_key,
-    domain_key,
-    snapshot_key,
     supported_langs_file_key,
 )
-from code2parquet_transform_python import CodeToParquetPythonTransform
 from data_processing.data_access import DataAccessFactory, DataAccessLocal
 
 
@@ -32,8 +30,8 @@ input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../ra
 params = {
     supported_langs_file_key: supported_languages_file,
     detect_programming_lang_key: True,
-    snapshot_key: "github",
-    domain_key: "code",
+    # snapshot_key: "github",
+    # domain_key: "code",
     "data_files_to_use": ast.literal_eval("['.zip']"),
     data_factory_key: DataAccessFactory(),  # Expect to create DataAccessLocal
 }
@@ -41,7 +39,8 @@ params = {
 if __name__ == "__main__":
     # Here we show how to run outside of ray
     # Create and configure the transform.
-    transform = CodeToParquetPythonTransform(params)
+    # transform = CodeToParquetPythonTransform(params)
+    transform = CodeToParquetTransform(params)
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
     file_to_process = os.path.join(input_folder, "application-java.zip")

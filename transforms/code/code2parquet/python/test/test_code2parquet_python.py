@@ -13,10 +13,10 @@
 import ast
 import os
 
-from code2parquet_transform import (
+from code2parquet_transform import (  # domain_key,; snapshot_key,
+    detect_programming_lang_cli_key,
     detect_programming_lang_key,
-    domain_key,
-    snapshot_key,
+    supported_langs_file_cli_key,
     supported_langs_file_key,
 )
 from code2parquet_transform_python import CodeToParquetPythonConfiguration
@@ -42,10 +42,10 @@ class TestPythonIngestToParquetTransform(AbstractTransformLauncherTest):
         )
         config = {
             "data_files_to_use": ast.literal_eval("['.zip']"),
-            supported_langs_file_key: lang_supported_file,
-            detect_programming_lang_key: True,
-            snapshot_key: "github",
-            domain_key: "code",
+            supported_langs_file_cli_key: lang_supported_file,
+            detect_programming_lang_cli_key: True,
+            # snapshot_key: "github",
+            # domain_key: "code",
         }
         fixtures = [
             (
