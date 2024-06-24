@@ -21,6 +21,7 @@ from data_processing.runtime.pure_python.runtime_configuration import (
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import TransformUtils,get_logger,CLIArgumentProvider
 from scancode import api
+import pyarrow.parquet as pq
 
 logger = get_logger(__name__)
 
@@ -153,9 +154,6 @@ class LicenseCopyrightRemoveTransform(AbstractTableTransform):
 
     def transform(self, table: pa.Table,file_name: str = None) -> tuple[list[pa.Table], dict]:
 
-        if not TransformUtils.validate_columns(table, [self.column_name]):
-            return [], {}
-
         contents = table.column(self.column_name).to_pylist()
         updated_content = []
         remove_code_count = 0
@@ -184,7 +182,7 @@ class LicenseCopyrightRemoveTransform(AbstractTableTransform):
         updated_content = pa.array(updated_content)
         
         table = table.set_column(table.column_names.index(self.column_name), self.column_name, updated_content)
-
+        
         return [table], {'Removed code count' : remove_code_count}
 
 
