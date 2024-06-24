@@ -17,7 +17,7 @@ run_exact_dedup_op = comp.load_component_from_file(component_spec_path + "execut
 run_fuzzy_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_tokenization_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 
-code_to_parquet_image = "quay.io/dataprep1/data-prep-kit/code_2_parquet-ray:0.4.0.dev6"
+code_to_parquet_image = "quay.io/dataprep1/data-prep-kit/code2parquet-ray:0.4.0.dev6"
 proglang_select_image = "quay.io/dataprep1/data-prep-kit/proglang_select-ray:0.4.0.dev6"
 code_quality_image = "quay.io/dataprep1/data-prep-kit/code_quality-ray:0.4.0.dev6"
 malware_image = "quay.io/dataprep1/data-prep-kit/malware-ray:0.5.0.dev6"
@@ -59,11 +59,11 @@ def sample_code_ray_orchestrator(
     p3_name: str = "code2parquet",
     p3_skip: bool = False,
     # code to parquet parameters
-    p3_code_to_parquet_supported_langs_file: str = "test/code_2_parquet/languages/lang_extensions.json",
-    p3_code_to_parquet_detect_programming_lang: bool = True,
-    p3_code_to_parquet_domain: str = "code",
-    ip3_ngest_to_parquet_snapshot: str = "github",
-    p3_code_to_parquet_s3_access_secret: str = "s3-secret",
+    p3_code2parquet_supported_langs_file: str = "test/code2parquet/languages/lang_extensions.json",
+    p3_code2parquet_detect_programming_lang: bool = True,
+    p3_code2parquet_domain: str = "code",
+    p3_code2parquet_snapshot: str = "github",
+    p3_code2parquet_s3_access_secret: str = "s3-secret",
     # overriding parameters
     p3_overriding_params: str = '{"ray_worker_options": {"image": "'
     + code_to_parquet_image
