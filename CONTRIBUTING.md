@@ -61,11 +61,16 @@ submitter accepts the DCO:
 Signed-off-by: John Doe <john.doe@example.com>
 ```
 
-You can include this automatically when you commit a change to your
-local git repository using the following command:
+To include Signed-off-by message automatically, set the git config as,
+```
+git config user.name "FirstName LastName"
+git config user.email "YourEmail@example.com"
+```
+
+and include flag `-s | --sign-off` when you commit a change to your local git repository, for example
 
 ```
-git commit -s
+git commit -s -m "your commit message"
 ```
 
 ## Overall Setup
