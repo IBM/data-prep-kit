@@ -32,7 +32,7 @@ publish-image:: .transforms.publish-image-ray
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${PROGLANG_SELECT_PYTHON_VERSION} TOML_VERSION=$(PROGLANG_SELECT_RAY_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 

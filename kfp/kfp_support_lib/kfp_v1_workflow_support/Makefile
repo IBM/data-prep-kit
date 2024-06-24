@@ -1,8 +1,6 @@
 # Define the root of the local git clone for the common rules to be able
 # know where they are running from.
 REPOROOT=../../..
-include ${REPOROOT}/.make.versions
-include ${REPOROOT}/kfp/requirements.env
 
 # Include the common rules.
 # Use "make help" to see them.
@@ -24,11 +22,11 @@ clean::
 .check-env:: .check_python_version
 	@echo "Checks passed"
 
-set-versions: .check-env
-	@# Help: Copy the Makefile distribution version into the pyproject.toml
-	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_VERSION}'"/' pyproject.toml
-	sed -i.back 's/data_prep_toolkit_kfp_shared==[0-9].*/data_prep_toolkit_kfp_shared==${DPK_LIB_KFP_SHARED}",/' pyproject.toml
-	sed -i.back 's/kfp==[0-9].*/kfp==${KFP_v1}",/' pyproject.toml
+.PHONY: set-versions
+set-versions: 
+	$(MAKE) TOML_VERSION=$(DPK_LIB_KFP_VERSION) .defaults.update-toml
+	cat pyproject.toml | sed -e 's/"kfp\([=><][=><]\).*",/"kfp\1$(KFP_v1)",/' > tt.toml
+	mv tt.toml pyproject.toml
 
 build:: set-versions venv
 ifeq ($(KFPv2), 1)
@@ -36,11 +34,10 @@ ifeq ($(KFPv2), 1)
 	echo "Skipping build as KFPv2 is defined"
 else
 	@# Help: Build the distribution for publishing to a pypi
-	rm -r dist || true
-	rm -rf src/*egg-info || true
-	${PYTHON} -m pip install --upgrade build
-	${PYTHON} -m build
+	$(MAKE) build-dist
 endif
+
+build-dist :: set-versions .defaults.build-dist
 
 publish:: .check-env
 	@# Help: Publish the wheel to testpypi
@@ -49,24 +46,16 @@ publish:: .check-env
 	${PYTHON} -m twine check dist/*
 	${PYTHON} -m twine upload --verbose --non-interactive dist/*
 
-venv::	pyproject.toml .check-env
+.PHONY: venv
+venv:
 ifeq ($(KFPv2), 1)
 	# we want to prevent execution of the rule, when we run `make venv` in upper directories and KFPv2==1
 	echo "Skipping as KFPv2 is defined"
 else
 	@# Help: Create the virtual environment using pyproject.toml
-	rm -rf venv
-	$(PYTHON) -m venv venv
-	. ${VENV_ACTIVATE};     \
-	cd ../../../data-processing-lib/python && make set-versions && cd -; \
-	cd ../../../data-processing-lib/ray && make set-versions && cd -; \
-	pip install --upgrade pip; \
-	pip install -e ../../../data-processing-lib/python; \
-	pip install -e ../../../data-processing-lib/ray; \
-	cd ../shared_workflow_support && make set-versions && cd -; \
-	pip install -e ../shared_workflow_support;	\
-	pip install -e .;	\
-	pip install pytest pytest-cov
+	$(MAKE) .defaults.create-venv .defaults.install-ray-lib-src-venv
+	@source venv/bin/activate; pip install -e ${REPOROOT}/kfp/kfp_support_lib/shared_workflow_support
+	$(MAKE) .defaults.install-local-requirements-venv
 endif
 
 test:: venv 

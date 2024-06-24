@@ -52,13 +52,12 @@ clean                Clean up the virtual environment.
 conventions          Check transform project conventions and make recommendations, if needed.
 image                Create the docker image quay.io/dataprep1/data-prep-kit/noop:0.7
 publish              Publish the quay.io/dataprep1/data-prep-kit/noop:0.7 to quay.io container registry
-setup                Do nothing, since nothing to setup by default. 
+setup                Build kfp workflow for noop. 
 test                 Run both source and image level tests.
 test-image           Test an quay.io/dataprep1/data-prep-kit/noop:0.7 use test source inside the image. 
 test-locals          Run the *local*.py files in the src directory 
 test-src             Run the transform's tests and any '*local' .py files
 venv                 Install the source from the data processing library for python
-workflow-build       Recursively make workflow-build in subdirs
 workflow-reconcile-requirements Recursively make workflow-reconcile-requirements in all subdirs
 workflow-test        Recursively make workflow-test in subdirs
 workflow-upload      Recursively make workflow-upload in subdirs
