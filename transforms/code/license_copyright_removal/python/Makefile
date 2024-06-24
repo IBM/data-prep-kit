@@ -34,7 +34,7 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${FILTER_PYTHON_VERSION} TOML_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 
@@ -47,6 +47,8 @@ run-cli-sample: .transforms.run-cli-python-sample
 run-local-sample: .transforms.run-local-sample
 
 run-local-python-sample: .transforms.run-local-python-sample
+
+#run-s3-ray-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
