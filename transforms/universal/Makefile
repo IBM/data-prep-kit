@@ -50,7 +50,7 @@ workflow-venv::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse	
 
-workflow-build::
+setup::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse
 

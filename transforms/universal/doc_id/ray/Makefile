@@ -30,8 +30,6 @@ publish:: publish-dist publish-image
 
 publish-image:: .transforms.publish-image-ray
 
-setup:: .transforms.setup
-
 set-versions:
 	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions
         

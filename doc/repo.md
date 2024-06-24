@@ -34,8 +34,8 @@ supporting data transformations in 3 runtimes
 Makefiles are used for operations performed across all projects in the directory tree.
 There are two types of users envisioned to use the make files.  
 
-    * adminstrators - perform git actions and release management 
-    * developers - work with core libraries and transforms
+* adminstrators - perform git actions and release management 
+* developers - work with core libraries and transforms
 
 Each directory has access to a `make help` target that will show all available targets.
 

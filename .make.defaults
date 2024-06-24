@@ -304,7 +304,9 @@ __check_defined = \
 	@echo Installing Ray and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	pip install pytest;						\
+	pip install pytest pytest-cov;					\
 	$(MAKE) PIP_TARGET=data-prep-toolkit-ray .defaults.pip-uninstall;	\
+	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;		\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_RAY_LIB_DIR) .defaults.install-src-venv;		\
@@ -514,15 +516,17 @@ MINIO_ADMIN_PWD= localminiosecretkey
 .PHONY: .defaults.__update-toml-lib-dep-versions
 .defaults.__update-toml-lib-dep-versions:
 	@# Help: Update pyproject.toml to depend on lib versions defined in .make.versions 
-	if [ -e pyproject.toml ]; then					\
+	@if [ -e pyproject.toml ]; then					\
 	    cat pyproject.toml | sed 									\
 		-e 's/"data-prep-toolkit-ray\(..\).*",/"data-prep-toolkit-ray\1$(DPK_LIB_VERSION)",/' 	\
 		-e 's/"data-prep-toolkit-spark\(..\).*",/"data-prep-toolkit-spark\1$(DPK_LIB_VERSION)",/' 	\
-		-e 's/"data-prep-toolkit-kfp\(..\).*",/"data-prep-toolkit-kfp\1$(DPK_LIB_KFP_VERSION)",/' 	\
+		-e 's/"data-prep-toolkit-kfp\([=><][=><]\).*",/"data-prep-toolkit-kfp\1$(DPK_LIB_KFP_VERSION)",/' 	\
 		-e 's/"data-prep-toolkit\([=><][=><]\).*",/"data-prep-toolkit\1$(DPK_LIB_VERSION)",/' 		\
-		> tt.toml;						\
-	    mv tt.toml pyproject.toml;					\
-	fi
+		-e 's/"ray\[default\]\([=><][=><]\).*",/"ray\[default\]\1$(RAY)",/'				\
+		-e 's/"data-prep-toolkit-kfp-shared\(..\).*",/"data-prep-toolkit-kfp-shared\1$(DPK_LIB_KFP_VERSION)",/'     \
+		> tt.toml;				\
+	    mv tt.toml pyproject.toml;			\
+	 fi
 
 # Build the distribution, usually in preparation for publishing using ith the .defaults.publish-dist  target
 .PHONY: .defaults.build-dist 

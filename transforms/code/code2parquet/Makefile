@@ -49,10 +49,6 @@ set-versions:
 workflow-venv:
 	$(MAKE) -C kfp_ray workflow-venv
 
-.PHONY: workflow-build
-workflow-build:
-	$(MAKE) -C kfp_ray workflow-build
-
 .PHONY: workflow-test
 workflow-test:
 	$(MAKE) -C kfp_ray workflow-test

@@ -15,6 +15,7 @@ pipeline_path=$2
 while IFS= read -r line; do 
 	[ -z "$line" ] && continue
 	[[ $line == *#* ]] && continue
+	[[ $line == *ifeq* || $line == *else* || $line == *endif* ]] && continue
 	VERSION_NAME=$(echo $line |cut -d "=" -f 1)
 	DOCKER_IMAGE_NAME=$(echo $line |cut -d "=" -f 1 |sed "s/_VERSION//" |tr '[:upper:]' '[:lower:]')
 	DOCKER_IMAGE_NAME=$(echo $DOCKER_IMAGE_NAME |sed "s/_ray$/\-ray/" | sed "s/_spark$/\-spark/" | sed "s/_parquet$/\-parquet/")
