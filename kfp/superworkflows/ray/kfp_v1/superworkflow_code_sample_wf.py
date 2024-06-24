@@ -1,7 +1,8 @@
+from workflow_support.compile_utils import ONE_WEEK_SEC
+
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from workflow_support.compile_utils import ONE_WEEK_SEC
 
 
 # Components
