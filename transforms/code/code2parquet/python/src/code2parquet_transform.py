@@ -203,7 +203,7 @@ class CodeToParquetTransformConfiguration(TransformConfiguration):
             # snapshot_key: dargs.get(snapshot_key, ""),
             data_factory_key: self.daf,
         }
-        self.logger.info(f"Transform configuration {self.params}")
+        # self.logger.info(f"Transform configuration {self.params}") # Uhmm, let's NOT print out S3 keys please!
 
         # Validate and populate the transform's DataAccessFactory
         return self.daf.apply_input_params(args)
