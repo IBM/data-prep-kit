@@ -31,7 +31,7 @@ publish-image:: .transforms.publish-image-ray
 setup:: .transforms.setup
 
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(TOKENIZATION_PYTHON_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 

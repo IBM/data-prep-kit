@@ -29,7 +29,7 @@ publish:: publish-dist publish-image
 publish-image:: .transforms.publish-image-ray
 
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=not-used .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 
