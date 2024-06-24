@@ -21,6 +21,8 @@ from lang_id_transform_ray import (
     model_credential_cli_param,
     model_kind_cli_param,
     model_url_cli_param,
+    output_lang_column_name_cli_param,
+    output_score_column_name_cli_param,
 )
 from lang_models import KIND_FASTTEXT
 
@@ -58,6 +60,8 @@ params = {
     model_kind_cli_param: KIND_FASTTEXT,
     model_url_cli_param: "facebook/fasttext-language-identification",
     content_column_name_cli_param: "text",
+    output_lang_column_name_cli_param: "ft_lang",
+    output_score_column_name_cli_param: "ft_score",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 # for arg in sys.argv:

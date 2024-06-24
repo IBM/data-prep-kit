@@ -27,10 +27,14 @@ model_credential_key = "model_credential"
 model_kind_key = "model_kind"
 model_url_key = "model_url"
 content_column_name_key = "content_column_name"
+output_lang_column_name_key = "output_lang_column_name"
+output_score_column_name_key = "output_score_column_name"
 model_credential_cli_param = f"{cli_prefix}{model_credential_key}"
 model_kind_cli_param = f"{cli_prefix}{model_kind_key}"
 model_url_cli_param = f"{cli_prefix}{model_url_key}"
 content_column_name_cli_param = f"{cli_prefix}{content_column_name_key}"
+output_lang_column_name_cli_param = f"{cli_prefix}{output_lang_column_name_key}"
+output_score_column_name_cli_param = f"{cli_prefix}{output_score_column_name_key}"
 
 
 class LangIdentificationRayTransformConfiguration(RayTransformRuntimeConfiguration):

@@ -26,10 +26,14 @@ model_credential_key = "model_credential"
 model_kind_key = "model_kind"
 model_url_key = "model_url"
 content_column_name_key = "content_column_name"
+output_lang_column_name_key = "output_lang_column_name"
+output_score_column_name_key = "output_score_column_name"
 model_credential_cli_param = f"{cli_prefix}{model_credential_key}"
 model_kind_cli_param = f"{cli_prefix}{model_kind_key}"
 model_url_cli_param = f"{cli_prefix}{model_url_key}"
 content_column_name_cli_param = f"{cli_prefix}{content_column_name_key}"
+output_lang_column_name_cli_param = f"{cli_prefix}{output_lang_column_name_key}"
+output_score_column_name_cli_param = f"{cli_prefix}{output_score_column_name_key}"
 
 
 class LangIdentificationTransform(AbstractTableTransform):
@@ -53,7 +57,9 @@ class LangIdentificationTransform(AbstractTableTransform):
         self.nlp_langid = LangModelFactory.create_model(
             config.get(model_kind_key), config.get(model_url_key), config.get(model_credential_key)
         )
-        self.column_name = config.get(content_column_name_key)
+        self.content_column_name = config.get(content_column_name_key)
+        self.output_lang_column_name = config.get(output_lang_column_name_key)
+        self.output_score_column_name = config.get(output_score_column_name_key)
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -62,11 +68,17 @@ class LangIdentificationTransform(AbstractTableTransform):
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
-        TransformUtils.validate_columns(table, [self.column_name])
+        TransformUtils.validate_columns(table, [self.content_column_name])
+        if self.output_lang_column_name in table.schema.names:
+            raise Exception(
+                f"column to store identified language ({self.output_lang_column_name}) already exist"
+            )
+        if self.output_score_column_name in table.schema.names:
+            raise Exception(
+                f"column to store score of language identification ({self.output_score_column_name}) already exist"
+            )
         self.logger.debug(f"Transforming one table with {len(table)} rows")
-        table, stats = get_lang_ds_pa(table, self.nlp_langid, self.column_name)
-        if table is None:
-            return [], {}
+        table, stats = get_lang_ds_pa(table, self.nlp_langid, self.content_column_name)
         self.logger.debug(f"Transformed one table with {len(table)} rows")
         return [table], stats
 
@@ -103,6 +115,12 @@ class LangIdentificationTransformConfiguration(TransformConfiguration):
         parser.add_argument(f"--{model_url_cli_param}", required=True, help="Url to model for language detection")
         parser.add_argument(
             f"--{content_column_name_cli_param}", default="contents", help="Column name to get content"
+        )
+        parser.add_argument(
+            f"--{output_lang_column_name_cli_param}", default="language", help="Column name to store identified language"
+        )
+        parser.add_argument(
+            f"--{output_score_column_name_cli_param}", default="score", help="Column name to store the score of language identification"
         )
 
     def apply_input_params(self, args: Namespace) -> bool:

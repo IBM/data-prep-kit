@@ -30,6 +30,8 @@ class TestLangIdentificationTransform(AbstractTableTransformTest):
             "model_kind": KIND_FASTTEXT,
             "model_url": "facebook/fasttext-language-identification",
             "content_column_name": "contents",
+            "output_lang_column_name": "ft_lang",
+            "output_score_column_name": "ft_score",
         }
         table = pa.Table.from_arrays(
             [
@@ -79,10 +81,43 @@ class TestLangIdentificationTransform(AbstractTableTransformTest):
             ],
             names=["contents", "ft_lang", "ft_score"],
         )
+        invalid_content_column_name_table = pa.Table.from_arrays(
+            [pa.array(["This text won't be processed",])],
+            names=["text"],
+        )
+        invalid_output_lang_column_name_table = pa.Table.from_arrays(
+            [
+                pa.array(["This content for lang column test won't be processed",]),
+                pa.array(["en",]),
+                pa.array([1.000])
+            ],
+            names=[
+                "contents",
+                "lang",
+                "ft_score"
+            ],
+        )
+        invalid_output_score_column_name_table = pa.Table.from_arrays(
+            [
+                pa.array(["This content for score column test won't be processed",]),
+                pa.array(["en",]),
+                pa.array([1.000])
+            ],
+            names=[
+                "contents",
+                "ft_lang",
+                "score"
+            ],
+        )
         return [
             (
                 LangIdentificationTransform(config),
-                [table],
+                [
+                    table,
+                    invalid_content_column_name_table,
+                    invalid_output_lang_column_name_table,
+                    invalid_output_score_column_name_table
+                ],
                 [expected_table],
                 [{"de": 1, "es": 1, "fr": 1, "ja": 1, "pt": 1}, {}],
             )
