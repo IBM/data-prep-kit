@@ -42,8 +42,9 @@ detect_programming_lang_cli_key = f"{cli_prefix}{detect_programming_lang_key}"
 detect_programming_lang_default = True
 
 data_factory_key = "data_factory"
-# domain_key = f"{shortname}_domain"
-# snapshot_key = f"{shortname}_snapshot"
+
+_domain_cli_key = f"{cli_prefix}domain"
+_snapshot_cli_key = f"{cli_prefix}snapshot"
 
 
 def get_supported_languages(lang_file: str, data_access: DataAccess, logger: logging.Logger) -> dict[str, str]:
@@ -69,7 +70,6 @@ class CodeToParquetTransform(AbstractBinaryTransform):
         from data_processing.utils import get_logger
 
         self.logger = get_logger(__name__)
-        # self.domain = config.get(domain_key, "")
         super().__init__(config)
         self.languages_supported = config.get(supported_languages_key, None)
         if self.languages_supported is None:
@@ -174,13 +174,13 @@ class CodeToParquetTransformConfiguration(TransformConfiguration):
             default=detect_programming_lang_default,
             help="Infer the programming lang from the file extension using the file of supported languages",
         )
-        #        parser.add_argument(f"--{snapshot_key}", type=str, help="Name the dataset", default="")
-        # parser.add_argument(
-        #     f"--{domain_key}",
-        #     type=str,
-        #     help="To identify whether data is code or natural language",
-        #     default="",
-        # )
+        parser.add_argument(f"--{_snapshot_cli_key}", type=str, help="Currently not used.", default="")
+        parser.add_argument(
+            f"--{_domain_cli_key}",
+            type=str,
+            help="Currently not used",
+            default="",
+        )
         # Create the DataAccessFactor to use CLI args
         self.daf = DataAccessFactory(cli_prefix, False)
         # Add the DataAccessFactory parameters to the transform's configuration parameters.
