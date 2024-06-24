@@ -1,3 +1,4 @@
+PRE_COMMIT = "./pre-commit-config.yaml"
 PIPELINE_TEMPLATE_FILE = "simple_pipeline.py"
 
 INPUT_PARAMETERS = "input_parameters"
@@ -32,7 +33,7 @@ if __name__ == "__main__":
 
     component_spec_path = pipeline_parameters.get("component_spec_path", "")
     if component_spec_path == "":
-        component_spec_path = "../../../../../kfp/kfp_ray_components/"
+        component_spec_path = "../../../../kfp/kfp_ray_components/"
 
     content = template.render(
         transform_image=common_input_params_values["transform_image"],
@@ -45,9 +46,18 @@ if __name__ == "__main__":
         input_folder=common_input_params_values.get("input_folder", ""),
         output_folder=common_input_params_values.get("output_folder", ""),
         s3_access_secret=common_input_params_values["s3_access_secret"],
+        image_pull_secret=common_input_params_values["image_pull_secret"],
+        multi_s3=pipeline_parameters["multi_s3"]
     )
 
     output_file = f"{args.output_dir_file}/{pipeline_parameters[NAME]}_wf.py"
     with open(output_file, mode="w", encoding="utf-8") as message:
         message.write(content)
         print(f"... wrote {output_file}")
+
+    import sys
+    from pre_commit.main import main
+
+    print(f"Pipeline ${output_file} auto generation completed")
+    args = ["run", "--file", f"{output_file}", "-c", PRE_COMMIT]
+    sys.exit(main(args))

@@ -18,16 +18,16 @@ import kfp.dsl as dsl
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
-task_image = "{{ transform_image }}"
+task_image = "quay.io/dataprep1/data-prep-kit/noop:0.8.0"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "{{ script_name }}"
+EXEC_SCRIPT_NAME: str = "noop_transform.py"
 
 # components
-base_kfp_image = "{{ kfp_base_image }}"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.1.1"
 
 # path to kfp component specifications files
-component_spec_path = "{{ component_spec_path }}"
+component_spec_path = "../../../../kfp/kfp_ray_components/"
 
 # compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
@@ -40,9 +40,7 @@ def compute_exec_params_func(
     runtime_pipeline_id: str,
     runtime_job_id: str,
     runtime_code_location: str,
-    {%- for pipeline_argument in pipeline_arguments %}
-    {{ pipeline_argument.name }}: {{ pipeline_argument.type }},
-    {%- endfor %}
+    noop_sleep_sec: int,
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -55,9 +53,7 @@ def compute_exec_params_func(
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": runtime_code_location,
-        {%- for pipeline_argument in pipeline_arguments %}
-        "{{ pipeline_argument.name }}": {{ pipeline_argument.name }},
-        {%- endfor %}
+        "noop_sleep_sec": noop_sleep_sec,
     }
 
 
@@ -92,42 +88,36 @@ execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "execu
 cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
 
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "{{ pipeline_name }}"
+TASK_NAME: str = "noop"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="{{ pipeline_description }}",
+    description="Pipeline for noop task",
 )
-def {{ pipeline_name }}(
+def noop(
     # Ray cluster
-    ray_name: str = "{{ pipeline_name }}-kfp-ray",
+    ray_name: str = "noop-kfp-ray",
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image_pull_secret": "{{ image_pull_secret }}", "image": "' + task_image + '"}',
+    '"image_pull_secret": "prod-all-icr-io", "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    {% if multi_s3 == False %}
-    data_s3_config: str = "{'input_folder': '{{ input_folder }}', 'output_folder': '{{ output_folder }}'}",
-    {% else %}
-    data_s3_config: str = ["{'input_folder': '{{ input_folder }}', 'output_folder': '{{ output_folder }}'}"],
-    {% endif %}
-    data_s3_access_secret: str = "{{ s3_access_secret }}",
+    data_s3_config: str = ["{'input_folder': 'test/noop/input/', 'output_folder': 'test/noop/output/'}"],
+    data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
     runtime_actor_options: str = "{'num_cpus': 0.8}",
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # {{ pipeline_name }} parameters
-    {%- for pipeline_argument in pipeline_arguments %}
-    {{ pipeline_argument.name }}: {{ pipeline_argument.type }}{% if pipeline_argument.value is defined %}{% if pipeline_argument.type == "int" %} = {{ pipeline_argument.value }}{% else %} = "{{ pipeline_argument.value }}"{% endif %}{% endif %},
-    {%- endfor %}
+    # noop parameters
+    noop_sleep_sec: int = 10,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
-    Pipeline to execute {{ pipeline_name }} transform
+    Pipeline to execute noop transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -157,9 +147,7 @@ def {{ pipeline_name }}(
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    {%- for pipeline_argument in pipeline_arguments %}
-    :param {{ pipeline_argument.name }} - {{ pipeline_argument.description }}
-    {%- endfor %}
+    :param noop_sleep_sec - # noop sleep time
     :return: None
     """
     # create clean_up task
@@ -177,9 +165,7 @@ def {{ pipeline_name }}(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            {%- for pipeline_argument in pipeline_arguments %}
-            {{ pipeline_argument.name }}={{ pipeline_argument.name }},
-            {%- endfor %}
+            noop_sleep_sec=noop_sleep_sec,
         )
 
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
@@ -208,6 +194,7 @@ def {{ pipeline_name }}(
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
 
+
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile({{ pipeline_name }}, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(noop, __file__.replace(".py", ".yaml"))
