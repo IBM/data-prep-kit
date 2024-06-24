@@ -43,7 +43,14 @@ publish-dist:: .defaults.publish-dist
 
 test-image:: .transforms.python-test-image
 
-run-cli-sample: .transforms.run-cli-python-sample
+run-cli-sample: 
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_python.py \
+	    RUN_ARGS="	\
+	    --data_local_config \" { 'input_folder' : '../test-data/input', 'output_folder' : '../output' } \"  \
+	    --data_files_to_use \"['.zip']\"  \
+	    --code2parquet_supported_langs_file ../test-data/languages/lang_extensions.json     \
+	    --code2parquet_detect_programming_lang True "       \
+	    .transforms.run-src-file
 
 run-local-sample: .transforms.run-local-sample
 
