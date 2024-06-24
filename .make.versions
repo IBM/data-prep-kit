@@ -8,6 +8,8 @@
 #
 ################################################################################
 
+# See below for versions the repo depends on
+
 
 # This major versions is generally changed manually when a breaking change to apis is made in the libraries, for example.
 DPK_MAJOR_VERSION=0
@@ -30,16 +32,6 @@ DPK_LIB_KFP_SHARED=$(DPK_VERSION)
 KFP_DOCKER_VERSION=$(DPK_VERSION)
 KFP_DOCKER_VERSION_v2=$(DPK_VERSION)
 
-KFP_v2=2.7.0
-KFP_v1=1.8.22
-RAY=2.24.0
-
-ifeq ($(KFPv2), 1)
-        WORKFLOW_SUPPORT_LIB=kfp_v2_workflow_support
-else
-        WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
-endif
-
 # Begin transform versions/tags
 BLOCKLIST_VERSION=$(DPK_VERSION)
 
@@ -60,8 +52,6 @@ NOOP_SPARK_VERSION=$(DPK_VERSION)
 PROFILER_VERSION=$(DPK_VERSION)
 PROFILER_RAY_VERSION=$(DPK_VERSION)
 
-RESIZE_VERSION=$(DPK_VERSION)
-
 LANG_ID_PYTHON_VERSION=$(DPK_VERSION)
 LANG_ID_RAY_VERSION=$(DPK_VERSION)
 
@@ -76,7 +66,6 @@ PROGLANG_SELECT_RAY_VERSION=$(DPK_VERSION)
 
 CODE_QUALITY_RAY_VERSION=$(DPK_VERSION)
 CODE_QUALITY_PYTHON_VERSION=$(DPK_VERSION)
-CODE_QUALITY_RAY_VERSION=$(DPK_VERSION)
 
 CODE2PARQUET_PYTHON_VERSION=$(DPK_VERSION)
 CODE2PARQUET_RAY_VERSION=$(DPK_VERSION)
@@ -84,4 +73,18 @@ INGEST_TO_PARQUET_VERSION=$(DPK_VERSION)
 
 KFP_DOCKER_VERSION=$(DPK_VERSION)
 KFP_DOCKER_VERSION_v2=$(DPK_VERSION)
+
+################## ################## ################## ################## ################## ##################
+# Begin versions that the repo depends on. 
+
+KFP_v2=2.7.0
+KFP_v1=1.8.22
+RAY=2.24.0
+
+ifeq ($(KFPv2), 1)
+        WORKFLOW_SUPPORT_LIB=kfp_v2_workflow_support
+else
+        WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
+endif
+
 
