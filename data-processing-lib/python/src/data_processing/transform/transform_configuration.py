@@ -13,8 +13,7 @@
 from argparse import ArgumentParser
 from typing import Any
 
-from data_processing.transform import AbstractBinaryTransform
-from data_processing.transform.abstract_transform import AbstractTransform
+from data_processing.transform import AbstractTransform
 from data_processing.utils import CLIArgumentProvider
 
 

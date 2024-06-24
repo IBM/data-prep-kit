@@ -33,6 +33,9 @@ endif
 	$(MAKE) cluster-deploy
 	@echo "setup-cluster completed"
 
+.PHONY: publish
+publish:
+
 populate-data::
 	@# Help: Populate test data in Minio
 	cd ${KIND_SCRIPTS} && ./populate_minio.sh

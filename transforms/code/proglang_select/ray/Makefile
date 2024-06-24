@@ -30,16 +30,15 @@ publish:: publish-dist publish-image
 
 publish-image:: .transforms.publish-image-ray
 
-# distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(PROGLANG_SELECT_PYTHON_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 
 
-run-cli-ray-sample: .transforms.run-cli-ray-sample
+run-cli-sample: .transforms.run-cli-ray-sample
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
 		--proglang_select_language_column language							\
@@ -47,11 +46,11 @@ run-cli-ray-sample: .transforms.run-cli-ray-sample
 		--proglang_select_allowed_langs_file ../test-data/languages/allowed-code-languages.txt "	\
 		.transforms.run-src-file
 
-run-local-sample: .transforms.run-local-sample
+#run-local-sample: .transforms.run-local-sample
 
 run-local-ray-sample: .transforms.run-local-ray-sample
 
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+#run-s3-ray-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 

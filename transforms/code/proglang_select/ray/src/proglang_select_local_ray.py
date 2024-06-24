@@ -15,12 +15,12 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from proglang_select_transform_ray import (
-    ProgLangSelectRayConfiguration,
+from proglang_select_transform import (
     lang_allowed_langs_file_key,
     lang_lang_column_key,
     lang_output_column_key,
 )
+from proglang_select_transform_ray import ProgLangSelectRayConfiguration
 
 
 # create parameters

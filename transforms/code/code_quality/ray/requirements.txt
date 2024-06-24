@@ -1,5 +1,0 @@
-# transform runtime
-#data-prep-kit==0.1.2
-# Transform requirements except data-prep-kit (see above)
-bs4==0.0.2
-transformers==4.38.2

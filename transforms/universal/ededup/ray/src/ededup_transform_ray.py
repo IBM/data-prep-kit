@@ -94,8 +94,7 @@ class EdedupTransform(AbstractTableTransform):
         :return: resulting table, statistics
         """
         # make sure that the doc column exists
-        if not TransformUtils.validate_columns(table=table, required=[self.doc_column]):
-            return [], {}
+        TransformUtils.validate_columns(table=table, required=[self.doc_column])
         # Inner variables
         hashes = set()
         unique = []

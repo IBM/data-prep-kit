@@ -1,0 +1,54 @@
+# Define the root of the local git clone for the common rules to be able 
+# know where they are running from.
+REPOROOT=../../../..
+# Include a library of common .transform.* targets which most
+# transforms should be able to reuse.  However, feel free
+# to override/redefine the rules below. 
+include $(REPOROOT)/transforms/.make.transforms
+
+TRANSFORM_NAME=proglang_select
+# $(REPOROOT)/.make.versions file contains the versions
+DOCKER_IMAGE_VERSION=${PROGLANG_SELECT_PYTHON_VERSION}
+
+venv::	.transforms.python-venv
+
+test::	.transforms.python-test
+
+clean:: .transforms.clean
+
+image:: .transforms.python-image
+
+test-src:: .transforms.test-src
+
+setup:: .transforms.setup
+
+test-image:: .transforms.python-test-image
+
+build:: build-dist image
+
+publish:: publish-dist publish-image
+
+publish-image:: .transforms.publish-image-python
+
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${PROGLANG_SELECT_PYTHON_VERSION} TOML_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions 
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
+
+run-cli-sample: #.transforms.run-cli-python-sample
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_python.py \
+                RUN_ARGS="--data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
+		--proglang_select_language_column language							\
+    		--proglang_select_output_column lang_selected							\
+		--proglang_select_allowed_langs_file ../test-data/languages/allowed-code-languages.txt "	\
+		.transforms.run-src-file
+
+run-local-sample: .transforms.run-local-sample
+
+run-local-python-sample: .transforms.run-local-python-sample
+
+load-image:: .transforms.load-image

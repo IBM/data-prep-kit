@@ -4,6 +4,9 @@ include ${REPOROOT}/.make.defaults
 
 KFPv2 ?= 0
 
+.PHONY: publish
+publish:
+
 .PHONY: workflow-venv
 workflow-venv:
 ifeq ($(KFPv2), 1)
@@ -12,12 +15,12 @@ else
 	$(MAKE) -C ray/kfp_v1 workflow-venv
 endif
 
-.PHONY: workflow-build
-workflow-build:
+.PHONY: setup
+setup:
 ifeq ($(KFPv2), 1)
 	echo "Skipping build as KFPv2 is defined"
 else
-	$(MAKE) -C ray/kfp_v1 workflow-build
+	$(MAKE) -C ray/kfp_v1 setup
 endif
 
 .PHONY: workflow-test

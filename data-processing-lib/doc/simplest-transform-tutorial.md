@@ -53,7 +53,7 @@ Finally, we show how to use the command line to run the transform in a local ray
 
 First, let's define the transform class.  To do this we extend
 the base abstract/interface class
-[`AbstractTableTransform`](../ray/src/data_processing_ibm/transform/table_transform.py),
+[`AbstractTableTransform`](../python/src/data_processing/transform/table_transform.py),
 which requires definition of the following:
 
 * an initializer (i.e. `init()`) that accepts a dictionary of configuration
