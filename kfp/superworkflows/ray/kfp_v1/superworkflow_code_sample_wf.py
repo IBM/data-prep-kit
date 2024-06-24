@@ -7,7 +7,7 @@ from workflow_support.compile_utils import ONE_WEEK_SEC
 # Components
 # For every sub workflow we need a separate components, that knows about this subworkflow.
 component_spec_path = "../../../kfp_ray_components/"
-run_ingest_to_parquet_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
+run_code_to_parquet_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_code_quality_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_malware_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_proglang_select_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
@@ -16,7 +16,7 @@ run_exact_dedup_op = comp.load_component_from_file(component_spec_path + "execut
 run_fuzzy_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_tokenization_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 
-ingest_to_parquet_image = "quay.io/dataprep1/data-prep-kit/ingest_2_parquet-ray:0.4.0.dev6"
+code_to_parquet_image = "quay.io/dataprep1/data-prep-kit/code_2_parquet-ray:0.4.0.dev6"
 proglang_select_image = "quay.io/dataprep1/data-prep-kit/proglang_select-ray:0.4.0.dev6"
 code_quality_image = "quay.io/dataprep1/data-prep-kit/code_quality-ray:0.4.0.dev6"
 malware_image = "quay.io/dataprep1/data-prep-kit/malware-ray:0.5.0.dev6"
@@ -33,7 +33,7 @@ tokenizer_image = "quay.io/dataprep1/data-prep-kit/tokenization-ray:0.4.0.dev6"
 )
 def sample_code_ray_orchestrator(
     # the super pipeline parameters
-    p1_orch_ingest_to_parquet_name: str = "ingest_2_parquet_wf",
+    p1_orch_code_to_parquet_name: str = "code_2_parquet_wf",
     p1_orch_code_quality_name: str = "code_quality_wf",
     p1_orch_malware_name: str = "malware_wf",
     p1_orch_proglang_select_name: str = "proglang_select_wf",
@@ -45,7 +45,7 @@ def sample_code_ray_orchestrator(
     p2_pipeline_ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": ""}',
     p2_pipeline_ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": ""}',
     p2_pipeline_server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-    p2_pipeline_input_parent_path: str = "test/ingest2parquet/output/",
+    p2_pipeline_input_parent_path: str = "test/code2parquet/output/",
     p2_pipeline_output_parent_path: str = "test/super/output/",
     p2_pipeline_parent_path_suffix: str = "",
     p2_pipeline_additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
@@ -54,20 +54,20 @@ def sample_code_ray_orchestrator(
     p2_pipeline_runtime_actor_options: str = '{"num_cpus": 0.8}',
     p2_pipeline_data_max_files: int = -1,
     p2_pipeline_data_num_samples: int = -1,
-    # ingest to parquet step parameters
-    p3_name: str = "ingest2parquet",
+    # code to parquet step parameters
+    p3_name: str = "code2parquet",
     p3_skip: bool = False,
-    # ingest to parquet parameters
-    p3_ingest_to_parquet_supported_langs_file: str = "test/ingest_2_parquet/languages/lang_extensions.json",
-    p3_ingest_to_parquet_detect_programming_lang: bool = True,
-    p3_ingest_to_parquet_domain: str = "code",
+    # code to parquet parameters
+    p3_code_to_parquet_supported_langs_file: str = "test/code_2_parquet/languages/lang_extensions.json",
+    p3_code_to_parquet_detect_programming_lang: bool = True,
+    p3_code_to_parquet_domain: str = "code",
     ip3_ngest_to_parquet_snapshot: str = "github",
-    p3_ingest_to_parquet_s3_access_secret: str = "s3-secret",
+    p3_code_to_parquet_s3_access_secret: str = "s3-secret",
     # overriding parameters
     p3_overriding_params: str = '{"ray_worker_options": {"image": "'
-    + ingest_to_parquet_image
+    + code_to_parquet_image
     + '"}, "ray_head_options": {"image": "'
-    + ingest_to_parquet_image
+    + code_to_parquet_image
     + '"}}',
     # Exact dedup step parameters
     p4_name: str = "ededup",
@@ -199,15 +199,15 @@ def sample_code_ray_orchestrator(
         if prev_op is not None:
             op.after(prev_op)
 
-    # ingest to parquet deduplication
-    ingest_to_parquet = run_exact_dedup_op(
-        name=p1_orch_ingest_to_parquet_name,
+    # code to parquet deduplication
+    code_to_parquet = run_exact_dedup_op(
+        name=p1_orch_code_to_parquet_name,
         prefix="p3_",
         params=args,
         host=orch_host,
         input_folder=p2_pipeline_input_parent_path,
     )
-    _set_component(ingest_to_parquet, "ingest to parquet")
+    _set_component(code_to_parquet, "code to parquet")
 
     # exact deduplication
     exact_dedup = run_exact_dedup_op(
@@ -215,9 +215,9 @@ def sample_code_ray_orchestrator(
         prefix="p4_",
         params=args,
         host=orch_host,
-        input_folder=ingest_to_parquet.output,
+        input_folder=code_to_parquet.output,
     )
-    _set_component(exact_dedup, "exact dedup", ingest_to_parquet)
+    _set_component(exact_dedup, "exact dedup", code_to_parquet)
     # document ID
     doc_id = run_doc_id_op(
         name=p1_orch_doc_id_name, prefix="p5_", params=args, host=orch_host, input_folder=exact_dedup.output
