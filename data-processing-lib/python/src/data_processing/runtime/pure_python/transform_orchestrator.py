@@ -41,12 +41,14 @@ def orchestrate(
     """
     start_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     logger.info(f"orchestrator {runtime_config.get_name()} started at {start_ts}")
+    # create statistics
+    statistics = TransformStatistics()
+    # create data access
+    data_access = data_access_factory.create_data_access()
+    if data_access is None:
+        logger.error("No DataAccess instance provided - exiting")
+        return 1
     try:
-        # create data access
-        data_access = data_access_factory.create_data_access()
-        if data_access is None:
-            logger.error("No DataAccess instance provided - exiting")
-            return 1
         # Get files to process
         files, profile, retries = data_access.get_files_to_process()
         if len(files) == 0:
@@ -57,8 +59,6 @@ def orchestrate(
         print_interval = int(len(files) / 100)
         if print_interval == 0:
             print_interval = 1
-        # create statistics
-        statistics = TransformStatistics()
         if retries > 0:
             statistics.add_stats({"data access retries": retries})
         # create executor
@@ -82,6 +82,13 @@ def orchestrate(
         start = time.time()
         executor.flush()
         logger.info(f"done flushing in {time.time() - start} sec")
+        status = "success"
+        return_code = 0
+    except Exception as e:
+        logger.error(f"Exception during execution {e}: {traceback.print_exc()}")
+        return_code = 1
+        status = "failure"
+    try:
         # Compute execution statistics
         logger.debug("Computing execution stats")
         stats = statistics.get_execution_stats()
@@ -94,7 +101,7 @@ def orchestrate(
             | {
                 "start_time": start_ts,
                 "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "status": "success",
+                "status": status,
             },
             "code": execution_config.code_location,
             "job_input_params": input_params | data_access_factory.get_input_params(),
@@ -103,7 +110,7 @@ def orchestrate(
         logger.debug(f"Saving job metadata: {metadata}.")
         data_access.save_job_metadata(metadata)
         logger.debug("Saved job metadata.")
-        return 0
+        return return_code
     except Exception as e:
         logger.error(f"Exception during execution {e}: {traceback.print_exc()}")
         return 1

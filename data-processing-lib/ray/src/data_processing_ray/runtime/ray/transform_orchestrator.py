@@ -47,12 +47,16 @@ def orchestrate(
     start_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     start_time = time.time()
     logger.info(f"orchestrator started at {start_ts}")
+    # create data access
+    data_access = data_access_factory.create_data_access()
+    if data_access is None:
+        logger.error("No DataAccess instance provided - exiting")
+        return 1
+    statistics = TransformStatisticsRay.remote({})
+    # create transformer runtime
+    runtime = runtime_config.create_transform_runtime()
+    resources = RayUtils.get_cluster_resources()
     try:
-        # create data access
-        data_access = data_access_factory.create_data_access()
-        if data_access is None:
-            logger.error("No DataAccess instance provided - exiting")
-            return 1
         # Get files to process
         files, profile, retries = data_access.get_files_to_process()
         if len(files) == 0:
@@ -64,16 +68,12 @@ def orchestrate(
         if print_interval == 0:
             print_interval = 1
         # Get Resources for execution
-        resources = RayUtils.get_cluster_resources()
         logger.info(f"Cluster resources: {resources}")
         # print execution params
         logger.info(
             f"Number of workers - {preprocessing_params.n_workers} " f"with {preprocessing_params.worker_options} each"
         )
-        # create transformer runtime
-        runtime = runtime_config.create_transform_runtime()
         # create statistics
-        statistics = TransformStatisticsRay.remote({})
         if retries > 0:
             statistics.add_stats.remote({"data access retries": retries})
         # create executors
@@ -103,7 +103,7 @@ def orchestrate(
         available_object_memory_gauge = Gauge("available_object_store", "Available object store")
         # process data
         logger.debug("Begin processing files")
-        RayUtils.process_files(
+        failures = RayUtils.process_files(
             executors=processors_pool,
             files=files,
             print_interval=print_interval,
@@ -115,12 +115,23 @@ def orchestrate(
             object_memory_gauge=available_object_memory_gauge,
             logger=logger,
         )
+        if failures > 0:
+            statistics.add_stats.remote({"actor failures": failures})
         logger.debug("Done processing files, waiting for flush() completion.")
         # invoke flush to ensure that all results are returned
         start = time.time()
         replies = [processor.flush.remote() for processor in processors]
-        RayUtils.wait_for_execution_completion(replies)
+        failures = RayUtils.wait_for_execution_completion(logger=logger, replies=replies)
+        if failures > 0:
+            statistics.add_stats.remote({"actor failures": failures})
         logger.info(f"done flushing in {time.time() - start} sec")
+        status = "success"
+        return_code = 0
+    except Exception as e:
+        logger.error(f"Exception during execution {e}: {traceback.print_exc()}")
+        status = "failure"
+        return_code = 1
+    try:
         # Compute execution statistics
         logger.debug("Computing execution stats")
         stats = runtime.compute_execution_stats(ray.get(statistics.get_execution_stats.remote()))
@@ -130,7 +141,7 @@ def orchestrate(
         metadata = {
             "pipeline": preprocessing_params.pipeline_id,
             "job details": preprocessing_params.job_details
-            | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "status": "success"},
+            | {"start_time": start_ts, "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "status": status},
             "code": preprocessing_params.code_location,
             "job_input_params": runtime_config.get_transform_metadata()
             | data_access_factory.get_input_params()
@@ -144,7 +155,7 @@ def orchestrate(
         logger.debug(f"Saving job metadata: {metadata}.")
         data_access.save_job_metadata(metadata)
         logger.debug("Saved job metadata.")
-        return 0
+        return return_code
     except Exception as e:
         logger.error(f"Exception during execution {e}: {traceback.print_exc()}")
         return 1
