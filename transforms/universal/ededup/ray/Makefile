@@ -32,6 +32,8 @@ publish-image:: .transforms.publish-image-ray
 
 setup:: .transforms.setup
 
+set-versions::
+
 build-dist:: .defaults.build-dist
 
 publish-dist:: .defaults.publish-dist

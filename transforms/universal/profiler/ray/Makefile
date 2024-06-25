@@ -22,6 +22,8 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
+set-versions::
+
 test-image:: .transforms.ray-test-image
 
 build:: build-dist image
