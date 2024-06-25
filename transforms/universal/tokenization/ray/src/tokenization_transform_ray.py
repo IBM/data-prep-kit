@@ -20,8 +20,6 @@ from tokenization_transform import TokenizationTransformConfiguration
 
 logger = get_logger(__name__)
 
-CHUNK_CHECKPOINT_INTERVAL = 100
-
 
 class TokenizationRayConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):

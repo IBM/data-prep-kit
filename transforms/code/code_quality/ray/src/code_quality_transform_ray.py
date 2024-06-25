@@ -27,13 +27,6 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
 )
 
 
-CODE_QUALITY_PARAMS = "code_quality_params"
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-
-
-# CODEPARROT FILTERS
-
-
 class CodeQualityRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(transform_config=CodeQualityTransformConfiguration())
