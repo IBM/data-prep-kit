@@ -30,16 +30,6 @@ LONG_BUCKET = 5000
 LONG_BUCKET_PRINT = 1000
 
 
-def find(s: str, ch: str) -> list[int]:
-    """
-    Get indexes of all locations of character in string
-    :param s: string
-    :param ch: character
-    :return: list of locations
-    """
-    return [i for i, ltr in enumerate(s) if ltr == ch]
-
-
 def get_snapshot_folder(data_access: DataAccess) -> str:
     """
     Get output folder from data access
