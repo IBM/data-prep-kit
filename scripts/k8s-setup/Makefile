@@ -4,13 +4,13 @@ export REPOROOT=${CURDIR}/../../
 
 # Include the common rules.
 # Use "make help" to see them.
-include ../.make.defaults
+include ../../.make.defaults
 
-IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/kind/requirements.env > makeenv")
-ifneq ($(KFPv2), 1)
-	$(shell bash -c "echo PIPELINE_VERSION=$(KFP_V2)) >> makeenv
+IGNORE := $(shell bash -c "sed -n /=/p  ${REPOROOT}/scripts/k8s-setup/requirements.env | sed 's/=/:=/;s/^/export /'  > makeenv")
+ifeq ($(KFPv2), 1)
+   $(shell bash -c "echo export PIPELINE_VERSION:=$(KFP_v2) >> makeenv")
 else
-	$(shell bash -c "echo PIPELINE_VERSION=$(KFP_V1)) >> makeenv
+   $(shell bash -c "echo export PIPELINE_VERSION:=$(KFP_v1) >> makeenv")
 endif
 include makeenv
 
@@ -31,16 +31,10 @@ extra-help:
 	@# Help: Shows additional make macros that can be overridden/used. 
 	@echo ""
 	@echo Overridable macro values include the following:
-	@echo DOCKER - the name of the docker executable to use.  DOCKER=$(DOCKER)
-	@echo DOCKER_FILE - the name of the docker file to use.  DOCKER_FILE=$(DOCKER_FILE)
-	@echo DOCKER_REGISTRY_ENDPOINT - the docker registry location to publish images.  DOCKER_REGISTRY_ENDPOINT=$(DOCKER_REGISTRY_ENDPOINT)
-	@echo DOCKER_HOSTNAME - the name of the docker registry to use.  DOCKER_HOSTNAME=$(DOCKER_HOSTNAME)
-	@echo DOCKER_NAMESPACE - the name space to use in the registry.  DOCKER_NAMESPACE=$(DOCKER_NAMESPACE)
-	@echo DOCKER_IMAGE_NAME - the name under the name space where images are publishes.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
-	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
-	@echo DOCKER_REGISTRY_KEY - the docker user to use.  DOCKER_REGISTRY_KEY=secret
-	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
-	@echo "TRANSFORM_RUNTIME_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_local_ray.py)"
+	@echo EXTERNAL_CLUSTER - If 0 create a KinD cluster.  EXTERNAL_CLUSTER=$(EXTERNAL_CLUSTER)
+	@echo DEPLOY_KUBEFLOW - If 1 deploy kubeflow pipelines on the cluster. DEPLOY_KUBEFLOW=$(DEPLOY_KUBEFLOW)
+	@echo USE_KFP_MINIO - If 1 and DEPLOY_KUBEFLOW is also 1 then deploy MinIO on the cluster including ingress to access it.  USE_KFP_MINIO=$(USE_KFP_MINIO)
+	@echo POPULATE_TEST_DATA - If 1 populate test data to MinIO.  POPULATE_TEST_DATA=$(POPULATE_TEST_DATA)
 	@echo ""
 
 setup::

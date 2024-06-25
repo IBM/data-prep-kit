@@ -50,7 +50,7 @@ jobs:
                   chmod 777 /tmp/kubectl
                   curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
                   chmod +x /tmp/mc
-                  make -C kind setup
+                  make -C scripts/k8s-setup setup
                   make -C $WORKFLOW_PATH workflow-test
                   debug_mode=$(echo "$DEBUG_MODE" | tr '[:upper:]' '[:lower:]')
                   if [ "$debug_mode" == "true" ]; then

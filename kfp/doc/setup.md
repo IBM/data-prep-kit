@@ -125,10 +125,5 @@ export EXTERNAL_CLUSTER=1
 Now, you can cleanup the external or Kind Kubernetes clusters by running the following command:
 
 ```shell
-make clean
-```
-
-**Note** that this command has to run from the project kind subdirectory, from the root directory, the command will be
-```shell
-make -C kind clean
+make -C scripts/k8s-setup clean
 ```
