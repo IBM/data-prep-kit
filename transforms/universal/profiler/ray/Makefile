@@ -32,10 +32,6 @@ publish-image:: .transforms.publish-image-ray
 
 setup:: .transforms.setup
 
-# set the version of python transform that this depends on.
-set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${CODE2PARQUET_PYTHON_VERSION} TOML_VERSION=$(CODE2PARQUET_PYTHON_VERSION) .transforms.set-versions
-
 build-dist:: set-versions .defaults.build-dist
 
 publish-dist:: .defaults.publish-dist
