@@ -57,9 +57,9 @@ class LangIdentificationTransform(AbstractTableTransform):
         self.nlp_langid = LangModelFactory.create_model(
             config.get(model_kind_key), config.get(model_url_key), config.get(model_credential_key)
         )
-        self.content_column_name = config.get(content_column_name_key)
-        self.output_lang_column_name = config.get(output_lang_column_name_key)
-        self.output_score_column_name = config.get(output_score_column_name_key)
+        self.content_column_name = config.get(content_column_name_key, "contents")
+        self.output_lang_column_name = config.get(output_lang_column_name_key, "language")
+        self.output_score_column_name = config.get(output_score_column_name_key, "score")
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
