@@ -35,6 +35,9 @@ extra-help:
 	@echo DEPLOY_KUBEFLOW - If 1 deploy kubeflow pipelines on the cluster. DEPLOY_KUBEFLOW=$(DEPLOY_KUBEFLOW)
 	@echo USE_KFP_MINIO - If 1 and DEPLOY_KUBEFLOW is also 1 then use the KFP Minio server for S3 tests.  USE_KFP_MINIO=$(USE_KFP_MINIO)
 	@echo POPULATE_TEST_DATA - If 1 then upload the test data into the MinIO Object Store, deployed as part of KFP.  POPULATE_TEST_DATA=$(POPULATE_TEST_DATA)
+	@echo MINIO_SERVER - MinIO endpoint. Default value is "http://localhost:8090" which is the MinIO deployed as part of KFP.
+	@echo MINIO_ACCESS_KEY - MinIO access key. Default value is the access key of the MinIO deployed as part of KFP.
+	@echo MINIO_SECRET_KEY - MinIO secret key. Default value is the secret key of the MinIO deployed as part of KFP.
 	@echo ""
 
 setup::

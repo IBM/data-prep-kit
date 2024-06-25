@@ -4,8 +4,16 @@ if [ "$MINIO_SERVER" == "" ]; then
     MINIO_SERVER="http://localhost:8090"
 fi
 
+if [ "$MINIO_ACCESS_KEY" == "" ]; then
+    MINIO_ACCESS_KEY="minio"
+fi
+
+if [ "$MINIO_SECRET_KEY" == "" ]; then
+    MINIO_SECRET_KEY="minio123"
+fi
+
 echo "creating minio alias to $MINIO_SERVER"
-mc alias set kfp $MINIO_SERVER minio minio123
+mc alias set kfp $MINIO_SERVER $MINIO_ACCESS_KEY $MINIO_SECRET_KEY
 
 echo "creating test bucket"
 mc mb kfp/test
