@@ -10,8 +10,11 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/ 
 RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
 
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r  requirements.txt
+# Install ray project source
+COPY --chown=ray:users src/ src/
+COPY --chown=ray:users pyproject.toml pyproject.toml
+COPY --chown=ray:users Readme.md Readme.md
+RUN pip install --no-cache-dir -e .
 
 # copy source data
 COPY src/profiler_transform_ray.py .
