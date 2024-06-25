@@ -1,6 +1,6 @@
 [project]
 name = "dpk_license_copyright_removal_transform_ray"
-version = "0.4.0.dev6"
+version = "0.2.0.dev6"
 requires-python = ">=3.10"
 description = "License copyright removal Transform for Ray"
 license = {text = "Apache-2.0"}
@@ -9,7 +9,7 @@ authors = [
     { name = "Yash kalathiya", email = "yashkalathiya164@gmail.com" },
 ]
 dependencies = [
-    "dpk-license-copyright-removal-transform-python==0.4.0.dev6",
+    "dpk-license-copyright-removal-transform-python==0.2.0.dev6",
     "data-prep-toolkit-ray==0.2.0.dev6",
 ]
 
