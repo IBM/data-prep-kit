@@ -12,14 +12,12 @@
 
 import os
 
-from code2parquet_transform import (
+from code2parquet_transform import (  # domain_key,; snapshot_key,
+    CodeToParquetTransform,
     data_factory_key,
     detect_programming_lang_key,
-    domain_key,
-    snapshot_key,
     supported_langs_file_key,
 )
-from code2parquet_transform_python import CodeToParquetPythonTransform
 from data_processing.data_access import DataAccessFactory
 from data_processing.test_support import get_files_in_folder
 from data_processing.test_support.transform import AbstractBinaryTransformTest
@@ -42,8 +40,8 @@ class TestIngestToParquetTransform(AbstractBinaryTransformTest):
         config = {
             supported_langs_file_key: lang_supported_file,
             detect_programming_lang_key: True,
-            snapshot_key: "github",
-            domain_key: "code",
+            # snapshot_key: "github",
+            # domain_key: "code",
             data_factory_key: DataAccessFactory(),
         }
 
@@ -51,7 +49,7 @@ class TestIngestToParquetTransform(AbstractBinaryTransformTest):
         expected_files = [
             (binary, TransformUtils.get_file_extension(name)[1]) for name, binary in expected_files.items()
         ]
-        return [(CodeToParquetPythonTransform(config), input_files, expected_files, expected_metadata_list)]
+        return [(CodeToParquetTransform(config), input_files, expected_files, expected_metadata_list)]
 
 
 if __name__ == "__main__":
