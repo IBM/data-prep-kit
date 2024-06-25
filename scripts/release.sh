@@ -78,7 +78,6 @@ if [ -z "$debug" ]; then
     make build publish
     export KFPv2=1
     make set-versions -C kfp
-    make build publish -C kfp/kfp_support_lib/kfp_v2_workflow_support/
     make build publish -C kfp/kfp_ray_components/
     export KFPv2=0
     make set-versions -C kfp

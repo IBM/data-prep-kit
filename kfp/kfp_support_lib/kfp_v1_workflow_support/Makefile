@@ -29,37 +29,22 @@ set-versions:
 	mv tt.toml pyproject.toml
 
 build:: set-versions venv
-ifeq ($(KFPv2), 1)
-	# we want to prevent execution of the rule, when we run `make build` in upper directories and KFPv2==1
-	echo "Skipping build as KFPv2 is defined"
-else
 	@# Help: Build the distribution for publishing to a pypi
 	$(MAKE) build-dist
-endif
 
 build-dist :: set-versions .defaults.build-dist
 
 publish::
-ifeq ($(KFPv2), 1)
-	# we want to prevent execution of the rule, when we run `make publish` in upper directories and KFPv2==1
-	echo "Skipping publish as KFPv2 is defined"
-else
 	$(MAKE) publish-dist
-endif
 
 publish-dist :: .check-env .defaults.publish-dist
 
 .PHONY: venv
 venv:
-ifeq ($(KFPv2), 1)
-	# we want to prevent execution of the rule, when we run `make venv` in upper directories and KFPv2==1
-	echo "Skipping as KFPv2 is defined"
-else
 	@# Help: Create the virtual environment using pyproject.toml
 	$(MAKE) .defaults.create-venv .defaults.install-ray-lib-src-venv
 	@source venv/bin/activate; pip install -e ${REPOROOT}/kfp/kfp_support_lib/shared_workflow_support
 	$(MAKE) .defaults.install-local-requirements-venv
-endif
 
 test:: venv 
 ifeq ($(KFPv2), 1)
