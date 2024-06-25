@@ -42,7 +42,7 @@ FORCE:
 	@# Help: upload and run the workflow. Set export USE_DEV_IMAGES=0 to use release docker image versions.
 	$(call set_env_var, CLUSTER_EXISTS, $(shell kind get clusters | grep ${KIND_CLUSTER_NAME}))
 	@if [ -z ${CLUSTER_EXISTS} ]; then \
-		cd ${REPOROOT} && make setup;  \
+		cd ${REPOROOT} && make -C scripts/k8s-setup setup;  \
 	fi
 ifeq ($(USE_DEV_IMAGES), 1)
 	cd ${TRANSFORM_SRC} && $(MAKE) image && $(MAKE) load-image
