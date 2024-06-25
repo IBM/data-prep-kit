@@ -18,6 +18,7 @@ from typing import Any
 
 import pyarrow as pa
 import ray
+from base_tokenizer import tokenize
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils
@@ -30,7 +31,6 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
 from ray.actor import ActorHandle
-from base_tokenizer import tokenize
 
 
 REQUEST_LEN = 8192

@@ -12,6 +12,7 @@
 
 import string
 
+
 """
 This implements the most simplistic tokenizer based on the white spaces
 that can be overwritten by a different a different one. This method is

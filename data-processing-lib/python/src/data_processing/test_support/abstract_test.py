@@ -218,7 +218,7 @@ class AbstractTest:
                 # These are binary files.
                 da = DataAccessLocal()
                 f1_bytes = da.get_file(src)
-                f2_bytes = da.get_file(dest)
+                f2_bytes = da.get_file(expected)
                 assert (
                     len(f1_bytes) - len(f2_bytes)
                 ) < 50, (
