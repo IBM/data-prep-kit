@@ -32,7 +32,7 @@ publish-image:: .transforms.publish-image-ray
 
 setup:: .transforms.setup
 
-build-dist:: set-versions .defaults.build-dist
+build-dist:: .defaults.build-dist
 
 publish-dist:: .defaults.publish-dist
 
