@@ -21,6 +21,10 @@ image::
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
+set-versions:  
+	@# Help: Recursively $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
 publish:: 
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
@@ -44,10 +48,6 @@ load-image::
 .PHONY: workflow-venv
 workflow-venv:
 	$(MAKE) -C  kfp_ray workflow-venv
-
-.PHONY: workflow-build
-workflow-build:
-	$(MAKE) -C  kfp_ray workflow-build
 
 .PHONY: workflow-test
 workflow-test:
