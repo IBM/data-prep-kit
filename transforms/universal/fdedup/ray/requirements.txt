@@ -1,8 +1,8 @@
 # transform runtime
 #data-prep-kit==0.1.2
 # fdedup
-mmh3
-xxhash
+mmh3==4.1.0
+xxhash==3.4.1
 tqdm==4.66.3
-scipy
+scipy==1.12.0
 

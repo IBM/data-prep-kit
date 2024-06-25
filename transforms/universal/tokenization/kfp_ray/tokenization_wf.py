@@ -20,7 +20,7 @@ from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, Component
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "tokenization_transform_ray.py"
 
-task_image = "quay.io/dataprep1/data-prep-kit/tokenization-ray:0.4.0.dev6"
+task_image = "quay.io/dataprep1/data-prep-kit/tokenization-ray:0.2.0.dev6"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6"

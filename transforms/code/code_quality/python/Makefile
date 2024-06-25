@@ -6,7 +6,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=code_quality
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${CODE_QUALITY_RAY_VERSION}
+DOCKER_IMAGE_VERSION=${CODE_QUALITY_PYTHON_VERSION}
 
 # Use default rule inherited from makefile.common
 clean:: .transforms.clean
@@ -34,7 +34,7 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${CODE_QUALITY_PYTHON_VERSION} TOML_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 

@@ -9,6 +9,14 @@ on:
         branches:
             - "dev"
 jobs:
+    test-make:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Test top-level recursive make targets.
+              run: |
+                  make -n clean test build publish set-versions
     test-python-lib:
         runs-on: ubuntu-latest
         steps:
@@ -97,7 +105,7 @@ jobs:
                   export DEPLOY_KUBEFLOW=1
                   make -C kind setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms workflow-build
+                  make -C transforms setup
                   dir=("code"  "universal") && index=$(($RANDOM % 2)) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs/ -type d  -maxdepth 1 ))
                   # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
                   set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
@@ -141,5 +149,13 @@ jobs:
                   export KFPv2=1
                   make -C kind setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms/universal/noop workflow-build
-                  make -C transforms/universal/noop workflow-test
+                  make -C transforms setup
+                  dir=("code"  "universal") && index=$(($RANDOM % 2)) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs/ -type d  -maxdepth 1 ))
+                  # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
+                  set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
+                  export REPOROOT=$PWD
+                  export KIND_SCRIPTS=$PWD/scripts/kind
+                  source scripts/kind/common.sh
+                  header_text "Running ${transforms[$index]} workflow test"
+                  make -C ${transforms[$index]} workflow-test
+                  header_text "Run ${transforms[$index]} completed"

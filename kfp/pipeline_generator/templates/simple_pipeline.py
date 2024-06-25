@@ -9,6 +9,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+
 import os
 
 import kfp.compiler as compiler
@@ -17,17 +18,16 @@ import kfp.dsl as dsl
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
-# the name of the job script
-EXEC_SCRIPT_NAME: str = "code_quality_transform_ray.py"
-PREFIX: str = ""
+task_image = "{{ transform_image }}"
 
-task_image = "quay.io/dataprep1/data-prep-kit/code_quality-ray:0.2.0.dev6"
+# the name of the job script
+EXEC_SCRIPT_NAME: str = "{{ script_name }}"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.0.dev6"
+base_kfp_image = "{{ kfp_base_image }}"
 
 # path to kfp component specifications files
-component_spec_path = "../../../../kfp/kfp_ray_components/"
+component_spec_path = "{{ component_spec_path }}"
 
 # compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
@@ -40,10 +40,9 @@ def compute_exec_params_func(
     runtime_pipeline_id: str,
     runtime_job_id: str,
     runtime_code_location: str,
-    cq_contents_column_name: str,
-    cq_language_column_name: str,
-    cq_tokenizer: str,
-    cq_hf_token: str,
+    {%- for pipeline_argument in pipeline_arguments %}
+    {{ pipeline_argument.name }}: {{ pipeline_argument.type }},
+    {%- endfor %}
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -56,10 +55,9 @@ def compute_exec_params_func(
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": runtime_code_location,
-        "cq_contents_column_name": cq_contents_column_name,
-        "cq_language_column_name": cq_language_column_name,
-        "cq_tokenizer": cq_tokenizer,
-        "cq_hf_token": cq_hf_token,
+        {%- for pipeline_argument in pipeline_arguments %}
+        "{{ pipeline_argument.name }}": {{ pipeline_argument.name }},
+        {%- endfor %}
     }
 
 
@@ -86,7 +84,6 @@ else:
     compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
     run_id = dsl.RUN_ID_PLACEHOLDER
 
-
 # create Ray cluster
 create_ray_op = comp.load_component_from_file(component_spec_path + "createRayClusterComponent.yaml")
 # execute job
@@ -95,43 +92,42 @@ execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "execu
 cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
 
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "code_quality"
+TASK_NAME: str = "{{ pipeline_name }}"
 
 
-# Pipeline to invoke execution on remote resource
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for code quality task",
+    description="{{ pipeline_description }}",
 )
-def code_quality(
+def {{ pipeline_name }}(
     # Ray cluster
-    ray_name: str = "code_quality-kfp-ray",  # name of Ray cluster
-    # Add image_pull_secret and image_pull_policy to ray workers if needed
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, \
-            "image": "'
-    + task_image
-    + '" }',
+    ray_name: str = "{{ pipeline_name }}-kfp-ray",
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", "image": "' + task_image + '" }',
+    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
+    '"image_pull_secret": "{{ image_pull_secret }}", "image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'test/code_quality/input/', 'output_folder': 'test/code_quality/output/'}",
-    data_s3_access_secret: str = "s3-secret",
+    {% if multi_s3 == False %}
+    data_s3_config: str = "{'input_folder': '{{ input_folder }}', 'output_folder': '{{ output_folder }}'}",
+    {% else %}
+    data_s3_config: str = ["{'input_folder': '{{ input_folder }}', 'output_folder': '{{ output_folder }}'}"],
+    {% endif %}
+    data_s3_access_secret: str = "{{ s3_access_secret }}",
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
     runtime_actor_options: str = "{'num_cpus': 0.8}",
-    runtime_pipeline_id: str = "runtime_pipeline_id",
+    runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # code quality parameters
-    cq_contents_column_name: str = "contents",
-    cq_language_column_name: str = "language",
-    cq_tokenizer: str = "codeparrot/codeparrot",
-    cq_hf_token: str = "None",
+    # {{ pipeline_name }} parameters
+    {%- for pipeline_argument in pipeline_arguments %}
+    {{ pipeline_argument.name }}: {{ pipeline_argument.type }}{% if pipeline_argument.value is defined %}{% if pipeline_argument.type == "int" %} = {{ pipeline_argument.value }}{% else %} = "{{ pipeline_argument.value }}"{% endif %}{% endif %},
+    {%- endfor %}
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
-    Pipeline to execute Code Quality transform
+    Pipeline to execute {{ pipeline_name }} transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -160,10 +156,10 @@ def code_quality(
     :param data_num_samples - num samples to process
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
-    :param cq_contents_column_name - Name of the column holds the data to process
-    :param cq_language_column_name - Name of the column holds the programming language details
-    :param cq_tokenizer - Name or path to the tokenizer
-    :param cq_hf_token - Huggingface auth token to download and use the tokenizer
+    :param runtime_code_location - code location
+    {%- for pipeline_argument in pipeline_arguments %}
+    :param {{ pipeline_argument.name }} - {{ pipeline_argument.description }}
+    {%- endfor %}
     :return: None
     """
     # create clean_up task
@@ -181,10 +177,9 @@ def code_quality(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            cq_contents_column_name=cq_contents_column_name,
-            cq_language_column_name=cq_language_column_name,
-            cq_tokenizer=cq_tokenizer,
-            cq_hf_token=cq_hf_token,
+            {%- for pipeline_argument in pipeline_arguments %}
+            {{ pipeline_argument.name }}={{ pipeline_argument.name }},
+            {%- endfor %}
         )
 
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
@@ -205,17 +200,14 @@ def code_quality(
             ray_name=ray_name,
             run_id=run_id,
             additional_params=additional_params,
-            # note that the parameters below are specific for NOOP transform
             exec_params=compute_exec_params.output,
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
         )
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
-
         execute_job.after(ray_cluster)
-
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(code_quality, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile({{ pipeline_name }}, __file__.replace(".py", ".yaml"))
