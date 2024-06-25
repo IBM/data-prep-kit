@@ -12,7 +12,6 @@
 
 import csv
 import io
-import string
 import uuid
 from argparse import ArgumentParser, Namespace
 from typing import Any
@@ -31,6 +30,7 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
 from ray.actor import ActorHandle
+from base_tokenizer import tokenize
 
 
 REQUEST_LEN = 8192
@@ -109,36 +109,6 @@ class DataAggregator:
         return self.data_access.save_file(path=output_path, data=s.read().encode("utf-8"))
 
 
-class AbstractTokenizer:
-    """
-    Abstract tokenizer class
-    """
-
-    def tokenize(self, text: str) -> list[str]:
-        """
-        Tokenize string
-        :param text: source text
-        :return: list of tokens (words)
-        """
-        pass
-
-
-class SimpleTokenizer(AbstractTokenizer):
-    """
-    Simple implementation of the abstract tokenizer
-    """
-
-    def tokenize(self, text: str) -> list[str]:
-        """
-        Tokenize string
-        :param text: source text
-        :return: list of tokens (words)
-        """
-        # start from normalizing string
-        normal = text.strip().lower().translate(str.maketrans("", "", string.punctuation))
-        return normal.split()
-
-
 class ProfilerTransform(AbstractTableTransform):
     """
     Implements Aggregator table transformer.
@@ -149,7 +119,6 @@ class ProfilerTransform(AbstractTableTransform):
         Initialize based on the dictionary of configuration information.
         The dictionary should contain the following:
             doc_column - name of the doc column
-            tokenizer - tokenizer to use
             aggregators - list of aggregator actors, references
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
@@ -157,9 +126,6 @@ class ProfilerTransform(AbstractTableTransform):
         super().__init__(config)
         self.doc_column = config.get("doc_column", "contents")
         self.aggregators = config.get("aggregators", [])
-        self.tokenizer = config.get("tokenizer", None)
-        if self.tokenizer is None:
-            raise RuntimeError("tokenizer is not provided")
         if len(self.aggregators) == 0:
             raise RuntimeError("No aggregators are available")
 
@@ -177,7 +143,7 @@ class ProfilerTransform(AbstractTableTransform):
         # Compute words count
         for text in table[self.doc_column]:
             # Compute doc hash
-            tokens = self.tokenizer.tokenize(str(text))
+            tokens = tokenize(text=str(text))
             for token in tokens:
                 words[token] = words.get(token, 0) + 1
         # submit word counts to cache
@@ -247,7 +213,7 @@ class ProfilerRuntime(DefaultRayTransformRuntime):
             actor_options={"num_cpus": self.params.get("aggregator_cpu", 0.5)},
             n_actors=self.params.get("num_aggregators", 1),
         )
-        return {"aggregators": self.aggregators, "tokenizer": SimpleTokenizer()} | self.params
+        return {"aggregators": self.aggregators} | self.params
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
         """

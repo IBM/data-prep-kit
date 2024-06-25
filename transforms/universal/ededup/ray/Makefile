@@ -40,7 +40,11 @@ build-dist:: set-versions .defaults.build-dist
 
 publish-dist:: .defaults.publish-dist
 
-run-cli-sample: .transforms.run-cli-ray-sample
+run-cli-sample:
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
+                RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
+                --ededup_num_hashes 2"	\
+                .transforms.run-src-file
 
 run-local-sample: .transforms.run-local-ray-sample
 

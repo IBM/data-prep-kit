@@ -1,5 +1,0 @@
-# aggregator
-mmh3==4.1.0
-xxhash==3.4.1
-tqdm==4.66.3
-numpy==1.26.4

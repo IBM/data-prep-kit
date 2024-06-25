@@ -11,7 +11,6 @@
 ################################################################################
 
 import random
-import string
 import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
@@ -186,9 +185,9 @@ class FdedupTransform(AbstractTableTransform):
         doc_ids = table[self.doc_id_column]
         # for every document/its integer id
         for n in range(table.num_rows):
-            doc = docs[n].as_py().replace("\n", "").lower().translate(str.maketrans("", "", string.punctuation))
+            doc = docs[n].as_py()
             doc_id = doc_ids[n].as_py()
-            shingles = compute_shingles(text=doc, word_shingle_size=self.word_shingle_size, delimiter=self.delimiter)
+            shingles = compute_shingles(txt=doc, word_shingle_size=self.word_shingle_size, delimiter=self.delimiter)
             if len(shingles) > 0:
                 mh = self._generate_minhashes(shingles)
                 minhashes.append((doc_id, len(doc), mh))
