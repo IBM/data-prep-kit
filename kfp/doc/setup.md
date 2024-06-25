@@ -76,9 +76,9 @@ export KFPv2=1
 Now, you can create a Kind cluster with all required software installed using the following command: 
 
 ```shell
- make setup
+ make -C scripts/k8s-setup setup
 ```
-from this main package directory or from the `scripts/k8s-setup` directory.
+from this main package directory.
 If you do not want to upload the testing data into the locally deployed Minio, and reduce memory footprint, please set:
 ```bash
 export POPULATE_TEST_DATA=0
@@ -97,10 +97,10 @@ upstream Argo-based KFP v1.
 
 You can install the software from their repositories, or you can use our installation scripts.
 
-If your local kubectl is configured to connect to the external cluster do the following:
+If your local kubectl is configured to connect to the external cluster do the following from this main directory:
 ```bash
 export EXTERNAL_CLUSTER=1
-make setup
+make -C scripts/k8s-setup setup
 ```
 
 - In addition, you should configure external access to the KFP UI (`svc/ml-pipeline-ui` in the `kubeflow` ns) and the Ray 
@@ -109,7 +109,7 @@ LoadBalancer services, Ingresses or Routes.
 
 - Optionally, you can upload the test data into the [MinIO](https://min.io/) Object Store, deployed as part of KFP. In 
 order to do this, please provide external access to the Minio (`svc/minio-service` in the `kubeflow` ns) and execute the 
-following commands: 
+following commands from the root directory: 
 ```shell
 export MINIO_SERVER=<Minio external URL>
 kubectl apply -f scripts/k8s-setup/s3_secret.yaml

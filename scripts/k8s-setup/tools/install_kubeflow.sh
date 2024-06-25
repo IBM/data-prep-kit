@@ -2,8 +2,6 @@
 
 op=$1
 
-set -x
-
 source ../common.sh
 
 SLEEP_TIME="${SLEEP_TIME:-60}"

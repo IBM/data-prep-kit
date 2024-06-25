@@ -15,7 +15,7 @@ endif
 include makeenv
 
 export TOOLS_DIR=${REPOROOT}/scripts/k8s-setup/tools
-export KIND_SCRIPTS=${REPOROOT}/scripts/k8s-setup
+export K8S_SETUP_SCRIPTS=${REPOROOT}/scripts/k8s-setup
 
 export EXTERNAL_CLUSTER ?= 0
 export DEPLOY_KUBEFLOW ?= 1
@@ -31,10 +31,10 @@ extra-help:
 	@# Help: Shows additional make macros that can be overridden/used. 
 	@echo ""
 	@echo Overridable macro values include the following:
-	@echo EXTERNAL_CLUSTER - If 0 create a KinD cluster.  EXTERNAL_CLUSTER=$(EXTERNAL_CLUSTER)
+	@echo EXTERNAL_CLUSTER - if not 1 - create a KinD cluster.  EXTERNAL_CLUSTER=$(EXTERNAL_CLUSTER)
 	@echo DEPLOY_KUBEFLOW - If 1 deploy kubeflow pipelines on the cluster. DEPLOY_KUBEFLOW=$(DEPLOY_KUBEFLOW)
-	@echo USE_KFP_MINIO - If 1 and DEPLOY_KUBEFLOW is also 1 then deploy MinIO on the cluster including ingress to access it.  USE_KFP_MINIO=$(USE_KFP_MINIO)
-	@echo POPULATE_TEST_DATA - If 1 populate test data to MinIO.  POPULATE_TEST_DATA=$(POPULATE_TEST_DATA)
+	@echo USE_KFP_MINIO - If 1 and DEPLOY_KUBEFLOW is also 1 then use the KFP Minio server for S3 tests.  USE_KFP_MINIO=$(USE_KFP_MINIO)
+	@echo POPULATE_TEST_DATA - If 1 then upload the test data into the MinIO Object Store, deployed as part of KFP.  POPULATE_TEST_DATA=$(POPULATE_TEST_DATA)
 	@echo ""
 
 setup::
@@ -50,7 +50,7 @@ publish:
 
 populate-data::
 	@# Help: Populate test data in Minio
-	cd ${KIND_SCRIPTS} && ./populate_minio.sh
+	cd ${K8S_SETUP_SCRIPTS} && ./populate_minio.sh
 
 cluster-deploy::
 	@# Help: Deploy all required tools on existing cluster
