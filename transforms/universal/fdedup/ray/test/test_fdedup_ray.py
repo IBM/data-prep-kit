@@ -19,7 +19,7 @@ from data_processing_ray.runtime.ray import RayTransformLauncher
 from fdedup_transform_ray import FdedupRayTransformConfiguration
 
 
-class TestRayBlocklistTransform(AbstractTransformLauncherTest):
+class TestRayFdedupTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -39,7 +39,7 @@ class TestRayBlocklistTransform(AbstractTransformLauncherTest):
             "fdedup_bucket_cpu": 0.5,
             "fdedup_doc_cpu": 0.5,
             "fdedup_mhash_cpu": 0.5,
-            "fdedup_num_doc_actors": 2,
+            "fdedup_num_doc_actors": 1,
             "fdedup_num_bucket_actors": 1,
             "fdedup_num_minhash_actors": 1,
             "fdedup_num_preprocessors": 1,

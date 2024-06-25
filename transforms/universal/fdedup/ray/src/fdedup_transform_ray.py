@@ -11,6 +11,7 @@
 ################################################################################
 
 import random
+import string
 import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
@@ -19,6 +20,7 @@ import mmh3
 import numpy as np
 import pyarrow as pa
 import ray
+from compute_shingles import compute_shingles
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import (
@@ -44,7 +46,6 @@ from fdedup_support import (
     DocCollector,
     DocsMinHash,
     MurmurMH,
-    find,
     fuzzy_optimal_param,
     get_snapshot_folder,
 )
@@ -90,21 +91,6 @@ class FdedupTransform(AbstractTableTransform):
         self.buckets = config.get("remote_buckets", [])
         self.minhashes = config.get("remote_minhashes", [])
         self.random_delay_limit = config.get("random_delay_limit", 10)
-
-    def _generate_word_shingles(self, text: str) -> list[str]:
-        """
-        Generate word shingles
-        :param text: document
-        :return: list of shingles
-        """
-        separators = find(text, self.delimiter)
-        if len(separators) + 1 <= self.word_shingle_size:
-            return [text]
-        bounds = [-1] + separators + [len(text)]
-        return [
-            text[bounds[i] + 1 : bounds[i + self.word_shingle_size]]
-            for i in range(0, len(bounds) - self.word_shingle_size)
-        ]
 
     def _generate_minhashes(self, shingles: list[str]) -> np.array:
         """
@@ -200,9 +186,9 @@ class FdedupTransform(AbstractTableTransform):
         doc_ids = table[self.doc_id_column]
         # for every document/its integer id
         for n in range(table.num_rows):
-            doc = docs[n].as_py()
+            doc = docs[n].as_py().replace("\n", "").lower().translate(str.maketrans("", "", string.punctuation))
             doc_id = doc_ids[n].as_py()
-            shingles = self._generate_word_shingles(TransformUtils.normalize_string(doc))
+            shingles = compute_shingles(text=doc, word_shingle_size=self.word_shingle_size, delimiter=self.delimiter)
             if len(shingles) > 0:
                 mh = self._generate_minhashes(shingles)
                 minhashes.append((doc_id, len(doc), mh))
