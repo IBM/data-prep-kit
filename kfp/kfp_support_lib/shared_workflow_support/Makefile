@@ -30,12 +30,9 @@ build:: build-dist
 
 build-dist :: set-versions .defaults.build-dist
 
-publish:: .check-env
-	@# Help: Publish the wheel to testpypi
-	if [ -d "dist"]; then rm -r dist; fi
-	${PYTHON} -m pip install --upgrade build
-	${PYTHON} -m twine check dist/*
-	${PYTHON} -m twine upload --verbose --non-interactive dist/* || true
+publish:: publish-dist
+
+publish-dist :: .check-env .defaults.publish-dist
 
 .PHONY: venv
 venv:
