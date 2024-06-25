@@ -2,7 +2,7 @@
 name = "dpk_ededup_transform_ray"
 version = "0.4.0.dev6"
 requires-python = ">=3.10"
-description = "code2parquet Ray Transform"
+description = "ededup Ray Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [

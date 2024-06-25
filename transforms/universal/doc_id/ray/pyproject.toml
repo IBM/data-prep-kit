@@ -1,8 +1,8 @@
 [project]
-name = "dpk_fdedup_transform_ray"
+name = "dpk_docid_transform_ray"
 version = "0.4.0.dev6"
 requires-python = ">=3.10"
-description = "fdedup Ray Transform"
+description = "docid Ray Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -11,10 +11,6 @@ authors = [
 ]
 dependencies = [
     "data-prep-toolkit-ray==0.2.0.dev6",
-    "mmh3==4.1.0",
-    "xxhash==3.4.1",
-    "tqdm==4.66.3",
-    "scipy==1.12.0"
 ]
 
 [build-system]

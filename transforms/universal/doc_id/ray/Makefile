@@ -30,20 +30,15 @@ publish:: publish-dist publish-image
 
 publish-image:: .transforms.publish-image-ray
 
+setup:: .transforms.setup
+
+# set the version of python transform that this depends on.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=not-used  .transforms.set-versions
-        
-build-dist:: set-versions .defaults.build-dist 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${CODE2PARQUET_PYTHON_VERSION} TOML_VERSION=$(CODE2PARQUET_PYTHON_VERSION) .transforms.set-versions
+
+build-dist:: set-versions .defaults.build-dist
 
 publish-dist:: .defaults.publish-dist
-
-run-cli-sample: 
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
-                RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
-                --doc_id_int True "	\
-                .transforms.run-src-file
-
-run-local-python-only-sample: .transforms.run-local-sample
 
 run-local-sample: .transforms.run-local-ray-sample
 
@@ -52,3 +47,10 @@ run-s3-sample: .transforms.run-s3-ray-sample
 minio-start:	.minio-start
 
 load-image:: .transforms.load-image
+
+run-cli-sample: 
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
+                RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
+                --doc_id_int True "	\
+                .transforms.run-src-file
+
