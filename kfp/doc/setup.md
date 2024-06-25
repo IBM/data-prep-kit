@@ -78,7 +78,7 @@ Now, you can create a Kind cluster with all required software installed using th
 ```shell
  make setup
 ```
-from this main package directory or from the `kind` directory.
+from this main package directory or from the `scripts/k8s-setup` directory.
 If you do not want to upload the testing data into the locally deployed Minio, and reduce memory footprint, please set:
 ```bash
 export POPULATE_TEST_DATA=0
@@ -112,8 +112,8 @@ order to do this, please provide external access to the Minio (`svc/minio-servic
 following commands: 
 ```shell
 export MINIO_SERVER=<Minio external URL>
-kubectl apply -f kind/hack/s3_secret.yaml
-kind/hack/populate_minio.sh
+kubectl apply -f scripts/k8s-setup/s3_secret.yaml
+scripts/k8s-setup/populate_minio.sh
 ```
 
 ## Clean up the cluster <a name = "cleanup"></a>

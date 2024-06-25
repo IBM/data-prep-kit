@@ -2,9 +2,9 @@
 
 ## Pre-requirements
 
-- [Supported platforms](../kfp/doc/setup.md#kind_platforms)
-- [Preinstalled software components](../kfp/doc/setup.md#kind)
-- [Preparing a Kind cluster for testing](../kfp/doc/setup.md#installation)
+- [Supported platforms](../../kfp/doc/setup.md#kind_platforms)
+- [Preinstalled software components](../../kfp/doc/setup.md#kind)
+- [Preparing a Kind cluster for testing](../../kfp/doc/setup.md#installation)
 
 As an alternative, you can execute the following manual installation instructions:
 
@@ -21,7 +21,7 @@ kind create cluster --name dataprep --config ${REPOROOT}/scripts/k8s-setup/kind-
 ```
 
 Note that by default this will create a kind cluster with 2 worker nodes. If you would like a different
-amount of node, modify [cluster configuration](../scripts/k8s-setup/kind-cluster-config.yaml)
+amount of node, modify [cluster configuration](./kind-cluster-config.yaml)
 
 ### Install KFP
 
@@ -96,4 +96,4 @@ used by `populate_minio.sh`
 
 
 ## Cleanup
-See [Clean up the cluster](../kfp/doc/setup.md#cleanup)
+See [Clean up the cluster](../../kfp/doc/setup.md#cleanup)

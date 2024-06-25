@@ -38,7 +38,7 @@ jobs:
             - name: Test KFP worflow run
               timeout-minutes: 120
               run: |
-                  source kind/requirements.env
+                  source scripts/k8s-setup/requirements.env
                   export PATH=$PATH:/tmp/
                   curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
                   chmod 777 /tmp/kind

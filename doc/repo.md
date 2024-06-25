@@ -27,7 +27,7 @@ supporting data transformations in 3 runtimes
 * kfp - Kubeflow pipeline support
     * kfp_support_lib - Data Preparation Kit Library. KFP support
     * kfp_ray_components - Kubflow pipeline components used in the pipelines
-* kind - kind
+* scripts
 
 
 # Build and Makefiles
