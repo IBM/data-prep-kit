@@ -18,7 +18,7 @@ from src.fdedup_compute_execution_params import fdedup_compute_execution_params
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/fdedup-ray:0.4.0.dev6"
+task_image = "quay.io/dataprep1/data-prep-kit/fdedup-ray:0.2.0.dev6"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "fdedup_transform_ray.py"
