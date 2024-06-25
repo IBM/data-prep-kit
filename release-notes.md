@@ -21,6 +21,7 @@
 1. Added language/lang_id - detects language in documents
 1. Added universal/profiler - counts works/tokens in documents
 1. Split transforms, as appropriate, into python, ray and/or spark.
+1. Added spark implementations of filter, doc_id and noop transforms.
 
 ## Release 0.1.1 - 5/24/2024
 
