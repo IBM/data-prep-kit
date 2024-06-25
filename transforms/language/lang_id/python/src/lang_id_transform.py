@@ -35,6 +35,9 @@ content_column_name_cli_param = f"{cli_prefix}{content_column_name_key}"
 output_lang_column_name_cli_param = f"{cli_prefix}{output_lang_column_name_key}"
 output_score_column_name_cli_param = f"{cli_prefix}{output_score_column_name_key}"
 
+default_content_column_name = "contents"
+default_output_lang_column_name = "lang"
+default_output_score_column_name = "score"
 
 class LangIdentificationTransform(AbstractTableTransform):
     """
@@ -57,9 +60,9 @@ class LangIdentificationTransform(AbstractTableTransform):
         self.nlp_langid = LangModelFactory.create_model(
             config.get(model_kind_key), config.get(model_url_key), config.get(model_credential_key)
         )
-        self.content_column_name = config.get(content_column_name_key, "contents")
-        self.output_lang_column_name = config.get(output_lang_column_name_key, "language")
-        self.output_score_column_name = config.get(output_score_column_name_key, "score")
+        self.content_column_name = config.get(content_column_name_key, default_content_column_name)
+        self.output_lang_column_name = config.get(output_lang_column_name_key, default_output_lang_column_name)
+        self.output_score_column_name = config.get(output_score_column_name_key, default_output_score_column_name)
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -114,13 +117,13 @@ class LangIdentificationTransformConfiguration(TransformConfiguration):
         parser.add_argument(f"--{model_kind_cli_param}", required=True, help="Kind of model for language detection")
         parser.add_argument(f"--{model_url_cli_param}", required=True, help="Url to model for language detection")
         parser.add_argument(
-            f"--{content_column_name_cli_param}", default="contents", help="Column name to get content"
+            f"--{content_column_name_cli_param}", default=default_content_column_name, help="Column name to get content"
         )
         parser.add_argument(
-            f"--{output_lang_column_name_cli_param}", default="language", help="Column name to store identified language"
+            f"--{output_lang_column_name_cli_param}", default=default_output_lang_column_name, help="Column name to store identified language"
         )
         parser.add_argument(
-            f"--{output_score_column_name_cli_param}", default="score", help="Column name to store the score of language identification"
+            f"--{output_score_column_name_cli_param}", default=default_output_score_column_name, help="Column name to store the score of language identification"
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
