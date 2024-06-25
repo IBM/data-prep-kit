@@ -75,7 +75,6 @@ git push origin $tag
 # Now build with the updated version
 # Requires quay credentials in the environment, DPL_DOCKER_REGISTRY_USER, DPK_DOCKER_REGISTRY_KEY
 if [ -z "$debug" ]; then
-    export KFPv2=0
     make build publish
     export KFPv2=1
     make set-versions -C kfp

@@ -41,7 +41,7 @@ build-dist :: set-versions .defaults.build-dist
 
 publish:: .check-env
 ifeq ($(KFPv2), 1)
-	# we want to prevent execution of the rule, when we run `make build` in upper directories and KFPv2==1
+	# we want to prevent execution of the rule, when we run `make publish` in upper directories and KFPv2==1
 	echo "Skipping publish as KFPv2 is defined"
 else
 	@# Help: Publish the wheel to testpypi
