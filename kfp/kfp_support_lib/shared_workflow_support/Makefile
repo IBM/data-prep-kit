@@ -35,7 +35,7 @@ publish:: .check-env
 	if [ -d "dist"]; then rm -r dist; fi
 	${PYTHON} -m pip install --upgrade build
 	${PYTHON} -m twine check dist/*
-	${PYTHON} -m twine upload --verbose --non-interactive dist/*
+	${PYTHON} -m twine upload --verbose --non-interactive dist/* || true
 
 .PHONY: venv
 venv:
