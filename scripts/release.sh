@@ -80,6 +80,7 @@ if [ -z "$debug" ]; then
     export KFPv2=1
     make set-versions -C kfp
     make build publish -C kfp
+    export KFPv2=0
 else
     # make -C data-processing-lib/spark image # Build the base image required by spark
     make -C transforms/universal/noop/python build publish
