@@ -18,7 +18,6 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from base_tokenizer import tokenize
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils
@@ -136,6 +135,7 @@ class ProfilerTransform(AbstractTableTransform):
         :param file_name: name of the file to process
         :return: resulting table, statistics
         """
+        from base_tokenizer import tokenize
         # make sure that the doc column exists
         TransformUtils.validate_columns(table=table, required=[self.doc_column])
         # Inner variables
@@ -149,8 +149,7 @@ class ProfilerTransform(AbstractTableTransform):
         # submit word counts to cache
         self._submit_to_cache(words=words)
         # return
-        stats = {"unique words": len(words)}
-        return [], stats
+        return [], {}
 
     def _submit_to_cache(self, words: dict[str, str]) -> None:
         """
