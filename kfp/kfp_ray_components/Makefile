@@ -9,8 +9,7 @@ include $(REPOROOT)/.make.defaults
 #DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}
 DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 
-.PHONY: .setImage
-.setImage::
+
 ifeq ($(KFPv2), 1)
         DOCKER_IMAGE_NAME=kfp-data-processing_v2
         DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
@@ -33,14 +32,14 @@ endif
 
 .PHONY: build
 build: Dockerfile requirements.txt
-	@$(make) .setImage
+	echo ${DOCKER_IMAGE_NAME}
+	echo $(DOCKER_REMOTE_IMAGE)
 	$(MAKE) set-versions 
 	$(MAKE) .lib-src-image
 
 
 .PHONY: .reconcile-requirements
 .reconcile-requirements:
-	@$(make) .setImage
 	@sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${FILE}
 
 .PHONY: set-versions 
@@ -58,26 +57,16 @@ endif
 .PHONY: load-image
 load-image:
 	@# Help: Load the image to the kind cluster created with make setup.
-	@$(make) .setImage
 	kind load docker-image $(DOCKER_REMOTE_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
 
 .PHONY: publish
 publish:
-	CURRENT_KFPv2=$(KFPv2)
-	unset KFPv2
-	@$(make) .setImage
-	@echo "Publishing $DOCKER_IMAGE_NAME"
-	@$(make) build
-	$(MAKE) .defaults.publish-image
-	export KFPv2=1
-	@$(make) .setImage
-	@echo "Publishing $DOCKER_IMAGE_NAME"
-	@$(make) build
-	$(MAKE) .defaults.publish-image
-ifeq ($(CURRENT_KFPv2), 1)
-	export KFPv2=CURRENT_KFPv2
-endif
+	echo "Publishing ${DOCKER_IMAGE_NAME}"
+	$(MAKE) KFPv2=0 DOCKER_IMAGE_NAME="kfp-data-processing" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION} build .defaults.publish-image
+	echo "Publishing ${DOCKER_IMAGE_NAME}"
+	$(MAKE) KFPv2=1 DOCKER_IMAGE_NAME="kfp-data-processing_v2" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2} build .defaults.publish-image
+	$(MAKE) set-versions
 
 test::
 
