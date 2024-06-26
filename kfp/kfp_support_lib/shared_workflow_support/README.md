@@ -35,13 +35,13 @@ The process of creating a release for the package involves the following steps:
 
 - cd to the package directory.
 - update the `DPK_LIB_KFP_SHARED` version in [.make.versions](../../../.make.versions) file.
-- run `make build` and `make publish`.
+- run `make set-versions` and `make build` and `make publish`.
 
 ## Testing
 
 To run the package tests perform the following:
 
-To begin with, establish a Kind cluster and deploy all required components by executing the makfefile command in the main directory of this repository. As an alternative, you can manually execute the instructions provided in the [README.md](../../kind/README.md) file.
+To begin with, establish a Kind cluster and deploy all required components by executing the makfefile command in the main directory of this repository. As an alternative, you can manually execute the instructions provided in the [README.md](../../../scripts/k8s-setup/README.md) file.
 
 ```bash
 make setup

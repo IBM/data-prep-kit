@@ -38,7 +38,8 @@ jobs:
             - name: Test KFP worflow run
               timeout-minutes: 120
               run: |
-                  source kind/requirements.env
+                  export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
+                  source $K8S_SETUP_SCRIPTS/requirements.env
                   export PATH=$PATH:/tmp/
                   curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
                   chmod 777 /tmp/kind
@@ -50,7 +51,7 @@ jobs:
                   chmod 777 /tmp/kubectl
                   curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
                   chmod +x /tmp/mc
-                  make -C kind setup
+                  make -C $K8S_SETUP_SCRIPTS setup
                   make -C $WORKFLOW_PATH workflow-test
                   debug_mode=$(echo "$DEBUG_MODE" | tr '[:upper:]' '[:lower:]')
                   if [ "$debug_mode" == "true" ]; then

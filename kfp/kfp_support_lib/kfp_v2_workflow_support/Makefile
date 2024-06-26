@@ -25,7 +25,7 @@ clean::
 .PHONY: set-versions
 set-versions: 
 	$(MAKE) TOML_VERSION=$(DPK_LIB_KFP_VERSION) .defaults.update-toml
-	cat pyproject.toml | sed -e 's/"kfp\([=><][=><]\).*",/"kfp\1$(KFP_v2)",/' > tt.toml
+	cat pyproject.toml | sed -e 's/"kfp\([=><][=><]\).*",/"kfp\1$(KFP_v2_SDK)",/' > tt.toml
 	mv tt.toml pyproject.toml
 
 build:: set-versions venv

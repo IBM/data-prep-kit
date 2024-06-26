@@ -5,10 +5,10 @@ op=$1
 SLEEP_TIME="${SLEEP_TIME:-30}"
 MAX_RETRIES="${MAX_RETRIES:-20}"
 EXIT_CODE=0
-NGINX_INSTALLATION_FILE="${KIND_SCRIPTS}/nginx_deploy.yaml"
-NGINX_MINIO_INSTALLATION_FILE="${KIND_SCRIPTS}/nginx_deploy_minio.yaml"
+NGINX_INSTALLATION_FILE="${K8S_SETUP_SCRIPTS}/nginx_deploy.yaml"
+NGINX_MINIO_INSTALLATION_FILE="${K8S_SETUP_SCRIPTS}/nginx_deploy_minio.yaml"
 
-source ${KIND_SCRIPTS}/common.sh
+source ${K8S_SETUP_SCRIPTS}/common.sh
 
 deploy() {
 	kubectl apply -f "$NGINX_INSTALLATION_FILE"
