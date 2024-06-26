@@ -56,7 +56,7 @@ Contributors are welcome to add new modules as well as add runtime support for e
 |Malware annotation              |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
 |Filter on annotations           |:white_check_mark:|:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 |Language identification         |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
-|Code import                     |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
+|Code (from zip) to Parquet      |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
 |Profiler                        |                  |:white_check_mark:|                  |:white_check_mark:      |
 |Tokenizer                       |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
 
