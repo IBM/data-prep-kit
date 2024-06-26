@@ -6,7 +6,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=legal_removal
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${LEGAL_REMOVAL_VERSION}
+DOCKER_IMAGE_VERSION=${LEGAL_REMOVAL_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
@@ -28,13 +28,8 @@ publish:: publish-dist publish-image
 
 publish-image:: .transforms.publish-image-ray
 
-# distribution versions is the same as image version.
-set-versions:
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
-	cat pyproject.toml | sed                                                                        \
-                -e 's/"dpk-license_copyright_removal-transform-python\(..\).*",/"dpk-license_copyright_removal-transform-python\1$(LICENSE_COPYRIGHT_REMOVAL_VERSION)",/'   \
-                > tt.toml
-	mv tt.toml pyproject.toml
+set-versions: 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${LEGAL_REMOVAL_PYTHON_VERSION} TOML_VERSION=$(LEGAL_REMOVAL_RAY_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 
