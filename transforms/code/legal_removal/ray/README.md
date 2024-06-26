@@ -12,11 +12,7 @@ After detecting license and copyright position code has been stored at same colu
 
 ## Configuration and command line Options
 
-The set of dictionary keys holding configuration for values are as follows:
-
-* --legal_removal_contents_column_name - specifies the column name which holds code content. By default the value is 'contents'.
-* --legal_removal_license - specifies the bool value for removing license or not. Default value is True.
-* --legal_removal_copyright - specifies the bool value for removing copyright or not. Default value is True. 
+This project wraps the [license removal transform](../python) with a Ray runtime.
 
 ## Running
 

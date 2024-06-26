@@ -15,8 +15,8 @@ After detecting license and copyright position code has been stored at same colu
 The set of dictionary keys holding configuration for values are as follows:
 
 * --legal_removal_contents_column_name - specifies the column name which holds code content. By default the value is 'contents'.
-* --legal_removal_license - specifies the bool value for removing license or not. Default value is True.
-* --legal_removal_copyright - specifies the bool value for removing copyright or not. Default value is True. 
+* --legal_removal_license - specifies the bool value for removing license or not. Write true or false.  Default value is True.
+* --legal_removal_copyright - specifies the bool value for removing copyright or not. Write true or false. Default value is True. 
 
 ## Running
 You can run the [legal_removal_local.py](src/legal_removal_local.py) (python-only implementation) or [legal_removal_local_ray.py](ray/src/legal_removal_local_ray.py) (ray-based  implementation) to transform the `test1.parquet` file in [test input data](test-data/input) to an `output` directory.  The directory will contain both the new annotated `test1.parquet` file and the `metadata.json` file.
@@ -26,8 +26,7 @@ You can run the [legal_removal_local.py](src/legal_removal_local.py) (python-onl
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
-the options provided by the [ray launcher](../../../../data-processing-lib/doc/ray-launcher-options.md)
-and the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
+the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 
 ### Running the samples
 To run the samples, use the following `make` targets

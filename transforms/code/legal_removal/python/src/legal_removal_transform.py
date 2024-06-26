@@ -19,7 +19,7 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import TransformUtils,get_logger,CLIArgumentProvider
+from data_processing.utils import get_logger,CLIArgumentProvider
 from scancode import api
 
 logger = get_logger(__name__)

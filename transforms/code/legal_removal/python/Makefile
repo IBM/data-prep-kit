@@ -8,7 +8,7 @@ REPOROOT=../../../..
 # $(REPOROOT)/.make.versions file contains the versions
 
 TRANSFORM_NAME=legal_removal
-DOCKER_IMAGE_VERSION=${LEGAL_REMOVAL_VERSION}
+DOCKER_IMAGE_VERSION=${LEGAL_REMOVAL_PYTHON_VERSION}
 
 include $(REPOROOT)/transforms/.make.transforms
 
@@ -34,7 +34,7 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${FILTER_PYTHON_VERSION} TOML_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${LEGAL_REMOVAL_PYTHON_VERSION} TOML_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 
