@@ -86,7 +86,7 @@ export POPULATE_TEST_DATA=0
 You can access the KFP dashboard at http://localhost:8080/ and the MinIO dashboard at http://localhost:8090/
 
 ### Installation on an existing Kubernetes cluster <a name = "installation_existing"></a>
-Alternatively you can deploy pipeline to the existing Kubernetes cluster. If your local kubectl is configured to 
+Alternatively you can deploy pipeline to the existing Kubernetes cluster. 
 
 In order to execute data transformers on the remote Kubernetes cluster, the following packages should be installed on the cluster:
 
@@ -97,7 +97,7 @@ upstream Argo-based KFP v1.
 
 You can install the software from their repositories, or you can use our installation scripts.
 
-If your local kubectl is configured to connect to the external cluster do the following:
+Once your local kubectl is configured to connect to the external cluster do the following:
 ```bash
 export EXTERNAL_CLUSTER=1
 make setup
