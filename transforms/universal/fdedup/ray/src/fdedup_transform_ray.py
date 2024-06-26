@@ -19,7 +19,6 @@ import mmh3
 import numpy as np
 import pyarrow as pa
 import ray
-from compute_shingles import compute_shingles
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import (
@@ -112,7 +111,7 @@ class FdedupTransform(AbstractTableTransform):
         :return:
         """
         return [
-            mmh3.hash64(min_hashes[i * self.length_band : (i + 1) * self.length_band], seed=RANDOM_SEED, signed=False)[
+            mmh3.hash64(min_hashes[i * self.length_band: (i + 1) * self.length_band], seed=RANDOM_SEED, signed=False)[
                 0
             ]
             for i in range(self.num_bands)
@@ -158,6 +157,7 @@ class FdedupTransform(AbstractTableTransform):
         :param file_name - name of currently processed file
         :return: resulting table, statistics
         """
+        from compute_shingles import compute_shingles
 
         def flush(limit: int) -> None:
             """
@@ -341,7 +341,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             self.logger.info(f"Found the following snapshot files {files.keys()}")
             self.document_collectors = [None] * len(files)
             for file in files.keys():
-                i = int(file[file.rfind("_") + 1 :])
+                i = int(file[file.rfind("_") + 1:])
                 self.document_collectors[i] = DocCollector.options(
                     **{"num_cpus": self.params.get("doc_cpu", 0.5)}
                 ).remote({"id": i, "data_access": data_access_factory, "snapshot": file})
@@ -380,7 +380,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             self.logger.debug(f"Found the following bucket snapshot files {files.keys()}")
             bucket_collectors = [None] * len(files)
             for file in files.keys():
-                i = int(file[file.rfind("_") + 1 :])
+                i = int(file[file.rfind("_") + 1:])
                 bucket_collectors[i] = BucketsHash.options(**{"num_cpus": self.params.get("bucket_cpu", 0.5)}).remote(
                     {"id": i, "data_access": data_access_factory, "snapshot": file}
                 )
@@ -394,7 +394,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             self.logger.debug(f"Found the following minhash snapshot files {files.keys()}")
             minhash_collectors = [None] * len(files)
             for file in files.keys():
-                i = int(file[file.rfind("_") + 1 :])
+                i = int(file[file.rfind("_") + 1:])
                 minhash_collectors[i] = DocsMinHash.options(**{"num_cpus": self.params.get("mhash_cpu", 0.5)}).remote(
                     {"id": i, "data_access": data_access_factory, "snapshot": file}
                 )
