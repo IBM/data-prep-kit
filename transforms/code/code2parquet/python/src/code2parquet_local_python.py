@@ -14,11 +14,9 @@ import ast
 import os
 import sys
 
-from code2parquet_transform import (
-    detect_programming_lang_key,
-    domain_key,
-    snapshot_key,
-    supported_langs_file_key,
+from code2parquet_transform import (  # domain_key,; snapshot_key,
+    detect_programming_lang_cli_key,
+    supported_langs_file_cli_key,
 )
 from code2parquet_transform_python import CodeToParquetPythonConfiguration
 from data_processing.runtime.pure_python import PythonTransformLauncher
@@ -38,10 +36,10 @@ local_conf = {
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 ingest_config = {
-    supported_langs_file_key: supported_languages_file,
-    detect_programming_lang_key: True,
-    snapshot_key: "github",
-    domain_key: "code",
+    supported_langs_file_cli_key: supported_languages_file,
+    detect_programming_lang_cli_key: True,
+    # snapshot_key: "github",
+    # domain_key: "code",
 }
 
 params = {

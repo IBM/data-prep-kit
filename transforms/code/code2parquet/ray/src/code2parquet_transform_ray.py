@@ -19,7 +19,7 @@ from code2parquet_transform import (
     data_factory_key,
     get_supported_languages,
     supported_langs_file_key,
-    supported_languages,
+    supported_languages_key,
 )
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing_ray.runtime.ray import (
@@ -30,6 +30,9 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
 from ray.actor import ActorHandle
+
+
+supported_languages_ref_key = "supported_languages_ref"
 
 
 class CodeToParquetRayTransform(CodeToParquetTransform):
@@ -43,28 +46,20 @@ class CodeToParquetRayTransform(CodeToParquetTransform):
         these will be provided by that class with help from the RayMutatingDriver.
         """
 
-        super().__init__(config)
-        supported_languages_ref = config.get(supported_languages, None)
-        if supported_languages_ref is None:
-            path = config.get(supported_langs_file_key, None)
-            if path is None:
-                raise RuntimeError(f"Missing configuration value for key {supported_langs_file_key}")
-            daf = config.get(data_factory_key, None)
-            data_access = daf.create_data_access()
-            self.languages_supported = get_supported_languages(
-                lang_file=path, data_access=data_access, logger=self.logger
-            )
-        else:
+        supported_languages_ref = config.get(supported_languages_key, None)
+        if supported_languages_ref is not None:
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
             try:
                 self.logger.info(
                     f"Loading languages to include from Ray storage under reference {supported_languages_ref}"
                 )
-                self.languages_supported = ray.get(supported_languages_ref)
+                languages_supported = ray.get(supported_languages_ref_key)
+                config[supported_languages_key] = languages_supported
             except Exception as e:
                 self.logger.warning(f"Exception loading languages list from ray object storage {e}")
                 raise RuntimeError(f"exception loading from object storage for key {supported_languages_ref}")
+        super().__init__(config)
 
 
 class CodeToParquetRuntime(DefaultRayTransformRuntime):
@@ -112,7 +107,7 @@ class CodeToParquetRuntime(DefaultRayTransformRuntime):
         )
         lang_refs = ray.put(lang_dict)
         self.logger.debug(f"Placed language list into Ray object storage under reference{lang_refs}")
-        return {supported_languages: lang_refs} | self.params
+        return {supported_languages_ref_key: lang_refs} | self.params
 
 
 class CodeToParquetRayConfiguration(RayTransformRuntimeConfiguration):

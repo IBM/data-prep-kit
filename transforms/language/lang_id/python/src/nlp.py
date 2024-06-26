@@ -21,18 +21,14 @@ logger = get_logger(__name__)
 
 
 def get_lang_ds_pa(table: pa.table, nlp: LangModel, col_name: str = "contents") -> tuple[pa.table, dict[str, Any]]:
-    try:
-        detected_language = pa.Table.from_pylist(
-            list(
-                map(
-                    lambda r: {"lang": r[0], "score": r[1]},
-                    map(lambda x: nlp.detect_lang(x), table[col_name].to_pylist()),
-                )
+    detected_language = pa.Table.from_pylist(
+        list(
+            map(
+                lambda r: {"lang": r[0], "score": r[1]},
+                map(lambda x: nlp.detect_lang(x), table[col_name].to_pylist()),
             )
         )
-    except Exception as e:
-        logger.warning("ERROR: %s, skipping the file", e)
-        return None, None
+    )
     stats = pa.table([detected_language["lang"]], names=["lang"]).group_by("lang").aggregate([("lang", "count")])
     stats_dict = {}
     for batch in stats.to_batches():

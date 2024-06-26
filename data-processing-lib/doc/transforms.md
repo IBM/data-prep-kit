@@ -10,7 +10,9 @@ The [Spark runtime](spark-runtime.md) currently supports the native Spark `DataF
 All transforms convert their input `DATA` to a list of transformed `DATA` objects
 and optional metadata about the transformation of the `DATA` instance.
 The Transform itself need only be concerned with the conversion 
-of one `DATA` instance at a time.
+of one `DATA` instance at a time. 
+Transforms, where possible, should be implemented without regard to the
+runtime it will run in or where its configuration originates.  
 
 In the discussion that follows, we'll focus on the transformation of pyarrow Tables
 using the `AbstractTableTransform` class (see below), supported by both
@@ -23,11 +25,18 @@ which operates on a Spark DataFrame instead of a pyarrow Table.
 #### AbstractTableTransform class
 [AbstractTableTransform](../ray/src/data_processing_ray/transform/table_transform.py) 
 is expected to be extended when implementing a transform of pyarrow Tables.
+In general, when possible a transform should be independent of the runtime in
+which it runs, and the mechanism used to define its configuration
+(e.g., the `TransformConfiguration` class below, or other mechanism).
+That said, some transforms may require facilities provided by the runtime
+(shared memory, distribution, etc.), but as a starting point, think of the
+transform as an independent operator.
+
 The following methods are defined:
 
 * ```__init__(self, config:dict)``` - an initializer through which the transform can be created 
 with implementation-specific configuration.  For example, the location of a model, maximum number of
-rows in a table, column(s) to use, etc. 
+rows in a table, column(s) to use, etc.   Error checking of configuration should be done here.
 * ```transform(self, table:pyarrow.Table) -> tuple(list[pyarrow.Table], dict)``` - this method is responsible
 for the actual transformation of a given table to zero or more output tables, and optional 
 metadata regarding the transformation applied.  Zero tables might be returned when
@@ -51,7 +60,8 @@ not need this feature, a default implementation is provided to return an empty l
 #### TransformConfiguration class
 The [TransformConfiguration](../ray/src/data_processing_ray/runtime/runtime_configuration.py)
 serves as an interface and must be implemented by the any `AbstractTableTransform`
-implementation to provide the following configuration:
+implementation to enable running within and runtime or from a command line to capture 
+transform configuration.  It provides the following configuration:
 
 * the transform class to be used,
 * command line arguments used to initialize the Transform Runtime and generally, the Transform.

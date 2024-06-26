@@ -12,8 +12,9 @@ VALUE = "value"
 DESCRIPTION = "description"
 
 if __name__ == "__main__":
-    import yaml
     import argparse
+
+    import yaml
     from jinja2 import Environment, FileSystemLoader
 
     environment = Environment(loader=FileSystemLoader("templates/"))
@@ -47,7 +48,7 @@ if __name__ == "__main__":
         output_folder=common_input_params_values.get("output_folder", ""),
         s3_access_secret=common_input_params_values["s3_access_secret"],
         image_pull_secret=common_input_params_values["image_pull_secret"],
-        multi_s3=pipeline_parameters["multi_s3"]
+        multi_s3=pipeline_parameters["multi_s3"],
     )
 
     output_file = f"{args.output_dir_file}/{pipeline_parameters[NAME]}_wf.py"
@@ -56,6 +57,7 @@ if __name__ == "__main__":
         print(f"... wrote {output_file}")
 
     import sys
+
     from pre_commit.main import main
 
     print(f"Pipeline ${output_file} auto generation completed")

@@ -32,6 +32,8 @@ class TestPythonLangIdentificationTransform(AbstractTransformLauncherTest):
             "lang_id_model_kind": KIND_FASTTEXT,
             "lang_id_model_url": "facebook/fasttext-language-identification",
             "lang_id_content_column_name": "text",
+            "lang_id_output_lang_column_name": "ft_lang",
+            "lang_id_output_score_column_name": "ft_score",
         }
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
         fixtures = []

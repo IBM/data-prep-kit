@@ -66,7 +66,7 @@ choose your OS system, and process according to "(Optional) Install the MinIO Cl
 
 ## Installation steps <a name = "installation"></a>
 
-Before installation, you have to deside which KFP version do you want to use. 
+Before installation, you have to decide which KFP version do you want to use. 
 In order to use KFP v2, please set the following environment variable:
 
 ```shell
