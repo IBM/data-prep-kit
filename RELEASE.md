@@ -12,11 +12,7 @@ The following points are important:
    1. Corollary: `make set-versions` should ONLY be used from the top of the repo when `.make.versions` changes.
 1. The main branch always has the version suffix set to .dev\<N\>, which
 allows intermediate publishing from the main branch using version X.Y.Z.dev\<N\>.
-1. The `scripts/release-branch.sh` script automates the following:
-   1. Creating a `releases/vX.Y.Z` branch and `vX.Y.Z` tag.
-   2. Nulling out the version suffix in the new branch's `.make.version` file. 
-   3. Applying the unsuffixed versions to the artifacts published from the repo.
-   4. Incrementing the minor version and resetting the suffix in the main branch.
+1. The `scripts/release-branch.sh` script automates creation of a new release branch and tag and version numbers in `.make.versions` 
 1. Building and publishing is done manually, or soon via a git action, in the branch created by `scripts/release-branch.sh`. 
    1. Wheels can only be published once to pypi for a given version.
    1. Transform and kfp images may be republished to the docker registry.
@@ -24,11 +20,11 @@ allows intermediate publishing from the main branch using version X.Y.Z.dev\<N\>
 ## Cutting the release
 Creating the release involves
 
-1. Creating a release branch and tag.
-1. Building and publish pypi library wheels and docker registry image.
+1. Creating a release branch and tag and updating the main branch versions.
+1. Building and publishing pypi library wheels and docker registry image.
 1. Creating a github release from the release branch and tag.
 
-Each is discussed below
+Each is discussed below.
 
 ### Creating release branch and tag 
 The `scripts/release-branch.sh` is currently run manually to create the branch and tags as follows:
