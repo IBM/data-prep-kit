@@ -74,12 +74,12 @@ git push origin $tag
 
 # Now build with the updated version
 # Requires quay credentials in the environment, DPL_DOCKER_REGISTRY_USER, DPK_DOCKER_REGISTRY_KEY
-if [ -z "$debug" ]; then
-    make build publish
-else
-    # make -C data-processing-lib/spark image # Build the base image required by spark
-    make -C transforms/universal/noop/python build publish
-fi
+#if [ -z "$debug" ]; then
+#    make build publish
+#else
+#    # make -C data-processing-lib/spark image # Build the base image required by spark
+#    make -C transforms/universal/noop/python build publish
+#fi
 
 # Now go back to the default branch so we can bump the minor version number and reset the version suffix
 git checkout $DEFAULT_BRANCH
@@ -95,8 +95,11 @@ make set-versions
 
 # Push the version change back to the origin
 next_version=$(make show-version)
-git commit -s -a -m "Bump micro version to $next_version after cutting release $version into branch $release_branch"
-git diff origin/$DEFAULT_BRANCH $DEFAULT_BRANCH
 if [ -z "$debug" ]; then
+    git commit -s -a -m "Bump micro version to $next_version after cutting release $version into branch $release_branch"
+    git diff origin/$DEFAULT_BRANCH $DEFAULT_BRANCH
     git push origin
+else
+    git status
+    echo In non-debug mode, the above diffs would have been commited to the $DEFAULT_BRANCH branch
 fi
