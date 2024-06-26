@@ -32,9 +32,6 @@ endif
 
 .PHONY: build
 build: Dockerfile requirements.txt
-	echo ${DOCKER_IMAGE_NAME}
-	echo $(DOCKER_REMOTE_IMAGE)
-	$(MAKE) set-versions 
 	$(MAKE) .lib-src-image
 
 
@@ -43,7 +40,10 @@ build: Dockerfile requirements.txt
 	@sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${FILE}
 
 .PHONY: set-versions 
-set-versions:
+set-versions::
+
+.PHONE: set-image
+set-image:
 	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
 	@$(MAKE) .reconcile-requirements FILE=createRayClusterComponent.yaml
 	@$(MAKE) .reconcile-requirements FILE=deleteRayClusterComponent.yaml
@@ -66,7 +66,6 @@ publish:
 	$(MAKE) KFPv2=0 DOCKER_IMAGE_NAME="kfp-data-processing" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION} build .defaults.publish-image
 	echo "Publishing ${DOCKER_IMAGE_NAME}"
 	$(MAKE) KFPv2=1 DOCKER_IMAGE_NAME="kfp-data-processing_v2" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2} build .defaults.publish-image
-	$(MAKE) set-versions
 
 test::
 
