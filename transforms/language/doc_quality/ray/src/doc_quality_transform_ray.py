@@ -21,20 +21,6 @@ from doc_quality_transform import DocQualityTransformConfiguration
 
 logger = get_logger(__name__)
 
-short_name = "docq"
-cli_prefix = f"{short_name}_"
-text_lang_key = "text_lang"
-doc_content_column_key = "doc_content_column"
-doc_id_column_key = "doc_id_column"
-bad_word_filepath_key = "bad_word_filepath"
-kenLM_model_key = "kenLM_model"
-text_lang_cli_param = f"{cli_prefix}{text_lang_key}"
-doc_content_column_cli_param = f"{cli_prefix}{doc_content_column_key}"
-doc_id_column_cli_param = f"{cli_prefix}{doc_id_column_key}"
-bad_word_filepath_cli_param = f"{cli_prefix}{bad_word_filepath_key}"
-kenLM_model_cli_param = f"{cli_prefix}{kenLM_model_key}"
-
-
 class DocQualityRayTransformConfiguration(RayTransformRuntimeConfiguration):
     """
     Implements the RayTransformConfiguration for Document Quality as required by the RayTransformLauncher.
