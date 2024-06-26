@@ -29,13 +29,6 @@ from noop_transform import NOOPTransformConfiguration
 
 logger = get_logger(__name__)
 
-short_name = "noop"
-cli_prefix = f"{short_name}_"
-sleep_key = "sleep_sec"
-pwd_key = "pwd"
-sleep_cli_param = f"{cli_prefix}{sleep_key}"
-pwd_cli_param = f"{cli_prefix}{pwd_key}"
-
 
 class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
     """
