@@ -31,7 +31,10 @@ endif
 	rm -rf workflow_support_lib
 
 .PHONY: build
-build: Dockerfile requirements.txt
+build: image
+
+.PHONY: image
+image: Dockerfile requirements.txt
 	$(MAKE) .lib-src-image
 
 
