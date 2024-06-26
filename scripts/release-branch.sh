@@ -44,7 +44,7 @@ else
 fi
 # Apply the version change to all files in the repo 
 echo Applying $version to $release_branch branch 
-make set-versions
+make set-versions > /dev/null
 
 # Commit the changes to the release branch and tag it
 git status
@@ -67,7 +67,7 @@ mv tt .make.versions
 # Apply the version change to all files in the repo 
 next_version=$(make show-version)
 echo Applying updated version $next_version to $DEFAULT_BRANCH  branch
-make set-versions
+make set-versions > /dev/null
 
 # Push the version change back to the origin
 if [ -z "$debug" ]; then
