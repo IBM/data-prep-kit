@@ -17,7 +17,7 @@ if [[ "$os" == "unknown" ]]; then
 	exit 1
 fi
 
-source ${KIND_SCRIPTS}/helper-functions.sh
+source ${K8S_SETUP_SCRIPTS}/helper-functions.sh
 
 # Turn colors in this script off by setting the NO_COLOR variable in your
 # environment to any value:

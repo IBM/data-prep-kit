@@ -76,9 +76,9 @@ export KFPv2=1
 Now, you can create a Kind cluster with all required software installed using the following command: 
 
 ```shell
- make setup
+ make -C scripts/k8s-setup setup
 ```
-from this main package directory or from the `kind` directory.
+from this main package directory.
 If you do not want to upload the testing data into the locally deployed Minio, and reduce memory footprint, please set:
 ```bash
 export POPULATE_TEST_DATA=0
@@ -86,7 +86,7 @@ export POPULATE_TEST_DATA=0
 You can access the KFP dashboard at http://localhost:8080/ and the MinIO dashboard at http://localhost:8090/
 
 ### Installation on an existing Kubernetes cluster <a name = "installation_existing"></a>
-Alternatively you can deploy pipeline to the existing Kubernetes cluster. If your local kubectl is configured to 
+Alternatively you can deploy pipeline to the existing Kubernetes cluster. 
 
 In order to execute data transformers on the remote Kubernetes cluster, the following packages should be installed on the cluster:
 
@@ -97,10 +97,10 @@ upstream Argo-based KFP v1.
 
 You can install the software from their repositories, or you can use our installation scripts.
 
-If your local kubectl is configured to connect to the external cluster do the following:
+Once your local kubectl is configured to connect to the external cluster do the following:
 ```bash
 export EXTERNAL_CLUSTER=1
-make setup
+make -C scripts/k8s-setup setup
 ```
 
 - In addition, you should configure external access to the KFP UI (`svc/ml-pipeline-ui` in the `kubeflow` ns) and the Ray 
@@ -109,11 +109,11 @@ LoadBalancer services, Ingresses or Routes.
 
 - Optionally, you can upload the test data into the [MinIO](https://min.io/) Object Store, deployed as part of KFP. In 
 order to do this, please provide external access to the Minio (`svc/minio-service` in the `kubeflow` ns) and execute the 
-following commands: 
+following commands from the root directory: 
 ```shell
 export MINIO_SERVER=<Minio external URL>
-kubectl apply -f kind/hack/s3_secret.yaml
-kind/hack/populate_minio.sh
+kubectl apply -f scripts/k8s-setup/s3_secret.yaml
+scripts/k8s-setup/populate_minio.sh
 ```
 
 ## Clean up the cluster <a name = "cleanup"></a>
@@ -125,10 +125,5 @@ export EXTERNAL_CLUSTER=1
 Now, you can cleanup the external or Kind Kubernetes clusters by running the following command:
 
 ```shell
-make clean
-```
-
-**Note** that this command has to run from the project kind subdirectory, from the root directory, the command will be
-```shell
-make -C kind clean
+make -C scripts/k8s-setup clean
 ```

@@ -38,7 +38,7 @@ kind_create() {
       echo "port 8090 is in use, please clear the port and try again"
       exit 1
   fi
-  kind create cluster --name $cluster_name --config ${KIND_SCRIPTS}/kind-cluster-config.yaml
+  kind create cluster --name $cluster_name --config ${K8S_SETUP_SCRIPTS}/kind-cluster-config.yaml
 }
 
 usage(){

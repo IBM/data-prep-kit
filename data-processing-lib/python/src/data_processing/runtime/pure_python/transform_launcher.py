@@ -46,9 +46,9 @@ class PythonTransformLauncher(AbstractTransformLauncher):
 
     def __get_parameters(self) -> bool:
         """
-        This method creates arg parser, fill it with the parameters
+        This method creates arg parser, fills it with the parameters
         and does parameters validation
-        :return: True id validation passe or False, if not
+        :return: True if validation passes or False, if not
         """
         parser = argparse.ArgumentParser(
             description=f"Driver for {self.name} processing",

@@ -9,11 +9,11 @@ MAX_RETRIES="${MAX_RETRIES:-5}"
 EXIT_CODE=0
 
 deploy() {
-	sed -i.back "s/tag: v[0-9].*/tag: v${KUBERAY_APISERVER}/" ${KIND_SCRIPTS}/ray_api_server_values.yaml
+	sed -i.back "s/tag: v[0-9].*/tag: v${KUBERAY_APISERVER}/" ${K8S_SETUP_SCRIPTS}/ray_api_server_values.yaml
 	helm repo add kuberay https://ray-project.github.io/kuberay-helm/
 	helm repo update kuberay
 	helm install kuberay-operator kuberay/kuberay-operator -n kuberay --version ${KUBERAY_OPERATOR} --set image.pullPolicy=IfNotPresent --create-namespace
-	helm install -f ${KIND_SCRIPTS}/ray_api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay --version ${KUBERAY_APISERVER} --set image.pullPolicy=IfNotPresent
+	helm install -f ${K8S_SETUP_SCRIPTS}/ray_api_server_values.yaml kuberay-apiserver kuberay/kuberay-apiserver -n kuberay --version ${KUBERAY_APISERVER} --set image.pullPolicy=IfNotPresent
 	echo "Finished KubeRay deployment."
 }
 
