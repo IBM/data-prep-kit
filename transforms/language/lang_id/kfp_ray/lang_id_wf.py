@@ -121,7 +121,7 @@ def lang_id(
     lang_id_model_credential: str = "PUT YOUR OWN HUGGINGFACE CREDENTIAL",
     lang_id_model_kind: str = "fasttext",
     lang_id_model_url: str = "facebook/fasttext-language-identification",
-    lang_id_content_column_name: str = "contents",
+    lang_id_content_column_name: str = "text",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
