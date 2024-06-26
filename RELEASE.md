@@ -12,12 +12,12 @@ The following points are important:
    1. Corollary: `make set-versions` should ONLY be used from the top of the repo when `.make.versions` changes.
 1. The main branch always has the version suffix set to .dev\<N\>, which
 allows intermediate publishing from the main branch using version X.Y.Z.dev\<N\>.
-1. The `scripts/release.sh` script automates the following:
+1. The `scripts/release-branch.sh` script automates the following:
    1. Creating a `releases/vX.Y.Z` branch and `vX.Y.Z` tag.
    2. Nulling out the version suffix in the new branch's `.make.version` file. 
    3. Applying the unsuffixed versions to the artifacts published from the repo.
    4. Incrementing the minor version and resetting the suffix in the main branch.
-1. Building and publishing is done manually, or soon via a git action, in the branch created by `scripts/release.sh`. 
+1. Building and publishing is done manually, or soon via a git action, in the branch created by `scripts/release-branch.sh`. 
    1. Wheels can only be published once to pypi for a given version.
    1. Transform and kfp images may be republished to the docker registry.
    
@@ -31,12 +31,17 @@ Creating the release involves
 Each is discussed below
 
 ### Creating release branch and tag 
-The `scripts/release.sh` is currently run manually to create the branch and tags 
-for the next release using versions in `.make.versions`.
-The script performs the following:
+The `scripts/release-branch.sh` is currently run manually to create the branch and tags as follows:
 
 1. Creates the `release/vX.Y.Z` and tag `vX.Y.Z` where `X.Y.Z` are defined in .make.versions 
-1. Resets main branch to version `X.Y.Z+1` with version suffix `.dev0`. 
+1. In the new branch:
+    1. Nulls out the version suffix in the new branch's `.make.version` file. 
+    1. Applies the unsuffixed versions to the artifacts published from the repo using `make set-versions`..
+    1. Commits and pushes branch and tag
+1. In the main branch:
+    1. Increments the minor version (i.e. Z+1) and resets the suffix in the main branch to `dev0` in `.make.versions`..
+    1. Commits and pushes branch 
+
 
 To double-check the version that will be published from the main branch,
 ```
@@ -48,13 +53,13 @@ This will print for example, 1.2.3.
 To run the script from the top of the repo:
 
 ```shell
-scripts/release.sh
+scripts/release-branch.sh
 ```
 
 ### Publishing wheels and images
-After creating the release branch and tag using the `scripts/release.sh` script:
+After creating the release branch and tag using the `scripts/release-branch.sh` script:
 
-1. Switch to a release branch (e.g. releases/v1.2.3) created by the `release.sh` script
+1. Switch to a release branch (e.g. releases/v1.2.3) created by the `release-branch.sh` script
 1. Be sure you're at the top of the repository (`.../data-prep-kit`)
 1. Optionally, `make show-version` to see the version that will be published
 1. Running the following, either manually or in a git action
@@ -72,7 +77,7 @@ See [pypi](https://packaging.python.org/en/latest/specifications/pypirc/) for de
 
 
 ### Github release
-After running the `release.sh` script, to create tag `vX.Y.Z` and branch `releases/vX.Y.Z`
+After running the `release-branch.sh` script, to create tag `vX.Y.Z` and branch `releases/vX.Y.Z`
 1. Go to the [releases page](https://github.com/IBM/data-prep-kit/releases). 
 2. Select `Draft a new release`
 3. Select `Choose a tag -> vX.Y.Z`

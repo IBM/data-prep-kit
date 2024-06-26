@@ -28,7 +28,7 @@ else
 fi
 
 # Make sure we're starting from the base branch
-get fetch
+git fetch
 git checkout $DEFAULT_BRANCH 
 
 # Get the currently defined version w/o any suffix.  This is the next release version
