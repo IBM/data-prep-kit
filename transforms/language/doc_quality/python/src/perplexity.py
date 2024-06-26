@@ -42,9 +42,16 @@ import kenlm
 import sentencepiece
 from cc_net_prepro import cc_net_normalize
 
-
 TEST_MODE = 0
 
+MODEL_FILE_NAME_SUFFIX = ".arpa.bin"
+TOKENIZER_FILE_NAME_SUFFIX = ".sp.model"
+
+def get_model_file_name(language: str):
+    return f"{language}{MODEL_FILE_NAME_SUFFIX}"
+
+def get_tokenizer_file_name(language: str):
+    return f"{language}{TOKENIZER_FILE_NAME_SUFFIX}"
 
 class SentencePieceModel:
     """
@@ -172,8 +179,8 @@ class KenLMModel:
         """Load pre-trained KenLM and sp: """
         try:
             # print ('model_pathmodel_pathmodel_pathmodel_pathmodel_pathmodel_pathmodel_pathmodel_path:', os.path.join(model_path, f"{language}.arpa.bin"))
-            self.kenlm_model = kenlm.Model(os.path.join(model_path, f"{language}.arpa.bin"))
-            self.sp_tokenizer = SentencePieceModel(os.path.join(model_path, f"{language}.sp.model"))
+            self.kenlm_model = kenlm.Model(os.path.join(model_path, f"{get_model_file_name(language)}"))
+            self.sp_tokenizer = SentencePieceModel(os.path.join(model_path, f"{get_tokenizer_file_name(language)}"))
         except Exception as e:
             raise Exception(f"== Failed in loading pre-trained KenLM/SentencePiece of `{language}` due to: {e}")
         self.strip_accent = strip_accent

@@ -13,7 +13,9 @@
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
+import os
 import pyarrow as pa
+from data_processing.data_access import DataAccessFactory, DataAccess
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from doc_c4_statistics import (
@@ -29,8 +31,13 @@ from doc_Gopher_statistics import (
     contains_common_English_words,
     find_first_japanese_alphabet_position,
 )
-from perplexity import KenLMModel
-
+from perplexity import (
+    get_model_file_name,
+    get_tokenizer_file_name,
+    KenLMModel,
+    MODEL_FILE_NAME_SUFFIX,
+    TOKENIZER_FILE_NAME_SUFFIX,
+)
 
 logger = get_logger(__name__)
 
@@ -46,6 +53,9 @@ doc_content_column_cli_param = f"{cli_prefix}{doc_content_column_key}"
 doc_id_column_cli_param = f"{cli_prefix}{doc_id_column_key}"
 bad_word_filepath_cli_param = f"{cli_prefix}{bad_word_filepath_key}"
 kenLM_model_cli_param = f"{cli_prefix}{kenLM_model_key}"
+
+data_factory_internal_key = f"{cli_prefix}data_factory"
+files_to_use_internal_key = f"{cli_prefix}files_to_use"
 
 class DocQualityTransform(AbstractTableTransform):
     """
@@ -69,11 +79,32 @@ class DocQualityTransform(AbstractTableTransform):
 
         self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=self.bad_word_filepath)
 
-        self.kenLM_model = config.get(kenLM_model_key)
-        print(config)
-        self.klm = KenLMModel.from_pretrained(
-            model_path=self.kenLM_model, language=self.text_lang, strip_accent=True
-        )
+        self.kenLM_model = config.get(kenLM_model_key, None)
+        if self.kenLM_model is None:
+            raise RuntimeError(f"Missing configuration value for key {kenLM_model_key}")
+        daf = config.get(data_factory_internal_key, None)
+        if os.path.exists(self.kenLM_model):
+            logger.info(f"Load kenLM model found locally")
+            self.klm = KenLMModel.from_pretrained(
+                model_path=self.kenLM_model, language=self.text_lang, strip_accent=True
+            )
+        else:
+            logger.info(f"Load kenLM model from remote")
+            data_access = daf.create_data_access()
+            import tempfile
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # use a temporary directory until model is loaded to memory
+                self._write_locally(data_access, self.kenLM_model, get_model_file_name(self.text_lang), temp_dir)
+                self._write_locally(data_access, self.kenLM_model, get_tokenizer_file_name(self.text_lang), temp_dir)
+                self.klm = KenLMModel.from_pretrained(
+                    model_path=temp_dir, language=self.text_lang, strip_accent=True
+                )
+
+    def _write_locally(self, data_access: DataAccess, path: str, filename: str, temp_dir: str):
+        content = data_access.get_file(os.path.join(path, filename))
+        temp_file_path = os.path.join(temp_dir, filename)
+        with open(temp_file_path, 'wb') as temp_file:
+            temp_file.write(content)
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -177,7 +208,9 @@ class DocQualityTransformConfiguration(TransformConfiguration):
         super().__init__(
             name=short_name,
             transform_class=DocQualityTransform,
+            remove_from_metadata=[data_factory_internal_key],
         )
+        self.daf = None
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
@@ -189,22 +222,23 @@ class DocQualityTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{text_lang_cli_param}",
             default="en",
+            help="language used in the text content"
         )
         parser.add_argument(
             f"--{doc_content_column_cli_param}",
             default="contents",
-            help="column name that contain document text",
+            help="column name that contains document text",
         )
         parser.add_argument(
             f"--{doc_id_column_cli_param}",
             default="document_id",
-            help="column name that contain document id",
+            help="column name that contains document id",
         )
         parser.add_argument(
             f"--{bad_word_filepath_cli_param}",
             type=str,
             required=True,
-            help="Path to bad word file: local folder (file or directory) that points to bad word file",
+            help="path to bad word file: local folder (file or directory) that points to bad word file",
         )
         parser.add_argument(
             f"--{kenLM_model_cli_param}",
@@ -212,6 +246,8 @@ class DocQualityTransformConfiguration(TransformConfiguration):
             required=True,
             help="path to kenLM model: local folder (file or directory) that points to kenLM model",
         )
+        self.daf = DataAccessFactory(cli_prefix, False)
+        self.daf.add_input_params(parser)
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -220,6 +256,9 @@ class DocQualityTransformConfiguration(TransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
-        self.params = self.params | captured
+        self.params = self.params | captured | {
+            data_factory_internal_key: self.daf,
+        }
         logger.info(f"doc_quality parameters are : {self.params}")
-        return True
+        # Validate and populate the transform's DataAccessFactory
+        return self.daf.apply_input_params(args)
