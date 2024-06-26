@@ -1,21 +1,35 @@
-# Language Identification Transform 
+# Document Quality Transform 
 Please see the set of
 [transform project conventions](../../../README.md#transform-project-conventions)
 for details on general project conventions, transform configuration,
 testing and IDE set up.
 
 ## Summary 
-This transform will identify language of each text with confidence score with fasttext Document Quality model. [ref](https://huggingface.co/facebook/fasttext-language-identification)
+This transform will calculate several metrics related to document, which are usuful to see the quality of document. 
+
+In this transform, following metrics will be included:
+- Gopher (Deepmind): filter docs that
+  - do not contain between 50 and 100,000 words
+  - mean word length is outside the range of 3 to 10 characters;
+  - symbol-to-word ratio > 0.1 for either the hash symbol or the ellipsis;
+  - > 90% of lines starting with a bullet point,
+  - > 30% ending with an ellipsis.
+  - Require that 80% of words in a document contain at least one alphabetic character, and apply a "stop word" filter, to remove documents that do NOT contain at least TWO of the following English words: the, be, to, of, and, that, have, with; this adequately deals with ostensibly English documents that contain no coherent English text.
+- Perplexity score (KenLM+sentencepiece) suggested in Gopher The smaller the perplexity score, the closer is the text to the targeted domain (i.e., en Wikipedia). Journalistic and well written content. Distribution of perplexity for different languages may have different shapes.
+
+
 
 ## Configuration and command line Options
 
 The set of dictionary keys holding [DocQualityTransform](src/doc_quality_transform.py) 
 configuration for values are as follows:
 
-* _lang_id_model_credential_ - specifies the credential you use to get model. This will be huggingface token. [Guide to get huggingface token](https://huggingface.co/docs/hub/security-tokens)
-* _lang_id_model_kind_ - specifies what kind of model you want to use for document quality. Currently, only `fasttext` is available.
-* _lang_id_model_url_ - specifies url that model locates. For fasttext, this will be repo name of the model, like `facebook/fasttext-language-identification`
-* _lang_id_content_column_name_ - specifies name of the column containing documents
+* _docq_text_lang_ - specifies language used in the text content. By defaut, "en" is used.
+* _docq_doc_content_column_ - specifies column name that contains document text.
+* _docq_doc_id_column_ - specifies column name that contains document id.
+* _docq_bad_word_filepath_ - specifies a path to bad word file: local folder (file or directory) that points to bad word file.
+* _docq_kenLM_model_ - specifies a path to kenLM model: local folder (file or directory) that points to kenLM model. If it exists in local file system, model will be loaded from there. If it does not exist, the value specified here will be ignored and try to find model in s3 using _docq_s3_cred_.
+* _docq_s3_cred_ - AST string of options for cos credentials retrieve kenLM model from s3.
 
 ## Running
 
@@ -25,10 +39,11 @@ the following command line arguments are available in addition to
 the options provided by 
 the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 ```
-  --lang_id_model_credential LANG_ID_MODEL_CREDENTIAL   the credential you use to get model. This will be huggingface token.
-  --lang_id_model_kind LANG_ID_MODEL_KIND   what kind of model you want to use for document quality. Currently, only `fasttext` is available.
-  --lang_id_model_url LANG_ID_MODEL_URL   url that model locates. For fasttext, this will be repo name of the model, like `facebook/fasttext-language-identification`
-  --lang_id_content_column_name LANG_ID_CONTENT_COLUMN_NAME   A name of the column containing documents
+  --docq_text_lang DOCQ_TEXT_LANG   language used in the text content. By defaut, "en" is used
+  --docq_doc_content_column DOCQ_DOC_CONTENT_COLUMN   column name that contain document text
+  --docq_doc_id_colum DOCQ_DOC_ID_COLUMN   column name that contains document id
+  --docq_bad_word_filepath DOCQ_BAD_WORD_FILEPATH   path to bad word file: local folder (file or directory) that points to bad word file
+  --docq_kenLM_model   path to kenLM model: local folder (file or directory) that points to kenLM model
 ```
 These correspond to the configuration keys described above.
 
