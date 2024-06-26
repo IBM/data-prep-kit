@@ -4,11 +4,7 @@ dbg_suffix=.dev7
 reporoot=$(dirname $0)/..
 cd $reporoot
 
-if [ -z "$debug" ]; then
-    DEFAULT_BRANCH=dev
-else
-    DEFAULT_BRANCH=releasing-copy
-fi
+DEFAULT_BRANCH=dev
 
 # Make sure we're starting from the base branch
 git fetch
