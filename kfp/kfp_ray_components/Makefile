@@ -62,15 +62,15 @@ load-image:
 
 .PHONY: publish
 publish:
-	echo "Publishing ${DOCKER_IMAGE_NAME}"
+	echo "Publishing kfp-data-processing"
 	$(MAKE) KFPv2=0 DOCKER_IMAGE_NAME="kfp-data-processing" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION} build .defaults.publish-image
-	echo "Publishing ${DOCKER_IMAGE_NAME}"
+	echo "Publishing kfp-data-processing_v2"
 	$(MAKE) KFPv2=1 DOCKER_IMAGE_NAME="kfp-data-processing_v2" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2} build .defaults.publish-image
 
 test::
 
 .PHONY: clean
 clean:
-	@# Help: Remove $(IMG) 
+	@# Help: Remove $(IMG)
 	-rm  makeenv
 	rm -rf *.back || true
