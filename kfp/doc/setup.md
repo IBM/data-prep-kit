@@ -97,7 +97,7 @@ upstream Argo-based KFP v1.
 
 You can install the software from their repositories, or you can use our installation scripts.
 
-Once, your local kubectl is configured to connect to the external cluster do the following:
+Once your local kubectl is configured to connect to the external cluster do the following:
 ```bash
 export EXTERNAL_CLUSTER=1
 make setup
