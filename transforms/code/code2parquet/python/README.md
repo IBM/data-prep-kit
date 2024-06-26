@@ -66,7 +66,7 @@ Each file contained within the ZIP is transformed into a distinct row within the
 
 ## Configuration 
 
-The set of dictionary keys holding [code2parquet](src/code2parquet.py) 
+The set of dictionary keys holding [code2parquet](src/code2parquet_transform.py) 
 configuration for values are as follows:
 
 The transform can be configured with the following key/value pairs
