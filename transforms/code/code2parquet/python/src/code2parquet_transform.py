@@ -13,6 +13,7 @@
 import io
 import json
 import logging
+import uuid
 import zipfile
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
@@ -43,8 +44,10 @@ detect_programming_lang_default = True
 
 data_factory_key = "data_factory"
 
-_domain_cli_key = f"{cli_prefix}domain"
-_snapshot_cli_key = f"{cli_prefix}snapshot"
+domain_key = "domain"
+domain_cli_key = f"{cli_prefix}{domain_key}"
+snapshot_key = "snapshot"
+snapshot_cli_key = f"{cli_prefix}{snapshot_key}"
 
 
 def get_supported_languages(lang_file: str, data_access: DataAccess, logger: logging.Logger) -> dict[str, str]:
@@ -74,16 +77,26 @@ class CodeToParquetTransform(AbstractBinaryTransform):
         self.languages_supported = config.get(supported_languages_key, None)
         if self.languages_supported is None:
             path = config.get(supported_langs_file_key, None)
-            if path is None:
-                raise RuntimeError(f"Missing configuration value for key {supported_langs_file_key}")
-            daf = config.get(data_factory_key, None)
-            if daf is None:
-                raise ValueError(f"Neither {supported_languages_key} nor {data_factory_key} were provided.")
-            data_access = daf.create_data_access()
-            self.languages_supported = get_supported_languages(
-                lang_file=path, data_access=data_access, logger=self.logger
-            )
-        self.detect_programming_lang = config.get(detect_programming_lang_key, detect_programming_lang_default)
+            if path is not None:
+                daf = config.get(data_factory_key, None)
+                if daf is None:
+                    raise ValueError(f"Neither {supported_languages_key} nor {data_factory_key} were provided.")
+                data_access = daf.create_data_access()
+                self.languages_supported = get_supported_languages(
+                    lang_file=path, data_access=data_access, logger=self.logger
+                )
+            self.detect_programming_lang = config.get(detect_programming_lang_key, detect_programming_lang_default)
+            if self.detect_programming_lang and self.languages_supported is None:
+                raise RuntimeError(
+                    "Programming language detection requested without providing a mapping of extensions to languages"
+                )
+        domain = config.get(domain_key, None)
+        snapshot = config.get(domain_key, None)
+        self.shared_columns = {}
+        if domain is not None:
+            self.shared_columns["domain"] = domain
+        if snapshot is not None:
+            self.shared_columns["snapshot"] = snapshot
 
     def _get_lang_from_ext(self, ext):
         lang = "unknown"
@@ -117,12 +130,12 @@ class CodeToParquetTransform(AbstractBinaryTransform):
                                     "title": member.filename,
                                     "document": TransformUtils.get_file_basename(file_name),
                                     "contents": content_string,
-                                    "document_id": TransformUtils.str_to_hash(content_string),
+                                    "document_id": str(uuid.uuid4()),
                                     "ext": ext,
                                     "hash": TransformUtils.str_to_hash(content_string),
                                     "size": len(content_string),
                                     "date_acquired": datetime.now().isoformat(),
-                                }
+                                } | self.shared_columns
                                 if self.detect_programming_lang:
                                     lang = self._get_lang_from_ext(ext)
                                     row_data["programming_language"] = lang  # TODO column name should be configurable
@@ -174,12 +187,14 @@ class CodeToParquetTransformConfiguration(TransformConfiguration):
             default=detect_programming_lang_default,
             help="Infer the programming lang from the file extension using the file of supported languages",
         )
-        parser.add_argument(f"--{_snapshot_cli_key}", type=str, help="Currently not used.", default="")
         parser.add_argument(
-            f"--{_domain_cli_key}",
+            f"--{snapshot_cli_key}", type=str, help="Snapshot value assigned to all imported documents.", default=None
+        )
+        parser.add_argument(
+            f"--{domain_cli_key}",
             type=str,
-            help="Currently not used",
-            default="",
+            help="Domain value assigned to all imported documents.",
+            default=None,
         )
         # Create the DataAccessFactor to use CLI args
         self.daf = DataAccessFactory(cli_prefix, False)

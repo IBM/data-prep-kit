@@ -16,6 +16,8 @@ from code2parquet_transform import (  # domain_key,; snapshot_key,
     CodeToParquetTransform,
     data_factory_key,
     detect_programming_lang_key,
+    domain_key,
+    snapshot_key,
     supported_langs_file_key,
 )
 from data_processing.data_access import DataAccessFactory
@@ -40,8 +42,8 @@ class TestIngestToParquetTransform(AbstractBinaryTransformTest):
         config = {
             supported_langs_file_key: lang_supported_file,
             detect_programming_lang_key: True,
-            # snapshot_key: "github",
-            # domain_key: "code",
+            snapshot_key: "github",
+            domain_key: "code",
             data_factory_key: DataAccessFactory(),
         }
 
