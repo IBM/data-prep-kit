@@ -14,6 +14,7 @@ venv::
 test:: 
 	@# Help: Recursively test in all subdirs 
 	@$(MAKE) RULE=test .recurse
+
 setup:: 
 	@# Help: Recursively $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse

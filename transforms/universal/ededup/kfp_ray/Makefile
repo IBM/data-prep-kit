@@ -17,6 +17,8 @@ venv::
 
 build::
 
+setup::
+
 test::
 
 test-src::
