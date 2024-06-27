@@ -23,9 +23,9 @@ test-src:: .transforms.test-src
 setup:: .transforms.setup
 
 
-# set the version of python transform that this depends on.
+# TRANSFORM_PYTHON_VERSION has no effect since requirements do not specify a python transform implementation
 set-versions: 
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${NOOP_PYTHON_VERSION} TOML_VERSION=$(NOOP_RAY_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${DOCKER_IMAGE_VERSION} .transforms.set-versions 
 
 test-image:: .transforms.ray-test-image
 
