@@ -120,7 +120,7 @@ class ResizeTransform(AbstractTableTransform):
     def flush(self) -> tuple[list[pa.Table], dict[str, Any]]:
         result = []
         if self.buffer is not None:
-            self.logger.debug(f"flushing buffered table with {self.buffer.num_rows} rows")
+            self.logger.debug(f"flushing buffered table with {self.buffer.num_rows} rows of size {self.buffer.nbytes}")
             result.append(self.buffer)
             self.buffer = None
         else:
