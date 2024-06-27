@@ -90,7 +90,9 @@ jobs:
             - name: Test KFP libs (shared and v1) and run a workflow
               timeout-minutes: 120
               run: |
-                  source kind/requirements.env
+                  export REPOROOT=$PWD
+                  export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
+                  source $K8S_SETUP_SCRIPTS/requirements.env
                   export PATH=$PATH:/tmp/
                   curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
                   chmod 777 /tmp/kind
@@ -103,15 +105,13 @@ jobs:
                   curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
                   chmod +x /tmp/mc
                   export DEPLOY_KUBEFLOW=1
-                  make -C kind setup
+                  make -C $K8S_SETUP_SCRIPTS setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms setup
+                  make -C transforms workflow-build
                   dir=("code"  "universal") && index=$(($RANDOM % 2)) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs/ -type d  -maxdepth 1 ))
                   # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
                   set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
-                  export REPOROOT=$PWD
-                  export KIND_SCRIPTS=$PWD/scripts/kind
-                  source scripts/kind/common.sh
+                  source $K8S_SETUP_SCRIPTS/common.sh
                   header_text "Running ${transforms[$index]} workflow test"
                   make -C ${transforms[$index]} workflow-test
                   header_text "Run ${transforms[$index]} completed"
@@ -133,7 +133,9 @@ jobs:
             - name: Test KFP libs (shared and v2) and run a workflow
               timeout-minutes: 120
               run: |
-                  source kind/requirements.env
+                  export REPOROOT=$PWD
+                  export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
+                  source $K8S_SETUP_SCRIPTS/requirements.env
                   export PATH=$PATH:/tmp/
                   curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
                   chmod 777 /tmp/kind
@@ -147,15 +149,13 @@ jobs:
                   chmod +x /tmp/mc
                   export DEPLOY_KUBEFLOW=1
                   export KFPv2=1
-                  make -C kind setup
+                  make -C $K8S_SETUP_SCRIPTS setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms setup
+                  make -C transforms workflow-build
                   dir=("code"  "universal") && index=$(($RANDOM % 2)) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs/ -type d  -maxdepth 1 ))
                   # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
                   set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
-                  export REPOROOT=$PWD
-                  export KIND_SCRIPTS=$PWD/scripts/kind
-                  source scripts/kind/common.sh
+                  source $K8S_SETUP_SCRIPTS/common.sh
                   header_text "Running ${transforms[$index]} workflow test"
                   make -C ${transforms[$index]} workflow-test
                   header_text "Run ${transforms[$index]} completed"

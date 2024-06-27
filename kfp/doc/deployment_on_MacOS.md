@@ -15,6 +15,6 @@ requires more CPU and Memory than what the default Podman virtual machine provid
 adjusted.
   - For Podman CLI execute `podman machine init --cpus 5 --memory 61440`
   - For Podman Desktop, open the "Settings" and set required CPUS and Memory. ![podman VM settings](./podman_vm_settings.png) 
-- Execute `make setup` from the `kind` directory.
+- Execute `make setup` from the `scripts/k8s-setup` directory.
   - The installation of Kubeflow pipelines takes time, and some of its pods may experience crashes during startup. 
   Therefore, we kindly ask for your patience and to wait until ALL pods are in the Ready state. 

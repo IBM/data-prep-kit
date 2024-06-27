@@ -34,7 +34,7 @@ We will **not** be showing the following:
   This will be covered in an advanced tutorial.
 
 The complete task involves the following:
-
+* `noop_main.py` - a empty file to start writing code as described below 
 * `NOOPTransform` - class that implements the specific transformation
 * `NOOPTableTransformConfiguration` - class that provides configuration for the
   `NOOPTransform`, specifically the command line arguments used to configure it.
@@ -73,8 +73,8 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.runtime.ray import RayTransformLauncher
-from data_processing.runtime.ray.runtime_configuration import (
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from data_processing_ray.runtime.ray.runtime_configuration import (
   RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
@@ -133,7 +133,11 @@ First we define the pure python transform configuration  class and its initializ
 ```python
 short_name = "noop"
 cli_prefix = f"{short_name}_"
+sleep_key = "sleep_sec"
 pwd_key = "pwd"
+sleep_cli_param = f"{cli_prefix}{sleep_key}"
+pwd_cli_param = f"{cli_prefix}{pwd_key}"
+
 
 class NOOPTransformConfiguration(TransformConfiguration):
     def __init__(self):
@@ -173,9 +177,6 @@ In our case we will use `noop_`.
             default="nothing",
             help="A dummy password which should be filtered out of the metadata",
         )
-
-
-
 ```
 Next we implement a method that is called after the CLI args are parsed (usually by one
 of the runtimes) and which allows us to capture the `NOOPTransform`-specific arguments. 
@@ -199,8 +200,9 @@ To run in the python runtime, we need to create the instance of `PythonTransform
 using the `NOOPTransformConfiguration`, and launch it as follows:
 
 ```python
+from data_processing.runtime.pure_python import PythonTransformLauncher
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(transform_config=NOOPTransformConfiguration())
+    launcher = PythonTransformLauncher(runtime_config=NOOPTransformConfiguration())
     launcher.launch()
 ```
 
@@ -212,7 +214,7 @@ export NOOP_INPUT=$DPK_REPOROOT/transforms/universal/noop/ray/test-data/input
 ```
 To run
 ```shell
-python noop_main.py --noop_sleep_msec 2 \
+python noop_main.py --noop_sleep_sec 2 \
   --data_local_config "{'input_folder': '"$NOOP_INPUT"', 'output_folder': '/tmp/noop-output'}"
 ```
 See the [python launcher options](python-launcher-options.md) for a complete list of
@@ -224,7 +226,7 @@ we use the `RayTransformLauncher`.
 as follows:
 ```python
 if __name__ == "__main__":
-    launcher = RayTransformLauncher(transform_config=NOOPRayTransformConfiguration())
+    launcher = RayTransformLauncher(runtime_config=NOOPRayTransformConfiguration())
     launcher.launch()
 ```
 We can run this with the same command as for the python runtime but to run in local Ray

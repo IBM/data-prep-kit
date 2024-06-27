@@ -9,6 +9,7 @@ For more details see the [documentation](../doc/overview.md).
 The project uses `pyproject.toml` and a Makefile for operations.
 To do development you should establish the virtual environment
 ```shell
+cd data-processing-lib/ray/
 make venv
 ```
 and then either activate

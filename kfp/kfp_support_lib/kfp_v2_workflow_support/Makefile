@@ -12,51 +12,34 @@ VENV_ACTIVATE=venv/bin/activate
 
 DEPLOY_KUBEFLOW ?= 0
 
+.PHONY: clean
 clean::
 	@# Help: Clean up the distribution build and the venv
 	rm -r dist venv || true
 	rm -rf src/*egg-info || true
 	rm -rf *.back || true
 
-
+.PHONY: .check-env
 .check-env:: .check_python_version
 	@echo "Checks passed"
 
 .PHONY: set-versions
 set-versions: 
 	$(MAKE) TOML_VERSION=$(DPK_LIB_KFP_VERSION) .defaults.update-toml
-	cat pyproject.toml | sed -e 's/"kfp\([=><][=><]\).*",/"kfp\1$(KFP_v2)",/' > tt.toml
+	cat pyproject.toml | sed -e 's/"kfp\([=><][=><]\).*",/"kfp\1$(KFP_v2_SDK)",/' > tt.toml
 	mv tt.toml pyproject.toml
 
-build:: set-versions venv
-ifneq ($(KFPv2), 1)
-	# we want to prevent execution of the rule, when we run `make build` in upper directories and KFPv2 is not set
-	echo "Skipping build as KFPv2 is not defined"
-else
-	@# Help: Build the distribution for publishing to a pypi
-	$(MAKE) build-dist
-endif
 
-build-dist :: set-versions .defaults.build-dist
+build:: .check-env .defaults.build-dist
 
-publish:: .check-env
-	@# Help: Publish the wheel to testpypi
-	if [ -d "dist"]; then rm -r dist; fi
-	${PYTHON} -m pip install --upgrade build
-	${PYTHON} -m twine check dist/*
-	${PYTHON} -m twine upload --verbose --non-interactive dist/*
+publish:: .check-env  .defaults.publish-dist
 
 .PHONY: venv
 venv:
-ifneq ($(KFPv2), 1)
-	# we want to prevent execution of the rule, when we run `make venv` in upper directories and KFPv2 is not set
-	echo "Skipping venv as KFPv2 is not defined"
-else
 	@# Help: Create the virtual environment using pyproject.toml
 	$(MAKE) .defaults.create-venv .defaults.install-ray-lib-src-venv
 	@source venv/bin/activate; pip install -e ${REPOROOT}/kfp/kfp_support_lib/shared_workflow_support
 	$(MAKE) .defaults.install-local-requirements-venv
-endif
 
 test:: 	venv
 ifneq ($(KFPv2), 1)

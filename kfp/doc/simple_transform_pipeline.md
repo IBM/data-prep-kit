@@ -237,7 +237,7 @@ image registry and one for S3 access). As KFP is deployed in `kubeflow` namespac
 there as well, which means that secrets have to be created there as well.
 
 When the MinIO Object Store, deployed as part of KFP, is used, its access secret is deployed as part of the cluster preparation, 
-see [s3_secret.yaml](../../kind/hack/s3_secret.yaml). 
+see [s3_secret.yaml](../../scripts/k8s-setup/s3_secret.yaml). 
 Creation a secret to pull images from a private repository described [here](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 )
 

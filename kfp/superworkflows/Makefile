@@ -15,7 +15,7 @@ else
 	$(MAKE) -C ray/kfp_v1 workflow-venv
 endif
 
-.PHONY: setup
+.PHONY: workflow-build
 setup:
 ifeq ($(KFPv2), 1)
 	echo "Skipping build as KFPv2 is defined"

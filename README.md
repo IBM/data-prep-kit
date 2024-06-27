@@ -84,7 +84,7 @@ We use the popular [parquet](https://arrow.apache.org/docs/python/parquet.html) 
 Every parquet file follows a set 
 [schema](tools/ingest2parquet/).
 Data is converted from raw form (e.g., zip files for GitHub repositories) to parquet files by the
-[ingest2parquet](tools/ingest2parquet/) 
+[code2parquet](/transforms/code/code2parquet) 
 tool that also adds the necessary fields in the schema.  
 A user can then use one or more of the [available transforms](transforms) to process their data. 
 
@@ -161,7 +161,7 @@ software and test data, or deployment of required software on an existing cluste
 See [Set up a Kubernetes clusters for KFP execution](kfp/doc/setup.md)
 
 A simple transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md) explains the pipeline creation and execution. 
-In addition, if you want to combine severat transformers in a single pipeline, you can look at [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
+In addition, if you want to combine several transformers in a single pipeline, you can look at [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
 
 When you finish working with the cluster, and want to clean up or destroy it. See the 
 [clean up the cluster](../kfp/doc/setup.md#cleanup)

@@ -9,6 +9,7 @@ include $(REPOROOT)/.make.defaults
 #DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}
 DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 
+
 ifeq ($(KFPv2), 1)
         DOCKER_IMAGE_NAME=kfp-data-processing_v2
         DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
@@ -29,9 +30,11 @@ endif
 	rm -rf shared_workflow_support_lib
 	rm -rf workflow_support_lib
 
+.PHONY: build
+build: image
+
 .PHONY: image
 image: Dockerfile requirements.txt
-	$(MAKE) set-versions 
 	$(MAKE) .lib-src-image
 
 
@@ -40,7 +43,10 @@ image: Dockerfile requirements.txt
 	@sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${FILE}
 
 .PHONY: set-versions 
-set-versions:
+set-versions::
+
+.PHONE: set-image
+set-image:
 	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
 	@$(MAKE) .reconcile-requirements FILE=createRayClusterComponent.yaml
 	@$(MAKE) .reconcile-requirements FILE=deleteRayClusterComponent.yaml
@@ -56,17 +62,18 @@ load-image:
 	@# Help: Load the image to the kind cluster created with make setup.
 	kind load docker-image $(DOCKER_REMOTE_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
-.PHONY: build
-build: image
 
 .PHONY: publish
 publish:
-	$(MAKE) image .defaults.publish-image
+	echo "Publishing kfp-data-processing"
+	$(MAKE) KFPv2=0 DOCKER_IMAGE_NAME="kfp-data-processing" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION} build .defaults.publish-image
+	echo "Publishing kfp-data-processing_v2"
+	$(MAKE) KFPv2=1 DOCKER_IMAGE_NAME="kfp-data-processing_v2" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2} build .defaults.publish-image
 
 test::
 
 .PHONY: clean
 clean:
-	@# Help: Remove $(IMG) 
+	@# Help: Remove $(IMG)
 	-rm  makeenv
 	rm -rf *.back || true

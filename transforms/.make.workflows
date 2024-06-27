@@ -13,6 +13,8 @@ define set_env_var
 endef
 
 
+KFP_ENDPOINT ?= "http://localhost:8080/" 
+
 .PHONY: set-versions
 set-versions:
 	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) set-versions
@@ -23,9 +25,12 @@ set-versions:
 
 .PHONY: .workflows.compile-pipeline
 .workflows.compile-pipeline:
+	$(MAKE) -C ${REPOROOT}/kfp/kfp_ray_components set-image
 	. ${WORKFLOW_VENV_ACTIVATE} && ${PYTHON} ${WF_NAME}.py
 
-KFP_LIB_SRC_FILES := $(shell find ${REPOROOT}/kfp/kfp_support_lib/${WORKFLOW_SUPPORT_LIB}/src/ -name '*.py')
+KFP_SHARED_LIB_SRC_FILES := $(shell find ${REPOROOT}/kfp/kfp_support_lib/shared_workflow_support/ \( -name '*.py' -o -name '*.toml' \))
+
+KFP_LIB_SRC_FILES := $(shell find ${REPOROOT}/kfp/kfp_support_lib/${WORKFLOW_SUPPORT_LIB}/ \( -name '*.py' -o -name '*.toml' \))
 
 KFP_LIB_CONFIG_FILE := ${REPOROOT}/kfp/kfp_support_lib/${WORKFLOW_SUPPORT_LIB}/pyproject.toml
 
@@ -40,21 +45,22 @@ FORCE:
 	@# Help: upload and run the workflow. Set export USE_DEV_IMAGES=0 to use release docker image versions.
 	$(call set_env_var, CLUSTER_EXISTS, $(shell kind get clusters | grep ${KIND_CLUSTER_NAME}))
 	@if [ -z ${CLUSTER_EXISTS} ]; then \
-		cd ${REPOROOT} && make setup;  \
+		cd ${REPOROOT} && make -C scripts/k8s-setup setup;  \
 	fi
 ifeq ($(USE_DEV_IMAGES), 1)
 	cd ${TRANSFORM_SRC} && $(MAKE) image && $(MAKE) load-image
 	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) image && $(MAKE) load-image
 endif
-	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipeline_utils.pipelines_tests_utils -c "sanity-test" -p ${CURDIR}/${PIPELINE_FILE}
+	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipeline_utils.pipelines_tests_utils -c "sanity-test" -p ${CURDIR}/${PIPELINE_FILE} -e ${KFP_ENDPOINT}
 
 
-${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/kfp_ray_components/requirements.txt ${DPK_RAY_LIB_DIR} ${KFP_LIB_SRC_FILES} ${KFP_LIB_CONFIG_FILE}
+${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/kfp_ray_components/requirements.txt ${DPK_RAY_LIB_DIR} ${KFP_LIB_SRC_FILES} ${KFP_LIB_CONFIG_FILE} ${KFP_SHARED_LIB_SRC_FILES}
 	rm -rf ${REPOROOT}/transforms/venv
 	$(MAKE) -C ${REPOROOT}/transforms .defaults.ray-lib-src-venv
 	. ${WORKFLOW_VENV_ACTIVATE};     \
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/shared_workflow_support; \
-	pip install -e $(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB);
+	pip install -e $(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB); \
+	$(MAKE) -C ${REPOROOT}/kfp/kfp_ray_components set-image
 	@# Help: Create the virtual environment common to all workflows
 
 .PHONY: .workflows.upload-pipeline
@@ -63,5 +69,5 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/kfp_ray_co
 	@if [ -z ${CLUSTER_EXISTS} ]; then \
 		cd ${REPOROOT} && make setup;  \
 	fi
-	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipeline_utils.pipelines_tests_utils -c "upload" -p ${CURDIR}/${PIPELINE_FILE}
+	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipeline_utils.pipelines_tests_utils -c "upload" -p ${CURDIR}/${PIPELINE_FILE} -e ${KFP_ENDPOINT}
 
