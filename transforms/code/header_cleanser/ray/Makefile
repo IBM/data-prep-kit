@@ -42,8 +42,6 @@ run-cli-sample:
 		--header_cleanser_license \"True\" "	\
                 .transforms.run-src-file
 
-
-
 run-local-python-only-sample: .transforms.run-local-sample
 
 run-local-sample: .transforms.run-local-sample

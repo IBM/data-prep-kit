@@ -1,5 +1,5 @@
-# Legal Removal Transform 
-The Legal Removal transforms 
+# Header Cleanser Transform 
+The Header cleanser transforms 
 Detect and remove license and copyright of input data.
 Per the set of 
 [transform project conventions](../../README.md#transform-project-conventions)
