@@ -26,9 +26,12 @@ image:: lm_sp .transforms.python-image
 test-src:: lm_sp .transforms.test-src
 
 setup:: .transforms.setup
-	@which brew
-	@if [[ $? == 0 ]]; then \
-		brew install wget; \
+	which wget
+	if [[ $$? == 1 ]]; then \
+		which brew; \
+		if [[ $$? == 0 ]]; then \
+			brew install wget; \
+		fi \
 	fi
 
 build:: build-dist image
