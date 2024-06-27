@@ -1,4 +1,4 @@
-debug=echo
+debug=$1
 dbg_suffix=.dev7
 # Assume this file is in the reporoot/scripts directory
 reporoot=$(dirname $0)/..
