@@ -1,5 +1,4 @@
-.PHONY: lm_sp
-lm_sp::
+lm_sp:
 	@# Help: Clone the cc_net repo with the kenlm model and build the model
 	@if [[ ! -d "../cc_net" ]]; then \
 		cd ../; \
@@ -7,18 +6,18 @@ lm_sp::
 		cd cc_net/; \
 		$(MAKE) lang=en dl_lm; \
 		cd ../; \
-		rm -rf lm_sp; \
-		mkdir lm_sp; \
-		cp cc_net/data/lm_sp/* lm_sp; \
+		if [[ -d "cc_net/data/lm_sp/*" ]]; then \
+			rm -rf lm_sp; \
+			mkdir lm_sp; \
+			cp cc_net/data/lm_sp/* lm_sp; \
+		fi \
 	fi
 
-.PHONY: clean_lm_sp
-clean_lm_sp::
+clean_lm_sp:
 	rm -rf ../cc_net
 	rm -rf ../lm_sp
 
-.PHONY: test-image-pytest
-test-image-pytest:: 
+test-image-pytest:
 	# Put this 2nd so its help showss up instead of .defaults.image help
 	@# Help: Test $(DOCKER_LOCAL_IMAGE) using test source inside the image. 
 	$(DOCKER) run -t -v $$(dirname ${PWD})/lm_sp:$(DOCKER_HOME_DIR)/lm_sp --rm $(DOCKER_LOCAL_IMAGE) pytest -s test 
