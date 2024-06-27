@@ -64,15 +64,16 @@ class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
             out_tables=out_tables, stats=stats | {"source_doc_count": table.num_rows}
         )
 
-    # def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
-    #     """
-    #     Converts input table into an output table.
-    #     If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
-    #     :param table: input table
-    #     :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
-    #     propagated to metadata
-    #     """
-    #     raise NotImplemented()
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
+        """
+        Converts input table into an output table.
+        If there is an error, an exception must be raised - exit()ing is not generally allowed.
+        :param table: input table
+        :param file_name: the file name of the file containing the given byte_array.
+        :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
+        propagated to metadata
+        """
+        raise NotImplemented("This method must be implemented by the subclass")
 
     def flush_binary(self) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
