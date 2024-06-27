@@ -26,8 +26,8 @@ s3_cred = {
     "url": "http://localhost:9000",
 }
 s3_conf = {
-    "input_folder": "test/aggregator/input",
-    "output_folder": "test/aggregator/output",
+    "input_folder": "test/profiler/input",
+    "output_folder": "test/profiler/output",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
