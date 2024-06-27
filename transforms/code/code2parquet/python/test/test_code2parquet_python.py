@@ -15,9 +15,9 @@ import os
 
 from code2parquet_transform import (  # domain_key,; snapshot_key,
     detect_programming_lang_cli_key,
-    detect_programming_lang_key,
+    domain_cli_key,
+    snapshot_cli_key,
     supported_langs_file_cli_key,
-    supported_langs_file_key,
 )
 from code2parquet_transform_python import CodeToParquetPythonConfiguration
 from data_processing.runtime.pure_python import PythonTransformLauncher
@@ -44,8 +44,8 @@ class TestPythonIngestToParquetTransform(AbstractTransformLauncherTest):
             "data_files_to_use": ast.literal_eval("['.zip']"),
             supported_langs_file_cli_key: lang_supported_file,
             detect_programming_lang_cli_key: True,
-            # snapshot_key: "github",
-            # domain_key: "code",
+            snapshot_cli_key: "github",
+            domain_cli_key: "code",
         }
         fixtures = [
             (
@@ -54,7 +54,7 @@ class TestPythonIngestToParquetTransform(AbstractTransformLauncherTest):
                 os.path.join(basedir, "input"),
                 os.path.join(basedir, "expected"),
                 # this is added as a fixture to remove these 2 columns from comparison
-                ["size", "date_acquired"],
+                ["date_acquired", "document_id"],
             )
         ]
         return fixtures
