@@ -76,7 +76,8 @@ from the configuration dictionary.
   and specifies the path to a JSON file containing the mapping of languages
   to extensions. The json file is expected to contain a dictionary of
   languages names as keys, with values being a list of strings specifying the
-  associated extensions.
+  associated extensions. As an example, see 
+  [lang_extensions](test-data/languages/lang_extensions.json) .
 * `data_access_factory` - used to create the DataAccess instance used to read
 the file specified in `supported_langs_file`.
 * `detect_programming_lang` - a flag that indicates if the language:extension mappings
