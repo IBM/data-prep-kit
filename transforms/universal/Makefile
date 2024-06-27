@@ -8,6 +8,9 @@ clean::
 build::
 	@# Help: Recursively make $@ all subdirs 
 	$(MAKE) RULE=$@ .recurse
+setup::
+	@# Help: Recursively make $@ in subdirs 
+	$(MAKE) RULE=$@ .recurse
 venv::
 	@# Help: Recursively make $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
@@ -59,5 +62,9 @@ workflow-test::
 	$(MAKE) RULE=$@ .recurse
 
 workflow-upload::
+	@# Help: Recursively make $@ in subdirs
+	$(MAKE) RULE=$@ .recurse
+
+workflow-build::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse
