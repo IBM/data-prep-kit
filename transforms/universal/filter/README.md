@@ -1,6 +1,6 @@
 # Filter Transform 
-The NOOP transforms serves as a simple exemplar to demonstrate the development
-of a simple 1:1 transform.  Per the set of 
+The filter transforms provides SQL-based expressions for filtering rows and optionally column removal from parquet files, 
+per the set of 
 [transform project conventions](../../README.md#transform-project-conventions)
 the following runtimes are available:
 

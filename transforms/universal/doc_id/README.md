@@ -1,5 +1,5 @@
-# DOC Id Transform 
-The doc_id transforms allows the addition of document identifiers, both unique integers and content hashes, 
+# Doc ID Transform 
+The Document ID transforms adds a document identification (unique integers and content hashes), which later can be used in de-duplication operations,
 per the set of 
 [transform project conventions](../../README.md#transform-project-conventions)
 the following runtimes are available:
