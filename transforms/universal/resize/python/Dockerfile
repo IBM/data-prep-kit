@@ -18,7 +18,7 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 # Install python project source
 COPY --chown=dpk:users src/ src/
 COPY --chown=dpk:users pyproject.toml pyproject.toml
-COPY --chown=dpk:users Readme.md Readme.md
+COPY --chown=dpk:users README.md Readme.md
 RUN pip install --no-cache-dir -e .
 
 # copy source data
