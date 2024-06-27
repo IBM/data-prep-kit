@@ -1,6 +1,6 @@
 [project]
 name = "dpk_noop_transform_ray"
-version = "0.2.0.dev6"
+version = "0.2.1.dev0"
 requires-python = ">=3.10"
 description = "NOOP Ray Transform"
 license = {text = "Apache-2.0"}
@@ -10,8 +10,8 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
 ]
 dependencies = [
-    "dpk-noop-transform-python==0.2.0.dev6",
-    "data-prep-toolkit-ray==0.2.0.dev6",
+    "dpk-noop-transform-python==0.2.1.dev0",
+    "data-prep-toolkit-ray==0.2.1.dev0",
 ]
 
 [build-system]

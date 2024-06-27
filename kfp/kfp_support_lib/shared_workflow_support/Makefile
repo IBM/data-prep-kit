@@ -12,6 +12,7 @@ VENV_ACTIVATE=venv/bin/activate
 
 DEPLOY_KUBEFLOW ?= 0
 
+.PHONY: clean
 clean::
 	@# Help: Clean up the distribution build and the venv
 	rm -r dist venv || true
@@ -19,23 +20,16 @@ clean::
 	rm -rf *.back || true
 
 .PHONY: .check-env
-.check-env::
+.check-env:: .check_python_version
 	@echo "Checks passed"
 
 .PHONY: set-versions
 set-versions:
 	$(MAKE) TOML_VERSION=$(DPK_LIB_KFP_VERSION) .defaults.update-toml
 
-build:: build-dist
+build:: .check-env .defaults.build-dist
 
-build-dist :: set-versions .defaults.build-dist
-
-publish:: .check-env
-	@# Help: Publish the wheel to testpypi
-	if [ -d "dist"]; then rm -r dist; fi
-	${PYTHON} -m pip install --upgrade build
-	${PYTHON} -m twine check dist/*
-	${PYTHON} -m twine upload --verbose --non-interactive dist/*
+publish:: .check-env  .defaults.publish-dist
 
 .PHONY: venv
 venv:

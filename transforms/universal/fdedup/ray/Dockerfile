@@ -13,7 +13,7 @@ RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
 # Install ray project source
 COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml
-COPY --chown=ray:users Readme.md Readme.md
+COPY --chown=ray:users README.md README.md
 COPY --chown=ray:users images/ images/
 RUN pip install --no-cache-dir -e .
 

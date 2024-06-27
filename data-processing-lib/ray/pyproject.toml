@@ -1,6 +1,6 @@
 [project]
 name = "data_prep_toolkit_ray"
-version = "0.2.0.dev6"
+version = "0.2.1.dev0"
 keywords = ["data", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
 requires-python = ">=3.10"
 description = "Data Preparation Toolkit Library for Ray"
@@ -11,7 +11,7 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit==0.2.0.dev6",
+    "data-prep-toolkit==0.2.1.dev0",
     "ray[default]==2.24.0",
     # These two are to fix security issues identified by quay.io
     "fastapi>=0.110.2",

@@ -24,7 +24,7 @@ Each file contained within the ZIP is transformed into a distinct row within the
 
 **document_id:** (string)
 
-- **Description:** Unique identifier generated for each file.
+- **Description:** Unique identifier computed as a uuid. 
 - **Example:** `"document_id": "b1e4a879-41c5-4a6d-a4a8-0d7a53ec7e8f"`
 
 **ext:** (string)
@@ -64,25 +64,26 @@ Each file contained within the ZIP is transformed into a distinct row within the
 
 
 
-## Configuration and command line Options
+## Configuration 
 
-The set of dictionary keys holding [code2parquet](src/code2parquet.py) 
+The set of dictionary keys holding [code2parquet](src/code2parquet_transform.py) 
 configuration for values are as follows:
-```
-  supported_langs_file CODE2PARQUET_SUPPORTED_LANGS_FILE
-                        Path to file containing the list of supported languages
-  detect_programming_lang CODE2PARQUET_DETECT_PROGRAMMING_LANG
-                        generate programming lang
-  s3_cred CODE2PARQUET_S3_CRED
-                        AST string of options for s3 credentials. Only required for S3 data access.
-                        access_key: access key help text
-                        secret_key: secret key help text
-                        url: optional s3 url
-                        region: optional s3 region
-                        Example: { 'access_key': 'access', 'secret_key': 'secret', 
-                        'url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud', 
-                        'region': 'us-east-1' }
-```
+
+The transform can be configured with the following key/value pairs
+from the configuration dictionary.
+* `supported_languages` - a dictionary mapping file extensions to language names.
+* `supported_langs_file` - used if `supported_languages` key is not provided,
+  and specifies the path to a JSON file containing the mapping of languages
+  to extensions. The json file is expected to contain a dictionary of
+  languages names as keys, with values being a list of strings specifying the
+  associated extensions. As an example, see 
+  [lang_extensions](test-data/languages/lang_extensions.json) .
+* `data_access_factory` - used to create the DataAccess instance used to read
+the file specified in `supported_langs_file`.
+* `detect_programming_lang` - a flag that indicates if the language:extension mappings
+  should be applied in a new column value named `programming_language`.
+* `domain` - optional value assigned to the imported data in the 'domain' column.
+* `snapshot` -  optional value assigned to the imported data in the 'snapshot' column.
 
 ## Running
 
@@ -91,14 +92,10 @@ When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to
 [the options provided by the launcher](../../../../data-processing-lib/doc/ray-launcher-options.md).
 
-```shell
-  --code2parquet_supported_langs_file CODE2PARQUET_SUPPORTED_LANGS_FILE
-                        Path to file containing the list of supported languages
-  --code2parquet_detect_programming_lang CODE2PARQUET_DETECT_PROGRAMMING_LANG
-                        generate programming lang
- ```
-
-These correspond to the configuration keys described above.
+* `--code2parquet_supported_langs_file` - set the `supported_langs_file` configuration key. 
+* `--code2parquet_detect_programming_lang` - set the `detect_programming_lang` configuration key. 
+* `--code2parquet_domain` - set the `domain` configuration key. 
+* `--code2parquet_snapshot` -  set the `snapshot` configuration key. 
 
 ### Running the samples
 To run the samples, use the following `make` targets

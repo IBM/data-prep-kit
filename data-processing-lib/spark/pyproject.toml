@@ -1,6 +1,6 @@
 [project]
 name = "data_prep_toolkit_spark"
-version = "0.2.0.dev6"
+version = "0.2.1.dev0"
 keywords = ["data", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
 requires-python = ">=3.10"
 description = "Data Preparation Toolkit Library for Spark"
@@ -11,7 +11,7 @@ authors = [
     { name = "Constantin Adam", email = "cmadam@us.ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit==0.2.0.dev6",	
+    "data-prep-toolkit==0.2.1.dev0",	
     "pyspark>=3.5.1",
     "pyyaml>=6.0.1",
 ]

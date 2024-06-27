@@ -1,6 +1,6 @@
 [project]
 name = "data_prep_toolkit_kfp_v1"
-version = "0.2.0.dev6"
+version = "0.2.1.dev0"
 requires-python = ">=3.10,<3.12"
 description = "Data Preparation Kit Library. KFP support"
 license = {text = "Apache-2.0"}
@@ -13,7 +13,7 @@ authors = [
 ]
 dependencies = [
     "kfp==1.8.22",
-    "data-prep-toolkit-kfp-shared==0.2.0.dev6",
+    "data-prep-toolkit-kfp-shared==0.2.1.dev0",
 ]
 
 [build-system]

@@ -1,38 +1,18 @@
-debug=echo
+debug=$1
 dbg_suffix=.dev7
 # Assume this file is in the reporoot/scripts directory
 reporoot=$(dirname $0)/..
 cd $reporoot
 
-# Make sure required env vars are set
-if [ -z "$DPK_DOCKER_REGISTRY_USER" ]; then
-    echo DPK_DOCKER_REGISTRY_USER env var must be set
-    exit 1
-elif [ -z "$DPK_DOCKER_REGISTRY_KEY" ]; then
-    echo DPK_DOCKER_REGISTRY_KEY env var must be set
-    exit 1
-fi
-if [ ! -e ~/.pypirc ]; then
-   cat << EOF
-You need a ~/.pypirc containing pypi.org credentials.
-See https://packaging.python.org/en/latest/specifications/pypirc/ for details.
-EOF
-    exit
-fi
-exit
-
-if [ -z "$debug" ]; then
-    DEFAULT_BRANCH=dev
-else
-    DEFAULT_BRANCH=releasing-copy
-fi
+DEFAULT_BRANCH=dev
 
 # Make sure we're starting from the base branch
-get fetch
+git fetch
 git checkout $DEFAULT_BRANCH 
 
 # Get the currently defined version w/o any suffix.  This is the next release version
 version=$(make DPK_VERSION_SUFFIX= show-version)
+echo Building release branch and tag for version $version
 
 if [ -z "$debug" ]; then
     tag=v$version
@@ -50,8 +30,8 @@ if [ ! -z "$debug" ]; then
     git push --delete origin $tag
     git push --delete origin $release_branch
 fi
+echo Creating $release_branch branch
 git checkout -b $release_branch 
-
 
 # Remove the release suffix in this branch
 # Apply the unsuffixed version to the repo and check it into this release branch
@@ -63,23 +43,17 @@ else
     mv tt .make.versions
 fi
 # Apply the version change to all files in the repo 
-make set-versions
+echo Applying $version to $release_branch branch 
+make set-versions > /dev/null
 
 # Commit the changes to the release branch and tag it
 git status
-git commit -s -a -m "Cut release $version"
+echo Committing and pushing version changes in $release_branch branch. 
+git commit --no-verify -s -a -m "Cut release $version"
 git push --set-upstream origin $release_branch 
+echo Committing and pushing tag $tag in $release_branch branch
 git tag -a -s -m "Cut release $version" $tag 
 git push origin $tag 
-
-# Now build with the updated version
-# Requires quay credentials in the environment, DPL_DOCKER_REGISTRY_USER, DPK_DOCKER_REGISTRY_KEY
-if [ -z "$debug" ]; then
-    make build publish
-else
-    # make -C data-processing-lib/spark image # Build the base image required by spark
-    make -C transforms/universal/noop/python build publish
-fi
 
 # Now go back to the default branch so we can bump the minor version number and reset the version suffix
 git checkout $DEFAULT_BRANCH
@@ -91,12 +65,17 @@ cat .make.versions | sed -e "s/^DPK_MICRO_VERSION=.*/DPK_MICRO_VERSION=$micro/" 
  			 -e "s/^DPK_VERSION_SUFFIX=.*/DPK_VERSION_SUFFIX=.dev0/"  > tt
 mv tt .make.versions
 # Apply the version change to all files in the repo 
-make set-versions
+next_version=$(make show-version)
+echo Applying updated version $next_version to $DEFAULT_BRANCH  branch
+make set-versions > /dev/null
 
 # Push the version change back to the origin
-next_version=$(make show-version)
-git commit -s -a -m "Bump micro version to $next_version after cutting release $version into branch $release_branch"
-git diff origin/$DEFAULT_BRANCH $DEFAULT_BRANCH
 if [ -z "$debug" ]; then
+    echo Committing and pushing version $next_version to $DEFAULT_BRANCH branch.
+    git commit --no-verify -s -a -m "Bump micro version to $next_version after cutting release $version into branch $release_branch"
+    git diff origin/$DEFAULT_BRANCH $DEFAULT_BRANCH
     git push origin
+else
+    git status
+    echo In non-debug mode, the above diffs would have been commited to the $DEFAULT_BRANCH branch
 fi
