@@ -49,10 +49,6 @@ load-image::
 workflow-venv:
 	$(MAKE) -C kfp_ray workflow-venv
 
-.PHONY: workflow-build
-workflow-build:
-	$(MAKE) -C kfp_ray workflow-build
-
 .PHONY: workflow-test
 workflow-test:
 	$(MAKE) -C kfp_ray workflow-test
@@ -60,7 +56,3 @@ workflow-test:
 .PHONY: workflow-upload
 workflow-upload:
 	$(MAKE) -C kfp_ray workflow-upload
-
-.PHONY: workflow-reconcile-requirements
-workflow-reconcile-requirements:
-	$(MAKE) -C kfp_ray workflow-reconcile-requirements
