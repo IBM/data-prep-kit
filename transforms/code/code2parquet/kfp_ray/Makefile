@@ -31,16 +31,16 @@ test-image::
 load-image::
 
 
-.PHONY: setup
-setup: workflow-venv
+.PHONY: workflow-build
+workflow-build: workflow-venv
 	$(MAKE) $(YAML_WF)
 
 .PHONY: workflow-test
-workflow-test: setup
+workflow-test: workflow-build
 	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=code2parquet_wf.yaml
 
 .PHONY: workflow-upload
-workflow-upload: setup
+workflow-upload: workflow-build
 	@for file in $(YAML_WF); do \
 		$(MAKE) .workflows.upload-pipeline PIPELINE_FILE=$$file; \
 	done

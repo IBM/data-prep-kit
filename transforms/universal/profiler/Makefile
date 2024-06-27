@@ -57,5 +57,6 @@ workflow-test:
 workflow-upload:
 	$(MAKE) -C kfp_ray workflow-upload
 
-.PHONY: workflow-reconcile-requirements
-	$(MAKE) -C kfp_ray workflow-reconcile-requirements
+.PHONY: workflow-build
+workflow-build:
+	$(MAKE) -C  kfp_ray workflow-build
