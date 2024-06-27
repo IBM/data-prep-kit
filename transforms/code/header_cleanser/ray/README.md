@@ -1,0 +1,42 @@
+# License copyright removal 
+
+Please see the set of
+[transform project conventions](../../../README.md)
+for details on general project conventions, transform configuration,
+testing and IDE set up.
+
+## Summary
+This module is designed to detect and remove license and copyright information from code files. It leverages the [ScanCode Toolkit](https://pypi.org/project/scancode-toolkit/) to accurately identify and process licenses and copyrights in various programming languages.
+
+After detecting license and copyright position code has been stored at same column. Now lines which doesn't contain license or copyright copied to same position.
+
+## Configuration and command line Options
+
+This project wraps the [header cleanser transform](../python) with a Ray runtime.
+
+## Running
+
+### Launched Command Line Options 
+When running the transform with the Ray launcher (i.e. TransformLauncher), In addition to those available to the transform as defined in [here](https://github.com/IBM/data-prep-kit/blob/dev/transforms/universal/filter/python/README.md), the set of [ray launcher](https://github.com/IBM/data-prep-kit/blob/dev/data-processing-lib/doc/ray-launcher-options.md) are available.
+
+### Running the samples
+To run the samples, use the following `make` targets
+
+* `run-cli-ray-sample` - runs src/header_cleanser_transform.py using command line args
+* `run-local-ray-sample` - runs src/header_cleanser_local_ray.py
+* `run-s3-ray-sample` - runs src/header_cleanser_s3_ray.py
+    * Requires prior invocation of `make minio-start` to load data into local minio for S3 access.
+
+These targets will activate the virtual environment and set up any configuration needed.
+Use the `-n` option of `make` to see the detail of what is done to run the sample.
+
+For example, 
+```shell
+make run-cli-ray-sample
+...
+```
+Then 
+```shell
+ls output
+```
+To see results of the transform.
