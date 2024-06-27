@@ -22,7 +22,10 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-set-versions::
+
+# set the version of python transform that this depends on.
+set-versions: 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${NOOP_PYTHON_VERSION} TOML_VERSION=$(NOOP_RAY_VERSION) .transforms.set-versions 
 
 test-image:: .transforms.ray-test-image
 
