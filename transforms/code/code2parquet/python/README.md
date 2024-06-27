@@ -24,7 +24,7 @@ Each file contained within the ZIP is transformed into a distinct row within the
 
 **document_id:** (string)
 
-- **Description:** Unique identifier generated from the content (i.e. a hash).
+- **Description:** Unique identifier computed as a uuid. 
 - **Example:** `"document_id": "b1e4a879-41c5-4a6d-a4a8-0d7a53ec7e8f"`
 
 **ext:** (string)
