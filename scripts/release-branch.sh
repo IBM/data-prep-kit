@@ -49,7 +49,7 @@ make set-versions > /dev/null
 # Commit the changes to the release branch and tag it
 git status
 echo Committing and pushing version changes in $release_branch branch. 
-git commit -s -a -m "Cut release $version"
+git commit --no-verify -s -a -m "Cut release $version"
 git push --set-upstream origin $release_branch 
 echo Committing and pushing tag $tag in $release_branch branch
 git tag -a -s -m "Cut release $version" $tag 
@@ -72,7 +72,7 @@ make set-versions > /dev/null
 # Push the version change back to the origin
 if [ -z "$debug" ]; then
     echo Committing and pushing version $next_version to $DEFAULT_BRANCH branch.
-    git commit -s -a -m "Bump micro version to $next_version after cutting release $version into branch $release_branch"
+    git commit --no-verify -s -a -m "Bump micro version to $next_version after cutting release $version into branch $release_branch"
     git diff origin/$DEFAULT_BRANCH $DEFAULT_BRANCH
     git push origin
 else
