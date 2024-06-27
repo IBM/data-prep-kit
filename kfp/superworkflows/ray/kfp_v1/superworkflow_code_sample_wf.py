@@ -16,14 +16,14 @@ run_exact_dedup_op = comp.load_component_from_file(component_spec_path + "execut
 run_fuzzy_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_tokenization_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 
-code_to_parquet_image = "quay.io/dataprep1/data-prep-kit/code2parquet-ray:0.2.1.dev0"
-proglang_select_image = "quay.io/dataprep1/data-prep-kit/proglang_select-ray:0.2.1.dev0"
-code_quality_image = "quay.io/dataprep1/data-prep-kit/code_quality-ray:0.2.1.dev0"
-malware_image = "quay.io/dataprep1/data-prep-kit/malware-ray:0.2.1.dev0"
-doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id-ray:0.2.1.dev0"
-ededup_image = "quay.io/dataprep1/data-prep-kit/ededup-ray:0.2.1.dev0"
-fdedup_image = "quay.io/dataprep1/data-prep-kit/fdedup-ray:0.2.1.dev0"
-tokenizer_image = "quay.io/dataprep1/data-prep-kit/tokenization-ray:0.2.1.dev0"
+code_to_parquet_image = "quay.io/dataprep1/data-prep-kit/code2parquet-ray:0.2.0.dev6"
+proglang_select_image = "quay.io/dataprep1/data-prep-kit/proglang_select-ray:0.2.0.dev6"
+code_quality_image = "quay.io/dataprep1/data-prep-kit/code_quality-ray:0.2.0.dev6"
+malware_image = "quay.io/dataprep1/data-prep-kit/malware-ray:0.2.0.dev6"
+doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id-ray:0.2.0.dev6"
+ededup_image = "quay.io/dataprep1/data-prep-kit/ededup-ray:0.2.0.dev6"
+fdedup_image = "quay.io/dataprep1/data-prep-kit/fdedup-ray:0.2.0.dev6"
+tokenizer_image = "quay.io/dataprep1/data-prep-kit/tokenization-ray:0.2.0.dev6"
 
 
 # Pipeline to invoke execution on remote resource
