@@ -84,7 +84,7 @@ We use the popular [parquet](https://arrow.apache.org/docs/python/parquet.html) 
 Every parquet file follows a set 
 [schema](tools/ingest2parquet/).
 Data is converted from raw form (e.g., zip files for GitHub repositories) to parquet files by the
-[ingest2parquet](tools/ingest2parquet/) 
+[code2parquet](/transforms/code/code2parquet) 
 tool that also adds the necessary fields in the schema.  
 A user can then use one or more of the [available transforms](transforms) to process their data. 
 
