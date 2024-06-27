@@ -56,3 +56,7 @@ workflow-test:
 .PHONY: workflow-upload
 workflow-upload:
 	$(MAKE) -C kfp_ray workflow-upload
+
+.PHONY: workflow-build
+workflow-build:
+	$(MAKE) -C  kfp_ray workflow-build

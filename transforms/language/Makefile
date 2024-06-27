@@ -58,3 +58,6 @@ workflow-upload::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse
 
+workflow-build::
+	@# Help: Recursively make $@ in subdirs
+	$(MAKE) RULE=$@ .recurse

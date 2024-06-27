@@ -58,13 +58,13 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccessFactoryBase
-from data_processing.runtime.ray import (
+from data_processing_ray.data_access import DataAccessFactoryBase
+from data_processing_ray.runtime.ray import (
   DefaultRayTransformRuntime,
   RayTransformLauncher,
   RayUtils,
 )
-from data_processing.runtime.ray.runtime_configuration import (
+from data_processing_ray.runtime.ray.runtime_configuration import (
   RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration

@@ -13,6 +13,11 @@ clean::
 build::
 	@# Help: Recursively make $@ in subdirs 
 	$(MAKE) RULE=$@ .recurse
+	
+setup::
+	@# Help: Recursively make $@ in subdirs 
+	$(MAKE) RULE=$@ .recurse
+
 venv::
 	@# Help: Recursively make $@ in subdirs 
 	$(MAKE) RULE=$@ .recurse
@@ -56,3 +61,7 @@ workflow-test:
 .PHONY: workflow-upload
 workflow-upload:
 	$(MAKE) -C kfp_ray workflow-upload
+
+.PHONY: workflow-build
+workflow-build:
+	$(MAKE) -C  kfp_ray workflow-build

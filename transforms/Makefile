@@ -13,6 +13,10 @@ clean::
 	@# Help: Recursively make $@ all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
+setup::
+	@# Help: Recursively make $@ in subdirs 
+	$(MAKE) RULE=$@ .recurse
+
 build::
 	@# Help: Recursively make $@ in subdirs 
 	$(MAKE) RULE=$@ .recurse
@@ -53,6 +57,10 @@ setup::
 	$(MAKE) RULE=$@ .recurse
 
 workflow-test::
+	@# Help: Recursively make $@ in subdirs
+	$(MAKE) RULE=$@ .recurse
+
+workflow-build::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse
 
