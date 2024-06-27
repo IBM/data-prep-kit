@@ -1,6 +1,6 @@
 [project]
 name = "dpk_code_quality_transform_python"
-version = "0.2.0.dev6"
+version = "0.2.1.dev0"
 requires-python = ">=3.10"
 description = "Code Quality Python Transform"
 license = {text = "Apache-2.0"}
@@ -9,7 +9,7 @@ authors = [
     { name = "Shivdeep Singh", email = "shivdeep.singh@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit==0.2.0.dev6",
+    "data-prep-toolkit==0.2.1.dev0",
     "bs4==0.0.2",
     "transformers==4.38.2",
 ]

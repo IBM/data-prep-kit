@@ -12,9 +12,9 @@ run_doc_id_op = comp.load_component_from_file(component_spec_path + "executeSubW
 run_exact_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 run_fuzzy_dedup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 
-doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id-ray:0.2.0.dev6"
-ededup_image = "quay.io/dataprep1/data-prep-kit/ededup-ray:0.2.0.dev6"
-fdedup_image = "quay.io/dataprep1/data-prep-kit/fdedup-ray:0.2.0.dev6"
+doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id-ray:0.2.1.dev0"
+ededup_image = "quay.io/dataprep1/data-prep-kit/ededup-ray:0.2.1.dev0"
+fdedup_image = "quay.io/dataprep1/data-prep-kit/fdedup-ray:0.2.1.dev0"
 
 # Pipeline to invoke execution on remote resource
 @dsl.pipeline(

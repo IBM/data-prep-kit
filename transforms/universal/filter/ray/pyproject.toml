@@ -1,6 +1,6 @@
 [project]
 name = "dpk_filter_transform_ray"
-version = "0.2.0.dev6"
+version = "0.2.1.dev0"
 requires-python = ">=3.10"
 description = "Filter Transform for Ray"
 license = {text = "Apache-2.0"}
@@ -9,8 +9,8 @@ authors = [
     { name = "Constantin Adam", email = "cmadam@us.ibm.com" },
 ]
 dependencies = [
-    "dpk-filter-transform-python==0.2.0.dev6",
-    "data-prep-toolkit-ray==0.2.0.dev6",
+    "dpk-filter-transform-python==0.2.1.dev0",
+    "data-prep-toolkit-ray==0.2.1.dev0",
 ]
 
 [build-system]
