@@ -1,6 +1,6 @@
 # Data Prep Kit Release notes
 
-## Release 0.2.0 - 6/28/2024
+## Release 0.2.0 - 6/27/2024
 
 ### General 
 1. Many bug fixes across the repo, plus the following specifics.
