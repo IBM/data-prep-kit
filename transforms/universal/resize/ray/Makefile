@@ -34,7 +34,7 @@ setup:: .transforms.setup
 
 # set the version of python transform that this depends on.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${RESIZE_PYTHON_VERSION} TOML_VERSION=$(NOOP_RAY_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${RESIZE_PYTHON_VERSION} .transforms.set-versions
 
 build-dist:: set-versions .defaults.build-dist
 

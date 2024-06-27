@@ -99,10 +99,10 @@ class ResizeTransform(AbstractTableTransform):
         else:
             # split based on size
             current_size = 0.0
-            if table.nbytes > self.max_bytes_per_table:
+            if table.nbytes >= self.max_bytes_per_table:
                 for n in range(table.num_rows):
                     current_size += table.slice(offset=n, length=1).nbytes
-                    if current_size > self.max_bytes_per_table:
+                    if current_size >= self.max_bytes_per_table:
                         self.logger.debug(f"capturing slice, current_size={current_size}")
                         # Reached the size
                         a_slice = table.slice(offset=start_row, length=(n - start_row))

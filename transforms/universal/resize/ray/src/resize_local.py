@@ -13,7 +13,7 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-from resize_transform_ray import ResizeTransform
+from resize_transform import ResizeTransform
 
 
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))

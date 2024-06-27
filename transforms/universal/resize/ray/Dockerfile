@@ -1,9 +1,6 @@
-FROM docker.io/rayproject/ray:2.9.3-py310
+FROM docker.io/rayproject/ray:2.24.0-py310
 
 ARG EXTRA_ARTIFACTORY_URL
-
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r  requirements.txt
 
 # Copy and install data processing libraries
 # These are expected to be placed in the docker context before this is run (see the make image).
