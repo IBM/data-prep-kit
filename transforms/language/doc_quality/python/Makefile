@@ -26,7 +26,7 @@ image:: lm_sp .transforms.python-image
 test-src:: lm_sp .transforms.test-src
 
 setup:: .transforms.setup
-	@which -s brew
+	@which brew
 	@if [[ $? == 0 ]]; then \
 		brew install wget; \
 	fi
