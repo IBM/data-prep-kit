@@ -4,6 +4,7 @@ import kfp.dsl as dsl
 from workflow_support.compile_utils import ONE_WEEK_SEC
 
 
+# empty comment to triigger pre-commit
 # Components
 # For every sub workflow we need a separate components, that knows about this subworkflow.
 component_spec_path = "../../../kfp_ray_components/"
