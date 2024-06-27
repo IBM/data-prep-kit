@@ -1,6 +1,6 @@
 [project]
 name = "dpk_proglang_select_transform_ray"
-version = "0.2.0.dev6"
+version = "0.2.1.dev0"
 requires-python = ">=3.10"
 description = "Programming Language Selection Ray Transform"
 license = {text = "Apache-2.0"}
@@ -9,8 +9,8 @@ authors = [
     { name = "Shivdeep Singh", email = "shivdeep.singh@ibm.com" },
 ]
 dependencies = [
-    "dpk-proglang-select-transform-python==0.2.0.dev6",
-    "data-prep-toolkit-ray==0.2.0.dev6",
+    "dpk-proglang-select-transform-python==0.2.1.dev0",
+    "data-prep-toolkit-ray==0.2.1.dev0",
 ]
 
 [build-system]
