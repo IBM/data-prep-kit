@@ -212,7 +212,7 @@ The final thing that we need to do is set some pipeline global configuration:
 
 ## Compiling a pipeline <a name = "compilation"></a>
 
-To compile pipeline execute `make build` command in the same directory where your pipeline is. 
+To compile pipeline execute `make workflow-build` command in the same directory where your pipeline is. 
 
 ## Deploying a pipeline <a name = "deploying"></a>
 
