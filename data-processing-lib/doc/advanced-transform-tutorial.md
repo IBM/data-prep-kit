@@ -32,13 +32,13 @@ Finally, we show to use the command line to run the transform in a local ray clu
 
 One of the basic components of exact dedup implementation is a cache of hashes. That is why we will start
 from implementing this support actor. The implementation is fairly straight forward and can be
-found [here](../../transforms/universal/ededup/ray/src/ededup_transform.py)
+found [here](../../transforms/universal/ededup/ray/src/ededup_transform_ray.py)
 
 ## EdedupTransform
 
 First, let's define the transform class.  To do this we extend
 the base abstract/interface class
-[AbstractTableTransform](../ray/src/data_processing_ray/transform/table_transform.py),
+[AbstractTableTransform](../python/src/data_processing/transform/table_transform.py),
 which requires definition of the following:
 
 * an initializer (i.e. `init()`) that accepts a dictionary of configuration

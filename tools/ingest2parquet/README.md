@@ -1,5 +1,10 @@
 # INGEST2PARQUET  
 
+**Please note: This tool is deprecated and will be removed soon. 
+It is superseded by the transform-based implementation, 
+[code2parquet](../../transforms/code/code2parquet),  providing identical capability, 
+but with support for ray-based scalability.**
+
 ## Summary 
 This Python script is designed to convert raw data files, particularly ZIP files, into Parquet format. It is built to handle concurrent processing of multiple files using multiprocessing for efficient execution.
 Each file contained within the ZIP is transformed into a distinct row within the Parquet dataset, adhering to the below schema.
