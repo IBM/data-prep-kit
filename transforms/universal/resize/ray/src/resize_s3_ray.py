@@ -14,31 +14,24 @@ import os
 import sys
 
 from data_processing.utils import ParamsUtils
-from data_processing_ray.runtime.ray import RayTransformLauncher
-from lang_id_transform import (
-    content_column_name_cli_param,
-    model_credential_cli_param,
-    model_kind_cli_param,
-    model_url_cli_param,
-    output_lang_column_name_cli_param,
-    output_score_column_name_cli_param,
-)
-from lang_id_transform_ray import LangIdentificationRayTransformConfiguration
-from lang_models import KIND_FASTTEXT
+from data_processing_ibm.ray import TransformLauncherIBM
+from data_processing_ibm.utils import DPKConfigIBM
+from resize_transform_ray import ResizeRayTransformConfiguration
 
 
 print(os.environ)
 # create launcher
-launcher = RayTransformLauncher(LangIdentificationRayTransformConfiguration())
+launcher = TransformLauncherIBM(ResizeRayTransformConfiguration())
 # create parameters
 s3_cred = {
-    "access_key": "localminioaccesskey",
-    "secret_key": "localminiosecretkey",
-    "url": "http://localhost:9000",
+    "access_key": DPKConfigIBM.S3_ACCESS_KEY,
+    "secret_key": DPKConfigIBM.S3_SECRET_KEY,
+    "url": "https://s3.us-east.cloud-object-storage.appdomain.cloud",
 }
+
 s3_conf = {
-    "input_folder": "test/lang_id/input",
-    "output_folder": "test/lang_id/output",
+    "input_folder": "cos-optimal-llm-pile/sanity-test/input/dataset=big/",
+    "output_folder": "cos-optimal-llm-pile/boris-da-test/",
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
@@ -50,22 +43,16 @@ params = {
     "data_s3_config": ParamsUtils.convert_to_ast(s3_conf),
     # orchestrator
     "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "runtime_num_workers": 3,
+    "runtime_num_workers": 5,
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_creation_delay": 0,
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
-    # lang_id params
-    model_credential_cli_param: "PUT YOUR OWN HUGGINGFACE CREDENTIAL",
-    model_kind_cli_param: KIND_FASTTEXT,
-    model_url_cli_param: "facebook/fasttext-language-identification",
-    content_column_name_cli_param: "text",
-    output_lang_column_name_cli_param: "ft_lang",
-    output_score_column_name_cli_param: "ft_score",
+    # resize config
+    "resize_max_mbytes_per_table": 1,
+    #    "resize_max_rows_per_table": 150
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
-# for arg in sys.argv:
-#     print(arg)
 
 # launch
 launcher.launch()
