@@ -101,7 +101,7 @@ Next we define the `transform()` method itself, which includes the addition of s
 almost trivial metadata.
 
 ```python
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         if self.sleep is not None:
             time.sleep(self.sleep)
         # Add some sample metadata.
@@ -210,7 +210,7 @@ Assuming the above `main` code is placed in `noop_main.py` we can run the transf
 and create a temporary directory to hold the output:
 ```shell
 export DPK_REPOROOT=...
-export NOOP_INPUT=$DPK_REPOROOT/transforms/universal/noop/ray/test-data/input
+export NOOP_INPUT=$DPK_REPOROOT/transforms/universal/noop/python/test-data/input
 ```
 To run
 ```shell
@@ -225,11 +225,21 @@ To run in the Ray runtime, instead of creating the `PythonTransformLauncher`
 we use the `RayTransformLauncher`.
 as follows:
 ```python
+class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
+    def __init__(self):
+        super().__init__(transform_config=NOOPTransformConfiguration())
+
+from data_processing_ray.runtime.ray import RayTransformLauncher
 if __name__ == "__main__":
     launcher = RayTransformLauncher(runtime_config=NOOPRayTransformConfiguration())
     launcher.launch()
 ```
 We can run this with the same command as for the python runtime but to run in local Ray
 add the `--run_locally True` option.
+```shell
+python noop_main.py --noop_sleep_sec 2 \
+  --data_local_config "{'input_folder': '"$NOOP_INPUT"', 'output_folder': '/tmp/noop-output'}" --run_locally True
+```
+which will start local ray instance ( ray should be pre [installed](https://docs.ray.io/en/latest/ray-overview/installation.html)).
 See the [ray launcher options](ray-launcher-options.md) for a complete list of
 transform-independent command line options.
