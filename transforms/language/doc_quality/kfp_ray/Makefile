@@ -30,8 +30,8 @@ image::
 
 load-image::
 
-.PHONY: setup
-setup: workflow-venv
+.PHONY: workflow-build
+workflow-build: workflow-venv
 	$(MAKE) $(YAML_WF)
 
 .PHONY: workflow-test
