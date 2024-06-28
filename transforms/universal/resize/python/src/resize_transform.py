@@ -71,7 +71,7 @@ class ResizeTransform(AbstractTableTransform):
                 self.logger.debug(
                     f"concatenating buffer with {self.buffer.num_rows} rows to table with {table.num_rows} rows"
                 )
-                table = pa.concat_tables([self.buffer, table])
+                table = pa.concat_tables([self.buffer, table], unicode_promote_options="permissive")
                 self.logger.debug(f"concatenated table has {table.num_rows} rows")
                 self.buffer = None
             except Exception as e:  # Can happen if schemas are different
