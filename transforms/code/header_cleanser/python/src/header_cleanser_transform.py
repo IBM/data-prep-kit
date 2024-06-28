@@ -26,7 +26,6 @@ logger = get_logger(__name__)
 
 short_name = "header_cleanser"
 cli_prefix = short_name + "_"
-HEADER_CLEANSER_PARAMS = "header_cleanser_prams"
 COLUMN_KEY = "contents_column_name"
 LICENSE_KEY = "license"
 COPYRIGHT_KEY = "copyright"
