@@ -35,7 +35,7 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${NOOP_PYTHON_VERSION} TOML_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${DOCKER_IMAGE_VERSION} TOML_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 
