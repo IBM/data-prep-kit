@@ -32,7 +32,9 @@ publish-image:: .transforms.publish-image-ray
 
 setup:: .transforms.setup
 
-set-versions::
+# TRANSFORM_PYTHON_VERSION has no effect since requirements do not specify a python transform implementation
+set-versions:
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${DOCKER_IMAGE_VERSION} .transforms.set-versions 
 
 build-dist:: .defaults.build-dist
 

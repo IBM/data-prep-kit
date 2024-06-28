@@ -22,7 +22,10 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-set-versions::
+
+# TRANSFORM_PYTHON_VERSION has no effect since requirements do not specify a python transform implementation
+set-versions: 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${DOCKER_IMAGE_VERSION} .transforms.set-versions 
 
 test-image:: .transforms.ray-test-image
 
