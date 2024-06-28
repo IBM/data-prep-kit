@@ -39,6 +39,7 @@ default_content_column_name = "contents"
 default_output_lang_column_name = "lang"
 default_output_score_column_name = "score"
 
+
 class LangIdentificationTransform(AbstractTableTransform):
     """
     Implements a simple copy of a pyarrow Table.
@@ -73,9 +74,7 @@ class LangIdentificationTransform(AbstractTableTransform):
         """
         TransformUtils.validate_columns(table, [self.content_column_name])
         if self.output_lang_column_name in table.schema.names:
-            raise Exception(
-                f"column to store identified language ({self.output_lang_column_name}) already exist"
-            )
+            raise Exception(f"column to store identified language ({self.output_lang_column_name}) already exist")
         if self.output_score_column_name in table.schema.names:
             raise Exception(
                 f"column to store score of language identification ({self.output_score_column_name}) already exist"
@@ -117,13 +116,19 @@ class LangIdentificationTransformConfiguration(TransformConfiguration):
         parser.add_argument(f"--{model_kind_cli_param}", required=True, help="Kind of model for language detection")
         parser.add_argument(f"--{model_url_cli_param}", required=True, help="Url to model for language detection")
         parser.add_argument(
-            f"--{content_column_name_cli_param}", default=default_content_column_name, help="Column name to get content"
+            f"--{content_column_name_cli_param}",
+            default=default_content_column_name,
+            help="Column name to get content",
         )
         parser.add_argument(
-            f"--{output_lang_column_name_cli_param}", default=default_output_lang_column_name, help="Column name to store identified language"
+            f"--{output_lang_column_name_cli_param}",
+            default=default_output_lang_column_name,
+            help="Column name to store identified language",
         )
         parser.add_argument(
-            f"--{output_score_column_name_cli_param}", default=default_output_score_column_name, help="Column name to store the score of language identification"
+            f"--{output_score_column_name_cli_param}",
+            default=default_output_score_column_name,
+            help="Column name to store the score of language identification",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:

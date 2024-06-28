@@ -15,7 +15,6 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from lang_id_transform_ray import LangIdentificationRayTransformConfiguration
 from lang_id_transform import (
     content_column_name_cli_param,
     model_credential_cli_param,
@@ -24,6 +23,7 @@ from lang_id_transform import (
     output_lang_column_name_cli_param,
     output_score_column_name_cli_param,
 )
+from lang_id_transform_ray import LangIdentificationRayTransformConfiguration
 from lang_models import KIND_FASTTEXT
 
 

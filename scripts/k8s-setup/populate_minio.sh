@@ -35,4 +35,5 @@ mc cp --recursive ${REPOROOT}/transforms/universal/filter/ray/test-data/input/ k
 mc cp --recursive ${REPOROOT}/transforms/universal/noop/ray/test-data/input/ kfp/test/noop/input
 mc cp --recursive ${REPOROOT}/transforms/universal/tokenization/ray/test-data/ds01/input/ kfp/test/tokenization/ds01/input
 mc cp --recursive ${REPOROOT}/transforms/universal/profiler/ray/test-data/input/ kfp/test/profiler/input
+mc cp --recursive ${REPOROOT}/transforms/universal/resize/ray/test-data/input/ kfp/test/resize/input
 
