@@ -36,7 +36,5 @@ class ResizeRayTransformConfiguration(RayTransformRuntimeConfiguration):
 
 
 if __name__ == "__main__":
-    # launcher = NOOPRayLauncher()
     launcher = RayTransformLauncher(ResizeRayTransformConfiguration())
-    logger.info("Launching noop transform")
     launcher.launch()
