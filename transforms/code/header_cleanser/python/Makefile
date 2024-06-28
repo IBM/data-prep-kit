@@ -33,7 +33,8 @@ publish-image:: .transforms.publish-image-python
 setup:: .transforms.setup
 
 # distribution versions is the same as image version.
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${HEADER_CLEANSER_PYTHON_VERSION} TOML_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions 
+set-versions:
+	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
         
 build-dist:: set-versions .defaults.build-dist 
 
