@@ -14,10 +14,13 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=spark:root data-processing-lib-spark/ data-processing-lib-spark/
 RUN cd data-processing-lib-spark && pip install --no-cache-dir -e .
 
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+# Install project source
+COPY --chown=spark:root src/ src/
+COPY --chown=spark:root pyproject.toml pyproject.toml
+RUN pip install --no-cache-dir -e .
 
-# copy source data
+# copy source main
+
 COPY ./src/filter_transform_spark.py .
 COPY ./src/filter_local.py local/
 
