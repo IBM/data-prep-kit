@@ -54,6 +54,10 @@ doc_id_column_cli_param = f"{cli_prefix}{doc_id_column_key}"
 bad_word_filepath_cli_param = f"{cli_prefix}{bad_word_filepath_key}"
 kenLM_model_cli_param = f"{cli_prefix}{kenLM_model_key}"
 
+default_text_lang = "en"
+default_doc_content_column = "contents"
+default_doc_id_column = "documents_id"
+
 data_factory_internal_key = f"{cli_prefix}data_factory"
 files_to_use_internal_key = f"{cli_prefix}files_to_use"
 
@@ -66,16 +70,17 @@ class DocQualityTransform(AbstractTableTransform):
         """
         Initialize based on the dictionary of configuration information.
         This is generally called with configuration parsed from the CLI arguments defined
-        by the companion runtime, DocQualityTransformRuntime.  If running inside the RayMutatingDriver,
-        these will be provided by that class with help from the RayMutatingDriver.
+        by the companion runtime, DocQualityTransformRuntime.
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of DocQualityTransformConfiguration class
         super().__init__(config)
-        self.text_lang = config.get(text_lang_key)
-        self.doc_content_column = config.get(doc_content_column_key)
-        self.doc_id_column = config.get(doc_id_column_key)
-        self.bad_word_filepath = config.get(bad_word_filepath_key)
+        self.text_lang = config.get(text_lang_key, default_text_lang)
+        self.doc_content_column = config.get(doc_content_column_key, default_doc_content_column)
+        self.doc_id_column = config.get(doc_id_column_key, default_doc_id_column)
+        self.bad_word_filepath = config.get(bad_word_filepath_key, None)
+        if self.bad_word_filepath is None:
+            raise RuntimeError(f"Missing configuration value for key {bad_word_filepath_key}")
 
         self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=self.bad_word_filepath)
 
@@ -221,17 +226,17 @@ class DocQualityTransformConfiguration(TransformConfiguration):
         """
         parser.add_argument(
             f"--{text_lang_cli_param}",
-            default="en",
+            default=default_text_lang,
             help="language used in the text content"
         )
         parser.add_argument(
             f"--{doc_content_column_cli_param}",
-            default="contents",
+            default=default_doc_content_column,
             help="column name that contains document text",
         )
         parser.add_argument(
             f"--{doc_id_column_cli_param}",
-            default="document_id",
+            default=default_doc_id_column,
             help="column name that contains document id",
         )
         parser.add_argument(
@@ -244,7 +249,7 @@ class DocQualityTransformConfiguration(TransformConfiguration):
             f"--{kenLM_model_cli_param}",
             type=str,
             required=True,
-            help="path to kenLM model: local folder (file or directory) that points to kenLM model",
+            help="path to kenLM model: path (local or s3) to kenLM model",
         )
         self.daf = DataAccessFactory(cli_prefix, False)
         self.daf.add_input_params(parser)

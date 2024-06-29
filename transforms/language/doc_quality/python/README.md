@@ -43,7 +43,7 @@ the [python launcher](../../../../data-processing-lib/doc/python-launcher-option
   --docq_doc_content_column DOCQ_DOC_CONTENT_COLUMN   column name that contain document text
   --docq_doc_id_colum DOCQ_DOC_ID_COLUMN   column name that contains document id
   --docq_bad_word_filepath DOCQ_BAD_WORD_FILEPATH   path to bad word file: local folder (file or directory) that points to bad word file
-  --docq_kenLM_model   path to kenLM model: local folder (file or directory) that points to kenLM model
+  --docq_kenLM_model   path to kenLM model: path (local or s3) to kenLM model
 ```
 These correspond to the configuration keys described above.
 
