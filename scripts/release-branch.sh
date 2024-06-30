@@ -55,8 +55,12 @@ echo Committing and pushing tag $tag in $release_branch branch
 git tag -a -s -m "Cut release $version" $tag 
 git push origin $tag 
 
-# Now go back to the default branch so we can bump the minor version number and reset the version suffix
-git checkout $DEFAULT_BRANCH
+# Now create and push a new branch from which we will PR into main to update the version 
+next_version_branch=release_next_pending
+echo Creating $next_version_branch branch for PR request back to main for version upgrade
+git checkout -b $next_version_branch 
+git commit --no-verify -s -a -m "Branch to PR back into $DEFAULT_BRANCH holding the next version"
+git push --set-upstream origin $next_version_branch
 
 # Change to the next development version (bumped minor version with suffix).
 micro=$(cat .make.versions | grep '^DPK_MICRO_VERSION=' | sed -e 's/DPK_MICRO_VERSION=\([0-9]*\).*/\1/') 
@@ -66,16 +70,18 @@ cat .make.versions | sed -e "s/^DPK_MICRO_VERSION=.*/DPK_MICRO_VERSION=$micro/" 
 mv tt .make.versions
 # Apply the version change to all files in the repo 
 next_version=$(make show-version)
-echo Applying updated version $next_version to $DEFAULT_BRANCH  branch
+echo Applying updated version $next_version to $next_version_branch branch
 make set-versions > /dev/null
 
 # Push the version change back to the origin
 if [ -z "$debug" ]; then
-    echo Committing and pushing version $next_version to $DEFAULT_BRANCH branch.
+    echo Committing and pushing version $next_version to $next_version_branch branch.
     git commit --no-verify -s -a -m "Bump micro version to $next_version after cutting release $version into branch $release_branch"
-    git diff origin/$DEFAULT_BRANCH $DEFAULT_BRANCH
+    #git diff origin/$next_version_branch $next_version_branch 
     git push origin
+    echo Please go to https://github.com/IBM/data-prep-kit/pulls and 
+    echo create a new pull request from the $next_version_branch branch back into $DEFAULT_BRANCH branch. 
 else
     git status
-    echo In non-debug mode, the above diffs would have been commited to the $DEFAULT_BRANCH branch
+    echo In non-debug mode, the above diffs would have been committed to the $next_version_branch branch
 fi
