@@ -25,7 +25,7 @@ set-versions:
 
 .PHONY: .workflows.compile-pipeline
 .workflows.compile-pipeline:
-	$(MAKE) -C ${REPOROOT}/kfp/kfp_ray_components set-image
+	$(MAKE) -C ${REPOROOT}/kfp/kfp_ray_components set-versions
 	. ${WORKFLOW_VENV_ACTIVATE} && ${PYTHON} ${WF_NAME}.py
 
 KFP_SHARED_LIB_SRC_FILES := $(shell find ${REPOROOT}/kfp/kfp_support_lib/shared_workflow_support/ \( -name '*.py' -o -name '*.toml' \))
@@ -60,7 +60,7 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/kfp_ray_co
 	. ${WORKFLOW_VENV_ACTIVATE};     \
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/shared_workflow_support; \
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB); \
-	$(MAKE) -C ${REPOROOT}/kfp/kfp_ray_components set-image
+	$(MAKE) -C ${REPOROOT}/kfp/kfp_ray_components set-versions
 	@# Help: Create the virtual environment common to all workflows
 
 .PHONY: .workflows.upload-pipeline
