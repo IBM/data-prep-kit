@@ -48,4 +48,8 @@ run-local-sample: .transforms.run-local-sample
 
 run-local-python-sample: .transforms.run-local-python-sample
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image
