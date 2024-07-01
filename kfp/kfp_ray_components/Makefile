@@ -57,11 +57,18 @@ ifneq ($(KFPv2), 1)
 	@$(MAKE) .reconcile-requirements FILE=executeSubWorkflowComponent.yaml
 endif
 
-.PHONY: load-image
-load-image:
+.PHONY: kind-load-image
+kind-load-image:
 	@# Help: Load the image to the kind cluster created with make setup.
 	kind load docker-image $(DOCKER_REMOTE_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
+.PHONY: docker-load-image
+docker-load-image:
+	@$(MAKE) .defaults.docker-load-image
+
+.PHONY: docker-save-image
+docker-save-image:
+	@$(MAKE) .defaults.docker-load-image
 
 .PHONY: publish
 publish:
