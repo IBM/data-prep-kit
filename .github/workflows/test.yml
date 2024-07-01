@@ -50,10 +50,10 @@ jobs:
               run: |
                   make USE_LATEST_TAG=1 -C transforms/code DOCKER=docker venv test-src
             - name: Save images
-              if: ${{ github.event_name != 'pull_request' }}
+              # if: ${{ github.event_name != 'pull_request' }}
               run: make -C transforms -C kfp-kfp_ray_componenets docker-save-images
             - name: Upload images
-              if: ${{ github.event_name != 'pull_request' }}
+              # if: ${{ github.event_name != 'pull_request' }}
               uses: actions/upload-artifact@v3
               with:
                 name: images
@@ -176,7 +176,7 @@ jobs:
         DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
         DOCKER_REGISTRY_KEY: ${{ secrets.DOCKER_REGISTRY_KEY }}
       needs: [test-make, test-python-lib, test-ray-lib, test-kfp-v1]
-      if: ${{ github.event_name != 'pull_request' && github.repository == 'IBM/data-prep-kit' }}
+      # if: ${{ github.event_name != 'pull_request' && github.repository == 'IBM/data-prep-kit' }}
       steps:
       - uses: actions/checkout@v3
       - name: Download artifact
