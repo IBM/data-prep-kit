@@ -32,8 +32,8 @@ local_conf = {
 
 header_cleanser_params = {
     COLUMN_KEY: 'contents',
-    COPYRIGHT_KEY: 'true',
-    LICENSE_KEY: 'true',
+    COPYRIGHT_KEY: True,
+    LICENSE_KEY: True,
 }
 
 if __name__ == "__main__":

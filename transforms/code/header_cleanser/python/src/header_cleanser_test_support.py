@@ -54,8 +54,8 @@ class AbstractPythonHeaderCleanserTransformTest(AbstractTransformLauncherTest):
                 args
                 | {
                     column_cli_params: 'contents',
-                    license_cli_params: 'true',
-                    copyright_cli_params: 'true',
+                    license_cli_params: True,
+                    copyright_cli_params: True,
                 },
                 os.path.join(basedir, "input"),
                 os.path.join(basedir, "expected", "license-and-copyright"),
@@ -69,8 +69,8 @@ class AbstractPythonHeaderCleanserTransformTest(AbstractTransformLauncherTest):
                 args
                 | {
                     column_cli_params: 'contents',
-                    license_cli_params: 'false',
-                    copyright_cli_params: 'true',
+                    license_cli_params: False,
+                    copyright_cli_params: True,
                 },
                 os.path.join(basedir, "input"),
                 os.path.join(basedir, "expected", "copyright"),
@@ -84,8 +84,8 @@ class AbstractPythonHeaderCleanserTransformTest(AbstractTransformLauncherTest):
                 args
                 | {
                     column_cli_params: 'contents',
-                    license_cli_params: 'true',
-                    copyright_cli_params: 'false',
+                    license_cli_params: True,
+                    copyright_cli_params: False,
                 },
                 os.path.join(basedir, "input"),
                 os.path.join(basedir, "expected", "license"),

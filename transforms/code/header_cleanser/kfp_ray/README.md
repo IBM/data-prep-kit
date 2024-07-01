@@ -2,7 +2,7 @@
 
 
 ## Summary 
-This project allows execution of the [noop Ray transform](../ray) as a 
+This project allows execution of the [header cleanser Ray transform](../ray) as a 
 [KubeFlow Pipeline](https://www.kubeflow.org/docs/components/pipelines/overview/)
 
 The detail pipeline is presented in the [Simplest Transform pipeline tutorial](../../../../kfp/doc/simple_transform_pipeline.md) 

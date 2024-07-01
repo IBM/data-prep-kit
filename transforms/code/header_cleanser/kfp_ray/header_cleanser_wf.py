@@ -40,6 +40,10 @@ def compute_exec_params_func(
     runtime_pipeline_id: str,
     runtime_job_id: str,
     runtime_code_location: str,
+    header_cleanser_contents_column_name: str,
+    header_cleanser_license: bool,
+    header_cleanser_copyright: bool,
+
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -52,6 +56,9 @@ def compute_exec_params_func(
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": runtime_code_location,
+        "header_cleanser_contents_column_name": header_cleanser_contents_column_name,
+        "header_cleanser_license": header_cleanser_license,
+        "header_cleanser_copyright":header_cleanser_copyright,
     }
 
 
@@ -114,10 +121,10 @@ def header_cleanser(
     runtime_actor_options: str = "{'num_cpus': 0.8}",
     runtime_pipeline_id: str = "runtime_pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # code quality parameters
-    contents_column_name: str = "contents",
-    license: str = "true",
-    copyright: str = "true",
+    # header cleanser parameters
+    header_cleanser_contents_column_name: str = "contents",
+    header_cleanser_license: bool = True,
+    header_cleanser_copyright: bool = True,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 800, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
@@ -171,6 +178,9 @@ def header_cleanser(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
+            header_cleanser_contents_column_name=header_cleanser_contents_column_name,
+            header_cleanser_license=header_cleanser_license,
+            header_cleanser_copyright=header_cleanser_copyright,
         )
 
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)

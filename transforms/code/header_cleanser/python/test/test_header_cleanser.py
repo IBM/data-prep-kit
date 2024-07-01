@@ -15,14 +15,13 @@ import os
 
 import pyarrow as pa
 import pyarrow.parquet as pq
+from data_processing.utils import str2bool
 from data_processing.test_support.transform import AbstractTableTransformTest
-from data_processing.transform import get_transform_config
 from header_cleanser_transform import (
     HeaderCleanserTransform,
-    HeaderCleanserTransformConfiguration,
-    column_cli_params,
-    license_cli_params,
-    copyright_cli_params,
+    COLUMN_KEY,
+    LICENSE_KEY,
+    COPYRIGHT_KEY,
 )
 
 
@@ -35,21 +34,16 @@ class TestHeaderCleanserTransform(AbstractTableTransformTest):
     def create_header_cleanser_test_fixture(
         self,
         column: str,
-        license: str,
-        copyright: str,
+        license: bool,
+        copyright: bool,
         input_dir: str,
         expected_output_dir: str,
     ) -> tuple[HeaderCleanserTransform, pa.Table, pa.Table, list[dict]]:
-        cli = [
-            f"--{column_cli_params}",
-            column,
-            f"--{license_cli_params}",
-            license,
-            f"--{copyright_cli_params}",
-            copyright,
-        ]
-        ftc = HeaderCleanserTransformConfiguration()
-        config = get_transform_config(ftc, cli)
+        config = {
+            COLUMN_KEY : column,
+            LICENSE_KEY : license,
+            COPYRIGHT_KEY : copyright,
+        }
         input_df = pq.read_table(os.path.join(input_dir, "test1.parquet"))
         expected_output_df = pq.read_table(os.path.join(expected_output_dir, "test1.parquet"))
         with open(os.path.join(expected_output_dir, "metadata.json"), "r") as meta_file:
@@ -62,8 +56,8 @@ class TestHeaderCleanserTransform(AbstractTableTransformTest):
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/"))
         # test for both license and copyright removal
         column_name = 'contents'
-        license = 'true'
-        copyright = 'true'
+        license = True
+        copyright = True
         input_dir = os.path.join(basedir, "input")
         expected_output_dir = os.path.join(basedir, "expected", "license-and-copyright-local")
         fixtures.append(
@@ -77,7 +71,7 @@ class TestHeaderCleanserTransform(AbstractTableTransformTest):
         )
 
         # test for only license removal
-        copyright = 'false'
+        copyright = False
         expected_output_dir = os.path.join(basedir, "expected", "license-local")
         fixtures.append(
             self.create_header_cleanser_test_fixture(
@@ -91,8 +85,8 @@ class TestHeaderCleanserTransform(AbstractTableTransformTest):
 
         # test for only copyright removal
         column_name = 'contents'
-        license = 'false'
-        copyright = 'true'
+        license = False
+        copyright = True
         input_dir = os.path.join(basedir, "input")
         expected_output_dir = os.path.join(basedir, "expected", "copyright-local")
         fixtures.append(

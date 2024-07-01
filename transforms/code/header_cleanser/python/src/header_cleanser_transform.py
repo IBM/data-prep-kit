@@ -19,7 +19,7 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import get_logger,CLIArgumentProvider
+from data_processing.utils import get_logger,CLIArgumentProvider,str2bool
 from scancode import api
 
 logger = get_logger(__name__)
@@ -35,8 +35,8 @@ license_cli_params = f'{cli_prefix}{LICENSE_KEY}'
 copyright_cli_params = f'{cli_prefix}{COPYRIGHT_KEY}'
 
 DEFAULT_COLUMN = "contents"
-DEFAULT_LICENSE = "true"
-DEFAULT_COPYRIGHT = "true"
+DEFAULT_LICENSE = True
+DEFAULT_COPYRIGHT = True
 
 def file_generate(content):
     """
@@ -156,19 +156,19 @@ class HeaderCleanserTransform(AbstractTableTransform):
         updated_content = []
         remove_code_count = 0
         for content in contents:
-            if self.license_remove=="true" and self.copyright_remove=="true":
+            if self.license_remove and self.copyright_remove:
                 new_content,detect = remove_license_copyright(content)
                 if detect:
                     remove_code_count+=1
                 updated_content.append(new_content)
 
-            elif self.copyright_remove=="true" and self.license_remove!="true":
+            elif self.copyright_remove:
                 new_content,detect = remove_copyright(content)
                 if detect:
                     remove_code_count+=1
                 updated_content.append(new_content)
 
-            elif self.license_remove=='true' and self.copyright_remove!="true":
+            elif self.license_remove:
                 new_content,detect = remove_license(content)
                 if detect:
                     remove_code_count+=1
@@ -199,14 +199,14 @@ class HeaderCleanserTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{license_cli_params}",
             required=False,
-            type=str,
+            type=lambda x: bool(str2bool(x)),
             default=f'{DEFAULT_LICENSE}',
             help="Set False if license should not be removed",
         )
         parser.add_argument(
             f"--{copyright_cli_params}",
             required=False,
-            type=str,
+            type=lambda x: bool(str2bool(x)),
             default=f'{DEFAULT_COPYRIGHT}',
             help="Set False if copyright should not be removed ",
         )
