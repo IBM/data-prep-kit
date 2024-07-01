@@ -50,10 +50,10 @@ jobs:
               uses: actions/checkout@v4
             - name: Test Code Transforms
               run: |
-                  make USE_LATEST_TAG=1 -C transforms/code DOCKER=docker venv test-src
+                  make -C transforms/code DOCKER=docker venv test-src
             - name: Save images
               # if: ${{ github.event_name != 'pull_request' }}
-              run: make -C transforms -C kfp-kfp_ray_componenets docker-save-images
+              run: make USE_LATEST_TAG=1 -C transforms -C kfp-kfp_ray_componenets docker-save-image
             - name: Upload images
               # if: ${{ github.event_name != 'pull_request' }}
               uses: actions/upload-artifact@v3

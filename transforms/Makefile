@@ -49,6 +49,8 @@ kind-load-image::
 	$(MAKE) RULE=$@ .recurse
 
 docker-load-image::
+	@# Help: Recursively make $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
 
 docker-save-image::
 	@# Help: Recursively make $@ in all subdirs 
