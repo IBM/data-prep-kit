@@ -33,8 +33,8 @@ local_conf = {
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 header_cleanser_params = {
     column_cli_params: 'contents',
-    license_cli_params: 'false',
-    copyright_cli_params: 'true',
+    license_cli_params: True,
+    copyright_cli_params: True,
 }
 params = {
     # Data access. Only required parameters are specified
