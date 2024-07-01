@@ -20,7 +20,7 @@ from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, Component
 task_image = "quay.io/dataprep1/data-prep-kit/resize-ray:0.2.1.dev0"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "doc_id_transform_ray.py"
+EXEC_SCRIPT_NAME: str = "resize_transform_ray.py"
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.1.dev0"
 
@@ -95,23 +95,23 @@ execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "execu
 # clean up Ray
 cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "doc_id"
+TASK_NAME: str = "resize"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for doc_id",
+    description="Pipeline for resize",
 )
-def doc_id(
+def resize(
     # Ray cluster
-    ray_name: str = "doc_id-kfp-ray",  # name of Ray cluster
+    ray_name: str = "resize-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
     '"image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'test/doc_id/input/', 'output_folder': 'test/doc_id/output/'}",
+    data_s3_config: str = "{'input_folder': 'test/resize/input/', 'output_folder': 'test/resize/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
@@ -123,7 +123,7 @@ def doc_id(
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
     # doc id parameters
-    resize_max_rows_per_table: int = -1,
+    resize_max_rows_per_table: int = 20,
     resize_max_mbytes_per_table: int = -1,
     resize_size_type: str = "disk",
     # additional parameters
@@ -216,4 +216,4 @@ def doc_id(
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(doc_id, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(resize, __file__.replace(".py", ".yaml"))

@@ -42,11 +42,8 @@ image: Dockerfile requirements.txt
 .reconcile-requirements:
 	@sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${FILE}
 
-.PHONY: set-versions 
-set-versions::
-
-.PHONE: set-image
-set-image:
+.PHONE: set-versions
+set-versions:
 	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
 	@$(MAKE) .reconcile-requirements FILE=createRayClusterComponent.yaml
 	@$(MAKE) .reconcile-requirements FILE=deleteRayClusterComponent.yaml
