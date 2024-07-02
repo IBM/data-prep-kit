@@ -7,8 +7,6 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=proglang_select
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${PROGLANG_SELECT_PYTHON_VERSION}
 
 venv::	.transforms.python-venv
 
@@ -32,7 +30,7 @@ publish-image:: .transforms.publish-image-python
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${PROGLANG_SELECT_PYTHON_VERSION} TOML_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(PROGLANG_SELECT_PYTHON_VERSION) TOML_VERSION=$(PROGLANG_SELECT_PYTHON_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 

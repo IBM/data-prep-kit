@@ -5,8 +5,6 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=code_quality
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${CODE_QUALITY_RAY_VERSION}
 
 clean:: .transforms.clean
 
@@ -29,7 +27,7 @@ publish-image:: .transforms.publish-image-ray
 setup:: .transforms.setup
 
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(CODE_QUALITY_PYTHON_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(CODE_QUALITY_PYTHON_VERSION) TOML_VERSION=$(CODE_QUALITY_RAY_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 

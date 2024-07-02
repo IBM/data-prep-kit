@@ -5,8 +5,6 @@ include $(REPOROOT)/.make.defaults
 
 DOCKER_IMAGE_VERSION=${INGEST_TO_PARQUET_VERSION}
 DOCKER_IMAGE_NAME?=ingest2parquet
-#DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
-
 
 venv::	.defaults.ray-lib-src-venv
 

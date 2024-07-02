@@ -9,7 +9,6 @@ REPOROOT=../../../..
 
 TRANSFORM_RUNTIME=python
 TRANSFORM_NAME=code2parquet
-DOCKER_IMAGE_VERSION=${CODE2PARQUET_PYTHON_VERSION}
 
 include $(REPOROOT)/transforms/.make.transforms
 
@@ -35,7 +34,7 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(CODE2PARQUET_PYTHON_VERSION) TOML_VERSION=$(CODE2PARQUET_PYTHON_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 

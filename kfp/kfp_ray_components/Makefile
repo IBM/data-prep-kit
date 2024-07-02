@@ -12,10 +12,8 @@ DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
 
 ifeq ($(KFPv2), 1)
         DOCKER_IMAGE_NAME=kfp-data-processing_v2
-        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
 else
         DOCKER_IMAGE_NAME=kfp-data-processing
-        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
 endif
 
 .PHONY: .lib-src-image
@@ -40,7 +38,7 @@ image: Dockerfile requirements.txt
 
 .PHONY: .reconcile-requirements
 .reconcile-requirements:
-	@sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${FILE}
+	@sed -i.back "s/kfp-data-processing.*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${FILE}
 
 .PHONE: set-versions
 set-versions:
