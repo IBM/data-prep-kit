@@ -1,5 +1,4 @@
 
-
 <h1 align="center">Data Prep Kit</h1>
 
 <div align="center"> 
@@ -11,7 +10,8 @@
 
 ---
 
-Data Prep Kit is a community project to democratize and accelerate unstructured data preparation for LLM app developers. 
+Data Prep Kit is a community project to democratize and 
+accelerate unstructured data preparation for LLM app developers. 
 With the explosive growth of LLM-enabled use cases, developers are faced with the enormous challenge of preparing use case-specific unstructured data to fine-tune or instruct-tune the LLMs.
 As the variety of use cases grows, so does the need to support:
 
