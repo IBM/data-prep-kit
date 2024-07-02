@@ -1,7 +1,7 @@
 FROM docker.io/rayproject/ray:2.24.0-py310
 
 # Try and fix a problem in which git build of image uninstalls dpk-code_quality_transform-python
-pip install --upgrade pip
+RUN pip install --upgrade pip
 
 # install pytest
 RUN pip install --no-cache-dir pytest
