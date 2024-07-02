@@ -1,14 +1,11 @@
 FROM docker.io/rayproject/ray:2.24.0-py310
 
-# Try and fix a problem in which git build of image uninstalls dpk-code_quality_transform-python
-#RUN pip install --upgrade pip
-
 # install pytest
 RUN pip install --no-cache-dir pytest
 
-#USER root
-#RUN mkdir -p /home/ray/.cache && chmod -R 777 /home/ray/.cache
-#USER ray
+USER root
+RUN mkdir -p /home/ray/.cache && chmod -R 777 /home/ray/.cache
+USER ray
 
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
@@ -17,7 +14,7 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/ 
 RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
 COPY --chown=ray:users python-transform/  python-transform/
-RUN cd python-transform && pip -v -v -v install --no-cache-dir -e .
+RUN cd python-transform && pip install --no-cache-dir -e .
 RUN pip list 
 
 #COPY requirements.txt requirements.txt
@@ -27,9 +24,10 @@ COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 
 RUN pip install -v -v -v --no-cache-dir -e .
 
-# Debugging, should not be necessary
-COPY --chown=ray:users python-transform/  python-transform/
-RUN cd python-transform && pip -v -v -v install --no-cache-dir -e .
+# In some git action builds (only) we've seen pip do this
+# "Successfully uninstalled dpk_code_quality_transform_python-0.2.0"
+# As a workaround, let's just re-install it. 
+RUN cd python-transform && pip install --no-cache-dir -e .
 
 # copy source data
 COPY ./src/code_quality_transform_ray.py .
