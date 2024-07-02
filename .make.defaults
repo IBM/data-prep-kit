@@ -349,7 +349,8 @@ __check_defined = \
 .defaults.test-image-pytest:: 
 	# Put this 2nd so its help showss up instead of .defaults.image help
 	@# Help: Test $(DOCKER_LOCAL_IMAGE) using test source inside the image. 
-	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) pytest -s test 
+	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) pytest -s test
+	sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true 
 	
 .PHONY: .defaults.test-locals
 .defaults.test-locals::
