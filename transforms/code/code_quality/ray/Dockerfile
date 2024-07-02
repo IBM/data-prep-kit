@@ -27,6 +27,10 @@ COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 
 RUN pip install -v -v -v --no-cache-dir -e .
 
+# Debugging, should not be necessary
+COPY --chown=ray:users python-transform/  python-transform/
+RUN cd python-transform && pip -v -v -v install --no-cache-dir -e .
+
 # copy source data
 COPY ./src/code_quality_transform_ray.py .
 COPY ./src/code_quality_local_ray.py local/
