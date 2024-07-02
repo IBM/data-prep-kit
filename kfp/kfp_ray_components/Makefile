@@ -63,7 +63,7 @@ docker-load-image:
 
 .PHONY: docker-save-image
 docker-save-image:
-	@$(MAKE) .defaults.docker-load-image
+	@$(MAKE) .defaults.docker-save-image
 
 .PHONY: publish
 publish:
