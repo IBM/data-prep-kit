@@ -44,14 +44,12 @@ DOCKER_REGISTRY_KEY?=$(DPK_DOCKER_REGISTRY_KEY)
 DOCKER_REGISTRY_ENDPOINT?=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)
 DOCKER_LOCAL_IMAGE=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 DOCKER_REMOTE_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
-DOCKER_REMOTE_IMAGE_LATEST=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE_NAME):latest
 DOCKER_SPARK_BASE_IMAGE_NAME=data-prep-kit-spark-3.5.1
 DOCKER_SPARK_BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE_NAME):$(DPK_LIB_VERSION)
 # Deprecated in favor of DOCKER_REMOTE_IMAGE
 DOCKER_IMAGE?=$(DOCKER_REMOTE_IMAGE)
 KIND_CLUSTER_NAME=dataprep
 ARTIFACTS_DIR?=$(REPOROOT)/artifacts
-USE_LATEST_TAG?=0
 
 DPK_PYTHON_LIB_DIR=$(REPOROOT)/data-processing-lib/python
 DPK_RAY_LIB_DIR=$(REPOROOT)/data-processing-lib/ray
@@ -186,9 +184,6 @@ __check_defined = \
 
 .PHONY: .defaults.docker-save-image
 .defaults.docker-save-image:
-ifeq ($(USE_LATEST_TAG),1)
-	   docker tag $(DOCKER_REMOTE_IMAGE) $(DOCKER_REMOTE_IMAGE_LATEST)
-endif
 	docker save -o ${ARTIFACTS_DIR}/${DOCKER_IMAGE_NAME}.tar $(DOCKER_REMOTE_IMAGE)
 
 .PHONY: .defaults.docker-load-image
@@ -407,12 +402,7 @@ endif
 	@# Help: Publish the $(DOCKER_LOCAL_IMAGE) to $(DOCKER_HOSTNAME) container registry
 	-$(DOCKER) logout $(DOCKER_HOSTNAME)
 	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
-ifeq ($(USE_LATEST_TAG),1)
-	   $(DOCKER) push $(DOCKER_REMOTE_IMAGE_LATEST); 
-else  
-	   $(DOCKER) push $(DOCKER_REMOTE_IMAGE);
-endif
-
+	$(DOCKER) push $(DOCKER_REMOTE_IMAGE);
 
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp

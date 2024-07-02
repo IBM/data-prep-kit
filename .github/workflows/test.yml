@@ -51,7 +51,9 @@ jobs:
                   make -C transforms/code DOCKER=docker venv test-src
             - name: Save images
               # if: ${{ github.event_name != 'pull_request' }}
-              run: make USE_LATEST_TAG=1 -C transforms -C kfp-kfp_ray_componenets docker-save-image
+              run: |
+                  make -C transforms docker-save-image
+                  make -C kfp/kfp_ray_components docker-save-image
             - name: Upload images
               # if: ${{ github.event_name != 'pull_request' }}
               uses: actions/upload-artifact@v3
@@ -169,7 +171,7 @@ jobs:
                   header_text "Running ${transforms[$index]} workflow test"
                   make -C ${transforms[$index]} workflow-test
                   header_text "Run ${transforms[$index]} completed"
-    push_images:
+    push-images:
         name: Push images with latest tag
         runs-on: ubuntu-latest
         env:
@@ -182,9 +184,12 @@ jobs:
         - name: Download artifact
           uses: actions/download-artifact@v3
           with:
+            path: artifacts/*
             name: images
         - name: Load images
-          run: make -C transforms -C kfp-kfp_ray_componenets docker-load-image
+          run: |
+               make -C transforms docker-load-image
+               make -C kfp-kfp_ray_componenets docker-load-image
         - id: version
           name: Infer version
           run: |
@@ -196,8 +201,6 @@ jobs:
             echo ::set-output name=publish_images::$publish_images
         - name: Publish images
           if: ${{ steps.version.outputs.publish_images == 'true' }}
-          env:
-             USE_LATEST_TAG: 1
 #           run: make -C transforms -C kfp-kfp_ray_componenets publish
           run: echo "make -C transforms -C kfp-kfp_ray_componenets publish"
 
