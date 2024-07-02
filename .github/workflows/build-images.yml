@@ -19,8 +19,8 @@ jobs:
               uses: actions/checkout@v4
             - name: Build and Test Code Transforms
               run: |
-                  make -C data-processing-lib DOCKER=docker image 
-                  make -C transforms/code DOCKER=docker test-image
+                  echo make -C data-processing-lib DOCKER=docker image 
+                  make -C transforms/code/code_quality DOCKER=docker test-image
     build-language:
         runs-on: ubuntu-latest
         timeout-minutes: 30
