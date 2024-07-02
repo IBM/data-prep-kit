@@ -15,8 +15,8 @@ RUN cd python-transform && pip install --no-cache-dir -e .
 #COPY requirements.txt requirements.txt
 #RUN pip install --no-cache-dir -r  requirements.txt
 
-COPY --chown=dpk:root src/ transform/src/
-COPY --chown=dpk:root pyproject.toml transform/pyproject.toml 
+COPY --chown=ray:users src/ transform/src/
+COPY --chown=ray:users pyproject.toml transform/pyproject.toml 
 RUN cd transform && pip install --no-cache-dir -e .
 
 # copy source data
