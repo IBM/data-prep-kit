@@ -8,7 +8,6 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=resize
-DOCKER_IMAGE_VERSION=${RESIZE_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
@@ -34,7 +33,7 @@ setup:: .transforms.setup
 
 # set the version of python transform that this depends on.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${DOCKER_IMAGE_VERSION} .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${RESIZE_PYTHON_VERSION} TOML_VERSION=$(RESIZE_RAY_VERSION) .transforms.set-versions
 
 build-dist:: set-versions .defaults.build-dist
 

@@ -7,8 +7,6 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=profiler
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${PROFILER_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
@@ -25,7 +23,7 @@ setup:: .transforms.setup
 
 # TRANSFORM_PYTHON_VERSION has no effect since requirements do not specify a python transform implementation
 set-versions: 
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${DOCKER_IMAGE_VERSION} .transforms.set-versions 
+	$(MAKE)  TRANSFORM_PYTHON_VERSION=dummy TOML_VERSION=$(PROFILER_RAY_VERSION) .transforms.set-versions 
 
 test-image:: .transforms.ray-test-image
 

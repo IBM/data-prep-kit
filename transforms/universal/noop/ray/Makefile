@@ -8,7 +8,6 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=noop
-DOCKER_IMAGE_VERSION=${NOOP_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 

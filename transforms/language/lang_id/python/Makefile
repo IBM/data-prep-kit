@@ -9,7 +9,6 @@ REPOROOT=../../../..
 
 TRANSFORM_RUNTIME=python
 TRANSFORM_NAME=lang_id
-DOCKER_IMAGE_VERSION=${LANG_ID_PYTHON_VERSION}
 
 include $(REPOROOT)/transforms/.make.transforms
 
@@ -35,7 +34,7 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${LANG_ID_PYTHON_VERSION} TOML_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(LANG_ID_PYTHON_VERSION) TOML_VERSION=$(LANG_ID_PYTHON_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 

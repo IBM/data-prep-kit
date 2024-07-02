@@ -7,8 +7,6 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=doc_id
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${DOC_ID_SPARK_VERSION}
 
 venv::	.transforms.spark-venv
 
@@ -29,7 +27,7 @@ publish: publish-image
 publish-image:: .transforms.publish-image-spark
 
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=dummy TOML_VERSION=$(DOC_ID_SPARK_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 

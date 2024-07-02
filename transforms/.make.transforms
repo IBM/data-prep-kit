@@ -323,9 +323,8 @@ minio-stop:
 # Requires version number of Python image as TRANSFORM_PYTHON_VERSION to be set when called
 # In addition, update Dockerfile with versions
 .transforms.set-versions: 
-	$(call check_defined,DOCKER_IMAGE_VERSION)
 	$(call check_defined, TRANSFORM_PYTHON_VERSION)
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	$(MAKE) .defaults.update-toml
 	if [ -e pyproject.toml ]; then	\
 	    dash_name=$$(echo $(TRANSFORM_NAME) | sed -e 's/_/-/g');		\
 	    cat pyproject.toml | sed 	\

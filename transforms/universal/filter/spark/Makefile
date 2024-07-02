@@ -8,8 +8,6 @@ include $(REPOROOT)/transforms/.make.transforms
 
 # This is included in the image name, if defined
 TRANSFORM_NAME=filter
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${FILTER_SPARK_VERSION}
 
 venv::	.transforms.spark-venv
 
@@ -32,7 +30,7 @@ publish: publish-image
 publish-image:: .transforms.publish-image-spark
 
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOCKER_IMAGE_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=dummy TOML_VERSION=$(FILTER_SPARK_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 

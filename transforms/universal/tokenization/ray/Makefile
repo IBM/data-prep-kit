@@ -7,8 +7,6 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=tokenization
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${TOKENIZATION_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
@@ -31,7 +29,7 @@ publish-image:: .transforms.publish-image-ray
 setup:: .transforms.setup
 
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(TOKENIZATION_PYTHON_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(TOKENIZATION_PYTHON_VERSION) TOML_VERSION=$(TOKENIZATION_RAY_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 

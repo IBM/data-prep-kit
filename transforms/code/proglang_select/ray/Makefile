@@ -7,8 +7,6 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=proglang_select
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${PROGLANG_SELECT_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
@@ -31,7 +29,7 @@ publish: publish-image
 publish-image:: .transforms.publish-image-ray
 
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(PROGLANG_SELECT_PYTHON_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(PROGLANG_SELECT_PYTHON_VERSION) TOML_VERSION=$(PROGLANG_SELECT_RAY_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 
