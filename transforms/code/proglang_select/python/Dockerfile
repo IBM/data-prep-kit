@@ -19,6 +19,7 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 
 COPY --chown=dpk:root src/ transform/src/
 COPY --chown=dpk:root pyproject.toml transform/pyproject.toml 
+RUN cat transform/pyproject.toml
 RUN cd transform && pip install --no-cache-dir -e .
 
 
