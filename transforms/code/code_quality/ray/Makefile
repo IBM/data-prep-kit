@@ -6,6 +6,8 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=code_quality
 
+BASE_IMAGE=${RAY_BASE_IMAGE}
+
 clean:: .transforms.clean
 
 test:: .transforms.ray-test

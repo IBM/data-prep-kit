@@ -46,6 +46,7 @@ DOCKER_LOCAL_IMAGE=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 DOCKER_REMOTE_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 DOCKER_SPARK_BASE_IMAGE_NAME=data-prep-kit-spark-3.5.1
 DOCKER_SPARK_BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
+RAY_BASE_IMAGE?=docker.io/rayproject/ray:${RAY}-py310
 # Deprecated in favor of DOCKER_REMOTE_IMAGE
 DOCKER_IMAGE?=$(DOCKER_REMOTE_IMAGE)
 KIND_CLUSTER_NAME=dataprep
@@ -210,7 +211,7 @@ __check_defined = \
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\
-		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . 
+		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h) . 
 	$(DOCKER) tag $(DOCKER_LOCAL_IMAGE)  $(DOCKER_REMOTE_IMAGE)
 
 # Copy a source tree in LIB_PATH, including src, pyproject.toml to LIB_NAME
@@ -413,7 +414,7 @@ __check_defined = \
 	@# Help: Publish the $(DOCKER_LOCAL_IMAGE) to $(DOCKER_HOSTNAME) container registry
 	-$(DOCKER) logout $(DOCKER_HOSTNAME)
 	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
-	$(DOCKER) push $(DOCKER_REMOTE_IMAGE);
+	$(DOCKER) push $(DOCKER_REMOTE_IMAGE)
 
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
