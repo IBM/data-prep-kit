@@ -188,6 +188,7 @@ __check_defined = \
 	# The following touch seems to be needed to work around a docker build problem in which
 	# it seemed to be using a pyproject from a previously built image.  Specifically, malware's
 	# ray pyproject.toml seemed to be copied into the image instead of the proglang_select python version.
+	# This could not be reproduced locally and was only seen when running as the build-image.yml workflow
 	#if [ -e pyproject.toml ]; then 	\
 	#	cat pyproject.toml;	\
 	#fi
