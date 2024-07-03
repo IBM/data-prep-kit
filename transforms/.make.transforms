@@ -151,12 +151,15 @@ extra-help:
 
 .PHONY: .transforms.python-test-image
 .transforms.python-test-image:: .transforms.python-image .transforms.test-image-help .defaults.test-image-pytest 
+	$(MAKE) clean
 
 .PHONY: .transforms.ray-test-image
 .transforms.ray-test-image:: .transforms.ray-image .transforms.test-image-help .defaults.test-image-pytest 
+	$(MAKE) clean
 
 .PHONY: .transforms.spark-test-image
 .transforms.spark-test-image:: .transforms.spark-image .transforms.test-image-help .defaults.test-image-pytest 
+	$(MAKE) clean
 
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest:: .defaults.test-image-pytest 
