@@ -172,15 +172,15 @@ test-locals:: .transforms.test-locals
 .PHONY: .transforms.test-locals
 .transforms.test-locals:: .defaults.test-locals
 
-# Build the image the transform way and then use the default publishing
+# Publish the image assuming its already built.
 .PHONY: .transforms.publish-image-python
-.transforms.publish-image-python:: .transforms.python-image .defaults.publish-image
+.transforms.publish-image-python:: .defaults.publish-image
 
 .PHONY: .transforms.publish-image-ray
-.transforms.publish-image-ray:: .transforms.ray-image .defaults.publish-image
+.transforms.publish-image-ray:: .defaults.publish-image
 
 .PHONY: .transforms.publish-image-spark
-.transforms.publish-image-spark:: .transforms.spark-image .defaults.publish-image
+.transforms.publish-image-spark:: .defaults.publish-image
 
 .PHONY: .transforms-check-exists
 .transforms-check-exists:
