@@ -23,11 +23,6 @@ COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
-# In some git action builds (only) we've seen pip do this
-# "Successfully uninstalled dpk_code_quality_transform_python-0.2.0"
-# As a workaround, let's just re-install it. 
-#RUN cd python-transform && pip install --no-cache-dir -e .
-
 # copy source data
 COPY ./src/code_quality_transform_ray.py .
 COPY ./src/code_quality_local_ray.py local/
