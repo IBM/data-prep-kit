@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-set -x
-
 if [[ $# != 3 ]]; then
   cat << EOF
 	$1 $2 

@@ -333,5 +333,4 @@ minio-stop:
 	    > tt.toml;			\
 	    mv tt.toml pyproject.toml;	\
 	fi
-	$(REPOROOT)/scripts/transforms/update_dockerfile.sh ${RAY}
 
