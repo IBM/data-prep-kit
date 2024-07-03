@@ -185,6 +185,16 @@ __check_defined = \
 .PHONY: .defaults.image
 .defaults.image:: # Must be called with a DOCKER_IMAGE= settings.
 	@# Help: Create the docker image $(DOCKER_LOCAL_IMAGE) and a tag for $(DOCKER_REMOTE_IMAGE)
+	# The following touch seems to be needed to work around a docker build problem in which
+	# it seemed to be using a pyproject from a previously built image.  Specifically, malware's
+	# ray pyproject.toml seemed to be copied into the image instead of the proglang_select python version.
+	# This could not be reproduced locally and was only seen when running as the build-image.yml workflow
+	#if [ -e pyproject.toml ]; then \
+	#	cat pyproject.toml;	\
+	#fi
+	if [ -e pyproject.toml ]; then 	\
+		touch pyproject.toml;	\
+	fi
 	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE)		\
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
