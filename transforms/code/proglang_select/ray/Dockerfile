@@ -15,9 +15,9 @@ RUN cd python-transform && pip install --no-cache-dir -e .
 #COPY requirements.txt requirements.txt
 #RUN pip install --no-cache-dir -r  requirements.txt
 
-COPY --chown=ray:users src/ transform/src/
-COPY --chown=ray:users pyproject.toml transform/pyproject.toml 
-RUN cd transform && pip install --no-cache-dir -e .
+COPY --chown=ray:users src/ src/
+COPY --chown=ray:users pyproject.toml pyproject.toml 
+RUN pip install --no-cache-dir -e .
 
 # copy source data
 COPY ./src/proglang_select_transform_ray.py .

@@ -19,8 +19,6 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 
 COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
-RUN cat pyproject.toml
-RUN cat data-processing-lib-python/pyproject.toml
 RUN pip install --no-cache-dir -e .
 
 
