@@ -12,7 +12,7 @@ on:
             - "releases/**"
 jobs:
     build-python-lib:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         strategy:
             matrix:
                 python:
@@ -24,7 +24,7 @@ jobs:
               run: |
                   make -C data-processing-lib/python DOCKER=docker venv build
     build-ray-lib:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         strategy:
             matrix:
                 python:
@@ -36,7 +36,7 @@ jobs:
               run: |
                   make -C data-processing-lib/ray DOCKER=docker venv build
     build-spark-lib:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         strategy:
             matrix:
                 python:
