@@ -19,6 +19,8 @@ jobs:
               uses: actions/checkout@v4
             - name: Build and Test Code Transforms
               run: |
+                  sudo rm -rf /usr/share/dotnet
+                  sudo rm -rf "$AGENT_TOOLSDIRECTORY"
                   make -C data-processing-lib DOCKER=docker image 
                   make -C transforms/code DOCKER=docker test-image
     build-language:
@@ -29,6 +31,8 @@ jobs:
               uses: actions/checkout@v4
             - name: Build and Test Language Transforms
               run: |
+                  sudo rm -rf /usr/share/dotnet
+                  sudo rm -rf "$AGENT_TOOLSDIRECTORY"
                   make -C data-processing-lib DOCKER=docker image
                   make -C transforms/language DOCKER=docker test-image
     build-universal:
@@ -39,6 +43,8 @@ jobs:
               uses: actions/checkout@v4
             - name: Build and Test Universal Transforms
               run: |
+                  sudo rm -rf /usr/share/dotnet
+                  sudo rm -rf "$AGENT_TOOLSDIRECTORY"
                   make -C data-processing-lib DOCKER=docker image 
                   make -C transforms/universal DOCKER=docker test-image
     build-tools:
@@ -49,4 +55,6 @@ jobs:
               uses: actions/checkout@v4
             - name: Build and Test Tool images
               run: |
+                  sudo rm -rf /usr/share/dotnet
+                  sudo rm -rf "$AGENT_TOOLSDIRECTORY"
                   make -C tools/ingest2parquet DOCKER=docker test-image
