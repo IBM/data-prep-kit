@@ -204,10 +204,10 @@ jobs:
               run: make -C transforms/code docker-save-image
             - name: Upload images
               if: needs.infer_version.outputs.publish_images == 'true'
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                 name: images-code
-                path: artifacts/*
+                path: artifacts/
                 retention-days: 1
                 compression-level: 0
     test-language-images:
@@ -238,10 +238,10 @@ jobs:
               run: make -C transforms/language docker-save-image
             - name: Upload images
               if: needs.infer_version.outputs.publish_images == 'true'
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                   name: images-language
-                  path: artifacts/*
+                  path: artifacts/
                   compression-level: 0
     test-universal-images:
         needs: [infer_version]
@@ -274,10 +274,10 @@ jobs:
               run: make -C transforms/universal docker-save-image
             - name: Upload images
               if: ${{ needs.infer_version.outputs.publish_images == 'true' }}
-              uses: actions/upload-artifact@v3
+              uses: actions/upload-artifact@v4
               with:
                   name: images-universal
-                  path: artifacts/*
+                  path: artifacts/
                   compression-level: 0
     build-kfp-components:
       needs: [infer_version]
@@ -306,10 +306,10 @@ jobs:
             run: make -C kfp/kfp_ray_components docker-save-image
           - name: Upload images
             if: ${{ needs.infer_version.outputs.publish_images == 'true' }}
-            uses: actions/upload-artifact@v3
+            uses: actions/upload-artifact@v4
             with:
                 name: images-kfp
-                path: artifacts/*
+                path: artifacts/
                 compression-level: 0
     test-tool-images:
         runs-on: ubuntu-22.04
@@ -320,8 +320,8 @@ jobs:
             - name: Build and Test Tool images
               run: |
                   make -C tools/ingest2parquet DOCKER=docker test-image
-    push-images:
-        name: Push images with latest tag
+    push-code-images:
+        name: Push code images with latest tag
         runs-on: ubuntu-22.04
         if: needs.infer_version.outputs.publish_images == 'true'
         env:
@@ -339,21 +339,125 @@ jobs:
                 sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                 sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                 df -h
-        - name: Download artifact
-          uses: actions/download-artifact@v3
+        - name: Download artifacts
+          uses: actions/download-artifact@v4
           with:
             path: artifacts/
-            pattern: images-*
+            pattern: images-code
             merge-multiple: true
         - name: Print artifacts dir
           run: ls -R artifacts/
-        - name: Load code images
+        - name: Load images
           run: |
-               make -C transforms docker-load-image
-               make -C kfp-kfp_ray_componenets docker-load-image
+               make -C transforms/code docker-load-image
         - name: Publish images
           if: needs.infer_version.outputs.publish_images == 'true'
 #           run: make -C transforms -C kfp-kfp_ray_componenets publish
-          run: echo "make -C transforms -C kfp-kfp_ray_componenets publish"
+          run: echo "make -C transforms/code publish"
+    push-universal-images:
+        name: Push universal images with latest tag
+        runs-on: ubuntu-22.04
+        if: needs.infer_version.outputs.publish_images == 'true'
+        env:
+           DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
+           DOCKER_REGISTRY_KEY: ${{ secrets.DOCKER_REGISTRY_KEY }}
+        needs: [infer_version, test-ray-lib, test-spark-lib, test-code, test-language, test-universal, test-tools, test-kfp-v1, test-kfp-v2, test-code-images, test-language-images, test-universal-images, build-kfp-components]
+        steps:
+        - uses: actions/checkout@v3
+        - name: Free up space in github runner
+            # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
+          run: |
+                df -h
+                sudo rm -rf "/usr/local/share/boost"
+                sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+                sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
+                sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
+                df -h
+        - name: Download artifacts
+          uses: actions/download-artifact@v4
+          with:
+            path: artifacts/
+            pattern: images-universal
+            merge-multiple: true
+        - name: Print artifacts dir
+          run: ls -R artifacts/
+        - name: Load images
+          run: |
+               make -C transforms/universal docker-load-image
+        - name: Publish images
+          if: needs.infer_version.outputs.publish_images == 'true'
+#           run: make -C transforms -C kfp-kfp_ray_componenets publish
+          run: echo "make -C transforms/universal publish"
+    push-language-images:
+        name: Push language images with latest tag
+        runs-on: ubuntu-22.04
+        if: needs.infer_version.outputs.publish_images == 'true'
+        env:
+           DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
+           DOCKER_REGISTRY_KEY: ${{ secrets.DOCKER_REGISTRY_KEY }}
+        needs: [infer_version, test-ray-lib, test-spark-lib, test-code, test-language, test-universal, test-tools, test-kfp-v1, test-kfp-v2, test-code-images, test-language-images, test-universal-images, build-kfp-components]
+        steps:
+        - uses: actions/checkout@v3
+        - name: Free up space in github runner
+            # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
+          run: |
+                df -h
+                sudo rm -rf "/usr/local/share/boost"
+                sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+                sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
+                sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
+                df -h
+        - name: Download artifacts
+          uses: actions/download-artifact@v4
+          with:
+            path: artifacts/
+            pattern: images-language
+            merge-multiple: true
+        - name: Print artifacts dir
+          run: ls -R artifacts/
+        - name: Load images
+          run: |
+               make -C transforms/language docker-load-image
+        - name: Publish images
+          if: needs.infer_version.outputs.publish_images == 'true'
+#           run: make -C transforms -C kfp-kfp_ray_componenets publish
+          run: echo "make -C transforms/language publish"
+    push-kfp-images:
+        name: Push kfp images with latest tag
+        runs-on: ubuntu-22.04
+        if: needs.infer_version.outputs.publish_images == 'true'
+        env:
+           DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
+           DOCKER_REGISTRY_KEY: ${{ secrets.DOCKER_REGISTRY_KEY }}
+        needs: [infer_version, test-ray-lib, test-spark-lib, test-code, test-language, test-universal, test-tools, test-kfp-v1, test-kfp-v2, test-code-images, test-language-images, test-universal-images, build-kfp-components]
+        steps:
+        - uses: actions/checkout@v3
+        - name: Free up space in github runner
+            # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
+          run: |
+                df -h
+                sudo rm -rf "/usr/local/share/boost"
+                sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+                sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
+                sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
+                df -h
+        - name: Download artifacts
+          uses: actions/download-artifact@v4
+          with:
+            path: artifacts/
+            pattern: images-kfp
+            merge-multiple: true
+        - name: Print artifacts dir
+          run: ls -R artifacts/
+        - name: Load images
+          run: |
+               make -C kfp/kfp_ray_components docker-load-image
+        - name: Publish images
+          if: needs.infer_version.outputs.publish_images == 'true'
+#           run: make -C transforms -C kfp-kfp_ray_componenets publish
+          run: echo "make -C kfp/kfp_ray_components publish"
+
+
+     
 
 
