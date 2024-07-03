@@ -1,4 +1,4 @@
-# License and Copyright Removal
+# Header cleanser
 Please see the set of
 [transform project conventions](../../../README.md)
 for details on general project conventions, transform configuration,

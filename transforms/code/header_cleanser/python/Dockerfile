@@ -27,7 +27,6 @@ COPY --chown=dpk:root pyproject.toml pyproject.toml
 RUN pip install --no-cache-dir -e .
 
 # copy source data
-COPY ./src/header_cleanser_transform.py .
 COPY ./src/header_cleanser_transform_python.py .
 COPY ./src/header_cleanser_local.py local/
 
