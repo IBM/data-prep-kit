@@ -29,6 +29,8 @@ publish:: publish-dist
 
 publish-dist :: .check-env .defaults.publish-dist 
 
+publish-image:: .defaults.publish-image
+
 venv::  pyproject.toml
 	$(MAKE) .defaults.spark-lib-src-venv
 	pip install pytest pytest-cov 
