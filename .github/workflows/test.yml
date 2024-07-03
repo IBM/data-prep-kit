@@ -19,7 +19,7 @@ jobs:
             - id: version
               run: |
                  publish_images='false'
-                 if  [[ ${GITHUB_REF} != refs/heads/dev && ${GITHUB_REPOSITORY} == IBM/data-prep-kit ]] ;
+                 if  [[ ${GITHUB_REF} != refs/heads/dev && ${GITHUB_EVENT_NAME} != 'pull_request' && ${GITHUB_REPOSITORY} == IBM/data-prep-kit ]] ;
                  then
                    publish_images='true'
                  fi
