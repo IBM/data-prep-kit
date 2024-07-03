@@ -194,7 +194,7 @@ __check_defined = \
 	if [ -e pyproject.toml ]; then 	\
 		touch pyproject.toml;	\
 	fi
-	$(DOCKER) build --no-cache -t $(DOCKER_LOCAL_IMAGE)		\
+	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE)		\
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\
