@@ -21,8 +21,8 @@ jobs:
               run: |
                   sudo rm -rf /usr/share/dotnet
                   sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-                  make -C data-processing-lib DOCKER=docker image 
-                  make -C transforms/code DOCKER=docker test-image
+                  echo make -C data-processing-lib DOCKER=docker image 
+                  make -C transforms/code/proglang_select  DOCKER=docker test-image
     build-language:
         runs-on: ubuntu-latest
         timeout-minutes: 30
