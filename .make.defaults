@@ -187,7 +187,9 @@ __check_defined = \
 	@# Help: Create the docker image $(DOCKER_LOCAL_IMAGE) and a tag for $(DOCKER_REMOTE_IMAGE)
 	if [ -e pyproject.toml ]; then \
 		cat pyproject.toml;\
+		touch pyproject.toml;\
 	fi
+	$(DOCKER) images
 	$(DOCKER) build --no-cache -t $(DOCKER_LOCAL_IMAGE)		\
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
