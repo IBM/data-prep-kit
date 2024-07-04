@@ -22,7 +22,7 @@ jobs:
             KFPv2: ${{ github.event.inputs.kfp_v1 }}
             WORKFLOW_PATH: ${{ github.event.inputs.workflow-path }}
             DEBUG_MODE: ${{ github.event.inputs.debug }}
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4

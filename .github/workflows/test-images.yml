@@ -1,4 +1,4 @@
-name: Build Transform Images
+name: Test Transform Images
 
 on:
     workflow_dispatch:
@@ -11,42 +11,42 @@ on:
             - "dev"
             - "releases/**"
 jobs:
-    build-code:
-        runs-on: ubuntu-latest
+    test-code-images:
+        runs-on: ubuntu-22.04
         timeout-minutes: 30
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Build and Test Code Transforms
+            - name: Test Code Transform Images
               run: |
                   make -C data-processing-lib DOCKER=docker image 
                   make -C transforms/code DOCKER=docker test-image
-    build-language:
-        runs-on: ubuntu-latest
+    test-language-images:
+        runs-on: ubuntu-22.04
         timeout-minutes: 30
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Build and Test Language Transforms
+            - name: Test Language Transform Images
               run: |
                   make -C data-processing-lib DOCKER=docker image
                   make -C transforms/language DOCKER=docker test-image
-    build-universal:
-        runs-on: ubuntu-latest
+    test-universal-images:
+        runs-on: ubuntu-22.04
         timeout-minutes: 30
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Build and Test Universal Transforms
+            - name: Test Universal Transform Images
               run: |
                   make -C data-processing-lib DOCKER=docker image 
                   make -C transforms/universal DOCKER=docker test-image
-    build-tools:
-        runs-on: ubuntu-latest
+    test-tool-images:
+        runs-on: ubuntu-22.04
         timeout-minutes: 30
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Build and Test Tool images
+            - name: Test Tool images
               run: |
                   make -C tools/ingest2parquet DOCKER=docker test-image

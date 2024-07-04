@@ -1,4 +1,4 @@
-name: Test CI
+name: Test Code
 
 on:
     workflow_dispatch:
@@ -12,7 +12,7 @@ on:
             - "releases/**"
 jobs:
     test-make:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
               run: |
                   make -n clean test build publish set-versions
     test-python-lib:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -28,7 +28,7 @@ jobs:
               run: |
                   make -C data-processing-lib/python DOCKER=docker venv test
     test-ray-lib:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
               run: |
                   make -C data-processing-lib/ray DOCKER=docker venv test
     test-spark-lib:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
               run: |
                   make -C data-processing-lib/spark DOCKER=docker venv test
     test-code:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -52,7 +52,7 @@ jobs:
               run: |
                   make -C transforms/code DOCKER=docker venv test-src
     test-language:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -60,7 +60,7 @@ jobs:
               run: |
                   make -C transforms/language DOCKER=docker venv test-src
     test-universal:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -68,7 +68,7 @@ jobs:
               run: |
                   make -C transforms/universal DOCKER=docker venv test-src
     test-tools:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -76,7 +76,7 @@ jobs:
               run: |
                   make -C tools DOCKER=docker venv test
     test-kfp-v1:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -119,7 +119,7 @@ jobs:
                   header_text "Run ${transforms[$index]} completed"
 
     test-kfp-v2:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
