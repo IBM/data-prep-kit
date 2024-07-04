@@ -192,7 +192,7 @@ jobs:
                   df -h
             - name: Test Code Transform Images
               run: |
-                  make -C data-processing-lib DOCKER=docker image 
+                  make -C data-processing-lib/spark DOCKER=docker image 
                   make -C transforms/code DOCKER=docker test-image
             - name: Print space
                # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
@@ -201,7 +201,9 @@ jobs:
                    docker images
             - name: Save images
               if: needs.infer_version.outputs.publish_images == 'true'
-              run: make -C transforms/code docker-save-image
+              run: |
+                   make -C data-processing-lib/spark docker-save-image
+                   make -C transforms/code docker-save-image
             - name: Upload images
               if: needs.infer_version.outputs.publish_images == 'true'
               uses: actions/upload-artifact@v4
@@ -262,7 +264,7 @@ jobs:
                   df -h
             - name: Test Universal Transform Images
               run: |
-                  make -C data-processing-lib DOCKER=docker image 
+                  make -C data-processing-lib/spark DOCKER=docker image 
                   make -C transforms/universal DOCKER=docker test-image
             - name: Print space
                # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
@@ -271,7 +273,8 @@ jobs:
                    docker images
             - name: Save images
               if: ${{ needs.infer_version.outputs.publish_images == 'true' }}
-              run: make -C transforms/universal docker-save-image
+              run: |
+                   make -C transforms/universal docker-save-image
             - name: Upload images
               if: ${{ needs.infer_version.outputs.publish_images == 'true' }}
               uses: actions/upload-artifact@v4
@@ -298,12 +301,15 @@ jobs:
           - name: Build 
             run: |
                make -C kfp/kfp_ray_components DOCKER=docker image
+               make KFPv2=1 -C kfp/kfp_ray_components DOCKER=docker image
           - name: Print space
             # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
             run: df -h
           - name: Save images
             if: ${{ needs.infer_version.outputs.publish_images == 'true' }}
-            run: make -C kfp/kfp_ray_components docker-save-image
+            run: |
+                 make -C kfp/kfp_ray_components docker-save-image
+                 make KFPv2=1 -C kfp/kfp_ray_components docker-save-image
           - name: Upload images
             if: ${{ needs.infer_version.outputs.publish_images == 'true' }}
             uses: actions/upload-artifact@v4
@@ -349,10 +355,10 @@ jobs:
           run: ls -R artifacts/
         - name: Load images
           run: |
+               make -C data-processing-lib/spark/ docker-load-image
                make -C transforms/code docker-load-image
         - name: Publish images
           if: needs.infer_version.outputs.publish_images == 'true'
-#           run: make -C transforms -C kfp-kfp_ray_componenets publish
           run: |
                make -C data-processing-lib/spark/ publish-image
                make -C transforms/code publish
@@ -452,11 +458,7 @@ jobs:
         - name: Load images
           run: |
                make -C kfp/kfp_ray_components docker-load-image
+               make KFPv2=1 -C kfp/kfp_ray_components docker-load-image
         - name: Publish images
           if: needs.infer_version.outputs.publish_images == 'true'
           run: make -C kfp/kfp_ray_components publish
-
-
-     
-
-
