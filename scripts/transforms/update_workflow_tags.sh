@@ -3,7 +3,6 @@ set -euo pipefail
 
 if [[ $# != 3 ]]; then
   cat << EOF
-	$1 $2 
 	"Incorrect number of parameters provided. The required parameters are versions_file, pipeline_path and docker_image_version. 
 EOF
   exit 1

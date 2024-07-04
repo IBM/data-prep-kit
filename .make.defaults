@@ -181,7 +181,7 @@ __check_defined = \
 	-find . -name '*.egg-info' | xargs rm -rf
 	-find . -name '__pycache__' | xargs rm -rf
 	-rm -rf dist
-	-rm -rf $(REPOROOT)/artifacts > /dev/null 2>&1
+	-rm -rf $(ARTIFACTS_DIR) > /dev/null 2>&1
 
 .PHONY: .defaults.docker-save-image
 .defaults.docker-save-image:
