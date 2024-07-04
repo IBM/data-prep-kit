@@ -41,6 +41,10 @@ image-spark:: Dockerfile
 	@# Help: Build the bare Spark image 
 	$(MAKE) .defaults.image
 
+docker-save-image: .defaults.docker-save-image
+
+docker-load-image: .defaults.docker-load-image
+
 #image-dpk:: Dockerfile
 #	@# Help: Build the Spark image containing the data-prep-kit for spark 
 #	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib .defaults.copy-lib
