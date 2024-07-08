@@ -441,6 +441,15 @@ class TestGetOutputLocation(TestInit):
         out_path = self.dal.get_output_location(in_path)
         assert out_path == os.path.join(self.dal.output_folder, "path", "to", "f.parquet")
 
+        path_dict = {
+            "input_folder": os.path.join("..", "input_guf"),
+            "output_folder": os.path.join(os.sep, "tmp", "output_guf"),
+        }
+        dal = DataAccessLocal(path_dict)
+        in_path = os.path.abspath(os.path.join("..", "input_guf", "path", "to", "f.parquet"))
+        out_path = dal.get_output_location(in_path)
+        assert out_path == os.path.join(dal.output_folder, "path", "to", "f.parquet")
+
 
 class TestSavePyarrowTable(TestInit):
 

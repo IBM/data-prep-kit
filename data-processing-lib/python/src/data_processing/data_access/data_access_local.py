@@ -54,8 +54,8 @@ class DataAccessLocal(DataAccess):
             self.input_folder = None
             self.output_folder = None
         else:
-            self.input_folder = local_config["input_folder"]
-            self.output_folder = local_config["output_folder"]
+            self.input_folder = os.path.abspath(local_config["input_folder"])
+            self.output_folder = os.path.abspath(local_config["output_folder"])
         self.d_sets = d_sets
         self.checkpoint = checkpoint
         self.m_files = m_files
