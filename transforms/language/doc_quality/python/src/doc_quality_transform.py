@@ -31,12 +31,9 @@ from doc_Gopher_statistics import (
     contains_common_English_words,
     find_first_japanese_alphabet_position,
 )
-from perplexity import (
-    get_model_file_name,
-    get_tokenizer_file_name,
-    KenLMModel,
-    MODEL_FILE_NAME_SUFFIX,
-    TOKENIZER_FILE_NAME_SUFFIX,
+from perplexity_models import (
+    PerplexityModel,
+    PerplexityModelFactory
 )
 
 logger = get_logger(__name__)
@@ -47,16 +44,21 @@ text_lang_key = "text_lang"
 doc_content_column_key = "doc_content_column"
 doc_id_column_key = "doc_id_column"
 bad_word_filepath_key = "bad_word_filepath"
-kenLM_model_key = "kenLM_model"
+model_class_name_key = "model_class_name"
+model_path_key = "model_path"
+perplex_score_digit_key = "perplex_score_digit"
 text_lang_cli_param = f"{cli_prefix}{text_lang_key}"
 doc_content_column_cli_param = f"{cli_prefix}{doc_content_column_key}"
 doc_id_column_cli_param = f"{cli_prefix}{doc_id_column_key}"
 bad_word_filepath_cli_param = f"{cli_prefix}{bad_word_filepath_key}"
-kenLM_model_cli_param = f"{cli_prefix}{kenLM_model_key}"
+model_path_cli_param = f"{cli_prefix}{model_path_key}"
+model_class_name_cli_param = f"{cli_prefix}{model_class_name_key}"
+perplex_score_digit_cli_param = f"{cli_prefix}{perplex_score_digit_key}"
 
 default_text_lang = "en"
 default_doc_content_column = "contents"
 default_doc_id_column = "documents_id"
+default_perplex_score_digit = 3
 
 data_factory_internal_key = f"{cli_prefix}data_factory"
 files_to_use_internal_key = f"{cli_prefix}files_to_use"
@@ -83,15 +85,20 @@ class DocQualityTransform(AbstractTableTransform):
             raise RuntimeError(f"Missing configuration value for key {bad_word_filepath_key}")
 
         self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=self.bad_word_filepath)
+        self.perplexity_digit = config.get(perplex_score_digit_key, default_perplex_score_digit)
 
-        self.kenLM_model = config.get(kenLM_model_key, None)
-        if self.kenLM_model is None:
-            raise RuntimeError(f"Missing configuration value for key {kenLM_model_key}")
+        model_path = config.get(model_path_key, None)
+        if model_path is None:
+            raise RuntimeError(f"Missing configuration value for key {model_path_key}")
+        model_class_name = config.get(model_class_name_key, None)
+        if model_class_name is None:
+            raise RuntimeError(f"Missing configuration value for key {model_class_name_key}")
         daf = config.get(data_factory_internal_key, None)
-        if os.path.exists(self.kenLM_model):
-            logger.info(f"Load kenLM model found locally")
-            self.klm = KenLMModel.from_pretrained(
-                model_path=self.kenLM_model, language=self.text_lang, strip_accent=True
+        if os.path.exists(model_path):
+            logger.info(f"Load model found locally from {model_path}")
+            self.perplexity_model: PerplexityModel = PerplexityModelFactory.create_model(
+                model_path=model_path,
+                model_class_name=model_class_name
             )
         else:
             logger.info(f"Load kenLM model from remote")
@@ -99,13 +106,16 @@ class DocQualityTransform(AbstractTableTransform):
             import tempfile
             with tempfile.TemporaryDirectory() as temp_dir:
                 # use a temporary directory until model is loaded to memory
-                self._write_locally(data_access, self.kenLM_model, get_model_file_name(self.text_lang), temp_dir)
-                self._write_locally(data_access, self.kenLM_model, get_tokenizer_file_name(self.text_lang), temp_dir)
-                self.klm = KenLMModel.from_pretrained(
-                    model_path=temp_dir, language=self.text_lang, strip_accent=True
+                paths, _, _ = data_access.get_files_to_process_internal(model_path)
+                for path in paths:
+                    self._write_locally(data_access, path, temp_dir)
+                self.perplexity_model: PerplexityModel = PerplexityModelFactory.create_model(
+                    model_path=temp_dir,
+                    model_class_name=model_class_name
                 )
 
-    def _write_locally(self, data_access: DataAccess, path: str, filename: str, temp_dir: str):
+    def _write_locally(self, data_access: DataAccess, path: str, temp_dir: str):
+        filename = os.path.basename(path)
         content = data_access.get_file(os.path.join(path, filename))
         temp_file_path = os.path.join(temp_dir, filename)
         with open(temp_file_path, 'wb') as temp_file:
@@ -163,8 +173,6 @@ class DocQualityTransform(AbstractTableTransform):
 
             docq_contain_common_en_words.append(contains_common_English_words(text, self.text_lang))
 
-            docq_perplex_score.append(self.klm.get_perplexity(text))
-
             if self.text_lang == "ja":
                 docq_avg_ja_sentence_len.append(compute_average_japanese_sentence_length(text))
                 docq_first_ja_alphabet_pos.append(find_first_japanese_alphabet_position(text))
@@ -190,7 +198,12 @@ class DocQualityTransform(AbstractTableTransform):
         table = TransformUtils.add_column(
             table=table, name="docq_contain_common_en_words", content=docq_contain_common_en_words
         )
-        table = TransformUtils.add_column(table=table, name="metakenlm_docq_perplex_score", content=docq_perplex_score)
+
+        table = TransformUtils.add_column(
+            table=table,
+            name="docq_perplex_score",
+            content=self.perplexity_model.get_perplexities(table[self.doc_content_column], self.perplexity_digit)
+        )
 
         if self.text_lang == "ja":
             table = table.append_column("docq_avg_ja_sentence_len", pa.array(docq_avg_ja_sentence_len))
@@ -246,10 +259,22 @@ class DocQualityTransformConfiguration(TransformConfiguration):
             help="path to bad word file: local folder (file or directory) that points to bad word file",
         )
         parser.add_argument(
-            f"--{kenLM_model_cli_param}",
+            f"--{model_path_cli_param}",
             type=str,
             required=True,
-            help="path to kenLM model: path (local or s3) to kenLM model",
+            help="path to model: path (local or s3) to model",
+        )
+        parser.add_argument(
+            f"--{model_class_name_cli_param}",
+            type=str,
+            required=True,
+            help="class name that extends PerplexityModel to use model",
+        )
+        parser.add_argument(
+            f"--{perplex_score_digit_cli_param}",
+            type=int,
+            default=default_perplex_score_digit,
+            help="digit of perplexity score",
         )
         self.daf = DataAccessFactory(cli_prefix, False)
         self.daf.add_input_params(parser)

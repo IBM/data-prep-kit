@@ -48,7 +48,9 @@ def compute_exec_params_func(
     docq_doc_content_column: str,
     docq_doc_id_column: str,
     docq_bad_word_filepath: str,
-    docq_kenlm_model: str,
+    docq_model_path: str,
+    docq_model_class_name: str,
+    docq_perplex_score_digit: int,
 ) -> dict:
     
     from workflow_support.runtime_utils import KFPUtils
@@ -66,7 +68,9 @@ def compute_exec_params_func(
         "docq_doc_content_column": docq_doc_content_column,
         "docq_doc_id_column": docq_doc_id_column,
         "docq_bad_word_filepath": docq_bad_word_filepath,
-        "docq_kenLM_model": docq_kenlm_model,
+        "docq_model_path": docq_model_path,
+        "docq_model_class_name": docq_model_class_name,
+        "docq_perplex_score_digit": docq_perplex_score_digit,
     }
 
 
@@ -128,7 +132,9 @@ def doc_quality(
     docq_doc_content_column: str = "contents",
     docq_doc_id_column: str = "document_id",
     docq_bad_word_filepath: str = "/home/ray/ldnoobw/en",
-    docq_kenLM_model: str = "/home/ray/lm_sp/",
+    docq_model_path: str = "/home/ray/models",
+    docq_model_class_name: str = "TransformerModel",
+    docq_perplex_score_digit: int = -3,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
@@ -167,7 +173,9 @@ def doc_quality(
     :param docq_doc_content_column - column contains document content
     :param docq_doc_id_column - column contains document id
     :param docq_bad_word_filepath - a path to bad word file
-    :param docq_kenLM_model - a path to kenLM model
+    :param docq_model_path - a path to model
+    :param docq_model_class_name - class name of model
+    :param docq_perplex_score_digit - digit of perplexity score
     :return: None
     """
     # create clean_up task
@@ -189,7 +197,9 @@ def doc_quality(
             docq_doc_content_column=docq_doc_content_column,
             docq_doc_id_column=docq_doc_id_column,
             docq_bad_word_filepath=docq_bad_word_filepath,
-            docq_kenlm_model=docq_kenLM_model,
+            docq_model_path=docq_model_path,
+            docq_model_class_name=docq_model_class_name,
+            docq_perplex_score_digit=docq_perplex_score_digit,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster

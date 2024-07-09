@@ -19,7 +19,9 @@ from doc_quality_transform import (
     text_lang_cli_param,
     doc_content_column_cli_param,
     bad_word_filepath_cli_param,
-    kenLM_model_cli_param
+    model_path_cli_param,
+    model_class_name_cli_param,
+    perplex_score_digit_cli_param,
 )
 from doc_quality_transform_ray import (
     DocQualityRayTransformConfiguration,
@@ -56,7 +58,9 @@ params = {
     text_lang_cli_param: "en",
     doc_content_column_cli_param: "contents",
     bad_word_filepath_cli_param: os.path.join(basedir, "ldnoobw", "en"),
-    kenLM_model_cli_param: "lm_sp",
+    model_path_cli_param: "models",
+    model_class_name_cli_param: "TransformerModel",
+    perplex_score_digit_cli_param: 3,
     "docq_s3_cred": ParamsUtils.convert_to_ast(model_s3_cred),
 }
 if __name__ == "__main__":

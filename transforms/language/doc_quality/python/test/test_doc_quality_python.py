@@ -17,7 +17,7 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from doc_quality_transform_python import DocQualityPythonTransformConfiguration
-
+from perplexity_transform_model import TransformerModel
 
 
 
@@ -29,15 +29,17 @@ class TestPythonDocQualityTransform(AbstractTransformLauncherTest):
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        kenLM_model_path=os.path.join(basedir, "lm_sp")
-        if not os.path.exists(kenLM_model_path):
-            kenLM_model_path = os.path.abspath(os.path.join(basedir, "..", "lm_sp"))
+        model_path=os.path.join(basedir, "models")
+        if not os.path.exists(model_path):
+            model_path = os.path.abspath(os.path.join(basedir, "..", "models"))
 
         cli_params = {
             "docq_text_lang": "en",
             "docq_doc_content_column": "contents",
             "docq_bad_word_filepath": os.path.join(basedir, "ldnoobw", "en"),
-            "docq_kenLM_model": kenLM_model_path,
+            "docq_model_path": model_path,
+            "docq_model_class_name": "TransformerModel",
+            "docq_perplex_score_digit": 3,
         }
         basedir = os.path.abspath(os.path.join(basedir, "test-data"))
         fixtures = []

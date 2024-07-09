@@ -18,21 +18,25 @@ from doc_quality_transform import (
     text_lang_key,
     doc_content_column_key,
     bad_word_filepath_key,
-    kenLM_model_key,
+    model_path_key,
+    model_class_name_key,
+    perplex_score_digit_key,
 )
 
 # create parameters
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 input_folder = os.path.join(basedir, "test-data", "input")
-kenLM_model_path=os.path.join(basedir, "lm_sp")
-if not os.path.exists(kenLM_model_path):
-    kenLM_model_path = os.path.abspath(os.path.join(basedir, "..", "lm_sp"))
+model_path=os.path.join(basedir, "models")
+if not os.path.exists(model_path):
+    model_path = os.path.abspath(os.path.join(basedir, "..", "models"))
 
 doc_quality_params = {
     text_lang_key: "en",
     doc_content_column_key: "contents",
     bad_word_filepath_key: os.path.join(basedir, "ldnoobw", "en"),
-    kenLM_model_key: kenLM_model_path,
+    model_path_key: model_path,
+    model_class_name_key: "TransformerModel",
+    perplex_score_digit_key: 3,
 }
 if __name__ == "__main__":
     # Here we show how to run outside of the runtime

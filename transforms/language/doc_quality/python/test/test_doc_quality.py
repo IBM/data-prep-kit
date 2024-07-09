@@ -24,14 +24,16 @@ class TestDocQualityTransform(AbstractTableTransformTest):
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
-        kenLM_model_path = os.path.join(basedir, "lm_sp")
-        if not os.path.exists(kenLM_model_path):
-            kenLM_model_path = os.path.abspath(os.path.join(basedir, "..", "lm_sp"))
+        model_path = os.path.join(basedir, "models")
+        if not os.path.exists(model_path):
+            model_path = os.path.abspath(os.path.join(basedir, "..", "models"))
         config = {
             "text_lang": "en",
             "doc_content_column": "contents",
             "bad_word_filepath": os.path.join(basedir, "ldnoobw", "en"),
-            "kenLM_model": kenLM_model_path,
+            "model_path": model_path,
+            "model_class_name": "TransformerModel",
+            "perplex_score_digit": 3,
         }
         table = pa.Table.from_arrays(
             [
@@ -55,7 +57,7 @@ class TestDocQualityTransform(AbstractTableTransformTest):
                 pa.array([0.0]),
                 pa.array([0.625000]),
                 pa.array([False]),
-                pa.array([6709.1])
+                pa.array([1150.691])
             ],
             names=[
                 "document_id",
@@ -71,7 +73,7 @@ class TestDocQualityTransform(AbstractTableTransformTest):
                 "docq_ellipsis_line_ratio",
                 "docq_alphabet_word_ratio",
                 "docq_contain_common_en_words",
-                "metakenlm_docq_perplex_score",
+                "docq_perplex_score",
             ],
         )
         return [
