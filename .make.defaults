@@ -185,11 +185,13 @@ __check_defined = \
 
 .PHONY: .defaults.docker-save-image
 .defaults.docker-save-image:
+	@# Help: Save docker image as tar file to ${ARTIFACTS_DIR} directory.
 	mkdir -p ${ARTIFACTS_DIR}/
 	docker save -o ${ARTIFACTS_DIR}/${DOCKER_IMAGE_NAME}.tar $(DOCKER_REMOTE_IMAGE)
 
 .PHONY: .defaults.docker-load-image
 .defaults.docker-load-image:
+	@# Help: load docker image from ${ARTIFACTS_DIR} directory.
 	docker load -i ${ARTIFACTS_DIR}/${DOCKER_IMAGE_NAME}.tar
 
 # We create both local and remote tags.  Local seems to be needed when using our spark
