@@ -136,6 +136,7 @@ class ProfilerTransform(AbstractTableTransform):
         :return: resulting table, statistics
         """
         from base_tokenizer import tokenize
+
         # make sure that the doc column exists
         TransformUtils.validate_columns(table=table, required=[self.doc_column])
         # Inner variables

@@ -27,7 +27,7 @@ test-image:: .transforms.spark-test-image
 
 build:: build-dist image
 
-publish:: publish-dist publish-image
+publish: publish-image
 
 publish-image:: .transforms.publish-image-spark
 

@@ -82,32 +82,46 @@ class TestLangIdentificationTransform(AbstractTableTransformTest):
             names=["contents", "ft_lang", "ft_score"],
         )
         invalid_content_column_name_table = pa.Table.from_arrays(
-            [pa.array(["This text won't be processed",])],
+            [
+                pa.array(
+                    [
+                        "This text won't be processed",
+                    ]
+                )
+            ],
             names=["text"],
         )
         invalid_output_lang_column_name_table = pa.Table.from_arrays(
             [
-                pa.array(["This content for lang column test won't be processed",]),
-                pa.array(["en",]),
-                pa.array([1.000])
+                pa.array(
+                    [
+                        "This content for lang column test won't be processed",
+                    ]
+                ),
+                pa.array(
+                    [
+                        "en",
+                    ]
+                ),
+                pa.array([1.000]),
             ],
-            names=[
-                "contents",
-                "lang",
-                "ft_score"
-            ],
+            names=["contents", "lang", "ft_score"],
         )
         invalid_output_score_column_name_table = pa.Table.from_arrays(
             [
-                pa.array(["This content for score column test won't be processed",]),
-                pa.array(["en",]),
-                pa.array([1.000])
+                pa.array(
+                    [
+                        "This content for score column test won't be processed",
+                    ]
+                ),
+                pa.array(
+                    [
+                        "en",
+                    ]
+                ),
+                pa.array([1.000]),
             ],
-            names=[
-                "contents",
-                "ft_lang",
-                "score"
-            ],
+            names=["contents", "ft_lang", "score"],
         )
         return [
             (
@@ -116,7 +130,7 @@ class TestLangIdentificationTransform(AbstractTableTransformTest):
                     table,
                     invalid_content_column_name_table,
                     invalid_output_lang_column_name_table,
-                    invalid_output_score_column_name_table
+                    invalid_output_score_column_name_table,
                 ],
                 [expected_table],
                 [{"de": 1, "es": 1, "fr": 1, "ja": 1, "pt": 1}, {}],
