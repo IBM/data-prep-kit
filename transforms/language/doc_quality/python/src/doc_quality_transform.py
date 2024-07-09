@@ -65,7 +65,7 @@ files_to_use_internal_key = f"{cli_prefix}files_to_use"
 
 class DocQualityTransform(AbstractTableTransform):
     """
-    Implements a simple copy of a pyarrow Table.
+    Implements a transform to calculate document quality.
     """
 
     def __init__(self, config: dict[str, Any]):
