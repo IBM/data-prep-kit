@@ -337,7 +337,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             path = f"{get_snapshot_folder(data_access)}docs"
             files, retries = data_access.get_folder_files(path=path)
             if retries > 0:
-                statistics.add_stats.remote({"data access retries", retries})
+                statistics.add_stats.remote({"data access retries": retries})
             self.logger.info(f"Found the following snapshot files {files.keys()}")
             self.document_collectors = [None] * len(files)
             for file in files.keys():
@@ -376,7 +376,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             path = f"{get_snapshot_folder(data_access)}buckets"
             files, retries = data_access.get_folder_files(path=path)
             if retries > 0:
-                statistics.add_stats.remote({"data access retries", retries})
+                statistics.add_stats.remote({"data access retries": retries})
             self.logger.debug(f"Found the following bucket snapshot files {files.keys()}")
             bucket_collectors = [None] * len(files)
             for file in files.keys():
@@ -390,7 +390,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             path = f"{get_snapshot_folder(data_access)}minhash"
             files, retries = data_access.get_folder_files(path=path)
             if retries > 0:
-                statistics.add_stats.remote({"data access retries", retries})
+                statistics.add_stats.remote({"data access retries": retries})
             self.logger.debug(f"Found the following minhash snapshot files {files.keys()}")
             minhash_collectors = [None] * len(files)
             for file in files.keys():
