@@ -215,7 +215,7 @@ jobs:
             - name: Publish images
               if: needs.check_if_push_images.outputs.publish_images == 'true'
               run: |
-                   make -C data-processing-lib/ publish-image
+                   make -C data-processing-lib/spark publish-image
     test-code-images:
         needs: [check_if_push_images]
         runs-on: ubuntu-22.04
