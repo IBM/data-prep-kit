@@ -80,11 +80,6 @@ class DocQualityTransform(AbstractTableTransform):
         self.text_lang = config.get(text_lang_key, default_text_lang)
         self.doc_content_column = config.get(doc_content_column_key, default_doc_content_column)
         self.doc_id_column = config.get(doc_id_column_key, default_doc_id_column)
-        self.bad_word_filepath = config.get(bad_word_filepath_key, None)
-        if self.bad_word_filepath is None:
-            raise RuntimeError(f"Missing configuration value for key {bad_word_filepath_key}")
-
-        self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=self.bad_word_filepath)
         self.perplexity_digit = config.get(perplex_score_digit_key, default_perplex_score_digit)
 
         model_path = config.get(model_path_key, None)
@@ -114,12 +109,29 @@ class DocQualityTransform(AbstractTableTransform):
                     model_class_name=model_class_name
                 )
 
-    def _write_locally(self, data_access: DataAccess, path: str, temp_dir: str):
+        bad_word_filepath = config.get(bad_word_filepath_key, None)
+        if bad_word_filepath is None:
+            raise RuntimeError(f"Missing configuration value for key {bad_word_filepath_key}")
+        if os.path.exists(bad_word_filepath):
+            logger.info(f"Load badwords found locally from {bad_word_filepath}")
+            self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=bad_word_filepath)
+        else:
+            logger.info(f"Load badwords from remote")
+            data_access = daf.create_data_access()
+            import tempfile
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # use a temporary directory until model is loaded to memory
+                bad_word_filepath = self._write_locally(data_access, bad_word_filepath, temp_dir)
+                self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=bad_word_filepath)
+
+
+    def _write_locally(self, data_access: DataAccess, path: str, temp_dir: str) -> str:
         filename = os.path.basename(path)
         content = data_access.get_file(os.path.join(path, filename))
         temp_file_path = os.path.join(temp_dir, filename)
         with open(temp_file_path, 'wb') as temp_file:
             temp_file.write(content)
+        return temp_file_path
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
