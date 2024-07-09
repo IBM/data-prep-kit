@@ -14,13 +14,13 @@ DOCKER_HOME_DIR=/home/ray
 
 venv::	.transforms.ray-venv
 
-test:: lm_sp .transforms.ray-test
+test:: download_model .transforms.ray-test
 
-clean:: .transforms.clean clean_lm_sp
+clean:: .transforms.clean clean_model
 
-image:: lm_sp .transforms.ray-image
+image:: download_model .transforms.ray-image
 
-test-src:: lm_sp .transforms.test-src
+test-src:: download_model .transforms.test-src
 
 setup:: .transforms.setup
 	@which -s brew
@@ -28,7 +28,7 @@ setup:: .transforms.setup
 		brew install wget; \
 	fi
 
-test-image:: lm_sp .transforms.ray-image .transforms.test-image-help test-image-pytest 
+test-image:: download_model .transforms.ray-image .transforms.test-image-help test-image-pytest 
 
 build:: build-dist image
 
@@ -46,18 +46,18 @@ build-dist:: set-versions .defaults.build-dist
 
 publish-dist:: .defaults.publish-dist
 
-run-cli-sample: lm_sp 
+run-cli-sample: download_model 
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
                 RUN_ARGS=" --run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
                 --docq_text_lang \"en\"	\
 				--docq_doc_content_column \"contents\"	\
 				--docq_bad_word_filepath \"../ldnoobw/en\" \
-				--docq_kenLM_model \"../lm_sp/\" "	\
+				--docq_kenLM_model \"../$(MODEL_DIR)/\" "	\
                 .transforms.run-src-file
 
-run-local-sample: lm_sp .transforms.run-local-ray-sample
+run-local-sample: download_model .transforms.run-local-ray-sample
 
-run-s3-sample: lm_sp .transforms.run-s3-ray-sample
+run-s3-sample: download_model .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 

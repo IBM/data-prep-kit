@@ -19,7 +19,9 @@ from doc_quality_transform import (
     text_lang_cli_param,
     doc_content_column_cli_param,
     bad_word_filepath_cli_param,
-    kenLM_model_cli_param
+    model_path_cli_param,
+    model_class_name_cli_param,
+    perplex_score_digit_cli_param,
 )
 from doc_quality_transform_ray import (
     DocQualityRayTransformConfiguration,
@@ -33,9 +35,9 @@ local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
-kenLM_model_path = os.path.join(basedir, "lm_sp")
-if not os.path.exists(kenLM_model_path):
-    kenLM_model_path = os.path.abspath(os.path.join(basedir, "..", "lm_sp"))
+model_path = os.path.join(basedir, "models")
+if not os.path.exists(model_path):
+    model_path = os.path.abspath(os.path.join(basedir, "..", "models"))
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
@@ -54,7 +56,9 @@ params = {
     text_lang_cli_param: "en",
     doc_content_column_cli_param: "contents",
     bad_word_filepath_cli_param: os.path.join(basedir, "ldnoobw", "en"),
-    kenLM_model_cli_param: kenLM_model_path,
+    model_path_cli_param: model_path,
+    model_class_name_cli_param: "TransformerModel",
+    perplex_score_digit_cli_param: 3,
 }
 if __name__ == "__main__":
     # Set the simulated command line args

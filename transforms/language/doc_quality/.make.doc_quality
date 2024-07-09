@@ -1,23 +1,18 @@
-lm_sp:
+MODEL_NAME=TinyLlama-1.1B-Chat-v0.6
+MODEL_DIR=models
+
+download_model:
 	@# Help: Clone the cc_net repo with the kenlm model and build the model
-	@if [[ ! -d "../cc_net" ]]; then \
+	@if [[ ! -d "../$(MODEL_DIR)" ]]; then \
+	    pip install -U "huggingface_hub[cli]"; \
 		cd ../; \
-		git clone https://github.com/facebookresearch/cc_net; \
-		cd cc_net/; \
-		$(MAKE) lang=en dl_lm; \
-		cd ../; \
-		if [[ -d "cc_net/data/lm_sp" ]]; then \
-			rm -rf lm_sp; \
-			mkdir lm_sp; \
-			cp cc_net/data/lm_sp/* lm_sp; \
-		fi \
+		huggingface-cli download "TinyLlama/$(MODEL_NAME)" --local-dir $(MODEL_DIR); \
 	fi
 
-clean_lm_sp:
-	rm -rf ../cc_net
-	rm -rf ../lm_sp
+clean_model:
+	rm -rf ../$(MODEL_DIR)
 
 test-image-pytest:
 	# Put this 2nd so its help showss up instead of .defaults.image help
 	@# Help: Test $(DOCKER_LOCAL_IMAGE) using test source inside the image. 
-	$(DOCKER) run -t -v $$(dirname ${PWD})/lm_sp:$(DOCKER_HOME_DIR)/lm_sp --rm $(DOCKER_LOCAL_IMAGE) pytest -s test 
+	$(DOCKER) run -t -v $$(dirname ${PWD})/$(MODEL_DIR):$(DOCKER_HOME_DIR)/$(MODEL_DIR) --rm $(DOCKER_LOCAL_IMAGE) pytest -s test 

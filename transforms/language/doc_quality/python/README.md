@@ -28,8 +28,10 @@ configuration for values are as follows:
 * _docq_doc_content_column_ - specifies column name that contains document text.
 * _docq_doc_id_column_ - specifies column name that contains document id.
 * _docq_bad_word_filepath_ - specifies a path to bad word file: local folder (file or directory) that points to bad word file.
-* _docq_kenLM_model_ - specifies a path to kenLM model: local folder (file or directory) that points to kenLM model. If it exists in local file system, model will be loaded from there. If it does not exist, the value specified here will be ignored and try to find model in s3 using _docq_s3_cred_.
+* _docq_model_path_ - specifies a path to model: local folder (file or directory) that points to model. If it exists in local file system, model will be loaded from there. If it does not exist, the value specified here will be ignored and try to find model in s3 using _docq_s3_cred_.
 * _docq_s3_cred_ - AST string of options for cos credentials retrieve kenLM model from s3.
+* _docq_model_class_name_ - specifies a class name that uses model. The class should extend perplexity_models.PerplexityModel.
+* _docq_perplex_score_digit_ - specifies a digit of perplexity score.
 
 ## Running
 
@@ -43,7 +45,9 @@ the [python launcher](../../../../data-processing-lib/doc/python-launcher-option
   --docq_doc_content_column DOCQ_DOC_CONTENT_COLUMN   column name that contain document text
   --docq_doc_id_colum DOCQ_DOC_ID_COLUMN   column name that contains document id
   --docq_bad_word_filepath DOCQ_BAD_WORD_FILEPATH   path to bad word file: local folder (file or directory) that points to bad word file
-  --docq_kenLM_model   path to kenLM model: path (local or s3) to kenLM model
+  --docq_model_path   path to model: path (local or s3) to model
+  --docq_model_class_name   class name that extends PerplexityModel to use model
+  --docq_perplex_score_digit   digit of perplexity score
 ```
 These correspond to the configuration keys described above.
 

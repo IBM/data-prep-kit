@@ -17,13 +17,13 @@ include $(REPOROOT)/transforms/language/doc_quality/.make.doc_quality
 
 venv::	.transforms.python-venv
 
-test:: lm_sp .transforms.python-test
+test:: download_model .transforms.python-test
 
-clean:: .transforms.clean clean_lm_sp
+clean:: .transforms.clean clean_model
 
-image:: lm_sp .transforms.python-image
+image:: download_model .transforms.python-image
 
-test-src:: lm_sp .transforms.test-src
+test-src:: download_model .transforms.test-src
 
 setup:: .transforms.setup
 	which wget
@@ -48,20 +48,20 @@ build-dist:: set-versions .defaults.build-dist
 
 publish-dist:: .defaults.publish-dist
 
-test-image:: lm_sp .transforms.python-image .transforms.test-image-help test-image-pytest 
+test-image:: download_model .transforms.python-image .transforms.test-image-help test-image-pytest 
 
-run-cli-sample: lm_sp
+run-cli-sample: download_model
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_python.py \
                 RUN_ARGS=" --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
                 --docq_text_lang \"en\"	\
 				--docq_doc_content_column \"contents\"	\
 				--docq_bad_word_filepath \"../ldnoobw/en\" \
-				--docq_kenLM_model \"../../lm_sp/\" "	\
+				--docq_kenLM_model \"../../$(MODEL_DIR)/\" "	\
                 .transforms.run-src-file
 
-run-local-sample: lm_sp .transforms.run-local-sample
+run-local-sample: download_model .transforms.run-local-sample
 
-run-local-python-sample: lm_sp .transforms.run-local-python-sample
+run-local-python-sample: download_model .transforms.run-local-python-sample
 
 #run-s3-ray-sample: .transforms.run-s3-ray-sample
 
