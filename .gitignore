@@ -142,3 +142,6 @@ dmypy.json
 
 # Ignore VSCode folder
 .vscode/
+
+# Ignore artifacts directory created by the `make save-images` target
+artifacts/
