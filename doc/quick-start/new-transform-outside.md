@@ -37,9 +37,9 @@ pip install -r requirements.txt
 ```
 
 ### Create python transform
-We create 3 classes
-1. `HelloTransform` class - implements the table transformation
-2. `HelloTransformConfiguration` class - defines CLI arguments to configure HelloTransform
+We create the following classes
+1. `HelloTransform` - implements the table transformation
+2. `HelloTransformConfiguration` - defines CLI arguments to configure HelloTransform
 
 ```python
 from typing import Any
