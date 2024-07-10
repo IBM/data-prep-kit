@@ -36,7 +36,7 @@ doc_quality_params = {
     bad_word_filepath_key: os.path.join(basedir, "ldnoobw", "en"),
     model_path_key: model_path,
     model_class_name_key: "TransformerModel",
-    perplex_score_digit_key: 3,
+    perplex_score_digit_key: 1,
 }
 if __name__ == "__main__":
     # Here we show how to run outside of the runtime

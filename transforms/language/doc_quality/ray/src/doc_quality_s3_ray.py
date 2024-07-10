@@ -65,7 +65,7 @@ params = {
     bad_word_filepath_cli_param: os.path.join(basedir, "ldnoobw", "en"),
     model_path_cli_param: model_path,
     model_class_name_cli_param: "TransformerModel",
-    perplex_score_digit_cli_param: 3,
+    perplex_score_digit_cli_param: 1,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 # for arg in sys.argv:
