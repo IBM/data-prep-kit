@@ -48,7 +48,7 @@ run-cli-sample: download_model
 				--docq_doc_content_column \"contents\"	\
 				--docq_bad_word_filepath \"../ldnoobw/en\" \
 				--docq_model_path \"../../$(MODEL_DIR)/\"	\
-				--docq_model_class_name \"TransformerModel\"	\
+				--docq_model_module_name \"perplexity_transform_model\"	\
 				--docq_perplex_score_digit \"1\"	\
                 .transforms.run-src-file
 

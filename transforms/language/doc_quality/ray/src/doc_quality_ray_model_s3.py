@@ -20,7 +20,7 @@ from doc_quality_transform import (
     doc_content_column_cli_param,
     bad_word_filepath_cli_param,
     model_path_cli_param,
-    model_class_name_cli_param,
+    model_module_name_cli_param,
     perplex_score_digit_cli_param,
 )
 from doc_quality_transform_ray import (
@@ -59,7 +59,7 @@ params = {
     doc_content_column_cli_param: "contents",
     bad_word_filepath_cli_param: os.path.join(basedir, "ldnoobw", "en"),
     model_path_cli_param: "models",
-    model_class_name_cli_param: "TransformerModel",
+    model_module_name_cli_param: "perplexity_transform_model",
     perplex_score_digit_cli_param: 1,
     "docq_s3_cred": ParamsUtils.convert_to_ast(model_s3_cred),
 }

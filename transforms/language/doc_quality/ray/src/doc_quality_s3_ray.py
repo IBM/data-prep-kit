@@ -20,7 +20,7 @@ from doc_quality_transform import (
     doc_content_column_cli_param,
     bad_word_filepath_cli_param,
     model_path_cli_param,
-    model_class_name_cli_param,
+    model_module_name_cli_param,
     perplex_score_digit_cli_param,
 )
 from doc_quality_transform_ray import (
@@ -28,8 +28,6 @@ from doc_quality_transform_ray import (
 )
 
 print(os.environ)
-# create launcher
-launcher = RayTransformLauncher(DocQualityRayTransformConfiguration())
 # create parameters
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 s3_cred = {
@@ -64,12 +62,16 @@ params = {
     doc_content_column_cli_param: "contents",
     bad_word_filepath_cli_param: os.path.join(basedir, "ldnoobw", "en"),
     model_path_cli_param: model_path,
-    model_class_name_cli_param: "TransformerModel",
+    model_module_name_cli_param: "perplexity_transform_model",
     perplex_score_digit_cli_param: 1,
 }
-sys.argv = ParamsUtils.dict_to_req(d=params)
 # for arg in sys.argv:
 #     print(arg)
 
-# launch
-launcher.launch()
+if __name__ == "__main__":
+    # Set the simulated command line args
+    sys.argv = ParamsUtils.dict_to_req(d=params)
+    # create launcher
+    launcher = RayTransformLauncher(DocQualityRayTransformConfiguration())
+    # Launch the ray actor(s) to process the input
+    launcher.launch()

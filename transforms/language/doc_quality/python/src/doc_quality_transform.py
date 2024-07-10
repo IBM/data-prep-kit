@@ -45,7 +45,7 @@ text_lang_key = "text_lang"
 doc_content_column_key = "doc_content_column"
 doc_id_column_key = "doc_id_column"
 bad_word_filepath_key = "bad_word_filepath"
-model_class_name_key = "model_class_name"
+model_module_name_key = "model_module_name"
 model_path_key = "model_path"
 perplex_score_digit_key = "perplex_score_digit"
 text_lang_cli_param = f"{cli_prefix}{text_lang_key}"
@@ -53,7 +53,7 @@ doc_content_column_cli_param = f"{cli_prefix}{doc_content_column_key}"
 doc_id_column_cli_param = f"{cli_prefix}{doc_id_column_key}"
 bad_word_filepath_cli_param = f"{cli_prefix}{bad_word_filepath_key}"
 model_path_cli_param = f"{cli_prefix}{model_path_key}"
-model_class_name_cli_param = f"{cli_prefix}{model_class_name_key}"
+model_module_name_cli_param = f"{cli_prefix}{model_module_name_key}"
 perplex_score_digit_cli_param = f"{cli_prefix}{perplex_score_digit_key}"
 
 default_text_lang = "en"
@@ -86,9 +86,9 @@ class DocQualityTransform(AbstractTableTransform):
         self.model_path = config.get(model_path_key, None)
         if self.model_path is None:
             raise RuntimeError(f"Missing configuration value for key {model_path_key}")
-        self.model_class_name = config.get(model_class_name_key, None)
-        if self.model_class_name is None:
-            raise RuntimeError(f"Missing configuration value for key {model_class_name_key}")
+        self.model_module_name = config.get(model_module_name_key, None)
+        if self.model_module_name is None:
+            raise RuntimeError(f"Missing configuration value for key {model_module_name_key}")
         self.daf = config.get(data_factory_internal_key, None)
         bad_word_filepath = config.get(bad_word_filepath_key, None)
         if bad_word_filepath is None:
@@ -117,14 +117,13 @@ class DocQualityTransform(AbstractTableTransform):
     model_cache = weakref.WeakValueDictionary()
 
     @classmethod
-    def get_model(cls, model_path, model_class_name, daf) -> PerplexityModel:
+    def get_model(cls, model_path, model_module_name, daf) -> PerplexityModel:
         if model_path not in cls.model_cache:
-            print(model_path)
             if os.path.exists(model_path):
                 logger.info(f"Load model found locally from {model_path}")
                 model = PerplexityModelFactory.create_model(
                     model_path=model_path,
-                    model_class_name=model_class_name
+                    model_module_name=model_module_name
                 )
             else:
                 logger.info(f"Load model from remote")
@@ -137,7 +136,7 @@ class DocQualityTransform(AbstractTableTransform):
                         cls._write_locally(data_access, path, temp_dir)
                     model = PerplexityModelFactory.create_model(
                         model_path=temp_dir,
-                        model_class_name=model_class_name
+                        model_module_name=model_module_name
                     )
             cls.model_cache[model_path] = model
         return cls.model_cache[model_path]
@@ -221,7 +220,7 @@ class DocQualityTransform(AbstractTableTransform):
             table=table, name="docq_contain_common_en_words", content=docq_contain_common_en_words
         )
 
-        self.perplexity_model = DocQualityTransform.get_model(self.model_path, self.model_class_name, self.daf)
+        self.perplexity_model = DocQualityTransform.get_model(self.model_path, self.model_module_name, self.daf)
         table = TransformUtils.add_column(
             table=table,
             name="docq_perplex_score",
@@ -288,10 +287,10 @@ class DocQualityTransformConfiguration(TransformConfiguration):
             help="path to model: path (local or s3) to model",
         )
         parser.add_argument(
-            f"--{model_class_name_cli_param}",
+            f"--{model_module_name_cli_param}",
             type=str,
             required=True,
-            help="class name that extends PerplexityModel to use model",
+            help="module name that has subclass of PerplexityModel to use",
         )
         parser.add_argument(
             f"--{perplex_score_digit_cli_param}",
