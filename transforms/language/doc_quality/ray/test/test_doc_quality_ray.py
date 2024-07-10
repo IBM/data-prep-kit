@@ -36,7 +36,7 @@ class TestRayDocQualityTransform(AbstractTransformLauncherTest):
             "docq_bad_word_filepath": os.path.join(basedir, "ldnoobw", "en"),
             "docq_model_path":model_path,
             "docq_model_class_name": "TransformerModel",
-            "perplex_score_digit": 1,
+            "docq_perplex_score_digit": 1,
             "run_locally": True
         }
         basedir = os.path.abspath(os.path.join(basedir, "test-data"))
