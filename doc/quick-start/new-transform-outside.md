@@ -126,16 +126,16 @@ if __name__ == "__main__":
 
 ### Running 
 In the following `parquet-tools` will be helpful here.  Install with 
-```
-source venv/bin/activate
-pip install parquet-tools
+```shell
+% source venv/bin/activate
+(venv) % pip install parquet-tools
 ```
 Now run the above, we will use a single parquet file in a directory named `input`.
 ```shell
 source venv/bin/activate
-% ls input
+(venv) % ls input
 test1.parquet
-% parquet-tools show input/test1.parquet
+(venv) % parquet-tools show input/test1.parquet
 +-----------------------------------+
 | title                             |
 |-----------------------------------|
