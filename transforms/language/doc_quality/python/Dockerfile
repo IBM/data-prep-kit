@@ -17,21 +17,9 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 
 # END OF STEPS destined for a data-prep-kit base image 
 
-# set up environment required to install kenlm 
-USER root
-RUN apt update && apt install -y software-properties-common build-essential
-USER dpk
-
 COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
-
-# clean up apt
-# USER root 
-# RUN apt-get remove gcc g++ -y \
-#     && apt clean \
-#     && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
-# USER dpk
 
 # copy source data
 COPY ./src/doc_quality_transform_python.py .
