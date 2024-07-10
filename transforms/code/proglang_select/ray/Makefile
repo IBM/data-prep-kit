@@ -7,9 +7,8 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=proglang_select
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${PROGLANG_SELECT_RAY_VERSION}
 
+BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
 
 test::	.transforms.ray-test
@@ -31,7 +30,7 @@ publish: publish-image
 publish-image:: .transforms.publish-image-ray
 
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(PROGLANG_SELECT_PYTHON_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(PROGLANG_SELECT_PYTHON_VERSION) TOML_VERSION=$(PROGLANG_SELECT_RAY_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 
@@ -54,4 +53,8 @@ run-local-ray-sample: .transforms.run-local-ray-sample
 
 minio-start:	.minio-start
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image
