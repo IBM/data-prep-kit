@@ -12,12 +12,12 @@ TRANSFORM_NAME=doc_quality
 DOCKER_IMAGE_VERSION=${DOC_QUALITY_PYTHON_VERSION}
 DOCKER_HOME_DIR=/home/dpk
 
-include $(REPOROOT)/transforms/.make.transforms
 include $(REPOROOT)/transforms/language/doc_quality/.make.doc_quality
+include $(REPOROOT)/transforms/.make.transforms
 
 venv::	.transforms.python-venv
 
-test:: download_model .transforms.python-test
+test:: download_model .transforms.test-src test-image
 
 clean:: .transforms.clean clean_model
 

@@ -4,8 +4,8 @@ REPOROOT=../../../..
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
-include $(REPOROOT)/transforms/.make.transforms
 include $(REPOROOT)/transforms/language/doc_quality/.make.doc_quality
+include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=doc_quality
 # $(REPOROOT)/.make.versions file contains the versions
@@ -14,7 +14,7 @@ DOCKER_HOME_DIR=/home/ray
 
 venv::	.transforms.ray-venv
 
-test:: download_model .transforms.ray-test
+test:: download_model .transforms.test-src test-image
 
 clean:: .transforms.clean clean_model
 
