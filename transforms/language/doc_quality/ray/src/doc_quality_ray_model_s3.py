@@ -59,7 +59,7 @@ params = {
     doc_content_column_cli_param: "contents",
     bad_word_filepath_cli_param: os.path.join(basedir, "ldnoobw", "en"),
     model_path_cli_param: "models",
-    model_module_name_cli_param: "perplexity_transform_model",
+    model_module_name_cli_param: "perplexity_transformer_model",
     perplex_score_digit_cli_param: 1,
     "docq_s3_cred": ParamsUtils.convert_to_ast(model_s3_cred),
 }

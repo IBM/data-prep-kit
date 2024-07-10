@@ -35,7 +35,7 @@ class TestRayDocQualityTransform(AbstractTransformLauncherTest):
             "docq_doc_content_column": "contents",
             "docq_bad_word_filepath": os.path.join(basedir, "ldnoobw", "en"),
             "docq_model_path":model_path,
-            "docq_model_module_name": "perplexity_transform_model",
+            "docq_model_module_name": "perplexity_transformer_model",
             "docq_perplex_score_digit": 1,
             "run_locally": True
         }

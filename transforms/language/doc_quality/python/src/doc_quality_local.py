@@ -35,7 +35,7 @@ doc_quality_params = {
     doc_content_column_key: "contents",
     bad_word_filepath_key: os.path.join(basedir, "ldnoobw", "en"),
     model_path_key: model_path,
-    model_module_name_key: "perplexity_transform_model",
+    model_module_name_key: "perplexity_transformer_model",
     perplex_score_digit_key: 1,
 }
 if __name__ == "__main__":
