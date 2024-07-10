@@ -1,7 +1,7 @@
-REPOROOT=../
+REPOROOT=../../..
 # Use make help, to see the available rules
 
-include ../.make.defaults
+include $(REPOROOT)/.make.defaults
 
 clean:: .defaults.clean
 

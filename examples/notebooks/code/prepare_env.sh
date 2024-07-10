@@ -1,7 +1,7 @@
 
 
 # Set REPOROOT
-REPO_ROOT=$(cd ../ && pwd && cd - > /dev/null )
+REPO_ROOT=$(cd ../../../ && pwd && cd - > /dev/null )
 echo $REPO_ROOT
 
 pip install jupyter 
