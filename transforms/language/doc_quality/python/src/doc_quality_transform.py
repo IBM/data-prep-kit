@@ -15,7 +15,6 @@ from typing import Any
 
 import os
 import pyarrow as pa
-import weakref
 from data_processing.data_access import DataAccessFactory, DataAccess
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
@@ -83,13 +82,32 @@ class DocQualityTransform(AbstractTableTransform):
         self.doc_id_column = config.get(doc_id_column_key, default_doc_id_column)
         self.perplexity_digit = config.get(perplex_score_digit_key, default_perplex_score_digit)
 
-        self.model_path = config.get(model_path_key, None)
-        if self.model_path is None:
+        daf = config.get(data_factory_internal_key, None)
+        model_path = config.get(model_path_key, None)
+        if model_path is None:
             raise RuntimeError(f"Missing configuration value for key {model_path_key}")
-        self.model_module_name = config.get(model_module_name_key, None)
-        if self.model_module_name is None:
+        model_module_name = config.get(model_module_name_key, None)
+        if model_module_name is None:
             raise RuntimeError(f"Missing configuration value for key {model_module_name_key}")
-        self.daf = config.get(data_factory_internal_key, None)
+        if os.path.exists(model_path):
+            logger.info(f"Load model found locally from {model_path}")
+            self.perplexity_model = PerplexityModelFactory.create_model(
+                model_path=model_path,
+                model_module_name=model_module_name
+            )
+        else:
+            logger.info(f"Load model from remote")
+            data_access = daf.create_data_access()
+            import tempfile
+            with tempfile.TemporaryDirectory() as temp_dir:
+                # use a temporary directory until model is loaded to memory
+                paths, _, _ = data_access.get_files_to_process_internal(model_path)
+                for path in paths:
+                    self._write_locally(data_access, path, temp_dir)
+                self.perplexity_model = PerplexityModelFactory.create_model(
+                    model_path=temp_dir,
+                    model_module_name=model_module_name
+                )
         bad_word_filepath = config.get(bad_word_filepath_key, None)
         if bad_word_filepath is None:
             raise RuntimeError(f"Missing configuration value for key {bad_word_filepath_key}")
@@ -102,45 +120,16 @@ class DocQualityTransform(AbstractTableTransform):
             import tempfile
             with tempfile.TemporaryDirectory() as temp_dir:
                 # use a temporary directory until model is loaded to memory
-                bad_word_filepath = DocQualityTransform._write_locally(data_access, bad_word_filepath, temp_dir)
+                bad_word_filepath = self._write_locally(data_access, bad_word_filepath, temp_dir)
                 self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=bad_word_filepath)
 
-    @classmethod
-    def _write_locally(cls, data_access: DataAccess, path: str, temp_dir: str) -> str:
+    def _write_locally(self, data_access: DataAccess, path: str, temp_dir: str) -> str:
         filename = os.path.basename(path)
         content = data_access.get_file(os.path.join(path, filename))
         temp_file_path = os.path.join(temp_dir, filename)
         with open(temp_file_path, 'wb') as temp_file:
             temp_file.write(content)
         return temp_file_path
-    
-    model_cache = weakref.WeakValueDictionary()
-
-    @classmethod
-    def get_model(cls, model_path, model_module_name, daf) -> PerplexityModel:
-        if model_path not in cls.model_cache:
-            if os.path.exists(model_path):
-                logger.info(f"Load model found locally from {model_path}")
-                model = PerplexityModelFactory.create_model(
-                    model_path=model_path,
-                    model_module_name=model_module_name
-                )
-            else:
-                logger.info(f"Load model from remote")
-                data_access = daf.create_data_access()
-                import tempfile
-                with tempfile.TemporaryDirectory() as temp_dir:
-                    # use a temporary directory until model is loaded to memory
-                    paths, _, _ = data_access.get_files_to_process_internal(model_path)
-                    for path in paths:
-                        cls._write_locally(data_access, path, temp_dir)
-                    model = PerplexityModelFactory.create_model(
-                        model_path=temp_dir,
-                        model_module_name=model_module_name
-                    )
-            cls.model_cache[model_path] = model
-        return cls.model_cache[model_path]
-
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -219,8 +208,6 @@ class DocQualityTransform(AbstractTableTransform):
         table = TransformUtils.add_column(
             table=table, name="docq_contain_common_en_words", content=docq_contain_common_en_words
         )
-
-        self.perplexity_model = DocQualityTransform.get_model(self.model_path, self.model_module_name, self.daf)
         table = TransformUtils.add_column(
             table=table,
             name="docq_perplex_score",
