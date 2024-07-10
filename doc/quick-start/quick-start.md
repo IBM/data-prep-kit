@@ -3,10 +3,11 @@ Here we provided short examples of various uses of the Data Prep Kit.
 
 ## Running transforms 
 
-* [Notebooks](../examples/notebooks/README.md) - show Multi-stage local data processing
-* Single transform local data processing
-    * [Using a docker image]() - runs on local data using a docker transform image 
-    * [Using a virtual environment]() - runs a transform locally to transform local data 
+* Notebooks
+    * [Various](../../examples/notebooks/README.md) - many notebook examples for code and language
+* Command line  
+    * [Using a docker image](run-transform-image.md) - runs a transform in a docker transform image 
+    * [Using a virtual environment](run-transform-venv.md) - runs a transform on the local host 
     
 ## Creating transforms
 

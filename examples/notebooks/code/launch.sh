@@ -1,5 +1,5 @@
 # Set REPOROOÞ
-REPO_ROOT=$(cd ../ && pwd && cd - > /dev/null )
+REPO_ROOT=$(cd ../../../ && pwd && cd - > /dev/null )
 echo $REPO_ROOT
 
 
