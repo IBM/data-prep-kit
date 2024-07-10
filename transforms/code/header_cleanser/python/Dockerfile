@@ -15,6 +15,9 @@ RUN useradd -ms /bin/bash dpk
 USER dpk
 WORKDIR /home/dpk
 
+# Create directories to mount volumnes for processing data outside of the image.
+RUN mkdir input && mkdir output
+
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
 COPY --chown=dpk:root data-processing-lib-python/ data-processing-lib-python/
