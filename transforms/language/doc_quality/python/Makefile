@@ -26,13 +26,6 @@ image:: download_model .transforms.python-image
 test-src:: download_model .transforms.test-src
 
 setup:: .transforms.setup
-	which wget
-	if [[ $$? == 1 ]]; then \
-		which brew; \
-		if [[ $$? == 0 ]]; then \
-			brew install wget; \
-		fi \
-	fi
 
 build:: build-dist image
 

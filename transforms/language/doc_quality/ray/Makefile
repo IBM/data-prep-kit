@@ -23,10 +23,6 @@ image:: download_model .transforms.ray-image
 test-src:: download_model .transforms.test-src
 
 setup:: .transforms.setup
-	@which -s brew
-	@if [[ $? == 0 ]]; then \
-		brew install wget; \
-	fi
 
 test-image:: download_model .transforms.ray-image .transforms.test-image-help test-image-pytest 
 
