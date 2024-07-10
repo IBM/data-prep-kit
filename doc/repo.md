@@ -1,6 +1,29 @@
 # Repository Structure and Use 
 
 Here we discuss the structure, use and approach to code management in the repo.
+# Setup
+
+There are various entry points that you can choose based on the use case. Each entry point has its pre-requirements and setup steps.
+The common part of are:
+#### Prerequisites
+- Python 3.10 or 3.11 
+-Docker/Podman
+
+Two important development tools will also be installed using the steps below:
+- [pre-commit](https://pre-commit.com/)
+- [twine](https://twine.readthedocs.io/en/stable/) 
+
+#### Installation Steps
+```shell
+pip install pre-commit
+pip install twine
+...
+git clone git@github.com:IBM/data-prep-kit.git
+cd data-prep-kit
+pre-commit install
+```
+Please note that there are further installation steps for running the transforms in general, as documented [here](data-processing-lib/ray/README.md) and on a local Kind cluster or on an existing Kubernetes cluster, as documented [here](kfp/doc/setup.md).
+
 
 # Repository structure
 * data_processing_lib - provides the core transform framework and library 
