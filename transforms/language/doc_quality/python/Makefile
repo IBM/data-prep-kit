@@ -9,7 +9,6 @@ REPOROOT=../../../..
 
 TRANSFORM_RUNTIME=python
 TRANSFORM_NAME=doc_quality
-DOCKER_IMAGE_VERSION=${DOC_QUALITY_PYTHON_VERSION}
 DOCKER_HOME_DIR=/home/dpk
 
 include $(REPOROOT)/transforms/language/doc_quality/.make.doc_quality
@@ -35,7 +34,7 @@ publish-image:: .transforms.publish-image-python
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOC_QUALITY_PYTHON_VERSION) TOML_VERSION=$(DOC_QUALITY_PYTHON_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 
