@@ -9,7 +9,6 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=doc_quality
 # $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${DOC_QUALITY_RAY_VERSION}
 DOCKER_HOME_DIR=/home/ray
 
 venv::	.transforms.ray-venv
@@ -35,8 +34,8 @@ publish-image:: .transforms.publish-image-ray
 setup:: .transforms.setup
 
 # set the version of python transform that this depends on.
-set-versions: 
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOC_QUALITY_PYTHON_VERSION) .transforms.set-versions 
+set-versions:
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOC_QUALITY_PYTHON_VERSION) TOML_VERSION=$(DOC_QUALITY_PYTHON_VERSION) .transforms.set-versions	
         
 build-dist:: set-versions .defaults.build-dist 
 
