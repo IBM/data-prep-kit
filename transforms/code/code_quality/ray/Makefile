@@ -5,8 +5,8 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=code_quality
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${CODE_QUALITY_RAY_VERSION}
+
+BASE_IMAGE=${RAY_BASE_IMAGE}
 
 clean:: .transforms.clean
 
@@ -29,7 +29,7 @@ publish-image:: .transforms.publish-image-ray
 setup:: .transforms.setup
 
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(CODE_QUALITY_PYTHON_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(CODE_QUALITY_PYTHON_VERSION) TOML_VERSION=$(CODE_QUALITY_RAY_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 
@@ -43,4 +43,8 @@ run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image
