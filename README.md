@@ -151,7 +151,7 @@ Get started by running the "noop" transform that performs an identity operation 
 [noop implementation](transforms/universal/noop). 
 
 ### Run a Jupyter notebook on Local Ray cluster
-Get started by building a Jupiter notebook executing a sequence of Transforms with our  [example pipeline](./examples/) 
+Get started by building a Jupiter notebook executing a sequence of Transforms with our  [example pipelines](./examples/notebooks) 
 that can run on your machine. This implementation can also be extended to connect to the remote Ray cluster.
 
 ### Automate a Pipeline
