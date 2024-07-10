@@ -51,7 +51,7 @@ params = {
     bad_word_filepath_cli_param: os.path.join(basedir, "ldnoobw", "en"),
     model_path_cli_param: model_path,
     model_class_name_cli_param: "TransformerModel",
-    perplex_score_digit_cli_param: 3,
+    perplex_score_digit_cli_param: 1,
 }
 if __name__ == "__main__":
     # Set the simulated command line args

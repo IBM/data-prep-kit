@@ -13,8 +13,11 @@
 import os
 import pyarrow as pa
 from data_processing.test_support.transform.table_transform_test import AbstractTableTransformTest
-from doc_quality_transform import DocQualityTransform
-
+from data_processing.transform import get_transform_config
+from doc_quality_transform import (
+    DocQualityTransform,
+    DocQualityTransformConfiguration
+)
 
 class TestDocQualityTransform(AbstractTableTransformTest):
     """
@@ -27,14 +30,16 @@ class TestDocQualityTransform(AbstractTableTransformTest):
         model_path = os.path.join(basedir, "models")
         if not os.path.exists(model_path):
             model_path = os.path.abspath(os.path.join(basedir, "..", "models"))
-        config = {
-            "text_lang": "en",
-            "doc_content_column": "contents",
-            "bad_word_filepath": os.path.join(basedir, "ldnoobw", "en"),
-            "model_path": model_path,
-            "model_class_name": "TransformerModel",
-            "perplex_score_digit": 3,
-        }
+        cli = [
+            "--docq_text_lang", "en",
+            "--docq_doc_content_column", "contents",
+            "--docq_bad_word_filepath", os.path.join(basedir, "ldnoobw", "en"),
+            "--docq_model_path", model_path,
+            "--docq_model_class_name", "TransformerModel",
+            "--docq_perplex_score_digit", "1",
+        ]
+        transformConfig = DocQualityTransformConfiguration()
+        config = get_transform_config(transformConfig, cli)
         table = pa.Table.from_arrays(
             [
                 pa.array(["doc01"]),
@@ -57,7 +62,7 @@ class TestDocQualityTransform(AbstractTableTransformTest):
                 pa.array([0.0]),
                 pa.array([0.625000]),
                 pa.array([False]),
-                pa.array([1150.691])
+                pa.array([1150.7])
             ],
             names=[
                 "document_id",

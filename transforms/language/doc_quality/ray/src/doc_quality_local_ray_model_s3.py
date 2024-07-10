@@ -60,7 +60,7 @@ params = {
     bad_word_filepath_cli_param: os.path.join(basedir, "ldnoobw", "en"),
     model_path_cli_param: "models",
     model_class_name_cli_param: "TransformerModel",
-    perplex_score_digit_cli_param: 3,
+    perplex_score_digit_cli_param: 1,
     "docq_s3_cred": ParamsUtils.convert_to_ast(model_s3_cred),
 }
 if __name__ == "__main__":
