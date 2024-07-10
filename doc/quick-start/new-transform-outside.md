@@ -61,17 +61,9 @@ class HelloTransform(AbstractTableTransform):
         # Append the column to create a new table with the configured name.
         table = TransformUtils.add_column(table=table, name=self.column_name, content=new_column)
         return [table], {}
-```
 
-### Python Runtime
-To run the transform in the pure python runtime, we create 
-1. `HelloPythonTransformConfiguration` class - defines configuration for the python runtime
-2. `main` - launches the python runtime with our transform.
-
-```python
 import argparse
 from data_processing.transform import  TransformConfiguration
-from hello_transform import HelloTransform
 
 class HelloTransformConfiguration(TransformConfiguration):
     '''
@@ -85,11 +77,51 @@ class HelloTransformConfiguration(TransformConfiguration):
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         # Define the command line arguments used by this transform
+        # We use the ac_ CLI prefix to help distinguish from other runtime CLI parameters
         parser.add_argument(
             "--ac_who",
             type=str, required=False, default="World",
             help="Who to say hello to."
         )
+
+        parser.add_argument(
+            "--ac_column_name",
+            type=str, required=False, default="greeting", help="Name of column to add"
+        )
+
+    def apply_input_params(self, args: argparse.Namespace) -> bool:
+        dargs = vars(args)
+        # Select this transform's command line arguments from all those
+        # provided on the command line.
+        self.params = {
+            "who": dargs.get("ac_who",None),
+            "column_name": dargs.get("ac_column_name",None)
+        }
+        return True
+
+
+```
+
+### Python Runtime
+To run the transform in the pure python runtime, we create 
+1. `HelloPythonTransformConfiguration` class - defines configuration for the python runtime
+2. `main` - launches the python runtime with our transform.
+
+```python
+from data_processing.runtime.pure_python import PythonTransformRuntimeConfiguration, PythonTransformLauncher
+from hello_transform import HelloTransformConfiguration
+class HelloPythonConfiguration(PythonTransformRuntimeConfiguration):
+    '''
+    Configures the python runtime to use the Hello transform
+    '''
+    def __init__(self):
+        super().__init__(transform_config=HelloTransformConfiguration())
+
+
+if __name__ == "__main__":
+    # Create the runtime launcher to use the HelloTransform
+    launcher = PythonTransformLauncher(HelloPythonConfiguration())
+    launcher.launch()f
 ```
 
 ### Running 
@@ -103,7 +135,7 @@ Now run the above, we will use a single parquet file in a directory named `input
 source venv/bin/activate
 % ls input
 test1.parquet
-% parquet-tools input/test1.parquet
+% parquet-tools show input/test1.parquet
 +-----------------------------------+
 | title                             |
 |-----------------------------------|
