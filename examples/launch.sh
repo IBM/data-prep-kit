@@ -10,6 +10,7 @@ export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/data-processing-lib/ray/src:$REPO_ROOT/
 # Set PYTHONAPATH for transforms
 export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/transforms/code/malware/ray/src:$REPO_ROOT/transforms/code/malware/python/src
 export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/transforms/code/code_quality/ray/src:$REPO_ROOT/transforms/code/code_quality/python/src
+export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/transforms/code/code2parquet/ray/src:$REPO_ROOT/transforms/code/code2parquet/python/src
 export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/transforms/code/proglang_select/ray/src:$REPO_ROOT/transforms/code/proglang_select/python/src
 export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/transforms/universal/ededup/ray/src:$REPO_ROOT/transforms/universal/ededup/python/src
 export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/transforms/universal/fdedup/ray/src:$REPO_ROOT/transforms/universal/fdedup/python/src
