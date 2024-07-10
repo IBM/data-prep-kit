@@ -152,7 +152,7 @@ test1.parquet
 Next we run the transform to 
 1. read file(s) from the `input` directory 
 2. write transformed file(s) to the `output` directory
-3. Configure the transform to add column name `hello` containing `Hello David!`. 
+3. add a column named `hello` containing `Hello David!`, using the `--ac_column_name` and `--ac_who` CLI parameters. 
 ```shell
 (venv) % mkdir output
 (venv) % python hello_transform.py  --data_local_config \
