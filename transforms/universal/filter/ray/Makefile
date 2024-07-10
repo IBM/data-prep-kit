@@ -8,9 +8,8 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=filter
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${FILTER_RAY_VERSION}
 
+BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
 
 test::	.transforms.ray-test
@@ -32,7 +31,7 @@ publish: publish-image
 publish-image:: .transforms.publish-image-ray
 
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(FILTER_PYTHON_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(FILTER_PYTHON_VERSION) TOML_VERSION=$(FILTER_RAY_VERSION) .transforms.set-versions
         
 build-dist:: set-versions .defaults.build-dist 
 
@@ -51,4 +50,8 @@ run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image

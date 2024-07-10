@@ -7,9 +7,8 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=fdedup
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${FDEDUP_RAY_VERSION}
 
+BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
 
 test::	.transforms.ray-test
@@ -34,7 +33,7 @@ setup:: .transforms.setup
 
 # TRANSFORM_PYTHON_VERSION has no effect since requirements do not specify a python transform implementation
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${DOCKER_IMAGE_VERSION} .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=dummy TOML_VERSION=$(FDEDUP_RAY_VERSION) .transforms.set-versions 
 
 build-dist:: .defaults.build-dist
 
@@ -52,4 +51,8 @@ run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image
