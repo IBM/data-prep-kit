@@ -11,6 +11,6 @@ Here we provided short examples of various uses of the Data Prep Kit.
     
 ## Creating transforms
 
-* [Outside of the repository]() - shows to use pypi dependencies to create a transform independent of this repository.
-* [Adding to this repository]() - shows how to add a transform to this repository, including repository conventions and ci/cd. 
+* [Outside of the repository](new-transform-outside.md) - shows how to use pypi dependencies to create a transform independent of this repository.
+* [Adding to this repository](new-transform-inside.md) - shows how to add a transform to this repository, including repository conventions and ci/cd. 
 
