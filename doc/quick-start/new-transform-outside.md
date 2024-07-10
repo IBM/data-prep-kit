@@ -130,7 +130,8 @@ In the following `parquet-tools` will be helpful here.  Install with
 % source venv/bin/activate
 (venv) % pip install parquet-tools
 ```
-Next, we will the transform on a single parquet file in a directory named `input`.
+We will the transform on a single parquet file in a directory named `input`.
+We can examine the input as follows:
 ```shell
 % source venv/bin/activate
 (venv) % ls input
