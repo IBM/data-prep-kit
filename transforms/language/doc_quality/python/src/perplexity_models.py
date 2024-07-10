@@ -32,21 +32,15 @@ class NoopModel(PerplexityModel):
 
 class PerplexityModelFactory:
     @staticmethod
-    def create_model(model_class_name: str, model_path: str) -> PerplexityModel:
-        import importlib, pkgutil
-        for path in sys.path:
-            # Iterate through modules in the path
-            for importer, module_name, ispkg in pkgutil.iter_modules([path]):
-                full_module_name = f"{module_name}"
-                
-                # Import the module dynamically
-                try:
-                    module = importlib.import_module(full_module_name)
-                    # Check if the class exists in the module
-                    if hasattr(module, model_class_name):
-                        print(f"Found class {model_class_name} in module: {full_module_name}")
-                        found_class = getattr(__import__(full_module_name), model_class_name)
-                        return found_class(model_path)
-                except Exception as e:
-                    print(f"Error importing module {full_module_name}: {e}")
-        raise Exception(f"Could not find the class with name {model_class_name}")
+    def create_model(model_module_name: str, model_path: str) -> PerplexityModel:
+        import importlib
+        model_module_spec = importlib.util.find_spec(model_module_name)
+        if model_module_spec is not None:
+            model_module = importlib.util.module_from_spec(model_module_spec)
+            model_module_spec.loader.exec_module(model_module)
+            import inspect
+            for name, obj in inspect.getmembers(model_module, inspect.isclass):
+                if issubclass(obj, PerplexityModel) and obj is not PerplexityModel:
+                    print(f"Found class {name} in module: {model_module.__name__}")
+                    return obj(model_path)
+        raise Exception(f"Could not find perplexity model class from the module name {model_module_name}")

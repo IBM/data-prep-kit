@@ -20,7 +20,7 @@
     "doc_id_column": "documents_id",
     "bad_word_filepath": "/Users/dtsuzuku/granite/data-prep-kit/transforms/language/doc_quality/python/ldnoobw/en",
     "model_path": "/Users/dtsuzuku/granite/data-prep-kit/transforms/language/doc_quality/models",
-    "model_class_name": "TransformerModel",
+    "model_module_name": "perplexity_transform_model",
     "perplex_score_digit": 1,
     "s3_cred": null,
     "checkpointing": false,

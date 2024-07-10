@@ -38,7 +38,7 @@ class TestPythonDocQualityTransform(AbstractTransformLauncherTest):
             "docq_doc_content_column": "contents",
             "docq_bad_word_filepath": os.path.join(basedir, "ldnoobw", "en"),
             "docq_model_path": model_path,
-            "docq_model_class_name": "TransformerModel",
+            "docq_model_module_name": "perplexity_transform_model",
             "docq_perplex_score_digit": 1,
         }
         basedir = os.path.abspath(os.path.join(basedir, "test-data"))
