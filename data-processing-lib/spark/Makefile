@@ -3,7 +3,6 @@ REPOROOT=../..
 include $(REPOROOT)/.make.defaults
 SPARK_VERSION=3.5.1
 DOCKER_IMAGE_NAME=data-prep-kit-spark-$(SPARK_VERSION)
-DOCKER_IMAGE_VERSION=$(DPK_LIB_VERSION)
 DOCKER_IMAGE_LIB_NAME=data-prep-kit-spark
 TAG := "v${DPK_LIB_VERSION}"
 
@@ -30,6 +29,8 @@ publish:: publish-dist
 
 publish-dist :: .check-env .defaults.publish-dist 
 
+publish-image:: .defaults.publish-image
+
 venv::  pyproject.toml
 	$(MAKE) .defaults.spark-lib-src-venv
 	pip install pytest pytest-cov 
@@ -39,6 +40,10 @@ image:: image-spark
 image-spark:: Dockerfile
 	@# Help: Build the bare Spark image 
 	$(MAKE) .defaults.image
+
+docker-save-image: .defaults.docker-save-image
+
+docker-load-image: .defaults.docker-load-image
 
 #image-dpk:: Dockerfile
 #	@# Help: Build the Spark image containing the data-prep-kit for spark 

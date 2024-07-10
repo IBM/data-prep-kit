@@ -8,14 +8,12 @@ include $(REPOROOT)/.make.defaults
 
 #DOCKER_IMG=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}
 DOCKER_IMG=$(DOCKER_LOCAL_IMAGE)
-
+BASE_IMAGE=${RAY_BASE_IMAGE}
 
 ifeq ($(KFPv2), 1)
         DOCKER_IMAGE_NAME=kfp-data-processing_v2
-        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2}
 else
         DOCKER_IMAGE_NAME=kfp-data-processing
-        DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION}
 endif
 
 .PHONY: .lib-src-image
@@ -40,7 +38,7 @@ image: Dockerfile requirements.txt
 
 .PHONY: .reconcile-requirements
 .reconcile-requirements:
-	@sed -i.back "s/kfp-data-processing.*:[0-9].*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${FILE}
+	@sed -i.back "s/kfp-data-processing.*/$(DOCKER_IMAGE_NAME):${DOCKER_IMAGE_VERSION}\"/" ${FILE}
 
 .PHONE: set-versions
 set-versions:
@@ -49,23 +47,29 @@ set-versions:
 	@$(MAKE) .reconcile-requirements FILE=deleteRayClusterComponent.yaml
 	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent.yaml
 	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent_multi_s3.yaml
-	@$(REPOROOT)/scripts/transforms/update_dockerfile.sh ${RAY}
 ifneq ($(KFPv2), 1)
 	@$(MAKE) .reconcile-requirements FILE=executeSubWorkflowComponent.yaml
 endif
 
-.PHONY: load-image
-load-image:
+.PHONY: kind-load-image
+kind-load-image:
 	@# Help: Load the image to the kind cluster created with make setup.
 	kind load docker-image $(DOCKER_REMOTE_IMAGE) --name=$(KIND_CLUSTER_NAME)
 
+.PHONY: docker-load-image
+docker-load-image:
+	@$(MAKE) .defaults.docker-load-image
+
+.PHONY: docker-save-image
+docker-save-image:
+	@$(MAKE) .defaults.docker-save-image
 
 .PHONY: publish
 publish:
 	echo "Publishing kfp-data-processing"
-	$(MAKE) KFPv2=0 DOCKER_IMAGE_NAME="kfp-data-processing" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION} build .defaults.publish-image
+	$(MAKE) KFPv2=0 DOCKER_IMAGE_NAME="kfp-data-processing" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION} .defaults.publish-image
 	echo "Publishing kfp-data-processing_v2"
-	$(MAKE) KFPv2=1 DOCKER_IMAGE_NAME="kfp-data-processing_v2" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2} build .defaults.publish-image
+	$(MAKE) KFPv2=1 DOCKER_IMAGE_NAME="kfp-data-processing_v2" DOCKER_IMAGE_VERSION=${KFP_DOCKER_VERSION_v2} .defaults.publish-image
 
 test::
 
