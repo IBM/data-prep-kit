@@ -24,8 +24,11 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 
 ## 📝 Table of Contents
 - [About](#about)
-- [Getting Started](#getting_started)
-- [How to Contribute](#contribute_steps)
+- [Quick Start](doc/quick-start/quick-start.md)
+- [Transform Framework](data-processing-lib/doc/overview.md)
+- [Pipeline Automation](#pipeline)
+- [Repository Use and Navigation](doc/repo.md)
+- [How to Contribute](CONTRIBUTING.md)
 - [Acknowledgments](#acknowledgement)
 
 ## &#x1F4D6; About <a name = "about"></a>
@@ -117,44 +120,7 @@ for creating and managing the Ray cluster and [KubeRay API server](https://githu
 to interact with the KubeRay operator. An additional [framework](kfp/kfp_support_lib) along with several
 [kfp components](kfp/kfp_ray_components) is used to simplify the pipeline implementation.
 
-## &#x1F680; Getting Started <a name = "getting_started"></a>
-
-There are various entry points that you can choose based on the use case. Each entry point has its pre-requirements and setup steps.
-The common part of are:
-#### Prerequisites
-- Python 3.10 or 3.11 
--Docker/Podman
-
-Two important development tools will also be installed using the steps below:
-- [pre-commit](https://pre-commit.com/)
-- [twine](https://twine.readthedocs.io/en/stable/) 
-
-#### Installation Steps
-```shell
-pip install pre-commit
-pip install twine
-...
-git clone git@github.com:IBM/data-prep-kit.git
-cd data-prep-kit
-pre-commit install
-```
-Please note that there are further installation steps for running the transforms in general, as documented [here](data-processing-lib/ray/README.md) and on a local Kind cluster or on an existing Kubernetes cluster, as documented [here](kfp/doc/setup.md).
-
-Below are a few demos to get you started.
-### Build Your Own Transforms
-Follow the documentation [here](data-processing-lib/doc/overview.md) to build your own transform
-and run it in either the python  or Ray runtimes. 
-
-### Run a Single Transform on Local Ray
-Get started by running the "noop" transform that performs an identity operation by following the 
-[tutorial](data-processing-lib/doc/simplest-transform-tutorial.md) and associated 
-[noop implementation](transforms/universal/noop). 
-
-### Run a Jupyter notebook on Local Ray cluster
-Get started by building a Jupiter notebook executing a sequence of Transforms with our  [example pipeline](./examples/) 
-that can run on your machine. This implementation can also be extended to connect to the remote Ray cluster.
-
-### Automate a Pipeline
+## Automate a Pipeline<a name="pipeline"></a>
 The data preprocessing can be automated by running transformers as a Kubeflow pipeline (KFP). 
 The project facilitates the creation of a local [Kind cluster](https://kind.sigs.k8s.io/) with all the required 
 software and test data, or deployment of required software on an existing cluster. 
@@ -165,12 +131,6 @@ In addition, if you want to combine several transformers in a single pipeline, y
 
 When you finish working with the cluster, and want to clean up or destroy it. See the 
 [clean up the cluster](../kfp/doc/setup.md#cleanup)
-
-### How to Navigate and Use the Repository
-See the documentation on [repository structure and its use](doc/repo.md). 
-
-## &#x1F91D; How to Contribute <a name = "contribute_steps"></a>
-See the [contribution guide](CONTRIBUTING.md)
 
 
 ## &#x2B50; Acknowledgements <a name = "acknowledgement"></a>

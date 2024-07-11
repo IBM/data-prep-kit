@@ -30,7 +30,11 @@ image::
 
 test-image::
 
-load-image::
+kind-load-image::
+
+docker-load-image::
+
+docker-save-image::
 
 .PHONY: workflow-build
 workflow-build: workflow-venv

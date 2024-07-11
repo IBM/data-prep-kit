@@ -1,4 +1,5 @@
-FROM docker.io/rayproject/ray:2.24.0-py310
+ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
+FROM ${BASE_IMAGE}
 
 # install pytest
 RUN pip install --no-cache-dir pytest

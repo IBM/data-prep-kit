@@ -46,8 +46,16 @@ test-src::
 	@# Help: Recursively make $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
-load-image::
+kind-load-image::
 	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
+
+docker-load-image::
+	@# Help: Recursively make $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
+
+docker-save-image::
+	@# Help: Recursively make $@ in all subdirs
 	$(MAKE) RULE=$@ .recurse
 
 .PHONY: workflow-venv
