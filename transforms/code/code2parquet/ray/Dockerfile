@@ -25,9 +25,6 @@ RUN pip install --no-cache-dir -e .
 COPY src/code2parquet_transform_ray.py .
 COPY src/code2parquet_local_ray.py local/
 
-# Make mount points for processing data outside of the image
-RUN mkdir input && mkdir output
-
 # copy test
 COPY test/ test/
 COPY test-data/ test-data/
