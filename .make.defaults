@@ -283,12 +283,13 @@ __check_defined = \
 # PYTHON_PROJECT_DIR is expected to have src and pyproject.toml
 .PHONY: .defaults.install-src-venv
 .defaults.install-src-venv:: 
+	@echo Begin installing source from $(PYTHON_PROJECT_DIR) into venv
 	@source venv/bin/activate;				      	\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
 	pip install --force-reinstall $${extra_url}  -e $(PYTHON_PROJECT_DIR);		
-	@echo Installed python project source in $(PYTHON_PROJECT_DIR) into venv
+	@echo Done installing source from $(PYTHON_PROJECT_DIR) into venv
 
 # Install local requirements last as it generally includes our lib source
 .PHONY: .defaults.python-lib-src-venv
@@ -460,10 +461,10 @@ endif
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
 	if [ -e requirements.txt ]; then				\
-		echo Install requirements from requirements.txt;	\
+		echo Installing requirements from requirements.txt;	\
 		pip install $$extra_url -r requirements.txt;		\
 	elif [ -e pyproject.toml ]; then				\
-		echo Install requirements using pyproject.toml;		\
+		echo Installing from pyproject.toml;			\
 		pip install $$extra_url -e .;				\
 	fi
 
