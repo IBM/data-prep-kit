@@ -26,10 +26,10 @@ quay.io/dataprep1/data-prep-kit/noop-python                     latest   aac55fa
 Or, you can use the pre-built images (latest, or 0.2.1 or later tags) 
 on quay.io found at [https://quay.io/user/dataprep1](https://quay.io/user/dataprep1).
 
-### Local Data
-Images built in this repository
-include directories for mounting input and output directories. 
-Those directories are `/home/dpk/input` and `/home/dpk/output`.
+### Local Data - Python Runtime
+To use an image to process local data we will mount the host
+input and output directories into the image.  Any mount
+point can be used, but we will use `/input` and `/output'.
 
 To process data in the `/home/me/input` directory and write it
 to the `/home/me/output` directory, we mount these directories into
@@ -38,13 +38,13 @@ So for example, using the locally built `noop` transform:
 
 ```shell
 docker run  --rm 
-    -v /home/me/input:/home/dpk/input \
-    -v /home/me/output:/home/dpk/output \
+    -v /home/me/input:/input \
+    -v /home/me/output:/output \
     noop-python:latest 	\
 	python noop_transform_python.py \
 	--data_local_config "{ \
-	    'input_folder'  : '/home/dpk/input', \
-	    'output_folder' : '/home/dpk/output' \
+	    'input_folder'  : '/input', \
+	    'output_folder' : '/output' \
 	    }"
 
 ```
@@ -53,18 +53,40 @@ To run the quay.io located transform instead, substitute
 for `noop-python:latest`, as follows:
 ```shell
 docker run  --rm 
-    -v /home/me/input:/home/dpk/input \
-    -v /home/me/output:/home/dpk/output \
+    -v /home/me/input:/input \
+    -v /home/me/output:/output \
     quay.io/dataprep1/data-prep-kit/noop-python:latest 	\
 	python noop_transform_python.py \
 	--data_local_config "{ \
-	    'input_folder'  : '/home/dpk/input', \
-	    'output_folder' : '/home/dpk/output' \
+	    'input_folder'  : '/input', \
+	    'output_folder' : '/output' \
 	    }"
 
 ```
+### Local Data - Ray Runtime
+To use the ray runtime, we must 
+1. Switch to using the ray-based image `noop-ray:latest`
+2. Use the ray runtime python main() defined in `noop_transform_ray.py`
 
-### S3-located Data
+For example, using the quay.io image
+```shell
+docker run  --rm 
+    -v /home/me/input:/input \
+    -v /home/me/output:/output \
+    quay.io/dataprep1/data-prep-kit/noop-ray:latest 	\
+	python noop_transform_ray.py \
+	--data_local_config "{ \
+	    'input_folder'  : '/input', \
+	    'output_folder' : '/output' \
+	    }"
+
+```
+This is functionally equivalent to the python-runtime, but additional
+configuration can be provided (see the 
+[ray launcher args](../../data-processing-lib/doc/ray-launcher-options.md))
+for details.
+
+### S3-located Data - Python Runtime
 When processing data located in S3 buckets, one can use the same image
 and specify different `--data_s3_*` configuration as follows: 
 
