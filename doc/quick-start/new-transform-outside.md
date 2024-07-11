@@ -71,7 +71,7 @@ class HelloTransformConfiguration(TransformConfiguration):
     '''
     def __init__(self):
         super().__init__(
-            name="add_column",
+            name="hello",
             transform_class=HelloTransform,
         )
 
@@ -110,6 +110,7 @@ To run the transform in the pure python runtime, we create
 ```python
 from data_processing.runtime.pure_python import PythonTransformRuntimeConfiguration, PythonTransformLauncher
 from hello_transform import HelloTransformConfiguration
+
 class HelloPythonConfiguration(PythonTransformRuntimeConfiguration):
     '''
     Configures the python runtime to use the Hello transform
@@ -125,12 +126,15 @@ if __name__ == "__main__":
 ```
 
 ### Running 
-In the following `parquet-tools` will be helpful here.  Install with 
+In the following, `parquet-tools` will be helpful.  Install with 
 ```shell
 % source venv/bin/activate
 (venv) % pip install parquet-tools
 ```
-We will the transform on a single parquet file in a directory named `input`.
+We will the transform a single parquet file in a directory named 
+`input`.
+The directory may contain more than one parquet file, 
+in which case they will all be processed.
 We can examine the input as follows:
 ```shell
 % source venv/bin/activate
