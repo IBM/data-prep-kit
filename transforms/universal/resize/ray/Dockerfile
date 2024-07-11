@@ -30,6 +30,9 @@ RUN chown -R ray /home/ray/test
 RUN chown -R ray /home/ray/test-data
 USER ray
 
+# Make mount points for processing data outside of the image
+RUN mkdir input && mkdir output
+
 ENV PYTHONPATH /home/ray
 
 # Put these at the end since they seem to upset the docker cache.
