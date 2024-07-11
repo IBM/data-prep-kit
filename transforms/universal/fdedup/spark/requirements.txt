@@ -1,0 +1,5 @@
+pyspark
+pyarrow
+pyyaml
+boto3
+kubernetes
