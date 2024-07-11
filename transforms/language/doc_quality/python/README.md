@@ -24,14 +24,14 @@ In this transform, following metrics will be included:
 The set of dictionary keys holding [DocQualityTransform](src/doc_quality_transform.py) 
 configuration for values are as follows:
 
-* _docq_text_lang_ - specifies language used in the text content. By defaut, "en" is used.
-* _docq_doc_content_column_ - specifies column name that contains document text.
-* _docq_doc_id_column_ - specifies column name that contains document id.
-* _docq_bad_word_filepath_ - specifies a path to bad word file: local folder (file or directory) that points to bad word file.
-* _docq_model_path_ - specifies a path to model: local folder (file or directory) that points to model. If it exists in local file system, model will be loaded from there. If it does not exist, the value specified here will be ignored and try to find model in s3 using _docq_s3_cred_.
-* _docq_s3_cred_ - AST string of options for cos credentials retrieve kenLM model from s3.
-* _docq_model_module_name_ - specifies a class name that uses model. The class should extend perplexity_models.PerplexityModel.
-* _docq_perplex_score_digit_ - specifies a digit of perplexity score.
+* _text_lang_ - specifies language used in the text content. By defaut, "en" is used.
+* _doc_content_column_ - specifies column name that contains document text.
+* _doc_id_column_ - specifies column name that contains document id.
+* _bad_word_filepath_ - specifies a path to bad word file: local folder (file or directory) that points to bad word file.
+* _model_path_ - specifies a path to model: local folder (file or directory) that points to model. If it exists in local file system, model will be loaded from there. If it does not exist, the value specified here will be ignored and try to find model in s3 using _s3_cred_.
+* _s3_cred_ - AST string of options for cos credentials retrieve kenLM model from s3.
+* _model_module_name_ - specifies a class name that uses model. The class should extend perplexity_models.PerplexityModel.
+* _perplex_score_digit_ - specifies a digit of perplexity score.
 
 ## Running
 
@@ -70,6 +70,30 @@ Then
 ls output
 ```
 To see results of the transform.
+
+
+### Transforming local data 
+
+Beginning with version 0.2.1, most/all python transform images are built with directories for mounting local data for processing.
+Those directories are `/home/dpk/input` and `/home/dpk/output`.
+
+After using `make image` to build the transform image, you can process the data 
+in the `/home/me/input` directory and place it in the `/home/me/output` directory, for example,  using the 0.2.1 tagged image as follows:
+
+```shell
+docker run  --rm -v /home/me/input:/home/dpk/input -v /home/me/output:/home/dpk/output doc_quality-python:0.2.1 	\
+	python doc_quality_transform_python.py --data_local_config "{ 'input_folder' : '/home/dpk/input', 'output_folder' : '/home/dpk/output'}" --docq_bad_word_filepath /path/to/badword --docq_model_path /path/to/model	--docq_model_module_name perplexity_transformer_model
+```
+
+You may also use the pre-built images on quay.io using `quay.io/dataprep1/data-prep-kit//noop-python:0.2.1` as the image name.
+
+
+### Transforming data using the transform image
+
+To use the transform image to transform your data, please refer to the 
+[running images quickstart](../../../../doc/quick-start/run-transform-image.md),
+substituting the name of this transform image and runtime as appropriate.
+
 
 ## Troubleshooting guide
 
