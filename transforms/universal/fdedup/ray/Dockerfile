@@ -25,6 +25,9 @@ COPY src/fdedup_local_ray.py local/
 COPY test/ test/
 COPY test-data/ test-data/
 
+# Make mount points for processing data outside of the image
+RUN mkdir input && mkdir output
+
 # Set environment
 ENV PYTHONPATH /home/ray
 
