@@ -71,3 +71,9 @@ docker run  --rm -v /home/me/input:/home/dpk/input -v /home/me/output:/home/dpk/
 
 You may also use the pre-built images on quay.io using `quay.io/dataprep1/data-prep-kit//resize-python:0.2.1` as the image name.
 
+
+### Transforming data using the transform image
+
+To use the transform image to transform your data, please refer to the 
+[running images quickstart](../../../../doc/quick-start/run-transform-image.md),
+substituting the name of this transform image and runtime as appropriate.
