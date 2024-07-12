@@ -54,3 +54,26 @@ To see results of the transform.
 ## Troubleshooting guide
 
 For M1 Mac user, if you see following error during make command, `error: command '/usr/bin/clang' failed with exit code 1`, you may better follow [this step](https://freeman.vc/notes/installing-fasttext-on-an-m1-mac)
+
+
+### Transforming local data 
+
+Beginning with version 0.2.1, most/all python transform images are built with directories for mounting local data for processing.
+Those directories are `/home/dpk/input` and `/home/dpk/output`.
+
+After using `make image` to build the transform image, you can process the data 
+in the `/home/me/input` directory and place it in the `/home/me/output` directory, for example,  using the 0.2.1 tagged image as follows:
+
+```shell
+docker run  --rm -v /home/me/input:/home/dpk/input -v /home/me/output:/home/dpk/output lang_id-python:0.2.1 	\
+	python lang_id_transform_python.py --data_local_config "{ 'input_folder' : '/home/dpk/input', 'output_folder' : '/home/dpk/output'}"
+```
+
+You may also use the pre-built images on quay.io using `quay.io/dataprep1/data-prep-kit//lang_id-python:0.2.1` as the image name.
+
+
+### Transforming data using the transform image
+
+To use the transform image to transform your data, please refer to the 
+[running images quickstart](../../../../doc/quick-start/run-transform-image.md),
+substituting the name of this transform image and runtime as appropriate.
