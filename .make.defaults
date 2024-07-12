@@ -53,7 +53,7 @@ KIND_CLUSTER_NAME=dataprep
 ARTIFACTS_DIR?=$(REPOROOT)/artifacts
 # Set this to 0 to disable installation of data-processing-lib/* into virtual environments
 # Should cause data-prep-kit dependencies to be loaded from pypi instead.
-INSTALL_LIB_SRC_INTO_VENV?=1
+USE_REPO_LIB_SRC?=1
 
 DPK_PYTHON_LIB_DIR=$(REPOROOT)/data-processing-lib/python
 DPK_RAY_LIB_DIR=$(REPOROOT)/data-processing-lib/ray
@@ -235,9 +235,11 @@ __check_defined = \
 .PHONY: .defaults.python-lib-src-image
 .defaults.python-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
 	@# Help: Build the Python $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-lib/python source
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
+endif
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
-	rm -rf data-processing-lib-python
+	-rm -rf data-processing-lib-python
 
 # Build an image using the local Dockerfile and make the data-processing-lib/ray
 # available in the current directory for use by the Dockerfile (i.e. to install the library). 
@@ -246,15 +248,17 @@ __check_defined = \
 .PHONY: .defaults.ray-lib-src-image
 .defaults.ray-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
 	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
 	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray .defaults.copy-lib
+endif
 	if [ -e ../python ]; then								\
 		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
 	fi
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
-	rm -rf data-processing-lib-python
-	rm -rf data-processing-lib-ray
-	rm -rf python-transform 
+	-rm -rf data-processing-lib-python
+	-rm -rf data-processing-lib-ray
+	-rm -rf python-transform 
 
 # Build the base spark image used by spark-based transforms
 .PHONY: .defaults.spark-lib-base-image
@@ -268,15 +272,17 @@ __check_defined = \
 .defaults.spark-lib-src-image:: .defaults.spark-lib-base-image
 	@# Help: Build the Spark $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
 	$(MAKE) IMAGE_NAME_TO_VERIFY=$(DOCKER_SPARK_BASE_IMAGE_NAME) .defaults.verify-image-availability
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
 	$(MAKE) LIB_PATH=$(DPK_SPARK_LIB_DIR) LIB_NAME=data-processing-lib-spark .defaults.copy-lib
+endif
 	if [ -e ../python ]; then								\
 		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
 	fi
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE) .defaults.image
-	rm -rf data-processing-lib-python
-	rm -rf data-processing-lib-spark
-	rm -rf python-transform 
+	-rm -rf data-processing-lib-python
+	-rm -rf data-processing-lib-spark
+	-rm -rf python-transform 
 
 # Install the source from the given directory into an existing venv
 # Expected PYTHON_PROJECT_DIR and uses EXTRA_INDEX_URL if set.
@@ -312,7 +318,7 @@ __check_defined = \
 # Install all source from the repo for a python runtime transform into an existing venv 
 .PHONY: .defaults.install-python-lib-src-venv
 .defaults.install-python-lib-src-venv::
-ifeq ($(INSTALL_LIB_SRC_INTO_VENV), 1)
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	@# Help: Install Python data processing library source into existing venv
 	@echo Installing Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
@@ -321,7 +327,7 @@ ifeq ($(INSTALL_LIB_SRC_INTO_VENV), 1)
 	echo Installed source from Python processing library for `which $(PYTHON)`
 else
 	@# Help: DO NOT install Python data processing library source into existing venv
-	@echo INSTALL_LIB_SRC_INTO_VENV!=1 so do NOT installing Python data processing library source into existing venv
+	@echo USE_REPO_LIB_SRC!=1 so do NOT installing Python data processing library source into existing venv
 endif
 
 # Install local requirements last as it generally includes our lib source
@@ -333,7 +339,7 @@ endif
 # And if there is an adjacent python dir (as for transforms), then also install that source
 .PHONY: .defaults.install-ray-lib-src-venv
 .defaults.install-ray-lib-src-venv::
-ifeq ($(INSTALL_LIB_SRC_INTO_VENV), 1)
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	@# Help: Install Ray and Python data processing library source into existing venv
 	@echo Installing Ray and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
@@ -344,7 +350,7 @@ ifeq ($(INSTALL_LIB_SRC_INTO_VENV), 1)
 	echo Installed source from Python and Ray data processing libraries for `which $(PYTHON)`
 else
 	@# Help: DO NOT install Python or Ray data processing library source into existing venv
-	@echo INSTALL_LIB_SRC_INTO_VENV!=1 so do NOT installing Python or Ray data processing library source into existing venv
+	@echo USE_REPO_LIB_SRC!=1 so do NOT installing Python or Ray data processing library source into existing venv
 endif
 	@if [ -d ../python ]; then                                               		\
 		source venv/bin/activate;				      			\
@@ -359,7 +365,7 @@ endif
 # Install the python-based lib BEFORE spark assuming spark depends on the same version as python source.
 .PHONY: .defaults.install-spark-lib-src-venv
 .defaults.install-spark-lib-src-venv::
-ifeq ($(INSTALL_LIB_SRC_INTO_VENV), 1)
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	@# Help: Install Spark and Python data processing library source into existing venv
 	@echo Installing Spark and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
@@ -370,7 +376,7 @@ ifeq ($(INSTALL_LIB_SRC_INTO_VENV), 1)
 	echo Installed source from Python and Spark processing libraries for `which $(PYTHON)`
 else
 	@# Help: DO NOT install Python or Spark data processing library source into existing venv
-	@echo INSTALL_LIB_SRC_INTO_VENV!=1 so do NOT installing Python or Spark data processing library source into existing venv
+	@echo USE_REPO_LIB_SRC!=1 so do NOT installing Python or Spark data processing library source into existing venv
 endif
 	if [ -d ../python ]; then                                               	\
 		source venv/bin/activate;				      		\
