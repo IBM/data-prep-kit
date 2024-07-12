@@ -1,25 +1,24 @@
 import logging
 import os
-from typing import List, Tuple
+from typing import List
 
 import pandas as pd
 import pyarrow as pa
 import ray
 from data_processing.utils import get_logger
-from data_processing_ray.runtime.ray import RayUtils
-from pyarrow.fs import FileSelector, FileType, LocalFileSystem, S3FileSystem
+from pyarrow.fs import LocalFileSystem, S3FileSystem
 from pyarrow.parquet import ParquetDataset, write_table
 
 
 class DataAccessAlternative:
-    def __init__(self, key=None, secret=None, endpoint=None):
+    def __init__(self, key=None, secret=None, endpoint=None, request_timeout=20, connect_timeout=20):
         if key and secret:
             self.fs = S3FileSystem(
                 access_key=key,
                 secret_key=secret,
                 endpoint_override=endpoint,
-                request_timeout=20,
-                connect_timeout=20,
+                request_timeout=request_timeout,
+                connect_timeout=connect_timeout,
             )
         else:
             self.fs = LocalFileSystem()

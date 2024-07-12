@@ -1,6 +1,6 @@
 import os
 
-from pyarrow.fs import FileSelector, FileType, LocalFileSystem, S3FileSystem
+from pyarrow.fs import FileSelector, LocalFileSystem, S3FileSystem
 
 
 class FSStore:
