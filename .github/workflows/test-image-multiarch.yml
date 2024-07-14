@@ -48,9 +48,9 @@ jobs:
     test-multi-arch-images-on-ubuntu:
         runs-on: ubuntu-22.04
         timeout-minutes: 120
+        needs: [build-and-test-multi-arch-images-on-ubuntu]
         steps:
             - name: Test multi-arch image
-              needs: [build-and-test-multi-arch-images-on-ubuntu]
               run: |
                    docker pull quay.io/dataprep1/data-prep-kit/noop-ray:latest-multiarch
                    docker run -t --rm quay.io/dataprep1/data-prep-kit/noop-ray:latest-multiarch pytest -s test 
