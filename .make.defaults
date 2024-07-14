@@ -452,6 +452,10 @@ endif
 	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
 	$(DOCKER) push $(DOCKER_REMOTE_IMAGE)
 
+.PHONY: defaults.login
+defaults.login:
+	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
+
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
 # We install wheel, because it seems to be required for fasttext install on redhat.

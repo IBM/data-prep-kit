@@ -37,12 +37,12 @@ jobs:
                   df -h
             - name: build multi arch image
               run: |
-                  #cd transforms/universal/noop/ray
-                  #make multiarch_image 
-                  #docker buildx build -t noop-ray:latest-multiarch --load .
-                  #docker ps
-                  #docker run -t --rm noop-ray:latest-multiarch pytest -s test
-                  docker login quay.io -u "$(DOCKER_REGISTRY_USER)" -p "$(DOCKER_REGISTRY_KEY)"
+                  cd transforms/universal/noop/ray
+                  make multiarch_image 
+                  docker buildx build -t noop-ray:latest-multiarch --load .
+                  docker ps
+                  docker run -t --rm noop-ray:latest-multiarch pytest -s test
+                  make defaults.login
                   docker buildx build --platform=linux/amd64,linux/arm64 -t quay.io/dataprep1/data-prep-kit/noop-ray:latest-multiarch --push . 
                   docker ps
     test-multi-arch-images-on-ubuntu:
