@@ -48,6 +48,7 @@ jobs:
     test-multi-arch-images-on-ubuntu:
         runs-on: ubuntu-22.04
         timeout-minutes: 120
+        steps:
             - name: Test multi-arch image
               needs: [build-and-test-multi-arch-images-on-ubuntu]
               run: |
