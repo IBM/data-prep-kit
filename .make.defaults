@@ -267,9 +267,7 @@ ifeq ($(USE_REPO_LIB_SRC), 1)
 	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
 	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray .defaults.copy-lib
 endif
-	if [ -e ../python ]; then                                                               \	
-		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;        \	
-	fi
+	$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib
 
 # Build the base spark image used by spark-based transforms
 .PHONY: .defaults.spark-lib-base-image
