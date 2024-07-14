@@ -18,6 +18,8 @@ clean:: .transforms.clean
 
 image:: .transforms.ray-image
 
+multiarch_image:: .transforms._ray-image
+
 test-src:: .transforms.test-src
 
 setup:: .transforms.setup

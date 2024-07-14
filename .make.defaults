@@ -260,6 +260,17 @@ endif
 	-rm -rf data-processing-lib-ray
 	-rm -rf python-transform 
 
+.PHONY: .defaults._ray-lib-src-image
+.defaults._ray-lib-src-image:
+	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
+ifeq ($(USE_REPO_LIB_SRC), 1)
+	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
+	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray .defaults.copy-lib
+endif
+	if [ -e ../python ]; then                                                               \	
+		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;        \	
+	fi
+
 # Build the base spark image used by spark-based transforms
 .PHONY: .defaults.spark-lib-base-image
 .defaults.spark-lib-base-image-spark: 
