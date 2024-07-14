@@ -1,6 +1,20 @@
 ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
-FROM ${BASE_IMAGE}
 
+# Declare stage using linux/amd64 base image
+FROM --platform=linux/amd64 ${BASE_IMAGE} AS stage-amd64
+RUN echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM"
+
+# Declare stage using linux/arm64 base image
+FROM --platform=linux/arm64 ${BASE_IMAGE}-aarch64 AS stage-arm64
+RUN echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM"
+
+# Declare TARGETARCH to make it available
+ARG TARGETARCH
+
+# Select final stage based on TARGETARCH ARG
+FROM stage-${TARGETARCH} AS final
+
+RUN echo "I am running on $BUILDPLATFORM, building for $TARGETPLATFORM"
 # install pytest
 RUN pip install --no-cache-dir pytest
 
@@ -29,7 +43,7 @@ COPY test/ test/
 COPY test-data/ test-data/
 
 # Set environment
-ENV PYTHONPATH /home/ray
+ENV PYTHONPATH=/home/ray
 
 # Put these at the end since they seem to upset the docker cache.
 ARG BUILD_DATE
