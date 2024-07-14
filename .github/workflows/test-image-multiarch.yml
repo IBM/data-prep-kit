@@ -16,6 +16,9 @@ jobs:
     build-and-test-multi-arch-images-on-ubuntu:
         runs-on: ubuntu-22.04
         timeout-minutes: 120
+        env:
+           DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
+           DOCKER_REGISTRY_KEY: ${{ secrets.DOCKER_REGISTRY_KEY }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -39,11 +42,15 @@ jobs:
                   docker buildx build -t noop-ray:latest-multiarch --load .
                   docker ps
                   docker run -t --rm noop-ray:latest-multiarch pytest -s test
-                  docker buildx build --platform=linux/amd64,linux/arm64 -t noop-ray:latest-multiarch .
+                  docker login quay.io -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_KEY
+                  docker buildx build --platform=linux/amd64,linux/arm64 -t quay.io/dataprep1/data-prep-kit/noop-ray:latest-multiarch --push . 
                   docker ps
-            - name:  Run pre-created multi-arch image
+    test-multi-arch-images-on-ubuntu:
+        runs-on: ubuntu-22.04
+        timeout-minutes: 120
+            - name: Test multi-arch image
+              needs: [build-and-test-multi-arch-images-on-ubuntu]
               run: |
                    docker pull quay.io/dataprep1/data-prep-kit/noop-ray:latest-multiarch
                    docker run -t --rm quay.io/dataprep1/data-prep-kit/noop-ray:latest-multiarch pytest -s test 
-
 
