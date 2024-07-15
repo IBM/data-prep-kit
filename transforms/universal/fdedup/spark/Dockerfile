@@ -1,5 +1,5 @@
 #ARG BASE_IMAGE=cmadam/cma-pyspark:3.5.1
-ARG BASE_IMAGE=icr.io/spark-fdedup/pyspark-base:latest
+ARG BASE_IMAGE=pyspark-base:3.5.1
 # local kind test
 #ARG BASE_IMAGE=spark-fdedup/pyspark-base-1:latest
 FROM ${BASE_IMAGE}
@@ -25,7 +25,7 @@ COPY deployment/kubernetes/spark-executor-pod-template.yaml /opt/spark/work-dir/
 COPY config/spark_profile.yaml /opt/spark/work-dir/config/
 
 # install requirements from requirements.txt
-COPY src/requirements_fuzzy_dedup.txt .
+COPY requirements_fuzzy_dedup.txt .
 RUN pip3 install -r requirements_fuzzy_dedup.txt
 
 USER spark
