@@ -121,7 +121,7 @@ When you finish working with the cluster, and want to clean up or destroy it. Se
 [clean up the cluster](../kfp/doc/setup.md#cleanup)
 
 ## Acknowledgements <a name = "acknowledgement"></a>
-Thanks to the [BigCode Project](https://github.com/bigcode-project), which served as the source for borrowing the code quality metrics.
+Thanks to the [BigCode Project](https://github.com/bigcode-project), which served as the source for borrowing few code quality metrics.
 
 
 
