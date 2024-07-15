@@ -79,7 +79,6 @@ class FDSignatureCalculator(SparkTransformerRuntime):
         num_permutations: int,
         word_shingle_size: int,
         jaccard_similarity_threshold: int,
-        salting_size: int,
         debug: bool,
         language: str,
         checkpoint_count: int,
@@ -100,7 +99,6 @@ class FDSignatureCalculator(SparkTransformerRuntime):
         self.num_permutations = num_permutations
         self.word_shingle_size = word_shingle_size
         self.jaccard_threshold = jaccard_similarity_threshold
-        self.salting_size = salting_size
         self.debug = debug
         self.language = language
         self.checkpoint_count = checkpoint_count
@@ -126,20 +124,10 @@ class FDSignatureCalculator(SparkTransformerRuntime):
         :param contents_column: the dataframe column that contains the text
         :return: an RDD containing, for each row, the doc ID and contents_salt columns
         """
-        # create number of partitions
-        if self.salting_size is None:
-            num_part = max(1, int(self.spark.conf.get("spark.sql.shuffle.partitions")) / 4)
-        else:
-            num_part = min(max(1, self.salting_size), int(self.spark.conf.get("spark.sql.shuffle.partitions")))
-        logging.info("add columns to the data frame")
-        # add columns to the data frame
-        spark_df = spark_df.withColumn("salt", F.round(F.rand() * (num_part - 1), 0).cast(IntegerType()))
-        spark_df = spark_df.withColumn("contents_salt", F.struct(spark_df[contents_column], spark_df.salt))
-
         if self.debug:
             logging.debug(f"DEBUG: sparkDF count: {spark_df.count()}")
         # load Resilient Distributed Datasets()
-        resilient_distributed_dataset = spark_df.select(self.document_id_column, "contents_salt").rdd
+        resilient_distributed_dataset = spark_df.select(self.document_id_column, contents_column).rdd
         return resilient_distributed_dataset
 
     def generate_word_shingles_and_minhashes(
@@ -156,18 +144,15 @@ class FDSignatureCalculator(SparkTransformerRuntime):
         """
 
         # define shingles generation function
-        def _generate_word_shingles_salt(
-            text_salt: tuple[str, int], window_size: int = 5, delimiter: str = " ", language: str = "en"
-        ) -> tuple[list, str, int]:
+        def _generate_word_shingles(
+            text: str, window_size: int = 5, delimiter: str = " ", language: str = "en"
+        ) -> tuple[list, int]:
             """
             return a tuple
-            (A, B, C)
+            (A, B)
                 A = the list of k-word shingles
                 B = number of characters in document
-                C = salt
             """
-            text, salt = text_salt
-
             # TODO: for now, don't worry about Japanese language
             if language == "jp":
                 # sp = sentencepiece.SentencePieceProcessor()
@@ -193,14 +178,12 @@ class FDSignatureCalculator(SparkTransformerRuntime):
                 # get a shingle of words and join with delimiter
                 # yield delimiter.join(words[i:min(i+window_size, word_count)])
                 k_shingles.append(delimiter.join(words[i : i + window_size]))
-            return k_shingles, doc_len, salt
+            return k_shingles, doc_len
 
         # Generate word shingles
         logging.info(" Generate word shingles and minhashes")
         minhashed = resilient_distributed_dataset.mapValues(
-            lambda text_salt: mm_min_hash.minhash2_salt(
-                *_generate_word_shingles_salt(text_salt, window_size=word_shingle_size)
-            )
+            lambda text: mm_min_hash.minhash2_nosalt(*_generate_word_shingles(text, window_size=word_shingle_size))
         )
         if self.debug:
             logging.info(f"minhashed has {minhashed.count()} rows")
@@ -221,9 +204,7 @@ class FDSignatureCalculator(SparkTransformerRuntime):
         :return: an RDD, containing the band hashes, the band indexes, doc IDs, and doc lengths
         """
 
-        def emit_bands2_salt(
-            doc_id: str, minhashes: np.array, doc_len: int, salt: int, b: int, r: int, seed: int = 42
-        ):
+        def emit_bands2(doc_id: str, minhashes: np.array, b: int, r: int, seed: int = 42):
             """
             Return
 
@@ -241,14 +222,12 @@ class FDSignatureCalculator(SparkTransformerRuntime):
             for band_index in range(b):
                 # we create the band hashes by hashing the slice of minhashes
                 band_hash = mmh3.hash64(minhashes[band_index * r : (band_index + 1) * r], seed=seed, signed=True)[0]
-                yield (band_hash, band_index, doc_id, doc_len)
+                yield (band_hash, band_index, doc_id)
 
         bands = minhashed.flatMap(
-            lambda x: emit_bands2_salt(
+            lambda x: emit_bands2(
                 doc_id=x[0],
                 minhashes=np.array(x[1][0]).astype(np.uint32),
-                doc_len=x[1][1],
-                salt=x[1][2],
                 b=minhashlsh_num_bands,
                 r=minhashlsh_length_band,
             )
@@ -291,7 +270,6 @@ class FDSignatureCalculator(SparkTransformerRuntime):
                         [
                             StructField("minhashes", ArrayType(IntegerType()), True),
                             StructField("document_length", IntegerType(), True),
-                            StructField("salt", IntegerType(), True),
                         ]
                     ),
                     True,
@@ -304,7 +282,6 @@ class FDSignatureCalculator(SparkTransformerRuntime):
                 StructField("band_hash", LongType(), True),
                 StructField("band_index", IntegerType(), True),
                 StructField(self.document_id_column, LongType(), True),
-                StructField("document_length", IntegerType(), True),
             ]
         )
 

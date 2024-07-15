@@ -59,7 +59,7 @@ class Murmur_MH:
             doc_len,
         )
 
-    def minhash2_salt(self, shingles: List[str], doc_len: int, salt: int):
+    def minhash2_nosalt(self, shingles: List[str], doc_len: int):
         """
         for each shingle (i.e. a group of k-words) it generates a digest value based on
         mmh3-hash function (32-bit)
@@ -79,7 +79,6 @@ class Murmur_MH:
             .astype(np.int32)
             .tolist(),
             doc_len,
-            salt,
         )
 
     @staticmethod

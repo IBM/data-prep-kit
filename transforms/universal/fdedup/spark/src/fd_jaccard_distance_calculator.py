@@ -99,7 +99,6 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
                         [
                             StructField("minhashes", ArrayType(IntegerType()), True),
                             StructField("document_length", IntegerType(), True),
-                            StructField("salt", IntegerType(), True),
                         ]
                     ),
                     True,
