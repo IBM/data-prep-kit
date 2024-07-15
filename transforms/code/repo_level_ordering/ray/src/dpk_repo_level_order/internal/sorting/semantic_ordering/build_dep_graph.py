@@ -33,17 +33,6 @@ regex_patters_dict = {
 compiled_regex_dict = {key: re.compile(val) for key, val in regex_patters_dict.items()}
 
 
-def get_custom_logger():
-    logger = logging.getLogger(__name__)
-    logger.setLevel(level=logging.INFO)
-    consoleHandler = logging.StreamHandler()
-    # formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s:%(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
-    formatter = logging.Formatter("%(levelname)s: %(message)s")
-    consoleHandler.setFormatter(formatter)
-    logger.addHandler(consoleHandler)
-    return logger
-
-
 def get_analysis_obj(full_repo_name):
     analysis = Analysis()
     analysis.source_directory = f"/{full_repo_name.split('/')[-1]}/"
@@ -448,40 +437,3 @@ def build_edges(files_df_org, logger: Logger, title_column_name="new_title"):
     dep_graph = build_graph_from_results(parser_results, files_set, files_list, analysis, title_column_name)
     logger.info(f"Number of nodes in dependency graph - {len(dep_graph.nodes)}")
     return dep_graph
-
-
-def main():
-    from pathlib import Path
-
-    # code_path = "/dccstor/shanmukh/emerge_test/test_repos/cJSON"
-    # code_path = "/dccstor/vaibhav1/wisdom/basemodel/test_repos/featuretools"
-    code_path = "/dccstor/shanmukh/repos/dart"
-    path = Path(code_path)
-    fake_repo_name = f"A/{code_path.split('/')[-1]}"
-    res = [p for p in path.rglob("*")]
-    folder_to_ignore = ".git"
-    res = [p for p in res if not str(p.relative_to(path)).startswith(folder_to_ignore)]
-    files_dict = [
-        {
-            "new_title": str(p.relative_to(path)),
-            "contents": p.read_text(errors="ignore"),
-            "ext": p.suffix,
-            "repo_name": fake_repo_name,
-        }
-        for p in res
-        if p.is_file()
-    ]
-    for row in files_dict:
-        if row["ext"] == ".h":
-            row["language"] = "C"
-        else:
-            row["language"] = "None"
-    import pandas as pd
-
-    files_df = pd.DataFrame(files_dict)
-    dep_graph = build_edges(files_df, get_custom_logger())
-    print(dep_graph.edges, len(dep_graph.edges))
-
-
-if __name__ == "__main__":
-    main()
