@@ -290,6 +290,7 @@ endif
 .PHONY: .defaults.install-src-venv
 .defaults.install-src-venv:: 
 	@echo Begin installing source from $(PYTHON_PROJECT_DIR) into venv
+	$(call check_defined, PYTHON_PROJECT_DIR)
 	@source venv/bin/activate;				      	\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
@@ -306,6 +307,7 @@ endif
 # Expects PIP_TARGET
 .PHONY: .defaults.pip-uninstall
 .defaults.pip-uninstall:
+	$(call check_defined, PIP_TARGET)
 	pip uninstall -y $(PIP_TARGET) 
 
 # Provided for similar reasons as the .defaults.pip-uninstall target.
@@ -313,6 +315,7 @@ endif
 # Expects PIP_TARGET
 .PHONY: .defaults.pip-install-NOT-USED-YET
 .defaults.pip-install:
+	$(call check_defined, PIP_TARGET)
 	pip install $(PIP_TARGET) 
 	
 # Install all source from the repo for a python runtime transform into an existing venv 
@@ -417,6 +420,8 @@ endif
 .PHONY: .defaults.run-src-file
 .defaults.run-src-file:
 	@# Help: Run $(RUN_FILE) (if it exists).
+	$(call check_defined, RUN_FILE)
+	$(call check_defined, RUN_ARGS)
 	@if [ ! -e "src/$(RUN_FILE)" ];	then	\
 	    echo "";					\
 	    echo src/$(RUN_FILE) does not exist.;	\
@@ -543,6 +548,7 @@ MINIO_ADMIN_PWD= localminiosecretkey
 # Expects TOML_VERSION
 .PHONY: .defaults.update-toml
 .defaults.update-toml:
+	$(call check_defined, TOML_VERSION)
 	if [ -e pyproject.toml ]; then						\
 	    $(MAKE) TOML_VERSION=$(TOML_VERSION) .defaults.__set-toml-version;	\
 	    $(MAKE) .defaults.__update-toml-lib-dep-versions;			\
