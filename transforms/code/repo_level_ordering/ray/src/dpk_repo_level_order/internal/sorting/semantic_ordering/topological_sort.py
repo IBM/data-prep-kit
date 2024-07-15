@@ -1,22 +1,9 @@
-import logging
 import random
-import sys
 
 import networkx as nx
 import pandas as pd
 from dpk_repo_level_order.internal.sorting.semantic_ordering.utils import sort_by_path
 from networkx import read_graphml
-
-
-def get_custom_logger():
-    logger = logging.getLogger(__name__)
-    logger.setLevel(level=logging.INFO)
-    consoleHandler = logging.StreamHandler()
-    # formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s:%(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
-    formatter = logging.Formatter("%(levelname)s: %(message)s")
-    consoleHandler.setFormatter(formatter)
-    logger.addHandler(consoleHandler)
-    return logger
 
 
 # Find and remove cycles by removing random edges from cycle
@@ -161,19 +148,6 @@ def topological_sort_on_df(input_graph, df, logger, title_column_name="new_title
     return df_topo_sorted
 
 
-def create_test_graph():
-    left = tuple("ADDDEFFFFGGH")
-    right = tuple("HBFGGABGHHCE")
-    g = nx.DiGraph()
-    g.add_edges_from(list(zip(left, right)))
-    g.add_edges_from([("X", "Y"), ("Y", "Z"), ("Z", "X")])
-    g.add_node("J")
-    g.add_node("K")
-    g.add_edge("L", "M")
-
-    return g
-
-
 def get_dependency_graph():
     g = read_graphml("./emerge-file_result_dependency_graph.graphml")
     g.edges()
@@ -214,21 +188,3 @@ def get_dependency_graph2(code_path, logger):
     dep_graph = build_edges(files_df, logger)
     logger.debug(dep_graph.edges)
     return files_df, dep_graph
-
-
-if __name__ == "__main__":
-
-    logger = get_custom_logger()
-    logger.info("Performing dependency based sorting")
-    # G = create_test_graph()
-    # perform_topological_sort(G, logger)
-    # G = get_dependency_graph()
-
-    # code_path = "/dccstor/shanmukh/emerge_test/test_repos/testify"
-    df, G = get_dependency_graph2(sys.argv[1], logger)
-
-    logger.debug("Input dataframe : ")
-    logger.debug(df.head())
-    df_topo_sorted = topological_sort_on_df(G, df, logger)
-    logger.debug("Output dataframe : ")
-    logger.debug(df_topo_sorted.head())

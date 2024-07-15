@@ -114,24 +114,3 @@ class FSStore:
         print("Retry writing failed requests.")
         for key, value in self.failed_put_requests:
             self.put(key, value)
-
-
-if __name__ == "__main__":
-    p = "./mystore"
-    store = FSStore(p)
-
-    s3_store = {
-        "secret_key": os.environ["AWS_SECRET_KEY"],
-        "access_key": os.environ["AWS_ACCESS_KEY_ID"],
-        "endpoint": "https://s3.us-south.cloud-object-storage.appdomain.cloud",
-    }
-    bk = "dev-code-datasets/test_sd/share/store"
-    store = FSStore(bk, s3_store)
-
-    store.put("doeswork", "qawe")
-
-    store.put("abc__slash__upa", "a.pq")
-    for key in store.items():
-        print(f"values for {key}")
-        print(store.get(key))
-    print(store)
