@@ -34,7 +34,7 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 ## &#x1F4D6; About <a name = "about"></a>
 Data Prep Kit is a toolkit for streamlining data preparation for developers looking to build LLM-enabled applications via fine-tuning or instruction-tuning.
 Data Prep Kit contributes a set of modules that the developer can get started with to easily build data pipelines suitable for their use case.
-These modules have been tested while producing pre-training datasets for the Granite open models, [here](https://huggingface.co/instructlab/granite-7b-lab) and [here](https://huggingface.co/ibm-granite). 
+These modules have been tested while producing pre-training datasets for the Granite open models, [here](https://huggingface.co/instructlab/granite-7b-lab) and [here](https://huggingface.co/ibm-granite). You can also check out our paper for more details [Granite Code Models: A Family of Open Foundation Models for Code Intelligence](https://arxiv.org/abs/2405.04324).
 
 The modules are built on common frameworks (for Spark and Ray), called the *data processing library* that allows the developers to build new custom modules that readily scale across a variety of runtimes.
 Eventually, Data Prep Kit will offer consistent APIs and configurations across the following underlying runtimes.
