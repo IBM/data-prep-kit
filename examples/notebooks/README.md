@@ -1,4 +1,4 @@
 # Data Prep Kit Examples
 
-* [Code](code) - shows ingestion and processing of github zip downloads.
+* [Code](code) 
 * [Language](language) - coming soon.
