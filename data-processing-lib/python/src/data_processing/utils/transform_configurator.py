@@ -16,6 +16,13 @@ from data_processing.utils import get_logger
 
 logger = get_logger(__name__)
 
+def import_class(name):
+    components = name.split('.')
+    mod = __import__(components[0])
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod
+
 
 # Supported runtimes
 class TransformRuntime(Enum):

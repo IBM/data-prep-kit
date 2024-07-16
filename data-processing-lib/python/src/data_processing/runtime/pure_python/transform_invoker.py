@@ -14,18 +14,10 @@ import sys
 from typing import Any
 from data_processing.utils import ParamsUtils, get_logger
 from data_processing.runtime.pure_python import PythonTransformLauncher
-from data_processing.utils import PipInstaller, TransformRuntime, TransformsConfiguration
+from data_processing.utils import PipInstaller, TransformRuntime, TransformsConfiguration, import_class
 
 project = "https://github.com/IBM/data-prep-kit.git"
-logger = get_logger(__name__)
-
-
-def _import_class(name):
-    components = name.split('.')
-    mod = __import__(components[0])
-    for comp in components[1:]:
-        mod = getattr(mod, comp)
-    return mod
+executor_logger = get_logger(__name__)
 
 
 def execute_python_transform(name: str, input_folder: str, output_folder: str, params: dict[str, Any]) -> bool:
@@ -36,15 +28,14 @@ def execute_python_transform(name: str, input_folder: str, output_folder: str, p
         return False
 
     installer = PipInstaller()
-
-    # Install transform
-    if not installer.install(project=project, subdirectory=subdirectory, name=l_name):
-        logger.warning(f"failed to install transform {name}")
-        return False
+    # Check if transformer already installed
+    installed = False
     if not installer.validate(name=l_name):
-        logger.warning(f"failed to install transform {l_name}")
-        return False
-
+        # transformer is not installed, install it
+        if not installer.install(project=project, subdirectory=subdirectory, name=l_name):
+            executor_logger.warning(f"failed to install transform {name}")
+            return False
+        installed = True
     # configure input parameters
     location = {
         "data_local_config": ParamsUtils.convert_to_ast({
@@ -53,23 +44,30 @@ def execute_python_transform(name: str, input_folder: str, output_folder: str, p
         })}
     p = location | params
     # create configuration
-    klass = _import_class(t_class)
+    klass = import_class(t_class)
     transform_configuration = klass()
     # Set the command line args
+    current_args = sys.argv
     sys.argv = ParamsUtils.dict_to_req(d=p)
     # create launcher
     launcher = PythonTransformLauncher(runtime_config=transform_configuration)
     # Launch the ray actor(s) to process the input
     res = launcher.launch()
-    if not installer.uninstall(name=l_name):
-        logger.warning(f"failed uninstall transform {l_name}")
+    # restore args
+    sys.argv = current_args
+    if installed:
+        # we installed transformer, uninstall it
+        if not installer.uninstall(name=l_name):
+            executor_logger.warning(f"failed uninstall transform {l_name}")
     if res == 0:
         return True
-    logger.warning(f"failed execution of transform {name}")
+    executor_logger.warning(f"failed execution of transform {name}")
+    return False
 
-
-execute_python_transform(
-    name="noop",
-    input_folder="/Users/borisl/IdeaProjects/data-prep-kit/transforms/universal/noop/python/test-data/input",
-    output_folder="/Users/borisl/IdeaProjects/data-prep-kit/transforms/universal/noop/python/output",
-    params={"noop_sleep_sec": 1})
+if __name__ == "__main__":
+    r = execute_python_transform(
+        name="noop",
+        input_folder="/Users/borisl/IdeaProjects/data-prep-kit/transforms/universal/noop/python/test-data/input",
+        output_folder="/Users/borisl/IdeaProjects/data-prep-kit/transforms/universal/noop/python/output",
+        params={"noop_sleep_sec": 1})
+    executor_logger.info(f"completed execution with result {r}")
