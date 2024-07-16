@@ -3,7 +3,7 @@ import logging
 import os
 
 from pyspark.sql import functions as F
-from pyspark.sql.functions import col, collect_list, desc, size
+from pyspark.sql.functions import col, collect_set, desc, size
 from pyspark.sql.types import ArrayType, IntegerType, LongType, StructField, StructType
 from scipy.integrate import quad as integrate
 from spark_transformer_runtime import SparkFileBatcher, SparkTransformerRuntime
@@ -95,7 +95,7 @@ class FDClustersCalculator(SparkTransformerRuntime):
                 spark_df = self.read_data(input_batch, self.file_ext)
                 logging.info(f"  Read {spark_df.count()} documents")
                 self.total_number_of_documents += spark_df.count()
-                group_df = spark_df.groupBy("band_hash").agg(collect_list("int_id_column").alias("doc_ids"))
+                group_df = spark_df.groupBy("band_hash").agg(collect_set("int_id_column").alias("doc_ids"))
                 group_df = group_df.withColumn("cluster_size", size(col("doc_ids")))
                 group_df = group_df.orderBy(desc("cluster_size"))
                 band_df = band_df.union(group_df)
