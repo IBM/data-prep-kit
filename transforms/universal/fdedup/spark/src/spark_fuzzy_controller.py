@@ -59,12 +59,7 @@ def main(config_path="config.yml"):
     for step in config["steps"]:
         run_step(step, common_args, common_configs)
 
-    # with ThreadPoolExecutor() as executor:
-    #     futures = [executor.submit(run_step, step, common_args, common_heuristics) for step in config['steps']]
-    #     for future in futures:
-    #         future.result()
-
 
 if __name__ == "__main__":
     logging.info("Created spark session for generating minhash and band signatures")
-    main("config.yaml")
+    main("config.yml")
