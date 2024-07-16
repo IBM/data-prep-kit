@@ -2,7 +2,7 @@ MODEL_NAME=TinyLlama-1.1B-Chat-v0.6
 MODEL_DIR=models
 
 download_model:
-	@# Help: Clone the cc_net repo with the kenlm model and build the model
+	@# Help: Clone the huggingface moddel
 	@if [[ ! -d "../$(MODEL_DIR)" ]]; then \
 	    pip install -U "huggingface_hub[cli]"; \
 		cd ../; \
