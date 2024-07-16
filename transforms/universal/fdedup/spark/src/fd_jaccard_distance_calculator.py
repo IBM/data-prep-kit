@@ -13,9 +13,7 @@ from Murmur_MH import Murmur_MH
 from pyspark import RDD
 from pyspark.sql import DataFrame, Row
 from pyspark.sql import functions as F
-from pyspark.sql.functions import col, collect_list, explode, first, lit
-from pyspark.sql.functions import sum as _sum
-from pyspark.sql.functions import udf, when
+from pyspark.sql.functions import col, explode, size, udf
 from pyspark.sql.types import (
     ArrayType,
     BooleanType,
@@ -69,7 +67,6 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         self.num_permutations = num_permutations
         self.word_shingle_size = word_shingle_size
         self.jaccard_similarity_threshold = jaccard_similarity_threshold
-        self.num_bands, _ = _optimal_minhashlsh_param(self.jaccard_similarity_threshold, self.num_permutations)
         self.salting_size = salting_size
         self.debug = debug
         self.language = language
@@ -84,10 +81,25 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
             # if the code is running locally, add Murmur_MH.py to the py files used by the Spark context
             murmur_mh_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Murmur_MH.py")
             self.spark.sparkContext.addPyFile(murmur_mh_filepath)
-        logging.info("Initialized Spark Fuzzy Dedupe")
+        logging.info("Initialized Spark Fuzzy Dedupe document to remove calculation")
 
-    def run_transform(self):
+    def get_num_bands_from_metadata(self) -> int:
+        # Read number of bands from metadata
+        spark_df_metadata = self.read_data(os.path.join(self.band_output_path, "metadata"), "json")
+        in_out_metadata_val = spark_df_metadata.toJSON().collect()
+        json_object = json.loads(in_out_metadata_val[0])
+        num_bands = json.loads(json_object.get("value"))["num_bands"]
+        return num_bands
 
+    def define_schemas(self) -> tuple[StructType, StructType, StructType]:
+        # Define cluster schema
+        cluster_schema = StructType(
+            [
+                StructField("band_hash", LongType(), True),
+                StructField("doc_ids", ArrayType(LongType()), True),
+                StructField("cluster_size", IntegerType(), True),
+            ]
+        )
         # Define the minhash schema
         minhash_schema = StructType(
             [
@@ -105,12 +117,74 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
                 ),
             ]
         )
-        final_band_df = self.spark.createDataFrame([], minhash_schema)
+        # Define doc2remove schema
+        doc2remove_schema = StructType(
+            [
+                StructField("int_id_column", LongType(), True),
+                StructField("doc_ids", ArrayType(LongType()), True),
+                StructField("cluster_size", IntegerType(), True),
+            ]
+        )
+        return cluster_schema, minhash_schema, doc2remove_schema
 
-        logging.info(f"Default_batch_size{self.default_batch_size} rows")
-
+    def load_band_clusters(self, cluster_schema: StructType, band_index: int) -> DataFrame:
+        cluster_band_df = self.spark.createDataFrame([], cluster_schema)
+        logging.info(f"Loading clusters for band {band_index}")
         # Band hash and doc_ids
-        self.input_files, self.file_stats = self.list_files(self.clusters_doc_ids_output_path, self.file_ext)
+        band_cluster_doc_ids_path = os.path.join(
+            self.clusters_doc_ids_output_path,
+            f"cluster_bands_{band_index}",
+        )
+        self.input_files, self.file_stats = self.list_files(
+            band_cluster_doc_ids_path,
+            self.file_ext,
+        )
+        batch_size = 10000000
+        file_batcher = SparkFileBatcher(
+            self.input_files,
+            batch_size,
+            self.out_data_access,
+            os.path.join(self.output_path, "checkpoint.txt"),
+        )
+        while True:
+            self.checkpoint_count += 1
+            # Get next batch
+            input_batch, batch_size = file_batcher.next_batch()
+            # used to track document size
+            self.total_document_size += batch_size
+            if not input_batch:
+                break
+            logging.info(
+                f"Processing batch {file_batcher.current_batch_index} " f"out of {file_batcher.total_batches}"
+            )
+            spark_df_cluster_bands = self.read_data(input_batch, self.file_ext)
+            logging.info(f"spark_df_cluster_bands has {spark_df_cluster_bands.count()} rows")
+            cluster_band_df = cluster_band_df.union(spark_df_cluster_bands)
+        logging.info(f"Band {band_index} has {cluster_band_df.count()} clusters")
+        return cluster_band_df
+
+    def purge_clusters(self, band_clusters: DataFrame, docs_to_remove: set[LongType]) -> DataFrame:
+        def remove_doc_ids(doc_list, docs_to_remove):
+            return [x for x in doc_list if x not in docs_to_remove]
+
+        remove_integers_udf = udf(lambda doc_list: remove_doc_ids(doc_list, docs_to_remove), ArrayType(LongType()))
+        df_with_removed_docs = band_clusters.withColumn(
+            "doc_ids_filtered", remove_integers_udf(band_clusters["doc_ids"])
+        )
+        df_with_removed_docs = df_with_removed_docs.withColumn("purged_cluster_size", size(col("doc_ids_filtered")))
+        purged_cluster_df = df_with_removed_docs.filter(col("purged_cluster_size") > 0)
+        purged_cluster_df = purged_cluster_df.drop(["doc_ids_filtered", "purged_cluster_size"])
+        return purged_cluster_df
+
+    def add_minhash_to_clusters(self, cluster_band_df: DataFrame, minhash_schema: StructType) -> DataFrame:
+        # Explode spark_df_cluster_bands
+        spark_df_cluster_bands_exploded = cluster_band_df.withColumn("int_id_column", explode("doc_ids")).select(
+            "band_hash", "int_id_column"
+        )
+
+        # read minhash
+        minhash_band_df = self.spark.createDataFrame([], minhash_schema)
+        self.input_files, self.file_stats = self.list_files(self.minhash_output_path, self.file_ext)
         self.default_batch_size = 1
         file_batcher = SparkFileBatcher(
             self.input_files,
@@ -118,7 +192,7 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
             self.out_data_access,
             os.path.join(self.output_path, "checkpoint.txt"),
         )
-        logging.info("Starting signature group by bands and number process")
+        logging.info("Adding minhashes to the cluster documents")
 
         while True:
             self.checkpoint_count += 1
@@ -132,181 +206,118 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
             logging.info(
                 f"Processing batch {file_batcher.current_batch_index} " f"out of {file_batcher.total_batches}"
             )
-            spark_df_cluster_bands = self.read_data(input_batch, self.file_ext)
-            logging.info(f"spark_df_rdd has {spark_df_cluster_bands.count()} rows")
+            spark_df_rdd_minhash = self.read_data(input_batch, self.file_ext)
 
-            # Explode spark_df_cluster_bands
-            spark_df_cluster_bands_exploded = spark_df_cluster_bands.withColumn(
-                "int_id_column", explode("doc_ids")
-            ).select("band_hash", "int_id_column")
+            # Join the exploded DataFrame with the second DataFrame
+            joined_df = spark_df_cluster_bands_exploded.join(
+                spark_df_rdd_minhash, on="int_id_column", how="inner"
+            ).select("band_hash", "int_id_column", "data")
 
-            # Step 2: read minhash
-            self.input_files, self.file_stats = self.list_files(self.minhash_output_path, self.file_ext)
-            self.default_batch_size = 1
-            file_batcher = SparkFileBatcher(
-                self.input_files,
-                self.default_batch_size,
-                self.out_data_access,
-                os.path.join(self.output_path, "checkpoint.txt"),
-            )
-            logging.info("Starting signature group by bands and number process")
+            minhash_band_df = minhash_band_df.union(joined_df)
 
-            while True:
-                self.checkpoint_count += 1
-                # Get next batch
-                input_batch, batch_size = file_batcher.next_batch()
-                # used to track document size
-                self.total_document_size += batch_size
-                if not input_batch:
-                    break
+        # Group by band_hash and aggregate int_id_column, document_length, and minhashes
+        minhash_cluster_df = minhash_band_df.groupby("band_hash").agg(
+            F.collect_list(F.struct("int_id_column", "data.document_length", "data.minhashes")).alias("combined_data")
+        )
+        logging.info(f"minhash_cluster_df has {minhash_cluster_df.count()} rows")
+        # first_row = minhash_cluster_df.take(1)[0]
+        # print("minhash_cluster_df")
+        # print(first_row)
+        return minhash_cluster_df
 
-                logging.info(
-                    f"Processing batch {file_batcher.current_batch_index} " f"out of {file_batcher.total_batches}"
+    def sort_clusters(self, minhash_cluster_df: DataFrame) -> DataFrame:
+        def sort_combined_data(combined_data):
+            return sorted(combined_data, key=lambda x: (-x.document_length, x.int_id_column))
+
+        sort_udf = udf(
+            sort_combined_data,
+            ArrayType(
+                StructType(
+                    [
+                        StructField("int_id_column", LongType(), True),
+                        StructField("document_length", IntegerType(), True),
+                        StructField("minhashes", ArrayType(IntegerType()), True),
+                    ]
                 )
-                spark_df_rdd_minhash = self.read_data(input_batch, self.file_ext)
+            ),
+        )
+        # Apply the UDF to sort the combined_data array
+        sorted_clusters_df = minhash_cluster_df.withColumn("combined_data", sort_udf(col("combined_data")))
+        logging.info(f"sorted_clusters_df has {sorted_clusters_df.count()} rows")
+        # first_row = sorted_clusters_df.take(1)[0]
+        # print("sorted_clusters_df")
+        # print(first_row)
+        return sorted_clusters_df
 
-                # Join the exploded DataFrame with the second DataFrame
-                joined_df = spark_df_cluster_bands_exploded.join(
-                    spark_df_rdd_minhash, on="int_id_column", how="inner"
-                ).select("band_hash", "int_id_column", "data")
+    def get_docs_to_remove(
+        self,
+        sorted_cluster_df: DataFrame,
+        doc2remove_schema: StructType,
+    ) -> tuple[DataFrame, list]:
+        # Define the cluster processing function
+        def cluster_processing(row, threshold: float = self.jaccard_similarity_threshold):
+            docs_to_remove = []
+            combined_data = row.combined_data
+            doc_list = [doc_id for doc_id, _, _ in combined_data]
+            doc_minhashes = {doc_id: mh for doc_id, _, mh in combined_data}
+            # this is the document we are going to keep
+            first_doc = doc_list[0]
+            first_mh = doc_minhashes[first_doc]
+            for doc_id in doc_list[1:]:
+                doc_mh = doc_minhashes[doc_id]
+                distance = Murmur_MH.jaccard(np.array(first_mh), np.array(doc_mh))
+                if distance >= threshold:
+                    docs_to_remove.append(doc_id)
+            docs_to_remove = list(set(docs_to_remove))
+            yield (first_doc, docs_to_remove, len(docs_to_remove))
 
-                final_band_df = final_band_df.union(joined_df)
+        # Use flatMap with the custom processing function
+        doc_clusters = sorted_cluster_df.rdd.flatMap(lambda row: cluster_processing(row))
+        docs_to_remove_df = self.spark.createDataFrame(doc_clusters, doc2remove_schema)
+        docs_to_remove_df = docs_to_remove_df.filter(col("cluster_size") > 0)
+        docs_to_remove_df = docs_to_remove_df.drop("cluster_size")
+        docs_to_remove_explode = docs_to_remove_df.withColumn("rm_doc_id", explode(col("doc_ids")))
+        docs_to_remove_list = [int(row.rm_doc_id) for row in docs_to_remove_explode.select("rm_doc_id").collect()]
+        return docs_to_remove_df, docs_to_remove_list
 
-            # Group by band_hash and aggregate int_id_column, document_length, and minhashes
-            result_df = final_band_df.groupby("band_hash").agg(
-                F.collect_list(F.struct("int_id_column", "data.document_length", "data.minhashes")).alias(
-                    "combined_data"
-                )
+    def run_transform(self):
+        num_bands = self.get_num_bands_from_metadata()
+        cluster_schema, minhash_schema, doc2remove_schema = self.define_schemas()
+        docs2remove_list = []
+        for band_index in range(num_bands):
+            # load the clusters calculated for the band (through band hash groupBy)
+            # we cannot slice the band clusters so the only thing we can do is
+            # to setup a batch size so that the data loaded during each batch is
+            # small enough that it does not overflow
+            cluster_band_df = self.load_band_clusters(cluster_schema, band_index)
+            # exclude the clusters for which all the docs were already removed
+            if docs2remove_list:
+                purged_cluster_df = self.purge_clusters(cluster_band_df, set(docs2remove_list))
+            else:
+                purged_cluster_df = cluster_band_df
+
+            logging.info(f"purged_cluster_df.count() = {purged_cluster_df.count()}")
+            # Identify the list of documents to remove:
+            # Sort the documents inside each cluster by size, and double-check
+            # that Jaccard similarity between docs in the same cluster is above
+            # a given threshold
+            minhash_cluster_df = self.add_minhash_to_clusters(
+                purged_cluster_df,
+                minhash_schema,
             )
+            sorted_cluster_df = self.sort_clusters(minhash_cluster_df)
 
-            # Convert to the desired structure (band_hash, [(int_id_column, document_length, minhashes), ...])
-            result = result_df.rdd.map(
-                lambda row: (
-                    row.band_hash,
-                    [(item.int_id_column, item.document_length, item.minhashes) for item in row.combined_data],
-                )
-            ).collect()
-
-            # Create a new DataFrame from the output data
-            output_schema = StructType(
-                [
-                    StructField("band_hash", LongType(), True),
-                    StructField(
-                        "combined_data",
-                        ArrayType(
-                            StructType(
-                                [
-                                    StructField("int_id_column", LongType(), True),
-                                    StructField("document_length", IntegerType(), True),
-                                    StructField("minhashes", ArrayType(IntegerType()), True),
-                                ]
-                            )
-                        ),
-                        True,
-                    ),
-                ]
+            docs_to_remove_df, docs_to_remove_list = self.get_docs_to_remove(
+                sorted_cluster_df,
+                doc2remove_schema,
             )
+            print(f"Band {band_index}: docs_to_remove_df has {docs_to_remove_df.count()} rows")
+            print(docs_to_remove_df.show(truncate=False))
 
-            output_df = self.spark.createDataFrame(result, schema=output_schema)
-
-            # sort data based on document_length
-            def sort_combined_data(combined_data):
-                return sorted(combined_data, key=lambda x: x.document_length)
-
-            sort_udf = udf(
-                sort_combined_data,
-                ArrayType(
-                    StructType(
-                        [
-                            StructField("int_id_column", LongType(), True),
-                            StructField("document_length", IntegerType(), True),
-                            StructField("minhashes", ArrayType(IntegerType()), True),
-                        ]
-                    )
-                ),
-            )
-
-            # Apply the UDF to sort the combined_data array
-            sorted_df = output_df.withColumn("combined_data", sort_udf(col("combined_data")))
-
-            # Define the cluster processing function
-            def cluster_processing(row, threshold: float = 0.8):
-                band_hash = row.band_hash
-                combined_data = row.combined_data
-
-                candidates_list = {doc_id: mh for doc_id, doc_len, mh in combined_data}
-
-                doc_lengths = {doc_id: doc_len for doc_id, doc_len, mh in combined_data}
-
-                ds = disjoint_set.DisjointSet.from_iterable(
-                    candidates_list.keys()
-                )  # set with no-overlap (a set = a cluster of similar documents)
-                unvisited = set(candidates_list.keys())
-
-                while len(unvisited) > 0:
-                    current_doc_id = unvisited.pop()
-                    current_mh = candidates_list[current_doc_id]
-                    del candidates_list[current_doc_id]
-                    for other_doc_id, other_mh in candidates_list.items():
-                        distance = Murmur_MH.jaccard(np.array(current_mh), np.array(other_mh))
-                        # print(f"distance: {distance} ? {threshold}")
-                        d1 = ds.find(current_doc_id)
-                        d2 = ds.find(other_doc_id)
-                        if d1 != d2:  # union must apply based on canonical node
-                            if distance >= threshold:
-                                ds.union(d1, d2)
-                            # unvisited.discard(other_doc_id) # we should not remove as it can
-                            # be used to look for other matching candidates
-
-                local_connected_components = list(ds.itersets(with_canonical_elements=True))
-
-                def get_doc2keep_first(doc_id):
-                    return (-doc_lengths[doc_id], -doc_id)
-
-                for _, duplicates_list in local_connected_components:
-                    duplicates_list = sorted(duplicates_list, key=get_doc2keep_first)
-                    cluster_id = duplicates_list[0]
-                    cluster_size = len(duplicates_list)
-                    string = ",".join([str(i) for i in duplicates_list])
-                    for d in duplicates_list:
-                        if d == cluster_id:
-                            keep = True
-                            # low_threshold = True
-                        else:
-                            keep = False
-                            # distance = Murmur_MH.jaccard(candidates_list[d], candidates_list[cluster_id])
-                            # if distance < threshold:
-                            #    low_threshold = True
-                        # FIXME : DEBUG PURPOSE
-                        # low_threshold = False
-                        # END FIXME
-                        yield (cluster_id, d, doc_lengths[d], cluster_size, keep, string)  # , low_threshold)
-
-                # for item in combined_data:
-                #     yield (band_hash, item.int_id_column, item.document_length, item.minhashes)
-
-            # Use flatMap with the custom processing function
-            doc_clusters = sorted_df.rdd.flatMap(lambda row: cluster_processing(row))
-
-            doc_cluster_partitions = doc_clusters.getNumPartitions()
-            logging.info(f"{doc_clusters.count()} clusters ---- with {doc_cluster_partitions} partitions")
-
-            # Get the schema
-            columns = ["cluster_id", self.document_id_column, "doc_len", "cluster_size", "keep", "doc_ids"]
-            schema = self.get_schema_fuzzy_dedup(columns)
-
-            # create data frame from document clusters
-            doc_in_group_df = self.spark.createDataFrame(doc_clusters, schema=schema)
-            logging.info(f"Check doc_in_group_df has {doc_in_group_df.count()} rows")
-
-            fuzzyclustersize_threshold = 1
-            out_sdf = doc_in_group_df.filter(F.col("cluster_size") > fuzzyclustersize_threshold).filter(
-                F.col("keep") != True
-            )  # .drop('low_threshold')
-            doc2remove_sdf = out_sdf.select(self.document_id_column, "doc_ids").dropDuplicates()
+            # docs2remove_list += docs_to_remove_list
 
             # write doc2remove_sdf
-            self.write_data(doc2remove_sdf, self.doc2remove_output_path, self.file_ext)
+            self.write_data(docs_to_remove_df, self.doc2remove_output_path, self.file_ext)
             # remove data
             self.input_files, self.file_stats = self.list_files(self.input_path, self.file_ext)
             file_batcher = SparkFileBatcher(
@@ -343,30 +354,6 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
 
                 # write doc2remove_sdf
                 self.write_data(final_sdf, self.cleaned_output_path, self.file_ext)
-
-    def get_schema_fuzzy_dedup(self, columns: list[str]) -> Union[LongType, BooleanType, StringType]:
-        """
-        Create a StructType schema from a list of column names. Column names
-        are used so as to support multiple datatypes e.g., datapile and redpyjama
-
-        Args:
-        columns (list of str): List of column names.
-
-        Returns:
-        StructType: PySpark StructType schema.
-        """
-
-        def get_schema_fuzzy_dedup_column(column_name):
-            if column_name in [self.document_id_column, "doc_len", "cluster_size"]:
-                return LongType()
-            elif column_name == "keep":
-                return BooleanType()
-            else:
-                return StringType()
-
-        fields = [StructField(column, get_schema_fuzzy_dedup_column(column), True) for column in columns]
-        schema = StructType(fields)
-        return schema
 
     def execute(self):
         try:
