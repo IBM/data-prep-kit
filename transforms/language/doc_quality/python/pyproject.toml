@@ -20,6 +20,7 @@ dependencies = [
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
 
+
 [project.optional-dependencies]
 dev = [
     "twine",
