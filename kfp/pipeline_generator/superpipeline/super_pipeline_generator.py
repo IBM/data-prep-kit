@@ -3,8 +3,8 @@ import json
 import yaml
 
 
-PRE_COMMIT = "./pre-commit-config.yaml"
-PIPELINE_TEMPLATE_FILE = "superpipeline.ptmpl"
+PRE_COMMIT = "../pre-commit-config.yaml"
+PIPELINE_TEMPLATE_FILE = "template/superpipeline.ptmpl"
 
 PIPELINE_TASKS = "super_pipeline_tasks"
 COMMON_INPUT_PARAMETERS = "super_pipeline_common_parameters"
@@ -116,10 +116,10 @@ if __name__ == "__main__":
     for task_step_params in tasks_steps_params:
         task_params = task_step_params.get(STEP_PARAMETERS)
         task_name = pipeline_tasks[index]["name"]
-        sub_workflows_parameters += "\n# " + task_name + " step parameters"
-        sub_workflows_parameters += "\np" + str(index + 3) + "_name: str = \"" + task_name + "\","
+        sub_workflows_parameters += "\n\t# " + task_name + " step parameters"
+        sub_workflows_parameters += "\n\tp" + str(index + 3) + "_name: str = \"" + task_name + "\","
         sub_workflows_parameters += get_generic_params(task_params, "p" + str(index + 3) + "_")
-        override_params = "\np" + str(index + 3) + "_overriding_params: str = '{\"ray_worker_options\": {\"image\": \"' + " + task_name + "_image + '\"}, "
+        override_params = "\n\tp" + str(index + 3) + "_overriding_params: str = '{\"ray_worker_options\": {\"image\": \"' + " + task_name + "_image + '\"}, "
         override_params += "\"ray_head_options\": {\"image\": \"' + " + task_name + "_image + '\"}}',"
         sub_workflows_parameters += override_params
 
