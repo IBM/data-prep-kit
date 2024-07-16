@@ -187,7 +187,7 @@ class RepoLevelOrderRuntime(DefaultRayTransformRuntime):
         )
 
         if self.sorting_enabled:
-            self.logger.info(f"Repo leve sorting is enabled. Algo: {self.sorting_algo}")
+            self.logger.info(f"Repo level sorting is enabled. Algo: {self.sorting_algo}")
             from dpk_repo_level_order.internal.repo_level_wrappers import (
                 SORT_BY_PATH,
                 SORT_SEMANTIC,
@@ -251,7 +251,7 @@ class RepoLevelOrderRuntime(DefaultRayTransformRuntime):
         )
 
         p_pool = ActorPool(processors)
-        replies = list(p_pool.map(lambda a, x: a.process.remote(x[0], x[1]), p_input))
+        replies = list(p_pool.map_unordered(lambda a, x: a.process.remote(x[0], x[1]), p_input))
         return {"nrepos": len(p_input)}
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
