@@ -16,11 +16,11 @@ import sys
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 from filter_transform import (
-    FilterTransformConfiguration,
     filter_columns_to_drop_cli_param,
     filter_criteria_cli_param,
     filter_logical_operator_cli_param,
 )
+from filter_transform_python import FilterPythonTransformConfiguration
 
 
 # create parameters
@@ -55,6 +55,6 @@ if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params | filter_params)
     # create launcher
-    launcher = PythonTransformLauncher(FilterTransformConfiguration())
+    launcher = PythonTransformLauncher(FilterPythonTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()
