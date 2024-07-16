@@ -173,7 +173,7 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         )
         df_with_removed_docs = df_with_removed_docs.withColumn("purged_cluster_size", size(col("doc_ids_filtered")))
         purged_cluster_df = df_with_removed_docs.filter(col("purged_cluster_size") > 0)
-        purged_cluster_df = purged_cluster_df.drop(["doc_ids_filtered", "purged_cluster_size"])
+        purged_cluster_df = purged_cluster_df.drop(*["doc_ids_filtered", "purged_cluster_size"])
         return purged_cluster_df
 
     def add_minhash_to_clusters(self, cluster_band_df: DataFrame, minhash_schema: StructType) -> DataFrame:
@@ -314,46 +314,10 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
             print(f"Band {band_index}: docs_to_remove_df has {docs_to_remove_df.count()} rows")
             print(docs_to_remove_df.show(truncate=False))
 
-            # docs2remove_list += docs_to_remove_list
-
+            docs2remove_list.extend(docs_to_remove_list)
+            docs2remove_list = list(set(docs2remove_list))
             # write doc2remove_sdf
             self.write_data(docs_to_remove_df, self.doc2remove_output_path, self.file_ext)
-            # remove data
-            self.input_files, self.file_stats = self.list_files(self.input_path, self.file_ext)
-            file_batcher = SparkFileBatcher(
-                self.input_files,
-                self.default_batch_size,
-                self.out_data_access,
-                os.path.join(self.output_path, "checkpoint.txt"),
-            )
-            logging.info("Starting fuzzy dedupe data clean")
-
-            # Loop through batches until all files processed
-            while True:
-                # Get next batch
-                input_batch, batch_size = file_batcher.next_batch()
-                if not input_batch:
-                    break
-
-                logging.info(
-                    f"Processing batch {file_batcher.current_batch_index} out of {file_batcher.total_batches}"
-                )
-
-                # read ids of duplicate data
-                sdf_doc2remove = self.read_data(self.doc2remove_output_path, self.file_ext)
-
-                # read raw data
-                spark_df = self.read_data(input_batch, self.file_ext)
-
-                matching_cols = [self.document_id_column]
-
-                if sdf_doc2remove is None:
-                    final_sdf = spark_df
-                else:
-                    final_sdf = spark_df.join(sdf_doc2remove, on=matching_cols, how="left_anti")
-
-                # write doc2remove_sdf
-                self.write_data(final_sdf, self.cleaned_output_path, self.file_ext)
 
     def execute(self):
         try:

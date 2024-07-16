@@ -1,0 +1,60 @@
+logging_level: "INFO"
+common_args:
+    input_path: ${HOME}
+    output_path: ${HOME}
+    file_ext: .parquet
+    default_batch_size: 300
+    document_id_column: int_id_column
+    contents_column: contents
+    debug: False
+    checkpoint_count: 0
+    total_document_size: 0
+    total_number_of_documents: 0
+
+common_configs:
+    common_config1: common_value1
+    common_config2: common_value2
+
+steps:
+    - name: step1
+      udf_path: "fd_signature_calculator.py"
+      udf_class: "FDSignatureCalculator"
+      args:
+          seed: 42
+          num_permutations: 64
+          jaccard_similarity_threshold: 0.8
+          language: unspecified
+          word_shingle_size: 8
+      configs:
+          heuristic1: value1
+
+    - name: step2
+      udf_path: "fd_clusters_calculator.py"
+      udf_class: "FDClustersCalculator"
+      args:
+          seed: 42
+          default_batch_size: 10000000
+      configs:
+          heuristic1: value2
+
+    - name: step3
+      udf_path: "fd_jaccard_distance_calculator.py"
+      udf_class: "FDJaccardDistanceCalculator"
+      args:
+          seed: 42
+          default_batch_size: 50
+          num_permutations: 64
+          jaccard_similarity_threshold: 0.8
+          language: unspecified
+          word_shingle_size: 8
+          salting_size: 1
+      configs:
+          heuristic1: value2
+
+    - name: step4
+      udf_path: "fd_clean_data.py"
+      udf_class: "FDCleanData"
+      args:
+          default_batch_size: 300
+      configs:
+          heuristic1: value2

@@ -45,8 +45,8 @@ def setup_logging(log_level):
     logger.addHandler(handler)
 
 
-def main(config_path="config.yaml"):
-    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yaml")
+def main(config_path="config.yml"):
+    config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.yml")
     with open(config_path, "r") as config_fp:
         config = yaml.safe_load(os.path.expandvars(config_fp.read()))
 
