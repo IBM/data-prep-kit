@@ -25,7 +25,7 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 ## 📝 Table of Contents
 - [About](#about)
 - [Quick Start](doc/quick-start/quick-start.md)
-- [Data Processing Modules](#modules)
+- [Data Preparation Modules](#modules)
 - [Data Processing Framework](#data-proc-lib)
 - [Repository Use and Navigation](doc/repo.md)
 - [How to Contribute](CONTRIBUTING.md)
