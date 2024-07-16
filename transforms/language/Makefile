@@ -34,15 +34,27 @@ publish::
 	@$(MAKE) RULE=$@ .recurse
 
 
-load-image::
+set-versions:  
+	@# Help: Recursively $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
+kind-load-image::
 	@# Help: Recursively make $@ in all subdirs
 	@$(MAKE) RULE=$@ .recurse
+
+docker-load-image::
+	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
+
+docker-save-image::
+	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
 workflow-venv::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse	
 
-workflow-build::
+setup::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse
 
@@ -54,7 +66,6 @@ workflow-upload::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse
 
-workflow-reconcile-requirements::
-	@# Help: Recursively make $@ in all subdirs
-	@$(MAKE) RULE=$@ .recurse
-
+workflow-build::
+	@# Help: Recursively make $@ in subdirs
+	$(MAKE) RULE=$@ .recurse

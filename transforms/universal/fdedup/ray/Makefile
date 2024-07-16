@@ -7,12 +7,9 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=fdedup
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${FDEDUP_VERSION}
 
+BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
-
-build::	.transforms.ray-build
 
 test::	.transforms.ray-test
 
@@ -24,25 +21,38 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-test-image:: .transforms.test-image-help
-	@echo WARNING: Skipping pytest test until we have a test/test_fdedup.py file.
+test-image:: .transforms.ray-test-image
 
-publish:: .transforms.ray-publish
+build:: build-dist image
 
-run-cli-ray-sample: 
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+publish: publish-image
+
+publish-image:: .transforms.publish-image-ray
+
+setup:: .transforms.setup
+
+# TRANSFORM_PYTHON_VERSION has no effect since requirements do not specify a python transform implementation
+set-versions:
+	$(MAKE) TRANSFORM_PYTHON_VERSION=dummy TOML_VERSION=$(FDEDUP_RAY_VERSION) .transforms.set-versions 
+
+build-dist:: .defaults.build-dist
+
+publish-dist:: .defaults.publish-dist
+
+run-cli-sample:
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
                 --fdedup_id_column int_id_column"	\
                 .transforms.run-src-file
 
-run-local-sample: # .transforms.run-local-sample
-	@# Help: Not implemented yet
-	@echo "No src/fdedup_local.py yet :("
+run-local-sample: .transforms.run-local-ray-sample
 
-run-local-ray-sample: .transforms.run-local-ray-sample
-
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image

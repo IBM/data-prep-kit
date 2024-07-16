@@ -1,0 +1,28 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+    - role: control-plane
+      image: kindest/node:v1.29.2@sha256:51a1434a5397193442f0be2a297b488b6c919ce8a3931be0ce822606ea5ca245
+      kubeadmConfigPatches:
+          - |
+              kind: InitConfiguration
+              nodeRegistration:
+                kubeletExtraArgs:
+                  node-labels: "ingress-ready=true"
+      extraPortMappings:
+          - containerPort: 80
+            hostPort: 8080
+            listenAddress: "0.0.0.0"
+          - containerPort: 443
+            hostPort: 8433
+            listenAddress: "0.0.0.0"
+          - containerPort: 90
+            hostPort: 8090
+            listenAddress: "0.0.0.0"
+          - containerPort: 453
+            hostPort: 8453
+            listenAddress: "0.0.0.0"
+    - role: worker
+      image: kindest/node:v1.29.2@sha256:51a1434a5397193442f0be2a297b488b6c919ce8a3931be0ce822606ea5ca245
+    - role: worker
+      image: kindest/node:v1.29.2@sha256:51a1434a5397193442f0be2a297b488b6c919ce8a3931be0ce822606ea5ca245

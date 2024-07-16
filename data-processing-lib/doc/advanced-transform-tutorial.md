@@ -32,13 +32,13 @@ Finally, we show to use the command line to run the transform in a local ray clu
 
 One of the basic components of exact dedup implementation is a cache of hashes. That is why we will start
 from implementing this support actor. The implementation is fairly straight forward and can be
-found [here](../../transforms/universal/ededup/src/ededup_transform.py)
+found [here](../../transforms/universal/ededup/ray/src/ededup_transform_ray.py)
 
 ## EdedupTransform
 
 First, let's define the transform class.  To do this we extend
 the base abstract/interface class
-[AbstractTableTransform](../ray/src/data_processing/transform/table_transform.py),
+[AbstractTableTransform](../python/src/data_processing/transform/table_transform.py),
 which requires definition of the following:
 
 * an initializer (i.e. `init()`) that accepts a dictionary of configuration
@@ -58,13 +58,13 @@ from typing import Any
 
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccessFactoryBase
-from data_processing.runtime.ray import (
+from data_processing_ray.data_access import DataAccessFactoryBase
+from data_processing_ray.runtime.ray import (
   DefaultRayTransformRuntime,
   RayTransformLauncher,
   RayUtils,
 )
-from data_processing.runtime.ray.runtime_configuration import (
+from data_processing_ray.runtime.ray.runtime_configuration import (
   RayTransformRuntimeConfiguration,
 )
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
@@ -140,7 +140,7 @@ If there is no metadata then simply return an empty dictionary.
 
 First, let's define the transform runtime class.  To do this we extend
 the base abstract/interface class
-[DefaultTableTransformRuntime](../ray/src/data_processing/runtime/ray/transform_runtime.py),
+[DefaultTableTransformRuntime](../ray/src/data_processing_ray/runtime/ray/transform_runtime.py),
 which requires definition of the following:
 
 * an initializer (i.e. `init()`) that accepts a dictionary of configuration
@@ -166,14 +166,16 @@ adds their handles to the transform parameters
 ```python
     def get_transform_config(
         self, data_access_factory: DataAccessFactory, statistics: ActorHandle, files: list[str]
-    ) -> dict[str, Any]:
-        self.filters = RayUtils.create_actors(
-            clazz=HashFilter,
-            params={},
-            actor_options={"num_cpus": self.params.get("hash_cpu", 0.5)},
-            n_actors=self.params.get("num_hashes", 1),
-        )
-        return {"hashes": self.filters} | self.params
+) -> dict[str, Any]:
+
+
+self.aggregators = RayUtils.create_actors(
+  clazz=HashFilter,
+  params={},
+  actor_options={"num_cpus": self.params.get("hash_cpu", 0.5)},
+  n_actors=self.params.get("num_hashes", 1),
+)
+return {"hashes": self.aggregators} | self.params
 ```
 Inputs to this method includes a set of parameters, that moght not be needed for this transformer, but
 rather a superset of all parameters that can be used by different implementations of transform runtime (
@@ -187,20 +189,22 @@ class
 
 ```python
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
-    # Get filters stats
-    sum_hash = 0
-    sum_hash_mem = 0
-    remote_replies = [f.get_hash_size.remote() for f in self.filters]
-    while remote_replies:
-        # Wait for replies
-        ready, not_ready = ray.wait(remote_replies)
-        for r in ready:
-            h_size, h_memory = ray.get(r)
-            sum_hash = sum_hash + h_size
-            sum_hash_mem = sum_hash_mem + h_memory
-        remote_replies = not_ready
-    dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 1))
-    return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
+
+
+# Get filters stats
+sum_hash = 0
+sum_hash_mem = 0
+remote_replies = [f.get_size.remote() for f in self.aggregators]
+while remote_replies:
+  # Wait for replies
+  ready, not_ready = ray.wait(remote_replies)
+  for r in ready:
+    h_size, h_memory = ray.get(r)
+    sum_hash = sum_hash + h_size
+    sum_hash_mem = sum_hash_mem + h_memory
+  remote_replies = not_ready
+dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 1))
+return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
 ```
 Input to this method is a dictionary of metadata collected by statistics object. It then enhances it by information
 collected by hash actors and custom computations based on statistics data.
@@ -287,15 +291,14 @@ A single method `launch()` is then invoked to run the transform in a Ray cluster
 
 ## Running
 
-Assuming the above `main()` is placed in `ededup_transform.py` we can run the transform on data
-in COS as follows:
+> **Note:** You will need to run the setup commands in the [`README`](../ray/README.md) before running the following examples.
+
+Assuming the above `main()` is placed in `ededup_transform.py` we can run the transform on local data 
+as follows:
+
 
 ```shell
-python ededup_transform.py --hash_cpu 0.5 --num_hashes 2 --doc_column "contents" \
-  --run_locally True  \
-  --s3_cred "{'access_key': 'KEY', 'secret_key': 'SECRET', 'cos_url': 'https://s3.us-east.cloud-object-storage.appdomain.cloud'}" \
-  --s3_config "{'input_folder': 'cos-optimal-llm-pile/test/david/input/', 'output_folder': 'cos-optimal-llm-pile/test/david/output/'}"
+make run-cli-sample
 ```
-This is a minimal set of options to run locally.
-See the [launcher options](ray-launcher-options) for a complete list of
+See the [launcher options](ray-launcher-options.md) for a complete list of
 transform-independent command line options.

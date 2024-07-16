@@ -61,14 +61,19 @@ submitter accepts the DCO:
 Signed-off-by: John Doe <john.doe@example.com>
 ```
 
-You can include this automatically when you commit a change to your
-local git repository using the following command:
+To include Signed-off-by message automatically, set the git config as,
+```
+git config user.name "FirstName LastName"
+git config user.email "YourEmail@example.com"
+```
+
+and include flag `-s | --sign-off` when you commit a change to your local git repository, for example
 
 ```
-git commit -s
+git commit -s -m "your commit message"
 ```
 
-## Setup
+## Overall Setup
 Please install Python 3.10 or 3.11, then 
 
 ```
@@ -80,9 +85,8 @@ pre-commit install
 make help 
 ```
 
-## Testing
-Makefiles are use for most of the automation and you should be able to use `make test` in most
-directories.
+## Transform Setup and Testing
+Please note the many useful options of the make command, as shown by using `make help`, that will take care of manual steps that would have been needed for tasks such as building, publishing, setting up or testing transforms in most directories.
 
 ## Coding style guidelines
 Coding style as enforced by `pre-commit`.

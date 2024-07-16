@@ -5,60 +5,45 @@ include $(REPOROOT)/.make.defaults
 TAG := "v${DPK_LIB_VERSION}"
 
 
-clean::
+clean:: .defaults.clean
 	@# Help: Clean up the distribution build and the venv 
-	rm -rf dist venv
-	rm -rf src/*egg-info
+	-rm -rf dist > /dev/null 2>&1
 
+.PHONY: .check-env
 .check-env::
 	@echo "Checks passed"
 
-update-toml:: .check-env
-	@# Help: Copy the Makefile distribution version into the pyproject.toml 
-	sed -e 's/^version[ ]*=.*/version = "'${DPK_LIB_VERSION}'"/' pyproject.toml > tt.toml
-	mv tt.toml pyproject.toml
-
 setup::
 
-build:: update-toml venv
-	@# Help: Build the distribution for publishing to a pypi 
-	rm -r dist || true
-	rm -rf src/*egg-info || true
-	${PIP} install --upgrade build
-	${PYTHON} -m build
+set-versions: .check-env
+	$(MAKE) TOML_VERSION=$(DPK_LIB_VERSION) .defaults.update-toml
 
-publish:: .check-env update-toml
-	@# Help: Publish project to pypi
-	${PYTHON} -m twine check dist/*
-	${PYTHON} -m twine upload --verbose --non-interactive dist/*
-	#@echo "create a git tag to reference published version"
-	#@git tag ${TAG}
-	#@git push origin ${TAG}
+build:: build-dist 
+
+#build:: set-versions .defaults.build-dist 
+build-dist :: set-versions .defaults.build-dist 
+
+publish:: publish-dist  
+
+publish-dist :: .check-env .defaults.publish-dist 
 
 venv::	pyproject.toml
-	@# Help: Create the virtual environment using pyproject.toml 
-	rm -r dist venv || true
-	rm -rf src/*egg-info || true
-	rm makeenv || true
-	$(PYTHON) -m venv venv
-	source venv/bin/activate; 	\
-	pip install --upgrade pip;	\
-	pip install -e .;		\
-	pip install pytest pytest-cov moto==5.0.5 markupsafe==2.0.1
+	$(MAKE) .defaults.ray-lib-src-venv
+	pip install moto==5.0.5 markupsafe==2.0.1
 
+
+image:: 
+	@# Help: Placeholder does nothing for now.
+	@echo "Image building for ray is in the works (coming soon)."
 
 # Here we run each test directory of tests and each ray launched test separately, because
 # it seems when running multiple ray launch tests in a single pytest run there is some sort of ray.init() duplication.
 # pytest-forked was tried, but then we get SIGABRT in pytest when running the s3 tests, some of which are skipped.. 
-test::  
+test::  venv 
 	@# Help: Use the already-built virtual environment to run pytest on the test directory. 
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/data_access;
-	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/transform;
-	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/launch/pure_python/launcher_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/launch/pure_python/multi_launcher_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src;  cd test; $(PYTEST)  data_processing_tests/launch/pure_python/test_noop_launch.py;
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/ray_util_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/multi_launcher_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/launcher_test.py;
-	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_tests/launch/ray/test_noop_launch.py;
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_ray_tests/launch/ray/ray_util_test.py;
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_ray_tests/launch/ray/ray_launcher_test.py;
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_ray_tests/launch/ray/ray_test_noop_launch.py;
+	source venv/bin/activate; export PYTHONPATH=../src; cd test; $(PYTEST)  data_processing_ray_tests/launch/ray/ray_multi_launcher_test.py;
+
 

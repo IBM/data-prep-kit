@@ -13,22 +13,24 @@ permissions:
 
 jobs:
     build-package:
-        name: Build Ray data processing library
-        runs-on: ubuntu-latest
+        name: Build Ray data processing libraries
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
               with:
                   # for setuptools-scm
                   fetch-depth: 0
-            - name: Build Package for pypi
+            - name: Build Packages for pypi
               run: |
+                  make -C data-processing-lib build
                   make -C data-processing-lib/ray build
+                  make -C data-processing-lib/spark build
     publish-test-pypi:
         name: Publish packages to test.pypi.org
         # disabled
         if: false
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         needs: build-package
 
         steps:
@@ -45,7 +47,7 @@ jobs:
 
     publish-pypi:
         name: Publish release to pypi.org
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         needs: build-package
         # disabled as of now
         if: false

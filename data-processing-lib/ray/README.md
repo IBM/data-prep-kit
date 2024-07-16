@@ -9,6 +9,7 @@ For more details see the [documentation](../doc/overview.md).
 The project uses `pyproject.toml` and a Makefile for operations.
 To do development you should establish the virtual environment
 ```shell
+cd data-processing-lib/ray/
 make venv
 ```
 and then either activate
@@ -18,7 +19,7 @@ source venv/bin/activate
 or set up your IDE to use the venv directory when developing in this project
 
 ## Library Artifact Build and Publish
-To test, build and publish the library to artifactory
+To test, build and publish the library 
 ```shell
 make test build publish
 ```

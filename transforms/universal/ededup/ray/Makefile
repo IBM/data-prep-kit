@@ -7,12 +7,9 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=ededup
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${EDEDUP_VERSION}
 
+BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
-
-build::	.transforms.ray-build
 
 test::	.transforms.ray-test
 
@@ -24,28 +21,38 @@ test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-test-image:: .transforms.test-image-help
-	@echo WARNING: Skipping pytest version of this test until we have a test/test_ededup.py file.
+test-image:: .transforms.ray-test-image
 
+build:: build-dist image
 
-publish:: .transforms.ray-publish
+publish: publish-image
 
-run-cli-ray-sample: 
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+publish-image:: .transforms.publish-image-ray
+
+setup:: .transforms.setup
+
+# TRANSFORM_PYTHON_VERSION has no effect since requirements do not specify a python transform implementation
+set-versions:
+	$(MAKE) TRANSFORM_PYTHON_VERSION=dummy TOML_VERSION=$(EDEDUP_RAY_VERSION) .transforms.set-versions 
+
+build-dist:: .defaults.build-dist
+
+publish-dist:: .defaults.publish-dist
+
+run-cli-sample:
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
                 --ededup_num_hashes 2"	\
                 .transforms.run-src-file
 
+run-local-sample: .transforms.run-local-ray-sample
 
-
-run-local-sample: 
-	@# Help: Not implemented yet
-	@echo "No src/ededup_local.py yet :("
-
-run-local-ray-sample: .transforms.run-local-ray-sample
-
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image

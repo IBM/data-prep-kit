@@ -5,12 +5,26 @@ on:
     push:
         branches:
             - "dev"
+            - "releases/**"
     pull_request:
         branches:
             - "dev"
+            - "releases/**"
 jobs:
-    build-lib:
-        runs-on: ubuntu-latest
+    build-python-lib:
+        runs-on: ubuntu-22.04
+        strategy:
+            matrix:
+                python:
+                    - "3.11"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Build data-processing-lib/python
+              run: |
+                  make -C data-processing-lib/python DOCKER=docker venv build
+    build-ray-lib:
+        runs-on: ubuntu-22.04
         strategy:
             matrix:
                 python:
@@ -21,3 +35,15 @@ jobs:
             - name: Build data-processing-lib/ray
               run: |
                   make -C data-processing-lib/ray DOCKER=docker venv build
+    build-spark-lib:
+        runs-on: ubuntu-22.04
+        strategy:
+            matrix:
+                python:
+                    - "3.11"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Build data-processing-lib/spark
+              run: |
+                  make -C data-processing-lib/spark DOCKER=docker venv build

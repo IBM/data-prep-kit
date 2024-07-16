@@ -12,9 +12,9 @@
 
 import sys
 
-from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from doc_id_transform import DocIDRayTransformConfiguration
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from doc_id_transform_ray import DocIDRayTransformConfiguration
 
 
 # create launcher

@@ -106,10 +106,10 @@ celerybeat.pid
 .env
 .venv
 env/
-venv/
+**/venv/
 ENV/
 env.bak/
-venv.bak/
+**/venv.bak/
 
 # Spyder project settings
 .spyderproject
@@ -139,3 +139,9 @@ dmypy.json
 **/*.back
 **/makeenv
 **/*.yaml
+
+# Ignore VSCode folder
+.vscode/
+
+# Ignore artifacts directory created by the `make save-images` target
+artifacts/

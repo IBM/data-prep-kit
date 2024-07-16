@@ -13,13 +13,12 @@
 from typing import Tuple
 
 import pyarrow as pa
-from data_processing.test_support.transform.transform_test import AbstractTransformTest
+from data_processing.test_support.transform import AbstractTableTransformTest
 from data_processing.utils import TransformUtils
-from doc_id_transform import (
+from doc_id_transform_ray import (
     DocIDTransform,
     doc_column_name_key,
     hash_column_name_key,
-    int_column_name_key,
 )
 
 
@@ -38,7 +37,7 @@ expected_table = pa.Table.from_pydict(
 expected_metadata_list = [{}, {}]  # transform() result  # flush() result
 
 
-class TestDocIDTransform(AbstractTransformTest):
+class TestDocIDTransform(AbstractTableTransformTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.

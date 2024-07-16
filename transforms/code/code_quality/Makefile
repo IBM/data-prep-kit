@@ -21,6 +21,10 @@ image::
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
+set-versions:  
+	@# Help: Recursively $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
+
 publish:: 
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
@@ -37,27 +41,30 @@ test-src::
 	@# Help: Recursively make $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
-load-image::
+kind-load-image::
+	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
+
+docker-load-image::
+	@# Help: Recursively make $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
+
+docker-save-image::
 	@# Help: Recursively make $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
 .PHONY: workflow-venv
 workflow-venv:
-	$(MAKE) -C kfp_ray/v1 workflow-venv
-
-.PHONY: workflow-build
-workflow-build:
-	$(MAKE) -C kfp_ray/v1 workflow-build
+	$(MAKE) -C  kfp_ray workflow-venv
 
 .PHONY: workflow-test
 workflow-test:
-	$(MAKE) -C kfp_ray/v1 workflow-test
+	$(MAKE) -C  kfp_ray workflow-test
 
 .PHONY: workflow-upload
 workflow-upload:
-	$(MAKE) -C kfp_ray/v1 workflow-upload
+	$(MAKE) -C  kfp_ray workflow-upload
 
-.PHONY: workflow-reconcile-requirements
-workflow-reconcile-requirements:
-	$(MAKE) -C kfp_ray/v1 workflow-reconcile-requirements
-
+.PHONY: workflow-build
+workflow-build:
+	$(MAKE) -C  kfp_ray workflow-build

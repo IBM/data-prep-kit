@@ -7,12 +7,9 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=proglang_select
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${PROGLANG_SELECT_VERSION}
 
+BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
-
-build::	.transforms.ray-build
 
 test::	.transforms.ray-test
 
@@ -26,23 +23,38 @@ setup:: .transforms.setup
 
 test-image:: .transforms.ray-test-image
 
-publish:: .transforms.ray-publish
+build:: build-dist image
+
+publish: publish-image
+
+publish-image:: .transforms.publish-image-ray
+
+set-versions:
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(PROGLANG_SELECT_PYTHON_VERSION) TOML_VERSION=$(PROGLANG_SELECT_RAY_VERSION) .transforms.set-versions
+        
+build-dist:: set-versions .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
 
 
-run-cli-ray-sample: .transforms.run-cli-ray-sample
-	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform.py \
+run-cli-sample: .transforms.run-cli-ray-sample
+	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
                 RUN_ARGS="--run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
 		--proglang_select_language_column language							\
     		--proglang_select_output_column lang_selected							\
 		--proglang_select_allowed_langs_file ../test-data/languages/allowed-code-languages.txt "	\
 		.transforms.run-src-file
 
-run-local-sample: .transforms.run-local-sample
+#run-local-sample: .transforms.run-local-sample
 
 run-local-ray-sample: .transforms.run-local-ray-sample
 
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+#run-s3-ray-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image

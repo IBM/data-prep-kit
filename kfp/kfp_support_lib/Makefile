@@ -1,64 +1,57 @@
-# Define the root of the local git clone for the common rules to be able
-# know where they are running from.
+#################################################################################################################
+#
+# This is the top level makefile, which is intended to be able to process a common set of rules on all
+# sub-projects underneath this directory.  Currently, the common/standardized set of rules are as follows
+# and supported by .make.defaults
+#
+# setup:
+# clean:
+# build:
+# test:
+#
+# When finally getting to a makefile that requires a rule implementation, for example to test the build,
+# that makefile should override/implement the rule to meet its needs.  Such a rule may continue to recurse
+# using "$(MAKE) <rule>-recurse", for example "$(MAKE) test-recurse".
+#
+# Each rule is called recursively on sub-directories and if a similar inclusion is done in the sub-Makefiles,
+# the rules will be applied/executed recursively in their sub-directories.
+#
+#################################################################################################################
+
 REPOROOT=../..
-include ${REPOROOT}/.make.versions
-include ${REPOROOT}/kfp/requirements.env
 
-# Include the common rules.
-# Use "make help" to see them.
-include ../../.make.defaults
+# Get some common rules for the whole repo
+include $(REPOROOT)/.make.defaults
 
-# Command to run pytest
-PYTHON_VERSION=$(shell $(PYTHON) --version)
-VENV_ACTIVATE=venv/bin/activate
-
-DEPLOY_KUBEFLOW ?= 0
+########## ########## ########## ########## ########## ########## ########## ##########
+# Global rules that are generally to be implemented in the sub-directories and can
+# be overridden there (the double colon on the rule makes the overridable).
 
 clean::
-	@# Help: Clean up the distribution build and the venv 
-	rm -r dist venv || true
-	rm -rf src/*egg-info || true
-	rm -rf *.back || true
+	@# Help: Recursively $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
 
+setup::
+	@# Help: Recursively $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
-.check-env:: .check_python_version
-	@echo "Checks passed"
+build::
+	@# Help: Recursively $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
 
-update-toml:: .check-env
-	@# Help: Copy the Makefile distribution version into the pyproject.toml
-	sed -i.back 's/^version[ ]*=.*/version = "'${DPK_LIB_KFP_VERSION}'"/' pyproject.toml
-	sed -i.back 's/data-prep-toolkit==[0-9].*/data-prep-toolkit==${DPK_LIB_VERSION}",/' pyproject.toml
-	sed -i.back 's/kfp==[0-9].*/kfp==${KFP}",/' pyproject.toml
+test::
+	@# Help: Recursively $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
-build:: update-toml venv
-	@# Help: Build the distribution for publishing to a pypi 
-	rm -r dist || true
-	rm -rf src/*egg-info || true
-	${PYTHON} -m pip install --upgrade build
-	${PYTHON} -m build
-
-publish:: .check-env
 publish::
-	@# Help: Publish the wheel to testpypi
-	if [ -d "dist"]; then rm -r dist; fi
-	${PYTHON} -m pip install --upgrade build
-	${PYTHON} -m twine check dist/*
-	${PYTHON} -m twine upload --verbose --non-interactive dist/*
+	@# Help: Recursively $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
-venv::	pyproject.toml .check-env
-	@# Help: Create the virtual environment using pyproject.toml 
-	rm -rf venv
-	$(PYTHON) -m venv venv
-	. ${VENV_ACTIVATE};     \
-	pip install -e .;		\
-	pip install ray==${RAY} \
-	pip install pytest pytest-cov 
+image::
+	@# Help: Recursively $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
-test:: 	venv
-	@# Help: Use the already-built virtual environment to run pytest on the test directory.
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) api_params_test.py;
-ifeq ($(DEPLOY_KUBEFLOW),1)
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) kuberay_api_test.py;
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) ray_remote_jobs_test.py;
-	. ${VENV_ACTIVATE}; export PYTHONPATH=../src; cd test;  $(PYTEST) pipeline_utils_test.py;
-endif
+set-versions:
+	@# Help: Recursively $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
+

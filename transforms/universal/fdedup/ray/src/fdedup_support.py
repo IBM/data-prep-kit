@@ -16,12 +16,11 @@ from typing import Any, Iterator, Union
 import numpy as np
 import ray
 from data_processing.data_access import DataAccess
-from data_processing.runtime.ray import RayUtils
 from data_processing.utils import GB, RANDOM_SEED, TransformUtils, get_logger
+from data_processing_ray.runtime.ray import RayUtils
 from ray import cloudpickle
 from ray.actor import ActorHandle
 from ray.util import ActorPool
-from ray.util.metrics import Counter
 from scipy.integrate import quad as integrate
 
 
@@ -29,16 +28,6 @@ NO_SIMILARITY = -1
 REQUEST_LEN = 4096
 LONG_BUCKET = 5000
 LONG_BUCKET_PRINT = 1000
-
-
-def find(s: str, ch: str) -> list[int]:
-    """
-    Get indexes of all locations of character in string
-    :param s: string
-    :param ch: character
-    :return: list of locations
-    """
-    return [i for i, ltr in enumerate(s) if ltr == ch]
 
 
 def get_snapshot_folder(data_access: DataAccess) -> str:
@@ -160,7 +149,7 @@ class DocCollector:
             self.ids = {}
         else:
             try:
-                bids = self.data_access.get_file(snapshot)
+                bids, _ = self.data_access.get_file(snapshot)
                 self.ids = cloudpickle.loads(bids)
             except Exception as e:
                 self.logger.warning(f"Failed to load doc collector {self.actor_id} with exception {e}")
@@ -247,7 +236,7 @@ class DocsMinHash:
             self.docs = {}
         else:
             try:
-                bdocs = self.data_access.get_file(snapshot)
+                bdocs, _ = self.data_access.get_file(snapshot)
                 self.docs = cloudpickle.loads(bdocs)
             except Exception as e:
                 self.logger.warning(f"Failed to load minhash collector {self.actor_id} with exception {e}")
@@ -306,6 +295,8 @@ class BucketsHash:
         """
         Initialization
         """
+        from ray.util.metrics import Counter
+
         self.submitter = None
         self.n_buckets = 0
         self.bucket_memory = 0
@@ -318,7 +309,7 @@ class BucketsHash:
             self.buckets = {}
         else:
             try:
-                b_buckets = self.data_access.get_file(snapshot)
+                b_buckets, _ = self.data_access.get_file(snapshot)
                 self.buckets = cloudpickle.loads(b_buckets)
             except Exception as e:
                 self.logger.warning(f"Failed to load buckets collector {self.actor_id} with exception {e}")
@@ -438,6 +429,8 @@ class BucketsHashProcessor:
             threshold - threshold
             statistics - statistics actor
         """
+        from ray.util.metrics import Counter
+
         self.threshold = params["threshold"]
         self.mn_min_hash = params["mn_min_hash"]
         self.remote_docs = params["remote_docs"]
@@ -472,7 +465,7 @@ class BucketsHashProcessor:
                 remote_replies.append(self.remote_docs[i].add_documents.remote(req))
             i += 1
         # Process replies
-        RayUtils.wait_for_execution_completion(replies=remote_replies)
+        RayUtils.wait_for_execution_completion(logger=self.logger, replies=remote_replies)
 
     # get minhashes and length for docs in the bucket
     def _get_minhashes_docs(self, doc_ids: list[int]) -> dict[int, tuple[int, list[int]]]:
@@ -597,7 +590,9 @@ class BucketsHashProcessorInvoker(object):
         self.n_processors = len(bucket_processors)
         self.pool = ActorPool(bucket_processors)
         self.submitted = 0
+        self.processed = 0
         self.logger = get_logger(__name__)
+        self.start = time.time()
 
     def submit_for_processing(self, buckets: list[Union[int, list[int]]]) -> None:
         # Get completed results
@@ -607,13 +602,30 @@ class BucketsHashProcessorInvoker(object):
             self.submitted += 1
             return
         else:
-            self.pool.get_next_unordered()
+            while True:
+                # we can have several workers fail here
+                try:
+                    self.pool.get_next_unordered()
+                    break
+                except Exception as e:
+                    self.logger.error(f"Failed to process request worker exception {e}")
+                    self.processed += 1
+            self.processed += 1
+            if self.processed % 100 == 0:
+                self.logger.info(f"processed {self.processed} buckets in {(time.time() - self.start)/60} min")
             self.logger.debug("Completed bucket processing request")
             self.pool.submit(lambda a, v: a.process_buckets.remote(v), buckets)
+            self.submitted += 1
             self.logger.debug("Submitted bucket processing request")
             return
 
     def wait_for_completion(self) -> None:
-        self.logger.info("Waiting bucket processing completion")
+        self.logger.info(f"Waiting bucket processing completion. Submitted requests {self.submitted}")
         while self.pool.has_next():
-            self.pool.get_next_unordered()
+            try:
+                self.pool.get_next_unordered()
+            except Exception as e:
+                self.logger.error(f"Failed to process request worker exception {e}")
+            self.processed += 1
+            if self.processed % 100 == 0:
+                self.logger.info(f"processed {self.processed} buckets in {(time.time() - self.start)/60} min")

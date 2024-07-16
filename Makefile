@@ -27,28 +27,27 @@ include .make.defaults
 # Global rules that are generally to be implemented in the sub-directories and can
 # be overridden there (the double colon on the rule makes the overridable). 
 
-clean:: 
+clean: 
 	@# Help: Recursively $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
-setup::
-	@# Help: Recursively $@ in all subdirs
-	@$(MAKE) RULE=$@ .recurse
-
-build:: 
+build: 
 	@# Help: Recursively $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
-test::  
+test:  
 	@# Help: Recursively $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
-lib-release:
-	@# Help: Publish data-prep-kit $(DPK_LIB_VERSION) and data-prep-kit-kfp $(DPK_LIB_KFP_VERSION) libraries to pypi 
-	@$(MAKE) -C $(DPK_RAY_LIB_DIR) build publish
-	@$(MAKE) -C kfp/kfp_support_lib build publish
-	@echo ""
-	@echo "This modified files in the repo. Please be sure to commit/push back to the repository."
-	@echo ""
+publish:
+	@# Help: Recursively $@ in all subdirs 
+	@$(MAKE) RULE=$@ .recurse
 
+set-versions:  
+	@# Help: Recursively $@ in all subdirs. Should only be used when .make.versions is changed. 
+	@$(MAKE) RULE=$@ .recurse
+	
+show-version:
+	@# Help: Show the version defined in .make.versions 
+	@echo $(DPK_VERSION)
 

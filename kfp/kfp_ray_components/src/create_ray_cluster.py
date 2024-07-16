@@ -9,10 +9,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
 import sys
 
-from kfp_support.workflow_support.utils import KFPUtils, RayRemoteJobs
+from runtime_utils import KFPUtils, RayRemoteJobs
 
 
 def start_ray_cluster(

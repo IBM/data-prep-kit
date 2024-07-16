@@ -13,9 +13,9 @@
 import os
 import sys
 
-from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from noop_transform import NOOPRayTransformConfiguration
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from noop_transform_ray import NOOPRayTransformConfiguration
 
 
 # create parameters

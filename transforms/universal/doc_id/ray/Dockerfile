@@ -1,19 +1,25 @@
-FROM docker.io/rayproject/ray:2.9.3-py310
+ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
+
+FROM ${BASE_IMAGE}
 
 # install pytest
 RUN pip install --no-cache-dir pytest
 
-# install data processing
-# Copy in the data processing framework source/project and install it
-# This is expected to be placed in the docker context before this is run (see the make image).
-COPY --chown=ray:users data-processing-lib/ data-processing-lib/
-RUN cd data-processing-lib && pip install --no-cache-dir -e .
+# Copy and install data processing libraries 
+# These are expected to be placed in the docker context before this is run (see the make image).
+COPY --chown=ray:users data-processing-lib-python/ data-processing-lib-python/
+RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
+COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/ 
+RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
 
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r  requirements.txt
+# Install ray project source
+COPY --chown=ray:users src/ src/
+COPY --chown=ray:users pyproject.toml pyproject.toml
+COPY --chown=ray:users README.md README.md
+RUN pip install --no-cache-dir -e .
 
 # copy source data
-COPY ./src/doc_id_transform.py .
+COPY ./src/doc_id_transform_ray.py .
 COPY src/doc_id_local_ray.py local/
 
 # copy test

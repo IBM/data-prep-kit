@@ -12,14 +12,14 @@
 
 import os
 
-from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from ededup_transform import EdedupRayTransformConfiguration
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from ededup_transform_ray import EdedupRayTransformConfiguration
 
 
-class TestRayBlocklistTransform(AbstractTransformLauncherTest):
+class TestRayEdedupTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -28,6 +28,7 @@ class TestRayBlocklistTransform(AbstractTransformLauncherTest):
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
         config = {
+            "run_locally": True,
             # When running in ray, our Runtime's get_transform_config() method  will load the domains using
             # the orchestrator's DataAccess/Factory. So we don't need to provide the bl_local_config configuration.
             "ededup_hash_cpu": 0.5,

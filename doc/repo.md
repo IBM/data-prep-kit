@@ -1,12 +1,43 @@
 # Repository Structure and Use 
 
+Here we discuss the structure, use and approach to code management in the repo.
+# Setup
+
+There are various entry points that you can choose based on the use case. Each entry point has its pre-requirements and setup steps.
+The common part of are:
+#### Prerequisites
+- Python 3.10 or 3.11 
+-Docker/Podman
+
+Two important development tools will also be installed using the steps below:
+- [pre-commit](https://pre-commit.com/)
+- [twine](https://twine.readthedocs.io/en/stable/) 
+
+#### Installation Steps
+```shell
+pip install pre-commit
+pip install twine
+...
+git clone git@github.com:IBM/data-prep-kit.git
+cd data-prep-kit
+pre-commit install
+```
+Please note that there are further installation steps for running the transforms in general, as documented [here](data-processing-lib/ray/README.md) and on a local Kind cluster or on an existing Kubernetes cluster, as documented [here](kfp/doc/setup.md).
+
+
 # Repository structure
 * data_processing_lib - provides the core transform framework and library 
-supporting data transformations in a Ray cluster
+supporting data transformations in 3 runtimes
+    * python 
+    * ray
+    * spark
+ 
 * transform
     * universal
-        * ededup
+        * noop 
+          * python 
           * ray
+          * spark 
           * kfp_ray
         * ...
     * code
@@ -19,89 +50,65 @@ supporting data transformations in a Ray cluster
 * kfp - Kubeflow pipeline support
     * kfp_support_lib - Data Preparation Kit Library. KFP support
     * kfp_ray_components - Kubflow pipeline components used in the pipelines
-* kind - kind
+* scripts
 
 
 # Build and Makefiles
 Makefiles are used for operations performed across all projects in the directory tree.
-Using specific rules from the top of the repository tree will recurse their execution
-into subdirectories  until subdirectories provide a Makefile that implements the action
-and/or recurses further.  For example,
-```shell
-make test 
-```
-will apply the `make test` rule into all sub-directories supporting such recursion.
-Try `make help` to see the set of available targets in a directory.  For example,
-from the root of the repo...
-```
-Target               Description
-------               -----------
-build                Recursively build in all subdirs 
-clean                Recursively clean in all subdirs 
-setup                Recursively setup in all subdirs
-test                 Recursively test in all subdirs 
-```
-or from a transform project directory
-```
-cd transforms/universal/noop
-make help
-Target               Description
-------               -----------
-build                Create the venv and build the transform image 
-clean                Clean up the virtual environment.
-conventions          Check transform project conventions and make recommendations, if needed.
-image                Create the docker image quay.io/dataprep1/data-prep-kit/noop:0.7
-publish              Publish the quay.io/dataprep1/data-prep-kit/noop:0.7 to quay.io container registry
-setup                Do nothing, since nothing to setup by default. 
-test                 Run both source and image level tests.
-test-image           Test an quay.io/dataprep1/data-prep-kit/noop:0.7 use test source inside the image. 
-test-locals          Run the *local*.py files in the src directory 
-test-src             Run the transform's tests and any '*local' .py files
-venv                 Install the source from the data processing library for python
-workflow-build       Recursively make workflow-build in subdirs
-workflow-reconcile-requirements Recursively make workflow-reconcile-requirements in all subdirs
-workflow-test        Recursively make workflow-test in subdirs
-workflow-upload      Recursively make workflow-upload in subdirs
-workflow-venv        Recursively make workflow-venv in subdirs
-```
+There are two types of users envisioned to use the make files.  
 
-The `workflow-` related Makefile targets are dedicated for handling the [Kubeflow Pipelines](https://github.com/kubeflow/pipelines) workflows for the specified transforms.
+* adminstrators - perform git actions and release management 
+* developers - work with core libraries and transforms
 
-Overridable macro values include the following:
-DOCKER - the name of the docker executable to use. DOCKER=docker
-DOCKER_FILE - the name of the docker file to use. DOCKER_FILE=Dockerfile
-DOCKER_REGISTRY_ENDPOINT - the docker registry location to publish images. DOCKER_REGISTRY_ENDPOINT=quay.io/dataprep1/data-prep-kit
-DOCKER_HOSTNAME - the name of the docker registry to use. DOCKER_HOSTNAME=quay.io
-DOCKER_NAMESPACE - the name space to use in the registry. DOCKER_NAMESPACE=dataprep1
-DOCKER_NAME - the name under the name space where images are publishes. DOCKER_NAME=data-prep-kit
-DOCKER_REGISTRY_USER - the docker user to use. DOCKER_REGISTRY_USER=dataprep1
-DOCKER_REGISTRY_KEY - the docker user to use. DOCKER_REGISTRY_KEY=secret
-PYTHON - the python executable to use. PYTHON=python
-DOCKER_IMAGE_NAME - the name of the docker image to produce. DOCKER_IMAGE_NAME=noop
-TRANSFORM_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_local_ray.py)
+Each directory has access to a `make help` target that will show all available targets.
 
-Macros that require definition in the including Makefile
-REPOROOT defines the root directory of this repository (such as ../../..)
-TRANSFORM_NAME defines the name of the transform and is used to define defaults for...
-    DOCKER_IMAGE_NAME and TRANSFORM_SRC_FILE.  For, example 'noop'
-DOCKER_IMAGE_VERSION - the version of the docker image to produce. DOCKER_IMAGE_VERSION=0.7
-```
+## Administrators 
+Generally, administrators will issue make commands from the top of the repository to, for example
+publish a new release.  The top level make file provides a set of targets that 
+are executed recursively, which as a result are expected to be implementd by
+sub-directories.  These and their semantics are expected to be implemented,
+as appropriate, in the sub-directories are as follows:
 
-If you'd like to build each component separately, you can move into the sub-directories as desired.  
-If planning to develop and/or use on Apple Mac please see these [considerations](mac.md).
+* clean - Restore the directory to as close to initial repository clone state as possible. 
+* build - Build all components contained in a given sub-directory.  
+This might include pypi distributions, images, etc.
+* test -  Test all components contained in a given sub-directory. 
+* publish - Publish any components in sub-directory. 
+This might include things published to pypi or the docker registry.
+* set-versions - apply the DPK_VERSION to all published components. 
 
-## Data Prep Kit Library 
-To build the wheel for the data processing library and publish it to a pypi... 
-```shell
-cd data-processing-lib 
-make test build publish 
-```
+Sub-directories are free to define these as empty/no-op targets, but generally are required
+to define them unless a parent directory does not recurse into the directory.
 
-## Transforms
-To create all transform images and publish them (by default to quay.io)
-```shell
-cd transforms
-make venv test-src
-make image test-image publish
+## Developers
+Generally, developers will be working in a python project directory
+(e.g., data-processing-lib/python, transforms/universal/filter, etc.) 
+and can issue the administrator's make targets (e g., build, test, etc)
+or others that might be defined locally
+(e.g., venv, test-image, test-src in transform projects).
+Key targets are as follows:
+
+* venv -  creates the virtual environment from either a pyproject.toml or requirements.txt file.
+* publish - publish libraries or docker images as appropriate.  
+This is generally only used during release generation.
+ 
+If working with an IDE, one generally makes the venv, then configures the IDE to 
+reference the venv, src and test directories.
+
+Transform projects generally include these transform project-specific targets for convenience,
+which are triggered with the the `test` target.
+
+* test-src - test python tests in the test directory
+* test-image - build and test the docker image for the transform
+
+Please also consult [transform project conventions](../transforms/README.md#transform-project-conventions) for 
+additional considerations when developing transforms.
+
+### Transforms and KFP 
+The kfp_ray directories in the transform projects provide 
+`workflow-` targets and are dedicated to handling the 
+[Kubeflow Pipelines](https://github.com/kubeflow/pipelines) 
+workflows for the specified transforms.
+
 ```
 

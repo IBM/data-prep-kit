@@ -13,6 +13,10 @@ clean::
 	@# Help: Recursively make $@ all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
+setup::
+	@# Help: Recursively make $@ in subdirs 
+	$(MAKE) RULE=$@ .recurse
+
 build::
 	@# Help: Recursively make $@ in subdirs 
 	$(MAKE) RULE=$@ .recurse
@@ -40,7 +44,15 @@ test-src::
 	@# Help: Recursively make $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
-load-image::
+kind-load-image::
+	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
+
+docker-load-image::
+	@# Help: Recursively make $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
+
+docker-save-image::
 	@# Help: Recursively make $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
@@ -48,7 +60,7 @@ workflow-venv::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse	
 
-workflow-build::
+setup::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse
 
@@ -56,11 +68,14 @@ workflow-test::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse
 
+workflow-build::
+	@# Help: Recursively make $@ in subdirs
+	$(MAKE) RULE=$@ .recurse
+
 workflow-upload::
 	@# Help: Recursively make $@ in subdirs
 	$(MAKE) RULE=$@ .recurse
 
-workflow-reconcile-requirements::
+set-versions::
 	@# Help: Recursively make $@ in all subdirs
 	@$(MAKE) RULE=$@ .recurse
-

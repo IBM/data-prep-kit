@@ -3,11 +3,10 @@ REPOROOT=../../
 
 include $(REPOROOT)/.make.defaults
 
-
 DOCKER_IMAGE_VERSION=${INGEST_TO_PARQUET_VERSION}
 DOCKER_IMAGE_NAME?=ingest2parquet
-DOCKER_IMAGE=${DOCKER_REGISTRY_ENDPOINT}/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 
+BASE_IMAGE=${RAY_BASE_IMAGE}
 
 venv::	.defaults.ray-lib-src-venv
 
@@ -32,7 +31,10 @@ minio-stop:	.defaults.minio.stop
 
 test-local:: .defaults.test-locals
 
-publish:: image .defaults.publish
+publish:: image .defaults.publish-image
+
+set-versions:
+	@# Help: Nothing to see/do here (yet). 
 
 run-local-sample:
 	$(MAKE) RUN_FILE=ingest2parquet_local.py  .defaults.run-src-file

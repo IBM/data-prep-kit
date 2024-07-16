@@ -12,11 +12,11 @@
 
 import os
 
-from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from doc_id_transform import (
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from doc_id_transform_ray import (
     DocIDRayTransformConfiguration,
     doc_column_name_cli_param,
     hash_column_name_cli_param,
@@ -34,6 +34,7 @@ class TestRayDocIDTransform(AbstractTransformLauncherTest):
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
         fixtures = []
         transform_config = {
+            "run_locally": True,
             doc_column_name_cli_param: "contents",
             hash_column_name_cli_param: "doc_hash",
             int_column_name_cli_param: "doc_int",

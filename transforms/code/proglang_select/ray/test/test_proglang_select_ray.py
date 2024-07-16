@@ -12,16 +12,16 @@
 
 import os
 
-from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
+from data_processing_ray.runtime.ray import RayTransformLauncher
 from proglang_select_transform import (
-    ProgLangSelectRayConfiguration,
     lang_allowed_langs_file_key,
     lang_lang_column_key,
     lang_output_column_key,
 )
+from proglang_select_transform_ray import ProgLangSelectRayConfiguration
 
 
 class TestRayProgLangSelectTransform(AbstractTransformLauncherTest):
@@ -39,6 +39,7 @@ class TestRayProgLangSelectTransform(AbstractTransformLauncherTest):
             )
         )
         config = {
+            "run_locally": True,
             # When running in ray, our Runtime's get_transform_config() method  will load the domains using
             # the orchestrator's DataAccess/Factory. So we don't need to provide the lang_select_local_config configuration.
             lang_allowed_langs_file_key: languages_file,

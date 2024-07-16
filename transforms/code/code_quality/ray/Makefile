@@ -5,43 +5,46 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=code_quality
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${CODE_QUALITY_VERSION}
 
-# Use default rule inherited from makefile.common
+BASE_IMAGE=${RAY_BASE_IMAGE}
+
 clean:: .transforms.clean
 
-# Use default rule inherited from makefile.common
 test:: .transforms.ray-test
 
-# Use default rule inherited from makefile.common
 image:: .transforms.ray-image
 
-# Use default rule inherited from makefile.common
-build:: .transforms.ray-build
-
-# Use default rule inherited from makefile.common
 venv:: .transforms.ray-venv
 
 test-src:: .transforms.test-src
 
 test-image:: .transforms.ray-test-image
 
-publish:: .transforms.ray-publish
+build:: build-dist image
+
+publish: publish-image
+
+publish-image:: .transforms.publish-image-ray
 
 setup:: .transforms.setup
 
+set-versions:
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(CODE_QUALITY_PYTHON_VERSION) TOML_VERSION=$(CODE_QUALITY_RAY_VERSION) .transforms.set-versions
+        
+build-dist:: set-versions .defaults.build-dist 
 
-run-cli-ray-sample: .transforms.run-cli-ray-sample
+publish-dist:: .defaults.publish-dist
 
-run-local-sample: #.transforms.run-local-sample
-	@# Help: Not implemented yet
-	@echo "No src/code_quality_local.py yet :("
+run-cli-sample: .transforms.run-cli-ray-sample
 
-run-local-ray-sample: .transforms.run-local-ray-sample
+run-local-sample: .transforms.run-local-ray-sample
 
-run-s3-ray-sample: .transforms.run-s3-ray-sample
+run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image

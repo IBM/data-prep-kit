@@ -17,7 +17,7 @@ import uuid
 import zipfile
 from datetime import datetime
 from multiprocessing import Pool
-from typing import Any, List
+from typing import Any
 
 import pandas as pd
 import pyarrow as pa
@@ -36,7 +36,7 @@ def zip_to_table(data_access: DataAccess, file_path, detect_prog_lang: Any) -> p
     """
     data = []
     zip_name = os.path.basename(file_path)
-    compressed_zip_bytes = data_access.get_file(file_path)
+    compressed_zip_bytes, _ = data_access.get_file(file_path)
 
     with zipfile.ZipFile(io.BytesIO(bytes(compressed_zip_bytes))) as opened_zip:
         # Loop through each file member in the ZIP archive
@@ -108,13 +108,13 @@ def raw_to_parquet(
             # Get the output file name for the Parquet file
             output_file_name = data_access.get_output_location(file_path).replace(".zip", ".parquet")
             # Save the PyArrow table as a Parquet file and get metadata
-            metadata = data_access.save_table(output_file_name, table)
-            if metadata[1]:
+            l, metadata, _ = data_access.save_table(output_file_name, table)
+            if metadata:
                 return (
                     True,
                     {
                         "path": file_path,
-                        "bytes_in_memory": metadata[0],
+                        "bytes_in_memory": l,
                         "row_count": table.num_rows,
                     },
                 )
@@ -122,7 +122,7 @@ def raw_to_parquet(
                 raise Exception("Failed to upload")
 
     except Exception as e:
-        return (False, {"path": file_path, "error": str(e)})
+        return False, {"path": file_path, "error": str(e)}
 
 
 def generate_stats(metadata: list) -> dict[str, Any]:
@@ -133,19 +133,19 @@ def generate_stats(metadata: list) -> dict[str, Any]:
     :return: Dictionary containing processing statistics
     """
     success = 0
-    sucess_details = []
+    success_details = []
     failures = 0
     failure_details = []
     for m in metadata:
         if m[0] == True:
             success += 1
-            sucess_details.append(m[1])
+            success_details.append(m[1])
         else:
             failures += 1
             failure_details.append(m[1])
 
     # Create DataFrame from success details to calculate total bytes in memory
-    success_df = pd.DataFrame(sucess_details, columns=["path", "bytes_in_memory", "row_count"])
+    success_df = pd.DataFrame(success_details, columns=["path", "bytes_in_memory", "row_count"])
     total_bytes_in_memory = success_df["bytes_in_memory"].sum()
     total_row_count = success_df["row_count"].sum()
 
@@ -194,11 +194,10 @@ def ingest2parquet():
     data_access = data_access_factory.create_data_access()
 
     # Retrieves file paths of files from the input folder.
-    file_paths = data_access.get_folder_files(data_access.input_folder, args.data_files_to_use, False)
+    file_paths, _ = data_access.get_folder_files(data_access.input_folder, args.data_files_to_use, False)
 
     if len(file_paths) != 0:
         print(f"Number of files is {len(file_paths)} ")
-        metadata = []
         detect_prog_lang = detect_language.Detect_Programming_Lang() if args.detect_programming_lang else None
 
         with Pool() as p:
@@ -222,7 +221,8 @@ def ingest2parquet():
         print("processing stats generated", stats)
 
         # Saves the processing statistics
-        print("Metadata file stored - response:", data_access.save_job_metadata(stats))
+        res, _ = data_access.save_job_metadata(stats)
+        print("Metadata file stored - response:", res)
 
 
 if __name__ == "__main__":

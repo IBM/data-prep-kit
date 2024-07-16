@@ -12,9 +12,9 @@
 
 import sys
 
-from data_processing.runtime.ray import RayTransformLauncher
 from data_processing.utils import ParamsUtils
-from fdedup_transform import FdedupRayTransformConfiguration
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from fdedup_transform_ray import FdedupRayTransformConfiguration
 
 
 # create launcher

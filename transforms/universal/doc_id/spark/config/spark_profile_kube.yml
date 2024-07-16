@@ -1,0 +1,14 @@
+spark.app.name: ${APP_NAME}
+spark.driver.memory: ${DRIVER_MEMORY}
+spark.executor.instances: ${NUM_EXECUTORS}
+spark.executor.memory: ${EXECUTOR_MEMORY}
+spark.executor.cores: ${EXECUTOR_CORES}
+spark.sql.shuffle.partitions: ${NUM_TASKS}
+spark.task.cpus: ${TASK_CPUS}
+spark.sql.legacy.parquet.nanosAsLong: true
+spark.executor.decommission.forceKillTimeout: "10h"
+# spark.sql.files.ignoreCorruptFiles: true
+# configuration needed when running in kubernetes
+spark.kubernetes.authenticate.driver.serviceAccountName: ${SERVICE_ACCOUNT}
+spark.kubernetes.container.image: ${EXECUTOR_DOCKER_IMAGE}
+spark.kubernetes.namespace: ${EXECUTOR_NAMESPACE}
