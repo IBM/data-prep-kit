@@ -70,7 +70,7 @@ def sort_sem(files_df: pd.DataFrame, logger: Logger, title_column_name="new_titl
     else:
         logger.info("Proceeding with directory structure based sorting")
         # Default Sort
-        files_df_sorted = sort_by_path(files_df, logger)
+        files_df_sorted = sort_by_path(files_df, logger, title_column_name=title_column_name)
 
     transformed_shape = files_df_sorted.shape
     assert (
