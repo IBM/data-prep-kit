@@ -15,7 +15,7 @@ In this transform, following metrics will be included:
   - > 90% of lines starting with a bullet point,
   - > 30% ending with an ellipsis.
   - Require that 80% of words in a document contain at least one alphabetic character, and apply a "stop word" filter, to remove documents that do NOT contain at least TWO of the following English words: the, be, to, of, and, that, have, with; this adequately deals with ostensibly English documents that contain no coherent English text.
-- Perplexity score (KenLM+sentencepiece) suggested in Gopher The smaller the perplexity score, the closer is the text to the targeted domain (i.e., en Wikipedia). Journalistic and well written content. Distribution of perplexity for different languages may have different shapes.
+- Perplexity score. The smaller the perplexity score, the closer is the text to the targeted domain (i.e., en Wikipedia). Journalistic and well written content. Distribution of perplexity for different languages may have different shapes.
 
 
 
@@ -29,7 +29,7 @@ configuration for values are as follows:
 * _doc_id_column_ - specifies column name that contains document id.
 * _bad_word_filepath_ - specifies a path to bad word file: local folder (file or directory) that points to bad word file.
 * _model_path_ - specifies a path to model: local folder (file or directory) that points to model. If it exists in local file system, model will be loaded from there. If it does not exist, the value specified here will be ignored and try to find model in s3 using _s3_cred_.
-* _s3_cred_ - AST string of options for cos credentials retrieve kenLM model from s3.
+* _s3_cred_ - AST string of options for cos credentials retrieve model from s3.
 * _model_module_name_ - specifies a class name that uses model. The class should extend perplexity_models.PerplexityModel.
 * _perplex_score_digit_ - specifies a digit of perplexity score.
 
@@ -70,22 +70,6 @@ Then
 ls output
 ```
 To see results of the transform.
-
-
-### Transforming local data 
-
-Beginning with version 0.2.1, most/all python transform images are built with directories for mounting local data for processing.
-Those directories are `/home/dpk/input` and `/home/dpk/output`.
-
-After using `make image` to build the transform image, you can process the data 
-in the `/home/me/input` directory and place it in the `/home/me/output` directory, for example,  using the 0.2.1 tagged image as follows:
-
-```shell
-docker run  --rm -v /home/me/input:/home/dpk/input -v /home/me/output:/home/dpk/output doc_quality-python:0.2.1 	\
-	python doc_quality_transform_python.py --data_local_config "{ 'input_folder' : '/home/dpk/input', 'output_folder' : '/home/dpk/output'}" --docq_bad_word_filepath /path/to/badword --docq_model_path /path/to/model	--docq_model_module_name perplexity_transformer_model
-```
-
-You may also use the pre-built images on quay.io using `quay.io/dataprep1/data-prep-kit//noop-python:0.2.1` as the image name.
 
 
 ### Transforming data using the transform image
