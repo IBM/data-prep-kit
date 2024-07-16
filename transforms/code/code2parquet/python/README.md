@@ -123,3 +123,8 @@ To see results of the transform.
 ---------------------------------
 
 
+### Transforming data using the transform image
+
+To use the transform image to transform your data, please refer to the 
+[running images quickstart](../../../../doc/quick-start/run-transform-image.md),
+substituting the name of this transform image and runtime as appropriate.
