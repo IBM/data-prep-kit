@@ -16,20 +16,20 @@ def load_udf_class(udf_path, udf_class_name):
 
 
 def run_step(step, common_args, common_configs):
-    # try:
-    UDFClass = load_udf_class(step["udf_path"], step["udf_class"])
-    specific_args = step.get("args", {})
-    specific_configs = step.get("configs", {})
+    try:
+        UDFClass = load_udf_class(step["udf_path"], step["udf_class"])
+        specific_args = step.get("args", {})
+        specific_configs = step.get("configs", {})
 
-    # Merge common and specific arguments and heuristics
-    args = {**common_args, **specific_args}
-    configs = {**common_configs, **specific_configs}
+        # Merge common and specific arguments and heuristics
+        args = {**common_args, **specific_args}
+        configs = {**common_configs, **specific_configs}
 
-    logging.info(f"Running {step['name']} with args {args} and configs {configs}")
-    udf_instance = UDFClass(**args, configs=configs)
-    udf_instance.execute()
-    # except Exception as e:
-    #     logging.error(f"Error in step {step['name']}: {e}")
+        logging.info(f"Running {step['name']} with args {args} and configs {configs}")
+        udf_instance = UDFClass(**args, configs=configs)
+        udf_instance.execute()
+    except Exception as e:
+        logging.error(f"Error in step {step['name']}: {e}")
 
 
 def setup_logging(log_level):
@@ -59,12 +59,7 @@ def main(config_path="config.yml"):
     for step in config["steps"]:
         run_step(step, common_args, common_configs)
 
-    # with ThreadPoolExecutor() as executor:
-    #     futures = [executor.submit(run_step, step, common_args, common_heuristics) for step in config['steps']]
-    #     for future in futures:
-    #         future.result()
-
 
 if __name__ == "__main__":
     logging.info("Created spark session for generating minhash and band signatures")
-    main("config.yaml")
+    main("config.yml")
