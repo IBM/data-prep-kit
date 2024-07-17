@@ -1,4 +1,10 @@
-FROM docker.io/python:3.10.14-slim-bullseye
+FROM docker.io/python:3.11.9-slim-bookworm
+
+RUN \
+    apt-get update \
+    # for opencv, towhee
+    && apt-get install -y libgl1 libglib2.0-0 curl wget \
+    && apt-get clean
 
 RUN pip install --upgrade pip 
 
@@ -21,13 +27,14 @@ COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
-#COPY requirements.txt requirements.txt
-#RUN pip install --no-cache-dir -r  requirements.txt
+# Download models
+RUN python -c 'from deepsearch_glm.utils.load_pretrained_models import load_pretrained_nlp_models; load_pretrained_nlp_models(verbose=True);'
+RUN python -c 'from docling.document_converter import DocumentConverter; from pathlib import Path; DocumentConverter.download_models_hf(local_dir=Path("./artifacts/"));'
 
 # copy source data
-COPY ./src/noop_transform.py .
-COPY ./src/noop_transform_python.py .
-COPY ./src/noop_local.py local/
+COPY ./src/pdf2md_transform.py .
+COPY ./src/pdf2md_transform_python.py .
+COPY ./src/pdf2md_local.py local/
 
 # copy test
 COPY test/ test/
@@ -35,6 +42,9 @@ COPY test-data/ test-data/
 
 # Set environment
 ENV PYTHONPATH /home/dpk
+
+# Parallelism
+ENV OMP_NUM_THREADS=2
 
 # Put these at the end since they seem to upset the docker cache.
 ARG BUILD_DATE
