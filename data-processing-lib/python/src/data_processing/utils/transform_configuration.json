@@ -8,7 +8,6 @@
     ],
     "dpk_code2parquet_transform_ray",
     [
-      "dpk_code2parquet_transform_python",
       "parameterized",
       "pandas"
     ],
@@ -29,7 +28,6 @@
     ],
     "dpk_code_quality_transform_ray",
     [
-      "dpk_code_quality_transform_python",
       "bs4",
       "transformers"
     ],
@@ -49,7 +47,6 @@
     ],
     "dpk_malware_transform_ray",
     [
-      "dpk_malware_transform_python",
       "clamd"
     ],
     null,
@@ -68,7 +65,7 @@
     ],
     "dpk_proglang_select_transform_ray",
     [
-      "dpk_proglang_select_transform_python"
+
     ],
     null,
     [
@@ -89,7 +86,6 @@
     ],
     "dpk_lang_id_transform_ray",
     [
-      "dpk-lang_id-transform-python",
       "fasttext",
       "langcodes",
       "huggingface-hub",
@@ -168,7 +164,6 @@
     ],
     "dpk_filter_transform_ray",
     [
-      "dpk_filter_transform_python",
       "duckdb"
     ],
     null,
@@ -187,7 +182,7 @@
     ],
     "dpk_noop_transform_ray",
     [
-      "dpk_noop_transform_python"
+
     ],
     null,
     [
@@ -225,7 +220,7 @@
     ],
     "dpk_resize_transform_ray",
     [
-      "dpk_resize_transform_python"
+
     ],
     null,
     [
@@ -243,7 +238,6 @@
     ],
     "dpk_tokenization_transform_ray",
     [
-      "dpk_tokenization_transform_python",
       "transformers"
     ],
     null,

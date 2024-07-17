@@ -23,7 +23,6 @@ logger = get_logger(__name__)
 def execute_python_transform(configuration: TransformsConfiguration, name: str,
                              input_folder: str, output_folder: str, params: dict[str, Any]) -> bool:
     # get transform configuration
-    logger.info(f"available transforms: {configuration.get_available_transforms()}")
     subdirectory, l_name, extra_libraries, t_class = (configuration.
                                      get_configuration(transform=name, runtime=TransformRuntime.PYTHON))
     if subdirectory is None:
