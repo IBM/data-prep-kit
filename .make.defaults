@@ -214,6 +214,7 @@ __check_defined = \
 		touch pyproject.toml;	\
 	fi
 	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE)		\
+		--platform linux/amd64  \
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\

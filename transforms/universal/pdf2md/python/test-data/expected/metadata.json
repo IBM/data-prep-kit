@@ -1,46 +1,46 @@
 {
-    "pipeline": "pipeline_id",
-    "job details": {
-        "job category": "preprocessing",
-        "job name": "NOOP",
-        "job type": "ray",
-        "job id": "job_id",
-        "start_time": "2024-03-01 15:17:56",
-        "end_time": "2024-03-01 15:17:57",
-        "status": "success"
-    },
-    "code": [null],
-    "job_input_params": {
-        "sleep": 0,
-        "checkpointing": false,
-        "max_files": -1,
-        "number of workers": 1,
-        "worker options": {
-            "num_cpus": 0.8
-        },
-        "actor creation delay": 0
-    },
-    "execution_stats": {
-        "cpus": 10,
-        "gpus": 0,
-        "memory": 14.031964112073183,
-        "object_store": 2.0
-    },
-    "job_output_stats": {
-        "source_files": 1,
-        "source_size": 16534,
-        "result_files": 1,
-        "result_size": 16534,
-        "table_processing": 0.012392997741699219,
-        "nfiles": 1,
-        "nrows": 5
-    },
-    "source": {
-        "name": "test-data/data_processing/ray/noop/input",
-        "type": "path"
-    },
-    "target": {
-        "name": "/tmp/NOOP4o9gv2bq",
-        "type": "path"
-    }
+  "pipeline": "pipeline_id",
+  "job details": {
+    "job category": "preprocessing",
+    "job name": "pdf2md",
+    "job type": "pure python",
+    "job id": "job_id",
+    "start_time": "2024-07-17 16:11:36",
+    "end_time": "2024-07-17 16:11:58",
+    "status": "success"
+  },
+  "code": {
+    "github": "github",
+    "commit_hash": "12345",
+    "path": "path"
+  },
+  "job_input_params": {
+    "pdf2md_modelsdir": "scratch",
+    "pdf2md_download_models": true,
+    "pdf2md_do_table_structure": true,
+    "pdf2md_do_ocr": false,
+    "checkpointing": false,
+    "max_files": -1,
+    "random_samples": -1,
+    "files_to_use": [
+      ".pdf",
+      ".zip"
+    ]
+  },
+  "job_output_stats": {
+    "source_files": 2,
+    "source_size": 8925664,
+    "result_files": 2,
+    "result_size": 85712,
+    "processing_time": 18.417838096618652,
+    "nrows": 3
+  },
+  "source": {
+    "name": "data-prep-kit/transforms/universal/pdf2md/python/test-data/input",
+    "type": "path"
+  },
+  "target": {
+    "name": "data-prep-kit/transforms/universal/pdf2md/python/output",
+    "type": "path"
+  }
 }

@@ -1,63 +1,60 @@
-# NOOP Transform 
-Please see the set of
-[transform project conventions](../../../README.md#transform-project-conventions)
-for details on general project conventions, transform configuration,
-testing and IDE set up.
+# Ingest PDF to Parquet
 
-## Summary 
-This transform serves as a template for transform writers as it does
-not perform any transformations on the input (i.e., a no-operation transform).
-As such, it simply copies the input parquet files to the output directory.
-It shows the basics of creating a simple 1:1 table transform.
-It also implements a single configuration value to show how configuration
-of the transform is implemented.
+This tranforms iterate through PDF files or zip of PDF files and generates parquet files
+containing the converted document in Markdown format.
 
-## Configuration and command line Options
+The PDF conversion is using the [Docling package](https://github.com/DS4SD/docling).
 
-The set of dictionary keys holding [NOOPTransform](src/noop_transform.py) 
-configuration for values are as follows:
 
-* _noop_sleep_sec_ - specifies the number of seconds to sleep during the call the 
-the `transform()` method of `NOOPTransformation`.  This may be useful for
-simulating real transform timings and as a way to limit I/O on an S3 endpoint..
-* _noop_pwd_ - specifies a dummy password not included in metadata. Provided
-as an example of metadata that we want to not include in logging.
+## Output format
 
-## Running
+The output format will contain all the columns of the metadata CSV file,
+with the addition of the following columns
 
-### Launched Command Line Options 
-The following command line arguments are available in addition to 
-the options provided by 
-the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
+```jsonc
+{
+    // all the fields of the input CSV + ...
+
+    "source_filename": "string",  // the basename of the source archive or file
+    "filename": "string",         // the basename of the PDF file
+    "contents": "string",         // the content of the PDF
+    "document_id": "string",      // the document id, corresponding to the hash of the content 
+    "ext": "string",              // the detected file extension
+    "hash": "string",             // the hash of the `contents` column
+    "size": "string",             // the size of `contents`
+    "date_acquired": "date",      // the date when the transform was executing
+    "num_pages": "number",        // number of pages in the PDF
+    "num_tables": "number",       // number of tables in the PDF
+    "num_doc_elements": "number", // number of document elements in the PDF
+    "pdf_convert_time": "float",  // time taken to convert the document in seconds
+}
 ```
-  --noop_sleep_sec NOOP_SLEEP_SEC
-                        Sleep actor for a number of seconds while processing the data frame, before writing the file to COS
-  --noop_pwd NOOP_PWD   A dummy password which should be filtered out of the metadata
-```
-These correspond to the configuration keys described above.
 
-### Running the samples
-To run the samples, use the following `make` targets
 
-* `run-cli-sample` - runs src/noop_transform.py using command line args
-* `run-local-sample` - runs src/noop_local.py
+## Parameters
 
-These targets will activate the virtual environment and set up any configuration needed.
-Use the `-n` option of `make` to see the detail of what is done to run the sample.
+| Parameter  | Default  | Description  |
+|------------|----------|--------------|
+| `--pdf2md_modelsdir`                  | `./artifacts` | The location where the models are located or downloaded to |
+| `--pdf2md_download_models`            | `False`       | If true, the model artifacts will be downloaded, otherwise they must be already at the path specified in `--ingest_pdf_to_parquet_modelsdir` |
+| `--pdf2md_do_table_structure`         | `True`        | If true, detected tables will be processed with the table structure model.                                                                   |
+| `--pdf2md_do_ocr`                     | `False`        | If true, optical character recognization (OCR) will be used to read the PDF content model.                                                                   |
 
-For example, 
-```shell
-make run-cli-sample
-...
-```
-Then 
-```shell
-ls output
-```
-To see results of the transform.
 
-### Transforming data using the transform image
 
-To use the transform image to transform your data, please refer to the 
-[running images quickstart](../../../../doc/quick-start/run-transform-image.md),
-substituting the name of this transform image and runtime as appropriate.
+## Prometheus metrics
+
+The transform will produce the following statsd metrics:
+
+| metric name                      | Description                                                      |
+|----------------------------------|------------------------------------------------------------------|
+| worker_pdf_doc_count             | Number of PDF documents converted by the worker                  |
+| worker_pdf_pages_count           | Number of PDF pages converted by the worker                      |
+| worker_pdf_page_avg_convert_time | Average time for converting a single PDF page on each worker     |
+| worker_pdf_convert_time          | Time spent converting a single document                          |
+
+
+## Credits
+
+The PDF document conversion is developed by the AI for Knowledge group in IBM Research Zurich.
+The main package is [Docling](https://github.com/DS4SD/docling).
