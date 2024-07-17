@@ -12,8 +12,10 @@
 
 from enum import Enum
 from data_processing.utils import get_logger
+import os
+import json
 
-
+default_configuration = f"{os.path.abspath(os.path.dirname(__file__))}/transform_configuration.json"
 logger = get_logger(__name__)
 
 def import_class(name):
@@ -38,87 +40,55 @@ class TransformsConfiguration:
     """
     Configurations for existing transforms
     """
-    def __init__(self):
+    def __init__(self, configuration_file: str = default_configuration):
         """
-        Initialization - building transforms dictionary
+        Initialization - loading transforms dictionary
+        :param configuration_file: default is from the same dictionary
         """
-        self.transforms = {
-            "code2parquet": ("transforms/code/code2parquet/",       # Subdirectory in the project
-                             "dpk_code2parquet_transform_python",   # Python library name
-                             "dpk_code2parquet_transform_ray",      # Ray library name
-                             None,                                  # Spark library name
-                             "code2parquet_transform_python.CodeToParquetPythonConfiguration",  # Python configuration class
-                             "code2parquet_transform_ray.CodeToParquetRayConfiguration",  # Ray configuration class
-                             None),  # Spark configuration class
-            "code_quality": ("transforms/code/code_quality/", "dpk_code_quality_transform_python",
-                             "dpk_code_quality_transform_ray", None,
-                             "code_quality_transform.CodeQualityTransformConfiguration",
-                             "code_quality_transform_ray.CodeQualityRayTransformConfiguration", None),
-            "malware": ("transforms/code/malware/", "dpk_malware_transform_python", "dpk_malware_transform_ray", None,
-                        "malware_transform_python.MalwarePythonTransformConfiguration",
-                        "malware_transform_ray.MalwareRayTransformConfiguration", None),
-            "proglang_select": ("transforms/code/proglang_select/", "dpk_proglang_select_transform_python",
-                                "dpk_proglang_select_transform_ray", None,
-                                "proglang_select_transform_python.ProgLangSelectPythonConfiguration",
-                                "proglang_select_transform_ray.ProgLangSelectRayConfiguration", None),
-            "lang_id": ("transforms/language/lang_id/", "dpk_lang_id_transform_python", "dpk_lang_id_transform_ray",
-                        None, "lang_id_transform_python.LangIdentificationPythonTransformConfiguration",
-                        "lang_id_transform_ray.LangIdentificationRayTransformConfiguration", None),
-            "doc_id": ("transforms/universal/doc_id/", None, "dpk_docid_transform_ray", None, None,
-                       "doc_id_transform_ray.DocIDRayTransformConfiguration", None),
-            "ededup": ("transforms/universal/ededup/", None, "dpk_ededup_transform_ray", None, None,
-                       "ededup_transform_ray.EdedupRayTransformConfiguration", None),
-            "fdedup": ("transforms/universal/fdedup/", None, "dpk_fdedup_transform_ray", None, None,
-                       "fdedup_transform_ray.FdedupRayTransformConfiguration", None),
-            "filter": ("transforms/universal/filter/", "dpk_filter_transform_python", "dpk_filter_transform_ray", None,
-                       "filter_transform_python.FilterPythonTransformConfiguration",
-                       "filter_transform_ray.FilterRayTransformConfiguration", None),
-            "noop": ("transforms/universal/noop/", "dpk_noop_transform_python", "dpk_noop_transform_ray", None,
-                     "noop_transform_python.NOOPPythonTransformConfiguration",
-                     "noop_transform_ray.NOOPRayTransformConfiguration", None),
-            "profiler": ("transforms/universal/profiler/", None, "dpk_profiler_transform_ray", None, None,
-                         "profiler_transform_ray.ProfilerRayTransformConfiguration", None),
-            "resize": ("transforms/universal/resize/", "dpk_resize_transform_python", "dpk_resize_transform_ray", None,
-                       "resize_transform_python.ResizePythonTransformConfiguration",
-                       "resize_transform_ray.ResizeRayTransformConfiguration", None),
-            "tokenization": ("transforms/universal/tokenization/", "dpk_tokenization_transform_python",
-                             "dpk_tokenization_transform_ray", None,
-                             "tokenization_transform_python.TokenizationPythonConfiguration",
-                             "tokenization_transform_ray.TokenizationRayConfiguration", None),
-        }
+        logger.info(f"loading from transforms configuration from {configuration_file}")
+        with open(configuration_file) as f:
+            self.transforms = json.load(f)
 
-    def get_configuration(self, transform: str,
-                          runtime: TransformRuntime = TransformRuntime.PYTHON) -> tuple[str, str, str]:
+
+    def get_available_transforms(self) -> list[str]:
+        """
+        Get available transforms
+        :return: a list of transform names
+        """
+        return list(self.transforms.keys())
+
+    def get_configuration(self, transform: str, runtime: TransformRuntime = TransformRuntime.PYTHON)\
+            -> tuple[str, str, list[str], str]:
         """
         Get configuration for a given transform/runtime
         :param transform: transform name
         :param runtime: runtime
-        :return: a tuple containing transform subdirectory, library name and configuration class name.
-                 Return None if transform/runtime does not exist
+        :return: a tuple containing transform subdirectory, library name, list of extra libraries
+                 and configuration class name. Return None if transform/runtime does not exist
         """
         config = self.transforms.get(transform, None)
         if config is None:
             logger.warning(f"transform {transform} is not defined")
-            return None, None, None
+            return None, None, [], None
         match runtime:
             case TransformRuntime.PYTHON:
                 # runtime Python
-                if config[1] is None or config[4] is None:
+                if config[1] is None or config[7] is None:
                     logger.warning(f"transform {transform} for Python is not defined")
-                    return None, None, None
-                return config[0] + "python", config[1], config[4]
+                    return None, None, [], None
+                return config[0] + "python", config[1], config[2], config[7]
             case TransformRuntime.RAY:
                 # runtime Ray
-                if config[2] is None or config[5] is None:
+                if config[3] is None or config[8] is None:
                     logger.warning(f"transform {transform} for Ray is not defined")
-                    return None, None, None
-                return config[0] + "ray", config[2], config[5]
+                    return None, None, [], None
+                return config[0] + "ray", config[3], config[4], config[8]
             case TransformRuntime.SPARK:
                 # runtime Spark
-                if config[3] is None or config[6] is None:
+                if config[5] is None or config[9] is None:
                     logger.warning(f"transform {transform} for Spark is not defined")
-                    return None, None, None
-                return config[0] + "spark", config[3], config[6]
+                    return None, None, [], None
+                return config[0] + "spark", config[5], config[6], config[9]
             case _:
                 logger.warning(f"undefined runtime {runtime.name}")
-                return None, None, None
+                return None, None, [], None

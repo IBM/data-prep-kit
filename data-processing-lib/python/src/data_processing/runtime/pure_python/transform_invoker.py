@@ -17,12 +17,14 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import PipInstaller, TransformRuntime, TransformsConfiguration, import_class
 
 project = "https://github.com/IBM/data-prep-kit.git"
-executor_logger = get_logger(__name__)
+logger = get_logger(__name__)
 
 
-def execute_python_transform(name: str, input_folder: str, output_folder: str, params: dict[str, Any]) -> bool:
+def execute_python_transform(configuration: TransformsConfiguration, name: str,
+                             input_folder: str, output_folder: str, params: dict[str, Any]) -> bool:
     # get transform configuration
-    subdirectory, l_name, t_class = (TransformsConfiguration().
+    logger.info(f"available transforms: {configuration.get_available_transforms()}")
+    subdirectory, l_name, extra_libraries, t_class = (configuration.
                                      get_configuration(transform=name, runtime=TransformRuntime.PYTHON))
     if subdirectory is None:
         return False
@@ -33,7 +35,7 @@ def execute_python_transform(name: str, input_folder: str, output_folder: str, p
     if not installer.validate(name=l_name):
         # transformer is not installed, install it
         if not installer.install(project=project, subdirectory=subdirectory, name=l_name):
-            executor_logger.warning(f"failed to install transform {name}")
+            logger.warning(f"failed to install transform {name}")
             return False
         installed = True
     # configure input parameters
@@ -58,16 +60,11 @@ def execute_python_transform(name: str, input_folder: str, output_folder: str, p
     if installed:
         # we installed transformer, uninstall it
         if not installer.uninstall(name=l_name):
-            executor_logger.warning(f"failed uninstall transform {l_name}")
+            logger.warning(f"failed uninstall transform {l_name}")
+        for library in extra_libraries:
+            if not installer.uninstall(name=library):
+                logger.warning(f"failed uninstall transform {library}")
     if res == 0:
         return True
-    executor_logger.warning(f"failed execution of transform {name}")
+    logger.warning(f"failed execution of transform {name}")
     return False
-
-if __name__ == "__main__":
-    r = execute_python_transform(
-        name="noop",
-        input_folder="/Users/borisl/IdeaProjects/data-prep-kit/transforms/universal/noop/python/test-data/input",
-        output_folder="/Users/borisl/IdeaProjects/data-prep-kit/transforms/universal/noop/python/output",
-        params={"noop_sleep_sec": 1})
-    executor_logger.info(f"completed execution with result {r}")
