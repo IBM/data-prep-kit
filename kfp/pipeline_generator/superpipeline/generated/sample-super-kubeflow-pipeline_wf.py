@@ -3,7 +3,7 @@
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from kfp_support.workflow_support.utils import ONE_WEEK_SEC
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
 # path to kfp component specifications files
@@ -14,8 +14,8 @@ run_doc_id_op = comp.load_component_from_file(component_spec_path + "executeSubW
 run_ededup_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
 
 
-doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id:0.3.0"
-ededup_image = "quay.io/dataprep1/data-prep-kit/ededup:0.3.0"
+doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id-ray:latest`"
+ededup_image = "quay.io/dataprep1/data-prep-kit/ededup-ray:latest"
 
 # Pipeline to invoke execution on remote resource
 @dsl.pipeline(
