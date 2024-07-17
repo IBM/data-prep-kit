@@ -45,7 +45,7 @@ To learn more consider the following:
 * [Transform Exceptions](transform-exceptions.md)
 * [Transform Runtimes](transform-runtimes.md)
 * [Transform Examples](transform-tutorial-examples.md)
-* [Data Access Factory S3 Example](using-data-access-factory.md)
+* [Data Access Factory](data-access-factory)
 * [Testing Transforms](transform-testing.md)
 * [Utilities](transformer-utilities.md)
 * [Architecture Deep Dive](architecture.md)
