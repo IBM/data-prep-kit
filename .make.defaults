@@ -37,6 +37,7 @@ ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 DOCKER_FILE?=Dockerfile
 #DOCKER_IMAGE_NAME?=xyzzy	# Must be defined by the includeing makefile
 DOCKER?=docker
+DOCKER_PLATFORM=?linux/amd64
 DOCKER_HOSTNAME?=quay.io
 DOCKER_NAMESPACE ?= dataprep1/data-prep-kit
 DOCKER_REGISTRY_USER?=$(DPK_DOCKER_REGISTRY_USER)
@@ -214,7 +215,7 @@ __check_defined = \
 		touch pyproject.toml;	\
 	fi
 	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE)		\
-		--platform linux/amd64  \
+		--platform $(DOCKER_PLATFORM)  \
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\
