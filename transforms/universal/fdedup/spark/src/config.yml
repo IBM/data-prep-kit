@@ -1,11 +1,11 @@
 logging_level: "INFO"
 common_args:
-    input_path: ${HOME}
-    output_path: ${HOME}
+    input_path: ${FD_INPUT_PATH}
+    output_path: ${FD_OUTPUT_PATH}
     file_ext: .parquet
     default_batch_size: 300
     document_id_column: int_id_column
-    contents_column: contents
+    contents_column: text
     debug: False
     checkpoint_count: 0
     total_document_size: 0
@@ -42,7 +42,7 @@ steps:
       udf_class: "FDJaccardDistanceCalculator"
       args:
           seed: 42
-          default_batch_size: 50
+          default_batch_size: 300
           num_permutations: 64
           jaccard_similarity_threshold: 0.8
           language: unspecified
