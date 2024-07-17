@@ -181,11 +181,10 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         spark_df_cluster_bands_exploded = cluster_band_df.withColumn("int_id_column", explode("doc_ids")).select(
             "band_hash", "int_id_column"
         )
-
+        logging.info(f"spark_df_cluster_bands_exploded has {spark_df_cluster_bands_exploded.count()} rows")
         # read minhash
         minhash_band_df = self.spark.createDataFrame([], minhash_schema)
         self.input_files, self.file_stats = self.list_files(self.minhash_output_path, self.file_ext)
-        self.default_batch_size = 1
         file_batcher = SparkFileBatcher(
             self.input_files,
             self.default_batch_size,
@@ -215,6 +214,7 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
 
             minhash_band_df = minhash_band_df.union(joined_df)
 
+        logging.info(f"minhash_band_df has {minhash_band_df.count()} rows")
         # Group by band_hash and aggregate int_id_column, document_length, and minhashes
         minhash_cluster_df = minhash_band_df.groupby("band_hash").agg(
             F.collect_list(F.struct("int_id_column", "data.document_length", "data.minhashes")).alias("combined_data")
@@ -311,11 +311,12 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
                 sorted_cluster_df,
                 doc2remove_schema,
             )
-            print(f"Band {band_index}: docs_to_remove_df has {docs_to_remove_df.count()} rows")
-            print(docs_to_remove_df.show(truncate=False))
+            logging.info(f"Band {band_index}: docs_to_remove_df has {docs_to_remove_df.count()} rows")
+            logging.info(f"Band {band_index}: docs_to_remove_list has {len(docs_to_remove_list)} elements")
 
             docs2remove_list.extend(docs_to_remove_list)
             docs2remove_list = list(set(docs2remove_list))
+            logging.info(f"After band {band_index}, {len(docs2remove_list)} documents marked for removal")
             # write doc2remove_sdf
             self.write_data(docs_to_remove_df, self.doc2remove_output_path, self.file_ext)
 
