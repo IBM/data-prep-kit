@@ -5,10 +5,10 @@ super_pipeline_metadata:
 super_pipeline_tasks:
   - name: "doc_id"
     pipeline_name: "doc_id_wf"
-    image: "quay.io/dataprep1/data-prep-kit/doc_id:0.3.0"
+    image: "quay.io/dataprep1/data-prep-kit/doc_id-ray:latest`"
   - name: "ededup"
     pipeline_name: "ededup_wf"
-    image: "quay.io/dataprep1/data-prep-kit/ededup:0.3.0"
+    image: "quay.io/dataprep1/data-prep-kit/ededup-ray:latest"
 
 super_pipeline_common_parameters:
   - name: "input_parent_path"
