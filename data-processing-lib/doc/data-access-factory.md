@@ -34,13 +34,13 @@ With this in mind, the following function is provided:
     * random sampling
 * Output file identification (for a given input)
 * Checkpointing  - determines the set of input files that need processing 
-(i.e. which do not have correspondine output files).
+(i.e. which do not have corresponding output files).
 * Reading and writing of files.
 
 Each transform runtime uses a DataAccessFactory to create a DataAccess instance which
 is then used to identify and process the target input data.
 Transforms may use this the runtime instance or can use their own DataAccessFactory.
-This might be needed if reading or writing other files to/tfrom other locations.
+This might be needed if reading or writing other files to/from other locations.
 
 ## Creating DAF instance
 
@@ -91,4 +91,7 @@ data_access.save_file(f"data/report.log", "success")
 
 Call to `create_data_access` will create the `DataAccess` instance (`DataAccessS3` in this case) .
 `save_file` will write a new file at `data/report.log` with content `success`.
-DAF instance can be initialized in your transformer's `__init__` method.
+
+When writing a transform, the `DataAccessFactory` is generally created in the
+transform's configuration class and passed to the transform's initializer by the runtime. 
+See [this section](transform-external-resources.md) on accessing external resources for details.
