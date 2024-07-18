@@ -29,7 +29,7 @@ on quay.io found at [https://quay.io/user/dataprep1](https://quay.io/user/datapr
 ### Local Data - Python Runtime
 To use an image to process local data we will mount the host
 input and output directories into the image.  Any mount
-point can be used, but we will use `/input` and `/output'.
+point can be used, but we will use `/input` and `/output`.
 
 To process data in the `/home/me/input` directory and write it
 to the `/home/me/output` directory, we mount these directories into
