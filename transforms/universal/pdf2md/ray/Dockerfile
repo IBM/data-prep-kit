@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py311
+ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
 
 FROM ${BASE_IMAGE}
 
@@ -20,16 +20,17 @@ RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
 COPY --chown=ray:users python-transform/  python-transform/
 RUN cd python-transform && pip install --no-cache-dir -e .
 
-#COPY requirements.txt requirements.txt
-#RUN pip install --no-cache-dir -r  requirements.txt
 
-COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
+# Download models
+RUN python -c 'from deepsearch_glm.utils.load_pretrained_models import load_pretrained_nlp_models; load_pretrained_nlp_models(verbose=True);'
+RUN python -c 'from docling.document_converter import DocumentConverter; from pathlib import Path; DocumentConverter.download_models_hf(local_dir=Path("./artifacts/"));'
+
 # copy source data
-COPY ./src/noop_transform_ray.py .
-COPY ./src/noop_local_ray.py local/
+COPY --chown=ray:users src/ src/
+COPY ./src/pdf2md_local_ray.py local/
 
 # copy test
 COPY test/ test/

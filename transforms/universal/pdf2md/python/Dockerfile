@@ -1,4 +1,4 @@
-FROM docker.io/python:3.11.9-slim-bookworm
+FROM docker.io/python:3.10.14-slim-bullseye
 
 RUN \
     apt-get update \
