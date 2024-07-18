@@ -42,7 +42,6 @@ params = {
     "runtime_creation_delay": 0,
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # pdf2md params
-    "pdf2md_download_models": True,
 }
 if __name__ == "__main__":
     # Set the simulated command line args

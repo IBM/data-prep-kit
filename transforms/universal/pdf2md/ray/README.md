@@ -1,6 +1,6 @@
 # PDF2MD Ray Transform 
 
-This module implements the ray version of the `pdf2md` transform.
+This module implements the ray version of the [pdf2md transform](../python/).
 
 
 ## Prometheus metrics

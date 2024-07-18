@@ -48,7 +48,6 @@ params = {
     "runtime_creation_delay": 0,
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # pdf2ms params
-    "pdf2md_download_models": True,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 # for arg in sys.argv:
