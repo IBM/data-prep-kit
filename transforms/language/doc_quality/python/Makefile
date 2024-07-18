@@ -9,20 +9,18 @@ REPOROOT=../../../..
 
 TRANSFORM_RUNTIME=python
 TRANSFORM_NAME=doc_quality
-DOCKER_HOME_DIR=/home/dpk
 
-include $(REPOROOT)/transforms/language/doc_quality/.make.doc_quality
 include $(REPOROOT)/transforms/.make.transforms
 
 venv::	.transforms.python-venv
 
-test:: download_model .transforms.test-src test-image
+test:: .transforms.test-src test-image
 
-clean:: .transforms.clean clean_model
+clean:: .transforms.clean
 
-image:: download_model .transforms.python-image
+image:: .transforms.python-image
 
-test-src:: download_model .transforms.test-src
+test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
@@ -40,22 +38,19 @@ build-dist:: set-versions .defaults.build-dist
 
 publish-dist:: .defaults.publish-dist
 
-test-image:: download_model .transforms.python-image .transforms.test-image-help test-image-pytest 
+test-image:: .transforms.python-test-image
 
-run-cli-sample: download_model
+run-cli-sample:
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_python.py \
                 RUN_ARGS=" --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
                 --docq_text_lang \"en\"	\
 				--docq_doc_content_column \"contents\"	\
 				--docq_bad_word_filepath \"../ldnoobw/en\" \
-				--docq_model_path \"../../$(MODEL_DIR)/\"	\
-				--docq_model_module_name \"perplexity_transformer_model\"	\
-				--docq_perplex_score_digit \"1\"	\
                 .transforms.run-src-file
 
-run-local-sample: download_model .transforms.run-local-sample
+run-local-sample: .transforms.run-local-sample
 
-run-local-python-sample: download_model .transforms.run-local-python-sample
+run-local-python-sample: .transforms.run-local-python-sample
 
 #run-s3-ray-sample: .transforms.run-s3-ray-sample
 

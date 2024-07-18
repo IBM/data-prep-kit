@@ -31,10 +31,6 @@ from doc_Gopher_statistics import (
     contains_common_English_words,
     find_first_japanese_alphabet_position,
 )
-from perplexity_models import (
-    PerplexityModel,
-    PerplexityModelFactory
-)
 
 logger = get_logger(__name__)
 
@@ -44,21 +40,14 @@ text_lang_key = "text_lang"
 doc_content_column_key = "doc_content_column"
 doc_id_column_key = "doc_id_column"
 bad_word_filepath_key = "bad_word_filepath"
-model_module_name_key = "model_module_name"
-model_path_key = "model_path"
-perplex_score_digit_key = "perplex_score_digit"
 text_lang_cli_param = f"{cli_prefix}{text_lang_key}"
 doc_content_column_cli_param = f"{cli_prefix}{doc_content_column_key}"
 doc_id_column_cli_param = f"{cli_prefix}{doc_id_column_key}"
 bad_word_filepath_cli_param = f"{cli_prefix}{bad_word_filepath_key}"
-model_path_cli_param = f"{cli_prefix}{model_path_key}"
-model_module_name_cli_param = f"{cli_prefix}{model_module_name_key}"
-perplex_score_digit_cli_param = f"{cli_prefix}{perplex_score_digit_key}"
 
 default_text_lang = "en"
 default_doc_content_column = "contents"
 default_doc_id_column = "documents_id"
-default_perplex_score_digit = 3
 
 data_factory_internal_key = f"{cli_prefix}data_factory"
 files_to_use_internal_key = f"{cli_prefix}files_to_use"
@@ -80,34 +69,8 @@ class DocQualityTransform(AbstractTableTransform):
         self.text_lang = config.get(text_lang_key, default_text_lang)
         self.doc_content_column = config.get(doc_content_column_key, default_doc_content_column)
         self.doc_id_column = config.get(doc_id_column_key, default_doc_id_column)
-        self.perplexity_digit = config.get(perplex_score_digit_key, default_perplex_score_digit)
-
+        
         daf = config.get(data_factory_internal_key, None)
-        model_path = config.get(model_path_key, None)
-        if model_path is None:
-            raise RuntimeError(f"Missing configuration value for key {model_path_key}")
-        model_module_name = config.get(model_module_name_key, None)
-        if model_module_name is None:
-            raise RuntimeError(f"Missing configuration value for key {model_module_name_key}")
-        if os.path.exists(model_path):
-            logger.info(f"Load model found locally from {model_path}")
-            self.perplexity_model = PerplexityModelFactory.create_model(
-                model_path=model_path,
-                model_module_name=model_module_name
-            )
-        else:
-            logger.info(f"Load model from remote")
-            data_access = daf.create_data_access()
-            import tempfile
-            with tempfile.TemporaryDirectory() as temp_dir:
-                # use a temporary directory until model is loaded to memory
-                paths, _, _ = data_access.get_files_to_process_internal(model_path)
-                for path in paths:
-                    self._write_locally(data_access, path, temp_dir)
-                self.perplexity_model = PerplexityModelFactory.create_model(
-                    model_path=temp_dir,
-                    model_module_name=model_module_name
-                )
         bad_word_filepath = config.get(bad_word_filepath_key, None)
         if bad_word_filepath is None:
             raise RuntimeError(f"Missing configuration value for key {bad_word_filepath_key}")
@@ -116,7 +79,7 @@ class DocQualityTransform(AbstractTableTransform):
             self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=bad_word_filepath)
         else:
             logger.info(f"Load badwords from remote")
-            data_access = self.daf.create_data_access()
+            data_access = daf.create_data_access()
             import tempfile
             with tempfile.TemporaryDirectory() as temp_dir:
                 # use a temporary directory until model is loaded to memory
@@ -147,7 +110,6 @@ class DocQualityTransform(AbstractTableTransform):
         docq_ellipsis_line_ratio = []
         docq_alphabet_word_ratio = []
         docq_contain_common_en_words = []
-        docq_perplex_score = []
         if self.text_lang == "ja":
             # for japanese language, add 2 extra columns for 2 heuristic rules:
             docq_avg_ja_sentence_len = []
@@ -208,11 +170,6 @@ class DocQualityTransform(AbstractTableTransform):
         table = TransformUtils.add_column(
             table=table, name="docq_contain_common_en_words", content=docq_contain_common_en_words
         )
-        table = TransformUtils.add_column(
-            table=table,
-            name="docq_perplex_score",
-            content=self.perplexity_model.get_perplexities(table[self.doc_content_column], self.perplexity_digit)
-        )
 
         if self.text_lang == "ja":
             table = table.append_column("docq_avg_ja_sentence_len", pa.array(docq_avg_ja_sentence_len))
@@ -266,24 +223,6 @@ class DocQualityTransformConfiguration(TransformConfiguration):
             type=str,
             required=True,
             help="path to bad word file: local folder (file or directory) that points to bad word file",
-        )
-        parser.add_argument(
-            f"--{model_path_cli_param}",
-            type=str,
-            required=True,
-            help="path to model: path (local or s3) to model",
-        )
-        parser.add_argument(
-            f"--{model_module_name_cli_param}",
-            type=str,
-            required=True,
-            help="module name that has subclass of PerplexityModel to use",
-        )
-        parser.add_argument(
-            f"--{perplex_score_digit_cli_param}",
-            type=int,
-            default=default_perplex_score_digit,
-            help="digit of perplexity score",
         )
         self.daf = DataAccessFactory(cli_prefix, False)
         self.daf.add_input_params(parser)

@@ -19,9 +19,6 @@ from doc_quality_transform import (
     text_lang_cli_param,
     doc_content_column_cli_param,
     bad_word_filepath_cli_param,
-    model_path_cli_param,
-    model_module_name_cli_param,
-    perplex_score_digit_cli_param,
 )
 from doc_quality_transform_ray import (
     DocQualityRayTransformConfiguration,
@@ -61,9 +58,6 @@ params = {
     text_lang_cli_param: "en",
     doc_content_column_cli_param: "contents",
     bad_word_filepath_cli_param: os.path.join(basedir, "ldnoobw", "en"),
-    model_path_cli_param: model_path,
-    model_module_name_cli_param: "perplexity_transformer_model",
-    perplex_score_digit_cli_param: 1,
 }
 # for arg in sys.argv:
 #     print(arg)

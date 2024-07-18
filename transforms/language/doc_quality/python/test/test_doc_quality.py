@@ -27,16 +27,10 @@ class TestDocQualityTransform(AbstractTableTransformTest):
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
-        model_path = os.path.join(basedir, "models")
-        if not os.path.exists(model_path):
-            model_path = os.path.abspath(os.path.join(basedir, "..", "models"))
         cli = [
             "--docq_text_lang", "en",
             "--docq_doc_content_column", "contents",
             "--docq_bad_word_filepath", os.path.join(basedir, "ldnoobw", "en"),
-            "--docq_model_path", model_path,
-            "--docq_model_module_name", "perplexity_transformer_model",
-            "--docq_perplex_score_digit", "1",
         ]
         transformConfig = DocQualityTransformConfiguration()
         config = get_transform_config(transformConfig, cli)
@@ -62,7 +56,6 @@ class TestDocQualityTransform(AbstractTableTransformTest):
                 pa.array([0.0]),
                 pa.array([0.625000]),
                 pa.array([False]),
-                pa.array([1150.7])
             ],
             names=[
                 "document_id",
@@ -78,7 +71,6 @@ class TestDocQualityTransform(AbstractTableTransformTest):
                 "docq_ellipsis_line_ratio",
                 "docq_alphabet_word_ratio",
                 "docq_contain_common_en_words",
-                "docq_perplex_score",
             ],
         )
         return [
