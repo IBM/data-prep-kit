@@ -13,7 +13,7 @@ from Murmur_MH import Murmur_MH
 from pyspark import RDD
 from pyspark.sql import DataFrame, Row
 from pyspark.sql import functions as F
-from pyspark.sql.functions import col, explode, size, udf
+from pyspark.sql.functions import col, explode, size, sum, udf
 from pyspark.sql.types import (
     ArrayType,
     BooleanType,
@@ -291,12 +291,20 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
             # small enough that it does not overflow
             cluster_band_df = self.load_band_clusters(cluster_schema, band_index)
             # exclude the clusters for which all the docs were already removed
-            if docs2remove_list:
-                purged_cluster_df = self.purge_clusters(cluster_band_df, set(docs2remove_list))
-            else:
-                purged_cluster_df = cluster_band_df
+            # if docs2remove_list:
+            #     purged_cluster_df = self.purge_clusters(cluster_band_df, set(docs2remove_list))
+            # else:
+            #     purged_cluster_df = cluster_band_df
 
-            logging.info(f"purged_cluster_df.count() = {purged_cluster_df.count()}")
+            purged_cluster_df = cluster_band_df
+            num_clusters = purged_cluster_df.count()
+            logging.info(f"Before re-checking Jaccard distance, band {band_index} has {num_clusters} clusters")
+            num_docs_to_remove = purged_cluster_df.select(sum(col("cluster_size"))).collect()[0][0]
+            # we will keep one document from each cluster, so need to adjust num_docs_to_remove
+            num_docs_to_remove -= num_clusters
+            logging.info(
+                f"Before re-checking Jaccard distance, band {band_index} has {num_docs_to_remove} documents to remove"
+            )
             # Identify the list of documents to remove:
             # Sort the documents inside each cluster by size, and double-check
             # that Jaccard similarity between docs in the same cluster is above
