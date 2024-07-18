@@ -12,8 +12,6 @@ authors = [
 dependencies = [
     "dpk-pdf2md-transform-python==0.2.1.dev0",
     "data-prep-toolkit-ray==0.2.1.dev0",
-    "docling >=1.0.0, <2.0.0",
-    "filetype >=1.2.0, <2.0.0",
 ]
 
 [build-system]

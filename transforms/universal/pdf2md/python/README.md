@@ -31,25 +31,15 @@ with the addition of the following columns
 
 ## Parameters
 
+The transform can be initialized with the following parameters.
+
 | Parameter  | Default  | Description  |
 |------------|----------|--------------|
-| `--pdf2md_modelsdir`                  | `./artifacts` | The location where the models are located or downloaded to |
-| `--pdf2md_download_models`            | `False`       | If true, the model artifacts will be downloaded, otherwise they must be already at the path specified in `--ingest_pdf_to_parquet_modelsdir` |
-| `--pdf2md_do_table_structure`         | `True`        | If true, detected tables will be processed with the table structure model.                                                                   |
-| `--pdf2md_do_ocr`                     | `False`        | If true, optical character recognization (OCR) will be used to read the PDF content model.                                                                   |
+| `artfacts_path`              | <unset> | Path where to models artifacts are located, if unset they will be downloaded in the HF_CACHE folder. |
+| `do_table_structure`         | `True`        | If true, detected tables will be processed with the table structure model.                                                                   |
+| `do_ocr`                     | `False`        | If true, optical character recognization (OCR) will be used to read the PDF content model.                                                                   |
 
-
-
-## Prometheus metrics
-
-The transform will produce the following statsd metrics:
-
-| metric name                      | Description                                                      |
-|----------------------------------|------------------------------------------------------------------|
-| worker_pdf_doc_count             | Number of PDF documents converted by the worker                  |
-| worker_pdf_pages_count           | Number of PDF pages converted by the worker                      |
-| worker_pdf_page_avg_convert_time | Average time for converting a single PDF page on each worker     |
-| worker_pdf_convert_time          | Time spent converting a single document                          |
+When invoking the CLI, the parameters must be set as `--pdf2md_<name>`, e.g. `--pdf2md_do_ocr=true`.
 
 
 ## Credits

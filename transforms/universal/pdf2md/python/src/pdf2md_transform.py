@@ -34,13 +34,14 @@ logger = get_logger(__name__)
 
 shortname = "pdf2md"
 cli_prefix = f"{shortname}_"
-pdf2md_modelsdir_key = f"modelsdir"
-pdf2md_download_models_key = f"download_models"
+pdf2md_artifacts_path_key = f"artifacts_path"
 pdf2md_do_table_structure_key = f"do_table_structure"
 pdf2md_do_ocr_key = f"do_ocr"
 
-pdf2md_modelsdir_cli_param = f"{cli_prefix}{pdf2md_modelsdir_key}"
-pdf2md_download_models_cli_param = f"{cli_prefix}{pdf2md_download_models_key}"
+pdf2md_do_table_structure_default = True
+pdf2md_do_ocr_default = False
+
+pdf2md_artifacts_path_cli_param = f"{cli_prefix}{pdf2md_artifacts_path_key}"
 pdf2md_do_table_structure_cli_param = f"{cli_prefix}{pdf2md_do_table_structure_key}"
 pdf2md_do_ocr_cli_param = f"{cli_prefix}{pdf2md_do_ocr_key}"
 
@@ -58,22 +59,18 @@ class Pdf2MdTransform(AbstractBinaryTransform):
 
         super().__init__(config)
         
-        self.models_dir = Path(config.get(pdf2md_modelsdir_key, "scratch"))
-        self.do_table_structure = config.get(pdf2md_do_table_structure_key, True)
-        self.do_ocr = config.get(pdf2md_do_ocr_key, False)
+        self.artifacts_path = config.get(pdf2md_artifacts_path_key, None)
+        if self.artifacts_path is not None:
+            self.artifacts_path = Path(self.artifacts_path)
+        self.do_table_structure = config.get(pdf2md_do_table_structure_key, pdf2md_do_table_structure_default)
+        self.do_ocr = config.get(pdf2md_do_ocr_key, pdf2md_do_ocr_default)
 
-        download_models = config.get(pdf2md_download_models_key, False)
-        if download_models:
-            print("Downloading models")
-            logger.info("Downloading models")
-            DocumentConverter.download_models_hf(local_dir=self.models_dir)
-        print("Initializing models")
         logger.info("Initializing models")
         pipeline_options = PipelineOptions(
             do_table_structure=self.do_table_structure,
             do_ocr=self.do_ocr,
         )
-        self._converter = DocumentConverter(artifacts_path=self.models_dir, pipeline_options=pipeline_options)
+        self._converter = DocumentConverter(artifacts_path=self.artifacts_path, pipeline_options=pipeline_options)
 
     def _update_metrics(self, num_pages: int, elapse_time: float):
         # This is implemented in the ray version
@@ -216,7 +213,6 @@ class Pdf2MdTransform(AbstractBinaryTransform):
                 (TransformUtils.convert_arrow_to_binary(table=table), ".parquet")
             ], metadata
         except Exception as e:
-            print(f"Fatal error with file {file_name=}. No results produced.")
             logger.error(f"Fatal error with file {file_name=}. No results produced.")
             return [], {}
 
@@ -230,7 +226,7 @@ class Pdf2MdTransformConfiguration(TransformConfiguration):
     def __init__(self, transform_class: type[AbstractBinaryTransform] = Pdf2MdTransform):
         super().__init__(
             name=shortname,
-            transform_class=Pdf2MdTransform,
+            transform_class=transform_class,
         )
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -240,28 +236,22 @@ class Pdf2MdTransformConfiguration(TransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            f"--{pdf2md_modelsdir_cli_param}",
+            f"--{pdf2md_artifacts_path_cli_param}",
             type=str,
-            help="Path where to download models",
-            default="scratch",
-        )
-        parser.add_argument(
-            f"--{pdf2md_download_models_cli_param}",
-            type=bool,
-            help="If true, models will be downloaded locally. Not needed when inside the docker image.",
-            default=False,
+            help="Path where to models artifacts are located, if unset they will be downloaded in the HF_CACHE folder.",
+            default=None,
         )
         parser.add_argument(
             f"--{pdf2md_do_table_structure_cli_param}",
             type=str2bool,
             help="If true, detected tables will be processed with the table structure model.",
-            default=True,
+            default=pdf2md_do_table_structure_default,
         )
         parser.add_argument(
             f"--{pdf2md_do_ocr_cli_param}",
             type=str2bool,
             help="If true, optical character recognization (OCR) will be used to read the PDF content.",
-            default=False,
+            default=pdf2md_do_ocr_default,
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
