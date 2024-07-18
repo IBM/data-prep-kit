@@ -9,7 +9,7 @@ REPOROOT=../../../..
 
 TRANSFORM_RUNTIME=python
 TRANSFORM_NAME=pdf2md
-PYTHON=python3.11
+# PYTHON=python3.11
 
 RUN_ARGS=" --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
 	--data_files_to_use \"['.pdf','.zip']\" \

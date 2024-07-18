@@ -17,13 +17,13 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.utils import get_logger
-from pdf2md_transform import PdfToMdTransformConfiguration
+from pdf2md_transform import Pdf2MdTransformConfiguration
 
 
 logger = get_logger(__name__)
 
 
-class PdftoMdPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
+class Pdf2MdPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
     """
     Implements the PythonTransformConfiguration for PDF2MD as required by the PythonTransformLauncher.
     """
@@ -33,10 +33,10 @@ class PdftoMdPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
         Initialization
         :param base_configuration - base configuration class
         """
-        super().__init__(transform_config=PdfToMdTransformConfiguration())
+        super().__init__(transform_config=Pdf2MdTransformConfiguration())
 
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(PdftoMdPythonTransformConfiguration())
+    launcher = PythonTransformLauncher(Pdf2MdPythonTransformConfiguration())
     logger.info("Launching pdf2md transform")
     launcher.launch()

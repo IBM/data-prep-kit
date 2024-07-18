@@ -19,6 +19,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from data_processing.utils.cli_utils import CLIArgumentProvider
 import filetype
 import pyarrow as pa
 from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
@@ -33,13 +34,18 @@ logger = get_logger(__name__)
 
 shortname = "pdf2md"
 cli_prefix = f"{shortname}_"
-pdf2md_modelsdir_key = f"{shortname}_modelsdir"
-pdf2md_download_models_key = f"{shortname}_download_models"
-pdf2md_do_table_structure_key = f"{shortname}_do_table_structure"
-pdf2md_do_ocr_key = f"{shortname}_do_ocr"
+pdf2md_modelsdir_key = f"modelsdir"
+pdf2md_download_models_key = f"download_models"
+pdf2md_do_table_structure_key = f"do_table_structure"
+pdf2md_do_ocr_key = f"do_ocr"
+
+pdf2md_modelsdir_cli_param = f"{cli_prefix}{pdf2md_modelsdir_key}"
+pdf2md_download_models_cli_param = f"{cli_prefix}{pdf2md_download_models_key}"
+pdf2md_do_table_structure_cli_param = f"{cli_prefix}{pdf2md_do_table_structure_key}"
+pdf2md_do_ocr_cli_param = f"{cli_prefix}{pdf2md_do_ocr_key}"
 
 
-class PdfToMdTransform(AbstractBinaryTransform):
+class Pdf2MdTransform(AbstractBinaryTransform):
     """ """
 
     def __init__(self, config: dict):
@@ -69,17 +75,9 @@ class PdfToMdTransform(AbstractBinaryTransform):
         )
         self._converter = DocumentConverter(artifacts_path=self.models_dir, pipeline_options=pipeline_options)
 
-        # self.doc_counter = Counter("worker_pdf_doc_count", "Number of PDF documents converted by the worker")
-        # self.page_counter = Counter("worker_pdf_pages_count", "Number of PDF pages converted by the worker")
-        # self.page_convert_gauge = Gauge("worker_pdf_page_avg_convert_time", "Average time for converting a single PDF page on each worker")
-        # self.doc_convert_gauge = Gauge("worker_pdf_convert_time", "Time spent converting a single document")
-
     def _update_metrics(self, num_pages: int, elapse_time: float):
+        # This is implemented in the ray version
         pass
-        # self.page_convert_gauge.set(elapse_time / num_pages)
-        # self.doc_convert_gauge.set(elapse_time)
-        # self.doc_counter.inc(1)
-        # self.page_counter.inc(num_pages)
 
     def _convert_pdf2md(self, doc_filename:str, ext: str, content_bytes: bytes) -> dict:
         # Convert PDF to Markdown
@@ -222,57 +220,8 @@ class PdfToMdTransform(AbstractBinaryTransform):
             logger.error(f"Fatal error with file {file_name=}. No results produced.")
             return [], {}
 
-# class PdfToMdRuntime(DefaultRayTransformRuntime):
-#     """
-#     Ingest to Parquet runtime support
-#     """
 
-#     def __init__(self, params: dict[str, Any]):
-#         """
-#         Create filter runtime
-#         :param params: parameters, that should include
-#             ingest_supported_langs_file_key: supported languages file
-#             ingest_detect_programming_lang_key: whether to detect programming language
-#             ingest_domain_key: domain
-#             ingest_snapshot_key: snapshot
-#         """
-#         super().__init__(params)
-
-#     def get_transform_config(
-#         self,
-#         data_access_factory: DataAccessFactoryBase,
-#         statistics: ActorHandle,
-#         files: list[str],
-#     ) -> dict[str, Any]:
-#         """
-#         Set environment for filter execution
-#         :param data_access_factory - data access factory
-#         :param statistics - reference to the statistics object
-#         :param files - list of files to process
-#         :return: dictionary of filter init params
-#         """
-
-#         # This cannot yet be done, because the converter is not easily serializable
-
-#         # self.models_dir = Path(self.params.get(ingest_modelsdir_key, "scratch"))
-#         # print("Downloading models")
-#         # logger.info("Downloading models")
-#         # DocumentConverter.download_models(
-#         #     artifacts_path=self.models_dir,
-#         #     artifacts_url=DocumentConverter.artifacts_urls["standard"],
-#         # )
-#         # print("Initializing converter")
-#         # logger.info("Initializing converter")
-#         # converter = DocumentConverter(artifacts_path=self.models_dir)
-#         # converter_refs = ray.put(converter)
-
-#         # logger.debug(f"Placed converter into Ray object storage under reference {converter_refs=}")
-#         # return {ingest_converter_refname: converter_refs} | self.params
-
-#         return self.params
-
-
-class PdfToMdTransformConfiguration(TransformConfiguration):
+class Pdf2MdTransformConfiguration(TransformConfiguration):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -281,7 +230,7 @@ class PdfToMdTransformConfiguration(TransformConfiguration):
     def __init__(self):
         super().__init__(
             name=shortname,
-            transform_class=PdfToMdTransform,
+            transform_class=Pdf2MdTransform,
             # remove_from_metadata=[ingest_data_factory_key],
         )
         self.daf = None
@@ -293,25 +242,25 @@ class PdfToMdTransformConfiguration(TransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            f"--{pdf2md_modelsdir_key}",
+            f"--{pdf2md_modelsdir_cli_param}",
             type=str,
             help="Path where to download models",
             default="scratch",
         )
         parser.add_argument(
-            f"--{pdf2md_download_models_key}",
+            f"--{pdf2md_download_models_cli_param}",
             type=bool,
             help="If true, models will be downloaded locally. Not needed when inside the docker image.",
             default=False,
         )
         parser.add_argument(
-            f"--{pdf2md_do_table_structure_key}",
+            f"--{pdf2md_do_table_structure_cli_param}",
             type=str2bool,
             help="If true, detected tables will be processed with the table structure model.",
             default=True,
         )
         parser.add_argument(
-            f"--{pdf2md_do_ocr_key}",
+            f"--{pdf2md_do_ocr_cli_param}",
             type=str2bool,
             help="If true, optical character recognization (OCR) will be used to read the PDF content.",
             default=False,
@@ -323,25 +272,8 @@ class PdfToMdTransformConfiguration(TransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        dargs = vars(args)
-        self.params = {
-            pdf2md_modelsdir_key: dargs.get(pdf2md_modelsdir_key, None),
-            pdf2md_download_models_key: dargs.get(pdf2md_download_models_key, False),
-            pdf2md_do_table_structure_key: dargs.get(pdf2md_do_table_structure_key, True),
-            pdf2md_do_ocr_key: dargs.get(pdf2md_do_ocr_key, False),
-        }
-        logger.info(f"Transform configuration {self.params}")
-        return self.params
 
-
-# class PdftoMdPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
-#     def __init__(self):
-#         super().__init__(transform_config=PdfToMdTransformConfiguration())
-
-
-# class PdftoMdRayConfiguration(RayTransformRuntimeConfiguration):
-#     def __init__(self):
-#         super().__init__(
-#             transform_config=PdfToMdTransformConfiguration(),
-#             runtime_class=PdfToMdRuntime,
-#         )
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        self.params = self.params | captured
+        logger.info(f"pdf2md parameters are : {self.params}")
+        return True

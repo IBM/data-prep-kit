@@ -1,17 +1,19 @@
 [project]
-name = "dpk_noop_transform_ray"
+name = "dpk_pdf2md_transform_ray"
 version = "0.2.1.dev0"
 requires-python = ">=3.10"
-description = "NOOP Ray Transform"
+description = "PDF2MD Ray Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
-    { name = "David Wood", email = "dawood@us.ibm.com" },
-    { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
+    { name = "Michele Dolfi", email = "dol@zurich.ibm.com" },
+    { name = "Christoph Auer", email = "cau@zurich.ibm.com" },
 ]
 dependencies = [
-    "dpk-noop-transform-python==0.2.1.dev0",
+    "dpk-pdf2md-transform-python==0.2.1.dev0",
     "data-prep-toolkit-ray==0.2.1.dev0",
+    "docling >=1.0.0, <2.0.0",
+    "filetype >=1.2.0, <2.0.0",
 ]
 
 [build-system]

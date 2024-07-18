@@ -1,5 +1,12 @@
-ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
+ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py311
+
 FROM ${BASE_IMAGE}
+
+RUN \
+    sudo apt-get update \
+    # for opencv, towhee
+    && sudo apt-get install -y libgl1 libglib2.0-0 curl wget \
+    && sudo apt-get clean
 
 # install pytest
 RUN pip install --no-cache-dir pytest
@@ -30,6 +37,9 @@ COPY test-data/ test-data/
 
 # Set environment
 ENV PYTHONPATH /home/ray
+
+# Parallelism
+ENV OMP_NUM_THREADS=2
 
 # Put these at the end since they seem to upset the docker cache.
 ARG BUILD_DATE

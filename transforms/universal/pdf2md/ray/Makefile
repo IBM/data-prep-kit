@@ -7,7 +7,7 @@ REPOROOT=../../../..
 
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_NAME=noop
+TRANSFORM_NAME=pdf2md
 
 BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
@@ -34,7 +34,7 @@ setup:: .transforms.setup
 
 # set the version of python transform that this depends on.
 set-versions: 
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${NOOP_PYTHON_VERSION} TOML_VERSION=$(NOOP_RAY_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${PDF2MD_PYTHON_VERSION} TOML_VERSION=$(PDF2MD_RAY_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 
