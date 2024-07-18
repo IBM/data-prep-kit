@@ -31,7 +31,7 @@ RUN python -c 'from deepsearch_glm.utils.load_pretrained_models import load_pret
 RUN python -c 'from docling.document_converter import DocumentConverter; from pathlib import Path; DocumentConverter.download_models_hf(local_dir=Path("./artifacts/"));'
 
 # copy source data
-COPY --chown=dpk:root src/ src/
+COPY --chown=dpk:root src/ .
 COPY ./src/pdf2md_local.py local/
 
 # copy test
