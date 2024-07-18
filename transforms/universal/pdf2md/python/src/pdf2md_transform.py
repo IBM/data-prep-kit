@@ -227,13 +227,11 @@ class Pdf2MdTransformConfiguration(TransformConfiguration):
     configuration with CLI args and combining of metadata.
     """
 
-    def __init__(self):
+    def __init__(self, transform_class: type[AbstractBinaryTransform] = Pdf2MdTransform):
         super().__init__(
             name=shortname,
             transform_class=Pdf2MdTransform,
-            # remove_from_metadata=[ingest_data_factory_key],
         )
-        self.daf = None
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
