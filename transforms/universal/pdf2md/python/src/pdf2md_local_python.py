@@ -16,7 +16,7 @@ import sys
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
-from pdf2md_transform_python import PdftoMdPythonTransformConfiguration
+from pdf2md_transform_python import Pdf2MdPythonTransformConfiguration
 
 
 # create parameters
@@ -42,6 +42,6 @@ if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = PythonTransformLauncher(runtime_config=PdftoMdPythonTransformConfiguration())
+    launcher = PythonTransformLauncher(runtime_config=Pdf2MdPythonTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

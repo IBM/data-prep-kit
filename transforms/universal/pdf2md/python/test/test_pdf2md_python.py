@@ -17,11 +17,10 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from pdf2md_transform import sleep_cli_param
-from pdf2md_transform_python import PdftoMdPythonTransformConfiguration
+from pdf2md_transform_python import Pdf2MdPythonTransformConfiguration
 
 
-class TestPythonPdfToMdTransform(AbstractTransformLauncherTest):
+class TestPythonPdf2MdTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -35,6 +34,6 @@ class TestPythonPdfToMdTransform(AbstractTransformLauncherTest):
         }
 
         fixtures = []
-        launcher = PythonTransformLauncher(PdftoMdPythonTransformConfiguration())
+        launcher = PythonTransformLauncher(Pdf2MdPythonTransformConfiguration())
         fixtures.append((launcher, config, basedir + "/input", basedir + "/expected"))
         return fixtures

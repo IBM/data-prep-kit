@@ -15,11 +15,11 @@ import pyarrow as pa
 from data_processing.test_support import get_files_in_folder
 from data_processing.test_support.transform import AbstractBinaryTransformTest
 from data_processing.utils import TransformUtils
-from pdf2md_transform import PdfToMdTransform
+from pdf2md_transform import Pdf2MdTransform
 
 
 
-class TestPdfToMdTransform(AbstractBinaryTransformTest):
+class TestPdf2MdTransform(AbstractBinaryTransformTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -37,4 +37,4 @@ class TestPdfToMdTransform(AbstractBinaryTransformTest):
         expected_files = [
             (binary, TransformUtils.get_file_extension(name)[1]) for name, binary in expected_files.items()
         ]
-        return [(PdfToMdTransform(config), input_files, expected_files, expected_metadata_list)]
+        return [(Pdf2MdTransform(config), input_files, expected_files, expected_metadata_list)]
