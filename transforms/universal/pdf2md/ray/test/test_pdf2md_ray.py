@@ -20,7 +20,7 @@ from data_processing_ray.runtime.ray import RayTransformLauncher
 from pdf2md_transform_ray import Pdf2MdRayTransformConfiguration
 
 
-class TestRayNOOPTransform(AbstractTransformLauncherTest):
+class TestRayPdf2MdTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
