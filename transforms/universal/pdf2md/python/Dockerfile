@@ -23,7 +23,6 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 
 # END OF STEPS destined for a data-prep-kit base image 
 
-COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
@@ -32,8 +31,7 @@ RUN python -c 'from deepsearch_glm.utils.load_pretrained_models import load_pret
 RUN python -c 'from docling.document_converter import DocumentConverter; from pathlib import Path; DocumentConverter.download_models_hf(local_dir=Path("./artifacts/"));'
 
 # copy source data
-COPY ./src/pdf2md_transform.py .
-COPY ./src/pdf2md_transform_python.py .
+COPY --chown=dpk:root src/ src/
 COPY ./src/pdf2md_local.py local/
 
 # copy test

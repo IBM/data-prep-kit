@@ -13,12 +13,10 @@ with the addition of the following columns
 
 ```jsonc
 {
-    // all the fields of the input CSV + ...
-
     "source_filename": "string",  // the basename of the source archive or file
     "filename": "string",         // the basename of the PDF file
     "contents": "string",         // the content of the PDF
-    "document_id": "string",      // the document id, corresponding to the hash of the content 
+    "document_id": "string",      // the document id, a random uuid4 
     "ext": "string",              // the detected file extension
     "hash": "string",             // the hash of the `contents` column
     "size": "string",             // the size of `contents`

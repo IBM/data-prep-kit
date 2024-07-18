@@ -11,6 +11,7 @@
 ################################################################################
 
 import io
+import uuid
 import zipfile
 import time
 from argparse import ArgumentParser, Namespace
@@ -106,7 +107,7 @@ class PdfToMdTransform(AbstractBinaryTransform):
             "num_pages": num_pages,
             "num_tables": num_tables,
             "num_doc_elements": num_doc_elements,
-            "document_id": TransformUtils.str_to_hash(content_string),
+            "document_id": str(uuid.uuid4()),
             "ext": ext,
             "hash": TransformUtils.str_to_hash(content_string),
             "size": len(content_string),
