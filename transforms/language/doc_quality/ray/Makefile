@@ -4,7 +4,6 @@ REPOROOT=../../../..
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
-include $(REPOROOT)/transforms/language/doc_quality/.make.doc_quality
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=doc_quality
