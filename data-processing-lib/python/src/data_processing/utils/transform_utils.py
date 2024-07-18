@@ -160,7 +160,8 @@ class TransformUtils:
         try:
             # convert table to bytes
             writer = pa.BufferOutputStream()
-            # Update default snappy compression to ZSTD. See https://arrow.apache.org/docs/python/generated/pyarrow.parquet.write_table.html
+            # Update default snappy compression to ZSTD. 
+            # See https://arrow.apache.org/docs/python/generated/pyarrow.parquet.write_table.html
             pq.write_table(table=table, where=writer, compression='ZSTD')
             return bytes(writer.getvalue())
         except Exception as e:
