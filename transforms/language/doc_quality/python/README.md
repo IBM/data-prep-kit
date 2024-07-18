@@ -15,7 +15,6 @@ In this transform, following metrics will be included:
   - > 90% of lines starting with a bullet point,
   - > 30% ending with an ellipsis.
   - Require that 80% of words in a document contain at least one alphabetic character, and apply a "stop word" filter, to remove documents that do NOT contain at least TWO of the following English words: the, be, to, of, and, that, have, with; this adequately deals with ostensibly English documents that contain no coherent English text.
-- Perplexity score. The smaller the perplexity score, the closer is the text to the targeted domain (i.e., en Wikipedia). Journalistic and well written content. Distribution of perplexity for different languages may have different shapes.
 
 
 
@@ -28,10 +27,6 @@ configuration for values are as follows:
 * _doc_content_column_ - specifies column name that contains document text.
 * _doc_id_column_ - specifies column name that contains document id.
 * _bad_word_filepath_ - specifies a path to bad word file: local folder (file or directory) that points to bad word file.
-* _model_path_ - specifies a path to model: local folder (file or directory) that points to model. If it exists in local file system, model will be loaded from there. If it does not exist, the value specified here will be ignored and try to find model in s3 using _s3_cred_.
-* _s3_cred_ - AST string of options for cos credentials retrieve model from s3.
-* _model_module_name_ - specifies a class name that uses model. The class should extend perplexity_models.PerplexityModel.
-* _perplex_score_digit_ - specifies a digit of perplexity score.
 
 ## Running
 
@@ -45,9 +40,6 @@ the [python launcher](../../../../data-processing-lib/doc/python-launcher-option
   --docq_doc_content_column DOCQ_DOC_CONTENT_COLUMN   column name that contain document text
   --docq_doc_id_colum DOCQ_DOC_ID_COLUMN   column name that contains document id
   --docq_bad_word_filepath DOCQ_BAD_WORD_FILEPATH   path to bad word file: local folder (file or directory) that points to bad word file
-  --docq_model_path   path to model: path (local or s3) to model
-  --docq_model_module_name   module name that has subclass of PerplexityModel to use
-  --docq_perplex_score_digit   digit of perplexity score
 ```
 These correspond to the configuration keys described above.
 

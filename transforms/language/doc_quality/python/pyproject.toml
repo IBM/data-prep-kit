@@ -10,10 +10,6 @@ authors = [
 ]
 dependencies = [
     "data-prep-toolkit==0.2.1.dev0",
-    "sentencepiece==0.2.0",
-    "transformers==4.41.2",
-    "evaluate==0.4.2",
-    "torch==2.3.1",
 ]
 
 [build-system]

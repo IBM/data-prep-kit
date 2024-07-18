@@ -14,17 +14,17 @@ DOCKER_HOME_DIR=/home/ray
 BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
 
-test:: download_model .transforms.test-src test-image
+test:: .transforms.ray-test
 
-clean:: .transforms.clean clean_model
+clean:: .transforms.clean
 
-image:: download_model .transforms.ray-image
+image:: .transforms.ray-image
 
-test-src:: download_model .transforms.test-src
+test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
-test-image:: download_model .transforms.ray-image .transforms.test-image-help test-image-pytest 
+test-image:: .transforms.ray-test-image
 
 build:: build-dist image
 
@@ -36,26 +36,23 @@ setup:: .transforms.setup
 
 # set the version of python transform that this depends on.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOC_QUALITY_PYTHON_VERSION) TOML_VERSION=$(DOC_QUALITY_PYTHON_VERSION) .transforms.set-versions	
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOC_QUALITY_PYTHON_VERSION) TOML_VERSION=$(DOC_QUALITY_RAY_VERSION) .transforms.set-versions	
         
 build-dist:: set-versions .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 
-run-cli-sample: download_model 
+run-cli-sample: 
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_ray.py \
                 RUN_ARGS=" --run_locally True --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
                 --docq_text_lang \"en\"	\
 				--docq_doc_content_column \"contents\"	\
 				--docq_bad_word_filepath \"../ldnoobw/en\" \
-				--docq_model_path \"../../$(MODEL_DIR)/\"	\
-				--docq_model_module_name \"perplexity_transformer_model\"	\
-				--docq_perplex_score_digit \"1\"	\
                 .transforms.run-src-file
 
-run-local-sample: download_model .transforms.run-local-ray-sample
+run-local-sample: .transforms.run-local-ray-sample
 
-run-s3-sample: download_model .transforms.run-s3-ray-sample
+run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
