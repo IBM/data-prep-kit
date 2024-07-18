@@ -83,20 +83,3 @@ def execute_ray_transform(configuration: TransformsConfiguration, name: str,
         return True
     logger.warning(f"failed execution of transform {name}")
     return False
-
-if __name__ == "__main__":
-    input_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                             "../../../../../../transforms/universal/noop/ray/test-data/input"))
-    output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                              "../../../../../../transforms/universal/noop/ray/output"))
-    worker_options = {"num_cpus": 0.8}
-    t_configuration = TransformsConfiguration()
-    res = execute_ray_transform(
-        configuration = t_configuration,
-        name="noop",
-        input_folder=input_dir,
-        output_folder=output_dir,
-        params={"noop_sleep_sec": 1,
-                "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
-                "runtime_num_workers": 3})
-    logger.info(res)
