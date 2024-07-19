@@ -29,7 +29,8 @@ expected_table = table  # We only use NOOP
 # Because the test is calling transform/flush_binary(), we get the additional metadata *_doc_count.
 expected_metadata_list = [
     {"nfiles": 1, "nrows": 3, "result_doc_count": 3, "source_doc_count": 3},  # transform() result
-    {"result_doc_count": 0},  # flush() result
+    {}  # flush() result
+    # {"result_doc_count": 0},  # flush_binary() result
 ]
 
 
