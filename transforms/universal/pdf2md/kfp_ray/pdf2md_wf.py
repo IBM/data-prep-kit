@@ -17,10 +17,10 @@ import kfp.dsl as dsl
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/noop-ray:latest"
+task_image = "quay.io/dataprep1/data-prep-kit/pdf2md-ray:latest"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "noop_transform_ray.py"
+EXEC_SCRIPT_NAME: str = "pdf2md_transform_ray.py"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
@@ -39,7 +39,8 @@ def compute_exec_params_func(
     runtime_pipeline_id: str,
     runtime_job_id: str,
     runtime_code_location: str,
-    noop_sleep_sec: int,
+    pdf2md_do_table_structure: bool,
+    pdf2md_do_ocr: bool,
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -52,7 +53,8 @@ def compute_exec_params_func(
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": runtime_code_location,
-        "noop_sleep_sec": noop_sleep_sec,
+        pdf2md_do_table_structure: pdf2md_do_table_structure,
+        pdf2md_do_ocr: pdf2md_do_ocr,
     }
 
 
@@ -87,23 +89,23 @@ execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "execu
 cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
 
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "noop"
+TASK_NAME: str = "pdf2md"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for noop",
+    description="Pipeline for pdf2md",
 )
-def noop(
+def pdf2md(
     # Ray cluster
-    ray_name: str = "noop-kfp-ray",  # name of Ray cluster
+    ray_name: str = "pdf2md-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
     '"image": "' + task_image + '"}',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    data_s3_config: str = "{'input_folder': 'test/noop/input/', 'output_folder': 'test/noop/output/'}",
+    data_s3_config: str = "{'input_folder': 'test/pdf2md/input/', 'output_folder': 'test/pdf2md/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
@@ -111,13 +113,14 @@ def noop(
     runtime_actor_options: str = "{'num_cpus': 0.8}",
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
-    # noop parameters
-    noop_sleep_sec: int = 10,
+    # pdf2md parameters
+    pdf2md_do_table_structure: bool = True,
+    pdf2md_do_ocr: bool = False,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
-    Pipeline to execute NOOP transform
+    Pipeline to execute PDF2MD transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -147,7 +150,8 @@ def noop(
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    :param noop_sleep_sec - noop sleep time
+    :param pdf2md_do_table_structure - run table structure model
+    :param pdf2md_do_ocr - run ocr model
     :return: None
     """
     # create clean_up task
@@ -165,7 +169,8 @@ def noop(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            noop_sleep_sec=noop_sleep_sec,
+            pdf2md_do_table_structure=pdf2md_do_table_structure,
+            pdf2md_do_ocr=pdf2md_do_ocr,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
@@ -184,7 +189,7 @@ def noop(
             ray_name=ray_name,
             run_id=run_id,
             additional_params=additional_params,
-            # note that the parameters below are specific for NOOP transform
+            # note that the parameters below are specific for PDF2MD transform
             exec_params=compute_exec_params.output,
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
@@ -196,4 +201,4 @@ def noop(
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(noop, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(pdf2md, __file__.replace(".py", ".yaml"))

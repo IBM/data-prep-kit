@@ -7,7 +7,6 @@ REPOROOT=../../../..
 
 # $(REPOROOT)/.make.versions file contains the versions
 
-TRANSFORM_RUNTIME=python
 TRANSFORM_NAME=pdf2md
 
 RUN_ARGS=" --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
