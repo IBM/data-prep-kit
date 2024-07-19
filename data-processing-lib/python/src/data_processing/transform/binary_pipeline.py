@@ -54,9 +54,64 @@ class PipelinedBinaryTransform(AbstractBinaryTransform):
         Returns:
 
         """
-        pending_to_process = [(file_name, byte_array)]
+        r_bytes, r_metadata = self._apply_transforms_to_datum(self.transforms, (file_name, byte_array))
+        return r_bytes, r_metadata
+
+        # pending_to_process = [(file_name, byte_array)]
+        # r_metadata = {}
+        # for transform in self.transforms:
+        #     transform_name = type(transform).__name__
+        #     to_process = pending_to_process
+        #     pending_to_process = []
+        #     for tp in to_process:  # Over all outputs from the last transform  (or the initial input)
+        #         fname = tp[0]
+        #         byte_array = tp[1]
+        #         transformation_tuples, metadata = transform.transform_binary(fname, byte_array)
+        #         # Capture the list of outputs from this transform as inputs to the next (or as the return values).
+        #         for transformation in transformation_tuples:
+        #             transformed, extension = transformation
+        #             fname = transform_name + "-output" + extension
+        #             next = (fname, transformed)
+        #             pending_to_process.append(next)
+        #         # TODO: this is not quite right and might overwrite previous values.
+        #         # Would be better if we could somehow support lists.
+        #         r_metadata = r_metadata | metadata
+        #
+        # r_bytes = []
+        # for tp in pending_to_process:
+        #     fname = tp[0]
+        #     byte_array = tp[1]
+        #     extension = pathlib.Path(fname).suffix
+        #     tp = (byte_array, extension)
+        #     r_bytes.append(tp)
+        # return r_bytes, r_metadata
+
+    def _apply_transforms_to_data(
+        self, transforms: list[AbstractBinaryTransform], data: list[tuple[str, bytearray]]
+    ) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+        r_bytes = []
         r_metadata = {}
-        for transform in self.transforms:
+        for datum in data:
+            processed, metadata = self._apply_transforms_to_datum(transforms, data)
+            r_bytes.extend(processed)
+            r_metadata = r_metadata | metadata
+
+        return r_bytes, r_metadata
+
+    def _apply_transforms_to_datum(
+        self, transforms: list[AbstractBinaryTransform], datum: tuple[str, bytearray]
+    ) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+        """
+        Apply the list of transforms to the given datum tuple of filename and byte[]
+        Args:
+            transforms:
+            datum:
+        Returns: same as transform_binary().
+
+        """
+        r_metadata = {}
+        pending_to_process = [(datum[0], datum[1])]
+        for transform in transforms:
             transform_name = type(transform).__name__
             to_process = pending_to_process
             pending_to_process = []
@@ -74,6 +129,7 @@ class PipelinedBinaryTransform(AbstractBinaryTransform):
                 # Would be better if we could somehow support lists.
                 r_metadata = r_metadata | metadata
 
+        # Strip the pseudo-base filename from the pending_to_process tuples, leaving only the extension, as required.
         r_bytes = []
         for tp in pending_to_process:
             fname = tp[0]
@@ -81,22 +137,37 @@ class PipelinedBinaryTransform(AbstractBinaryTransform):
             extension = pathlib.Path(fname).suffix
             tp = (byte_array, extension)
             r_bytes.append(tp)
+
         return r_bytes, r_metadata
 
     def flush_binary(self) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
-        Call flush on all transforms in the pipeline and aggregated the results.
+        Call flush on all transforms in the pipeline passing flushed results to downstream
+        transforms, as appropriate.  Aggregated results.
         Returns:
 
         """
+
         r_bytes = []
         r_metadata = {}
-        for transform in self.transforms:
+        index = 0
+        for transform in self.transforms:  # flush each transform
+            index += 1
             transformation_tuples, metadata = transform.flush_binary()
-            for transformed_tuples in transformation_tuples:
-                r_bytes.append(transformed_tuples)
-            # TODO: this is not quite right and might overwrite previous values.
-            # Would be better if we could somehow support lists.
             r_metadata = r_metadata | metadata
+            if len(transformation_tuples) > 0:  # Something was flushed from this transform.
+                downstream_transforms = self.transforms[index:]
+                if len(downstream_transforms) > 0:
+                    # Apply the flushed results to the downstream transforms.
+                    transformation_tuples, metadata = self._apply_transforms_to_data(
+                        downstream_transforms, transformation_tuples
+                    )
+                    r_bytes.extend(transformation_tuples)
+                    # TODO: this is not quite right and might overwrite previous values.
+                    # Would be better if we could somehow support lists.
+                    r_metadata = r_metadata | metadata
+                else:
+                    # We flushed the last transform so just append its results.
+                    r_bytes.extend(transformation_tuples)
 
         return r_bytes, r_metadata
