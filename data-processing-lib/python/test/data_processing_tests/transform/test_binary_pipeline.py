@@ -16,8 +16,8 @@ import pyarrow as pa
 from data_processing.test_support.transform import AbstractBinaryTransformTest
 from data_processing.test_support.transform.noop_transform import NOOPTransform
 from data_processing.transform import AbstractBinaryTransform
-from data_processing.transform.binary_pipeline import (
-    PipelinedBinaryTransform,
+from data_processing.transform.pipelined_transform import (
+    PipelinedTransform,
     transform_key,
 )
 from data_processing.utils import TransformUtils
@@ -72,7 +72,7 @@ class TestPipelinedBinaryTransform(AbstractBinaryTransformTest):
         # Simple test to makes sure a single transform works
         fixtures.append(
             (
-                PipelinedBinaryTransform(config),
+                PipelinedTransform(config),
                 [("foo.parquet", binary_table)],
                 [(binary_expected_table, ".parquet")],
                 expected_metadata_list,
@@ -83,7 +83,7 @@ class TestPipelinedBinaryTransform(AbstractBinaryTransformTest):
         config = {transform_key: [noop0, noop1]}
         fixtures.append(
             (
-                PipelinedBinaryTransform(config),
+                PipelinedTransform(config),
                 [("foo.parquet", binary_table)],
                 [(binary_expected_table, ".parquet")],
                 expected_metadata_list,
@@ -94,7 +94,7 @@ class TestPipelinedBinaryTransform(AbstractBinaryTransformTest):
         config = {transform_key: [noop0, DoublerTransform()]}
         fixtures.append(
             (
-                PipelinedBinaryTransform(config),
+                PipelinedTransform(config),
                 [("foo.parquet", binary_table)],
                 [(binary_expected_table, ".parquet"), (binary_expected_table, ".parquet")],
                 expected_metadata_list,
