@@ -53,8 +53,8 @@ def compute_exec_params_func(
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": runtime_code_location,
-        pdf2md_do_table_structure: pdf2md_do_table_structure,
-        pdf2md_do_ocr: pdf2md_do_ocr,
+        "pdf2md_do_table_structure": pdf2md_do_table_structure,
+        "pdf2md_do_ocr": pdf2md_do_ocr,
     }
 
 

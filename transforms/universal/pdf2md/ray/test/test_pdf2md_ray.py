@@ -35,6 +35,13 @@ class TestRayPdf2MdTransform(AbstractTransformLauncherTest):
         fixtures = []
         launcher = RayTransformLauncher(Pdf2MdRayTransformConfiguration())
         fixtures.append(
-            (launcher, config, basedir + "/input", basedir + "/expected")
+            (
+                launcher,
+                config,
+                basedir + "/input",
+                basedir + "/expected",
+                # this is added as a fixture to remove these columns from comparison
+                ["date_acquired", "document_id", "pdf_convert_time"],
+            )
         )
         return fixtures

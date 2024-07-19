@@ -145,9 +145,10 @@ class Pdf2MdTransform(AbstractBinaryTransform):
 
                     data.append(file_data)
                     number_of_rows += 1
+                    success_doc_id.append(file_name)
 
                 except Exception as e:
-                    failed_doc_id.append(archive_doc_filename)
+                    failed_doc_id.append(file_name)
                     logger.warning(
                         f"Exception {str(e)} processing file {archive_doc_filename}, skipping"
                     )
@@ -189,6 +190,7 @@ class Pdf2MdTransform(AbstractBinaryTransform):
                                 file_data["source_filename"] = TransformUtils.get_file_basename(file_name)
 
                                 data.append(file_data)
+                                success_doc_id.append(archive_doc_filename)
                                 number_of_rows += 1
 
                             except Exception as e:

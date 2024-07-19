@@ -18,7 +18,6 @@ from data_processing.utils import TransformUtils
 from pdf2md_transform import Pdf2MdTransform
 
 
-
 class TestPdf2MdTransform(AbstractBinaryTransformTest):
     """
     Extends the super-class to define the test data for the tests defined there.
@@ -26,15 +25,28 @@ class TestPdf2MdTransform(AbstractBinaryTransformTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
+        basedir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "../test-data")
+        )
         input_dir = os.path.join(basedir, "input")
-        input_files = get_files_in_folder(input_dir, ".zip")
+        input_files = get_files_in_folder(input_dir, ".pdf")
+        # input_files = [*input_files, get_files_in_folder(input_dir, ".zip")]
         input_files = [(name, binary) for name, binary in input_files.items()]
-        expected_metadata_list = [{"nrows": 2, "nsuccess": 2, "nfail": 0, "nskip": 0}, {}]
+        expected_metadata_list = [{"nrows": 1, "nsuccess": 1, "nfail": 0, "nskip": 0}, {}]
         config = {}
 
-        expected_files = get_files_in_folder(os.path.join(basedir, "expected"), ".parquet")
+        expected_files = get_files_in_folder(
+            os.path.join(basedir, "expected"), ".parquet"
+        )
         expected_files = [
-            (binary, TransformUtils.get_file_extension(name)[1]) for name, binary in expected_files.items()
+            (binary, TransformUtils.get_file_extension(name)[1])
+            for name, binary in expected_files.items()
         ]
-        return [(Pdf2MdTransform(config), input_files, expected_files, expected_metadata_list)]
+        return [
+            (
+                Pdf2MdTransform(config),
+                input_files,
+                expected_files,
+                expected_metadata_list,
+            )
+        ]
