@@ -12,6 +12,7 @@
 
 import os
 import pyarrow as pa
+from data_processing.data_access.data_access_local import DataAccessLocal
 from data_processing.test_support import get_files_in_folder
 from data_processing.test_support.transform import AbstractBinaryTransformTest
 from data_processing.utils import TransformUtils
@@ -25,22 +26,24 @@ class TestPdf2MdTransform(AbstractBinaryTransformTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
+        dal = DataAccessLocal()
         basedir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "../test-data")
         )
         input_dir = os.path.join(basedir, "input")
         input_files = get_files_in_folder(input_dir, ".pdf")
-        # input_files = [*input_files, get_files_in_folder(input_dir, ".zip")]
         input_files = [(name, binary) for name, binary in input_files.items()]
         expected_metadata_list = [{"nrows": 1, "nsuccess": 1, "nfail": 0, "nskip": 0}, {}]
         config = {}
 
-        expected_files = get_files_in_folder(
-            os.path.join(basedir, "expected"), ".parquet"
-        )
         expected_files = [
-            (binary, TransformUtils.get_file_extension(name)[1])
-            for name, binary in expected_files.items()
+            os.path.join(basedir, "expected", TransformUtils.get_file_basename(input_file).replace(".pdf", ".parquet"))
+            for input_file, _ in input_files
+        ]
+
+        expected_files = [
+            (dal.get_file(name)[0], TransformUtils.get_file_extension(name)[1])
+            for name in expected_files
         ]
         return [
             (
