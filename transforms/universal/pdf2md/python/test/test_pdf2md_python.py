@@ -35,5 +35,14 @@ class TestPythonPdf2MdTransform(AbstractTransformLauncherTest):
 
         fixtures = []
         launcher = PythonTransformLauncher(Pdf2MdPythonTransformConfiguration())
-        fixtures.append((launcher, config, basedir + "/input", basedir + "/expected"))
+        fixtures.append(
+            (
+                launcher,
+                config,
+                basedir + "/input",
+                basedir + "/expected",
+                # this is added as a fixture to remove these columns from comparison
+                ["date_acquired", "document_id", "pdf_convert_time"],
+            )
+        )
         return fixtures
