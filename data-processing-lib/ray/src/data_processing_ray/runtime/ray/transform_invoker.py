@@ -17,7 +17,7 @@ from data_processing.utils import (ParamsUtils,
                                    PipInstaller,
                                    TransformRuntime,
                                    TransformsConfiguration,
-                                   import_class,
+                                   import_class, build_invoker_input
                                    )
 from data_processing_ray.runtime.ray import RayTransformLauncher
 
@@ -26,10 +26,21 @@ logger = get_logger(__name__)
 
 
 def execute_ray_transform(configuration: TransformsConfiguration, name: str,
-                             input_folder: str, output_folder: str, params: dict[str, Any]) -> bool:
+                          params: dict[str, Any], input_folder: str, output_folder: str,
+                          s3_config: dict[str, Any] = None) -> bool:
+    """
+    Execute Ray transform
+    :param configuration: transforms configuration
+    :param name: transform name
+    :param params: transform params
+    :param input_folder: input folder (local or S3)
+    :param output_folder: output folder (local or S3)
+    :param s3_config: S3 configuration - None local data
+    :return: True/False - execution result
+    """
     # get transform configuration
-    r_subdirectory, r_l_name, extra_libraries, t_class = (configuration.
-                                     get_configuration(transform=name, runtime=TransformRuntime.RAY))
+    r_subdirectory, r_l_name, extra_libraries, t_class = (configuration.get_configuration(transform=name,
+                                                                                          runtime=TransformRuntime.RAY))
     if r_subdirectory is None:
         return False
     p_subdirectory, p_l_name, _, _ = (configuration.get_configuration(transform=name, runtime=TransformRuntime.PYTHON))
@@ -52,22 +63,22 @@ def execute_ray_transform(configuration: TransformsConfiguration, name: str,
             return False
         r_installed = True
     # configure input parameters
-    location = {
-        "data_local_config": ParamsUtils.convert_to_ast({
-            "input_folder": input_folder,
-            "output_folder": output_folder,
-        })}
-    p = location | params | {"run_locally": True}
+    p = (build_invoker_input(input_folder=input_folder, output_folder=output_folder, s3_config=s3_config)
+         | params | {"run_locally": True})
     # create configuration
     klass = import_class(t_class)
     transform_configuration = klass()
     # Set the command line args
     current_args = sys.argv
     sys.argv = ParamsUtils.dict_to_req(d=p)
-    # create launcher
-    launcher = RayTransformLauncher(runtime_config=transform_configuration)
-    # Launch the ray actor(s) to process the input
-    res = launcher.launch()
+    try:
+        # create launcher
+        launcher = RayTransformLauncher(runtime_config=transform_configuration)
+        # Launch the ray actor(s) to process the input
+        res = launcher.launch()
+    except Exception as e:
+        logger.warning(f"Exception executing transform {name}: {e}")
+        res = 1
     # restore args
     sys.argv = current_args
     # clean up

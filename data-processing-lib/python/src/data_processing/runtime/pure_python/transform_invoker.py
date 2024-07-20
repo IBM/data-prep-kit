@@ -12,7 +12,7 @@
 
 import sys
 from typing import Any
-from data_processing.utils import ParamsUtils, get_logger
+from data_processing.utils import ParamsUtils, build_invoker_input, get_logger
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import PipInstaller, TransformRuntime, TransformsConfiguration, import_class
 
@@ -21,10 +21,21 @@ logger = get_logger(__name__)
 
 
 def execute_python_transform(configuration: TransformsConfiguration, name: str,
-                             input_folder: str, output_folder: str, params: dict[str, Any]) -> bool:
+                             params: dict[str, Any], input_folder: str, output_folder: str,
+                             s3_config: dict[str, Any] = None) -> bool:
+    """
+    Execute Python transform
+    :param configuration: transforms configuration
+    :param name: transform name
+    :param params: transform params
+    :param input_folder: input folder (local or S3)
+    :param output_folder: output folder (local or S3)
+    :param s3_config: S3 configuration - None local data
+    :return: True/False - execution result
+    """
     # get transform configuration
-    subdirectory, l_name, extra_libraries, t_class = (configuration.
-                                     get_configuration(transform=name, runtime=TransformRuntime.PYTHON))
+    subdirectory, l_name, extra_libraries, t_class = (configuration.get_configuration(transform=name,
+                                                                                      runtime=TransformRuntime.PYTHON))
     if subdirectory is None:
         return False
 
@@ -38,12 +49,7 @@ def execute_python_transform(configuration: TransformsConfiguration, name: str,
             return False
         installed = True
     # configure input parameters
-    location = {
-        "data_local_config": ParamsUtils.convert_to_ast({
-            "input_folder": input_folder,
-            "output_folder": output_folder,
-        })}
-    p = location | params
+    p = build_invoker_input(input_folder=input_folder, output_folder=output_folder, s3_config=s3_config) | params
     # create configuration
     klass = import_class(t_class)
     transform_configuration = klass()
@@ -51,9 +57,13 @@ def execute_python_transform(configuration: TransformsConfiguration, name: str,
     current_args = sys.argv
     sys.argv = ParamsUtils.dict_to_req(d=p)
     # create launcher
-    launcher = PythonTransformLauncher(runtime_config=transform_configuration)
-    # Launch the ray actor(s) to process the input
-    res = launcher.launch()
+    try:
+        launcher = PythonTransformLauncher(runtime_config=transform_configuration)
+        # Launch the ray actor(s) to process the input
+        res = launcher.launch()
+    except Exception as e:
+        logger.warning(f"Exception executing transform {name}: {e}")
+        res = 1
     # restore args
     sys.argv = current_args
     if installed:

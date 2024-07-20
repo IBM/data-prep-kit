@@ -11,7 +11,8 @@
 ################################################################################
 
 from enum import Enum
-from data_processing.utils import get_logger
+from typing import Any
+from data_processing.utils import ParamsUtils, get_logger
 import os
 import json
 
@@ -19,11 +20,42 @@ default_configuration = f"{os.path.abspath(os.path.dirname(__file__))}/transform
 logger = get_logger(__name__)
 
 def import_class(name):
+    """
+    Import class by name
+    :param name: name
+    :return:
+    """
     components = name.split('.')
     mod = __import__(components[0])
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return mod
+
+
+def build_invoker_input(input_folder: str, output_folder: str, s3_config: dict[str, Any]) -> dict[str, Any]:
+    """
+    prepare location for data factory
+    :param input_folder: input folder (local or S3)
+    :param output_folder: output folder (local or S3)
+    :param s3_config: S3 configuration - None local data
+    :return: data access factory config
+    """
+    if s3_config is None:
+        logger.info("Using local data")
+        return {
+            "data_local_config": ParamsUtils.convert_to_ast({
+                "input_folder": input_folder,
+                "output_folder": output_folder,
+            })}
+    logger.info("Using data from S3")
+    return {
+        "data_s3_conf": ParamsUtils.convert_to_ast({
+            "input_folder": input_folder,
+            "output_folder": output_folder,
+        }),
+        "data_s3_config": ParamsUtils.convert_to_ast(s3_config)
+    }
+
 
 
 # Supported runtimes
