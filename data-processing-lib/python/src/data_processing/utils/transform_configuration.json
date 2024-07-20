@@ -82,14 +82,12 @@
       "fasttext",
       "langcodes",
       "huggingface-hub",
-      "numpy"
     ],
     "dpk_lang_id_transform_ray",
     [
       "fasttext",
       "langcodes",
       "huggingface-hub",
-      "numpy"
     ],
     null,
     [
@@ -143,7 +141,6 @@
     ],
     "dpk_fdedup_transform_ray",
     [
-      "mmh3",
       "xxhash",
       "tqdm",
       "scipy"
@@ -200,7 +197,6 @@
     ],
     "dpk_profiler_transform_ray",
     [
-      "mmh3",
       "xxhash",
       "tqdm"
     ],
