@@ -94,16 +94,17 @@ class ParamsUtils:
     @staticmethod
     def get_config_parameter(params: dict[str, Any]) -> str:
         """
-        Get parameters for multi launch
+        Get the key name of the config parameter
         :param params: original parameters
-        :return: tuple of name of repeated parameter, list of repeated parameters, and dict of non changing ones
+        :return: the name of the key for the config parameter
         """
         # find config parameter
         config = None
         for key in params.keys():
             if key.startswith("data") and key.endswith("config"):
-                config = key
-                break
+                if params[key] != None and params[key] != "None" and len(params[key]) > 0:
+                    config = key
+                    break
         return config
 
     @staticmethod
