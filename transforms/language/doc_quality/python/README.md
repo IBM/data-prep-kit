@@ -5,10 +5,10 @@ for details on general project conventions, transform configuration,
 testing and IDE set up.
 
 ## Summary 
-This transform will calculate several metrics related to document, which are usuful to see the quality of document. 
+This transform will calculate and annotate several metrics related to document, which are usuful to see the quality of document. 
 
 In this transform, following metrics will be included:
-- Gopher (Deepmind): filter docs that
+- Gopher (Deepmind): With this metric, you can filter docs that
   - do not contain between 50 and 100,000 words
   - mean word length is outside the range of 3 to 10 characters;
   - symbol-to-word ratio > 0.1 for either the hash symbol or the ellipsis;
