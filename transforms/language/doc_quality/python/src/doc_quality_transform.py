@@ -38,16 +38,13 @@ short_name = "docq"
 cli_prefix = f"{short_name}_"
 text_lang_key = "text_lang"
 doc_content_column_key = "doc_content_column"
-doc_id_column_key = "doc_id_column"
 bad_word_filepath_key = "bad_word_filepath"
 text_lang_cli_param = f"{cli_prefix}{text_lang_key}"
 doc_content_column_cli_param = f"{cli_prefix}{doc_content_column_key}"
-doc_id_column_cli_param = f"{cli_prefix}{doc_id_column_key}"
 bad_word_filepath_cli_param = f"{cli_prefix}{bad_word_filepath_key}"
 
 default_text_lang = "en"
 default_doc_content_column = "contents"
-default_doc_id_column = "documents_id"
 
 data_factory_internal_key = f"{cli_prefix}data_factory"
 files_to_use_internal_key = f"{cli_prefix}files_to_use"
@@ -68,7 +65,6 @@ class DocQualityTransform(AbstractTableTransform):
         super().__init__(config)
         self.text_lang = config.get(text_lang_key, default_text_lang)
         self.doc_content_column = config.get(doc_content_column_key, default_doc_content_column)
-        self.doc_id_column = config.get(doc_id_column_key, default_doc_id_column)
         
         daf = config.get(data_factory_internal_key, None)
         bad_word_filepath = config.get(bad_word_filepath_key, None)
@@ -212,11 +208,6 @@ class DocQualityTransformConfiguration(TransformConfiguration):
             f"--{doc_content_column_cli_param}",
             default=default_doc_content_column,
             help="column name that contains document text",
-        )
-        parser.add_argument(
-            f"--{doc_id_column_cli_param}",
-            default=default_doc_id_column,
-            help="column name that contains document id",
         )
         parser.add_argument(
             f"--{bad_word_filepath_cli_param}",

@@ -17,7 +17,6 @@
   "job_input_params": {
     "text_lang": "en",
     "doc_content_column": "contents",
-    "doc_id_column": "documents_id",
     "bad_word_filepath": "/Users/dtsuzuku/granite/data-prep-kit/transforms/language/doc_quality/python/ldnoobw/en",
     "s3_cred": null,
     "checkpointing": false,

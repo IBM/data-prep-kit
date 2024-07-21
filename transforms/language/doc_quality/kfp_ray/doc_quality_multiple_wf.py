@@ -46,7 +46,6 @@ def compute_exec_params_func(
     runtime_code_location: str,
     docq_text_lang: str,
     docq_doc_content_column: str,
-    docq_doc_id_column: str,
     docq_bad_word_filepath: str,
 ) -> dict:
     
@@ -63,7 +62,6 @@ def compute_exec_params_func(
         "runtime_code_location": runtime_code_location,
         "docq_text_lang": docq_text_lang,
         "docq_doc_content_column": docq_doc_content_column,
-        "docq_doc_id_column": docq_doc_id_column,
         "docq_bad_word_filepath": docq_bad_word_filepath,
     }
 
@@ -124,7 +122,6 @@ def doc_quality(
     # doc_quality parameters
     docq_text_lang: str = "en",
     docq_doc_content_column: str = "contents",
-    docq_doc_id_column: str = "document_id",
     docq_bad_word_filepath: str = "/home/ray/ldnoobw/en",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
@@ -162,7 +159,6 @@ def doc_quality(
     :param runtime_code_location - code location
     :param docq_text_lang - language used in the text content
     :param docq_doc_content_column - column contains document content
-    :param docq_doc_id_column - column contains document id
     :param docq_bad_word_filepath - a path to bad word file
     :return: None
     """
@@ -183,7 +179,6 @@ def doc_quality(
             runtime_code_location=runtime_code_location,
             docq_text_lang=docq_text_lang,
             docq_doc_content_column=docq_doc_content_column,
-            docq_doc_id_column=docq_doc_id_column,
             docq_bad_word_filepath=docq_bad_word_filepath,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
