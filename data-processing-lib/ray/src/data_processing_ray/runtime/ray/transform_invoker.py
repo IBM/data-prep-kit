@@ -54,6 +54,10 @@ def execute_ray_transform(configuration: TransformsConfiguration, name: str,
         # transformer is not installed, install it
         if not installer.install(project=project, subdirectory=r_subdirectory, name=r_l_name):
             logger.warning(f"failed to install transform {name}")
+            if p_installed:
+                installer.uninstall(name=p_l_name)
+                for library in extra_libraries:
+                    installer.uninstall(name=library)
             return False
         r_installed = True
     # invoke transform
