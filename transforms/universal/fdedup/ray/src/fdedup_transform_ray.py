@@ -75,10 +75,7 @@ class FdedupTransform(AbstractTableTransform):
             delimiter - delimiter
             random_delay_limit - random delay limit
         """
-        from data_processing.utils import get_logger
-
         super().__init__(config)
-        self.logger = get_logger(__name__)
         self.doc_column = config.get("doc_column", "")
         self.doc_id_column = config.get("doc_id_int_column", "")
         self.word_shingle_size = config.get("word_shingle_size", 1)
