@@ -12,12 +12,75 @@
 
 import sys
 from typing import Any
-from data_processing.utils import ParamsUtils, build_invoker_input, get_logger
+from data_processing.utils import ParamsUtils, get_logger
 from data_processing.runtime.pure_python import PythonTransformLauncher
-from data_processing.utils import PipInstaller, TransformRuntime, TransformsConfiguration, import_class
+from data_processing.utils import PipInstaller, TransformRuntime, TransformsConfiguration
+from data_processing.runtime.transform_launcher import AbstractTransformLauncher
 
 project = "https://github.com/IBM/data-prep-kit.git"
 logger = get_logger(__name__)
+
+
+def _import_class(name):
+    """
+    Import class by name
+    :param name: name
+    :return:
+    """
+    components = name.split('.')
+    mod = __import__(components[0])
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod
+
+
+def invoke_transform(name: str, t_class: str, launcher: AbstractTransformLauncher,
+                     input_folder: str, output_folder: str, s3_config: dict[str, Any], params: dict[str, Any]) -> bool:
+    """
+    Invoke transform
+    :param name: transform name
+    :param t_class: transform configuration class
+    :param launcher: transform launcher
+    :param input_folder: input folder (local or S3)
+    :param output_folder: output folder (local or S3)
+    :param s3_config: S3 configuration - None local data
+    :param params: transform parameters
+    :return:
+    """
+    # Create data access params
+    if s3_config is None:
+        logger.info("Using local data")
+        data_params = {
+            "data_local_config": ParamsUtils.convert_to_ast({
+                "input_folder": input_folder,
+                "output_folder": output_folder,
+            })}
+    else:
+        logger.info("Using data from S3")
+        data_params = {
+            "data_s3_conf": ParamsUtils.convert_to_ast({
+                "input_folder": input_folder,
+                "output_folder": output_folder,
+            }),
+            "data_s3_config": ParamsUtils.convert_to_ast(s3_config)
+        }
+    # create configuration
+    klass = _import_class(t_class)
+    transform_configuration = klass()
+    # Set the command line args
+    current_args = sys.argv
+    sys.argv = ParamsUtils.dict_to_req(d=data_params | params)
+    # create launcher
+    try:
+        launcher = launcher(runtime_config=transform_configuration)
+        # Launch the ray actor(s) to process the input
+        res = launcher.launch()
+    except (Exception, SystemExit) as e:
+        logger.warning(f"Exception executing transform {name}: {e}")
+        res = 1
+    # restore args
+    sys.argv = current_args
+    return res
 
 
 def execute_python_transform(configuration: TransformsConfiguration, name: str,
@@ -48,24 +111,9 @@ def execute_python_transform(configuration: TransformsConfiguration, name: str,
             logger.warning(f"failed to install transform {name}")
             return False
         installed = True
-    # configure input parameters
-    p = build_invoker_input(input_folder=input_folder, output_folder=output_folder, s3_config=s3_config) | params
-    # create configuration
-    klass = import_class(t_class)
-    transform_configuration = klass()
-    # Set the command line args
-    current_args = sys.argv
-    sys.argv = ParamsUtils.dict_to_req(d=p)
-    # create launcher
-    try:
-        launcher = PythonTransformLauncher(runtime_config=transform_configuration)
-        # Launch the ray actor(s) to process the input
-        res = launcher.launch()
-    except Exception as e:
-        logger.warning(f"Exception executing transform {name}: {e}")
-        res = 1
-    # restore args
-    sys.argv = current_args
+    # invoke transform
+    res = invoke_transform(name=name, t_class=t_class, launcher=PythonTransformLauncher, input_folder=input_folder,
+                           output_folder=output_folder, s3_config=s3_config, params=params)
     if installed:
         # we installed transformer, uninstall it
         if not installer.uninstall(name=l_name):

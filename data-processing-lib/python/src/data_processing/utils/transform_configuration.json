@@ -81,13 +81,13 @@
     [
       "fasttext",
       "langcodes",
-      "huggingface-hub",
+      "huggingface-hub"
     ],
     "dpk_lang_id_transform_ray",
     [
       "fasttext",
       "langcodes",
-      "huggingface-hub",
+      "huggingface-hub"
     ],
     null,
     [

@@ -10,15 +10,9 @@
 # limitations under the License.
 ################################################################################
 
-import sys
 from typing import Any
-from data_processing.utils import (ParamsUtils,
-                                   get_logger,
-                                   PipInstaller,
-                                   TransformRuntime,
-                                   TransformsConfiguration,
-                                   import_class, build_invoker_input
-                                   )
+from data_processing.utils import get_logger, PipInstaller, TransformRuntime, TransformsConfiguration
+from data_processing.runtime.pure_python import invoke_transform
 from data_processing_ray.runtime.ray import RayTransformLauncher
 
 project = "https://github.com/IBM/data-prep-kit.git"
@@ -62,25 +56,9 @@ def execute_ray_transform(configuration: TransformsConfiguration, name: str,
             logger.warning(f"failed to install transform {name}")
             return False
         r_installed = True
-    # configure input parameters
-    p = (build_invoker_input(input_folder=input_folder, output_folder=output_folder, s3_config=s3_config)
-         | params | {"run_locally": True})
-    # create configuration
-    klass = import_class(t_class)
-    transform_configuration = klass()
-    # Set the command line args
-    current_args = sys.argv
-    sys.argv = ParamsUtils.dict_to_req(d=p)
-    try:
-        # create launcher
-        launcher = RayTransformLauncher(runtime_config=transform_configuration)
-        # Launch the ray actor(s) to process the input
-        res = launcher.launch()
-    except Exception as e:
-        logger.warning(f"Exception executing transform {name}: {e}")
-        res = 1
-    # restore args
-    sys.argv = current_args
+    # invoke transform
+    res = invoke_transform(name=name, t_class=t_class, launcher=RayTransformLauncher, input_folder=input_folder,
+                           output_folder=output_folder, s3_config=s3_config, params=params | {"run_locally": True})
     # clean up
     if p_installed:
         # we installed transformer, uninstall it

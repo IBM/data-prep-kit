@@ -2,4 +2,4 @@ from data_processing.runtime.pure_python.runtime_configuration import PythonTran
 from data_processing.runtime.pure_python.transform_file_processor import PythonTransformFileProcessor
 from data_processing.runtime.pure_python.transform_orchestrator import orchestrate
 from data_processing.runtime.pure_python.transform_launcher import PythonTransformLauncher
-from data_processing.runtime.pure_python.transform_invoker import execute_python_transform
+from data_processing.runtime.pure_python.transform_invoker import invoke_transform, execute_python_transform
