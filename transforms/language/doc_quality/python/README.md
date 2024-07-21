@@ -25,7 +25,6 @@ configuration for values are as follows:
 
 * _text_lang_ - specifies language used in the text content. By defaut, "en" is used.
 * _doc_content_column_ - specifies column name that contains document text.
-* _doc_id_column_ - specifies column name that contains document id.
 * _bad_word_filepath_ - specifies a path to bad word file: local folder (file or directory) that points to bad word file.
 
 ## Running
@@ -38,7 +37,6 @@ the [python launcher](../../../../data-processing-lib/doc/python-launcher-option
 ```
   --docq_text_lang DOCQ_TEXT_LANG   language used in the text content. By defaut, "en" is used
   --docq_doc_content_column DOCQ_DOC_CONTENT_COLUMN   column name that contain document text
-  --docq_doc_id_colum DOCQ_DOC_ID_COLUMN   column name that contains document id
   --docq_bad_word_filepath DOCQ_BAD_WORD_FILEPATH   path to bad word file: local folder (file or directory) that points to bad word file
 ```
 These correspond to the configuration keys described above.
