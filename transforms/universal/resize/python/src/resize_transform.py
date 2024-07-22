@@ -15,13 +15,19 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import LOCAL_TO_DISK, MB, CLIArgumentProvider, get_logger
+from data_processing.utils import (
+    LOCAL_TO_DISK,
+    MB,
+    CLIArgumentProvider,
+    get_logger,
+    str2bool,
+)
 
 
 max_rows_per_table_key = "max_rows_per_table"
 max_mbytes_per_table_key = "max_mbytes_per_table"
 size_type_key = "size_type"
-permissive_schema_merge_key = "merge_schemas"
+permissive_schema_merge_key = "permissive_schema_merge"
 shortname = "resize"
 cli_prefix = f"{shortname}_"
 max_rows_per_table_cli_param = f"{cli_prefix}{max_rows_per_table_key}"
@@ -175,9 +181,9 @@ class ResizeTransformConfiguration(TransformConfiguration):
         )
         parser.add_argument(
             f"--{permissive_schema_merge_cli_param}",
-            type=bool,
+            type=lambda x: bool(str2bool(x)),
             default=permissive_schema_merge_default,
-            help=f"Dis/allow permissivity when merging table schemas",
+            help=f"Dis/allow permissively merging table schemas, per pyarrow concat_table()",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:

@@ -25,12 +25,16 @@ The set of dictionary keys holding [BlockListTransform](src/blocklist_transform.
 configuration for values are as follows:
 
 * _max_rows_per_table_ - specifies max documents per table
-* _max_mbytes_per_table - specifies max size of table, according to the _size_type_ value.
+* _max_mbytes_per_table_ - specifies max size of table, according to the _size_type_ value.
 * _size_type_ - indicates how table size is measured. Can be one of
     * memory - table size is measure by the in-process memory used by the table
     * disk - table size is estimated as the on-disk size of the parquet files.  This is an estimate only
         as files are generally compressed on disk and so may not be exact due varying compression ratios.
         This is the default.
+* _permissive_schema_merge_ - enables support for merging of tables with differing schemas according
+to PyArrow concat_table()'s 
+[unicode_promote_option='permissive'](*https://arrow.apache.org/docs/python/generated/pyarrow.concat_tables.html)
+option. Default is True to enable permissive merging.
 
 Only one of the _max_rows_per_table_ and _max_mbytes_per_table_ may be used.
 
@@ -54,6 +58,9 @@ the following command line arguments are available in addition to
                         Determines how memory is measured when using the --resize_max_mbytes_per_table option.
                         'memory' measures the in-process memory footprint and 
                         'disk' makes an estimate of the resulting parquet file size.
+  --resize_merge_schemas RESIZE_MERGE_SCHEMAS
+    Dis/allow permissivity when merging table schemas
+
 ```
 
 ### Transforming data using the transform image
