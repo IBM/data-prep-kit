@@ -37,7 +37,7 @@ setup:: .transforms.setup
 set-versions:
 	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOC_QUALITY_PYTHON_VERSION) TOML_VERSION=$(DOC_QUALITY_RAY_VERSION) .transforms.set-versions	
         
-build-dist:: =.defaults.build-dist 
+build-dist:: .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 
