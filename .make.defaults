@@ -476,7 +476,7 @@ endif
 		pip install $$extra_url -r requirements.txt;		\
 	elif [ -e pyproject.toml ]; then				\
 		echo Installing from pyproject.toml;			\
-		pip install $$extra_url -e .;				\
+		pip install $$extra_url -e .[dev];				\
 	fi
 
 .PHONY: .defaults.check.installed
