@@ -42,6 +42,8 @@ class GroupByRepo:
 
     def process(self, repo: str, files: List[str]):
         cumulated_table = self._read_parquet_bulk(files)
+        if cumulated_table is None:
+            return
         repo_table = self._filter_table_by_column(cumulated_table, self.repo_column_name, repo)
 
         def sanitize_path(repo_name):
@@ -62,14 +64,26 @@ class GroupByRepo:
         self.data_access.save_table(os.path.normpath(parquet_path), table)
 
     def _read_parquet_bulk(self, files):
-        tables = list(
+        def get_dataframes(path):
+            table, _ = self.data_access.get_table(path)
+            if table is not None:
+                return table.to_pandas()
+            else:
+                return None
+
+        tables_ = list(
             map(
-                lambda x: self.data_access.get_table(os.path.normpath(x))[0].to_pandas(),
+                lambda x: get_dataframes(os.path.normpath(x)),
                 files,
             )
         )
-        df = pd.concat(tables)
-        return pa.Table.from_pandas(df)
+        tables = [table for table in tables_ if table is not None]
+        try:
+            df = pd.concat(tables)
+            return pa.Table.from_pandas(df)
+        except Exception as e:
+            self.logger.error(f"Error reading tables for {self.repo_column_name}: {e}")
+        return None
 
     def _filter_table_by_column(self, table: pa.Table, column_name: str, column_value: str) -> pa.Table:
         """
