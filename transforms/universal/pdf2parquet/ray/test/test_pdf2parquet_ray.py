@@ -31,6 +31,7 @@ class TestRayPdf2ParquetTransform(AbstractTransformLauncherTest):
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         config = {
             "data_files_to_use": ast.literal_eval("['.pdf','.zip']"),
+            "run_locally": True,
         }
         fixtures = []
         launcher = RayTransformLauncher(Pdf2ParquetRayTransformConfiguration())
