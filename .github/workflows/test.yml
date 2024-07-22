@@ -100,6 +100,14 @@ jobs:
             - name: Test Language Transforms
               run: |
                   make -C transforms/language DOCKER=docker venv test-src
+    test-universal-pdf2parquet:  # temporary add another test to run CI without the disk space issue
+      runs-on: ubuntu-22.04
+      steps:
+          - name: Checkout
+            uses: actions/checkout@v4
+          - name: Test Universal Transforms
+            run: |
+                make -C transforms/universal/pdf2parquet DOCKER=docker venv test-src            
     test-universal:
         runs-on: ubuntu-22.04
         steps:
