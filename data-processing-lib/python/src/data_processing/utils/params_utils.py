@@ -102,7 +102,7 @@ class ParamsUtils:
         config = None
         for key in params.keys():
             if key.startswith("data") and key.endswith("config"):
-                if params[key] != None and params[key] != "None" and len(params[key]) > 0:
+                if params[key] is not None and params[key] != "None" and len(params[key]) > 0:
                     config = key
                     break
         return config
