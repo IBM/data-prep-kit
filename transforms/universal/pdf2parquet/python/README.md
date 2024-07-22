@@ -35,7 +35,7 @@ The transform can be initialized with the following parameters.
 
 | Parameter  | Default  | Description  |
 |------------|----------|--------------|
-| `artfacts_path`              | <unset> | Path where to models artifacts are located, if unset they will be downloaded in the HF_CACHE folder. |
+| `artifacts_path`             | <unset> | Path where to Docling models artifacts are located, if unset they will be downloaded and fetched from the [HF_HUB_CACHE](https://huggingface.co/docs/huggingface_hub/en/guides/manage-cache) folder. |
 | `do_table_structure`         | `True`        | If true, detected tables will be processed with the table structure model.                                                                   |
 | `do_ocr`                     | `False`        | If true, optical character recognization (OCR) will be used to read the PDF content model.                                                                   |
 
