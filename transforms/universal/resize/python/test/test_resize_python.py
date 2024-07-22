@@ -48,7 +48,7 @@ class TestRayResizeTransform(AbstractTransformLauncherTest):
         fixtures.append((launcher, config, basedir + "/input", basedir + "/expected-mbytes-0.05"))
 
         # Split into 4 or so files
-        config = {"resize_max_mbytes_per_table": 0.02}
+        config = {"resize_max_mbytes_per_table": 0.02, "resize_merge_schemas": True}
         fixtures.append((launcher, config, basedir + "/input", basedir + "/expected-mbytes-0.02"))
 
         return fixtures

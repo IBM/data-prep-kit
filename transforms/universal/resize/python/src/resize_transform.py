@@ -21,14 +21,17 @@ from data_processing.utils import LOCAL_TO_DISK, MB, CLIArgumentProvider, get_lo
 max_rows_per_table_key = "max_rows_per_table"
 max_mbytes_per_table_key = "max_mbytes_per_table"
 size_type_key = "size_type"
+permissive_schema_merge_key = "merge_schemas"
 shortname = "resize"
 cli_prefix = f"{shortname}_"
 max_rows_per_table_cli_param = f"{cli_prefix}{max_rows_per_table_key}"
 max_mbytes_per_table_cli_param = f"{cli_prefix}{max_mbytes_per_table_key}"
 size_type_cli_param = f"{cli_prefix}{size_type_key}"
+permissive_schema_merge_cli_param = f"{cli_prefix}{permissive_schema_merge_key}"
 size_type_disk = "disk"
 size_type_memory = "memory"
 size_type_default = size_type_disk
+permissive_schema_merge_default = True
 
 
 class ResizeTransform(AbstractTableTransform):
@@ -50,6 +53,11 @@ class ResizeTransform(AbstractTableTransform):
         if size_type_default in disk_memory:
             self.max_bytes_per_table *= LOCAL_TO_DISK
 
+        merge_schemas = config.get(permissive_schema_merge_key, permissive_schema_merge_default)
+        if merge_schemas:
+            self.unicode_promote_options = "permissive"
+        else:
+            self.unicode_promote_options = "none"
         self.logger.debug(f"max bytes = {self.max_bytes_per_table}")
         self.logger.debug(f"max rows = {self.max_rows_per_table}")
         self.buffer = None
@@ -71,12 +79,10 @@ class ResizeTransform(AbstractTableTransform):
                 self.logger.debug(
                     f"concatenating buffer with {self.buffer.num_rows} rows to table with {table.num_rows} rows"
                 )
-                table = pa.concat_tables([self.buffer, table], unicode_promote_options="permissive")
+                table = pa.concat_tables([self.buffer, table], unicode_promote_options=self.unicode_promote_options)
                 self.logger.debug(f"concatenated table has {table.num_rows} rows")
                 self.buffer = None
             except Exception as e:  # Can happen if schemas are different
-                # Throw away the buffer and try and keep the current table by placing it in the buffer.
-                self.buffer = table
                 raise ValueError(
                     "Can not concatenate buffered table with input table. Dropping buffer and proceeding."
                 ) from e
@@ -166,6 +172,12 @@ class ResizeTransformConfiguration(TransformConfiguration):
             choices=[size_type_disk, size_type_memory],
             help=f"Determines how memory is measured when using the --{max_mbytes_per_table_cli_param} option."
             "\n'memory' measures the in-process memory footprint and \n'disk' makes an estimate of the resulting parquet file size.",
+        )
+        parser.add_argument(
+            f"--{permissive_schema_merge_cli_param}",
+            type=bool,
+            default=permissive_schema_merge_default,
+            help=f"Dis/allow permissivity when merging table schemas",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
