@@ -58,8 +58,8 @@ the following command line arguments are available in addition to
                         Determines how memory is measured when using the --resize_max_mbytes_per_table option.
                         'memory' measures the in-process memory footprint and 
                         'disk' makes an estimate of the resulting parquet file size.
-  --resize_merge_schemas RESIZE_MERGE_SCHEMAS
-    Dis/allow permissivity when merging table schemas
+  --resize_permissive_schema_merge RESIZE_PERMISSIVE_SCHEMA_MERGE
+    Dis/allow permissively merging table schemas, per pyarrow concat_table()
 
 ```
 
