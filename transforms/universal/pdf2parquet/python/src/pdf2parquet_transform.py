@@ -216,7 +216,7 @@ class Pdf2ParquetTransform(AbstractBinaryTransform):
             ], metadata
         except Exception as e:
             logger.error(f"Fatal error with file {file_name=}. No results produced.")
-            return [], {}
+            raise
 
 
 class Pdf2ParquetTransformConfiguration(TransformConfiguration):
