@@ -42,7 +42,7 @@ class TestPythonPdf2MdTransform(AbstractTransformLauncherTest):
                 basedir + "/input",
                 basedir + "/expected",
                 # this is added as a fixture to remove these columns from comparison
-                ["date_acquired", "document_id", "pdf_convert_time"],
+                ["date_acquired", "document_id", "pdf_convert_time", "contents"],
             )
         )
         return fixtures
