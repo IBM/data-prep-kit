@@ -27,6 +27,7 @@ dev = [
     "pytest-cov>=4.1.0",
     "pytest-mock>=3.10.0",
     "moto==5.0.5",
+    "moto[server]==5.0.5",
     "markupsafe==2.0.1",
 ]
 

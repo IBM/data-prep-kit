@@ -84,7 +84,7 @@ class DocQualityTransform(AbstractTableTransform):
 
     def _write_locally(self, data_access: DataAccess, path: str, temp_dir: str) -> str:
         filename = os.path.basename(path)
-        content = data_access.get_file(os.path.join(path, filename))
+        content, _ = data_access.get_file(path)
         temp_file_path = os.path.join(temp_dir, filename)
         with open(temp_file_path, 'wb') as temp_file:
             temp_file.write(content)

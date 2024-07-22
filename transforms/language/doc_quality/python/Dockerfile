@@ -19,7 +19,7 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 
 COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
-RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir -e .[dev]
 
 # copy source data
 COPY ./src/doc_quality_transform_python.py .
