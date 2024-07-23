@@ -132,9 +132,6 @@ def orchestrate(
         status = "failure"
         return_code = 1
 
-    # Cleanup processors and actor pool
-    del processors
-    del processors_pool
     try:
         # Compute execution statistics
         logger.debug("Computing execution stats")
