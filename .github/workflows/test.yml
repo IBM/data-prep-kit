@@ -119,7 +119,7 @@ jobs:
                   df -h
                   sudo rm -rf "/usr/local/share/boost"
                   sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-                  sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
+                  sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
             - name: Test Universal Transforms
