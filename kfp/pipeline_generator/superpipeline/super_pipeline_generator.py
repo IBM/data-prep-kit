@@ -20,19 +20,6 @@ VALUE = "value"
 DESCRIPTION = "description"
 
 
-def get_pipeline_input_parameters(arguments) -> str:
-    ret_str = ""
-    ret_str += get_generic_params(arguments.get("pipeline_arguments", None))
-    return ret_str
-
-def get_sub_pipelines_names(pipeline_tasks) -> str:
-    ret_str = ""
-    for task in pipeline_tasks:
-        task_name = task["name"]
-        task_pipeline_name = task["pipeline_name"]
-        ret_str += "\n    p1_orch_" + task_name + "_name: str = \"" + task_pipeline_name + '",'
-    return ret_str
-
 def get_generic_params(params, prefix = "") -> str:
     ret_str = ""
     if params is None:
@@ -45,17 +32,6 @@ def get_generic_params(params, prefix = "") -> str:
             ret_str += f"{param[VALUE]}"
         ret_str += f",  {param.get(DESCRIPTION, '')}"
     return ret_str
-
-
-def get_execute_job_params_guf(args) -> (str):
-    ret_execute_job_params = ""
-    if args is not None:
-        pargs = args.get("pipeline_arguments", None)
-        if pargs is not None:
-            for a in pargs:
-                ret_execute_job_params += f'"{a[NAME]}": {a[NAME]},\n'
-    return ret_execute_job_params
-
 
 if __name__ == "__main__":
     import argparse
@@ -84,22 +60,12 @@ if __name__ == "__main__":
     if component_spec_path == "":
         component_spec_path = "../../../../../kfp/kfp_ray_components/"
 
-    sub_workflows_components = ""
-    sub_workflows_images = ""
     for task in pipeline_tasks:
         task_name = task["name"]
         task_pipeline_name = task["pipeline_name"]
         task_image = task["image"]
 
         tasks_steps_params.append(pipeline_definitions[task_name+"_step_parameters"])
-        sub_workflows_components += "\nrun_" + task_name + '_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")'
-        sub_workflows_images += "\n" + task_name + '_image = "' + task_image + '"'
-
-    # get tasks pipelines
-    tasks_pipelines = get_sub_pipelines_names(pipeline_tasks)
-
-    # get the common super pipeline input parameters
-    common_input_parameters_text = get_generic_params(common_input_params, "p2_pipeline_")
 
     # get the sub tasks input parameters
     sub_workflows_parameters = ""
@@ -136,11 +102,10 @@ if __name__ == "__main__":
     content = template.render(
         superpipeline_name=pipeline_metadata[NAME],
         superpipeline_description=pipeline_metadata[DESCRIPTION],
-        sub_workflows_components=sub_workflows_components,
+        sub_workflows_components=pipeline_definitions[PIPELINE_TASKS],
         component_spec_path=component_spec_path,
-        sub_workflows_images=sub_workflows_images,
-        p1_parameters=tasks_pipelines,
-        add_p2_parameters=common_input_parameters_text,
+        p1_parameters=pipeline_definitions[PIPELINE_TASKS],
+        add_p2_parameters=common_input_params,
         sub_workflows_parameters=sub_workflows_parameters,
         sub_workflows_operations=sub_workflows_operations,
     )
