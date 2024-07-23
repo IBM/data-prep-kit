@@ -69,7 +69,7 @@ class EdedupTransformBase(AbstractTableTransform):
             doc_column - name of the doc column
         """
         super().__init__(config)
-        self.doc_column = config.get("doc_column", "")
+        self.doc_column = config.get("doc_column", "contents")
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
