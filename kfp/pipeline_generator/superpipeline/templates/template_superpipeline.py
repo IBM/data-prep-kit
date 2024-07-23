@@ -9,9 +9,14 @@ from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, Component
 # path to kfp component specifications files
 component_spec_path = "{{ component_spec_path }}"
 # For every sub workflow we need a separate components, that knows about this subworkflow.
-{{ sub_workflows_components }}
+{%- for component in sub_workflows_components %}
+run_{{ component.name }}_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")
+{%- endfor %}
 
-{{ sub_workflows_images }}
+
+{%- for component in sub_workflows_components %}
+{{ component.name }}_image = "{{ component.image }}"
+{%- endfor %}
 
 # Pipeline to invoke execution on remote resource
 @dsl.pipeline(
@@ -19,14 +24,18 @@ component_spec_path = "{{ component_spec_path }}"
     description="{{ superpipeline_description }}",
 )
 def super_pipeline(
-    {{ p1_parameters }}
+    {%- for p1_parameter in p1_parameters %}
+    p1_orch_{{ p1_parameter.name }}_name: str = "{{ p1_parameter.pipeline_name }}",
+    {%- endfor %}
     p2_pipeline_runtime_pipeline_id: str = "pipeline_id",
     p2_pipeline_ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": ""}',
     p2_pipeline_ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": ""}',
     p2_pipeline_server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     p2_pipeline_additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
     p2_pipeline_runtime_code_location: str = '{"github": "github", "commit_hash": "12345", "path": "path"}',
-    {{ add_p2_parameters }}
+    {%- for p2_parameter in add_p2_parameters %}
+    p2_pipeline_{{ p2_parameter.name }}: {{ p2_parameter.type }}{% if p2_parameter.value is defined %}{% if p2_parameter.type == "str" %} = "{{ p2_parameter.value }}"{% else %} = {{ p2_parameter.value }}{% endif %}{% endif %},
+    {%- endfor %}
 
     {{ sub_workflows_parameters }}
 ):
