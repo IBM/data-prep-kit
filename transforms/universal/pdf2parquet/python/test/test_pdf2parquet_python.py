@@ -42,7 +42,36 @@ class TestPythonPdf2ParquetTransform(AbstractTransformLauncherTest):
                 basedir + "/input",
                 basedir + "/expected",
                 # this is added as a fixture to remove these columns from comparison
-                ["date_acquired", "document_id", "pdf_convert_time", "contents"],
+                ["date_acquired", "document_id", "pdf_convert_time", "contents", "num_doc_elements"],
+            )
+        )
+        return fixtures
+
+
+class TestPythonPdf2JsonParquetTransform(AbstractTransformLauncherTest):
+    """
+    Extends the super-class to define the test data for the tests defined there.
+    The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
+    """
+
+    def get_test_transform_fixtures(self) -> list[tuple]:
+        basedir = "../test-data"
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        config = {
+            "data_files_to_use": ast.literal_eval("['.pdf','.zip']"),
+            "pdf2parquet_contents_type": "application/json",
+        }
+
+        fixtures = []
+        launcher = PythonTransformLauncher(Pdf2ParquetPythonTransformConfiguration())
+        fixtures.append(
+            (
+                launcher,
+                config,
+                basedir + "/input",
+                basedir + "/expected_json",
+                # this is added as a fixture to remove these columns from comparison
+                ["date_acquired", "document_id", "pdf_convert_time", "contents", "num_doc_elements"],
             )
         )
         return fixtures
