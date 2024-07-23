@@ -41,7 +41,7 @@ pdf2parquet_contents_type_key = f"contents_type"
 pdf2parquet_do_table_structure_key = f"do_table_structure"
 pdf2parquet_do_ocr_key = f"do_ocr"
 
-class pdf2parquet_contents_types(enum.StrEnum):
+class pdf2parquet_contents_types(str, enum.Enum):
     MARKDOWN = "text/markdown"
     JSON = "application/json"
 pdf2parquet_contents_type_default = pdf2parquet_contents_types.MARKDOWN
