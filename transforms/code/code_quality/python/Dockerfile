@@ -24,8 +24,10 @@ RUN pip install --no-cache-dir -e .
 #COPY requirements.txt requirements.txt
 #RUN pip install --no-cache-dir -r  requirements.txt
 
-# copy source data
+# copy the main() entry point to the image 
 COPY ./src/code_quality_transform_python.py .
+
+# copy some of the samples in
 COPY ./src/code_quality_local.py local/
 
 # copy test

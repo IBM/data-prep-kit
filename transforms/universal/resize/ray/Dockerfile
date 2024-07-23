@@ -17,7 +17,10 @@ COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml
 RUN pip install --no-cache-dir -e .
 
+# copy the main() entry point to the image 
 COPY ./src/resize_transform_ray.py ./
+
+# copy some of the samples in
 COPY ./src/resize_local_ray.py local/
 
 # Install pytest so we can test the image later

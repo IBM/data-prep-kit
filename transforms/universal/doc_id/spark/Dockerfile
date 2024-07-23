@@ -20,8 +20,10 @@ COPY --chown=spark:root src/ src/
 COPY --chown=spark:root pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
-# copy source main 
+# copy the main() entry point to the image 
 COPY ./src/doc_id_transform_spark.py .
+
+# copy some of the samples in
 COPY ./src/doc_id_local.py local/
 
 # copy test
