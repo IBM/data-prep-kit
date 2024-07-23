@@ -136,7 +136,7 @@ class CodeToParquetTransform(AbstractBinaryTransform):
                                     "hash": TransformUtils.str_to_hash(content_string),
                                     "size": len(content_string),
                                     "date_acquired": datetime.now().isoformat(),
-                                    "repo_name":os.path.splitext(file_name)[0]
+                                    "repo_name":os.path.splitext(os.path.basename(file_name))[0]
                                 } | self.shared_columns
                                 if self.detect_programming_lang:
                                     lang = self._get_lang_from_ext(ext)
