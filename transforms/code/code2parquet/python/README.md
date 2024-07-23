@@ -19,8 +19,8 @@ Each file contained within the ZIP is transformed into a distinct row within the
 
 **repo_name:**
 
-- **Description:** Name of the repository the code belongs to. Repo_name is same as zip file name.
-- **Example:** `"repo_name": "data"`
+- **Description:** The name of the repository to which the code belongs. This should match the name of the zip file containing the repository.
+- **Example:** `"repo_name": "example"`
 
 **contents:** (string)
 
