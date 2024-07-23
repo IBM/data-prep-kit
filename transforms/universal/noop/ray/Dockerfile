@@ -20,8 +20,10 @@ COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
-# copy source data
+# copy the main() entry point to the image 
 COPY ./src/noop_transform_ray.py .
+
+# copy some of the samples in
 COPY ./src/noop_local_ray.py local/
 
 # copy test
