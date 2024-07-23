@@ -10,7 +10,9 @@
 # limitations under the License.
 ################################################################################
 
+import enum
 import io
+import json
 import uuid
 import zipfile
 import time
@@ -35,13 +37,19 @@ logger = get_logger(__name__)
 shortname = "pdf2parquet"
 cli_prefix = f"{shortname}_"
 pdf2parquet_artifacts_path_key = f"artifacts_path"
+pdf2parquet_contents_type_key = f"contents_type"
 pdf2parquet_do_table_structure_key = f"do_table_structure"
 pdf2parquet_do_ocr_key = f"do_ocr"
 
+class pdf2parquet_contents_types(enum.StrEnum):
+    MARKDOWN = "text/markdown"
+    JSON = "application/json"
+pdf2parquet_contents_type_default = pdf2parquet_contents_types.MARKDOWN
 pdf2parquet_do_table_structure_default = True
 pdf2parquet_do_ocr_default = False
 
 pdf2parquet_artifacts_path_cli_param = f"{cli_prefix}{pdf2parquet_artifacts_path_key}"
+pdf2parquet_contents_type_cli_param = f"{cli_prefix}{pdf2parquet_contents_type_key}"
 pdf2parquet_do_table_structure_cli_param = f"{cli_prefix}{pdf2parquet_do_table_structure_key}"
 pdf2parquet_do_ocr_cli_param = f"{cli_prefix}{pdf2parquet_do_ocr_key}"
 
@@ -62,6 +70,9 @@ class Pdf2ParquetTransform(AbstractBinaryTransform):
         self.artifacts_path = config.get(pdf2parquet_artifacts_path_key, None)
         if self.artifacts_path is not None:
             self.artifacts_path = Path(self.artifacts_path)
+        self.contents_type = config.get(pdf2parquet_contents_type_key, pdf2parquet_contents_types.MARKDOWN)
+        if not isinstance(self.contents_type, pdf2parquet_contents_types):
+            self.contents_type = pdf2parquet_contents_types[self.contents_type]
         self.do_table_structure = config.get(pdf2parquet_do_table_structure_key, pdf2parquet_do_table_structure_default)
         self.do_ocr = config.get(pdf2parquet_do_ocr_key, pdf2parquet_do_ocr_default)
 
@@ -89,7 +100,12 @@ class Pdf2ParquetTransform(AbstractBinaryTransform):
             raise RuntimeError("Failed in converting.")
         elapse_time = time.time() - start_time
 
-        content_string = doc.render_as_markdown()
+        if self.contents_type == pdf2parquet_contents_types.MARKDOWN:
+            content_string = doc.render_as_markdown()
+        elif self.contents_type == pdf2parquet_contents_types.JSON:
+            content_string = json.dumps(doc.render_as_dict())
+        else:
+            raise RuntimeError(f"Uknown contents_type {self.contents_type}.")
         num_pages = len(doc.pages)
         num_tables = len(doc.output.tables if doc.output.tables is not None else 0)
         num_doc_elements = len(doc.output.main_text if doc.output.main_text is not None else 0)
@@ -242,6 +258,13 @@ class Pdf2ParquetTransformConfiguration(TransformConfiguration):
             type=str,
             help="Path where to models artifacts are located, if unset they will be downloaded in the HF_CACHE folder.",
             default=None,
+        )
+        parser.add_argument(
+            f"--{pdf2parquet_contents_type_cli_param}",
+            type=pdf2parquet_contents_types,
+            choices=list(pdf2parquet_contents_types),
+            help="Content type to use for the contents column.",
+            default=pdf2parquet_contents_types.MARKDOWN,
         )
         parser.add_argument(
             f"--{pdf2parquet_do_table_structure_cli_param}",
