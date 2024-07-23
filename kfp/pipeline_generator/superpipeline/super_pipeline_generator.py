@@ -1,10 +1,8 @@
-import json
-
 import yaml
 
 
 PRE_COMMIT = "../pre-commit-config.yaml"
-PIPELINE_TEMPLATE_FILE = "template/superpipeline.ptmpl"
+PIPELINE_TEMPLATE_FILE = "template_superpipeline.py"
 
 PIPELINE_TASKS = "super_pipeline_tasks"
 COMMON_INPUT_PARAMETERS = "super_pipeline_common_parameters"
@@ -61,10 +59,12 @@ def get_execute_job_params_guf(args) -> (str):
 
 if __name__ == "__main__":
     import argparse
-    import os
-    from pathlib import Path
 
     from pre_commit.main import main
+    from jinja2 import Environment, FileSystemLoader
+
+    environment = Environment(loader=FileSystemLoader("templates/"))
+    template = environment.get_template(PIPELINE_TEMPLATE_FILE)
 
     parser = argparse.ArgumentParser(description="Kubeflow pipeline generator for Foundation Models")
     parser.add_argument("-c", "--config_file", type=str, default="")
@@ -95,21 +95,12 @@ if __name__ == "__main__":
         sub_workflows_components += "\nrun_" + task_name + '_op = comp.load_component_from_file(component_spec_path + "executeSubWorkflowComponent.yaml")'
         sub_workflows_images += "\n" + task_name + '_image = "' + task_image + '"'
 
-    # Pipeline template file
-    fin = open(PIPELINE_TEMPLATE_FILE, "rt")
-
-    # Output file to write the pipeline
-    fout = open(f"{pipeline_metadata[NAME]}_wf.py", "wt")
-
     # get tasks pipelines
     tasks_pipelines = get_sub_pipelines_names(pipeline_tasks)
-    # print(tasks_pipelines)
 
     # get the common super pipeline input parameters
     common_input_parameters_text = get_generic_params(common_input_params, "p2_pipeline_")
-    # print(common_input_parameters_text)
 
-    # sub_tasks_input_parameters = []
     # get the sub tasks input parameters
     sub_workflows_parameters = ""
     index = 0
@@ -124,7 +115,6 @@ if __name__ == "__main__":
         sub_workflows_parameters += override_params
 
         index += 1
-    # print(sub_workflows_parameters)
 
     sub_workflows_operations = ""
     # build the op for the first sub workflow
@@ -143,33 +133,27 @@ if __name__ == "__main__":
         prefix_index += 1
         i += 1
 
-    # For each line in the template file
-    for line in fin:
-        # read replace the string and write to output pipeline file
-        fout.write(
-            line.replace("__superpipeline_name__", pipeline_metadata[NAME])
-            .replace("__superpipeline_description__", pipeline_metadata[DESCRIPTION])
-            .replace("__sub_workflows_components__", sub_workflows_components)
-            .replace("__component_spec_path__", component_spec_path)
-            .replace("__sub_workflows_images__", sub_workflows_images)
-            .replace("__p1_parameters__", tasks_pipelines)
-            .replace("__add_p2_parameters__", common_input_parameters_text)
-            .replace("__sub_workflows_parameters__", sub_workflows_parameters)
-            .replace("__sub_workflows_operations__", sub_workflows_operations)
-        )
-    # Move the generated file to the output directory
-    curr_dir = os.getcwd()
-    src_file = Path(f"{curr_dir}/{pipeline_metadata[NAME]}_wf.py")
-    dst_file = Path(f"{args.output_dir_file}/{pipeline_metadata[NAME]}_wf.py")
-    src_file.rename(dst_file)
-
-    fout.close()
+    content = template.render(
+        superpipeline_name=pipeline_metadata[NAME],
+        superpipeline_description=pipeline_metadata[DESCRIPTION],
+        sub_workflows_components=sub_workflows_components,
+        component_spec_path=component_spec_path,
+        sub_workflows_images=sub_workflows_images,
+        p1_parameters=tasks_pipelines,
+        add_p2_parameters=common_input_parameters_text,
+        sub_workflows_parameters=sub_workflows_parameters,
+        sub_workflows_operations=sub_workflows_operations,
+    )
+    output_file = f"{args.output_dir_file}/{pipeline_metadata[NAME]}_wf.py"
+    with open(output_file, mode="w", encoding="utf-8") as message:
+        message.write(content)
+        print(f"... wrote {output_file}")
 
     import sys
 
     from pre_commit.main import main
 
-    print(f"Pipeline ${dst_file} auto generation completed")
+    print(f"Pipeline ${output_file} auto generation completed")
     # format the pipeline python file
-    args = ["run", "--file", f"{dst_file}", "-c", PRE_COMMIT]
+    args = ["run", "--file", f"{output_file}", "-c", PRE_COMMIT]
     sys.exit(main(args))
