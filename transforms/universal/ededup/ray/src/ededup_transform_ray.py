@@ -13,11 +13,9 @@
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import GB, CLIArgumentProvider, TransformUtils
+from data_processing.utils import TransformUtils
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
@@ -27,49 +25,10 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
 from ray.actor import ActorHandle
+from ededup_transform_base import EdedupTransformBase, EdedupTransformConfigurationBase, HashFilter, cli_prefix
 
 
-REQUEST_LEN = 8192
-
-short_name = "ededup"
-cli_prefix = f"{short_name}_"
-
-
-@ray.remote(scheduling_strategy="SPREAD")
-class HashFilter:
-    """
-    Implements an element of distributed cache of hashes
-    """
-
-    def __init__(self, params: dict[str, Any]):
-        """
-        initialize set of local hashes
-        """
-        self.hashes = set()
-
-    def get_unique(self, ha: list[str]) -> list[str]:
-        """
-        Get list of unique hashes
-        :param ha: new set of hashes
-        :return: list of unique ones
-        """
-        unique = []
-        for h in ha:
-            if h not in self.hashes:
-                # If a hash does not exist, add it to unique and add to the local set
-                self.hashes.add(h)
-                unique.append(h)
-        return unique
-
-    def get_hash_size(self) -> tuple[int, float]:
-        """
-        Get size of created hashes for statistics
-        :return: size of the local set and its memory footprint
-        """
-        return len(self.hashes), TransformUtils.deep_get_size(self.hashes) / GB
-
-
-class EdedupTransform(AbstractTableTransform):
+class EdedupRayTransform(EdedupTransformBase):
     """
     Implements dedup table transformer.
     """
@@ -81,54 +40,10 @@ class EdedupTransform(AbstractTableTransform):
             doc_column - name of the doc column
             hashes - list of hash actors, references
         """
-        # Make sure that the param name corresponds to the name used in apply_input_params method
-        # of EdedupTableTransformConfiguration class
         super().__init__(config)
-        self.doc_column = config.get("doc_column", "")
         self.hashes = config.get("hashes", [])
 
-    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
-        """
-        De duping table content.
-        :param table: table
-        :return: resulting table, statistics
-        """
-        # make sure that the doc column exists
-        TransformUtils.validate_columns(table=table, required=[self.doc_column])
-        # Inner variables
-        hashes = set()
-        unique = []
-        hd = {}
-        # Compute unique hashes for the table
-        for text in table[self.doc_column]:
-            # Compute doc hash
-            h = TransformUtils.str_to_hash(TransformUtils.normalize_string(str(text)))
-            if h not in hashes:  # Processing this hash for the first time
-                hashes.add(h)  # Remember it locally
-                hd[h] = str(text)
-                if len(hd) >= REQUEST_LEN:  # time to check remotely
-                    unique = unique + self._process_remote_hashes(hd=hd)
-                    hd = {}
-        if len(hd) > 0:  # Process remaining hashes
-            unique = unique + self._process_remote_hashes(hd=hd)
-
-        # Remove duplicates
-        unique_set = set(unique)
-        mask = [False] * table.num_rows
-        index = 0
-        for text in table[self.doc_column]:
-            str_text = str(text)
-            if str_text in unique_set:
-                mask[index] = True
-                unique_set.remove(str_text)
-            index += 1
-        # Create output table
-        out_table = table.filter(mask)
-        # report statistics
-        stats = {"source_documents": table.num_rows, "result_documents": out_table.num_rows}
-        return [out_table], stats
-
-    def _process_remote_hashes(self, hd: dict[str, str]) -> list[str]:
+    def _process_cached_hashes(self, hd: dict[str, str]) -> list[str]:
         """
         check hashes uniqueness with the distributed cache of hashes
         :param hd: dictionary of hash to document
@@ -189,7 +104,7 @@ class EdedupRuntime(DefaultRayTransformRuntime):
         """
         # create hashes
         self.filters = RayUtils.create_actors(
-            clazz=HashFilter,
+            clazz=ray.remote(HashFilter),
             params={},
             actor_options={"num_cpus": self.params.get("hash_cpu", 0.5)},
             n_actors=self.params.get("num_hashes", 1),
@@ -218,28 +133,22 @@ class EdedupRuntime(DefaultRayTransformRuntime):
         return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
 
 
-class EdedupTableTransformConfiguration(TransformConfiguration):
+class EdedupTransformConfiguration(EdedupTransformConfigurationBase):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__(
-            name=short_name,
-            transform_class=EdedupTransform,
-        )
-        from data_processing.utils import get_logger
-
-        self.logger = get_logger(__name__)
+        super().__init__(transform_class=EdedupRayTransform)
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         """
+        super().add_input_params(parser)
         parser.add_argument(f"--{cli_prefix}hash_cpu", type=float, default=0.5, help="number of CPUs per hash")
         parser.add_argument(f"--{cli_prefix}num_hashes", type=int, default=0, help="number of hash actors to use")
-        parser.add_argument(f"--{cli_prefix}doc_column", type=str, default="contents", help="key for accessing data")
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -247,18 +156,16 @@ class EdedupTableTransformConfiguration(TransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
-        self.params = self.params | captured
+        super().apply_input_params(args)
         if self.params["num_hashes"] <= 0:
             self.logger.info(f"Number of hashes should be greater then zero, provided {self.params['num_hashes']}")
             return False
-        self.logger.info(f"exact dedup params are {self.params}")
         return True
 
 
 class EdedupRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=EdedupTableTransformConfiguration(), runtime_class=EdedupRuntime)
+        super().__init__(transform_config=EdedupTransformConfiguration(), runtime_class=EdedupRuntime)
 
 
 if __name__ == "__main__":
