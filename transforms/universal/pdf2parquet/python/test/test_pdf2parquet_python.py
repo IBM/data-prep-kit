@@ -71,7 +71,7 @@ class TestPythonPdf2JsonParquetTransform(AbstractTransformLauncherTest):
                 basedir + "/input",
                 basedir + "/expected_json",
                 # this is added as a fixture to remove these columns from comparison
-                ["date_acquired", "document_id", "pdf_convert_time", "contents", "num_doc_elements"],
+                ["date_acquired", "document_id", "pdf_convert_time", "contents"],
             )
         )
         return fixtures
