@@ -6,7 +6,7 @@ from typing import Union
 
 import yaml
 from data_access import S3, Local
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import DataFrame, Row, SparkSession
 
 
 class SparkTransformerRuntime:
@@ -235,6 +235,53 @@ class SparkTransformerRuntime:
 
     def stop(self):
         self.spark.stop()
+
+    def _save_metadata(self, execution_name, status, in_out_metadata, output_path):
+        print(in_out_metadata)
+        if execution_name not in in_out_metadata:
+            in_out_metadata[execution_name] = {}
+        in_out_metadata[execution_name][execution_name + "_status"] = status
+
+        if "file_index_status" in in_out_metadata[execution_name]:
+            in_out_metadata[execution_name]["file_index_status"] = status
+        # Convert JSON to Row
+        row_data = Row(**in_out_metadata)
+        # Create DataFrame
+        df = self.spark.createDataFrame([row_data])
+        logging.info(f"row_data count{df.count()}")
+        self.write_data(df, os.path.join(output_path, "metadata"), data_type="json", mode="overwrite")
+
+    def _load_metadata(self, input_path):
+        metadata = {}
+
+        path = os.path.join(input_path, "metadata")
+        try:
+            spark_df_metadata = self.read_data(path, "json")
+            in_out_metadata_val = spark_df_metadata.toJSON().collect()
+            print(in_out_metadata_val)
+            if len(in_out_metadata_val) > 0:
+                json_object = json.loads(in_out_metadata_val[0])
+                metadata = json.loads(json_object.get("value"))
+        except Exception as ex:
+            logging.error(f"Failed to read {path}: {ex}")
+        return metadata
+
+    def extract_step_info(self, s):
+        # Split the string by the '#' character
+        parts = s.split("#")
+
+        if len(parts) == 2 and parts[1].isdigit():
+            prefix = parts[0]
+            number = int(parts[1])
+            if number == 1:
+                prev_step_name = prefix + "#" + str(number)
+            elif number > 1:
+                prev_step_name = prefix + "#" + str(number - 1)
+
+            return prefix, number, prev_step_name
+        else:
+            # If the format is not as expected, return None for both
+            return None, None
 
 
 class SparkFileBatcher:

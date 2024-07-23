@@ -86,6 +86,7 @@ class FDSignatureCalculator(SparkTransformerRuntime):
         total_number_of_documents: int,
         seed: int,
         configs: str,
+        step_name: str,
     ):
         super().__init__()
         self.input_path = input_path
@@ -106,6 +107,9 @@ class FDSignatureCalculator(SparkTransformerRuntime):
         self.total_number_of_documents = total_number_of_documents
         self.seed = seed
         self.configs = configs
+        self.step_name = step_name
+        self.in_out_metadata = {}
+        self.execution_name = "execution_" + self.step_name
         self.init_io(self.input_path, self.output_path)
         server_port_https = int(os.getenv("KUBERNETES_SERVICE_PORT_HTTPS", "-1"))
         if server_port_https == -1:
@@ -238,7 +242,6 @@ class FDSignatureCalculator(SparkTransformerRuntime):
         return bands
 
     def run_transform(self):
-        in_out_metadata = {}
         self.input_files, self.file_stats = self.list_files(self.input_path, self.file_ext)
         file_batcher = SparkFileBatcher(
             self.input_files,
@@ -286,9 +289,30 @@ class FDSignatureCalculator(SparkTransformerRuntime):
         )
 
         while True:
+            if self.execution_name not in self.in_out_metadata:
+                self.in_out_metadata[self.execution_name] = {
+                    self.execution_name + "_status": "started",
+                    "default_batch_size": self.default_batch_size,
+                    "num_files": file_batcher.num_files,
+                    "total_batches": file_batcher.total_batches,
+                    "file_index": file_batcher.file_index,
+                }
+            elif (
+                self.execution_name in self.in_out_metadata
+                and self.in_out_metadata[self.execution_name][self.execution_name + "_status"] == "error"
+            ):
+                self.in_out_metadata[self.execution_name][self.execution_name + "_status"] = "progress"
+                if int(self.in_out_metadata[self.execution_name]["file_index"]) > 0:
+                    file_batcher.file_index = int(self.in_out_metadata[self.execution_name]["file_index"])
+                else:
+                    file_batcher.file_index = 0
+            else:
+                self.in_out_metadata[self.execution_name][self.execution_name + "_status"] = "progress"
+
             self.checkpoint_count += 1
             # Get next batch
             input_batch, batch_size = file_batcher.next_batch()
+            self.in_out_metadata[self.execution_name]["file_index"] = file_batcher.file_index
             # used to track document size
             self.total_document_size += batch_size
             if not input_batch:
@@ -329,26 +353,44 @@ class FDSignatureCalculator(SparkTransformerRuntime):
                 schema=band_schema,
             )
             num_bands_partitions = bands.getNumPartitions()
-            in_out_metadata["num_minhash_bands"] = num_bands_partitions
-            in_out_metadata["num_bands"] = minhashlsh_num_bands
-
+            self.in_out_metadata["num_minhash_bands"] = num_bands_partitions
+            self.in_out_metadata["num_bands"] = minhashlsh_num_bands
             for band_ix in range(minhashlsh_num_bands):
                 band_df = bands_df.filter(F.col("band_index") == band_ix).drop("band_index")
                 self.write_data(band_df, os.path.join(self.band_output_path, f"band_{band_ix}"), data_type="parquet")
             logging.info(f" Bands calculation complete: number of bands partitions = {num_bands_partitions}")
 
-        # Convert JSON to Row
-        row_data = Row(**in_out_metadata)
-
-        # Create DataFrame
-        df = self.spark.createDataFrame([row_data])
-        self.write_data(df, os.path.join(self.band_output_path, "metadata"), data_type="json")
+        # plus, now, minds, well
+        # # Convert JSON to Row
+        # row_data = Row(**self.in_out_metadata)
+        #
+        # # Create DataFrame
+        # df = self.spark.createDataFrame([row_data])
+        # self.write_data(df, os.path.join(self.band_output_path, "metadata"), data_type="json")
 
     def execute(self):
         try:
-            self.run_transform()
-            logging.info("Finished generating document signatures")
+            self.in_out_metadata = self._load_metadata(self.output_path)
+            prefix, step_number, prev_step_name = self.extract_step_info(self.execution_name)
+            if (
+                self.execution_name in self.in_out_metadata
+                and self.execution_name + "_status" in self.in_out_metadata[self.execution_name]
+                and self.in_out_metadata[self.execution_name][self.execution_name + "_status"] == "complete"
+            ):
+                logging.info(f"Skipping {self.step_name} because its complete")
+            elif (
+                prev_step_name in self.in_out_metadata
+                and self.in_out_metadata[prev_step_name][prev_step_name + "_status"] == "error"
+                or prev_step_name not in self.in_out_metadata
+            ):
+                self.run_transform()
+                self._save_metadata(self.execution_name, "complete", self.in_out_metadata, self.output_path)
+                logging.info("Finished generating document signatures")
+            else:
+                logging.info(f"Skipping {self.step_name} because the previous step failed")
+
         except Exception as ex:
+            self._save_metadata(self.execution_name, "error", self.in_out_metadata, self.output_path)
             logging.error(f"Failed to generate document signatures: {ex}")
         finally:
             self.stop()

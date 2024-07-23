@@ -47,6 +47,7 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         total_number_of_documents: int,
         seed: int,
         configs: str,
+        step_name: str,
     ):
         super().__init__()
         self.input_path = input_path
@@ -75,6 +76,9 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         self.total_number_of_documents = total_number_of_documents
         self.seed = seed
         self.configs = configs
+        self.step_name = step_name
+        self.in_out_metadata = {}
+        self.execution_name = "execution_" + self.step_name
         self.init_io(self.input_path, self.output_path)
         server_port_https = int(os.getenv("KUBERNETES_SERVICE_PORT_HTTPS", "-1"))
         if server_port_https == -1:
@@ -85,7 +89,7 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
 
     def get_num_bands_from_metadata(self) -> int:
         # Read number of bands from metadata
-        spark_df_metadata = self.read_data(os.path.join(self.band_output_path, "metadata"), "json")
+        spark_df_metadata = self.read_data(os.path.join(self.output_path, "metadata"), "json")
         in_out_metadata_val = spark_df_metadata.toJSON().collect()
         json_object = json.loads(in_out_metadata_val[0])
         num_bands = json.loads(json_object.get("value"))["num_bands"]
@@ -185,7 +189,6 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         # read minhash
         minhash_band_df = self.spark.createDataFrame([], minhash_schema)
         self.input_files, self.file_stats = self.list_files(self.minhash_output_path, self.file_ext)
-        self.default_batch_size = 1
         file_batcher = SparkFileBatcher(
             self.input_files,
             self.default_batch_size,
@@ -281,10 +284,32 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         return docs_to_remove_df, docs_to_remove_list
 
     def run_transform(self):
-        num_bands = self.get_num_bands_from_metadata()
+        num_bands = self.in_out_metadata["num_bands"]
+        num_bands_index = 0
+
+        # num_bands = self.get_num_bands_from_metadata()
         cluster_schema, minhash_schema, doc2remove_schema = self.define_schemas()
         docs2remove_list = []
-        for band_index in range(num_bands):
+
+        if self.execution_name not in self.in_out_metadata:
+            self.in_out_metadata[self.execution_name] = {
+                self.execution_name + "_status": "started",
+                "default_batch_size": self.default_batch_size,
+                "band_index": 0,
+            }
+        elif (
+            self.execution_name in self.in_out_metadata
+            and self.in_out_metadata[self.execution_name][self.execution_name + "_status"] == "error"
+        ):
+            self.in_out_metadata[self.execution_name][self.execution_name + "_status"] = "progress"
+            if int(self.in_out_metadata[self.execution_name]["band_index"]) > 0:
+                num_bands_index = int(self.in_out_metadata[self.execution_name]["band_index"])
+            else:
+                num_bands_index = 0
+        else:
+            self.in_out_metadata[self.execution_name][self.execution_name + "_status"] = "progress"
+
+        for band_index in range(num_bands_index, num_bands):
             # load the clusters calculated for the band (through band hash groupBy)
             # we cannot slice the band clusters so the only thing we can do is
             # to setup a batch size so that the data loaded during each batch is
@@ -321,9 +346,23 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
 
     def execute(self):
         try:
-            self.run_transform()
-            logging.info("Finished grouping by band hash and band number")
+            # load metadata
+            self.in_out_metadata = self._load_metadata(self.output_path)
+            prefix, step_number, prev_step_name = self.extract_step_info(self.execution_name)
+            if (
+                self.execution_name in self.in_out_metadata
+                and self.execution_name + "_status" in self.in_out_metadata[self.execution_name]
+                and self.in_out_metadata[self.execution_name][self.execution_name + "_status"] == "complete"
+            ):
+                logging.info(f"Skipping {self.step_name} because its complete")
+            elif self.in_out_metadata[prev_step_name][prev_step_name + "_status"] == "complete":
+                self.run_transform()
+                self._save_metadata(self.execution_name, "complete", self.in_out_metadata, self.output_path)
+                logging.info("Finished grouping by band hash and band number")
+            else:
+                logging.info(f"Skipping {self.step_name} because the previous step failed")
         except Exception as ex:
+            self._save_metadata(self.execution_name, "error", self.in_out_metadata, self.output_path)
             logging.error(f"Failed to group by band hash and band number: {ex}")
         finally:
             self.stop()

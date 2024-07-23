@@ -3,7 +3,7 @@ common_args:
     input_path: ${HOME}
     output_path: ${HOME}
     file_ext: .parquet
-    default_batch_size: 300
+    default_batch_size: 2
     document_id_column: int_id_column
     contents_column: contents
     debug: False
@@ -16,7 +16,7 @@ common_configs:
     common_config2: common_value2
 
 steps:
-    - name: step1
+    - name: step#1
       udf_path: "fd_signature_calculator.py"
       udf_class: "FDSignatureCalculator"
       args:
@@ -28,16 +28,16 @@ steps:
       configs:
           heuristic1: value1
 
-    - name: step2
+    - name: step#2
       udf_path: "fd_clusters_calculator.py"
       udf_class: "FDClustersCalculator"
       args:
           seed: 42
-          default_batch_size: 10000000
+          default_batch_size: 2
       configs:
           heuristic1: value2
 
-    - name: step3
+    - name: step#3
       udf_path: "fd_jaccard_distance_calculator.py"
       udf_class: "FDJaccardDistanceCalculator"
       args:
@@ -51,7 +51,7 @@ steps:
       configs:
           heuristic1: value2
 
-    - name: step4
+    - name: step#4
       udf_path: "fd_clean_data.py"
       udf_class: "FDCleanData"
       args:

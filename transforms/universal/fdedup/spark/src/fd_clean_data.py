@@ -41,6 +41,7 @@ class FDCleanData(SparkTransformerRuntime):
         total_document_size: int,
         total_number_of_documents: int,
         configs: str,
+        step_name: str,
     ):
         super().__init__()
         self.input_path = input_path
@@ -57,6 +58,9 @@ class FDCleanData(SparkTransformerRuntime):
         self.total_document_size = total_document_size
         self.total_number_of_documents = total_number_of_documents
         self.configs = configs
+        self.step_name = step_name
+        self.in_out_metadata = {}
+        self.execution_name = "execution_" + self.step_name
         self.init_io(self.input_path, self.output_path)
         logging.info("Initialized Spark Fuzzy Dedupe data cleaning")
 
@@ -98,8 +102,29 @@ class FDCleanData(SparkTransformerRuntime):
 
         # Loop through batches until all files processed
         while True:
+            if self.execution_name not in self.in_out_metadata:
+                self.in_out_metadata[self.execution_name] = {
+                    self.execution_name + "_status": "started",
+                    "default_batch_size": self.default_batch_size,
+                    "num_files": file_batcher.num_files,
+                    "total_batches": file_batcher.total_batches,
+                    "file_index": file_batcher.file_index,
+                }
+            elif (
+                self.execution_name in self.in_out_metadata
+                and self.in_out_metadata[self.execution_name][self.execution_name + "_status"] == "error"
+            ):
+                self.in_out_metadata[self.execution_name][self.execution_name + "_status"] = "progress"
+                if int(self.in_out_metadata[self.execution_name]["file_index"]) > 0:
+                    file_batcher.file_index = int(self.in_out_metadata[self.execution_name]["file_index"])
+                else:
+                    file_batcher.file_index = 0
+            else:
+                self.in_out_metadata[self.execution_name][self.execution_name + "_status"] = "progress"
             # Get next batch
             input_batch, batch_size = file_batcher.next_batch()
+            self.in_out_metadata[self.execution_name]["file_index"] = file_batcher.file_index
+
             if not input_batch:
                 break
 
@@ -122,9 +147,23 @@ class FDCleanData(SparkTransformerRuntime):
 
     def execute(self):
         try:
-            self.run_transform()
+            # load metadata
+            self.in_out_metadata = self._load_metadata(self.output_path)
+            prefix, step_number, prev_step_name = self.extract_step_info(self.execution_name)
+            if (
+                self.execution_name in self.in_out_metadata
+                and self.execution_name + "_status" in self.in_out_metadata[self.execution_name]
+                and self.in_out_metadata[self.execution_name][self.execution_name + "_status"] == "complete"
+            ):
+                logging.info(f"Skipping {self.step_name} because its complete")
+            elif self.in_out_metadata[prev_step_name][prev_step_name + "_status"] == "complete":
+                self.run_transform()
+                self._save_metadata(self.execution_name, "complete", self.in_out_metadata, self.output_path)
+            else:
+                logging.info(f"Skipping {self.step_name} because the previous step failed")
             logging.info("Finished grouping by band hash and band number")
         except Exception as ex:
+            self._save_metadata(self.execution_name, "error", self.in_out_metadata, self.output_path)
             logging.error(f"Failed to group by band hash and band number: {ex}")
         finally:
             self.stop()
