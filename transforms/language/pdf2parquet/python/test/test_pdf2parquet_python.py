@@ -75,3 +75,63 @@ class TestPythonPdf2JsonParquetTransform(AbstractTransformLauncherTest):
             )
         )
         return fixtures
+
+class TestPythonPdf2ParquetWithOcrTransform(AbstractTransformLauncherTest):
+    """
+    Extends the super-class to define the test data for the tests defined there.
+    The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
+    """
+
+    def get_test_transform_fixtures(self) -> list[tuple]:
+        basedir = "../test-data"
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        config = {
+            "data_files_to_use": ast.literal_eval("['.pdf','.zip']"),
+            "pdf2parquet_contents_type": "text/markdown",
+            "pdf2parquet_do_ocr": True,
+            "pdf2parquet_do_table_structure": True,
+        }
+
+        fixtures = []
+        launcher = PythonTransformLauncher(Pdf2ParquetPythonTransformConfiguration())
+        fixtures.append(
+            (
+                launcher,
+                config,
+                basedir + "/input",
+                basedir + "/expected_md_ocr",
+                # this is added as a fixture to remove these columns from comparison
+                ["date_acquired", "document_id", "pdf_convert_time"],
+            )
+        )
+        return fixtures
+
+class TestPythonPdf2ParquetNoTableTransform(AbstractTransformLauncherTest):
+    """
+    Extends the super-class to define the test data for the tests defined there.
+    The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
+    """
+
+    def get_test_transform_fixtures(self) -> list[tuple]:
+        basedir = "../test-data"
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        config = {
+            "data_files_to_use": ast.literal_eval("['.pdf','.zip']"),
+            "pdf2parquet_contents_type": "text/markdown",
+            "pdf2parquet_do_ocr": False,
+            "pdf2parquet_do_table_structure": False,
+        }
+
+        fixtures = []
+        launcher = PythonTransformLauncher(Pdf2ParquetPythonTransformConfiguration())
+        fixtures.append(
+            (
+                launcher,
+                config,
+                basedir + "/input",
+                basedir + "/expected_md_no_table",
+                # this is added as a fixture to remove these columns from comparison
+                ["date_acquired", "document_id", "pdf_convert_time"],
+            )
+        )
+        return fixtures
