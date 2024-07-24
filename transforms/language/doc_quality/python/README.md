@@ -36,7 +36,7 @@ the options provided by
 the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 ```
   --docq_text_lang DOCQ_TEXT_LANG   language used in the text content. By default, "en" is used
-  --docq_doc_content_column DOCQ_DOC_CONTENT_COLUMN   column name that contain document text
+  --docq_doc_content_column DOCQ_DOC_CONTENT_COLUMN   column name that contain document text. By default, "contents" is used
   --docq_bad_word_filepath DOCQ_BAD_WORD_FILEPATH   path to bad word file: local folder (file or directory) that points to bad word file
 ```
 These correspond to the configuration keys described above.
