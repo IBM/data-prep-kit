@@ -67,8 +67,6 @@ class DocQualityTransform(AbstractTableTransform):
         self.doc_content_column = config.get(doc_content_column_key, default_doc_content_column)
         
         daf = config.get(data_factory_internal_key, None)
-        if daf is None:
-            raise RuntimeError(f"Failed to create a data factory for retrieving resources")
         bad_word_filepath = config.get(bad_word_filepath_key, None)
         if bad_word_filepath is None:
             raise RuntimeError(f"Missing configuration value for key {bad_word_filepath_key}")
@@ -76,6 +74,8 @@ class DocQualityTransform(AbstractTableTransform):
             logger.info(f"Load badwords found locally from {bad_word_filepath}")
             self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=bad_word_filepath)
         else:
+            if daf is None: 
+                raise RuntimeError(f"Failed to create a data factory for retrieving resources")
             logger.info(f"Load badwords from remote")
             data_access = daf.create_data_access()
             import tempfile
