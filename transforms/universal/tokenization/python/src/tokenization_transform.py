@@ -103,7 +103,7 @@ class TokenizationTransform(AbstractTableTransform):
 
                         if (chunk_idx + 1) % CHUNK_CHECKPOINT_INTERVAL == 0 or (doc_len_so_far == doc_length):
                             elapse_time = int(time.time() - start_time)
-                            self.logger.info(
+                            self.logger.debug(
                                 f"row_idx: {idx:5,} "
                                 f"(doc_id: {doc_id}) "
                                 f"chunk_idx: {chunk_idx:6,} ({doc_len_so_far:11,}/{doc_length:11,} "
