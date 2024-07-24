@@ -18,8 +18,10 @@ COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .[dev]
 
-# copy source data
+ # copy transform main() entry point to the image
 COPY ./src/doc_quality_transform_ray.py .
+
+# copy some of the samples in
 COPY ./src/doc_quality_local_ray.py local/
 
 # copy test
