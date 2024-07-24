@@ -76,6 +76,7 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 |Filter on annotations           |:white_check_mark:|:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 |Language identification         |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
 |Document quality                |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
+|PDF to Parquet (convert)        |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
 |Code (from zip) to Parquet      |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
 |Profiler                        |                  |:white_check_mark:|                  |:white_check_mark:      |
 |Tokenizer                       |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
