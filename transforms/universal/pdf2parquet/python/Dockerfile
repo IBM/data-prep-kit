@@ -30,9 +30,13 @@ RUN pip install --no-cache-dir -e .
 RUN python -c 'from deepsearch_glm.utils.load_pretrained_models import load_pretrained_nlp_models; load_pretrained_nlp_models(verbose=True);'
 RUN python -c 'from docling.document_converter import DocumentConverter; s=DocumentConverter.download_models_hf(); print(f"Models cached in {s}")'
 
-# copy source data
-COPY --chown=dpk:root src/ .
-COPY ./src/pdf2parquet_local.py local/
+# copy the main() entry point to the image
+COPY --chown=dpk:root src/pdf2parquet_transform.py ./
+COPY --chown=dpk:root src/pdf2parquet_transform_python.py ./
+
+# copy some of the samples in
+COPY --chown=dpk:root ./src/pdf2parquet_local.py local/
+
 
 # copy test
 COPY test/ test/
