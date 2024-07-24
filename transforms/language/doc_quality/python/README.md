@@ -23,7 +23,7 @@ In this transform, following metrics will be included:
 The set of dictionary keys holding [DocQualityTransform](src/doc_quality_transform.py) 
 configuration for values are as follows:
 
-* _text_lang_ - specifies language used in the text content. By defaut, "en" is used.
+* _text_lang_ - specifies language used in the text content. By default, "en" is used.
 * _doc_content_column_ - specifies column name that contains document text.
 * _bad_word_filepath_ - specifies a path to bad word file: local folder (file or directory) that points to bad word file.
 
@@ -35,7 +35,7 @@ the following command line arguments are available in addition to
 the options provided by 
 the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 ```
-  --docq_text_lang DOCQ_TEXT_LANG   language used in the text content. By defaut, "en" is used
+  --docq_text_lang DOCQ_TEXT_LANG   language used in the text content. By default, "en" is used
   --docq_doc_content_column DOCQ_DOC_CONTENT_COLUMN   column name that contain document text
   --docq_bad_word_filepath DOCQ_BAD_WORD_FILEPATH   path to bad word file: local folder (file or directory) that points to bad word file
 ```
