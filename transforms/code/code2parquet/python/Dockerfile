@@ -21,12 +21,10 @@ COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
-#COPY requirements.txt requirements.txt
-#RUN pip install --no-cache-dir -r  requirements.txt
-
-# copy source data
-COPY ./src/code2parquet_transform.py .
+# copy the main() entry point to the image 
 COPY ./src/code2parquet_transform_python.py .
+
+# copy some of the samples in
 COPY ./src/code2parquet_local.py local/
 
 # copy test
