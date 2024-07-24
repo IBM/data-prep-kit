@@ -67,7 +67,7 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 |------------------------------  |------------------|------------------|------------------|------------------------|
 |No-op / template                |:white_check_mark:|:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 |Doc ID annotation               |:white_check_mark:|:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-|Programming language annnotation|:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      | 
+|Programming language annotation |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      | 
 |Exact dedup filter              |                  |:white_check_mark:|                  |:white_check_mark:      |
 |Fuzzy dedup filter              |                  |:white_check_mark:|                  |:white_check_mark:      |
 |Code quality annotation         |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |

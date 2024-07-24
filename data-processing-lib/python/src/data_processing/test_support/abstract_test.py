@@ -118,9 +118,18 @@ class AbstractTest:
             assert (
                 f1[1] == f2[1]
             ), f"produced file extension {f1[1]} is different from  expected file extension {f2[1]}"
+            lenf1 = len(f1[0])
+            lenf2 = len(f2[0])
+            if f1[1] == ".parquet":
+                # Parquet file compression seems to vary, so allow a bit of difference.
+                diff_allowed = 0.03 * lenf2  # 3% difference is a guess
+            else:
+                diff_allowed = 0
+            diff = abs(lenf1 - lenf2)
             assert (
-                len(f1[0]) - len(f2[0])
-            ) < 50, f"produced file length {len(f1[0])} is different from expected file extension {len(f2[0])}"
+                diff <= diff_allowed,
+                f"produced file length {lenf1} vs expected {lenf2}, exceeds allowance of {diff_allowed}",
+            )
 
     @staticmethod
     def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):

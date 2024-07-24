@@ -9,7 +9,7 @@ Therefore, to the extent the supported versions of python are used, transforms c
 ### Virtualization Considerations
 
 Desktops such as [Docker Desktop](https://www.docker.com/products/docker-desktop/),
-[Podman desktop](https://podman-desktop.io/) and [Rancher desktop](https://docs.rancherdesktop.io/) use different virtualization and emulation technics,
+[Podman desktop](https://podman-desktop.io/) and [Rancher desktop](https://docs.rancherdesktop.io/) use different virtualization and emulation techniques,
 ([qemu](https://www.qemu.org/), [Apple Virtualization framework](https://developer.apple.com/documentation/virtualization))
 to allow the execution of containers based on images compiled for Intel silicon. However, emulation significantly
 impacts performance, and there are additional restrictions, such as Virtual Machine RAM size.

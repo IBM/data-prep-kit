@@ -19,9 +19,10 @@ COPY --chown=spark:root src/ src/
 COPY --chown=spark:root pyproject.toml pyproject.toml
 RUN pip install --no-cache-dir -e .
 
-# copy source main
-
+# copy the main() entry point to the image 
 COPY ./src/filter_transform_spark.py .
+
+# copy some of the samples in
 COPY ./src/filter_local.py local/
 
 # copy test

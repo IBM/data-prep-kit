@@ -19,3 +19,4 @@ done
 
 
 pip install duckdb pandas parameterized scipy transformers
+pip install "networkx==3.3" "colorlog==6.8.2" "func-timeout==4.3.5" "pandas==2.2.2" "emerge-viz==2.0.0"

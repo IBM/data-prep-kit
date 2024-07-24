@@ -19,6 +19,7 @@ export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/transforms/universal/doc_id/ray/src:$RE
 export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/transforms/universal/tokenization/ray/src:$REPO_ROOT/transforms/universal/tokenization/python/src
 export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/tools/ingest2parquet/src/
 export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/transforms/code/ingest_2_parquet/ray/src:$REPO_ROOT/transforms/code/ingest_2_parquet/python/src
+export PYTHONPATH=$PYTHONPATH:$REPO_ROOT/transforms/code/repo_level_ordering/ray/src/
 
 . ./venv/bin/activate
 jupyter notebook demo_with_launcher.ipynb
