@@ -25,7 +25,7 @@ from data_processing.data_access import DataAccessFactory, DataAccessLocal
 supported_languages_file = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "../../ray/test-data/languages/lang_extensions.json")
 )
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../ray/test-data/input"))
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 
 params = {
     supported_langs_file_key: supported_languages_file,
