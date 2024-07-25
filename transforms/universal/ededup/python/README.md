@@ -13,6 +13,7 @@ The set of dictionary keys holding [EdedupPythonTransform](src/ededup_transform_
 configuration for values are as follows:
 
 * _ededup_doc_column_ - specifies the name of the column containing a document
+
 the `transform()` method of `EdedupPythonTransform` filters out duplicate documents. 
 
 ## Running
