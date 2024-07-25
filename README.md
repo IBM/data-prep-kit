@@ -63,20 +63,20 @@ Support for additional data modalities is expected in the future and additional 
 ## Data Preparation Modules <a name = "modules"></a>
 The below matrix shows the the combination of modules and supported runtimes. All the modules can be accessed [here](/transforms) and can be combined to form data processing pipelines, as shown in [examples](/examples) folder. 
 
-|Modules                         | Python-only | Ray              | Spark            | KFP on Ray             |
-|------------------------------  |-|------------------|------------------|------------------------|
-|No-op / template                |:white_check_mark:|:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-|Doc ID annotation               |:white_check_mark:|:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-|Programming language annnotation|:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      | 
-|Exact dedup filter              |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
-|Fuzzy dedup filter              | |:white_check_mark:|                  |:white_check_mark:      |
-|Code quality annotation         |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
-|Malware annotation              |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
-|Filter on annotations           |:white_check_mark:|:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-|Language identification         |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
-|Code (from zip) to Parquet      |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
-|Profiler                        | |:white_check_mark:|                  |:white_check_mark:      |
-|Tokenizer                       |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
+|Modules                         | Python-only        | Ray              | Spark            | KFP on Ray             |
+|------------------------------  |--------------------|------------------|------------------|------------------------|
+|No-op / template                | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
+|Doc ID annotation               | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
+|Programming language annnotation| :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      | 
+|Exact dedup filter              | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+|Fuzzy dedup filter              |                    |:white_check_mark:|                  |:white_check_mark:      |
+|Code quality annotation         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+|Malware annotation              | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+|Filter on annotations           | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
+|Language identification         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+|Code (from zip) to Parquet      | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+|Profiler                        |                    |:white_check_mark:|                  |:white_check_mark:      |
+|Tokenizer                       | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 
 Contributors are welcome to add new modules as well as add runtime support for existing modules!
 
