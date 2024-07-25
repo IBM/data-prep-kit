@@ -16,7 +16,7 @@ RUN cd python-transform && pip install --no-cache-dir -e .
 
 COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 
-RUN pip install --no-cache-dir -e .[dev]
+RUN pip install --no-cache-dir -e .
 
  # copy transform main() entry point to the image
 COPY ./src/doc_quality_transform_ray.py .
