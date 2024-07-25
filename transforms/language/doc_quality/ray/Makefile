@@ -9,7 +9,6 @@ include $(REPOROOT)/transforms/.make.transforms
 TRANSFORM_NAME=doc_quality
 # $(REPOROOT)/.make.versions file contains the versions
 
-BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
 
 test:: .transforms.ray-test
