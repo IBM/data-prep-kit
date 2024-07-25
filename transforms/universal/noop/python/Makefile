@@ -7,7 +7,6 @@ REPOROOT=../../../..
 
 # $(REPOROOT)/.make.versions file contains the versions
 
-TRANSFORM_RUNTIME=python
 TRANSFORM_NAME=noop
 
 include $(REPOROOT)/transforms/.make.transforms

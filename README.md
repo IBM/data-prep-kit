@@ -69,11 +69,11 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 |Doc ID annotation               |:white_check_mark:|:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 |Programming language annnotation|:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      | 
 |Exact dedup filter              |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
-|Fuzzy dedup filter              | |:white_check_mark:|                  |:white_check_mark:      |
 |Code quality annotation         |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
 |Malware annotation              |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
 |Filter on annotations           |:white_check_mark:|:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 |Language identification         |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
+|Document quality                |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
 |Code (from zip) to Parquet      |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |
 |Profiler                        | |:white_check_mark:|                  |:white_check_mark:      |
 |Tokenizer                       |:white_check_mark:|:white_check_mark:|                  |:white_check_mark:      |

@@ -37,8 +37,10 @@ USER dpk
 #COPY requirements.txt requirements.txt
 #RUN pip install --no-cache-dir -r  requirements.txt
 
-# copy source data
+# copy the main() entry point to the image 
 COPY ./src/lang_id_transform_python.py .
+
+# copy some of the samples in
 COPY ./src/lang_id_local.py local/
 
 # copy test
