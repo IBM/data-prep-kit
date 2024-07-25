@@ -99,38 +99,43 @@ class AbstractTest:
             for j in range(rows1):
                 r1 = t1.take([j])
                 r2 = t2.take([j])
-                AbstractTest.validate_expected_rows(i, j, r1, r2)
+                AbstractTest.validate_expected_row(i, j, r1, r2)
 
     @staticmethod
-    def validate_expected_rows(table_index: int, row_index: int, test_row: pa.Table, expected_row: pa.Table):
+    def validate_expected_row(table_index: int, row_index: int, test_row: pa.Table, expected_row: pa.Table):
         """
         Compare the two rows for equality, allowing float values to be within a percentage
         of each other as defined by global _allowed_float_percent_diff.
+        We assume the schema has already been compared and is equivalent.
         Args:
-            table_index:
+            table_index: index of tables that is the source of the rows.
             row_index:
             test_row:
             expected_row:
         """
         assert test_row.num_rows == 1, "Invalid usage.  Expected test table with 1 row"
         assert expected_row.num_rows == 1, "Invalid usage.  Expected expected table with 1 row"
-        fake_it = False
-        if fake_it or test_row != expected_row:
+        if test_row != expected_row:
+            # Else look for floating point values that might differ within the allowance
             msg = f"Row {row_index} of table {table_index} are not equal\n\tTransformed: {test_row}\n\tExpected   : {expected_row}"
             test_columns = test_row
             expected_columns = test_row
             assert len(test_columns) == len(expected_columns), msg
             num_columns = test_row.num_columns
             for i in range(num_columns):
+                # Over each cell/column in the row
                 test_column = test_columns.column(i)
                 expected_column = expected_columns.column(i)
-                if fake_it or test_column != expected_column:
+                if test_column != expected_column:
+                    # Check if the value is a float and if so, allow a fuzzy match
                     test_value = test_column.to_pylist()[0]
                     expected_value = expected_column.to_pylist()[0]
                     is_float = isinstance(test_value, float) and isinstance(expected_value, float)
                     if not is_float:
+                        # Its NOT a float, so do a normal compare
                         assert test_column == expected_column, msg
                     else:
+                        # It IS a float, so allow a fuzzy match
                         allowed_diff = abs(_allowed_float_percent_diff * expected_value)
                         diff = abs(test_value - expected_value)
                         assert diff <= allowed_diff, msg
