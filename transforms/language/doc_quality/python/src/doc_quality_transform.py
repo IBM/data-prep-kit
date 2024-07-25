@@ -68,21 +68,20 @@ class DocQualityTransform(AbstractTableTransform):
         
         daf = config.get(data_factory_internal_key, None)
         bad_word_filepath = config.get(bad_word_filepath_key, None)
-        if bad_word_filepath is None:
-            raise RuntimeError(f"Missing configuration value for key {bad_word_filepath_key}")
-        if os.path.exists(bad_word_filepath):
-            logger.info(f"Load badwords found locally from {bad_word_filepath}")
-            self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=bad_word_filepath)
-        else:
-            if daf is None: 
-                raise RuntimeError(f"Did not find DataAccessFactory instance under {data_factory_internal_key} key. This is required when bad word file is not in the local file system.")
-            logger.info(f"Load badwords from remote")
-            data_access = daf.create_data_access()
-            import tempfile
-            with tempfile.TemporaryDirectory() as temp_dir:
-                # use a temporary directory until model is loaded to memory
-                bad_word_filepath = self._write_locally(data_access, bad_word_filepath, temp_dir)
+        if bad_word_filepath is not None:
+            if os.path.exists(bad_word_filepath):
+                logger.info(f"Load badwords found locally from {bad_word_filepath}")
                 self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=bad_word_filepath)
+            else:
+                if daf is None: 
+                    raise RuntimeError(f"Did not find DataAccessFactory instance under {data_factory_internal_key} key. This is required when bad word file is not in the local file system.")
+                logger.info(f"Load badwords from remote")
+                data_access = daf.create_data_access()
+                import tempfile
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    # use a temporary directory until model is loaded to memory
+                    bad_word_filepath = self._write_locally(data_access, bad_word_filepath, temp_dir)
+                    self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=bad_word_filepath)
 
     def _write_locally(self, data_access: DataAccess, path: str, temp_dir: str) -> str:
         filename = os.path.basename(path)
@@ -214,8 +213,7 @@ class DocQualityTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{bad_word_filepath_cli_param}",
             type=str,
-            required=True,
-            help="path to bad word file: local folder (file or directory) that points to bad word file",
+            help="path to bad word file: local folder (file or directory) that points to bad word file. You don't have to set this parameter if you don't need to set bad words.",
         )
         self.daf = DataAccessFactory(cli_prefix, False)
         self.daf.add_input_params(parser)
