@@ -44,8 +44,8 @@ class TestPythonIngestToParquetTransform(AbstractTransformLauncherTest):
             "data_files_to_use": ast.literal_eval("['.zip']"),
             supported_langs_file_cli_key: lang_supported_file,
             detect_programming_lang_cli_key: True,
-            snapshot_cli_key: "github",
-            domain_cli_key: "code",
+            # snapshot_cli_key: "github",
+            # domain_cli_key: "code",
         }
         fixtures = [
             (
