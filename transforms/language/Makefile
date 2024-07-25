@@ -1,6 +1,6 @@
 REPOROOT=../..
 # Use make help to see the avialable rules
-include ../../.make.defaults
+include $(REPOROOT)/.make.defaults
 
 clean::
 	@# Help: Recursively clean all subdirs 
