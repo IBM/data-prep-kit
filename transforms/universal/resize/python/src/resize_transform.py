@@ -71,6 +71,7 @@ class ResizeTransform(AbstractTableTransform):
                 )
                 #table = pa.concat_tables([self.buffer, table], unicode_promote_options="permissive")
                 table = pa.concat_tables([self.buffer, table])
+                self.buffer = None
                 self.logger.debug(f"concatenated table has {table.num_rows} rows")
             except Exception as _:  # Can happen if schemas are different
                 # Raise unrecoverable error to stop the execution
