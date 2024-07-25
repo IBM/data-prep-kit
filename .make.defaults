@@ -297,7 +297,7 @@ endif
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
-	pip install --force-reinstall $${extra_url}  -e $(PYTHON_PROJECT_DIR);		
+	pip install $${extra_url}  -e $(PYTHON_PROJECT_DIR);
 	@echo Done installing source from $(PYTHON_PROJECT_DIR) into venv
 
 # Install local requirements last as it generally includes our lib source
