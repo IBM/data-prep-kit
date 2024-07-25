@@ -21,8 +21,10 @@ COPY --chown=ray:users README.md README.md
 COPY --chown=ray:users images/ images/
 RUN pip install --no-cache-dir -e .
 
-# copy source data
+# copy the main() entry point to the image 
 COPY ./src/ededup_transform_ray.py .
+
+# copy some of the samples in
 COPY src/ededup_local_ray.py local/
 
 # copy test

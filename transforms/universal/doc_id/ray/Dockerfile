@@ -18,8 +18,10 @@ COPY --chown=ray:users pyproject.toml pyproject.toml
 COPY --chown=ray:users README.md README.md
 RUN pip install --no-cache-dir -e .
 
-# copy source data
+# copy the main() entry point to the image 
 COPY ./src/doc_id_transform_ray.py .
+
+# copy some of the samples in
 COPY src/doc_id_local_ray.py local/
 
 # copy test
