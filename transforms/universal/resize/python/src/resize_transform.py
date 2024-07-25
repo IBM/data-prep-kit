@@ -15,7 +15,7 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import LOCAL_TO_DISK, MB, CLIArgumentProvider, get_logger
+from data_processing.utils import LOCAL_TO_DISK, MB, CLIArgumentProvider, UnrecoverableException, get_logger
 
 
 max_rows_per_table_key = "max_rows_per_table"
@@ -42,9 +42,7 @@ class ResizeTransform(AbstractTableTransform):
         Initialize based on the dictionary of configuration information.
         """
         super().__init__(config)
-        self.logger = get_logger(__name__)
         self.max_rows_per_table = config.get(max_rows_per_table_key, 0)
-
         self.max_bytes_per_table = MB * config.get(max_mbytes_per_table_key, 0)
         disk_memory = config.get(size_type_key, size_type_default)
         if size_type_default in disk_memory:
@@ -71,15 +69,16 @@ class ResizeTransform(AbstractTableTransform):
                 self.logger.debug(
                     f"concatenating buffer with {self.buffer.num_rows} rows to table with {table.num_rows} rows"
                 )
-                table = pa.concat_tables([self.buffer, table], unicode_promote_options="permissive")
-                self.logger.debug(f"concatenated table has {table.num_rows} rows")
+                #table = pa.concat_tables([self.buffer, table], unicode_promote_options="permissive")
+                table = pa.concat_tables([self.buffer, table])
                 self.buffer = None
-            except Exception as e:  # Can happen if schemas are different
-                # Throw away the buffer and try and keep the current table by placing it in the buffer.
-                self.buffer = table
-                raise ValueError(
-                    "Can not concatenate buffered table with input table. Dropping buffer and proceeding."
-                ) from e
+                self.logger.debug(f"concatenated table has {table.num_rows} rows")
+            except Exception as _:  # Can happen if schemas are different
+                # Raise unrecoverable error to stop the execution
+                self.logger.warning(f"table in {file_name} can't be merged with the buffer")
+                self.logger.warning(f"incoming table columns {table.schema.names} ")
+                self.logger.warning(f"buffer columns {self.buffer.schema.names}")
+                raise UnrecoverableException()
 
         result = []
         start_row = 0
