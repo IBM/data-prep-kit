@@ -63,6 +63,7 @@ Support for additional data modalities is expected in the future and additional 
 ## Data Preparation Modules <a name = "modules"></a>
 The below matrix shows the the combination of modules and supported runtimes. All the modules can be accessed [here](/transforms) and can be combined to form data processing pipelines, as shown in [examples](/examples) folder. 
 
+
 |Modules                         | Python-only        | Ray              | Spark            | KFP on Ray             |
 |------------------------------  |--------------------|------------------|------------------|------------------------|
 |No-op / template                | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
