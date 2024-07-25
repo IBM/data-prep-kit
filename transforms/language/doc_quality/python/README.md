@@ -24,7 +24,7 @@ The set of dictionary keys holding [DocQualityTransform](src/doc_quality_transfo
 configuration for values are as follows:
 
 * _text_lang_ - specifies language used in the text content. By default, "en" is used.
-* _doc_content_column_ - specifies column name that contains document text.
+* _doc_content_column_ - specifies column name that contains document text. By default, "contents" is used.
 * _bad_word_filepath_ - specifies a path to bad word file: local folder (file or directory) that points to bad word file.
 
 ## Running
@@ -35,9 +35,9 @@ the following command line arguments are available in addition to
 the options provided by 
 the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 ```
-  --docq_text_lang DOCQ_TEXT_LANG   language used in the text content. By default, "en" is used
-  --docq_doc_content_column DOCQ_DOC_CONTENT_COLUMN   column name that contain document text. By default, "contents" is used
-  --docq_bad_word_filepath DOCQ_BAD_WORD_FILEPATH   path to bad word file: local folder (file or directory) that points to bad word file
+  --docq_text_lang DOCQ_TEXT_LANG   language used in the text content. By default, "en" is used.
+  --docq_doc_content_column DOCQ_DOC_CONTENT_COLUMN   column name that contain document text. By default, "contents" is used.
+  --docq_bad_word_filepath DOCQ_BAD_WORD_FILEPATH   path to bad word file: local folder (file or directory) that points to bad word file.
 ```
 These correspond to the configuration keys described above.
 
