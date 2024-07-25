@@ -75,7 +75,7 @@ class DocQualityTransform(AbstractTableTransform):
             self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=bad_word_filepath)
         else:
             if daf is None: 
-                raise RuntimeError(f"Failed to create a data factory for retrieving resources")
+                raise RuntimeError(f"Did not find DataAccessFactory instance under {data_factory_internal_key} key. This is required when bad word file is not in the local file system.")
             logger.info(f"Load badwords from remote")
             data_access = daf.create_data_access()
             import tempfile
