@@ -99,6 +99,7 @@ class AbstractTest:
             for j in range(rows1):
                 r1 = t1.take([j])
                 r2 = t2.take([j])
+                # assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {r2}"
                 AbstractTest.validate_expected_row(i, j, r1, r2)
 
     @staticmethod
