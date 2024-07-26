@@ -118,8 +118,6 @@ class AbstractTest:
         if test_row != expected_row:
             # Else look for floating point values that might differ within the allowance
             msg = f"Row {row_index} of table {table_index} are not equal\n\tTransformed: {test_row}\n\tExpected   : {expected_row}"
-            # test_columns = test_row
-            # expected_columns = test_row
             assert len(test_row) == len(expected_row), msg
             num_columns = test_row.num_columns
             for i in range(num_columns):
