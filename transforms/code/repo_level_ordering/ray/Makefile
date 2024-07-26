@@ -7,8 +7,9 @@ REPOROOT=../../../..
 
 include $(REPOROOT)/transforms/.make.transforms
 
+BASE_IMAGE=$(RAY_BASE_IMAGE)
+
 TRANSFORM_NAME=repo_level_order
-DOCKER_IMAGE_VERSION=${REPO_LVL_ORDER_RAY_VERSION}
 
 venv::	.transforms.ray-venv
 
