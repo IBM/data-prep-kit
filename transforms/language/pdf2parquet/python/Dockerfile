@@ -1,11 +1,5 @@
 FROM docker.io/python:3.10.14-slim-bullseye
 
-RUN \
-    apt-get update \
-    # for opencv, towhee
-    && apt-get install -y libgl1 libglib2.0-0 curl wget \
-    && apt-get clean
-
 RUN pip install --upgrade pip 
 
 # install pytest
@@ -15,6 +9,12 @@ RUN pip install --no-cache-dir pytest
 RUN useradd -ms /bin/bash dpk
 USER dpk
 WORKDIR /home/dpk
+
+RUN \
+    apt-get update \
+    # for opencv, towhee
+    && apt-get install -y libgl1 libglib2.0-0 curl wget \
+    && apt-get clean
 
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).

@@ -2,14 +2,17 @@ ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
 
 FROM ${BASE_IMAGE}
 
+RUN pip install --ugrade pip 
+
+# install pytest
+RUN pip install --no-cache-dir pytest
+
 RUN \
     sudo apt-get update \
     # for opencv, towhee
     && sudo apt-get install -y libgl1 libglib2.0-0 curl wget \
     && sudo apt-get clean
 
-# install pytest
-RUN pip install --no-cache-dir pytest
 
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).

@@ -2,7 +2,9 @@ ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
 
 FROM ${BASE_IMAGE}
 
-# install pytest
+RUN pip install --upgrade pip 
+
+# Install pytest so we can test the image later
 RUN pip install --no-cache-dir pytest
 
 # Copy and install data processing libraries 
