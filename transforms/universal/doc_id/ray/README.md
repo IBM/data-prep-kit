@@ -19,7 +19,7 @@ To enable this annotation, set `int_id_column` to the name of the column, where 
 to store it. 
 
 Document IDs are generally useful for tracking annotations to specific documents. Additionally 
-[fuzzy deduping](../fdedup) relies on integer IDs to be present. If your dataset does not have
+[fuzzy deduping](../../fdedup) relies on integer IDs to be present. If your dataset does not have
 document ID column(s), you can use this transform to create ones.
 
 ## Building
@@ -34,7 +34,7 @@ make build
 
 ## Configuration and command line Options
 
-The set of dictionary keys defined in [DocIDTransform](src/doc_id_transform.py)
+The set of dictionary keys defined in [DocIDTransform](src/doc_id_transform_ray.py)
 configuration for values are as follows:
 
 * _doc_column_ - specifies name of the column containing the document (required for ID generation)
@@ -83,3 +83,9 @@ Then
 ls output
 ```
 To see results of the transform.
+
+### Transforming data using the transform image
+
+To use the transform image to transform your data, please refer to the 
+[running images quickstart](../../../../doc/quick-start/run-transform-image.md),
+substituting the name of this transform image and runtime as appropriate.

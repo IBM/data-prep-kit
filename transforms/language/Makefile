@@ -1,6 +1,6 @@
 REPOROOT=../..
 # Use make help to see the avialable rules
-include ../../.make.defaults
+include $(REPOROOT)/.make.defaults
 
 clean::
 	@# Help: Recursively clean all subdirs 
@@ -38,9 +38,17 @@ set-versions:
 	@# Help: Recursively $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
-load-image::
+kind-load-image::
 	@# Help: Recursively make $@ in all subdirs
 	@$(MAKE) RULE=$@ .recurse
+
+docker-load-image::
+	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
+
+docker-save-image::
+	@# Help: Recursively make $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
 
 workflow-venv::
 	@# Help: Recursively make $@ in subdirs

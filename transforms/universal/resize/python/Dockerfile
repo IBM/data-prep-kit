@@ -21,8 +21,10 @@ COPY --chown=dpk:users pyproject.toml pyproject.toml
 COPY --chown=dpk:users README.md Readme.md
 RUN pip install --no-cache-dir -e .
 
-# copy source data
+# copy the main() entry point to the image 
 COPY ./src/resize_transform_python.py .
+
+# copy some of the samples in
 COPY ./src/resize_local.py local/
 
 # copy test

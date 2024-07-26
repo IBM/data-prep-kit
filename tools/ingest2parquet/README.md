@@ -19,6 +19,11 @@ Each file contained within the ZIP is transformed into a distinct row within the
 - **Description:** Name of the ZIP file containing the current file.
 - **Example:** `"document": "example.zip"`
 
+**repo_name:**
+
+- **Description:** Name of the repository the code belongs to. Repo_name is same as zip file name.
+- **Example:** `"repo_name": "data"`
+
 **contents:** (string)
 
 - **Description:** Content of the file, converted to a string.

@@ -66,7 +66,8 @@ def test_table_read_write():
         # save the table
         l, result, _ = d_a.save_table(path=output_location, table=r_table)
         print(f"length of saved table {l}, result {result}")
-        assert 36132 == l
+        # expected byte length changed due to compression option updated to ZSTD
+        assert 35419 == l
         table, _ = d_a.get_table(output_location)
         s_columns = table.column_names
         assert len(r_columns) == len(s_columns)

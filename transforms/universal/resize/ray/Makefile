@@ -8,8 +8,8 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=resize
-DOCKER_IMAGE_VERSION=${RESIZE_RAY_VERSION}
 
+BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
 
 test::	.transforms.ray-test
@@ -34,7 +34,7 @@ setup:: .transforms.setup
 
 # set the version of python transform that this depends on.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${DOCKER_IMAGE_VERSION} .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${RESIZE_PYTHON_VERSION} TOML_VERSION=$(RESIZE_RAY_VERSION) .transforms.set-versions
 
 build-dist:: set-versions .defaults.build-dist
 
@@ -48,4 +48,8 @@ run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image

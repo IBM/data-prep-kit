@@ -20,8 +20,10 @@ COPY --chown=root:root src/ src/
 COPY --chown=root:root pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
-# copy source data
+# copy in the main() entry point to the image 
 COPY ./src/noop_transform_spark.py .
+
+# Copy in some samples
 COPY ./src/noop_local_spark.py local/
 
 # copy test

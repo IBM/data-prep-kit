@@ -32,12 +32,12 @@ class TestResizeTransform(AbstractTableTransformTest):
         input_tables = get_tables_in_folder(input_dir)
         expected_metadata_list = [{}] * (1 + len(input_tables))
 
-        config = {"max_rows_per_table": 125}
-        expected_tables = get_tables_in_folder(os.path.join(basedir, "expected-rows-125"))
-        fixtures.append((ResizeTransform(config), input_tables, expected_tables, expected_metadata_list))
-
         config = {"max_rows_per_table": 300}
         expected_tables = get_tables_in_folder(os.path.join(basedir, "expected-rows-300"))
+        fixtures.append((ResizeTransform(config), input_tables, expected_tables, expected_metadata_list))
+
+        config = {"max_rows_per_table": 125}
+        expected_tables = get_tables_in_folder(os.path.join(basedir, "expected-rows-125"))
         fixtures.append((ResizeTransform(config), input_tables, expected_tables, expected_metadata_list))
 
         config = {"max_mbytes_per_table": 0.05}

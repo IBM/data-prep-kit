@@ -21,9 +21,10 @@ COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
-
-# copy source data
+# copy the main() entry point to the image 
 COPY ./src/proglang_select_transform_python.py .
+
+# copy some of the samples in
 COPY ./src/proglang_select_local.py local/
 
 # copy test
