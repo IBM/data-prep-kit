@@ -1,8 +1,8 @@
 [project]
-name = "dpk_ededup_transform_ray"
+name = "dpk_ededup_transform_python"
 version = "0.2.1.dev0"
 requires-python = ">=3.10"
-description = "ededup Ray Transform"
+description = "ededup Python Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -10,9 +10,9 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit-ray==0.2.1.dev0",
-    "dpk_ededup_transform_python==0.2.1.dev0",
-    "tqdm==4.66.3",
+    "data-prep-toolkit==0.2.1.dev0",
+    "mmh3==4.1.0",
+    "xxhash==3.4.1",
 ]
 
 [build-system]
