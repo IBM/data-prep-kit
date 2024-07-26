@@ -13,31 +13,28 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-from doc_quality_transform import (
-    DocQualityTransform,
-    bad_word_filepath_key,
-    doc_content_column_key,
-    text_lang_key,
-)
-
+from ededup_transform_python import EdedupPythonTransform
 
 # create parameters
-basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
-input_folder = os.path.join(basedir, "test-data", "input")
-doc_quality_params = {
-    text_lang_key: "en",
-    doc_content_column_key: "contents",
-    bad_word_filepath_key: os.path.join(basedir, "ldnoobw", "en"),
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
+local_conf = {
+    "input_folder": input_folder,
+    "output_folder": output_folder,
 }
+
+ededup_params = {"doc_column": "contents"}
+
 if __name__ == "__main__":
-    # Here we show how to run outside of the runtime
+    # Here we show how to run outside of ray
+    # Filter transform needs a DataAccess to ready the domain list.
+    data_access = DataAccessLocal(local_conf)
     # Create and configure the transform.
-    transform = DocQualityTransform(doc_quality_params)
+    transform = EdedupPythonTransform(ededup_params)
     # Use the local data access to read a parquet table.
-    data_access = DataAccessLocal()
-    table, _ = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
-    print(f"input table: {table}")
+    table, _ = data_access.get_table(os.path.join(input_folder, "sample1.parquet"))
+    print(f"input table has {table.num_rows} rows")
     # Transform the table
     table_list, metadata = transform.transform(table)
-    print(f"\noutput table: {table_list}")
+    print(f"\noutput table has {table_list[0].num_rows} rows")
     print(f"output metadata : {metadata}")

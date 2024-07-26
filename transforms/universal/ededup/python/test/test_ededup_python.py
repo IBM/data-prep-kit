@@ -10,49 +10,25 @@
 # limitations under the License.
 ################################################################################
 
-import ast
 import os
 
-from code2parquet_transform import (  # domain_key,; snapshot_key,
-    detect_programming_lang_cli_key,
-    domain_cli_key,
-    snapshot_cli_key,
-    supported_langs_file_cli_key,
-)
-from code2parquet_transform_python import CodeToParquetPythonConfiguration
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
+from ededup_transform_python import EdedupPythonTransformConfiguration
 
 
-class TestPythonIngestToParquetTransform(AbstractTransformLauncherTest):
+class TestRayResizeTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
+        # The following based on 3 identical input files of about 39kbytes, and 200 rows
+        fixtures = []
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
-        lang_supported_file = os.path.abspath(
-            os.path.join(
-                basedir,
-                "languages/lang_extensions.json",
-            )
-        )
-        config = {
-            "data_files_to_use": ast.literal_eval("['.zip']"),
-            supported_langs_file_cli_key: lang_supported_file,
-            detect_programming_lang_cli_key: True,
-        }
-        fixtures = [
-            (
-                PythonTransformLauncher(CodeToParquetPythonConfiguration()),
-                config,
-                os.path.join(basedir, "input"),
-                os.path.join(basedir, "expected"),
-                # this is added as a fixture to remove these 2 columns from comparison
-                ["date_acquired", "document_id"],
-            )
-        ]
-        return fixtures
+        launcher = PythonTransformLauncher(EdedupPythonTransformConfiguration())
+        config = {"ededup_doc_column": "contents"}
+        return [(launcher, config, basedir + "/input", basedir + "/expected")]
