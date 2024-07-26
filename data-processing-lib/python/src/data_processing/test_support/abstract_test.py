@@ -118,14 +118,14 @@ class AbstractTest:
         if test_row != expected_row:
             # Else look for floating point values that might differ within the allowance
             msg = f"Row {row_index} of table {table_index} are not equal\n\tTransformed: {test_row}\n\tExpected   : {expected_row}"
-            test_columns = test_row
-            expected_columns = test_row
-            assert len(test_columns) == len(expected_columns), msg
+            # test_columns = test_row
+            # expected_columns = test_row
+            assert len(test_row) == len(expected_row), msg
             num_columns = test_row.num_columns
             for i in range(num_columns):
                 # Over each cell/column in the row
-                test_column = test_columns.column(i)
-                expected_column = expected_columns.column(i)
+                test_column = test_row.column(i)
+                expected_column = expected_row.column(i)
                 if test_column != expected_column:
                     # Check if the value is a float and if so, allow a fuzzy match
                     test_value = test_column.to_pylist()[0]
