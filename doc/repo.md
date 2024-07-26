@@ -22,7 +22,11 @@ git clone git@github.com:IBM/data-prep-kit.git
 cd data-prep-kit
 pre-commit install
 ```
-Please note that there are further installation steps for running the transforms in general, as documented [here](data-processing-lib/ray/README.md) and on a local Kind cluster or on an existing Kubernetes cluster, as documented [here](kfp/doc/setup.md).
+Please note that there are further installation steps 
+for running the transforms in general, as documented 
+[here](../data-processing-lib/ray/README.md) 
+and on a local Kind cluster or on an existing Kubernetes 
+cluster, as documented [here](../kfp/doc/setup.md).
 
 
 # Repository structure
