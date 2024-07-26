@@ -9,7 +9,7 @@ This project wraps the [noop transform](../python) with a Ray runtime.
 
 ## Configuration and command line Options
 
-Noop configuration and command line options are the same as for the base python transform. 
+Noop configuration and command line options are the same as for the [base python](../python) transform. 
 
 ## Running
 
