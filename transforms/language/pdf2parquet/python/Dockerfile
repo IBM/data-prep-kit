@@ -1,15 +1,15 @@
 FROM docker.io/python:3.10.14-slim-bullseye
 
+RUN pip install --upgrade --no-cache-dir pip 
+
+# install pytest
+RUN pip install --no-cache-dir pytest
+
 RUN \
     apt-get update \
     # for opencv, towhee
     && apt-get install -y libgl1 libglib2.0-0 curl wget \
     && apt-get clean
-
-RUN pip install --upgrade pip 
-
-# install pytest
-RUN pip install --no-cache-dir pytest
 
 # Create a user and use it to run the transform
 RUN useradd -ms /bin/bash dpk
