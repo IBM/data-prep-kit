@@ -42,7 +42,7 @@ if __name__ == "__main__":
     print(f"input table: {table}")
     # Transform the table
     try:
-        table_list, metadata = transform.transform(table[0])
+        table_list, metadata = transform.transform(table)
         print(f"\noutput table: {table_list}")
         print(f"output metadata : {metadata}")
     except Exception as e:
