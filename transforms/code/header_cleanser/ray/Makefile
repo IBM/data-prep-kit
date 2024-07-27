@@ -5,31 +5,31 @@ REPOROOT=../../../..
 include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=header_cleanser
-# $(REPOROOT)/.make.versions file contains the versions
-DOCKER_IMAGE_VERSION=${HEADER_CLEANSER_RAY_VERSION}
 
-venv::	.transforms.ray-venv
-
-test::	.transforms.ray-test
+BASE_IMAGE=${RAY_BASE_IMAGE}
 
 clean:: .transforms.clean
 
+test:: .transforms.ray-test
+
 image:: .transforms.ray-image
 
-test-src:: .transforms.test-src
+venv:: .transforms.ray-venv
 
-setup:: .transforms.setup
+test-src:: .transforms.test-src
 
 test-image:: .transforms.ray-test-image
 
 build:: build-dist image
 
-publish:: publish-dist publish-image
+publish: publish-image
 
 publish-image:: .transforms.publish-image-ray
 
-set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${DOCKER_IMAGE_VERSION} .transforms.set-versions 
+setup:: .transforms.setup
+
+set-versions: 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${HEADER_CLEANSER_PYTHON_VERSION} TOML_VERSION=$(HEADER_CLEANSER_RAY_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 
@@ -42,12 +42,14 @@ run-cli-sample:
 		--header_cleanser_license \"True\" "	\
                 .transforms.run-src-file
 
-run-local-python-only-sample: .transforms.run-local-sample
+run-local-sample: .transforms.run-local-ray-sample
 
-run-local-sample: .transforms.run-local-sample
-
-run-s3-sample: .transforms.run-s3-sample
+run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image

@@ -1,32 +1,30 @@
-# Define the root of the local git clone for the common rules to be able 
+
+# Define the root of the local git clone for the common rules to be able
 # know where they are running from.
 REPOROOT=../../../..
-# Include a library of common .transform.* targets which most
-# transforms should be able to reuse.  However, feel free
-# to override/redefine the rules below. 
-
-# $(REPOROOT)/.make.versions file contains the versions
-
-TRANSFORM_NAME=header_cleanser
-DOCKER_IMAGE_VERSION=${HEADER_CLEANSER_PYTHON_VERSION}
-
 include $(REPOROOT)/transforms/.make.transforms
 
-venv::	.transforms.python-venv
+TRANSFORM_NAME=header_cleanser
 
-test::	.transforms.python-test
-
+# Use default rule inherited from makefile.common
 clean:: .transforms.clean
 
+# Use default rule inherited from makefile.common
+test:: .transforms.python-test
+
+# Use default rule inherited from makefile.common
 image:: .transforms.python-image
+
+# Use default rule inherited from makefile.common
+venv:: .transforms.python-venv
 
 test-src:: .transforms.test-src
 
-setup:: .transforms.setup
+test-image:: .transforms.python-test-image
 
 build:: build-dist image
 
-publish:: publish-dist publish-image
+publish: publish-image
 
 publish-image:: .transforms.publish-image-python
 
@@ -34,13 +32,13 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(HEADER_CLEANSER_PYTHON_VERSION) TOML_VERSION=$(HEADER_CLEANSER_PYTHON_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 
-test-image:: .transforms.python-test-image
+setup:: .transforms.setup
 
 run-cli-sample: .transforms.run-cli-python-sample
 
@@ -48,6 +46,8 @@ run-local-sample: .transforms.run-local-sample
 
 run-local-python-sample: .transforms.run-local-python-sample
 
-minio-start:	.minio-start
+kind-load-image:: .transforms.kind-load-image
 
-load-image:: .transforms.load-image
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image

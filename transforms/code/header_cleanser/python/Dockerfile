@@ -2,21 +2,21 @@ FROM docker.io/python:3.11.9-slim-bullseye
 
 RUN pip install --upgrade pip 
 
+# install pytest
+RUN pip install --no-cache-dir pytest
+
 # Install system dependencies, including libgomp1
 RUN apt-get update && apt-get install -y \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
     
-# install pytest
-RUN pip install --no-cache-dir pytest
-
 # Create a user and use it to run the transform
 RUN useradd -ms /bin/bash dpk
 USER dpk
 WORKDIR /home/dpk
 
 # Create directories to mount volumnes for processing data outside of the image.
-RUN mkdir input && mkdir output
+# RUN mkdir input && mkdir output
 
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).

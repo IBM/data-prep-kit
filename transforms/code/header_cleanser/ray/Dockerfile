@@ -3,11 +3,6 @@ FROM docker.io/rayproject/ray:2.24.0-py310
 # install pytest
 RUN pip install --no-cache-dir pytest
 
-# Install system dependencies, including libgomp1
-RUN sudo apt-get update && sudo apt-get install -y \
-    libgomp1 \
-    && sudo rm -rf /var/lib/apt/lists/*
-
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
 COPY --chown=ray:users data-processing-lib-python/ data-processing-lib-python/
@@ -21,6 +16,11 @@ COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
+# Install system dependencies, including libgomp1
+RUN sudo apt-get update && sudo apt-get install -y \
+    libgomp1 \
+    && sudo rm -rf /var/lib/apt/lists/*
+    
 # copy source data
 COPY ./src/header_cleanser_transform_ray.py .
 COPY src/header_cleanser_local_ray.py local/
