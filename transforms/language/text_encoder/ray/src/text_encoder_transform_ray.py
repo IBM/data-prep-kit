@@ -24,7 +24,7 @@ from data_processing_ray.runtime.ray import RayTransformLauncher
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
-from text_encoder import TextEncoderTransformConfiguration
+from text_encoder_transform import TextEncoderTransformConfiguration
 
 
 logger = get_logger(__name__)
