@@ -13,6 +13,10 @@ DATA_PROFILER_NAME=syntactic_construct_extractor
 # include $(REPOROOT)/transforms/.make.transforms
 include $(REPOROOT)/tools/data-profiler/.make.profiler
 
-run-local-sample: .data-profiler.run-local-sample
+venv::	.data-profiler.python-venv
 
-clean:: .defaults.clean
+test::	.data-profiler.python-test
+
+clean:: .data-profiler.clean
+
+run-local-sample: .data-profiler.run-local-sample
