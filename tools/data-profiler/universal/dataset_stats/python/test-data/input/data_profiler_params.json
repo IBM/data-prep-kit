@@ -1,0 +1,10 @@
+{
+    "input": "qiskit.parquet",
+    "dynamic_schema_mapping": "True",
+    "instruction_col": "",
+    "input_code_col": "contents",
+    "output_code_col": "",
+    "code_language_col": "lang",
+    "code_language": "python",
+    "datatype": "EPT"
+}

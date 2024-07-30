@@ -1,0 +1,163 @@
+include $(REPOROOT)/.make.defaults
+
+DATA_PROFILER_RUNTIME?=$(shell basename $$(pwd))
+DOCKER_IMAGE_NAME?=$(DATA_PROFILER_NAME)-$(DATA_PROFILER_RUNTIME)
+# By convention the name of the python file is as follows and contains a main to start the ray-based transform
+# This file is used when starting the transformers in the Docker image.
+DATA_PROFILER_RUNTIME_SRC_FILE?=$(DATA_PROFILER_NAME)_transform_$(DATA_PROFILER_RUNTIME).py
+DATA_PROFILER_TEST_FILE?=test/test_$(DATA_PROFILER_NAME).py
+
+# The following taken from https://stackoverflow.com/a/65243296/45375
+# Lists all targets and optional help text found in the target.
+# :: rule means we first run the help from the main make.defaults.
+extra-help:	
+	@# Help: Shows additional make macros that can be overridden/used. 
+	@echo ""
+	@echo Overridable macro values include the following:
+	@echo DOCKER - the name of the docker executable to use.  DOCKER=$(DOCKER)
+	@echo DOCKER_FILE - the name of the docker file to use.  DOCKER_FILE=$(DOCKER_FILE)
+	@echo DOCKER_REGISTRY_ENDPOINT - the docker registry location to publish images.  DOCKER_REGISTRY_ENDPOINT=$(DOCKER_REGISTRY_ENDPOINT)
+	@echo DOCKER_HOSTNAME - the name of the docker registry to use.  DOCKER_HOSTNAME=$(DOCKER_HOSTNAME)
+	@echo DOCKER_NAMESPACE - the name space to use in the registry.  DOCKER_NAMESPACE=$(DOCKER_NAMESPACE)
+	@echo DOCKER_IMAGE_NAME - the name under the name space where images are publishes.  DOCKER_IMAGE_NAME=$(DOCKER_IMAGE_NAME)
+	@echo DOCKER_REGISTRY_USER - the docker user to use.  DOCKER_REGISTRY_USER=$(DOCKER_REGISTRY_USER)
+	@echo DOCKER_REGISTRY_KEY - the docker user to use.  DOCKER_REGISTRY_KEY=secret
+	@echo PYTHON - the python executable to use.  PYTHON=$(PYTHON)
+	@echo "DATA_PROFILER_RUNTIME_SRC_FILE is the base name of the python source file containing the main() (e.g. noop_local_ray.py)"
+	@echo ""
+
+.PHONY: .data-profiler.setup
+.data-profiler.setup::
+	@# Help: Do nothing, since nothing to setup by default. 
+
+.PHONY: .data-profiler.check_required_macros
+.data-profiler.check_required_macros::
+	@if [ -z "$(DATA_PROFILER_RUNTIME)" ]; then	\
+	    echo ERROR: DATA_PROFILER_RUNTIME must be defined.;	\
+	fi			
+	@if [ -z "$(DATA_PROFILER_NAME)" ]; then	\
+	    echo ERROR: DATA_PROFILER_NAME must be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_IMAGE_VERSION)" ]; then	\
+	    echo ERROR: DOCKER_IMAGE_VERSION must be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_REGISTRY_USER)" ]; then	\
+	    echo ERROR: DOCKER_REGISTRY_USER must be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_REGISTRY_KEY)" ]; then	\
+	    echo ERROR: DOCKER_REGISTRY_KEYmust be defined.;	\
+	fi			
+	@if [ -z "$(DOCKER_HOSTNAME)" ]; then	\
+	    echo ERROR: DOCKER_HOSTNAME must be defined.;	\
+	fi
+
+.PHONY: .data-profiler.clean
+.data-profiler.clean:: .defaults.clean
+	$(MAKE) minio-stop  
+	-rm -rf output > /dev/null 2>&1			# Created when running local samples
+	-rm -rf python-transform > /dev/null 2>&1	# Created when build ray and spark image 
+	@# Help: Normal cleanups plus stop minio server and rm output dir
+
+
+# Create the local virtual environment, assuming python is already installed and available
+# We upgrade pip as that seems to be required by watson_nlp
+# We install wheel, because it seems to be required for fasttext install on redhat.
+# We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
+# they will end up installing into that PYTHON and NOT the venv.
+.PHONY: .data-profiler.python-venv
+.data-profiler.python-venv:: .defaults.python-lib-src-venv
+
+.PHONY: .data-profiler.check_env
+.data-profiler.check_env::
+	@true
+
+.PHONY: .data-profiler.python-image
+.data-profiler.python-image:: .defaults.python-lib-src-image
+
+.PHONY: .data-profiler.python-build
+.data-profiler.python-build:: .data-profiler.python-venv .data-profiler.python-image	
+	@# Help: Create the venv and build the transform image 
+
+.PHONY: .data-profiler.python-test 
+.data-profiler.python-test::  .data-profiler.test-src .data-profiler.python-test-image
+	@# Help: Run both source and image level tests.
+
+# Assumes the runtime-specific venv has already been built.
+.PHONY: .data-profiler.test-src
+.data-profiler.test-src::  .defaults.test-src .data-profiler.test-locals
+	@# Help: Run the transform's tests and any '*local' .py files
+
+.PHONY: test-locals
+test-locals:: .data-profiler.test-locals
+
+.PHONY: .data-profiler.test-locals
+.data-profiler.test-locals:: .defaults.test-locals
+
+.PHONY: .data-profiler-check-exists
+.data-profiler-check-exists:
+	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
+	if  [ -z "$$exists" ]; then				\
+	    echo $$REQ create $(CHECK_FILE_NAME) in directory $(CHECK_DIR); 	\
+	fi
+
+.PHONY: .data-profiler-check-not-exists
+.data-profiler-check-not-exists:
+	@exists=$$(find $(CHECK_DIR) -name $(CHECK_FILE_NAME));	\
+	if  [ ! -z "$$exists" ]; then				\
+	    echo $REQ remove file $(CHECK_FILE_NAME) from directory $(CHECK_DIR); 	\
+	fi
+
+.PHONY: .data-profiler-check-target
+.data-profiler-check-target:
+	@exists=$$(grep "^$(CHECK_TARGET):" Makefile);		\
+	if  [ -z "$$exists" ]; then				\
+	    echo Missing makefile target $(CHECK_TARGET); 	\
+	fi
+
+.PHONY: .data-profiler-check-dir-size
+.data-profiler-check-dir-size:
+	@mb=$$(du -sm $(CHECK_DIR) | awk '{print $$1}');	\
+	if  [ $$mb -gt 15 ]; then				\
+	    echo Directory $(CHECK_DIR) is very large;		\
+	fi
+
+.PHONY: conventions
+conventions: .data-profiler.check_required_macros
+	@# Help: Check transform project conventions and make recommendations, if needed.
+	@echo "Begin checking transform conventions for $(DATA_PROFILER_RUNTIME) runtime project.  Recommendations/issues, if any, follow..."
+	@if [ "$(DATA_PROFILER_RUNTIME)" = "python" ]; then	\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(DATA_PROFILER_NAME)_transform.py REQ=Must .data-profiler-check-exists;		\
+		$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(DATA_PROFILER_NAME).py REQ=Must .data-profiler-check-exists;	\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(DATA_PROFILER_NAME)_local.py REQ=Should .data-profiler-check-exists;	\
+	else	\
+		$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(DATA_PROFILER_NAME).py REQ=Must .data-profiler-check-not-exists;		\
+	fi
+	@$(MAKE) CHECK_DIR=test CHECK_FILE_NAME=test_$(DATA_PROFILER_NAME)_$(DATA_PROFILER_RUNTIME).py REQ=Must .data-profiler-check-exists
+	@$(MAKE) CHECK_DIR=src CHECK_FILE_NAME=$(DATA_PROFILER_NAME)_local_$(DATA_PROFILER_RUNTIME).py REQ=Should .data-profiler-check-exists
+	@$(MAKE) CHECK_DIR=test-data CHECK_FILE_NAME=output  REQ=Must .data-profiler-check-not-exists
+	@$(MAKE) CHECK_DIR=. CHECK_FILE_NAME=.dockerignore  REQ=Should .data-profiler-check-exists
+	@$(MAKE) CHECK_DIR=test-data .data-profiler-check-dir-size
+	@$(MAKE) CHECK_TARGET=build .data-profiler-check-target
+	@$(MAKE) CHECK_TARGET=clean .data-profiler-check-target
+	@$(MAKE) CHECK_TARGET=image .data-profiler-check-target
+	@$(MAKE) CHECK_TARGET=publish .data-profiler-check-target
+	@$(MAKE) CHECK_TARGET=setup .data-profiler-check-target
+	@$(MAKE) CHECK_TARGET=test .data-profiler-check-target
+	@$(MAKE) CHECK_TARGET=test-src .data-profiler-check-target
+	@$(MAKE) CHECK_TARGET=test-image .data-profiler-check-target
+	@$(MAKE) CHECK_TARGET=set-versions .data-profiler-check-target
+	@$(MAKE) CHECK_TARGET=venv .data-profiler-check-target
+	@z=$$(echo $(DATA_PROFILER_NAME) | grep annotator);				\
+	if [ ! -z "$$z" ]; then	 					\
+		echo "Recommend not using 'annotator' in your transform name";	\
+	fi
+	@echo Done checking transform project conventions.
+
+
+.PHONY: .data-profiler.run-local-sample
+.data-profiler.run-local-sample:
+	$(MAKE) RUN_FILE=$(DATA_PROFILER_NAME)_local.py .data-profiler.run-src-file
+
+# Expects RUN_FILE
+.PHONY: .data-profiler.run-src-file
+.data-profiler.run-src-file: .defaults.run-src-file

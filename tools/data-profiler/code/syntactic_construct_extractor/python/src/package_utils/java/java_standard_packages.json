@@ -1,0 +1,4592 @@
+[
+    {
+        "package": "java.applet",
+        "description": "Provides the classes necessary to create an applet and the classes an applet\nuses to communicate with its applet context.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.awt",
+        "description": "Contains all of the classes for creating user\ninterfaces and for painting graphics and images.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.awt.datatransfer",
+        "description": "Provides interfaces and classes for transferring data\nbetween and within applications.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.awt.dnd",
+        "description": "Drag and Drop is a direct manipulation gesture found in many Graphical\nUser Interface systems that provides a mechanism to transfer\ninformation between two entities logically associated with presentation\nelements in the GUI.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.awt.event",
+        "description": "Provides interfaces and classes for dealing with different\ntypes of events fired by AWT components.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.awt.font",
+        "description": "Provides classes and interface relating to fonts.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.awt.im",
+        "description": "Provides classes and interfaces for the input method framework.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.awt.im.spi",
+        "description": "Provides interfaces that enable the development of input methods\nthat can be used with any Java runtime environment.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.awt.image",
+        "description": "Provides classes for creating and modifying images.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.awt.image.renderable",
+        "description": "Provides classes and interfaces for producing\nrendering-independent images.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.beans",
+        "description": "Contains classes related to developing\nbeans -- components\nbased on the JavaBeans\u2122 architecture.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.beans.beancontext",
+        "description": "Provides classes and interfaces relating to bean context.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.io",
+        "description": "Provides for system input and output through data streams,\nserialization and the file system.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.lang",
+        "description": "Provides classes that are fundamental to the design of the Java\n programming language.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.lang.invoke",
+        "description": "The java.lang.invoke package contains dynamic language support provided directly by\n the Java core class libraries and virtual machine.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.lang.management",
+        "description": "Provides the management interfaces for monitoring and management of the\nJava virtual machine and other components in the Java runtime.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.math",
+        "description": "Provides classes for performing arbitrary-precision integer\n arithmetic (BigInteger) and arbitrary-precision decimal\n arithmetic (BigDecimal).",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.net",
+        "description": "Provides the classes for implementing networking applications.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.nio.channels",
+        "description": "Defines channels, which represent connections to entities that are capable of\n performing I/O operations, such as files and sockets; defines selectors, for\n multiplexed, non-blocking I/O operations.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.nio.channels.spi",
+        "description": "Service-provider classes for the java.nio.channels package.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.nio.charset",
+        "description": "Defines charsets, decoders, and encoders, for translating between bytes and\nUnicode characters.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.nio.charset.spi",
+        "description": "Service-provider classes for the java.nio.charset package.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.nio.file",
+        "description": "Defines interfaces and classes for the Java virtual machine to access files,\n file attributes, and file systems.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.nio.file.attribute",
+        "description": "Interfaces and classes providing access to file and file system attributes.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.nio.file.spi",
+        "description": "Service-provider classes for the java.nio.file package.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.rmi.activation",
+        "description": "Provides support for RMI Object Activation.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.security",
+        "description": "Provides the classes and interfaces for the security framework.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.security.acl",
+        "description": "The classes and interfaces in this package have been\n superseded by classes in the java.security package.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.security.cert",
+        "description": "Provides classes and interfaces for parsing and managing\n certificates, certificate revocation lists (CRLs), and\n certification paths.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.sql",
+        "description": "Provides the API for accessing and processing data stored in a \ndata source (usually a relational database) using the \nJavaTM programming language.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.text",
+        "description": "Provides classes and interfaces for handling text, dates, numbers, and messages\nin a manner independent of natural languages.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.text.spi",
+        "description": "Service provider classes for the classes in the java.text package.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.time",
+        "description": "The main API for dates, times, instants, and durations.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.time.chrono",
+        "description": "Generic API for calendar systems other than the default ISO.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.time.format",
+        "description": "Provides classes to print and parse dates and times.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.time.temporal",
+        "description": "Access to date and time using fields and units, and date time adjusters.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.time.zone",
+        "description": "Support for time-zones and their rules.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.util",
+        "description": "Contains the collections framework, legacy collection classes, event model,\ndate and time facilities, internationalization, and miscellaneous utility\nclasses (a string tokenizer, a random-number generator, and a bit array).",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.util.concurrent",
+        "description": "Utility classes commonly useful in concurrent programming.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.util.concurrent.locks",
+        "description": "Interfaces and classes providing a framework for locking and waiting\n for conditions that is distinct from built-in synchronization and\n monitors.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.util.function",
+        "description": "Functional interfaces provide target types for lambda expressions\n and method references.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.util.jar",
+        "description": "Provides classes for reading and writing the JAR (Java ARchive) file\nformat, which is based on the standard ZIP file format with an\noptional manifest file.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.util.logging",
+        "description": "Provides the classes and interfaces of \nthe JavaTM 2\n platform's core logging facilities.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.util.prefs",
+        "description": "This package allows applications to store and retrieve user and system\npreference and configuration data.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.util.spi",
+        "description": "Service provider classes for the classes in the java.util package.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.util.stream",
+        "description": "Classes to support functional-style operations on streams of elements, such\n as map-reduce transformations on collections.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "java.util.zip",
+        "description": "Provides classes for reading and writing the standard ZIP and GZIP\nfile formats.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.accessibility",
+        "description": "Defines a contract between user-interface components and an assistive technology\nthat provides access to those components.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.activation",
+        "description": "",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.annotation.processing",
+        "description": "Facilities for declaring annotation processors and for\n allowing annotation processors to communicate with an annotation processing\n tool environment.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.imageio",
+        "description": "The main package of the Java Image I/O API.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.imageio.event",
+        "description": "A package of the Java Image I/O API dealing with synchronous\nnotification of events during the reading and writing of images.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.imageio.metadata",
+        "description": "A package of the Java Image I/O API dealing with reading and writing\nmetadata.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.imageio.plugins.bmp",
+        "description": "Package containing the public classes used by the built-in BMP plug-in.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.imageio.plugins.jpeg",
+        "description": "Classes supporting the built-in JPEG plug-in.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.imageio.spi",
+        "description": "A package of the Java Image I/O API containing the plug-in interfaces\nfor readers, writers, transcoders, and streams, and a runtime\nregistry.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.lang.model",
+        "description": "Classes and hierarchies of packages used to model the Java\n programming language.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.lang.model.element",
+        "description": "Interfaces used to model elements of the Java programming language.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.lang.model.type",
+        "description": "Interfaces used to model Java programming language types.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.lang.model.util",
+        "description": "Utilities to assist in the processing of\n program elements and\n types.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.management",
+        "description": "Provides the core classes for the Java Management Extensions.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.management.loading",
+        "description": "Provides the classes which implement advanced dynamic\n        loading.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.management.monitor",
+        "description": "Provides the definition of the monitor classes.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.management.openmbean",
+        "description": "Provides the open data types and Open MBean descriptor classes.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.management.relation",
+        "description": "Provides the definition of the Relation Service.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.management.remote",
+        "description": "Interfaces for remote access to\n        JMX MBean servers.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.management.remote.rmi",
+        "description": "The RMI connector is a connector for the JMX Remote API that\n      uses RMI to transmit client requests to a remote MBean server.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.management.timer",
+        "description": "Provides the definition of the Timer MBean.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.naming",
+        "description": "Provides the classes and interfaces for accessing naming services.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.naming.directory",
+        "description": "Extends the javax.naming package to provide functionality\nfor accessing directory services.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.naming.event",
+        "description": "Provides support for event notification when accessing naming and\ndirectory services.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.naming.ldap",
+        "description": "Provides support for LDAPv3 extended operations and controls.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.naming.spi",
+        "description": "",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.net.ssl",
+        "description": "Provides classes for the secure socket package.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.print.attribute",
+        "description": "Provides classes and interfaces\nthat describe the types of JavaTM Print\nService attributes and how they can be collected into attribute sets.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.print.attribute.standard",
+        "description": "Package javax.print.attribute.standard\ncontains classes for specific printing attributes.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.print.event",
+        "description": "Package javax.print.event contains event classes  and listener interfaces.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.script",
+        "description": "The scripting API consists of interfaces and classes that define\nJava TM Scripting Engines and provides\na framework for their use in Java applications.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.security.auth",
+        "description": "This package provides a framework for authentication and\n authorization.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.security.auth.callback",
+        "description": "This package provides the classes necessary for services\n to interact with applications in order to retrieve\n information (authentication data including usernames\n or passwords, for example) or to display information\n (error and warning messages, for example).",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.security.auth.kerberos",
+        "description": "This package contains utility classes related to the Kerberos network\n authentication protocol.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.security.auth.login",
+        "description": "This package provides a pluggable authentication framework.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.security.auth.spi",
+        "description": "This package provides the interface to be used for\n implementing pluggable authentication modules.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.security.auth.x500",
+        "description": "This package contains the classes that should be used to store\n X500 Principal and X500 Private Credentials in a\n Subject.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.security.sasl",
+        "description": "Contains class and interfaces for supporting SASL.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.sound.midi",
+        "description": "Provides interfaces and classes for I/O, sequencing, and synthesis of MIDI \n(Musical Instrument Digital Interface) data.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.sound.sampled",
+        "description": "Provides interfaces and classes for capture, processing, and playback of sampled audio data.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.sql",
+        "description": "Provides the API for server side data source access and processing from\nthe JavaTM programming language.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.sql.rowset",
+        "description": "Standard interfaces and base classes for JDBC RowSet\nimplementations.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.sql.rowset.serial",
+        "description": "Provides utility classes to allow serializable mappings between SQL types\nand data types in the Java programming language.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.sql.rowset.spi",
+        "description": "The standard classes and interfaces that a third party vendor has to\nuse in its implementation of a synchronization provider.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing",
+        "description": "Provides a set of \"lightweight\"\n(all-Java language) components that,\nto the maximum degree possible, work the same on all platforms.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing.event",
+        "description": "Provides for events fired by Swing components.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing.plaf.basic",
+        "description": "Provides user interface objects built according to the\nBasic look and feel.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing.plaf.metal",
+        "description": "Provides user interface objects built according to\nthe Java look and feel (once codenamed Metal),\nwhich is the default look and feel.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing.plaf.multi",
+        "description": "Provides user interface objects that combine two or more look and feels.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing.plaf.synth",
+        "description": "Synth is a skinnable look and feel in which all painting is\n      delegated.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing.table",
+        "description": "Provides classes and interfaces for dealing with\njavax.swing.JTable.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing.text",
+        "description": "Provides classes and interfaces that deal with editable\nand noneditable text components.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing.text.html",
+        "description": "Provides the class HTMLEditorKit and supporting classes\nfor creating HTML text editors.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing.text.html.parser",
+        "description": "Provides the default HTML parser, along with support classes.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing.tree",
+        "description": "Provides classes and interfaces for dealing with\njavax.swing.JTree.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.swing.undo",
+        "description": "Allows developers to provide support for undo/redo\nin applications such as text editors.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.tools",
+        "description": "Provides interfaces for tools which can be invoked from a program,\n for example, compilers.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.bind",
+        "description": "Provides a runtime binding framework for client applications including\n        unmarshalling, marshalling, and validation capabilities.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.crypto",
+        "description": "Common classes for XML cryptography.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.crypto.dom",
+        "description": "DOM-specific classes for the javax.xml.crypto package.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.crypto.dsig",
+        "description": "Classes for generating and validating XML digital\nsignatures.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.crypto.dsig.keyinfo",
+        "description": "Classes for parsing and processing KeyInfo elements and structures.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.crypto.dsig.spec",
+        "description": "Parameter classes for XML digital signatures.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.datatype",
+        "description": "XML/Java Type Mappings.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.namespace",
+        "description": "XML Namespace processing.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.soap",
+        "description": "Provides the API for creating and building SOAP messages.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.stream",
+        "description": "",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.stream.events",
+        "description": "",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.stream.util",
+        "description": "",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.transform",
+        "description": "This package defines the generic APIs for processing transformation\ninstructions, and performing a transformation from source to result.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.ws",
+        "description": "This package contains the core JAX-WS APIs.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.ws.handler",
+        "description": "This package defines APIs for message handlers.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.ws.handler.soap",
+        "description": "This package defines APIs for SOAP message handlers.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.ws.soap",
+        "description": "This package defines APIs specific to the SOAP binding.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.ws.spi",
+        "description": "This package defines SPIs for JAX-WS.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.ws.spi.http",
+        "description": "Provides HTTP SPI that is used for portable deployment of JAX-WS\n  web services in containers(for e.g.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "javax.xml.xpath",
+        "description": "This package provides an object-model neutral API for the\nevaluation of XPath expressions and access to the evaluation\nenvironment.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "org.omg.CORBA",
+        "description": "Provides the mapping of the OMG CORBA APIs to the JavaTM\nprogramming language, including the class ORB, which is implemented\nso that a programmer can use it as a fully-functional Object Request Broker\n(ORB).",
+        "concept": "utitlity"
+    },
+    {
+        "package": "org.xml.sax",
+        "description": "This package provides the core SAX APIs.",
+        "concept": "utitlity"
+    },
+    {
+        "package": "org.xml.sax.helpers",
+        "description": "This package contains \"helper\" classes, including\nsupport for bootstrapping SAX-based applications.",
+        "concept": "utitlity"
+    },
+    {
+        "Package": "com.sun.jarsigner",
+        "Description": "This package comprises the interfaces and classes used to define the\n signing mechanism used by the jarsigner tool.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.javadoc",
+        "Description": "Note: The declarations in this package have been superseded by those\nin the package jdk.javadoc.doclet.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.jdi.connect",
+        "Description": "This package defines connections between the virtual machine\n using the JDI and the target virtual machine.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.jdi.event",
+        "Description": "This package defines JDI events and event processing.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.management",
+        "Description": "This package contains the JDK's extension to\n the standard implementation of the\n java.lang.management API and also defines the management\n interface for some other components of the platform.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.net.httpserver.spi",
+        "Description": "Provides a pluggable service provider interface, which allows the HTTP server\n implementation to be replaced with other implementations.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.security.auth",
+        "Description": "Provides implementations of Principal.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.security.auth.login",
+        "Description": "Provides an implementation of Configuration.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.security.jgss",
+        "Description": "This package defines classes and interfaces for the JDK extensions\n to the GSS-API.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.source.tree",
+        "Description": "Provides interfaces to represent source code as abstract syntax\n trees (AST).",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.tools.attach",
+        "Description": "Provides the API to attach to a Java™ virtual machine.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.tools.javac",
+        "Description": "This package provides a legacy entry point for the javac tool.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "com.sun.tools.jconsole",
+        "Description": "This package contains the JConsole API.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.awt",
+        "Description": "Contains all of the classes for creating user interfaces and for painting\n graphics and images.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.awt.datatransfer",
+        "Description": "Provides interfaces and classes for transferring data between and within\n applications.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.awt.dnd",
+        "Description": "Drag and Drop is a direct manipulation gesture found in many Graphical User\n Interface systems that provides a mechanism to transfer information between\n two entities logically associated with presentation elements in the GUI.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.awt.font",
+        "Description": "Provides classes and interface relating to fonts.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.awt.im",
+        "Description": "Provides classes and interfaces for the input method framework.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.awt.image",
+        "Description": "Provides classes for creating and modifying images.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.awt.print",
+        "Description": "Provides classes and interfaces for a general printing API.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.beans.beancontext",
+        "Description": "Provides classes and interfaces relating to bean context.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.lang",
+        "Description": "Provides classes that are fundamental to the design of the Java\n programming language.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.lang.instrument",
+        "Description": "Provides services that allow Java programming language agents to instrument\n programs running on the JVM.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.lang.management",
+        "Description": "Provides the management interfaces for monitoring and management of the\nJava virtual machine and other components in the Java runtime.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.lang.ref",
+        "Description": "Provides reference-object classes, which support a limited degree\n of interaction with the garbage collector.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.math",
+        "Description": "Provides classes for performing arbitrary-precision integer\n arithmetic (BigInteger) and arbitrary-precision decimal\n arithmetic (BigDecimal).",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.net.http",
+        "Description": "HTTP Client and WebSocket APIs",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.nio",
+        "Description": "Defines buffers, which are containers for data, and provides an\n overview of the other NIO packages.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.nio.channels.spi",
+        "Description": "Service-provider classes for the java.nio.channels\n package.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.nio.charset.spi",
+        "Description": "Service-provider classes for the java.nio.charset package.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.nio.file.attribute",
+        "Description": "Interfaces and classes providing access to file and file system attributes.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.rmi",
+        "Description": "Provides the RMI package.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.rmi.dgc",
+        "Description": "Provides classes and interface for RMI distributed\ngarbage-collection (DGC).",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.rmi.server",
+        "Description": "Provides classes and interfaces for supporting the server\nside of RMI.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.security.acl",
+        "Description": "The classes and interfaces in this package have been deprecated.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.security.interfaces",
+        "Description": "Provides interfaces for generating RSA (Rivest, Shamir and\n Adleman AsymmetricCipher algorithm)\n keys as defined in the RSA Laboratory Technical Note\n PKCS#1, and DSA (Digital Signature\n Algorithm) keys as defined in NIST's FIPS-186.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.sql",
+        "Description": "Provides the API for accessing and processing data stored in a\ndata source (usually a relational database) using the\nJava™ programming language.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.text.spi",
+        "Description": "Service provider classes for the classes in the java.text package.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.time.chrono",
+        "Description": "Generic API for calendar systems other than the default ISO.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.time.temporal",
+        "Description": "Access to date and time using fields and units, and date time adjusters.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.util",
+        "Description": "Contains the collections framework, some internationalization support classes,\n a service loader, properties, random number generation, string parsing\n and scanning classes, base64 encoding and decoding, a bit array, and\n several miscellaneous utility classes.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.util.concurrent.atomic",
+        "Description": "A small toolkit of classes that support lock-free thread-safe\n programming on single variables.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.util.function",
+        "Description": "Functional interfaces provide target types for lambda expressions\n and method references.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.util.logging",
+        "Description": "Provides the classes and interfaces of \nthe Java™ 2 platform's core logging facilities.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.util.regex",
+        "Description": "Classes for matching character sequences against patterns specified\n by regular expressions.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "java.util.stream",
+        "Description": "Classes to support functional-style operations on streams of elements, such\n as map-reduce transformations on collections.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.accessibility",
+        "Description": "Defines a contract between user-interface components and an assistive\n technology that provides access to those components.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.crypto",
+        "Description": "Provides the classes and interfaces for cryptographic\n operations.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.crypto.spec",
+        "Description": "Provides classes and interfaces for key specifications and\n algorithm parameter specifications.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.imageio.event",
+        "Description": "A package of the Java Image I/O API dealing with synchronous notification of\n events during the reading and writing of images.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.imageio.plugins.bmp",
+        "Description": "Package containing the public classes used by the built-in BMP plug-in.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.imageio.plugins.tiff",
+        "Description": "Public classes used by the built-in TIFF plug-ins.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.imageio.stream",
+        "Description": "A package of the Java Image I/O API dealing with low-level I/O from files and\n streams.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.lang.model.element",
+        "Description": "Interfaces used to model elements of the Java programming language.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.lang.model.util",
+        "Description": "Utilities to assist in the processing of\n program elements and\n types.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.management.loading",
+        "Description": "Provides the classes which implement advanced dynamic\n        loading.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.management.monitor",
+        "Description": "Provides the definition of the monitor classes.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.management.relation",
+        "Description": "Provides the definition of the Relation Service.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.management.remote.rmi",
+        "Description": "The RMI connector is a connector for the JMX Remote API that\n      uses RMI to transmit client requests to a remote MBean server.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.naming",
+        "Description": "Provides the classes and interfaces for accessing naming services.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.naming.event",
+        "Description": "Provides support for event notification when accessing naming and\ndirectory services.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.naming.spi",
+        "Description": "Provides the means for dynamically plugging in support for accessing\nnaming and directory services through the javax.naming\nand related packages.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.net.ssl",
+        "Description": "Provides classes for the secure socket package.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.print.attribute",
+        "Description": "Provides classes and interfaces that describe the types of Java™ Print\n Service attributes and how they can be collected into attribute sets.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.print.event",
+        "Description": "Package javax.print.event contains event classes and listener\n interfaces.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.script",
+        "Description": "The scripting API consists of interfaces and classes that define\nJava™ Scripting Engines and provides\na framework for their use in Java applications.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.security.auth.callback",
+        "Description": "This package provides the classes necessary for services\n to interact with applications in order to retrieve\n information (authentication data including usernames\n or passwords, for example) or to display information\n (error and warning messages, for example).",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.security.auth.login",
+        "Description": "This package provides a pluggable authentication framework.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.security.auth.x500",
+        "Description": "This package contains the classes that should be used to store\n X500 Principal and X500 Private Credentials in a\n Subject.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.security.sasl",
+        "Description": "Contains class and interfaces for supporting SASL.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.sound.midi",
+        "Description": "Provides interfaces and classes for I/O, sequencing, and synthesis of MIDI\n (Musical Instrument Digital Interface) data.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.sound.sampled",
+        "Description": "Provides interfaces and classes for capture, processing, and playback of\n sampled audio data.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.sql",
+        "Description": "Provides the API for server side data source access and processing from\nthe Java™ programming language.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.sql.rowset.serial",
+        "Description": "Provides utility classes to allow serializable mappings between SQL types\nand data types in the Java programming language.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.swing",
+        "Description": "Provides a set of \"lightweight\" (all-Java language) components\n that, to the maximum degree possible, work the same on all platforms.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.swing.colorchooser",
+        "Description": "Contains classes and interfaces used by the JColorChooser component.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.swing.filechooser",
+        "Description": "Contains classes and interfaces used by the JFileChooser component.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.swing.plaf.basic",
+        "Description": "Provides user interface objects built according to the Basic look and feel.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.swing.plaf.multi",
+        "Description": "Provides user interface objects that combine two or more look and feels.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.swing.plaf.synth",
+        "Description": "Synth is a skinnable look and feel in which all painting is delegated.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.swing.text",
+        "Description": "Provides classes and interfaces that deal with editable and noneditable text\n components.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.swing.text.html.parser",
+        "Description": "Provides the default HTML parser, along with support classes.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.swing.tree",
+        "Description": "Provides classes and interfaces for dealing with javax.swing.JTree.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.tools",
+        "Description": "Provides interfaces for tools which can be invoked from a program,\n for example, compilers.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.xml",
+        "Description": "Defines constants for XML processing.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.xml.crypto",
+        "Description": "Common classes for XML cryptography.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.xml.crypto.dsig",
+        "Description": "Classes for generating and validating XML digital\nsignatures.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.xml.crypto.dsig.keyinfo",
+        "Description": "Classes for parsing and processing KeyInfo elements and structures.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.xml.datatype",
+        "Description": "Defines XML/Java Type Mappings.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.xml.parsers",
+        "Description": "Provides the classes for processing XML documents with a SAX (Simple API for XML)\n parser or a DOM (Document Object Model) Document builder.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.xml.stream.events",
+        "Description": "Defines event interfaces for the Streaming API for XML (StAX).",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.xml.transform",
+        "Description": "Defines the generic APIs for processing transformation instructions,\n and performing a transformation from source to result.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.xml.transform.sax",
+        "Description": "Provides SAX specific transformation classes.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.xml.transform.stream",
+        "Description": "Provides stream and URI specific transformation classes.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "javax.xml.xpath",
+        "Description": "Provides an object-model neutral API for the\n evaluation of XPath expressions and access to the evaluation\n environment.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "jdk.dynalink.beans",
+        "Description": "Contains the linker for ordinary Java objects.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "jdk.dynalink.linker.support",
+        "Description": "Contains classes that make it more convenient for language runtimes to\n implement their own language-specific object models and type conversions\n by providing basic implementations of some classes as well as various\n utilities.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "jdk.javadoc.doclet",
+        "Description": "The Doclet API provides an environment which, in conjunction with\n the Language Model API and Compiler Tree API, allows clients\n to inspect the source-level structures of programs and\n libraries, including API comments embedded in the source.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "jdk.jfr.consumer",
+        "Description": "This package contains classes for consuming Flight Recorder data.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "jdk.jshell.execution",
+        "Description": "Provides implementation support for building JShell execution engines.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "jdk.jshell.tool",
+        "Description": "Provides a mechanism to launch an instance of a Java™ shell tool.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "jdk.nashorn.api.scripting",
+        "Description": "This package provides the javax.script integration, which is the preferred way to use Nashorn.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "jdk.net",
+        "Description": "Platform specific socket options for the java.net and java.nio.channels\n socket classes.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "jdk.security.jarsigner",
+        "Description": "This package defines APIs for signing jar files.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "org.ietf.jgss",
+        "Description": "This package presents a framework that allows application developers to\n    make use of security services like authentication, data integrity and\n    data confidentiality from a variety of underlying security mechanisms\n    like Kerberos, using a unified API.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "org.w3c.dom.bootstrap",
+        "Description": "Provides a factory for obtaining instances of DOMImplementation.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "org.w3c.dom.events",
+        "Description": "Provides interfaces for DOM Level 2 Events.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "org.w3c.dom.ls",
+        "Description": "Provides interfaces for DOM Level 3 Load and Save.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "org.w3c.dom.stylesheets",
+        "Description": "Provides interfaces for DOM Level 2 Style Specification.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "org.w3c.dom.views",
+        "Description": "Provides interfaces for DOM Level 2 Views.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "org.xml.sax",
+        "Description": "Provides the core SAX APIs.",
+        "Concept": "inbuilt"
+    },
+    {
+        "Package": "org.xml.sax.helpers",
+        "Description": "Provides helper classes, including\n support for bootstrapping SAX-based applications.",
+        "Concept": "inbuilt"
+    },
+    {
+        "library_name": "dOOv",
+        "description": "- Provides fluent API for typesafe domain model validation and mapping. It uses annotations, code generation and a type safe DSL to make bean validation and mapping fast and easy.",
+        "concept": "Bean Mapping"
+    },
+    {
+        "library_name": "JMapper",
+        "description": "- Uses byte code manipulation for lightning-fast mapping. Supports annotations and API or XML configuration.",
+        "concept": "Bean Mapping"
+    },
+    {
+        "library_name": "MapStruct",
+        "description": "- Code generator that simplifies mappings between different bean types, based on a convention-over-configuration approach.",
+        "concept": "Bean Mapping"
+    },
+    {
+        "library_name": "ModelMapper",
+        "description": "- Intelligent object mapping library that automatically maps objects to each other.",
+        "concept": "Bean Mapping"
+    },
+    {
+        "library_name": "Orika",
+        "description": "- JavaBean-mapping framework that recursively copies (among other capabilities) data from one object to another.",
+        "concept": "Bean Mapping"
+    },
+    {
+        "library_name": "reMap",
+        "description": "- Lambda and method handle-based mapping which requires code and not annotations if objects have different names.",
+        "concept": "Bean Mapping"
+    },
+    {
+        "library_name": "Selma",
+        "description": "- Annotation processor-based bean mapper.",
+        "concept": "Bean Mapping"
+    },
+    {
+        "library_name": "Apache Maven",
+        "description": "- Declarative build and dependency management that favors convention over configuration. It might be preferable to Apache Ant, which uses a rather procedural approach and can be difficult to maintain.",
+        "concept": "Build"
+    },
+    {
+        "library_name": "Bazel",
+        "description": "- Tool from Google that builds code quickly and reliably.",
+        "concept": "Build"
+    },
+    {
+        "library_name": "Buck",
+        "description": "- Encourages the creation of small, reusable modules consisting of code and resources.",
+        "concept": "Build"
+    },
+    {
+        "library_name": "Gradle",
+        "description": "- Incremental builds programmed via Groovy instead of declaring XML. Works well with Maven's dependency management.",
+        "concept": "Build"
+    },
+    {
+        "library_name": "ASM",
+        "description": "- All-purpose, low-level bytecode manipulation and analysis.",
+        "concept": "Bytecode Manipulation"
+    },
+    {
+        "library_name": "Byte Buddy",
+        "description": "- Further simplifies bytecode generation with a fluent API.",
+        "concept": "Bytecode Manipulation"
+    },
+    {
+        "library_name": "bytecode-viewer",
+        "description": "- Java 8 Jar & Android APK reverse engineering suite. (GPL-3.0-only)",
+        "concept": "Bytecode Manipulation"
+    },
+    {
+        "library_name": "Byteman",
+        "description": "- Manipulate bytecode at runtime via DSL (rules); mainly for testing/troubleshooting. (LGPL-2.1-or-later)",
+        "concept": "Bytecode Manipulation"
+    },
+    {
+        "library_name": "cglib",
+        "description": "- Bytecode generation library.",
+        "concept": "Bytecode Manipulation"
+    },
+    {
+        "library_name": "Javassist",
+        "description": "- Tries to simplify bytecode editing.",
+        "concept": "Bytecode Manipulation"
+    },
+    {
+        "library_name": "Maker",
+        "description": "- Provides low level bytecode generation.",
+        "concept": "Bytecode Manipulation"
+    },
+    {
+        "library_name": "Mixin",
+        "description": "- Manipulate bytecode at runtime using real Java code.",
+        "concept": "Bytecode Manipulation"
+    },
+    {
+        "library_name": "Perses",
+        "description": "- Dynamically injects failure/latency at the bytecode level according to principles of chaos engineering.",
+        "concept": "Bytecode Manipulation"
+    },
+    {
+        "library_name": "Recaf",
+        "description": "- JVM reverse engineering toolkit, essentially an IDE for Java bytecode.",
+        "concept": "Bytecode Manipulation"
+    },
+    {
+        "library_name": "cache2k",
+        "description": "- In-memory high performance caching library.",
+        "concept": "Caching"
+    },
+    {
+        "library_name": "Caffeine",
+        "description": "- High-performance, near-optimal caching library.",
+        "concept": "Caching"
+    },
+    {
+        "library_name": "Ehcache",
+        "description": "- Distributed general-purpose cache.",
+        "concept": "Caching"
+    },
+    {
+        "library_name": "Infinispan",
+        "description": "- Highly concurrent key/value datastore used for caching.",
+        "concept": "Caching"
+    },
+    {
+        "library_name": "Airline",
+        "description": "- Annotation-based framework for parsing Git-like command-line arguments.",
+        "concept": "CLI"
+    },
+    {
+        "library_name": "JCommander",
+        "description": "- Command-line argument-parsing framework with custom types and validation via implementing interfaces.",
+        "concept": "CLI"
+    },
+    {
+        "library_name": "jbock",
+        "description": "- Reflectionless command line parser.",
+        "concept": "CLI"
+    },
+    {
+        "library_name": "JLine",
+        "description": "- Includes features from modern shells like completion or history.",
+        "concept": "CLI"
+    },
+    {
+        "library_name": "picocli",
+        "description": "- ANSI colors and styles in usage help with annotation-based POSIX/GNU/any syntax, subcommands, strong typing for both options and positional args.",
+        "concept": "CLI"
+    },
+    {
+        "library_name": "Apache Aurora",
+        "description": "- Mesos framework for long-running services and cron jobs.",
+        "concept": "Cluster Management"
+    },
+    {
+        "library_name": "Singularity",
+        "description": "- Mesos framework that makes deployment and operations easy. It supports web services, background workers, scheduled jobs, and one-off tasks.",
+        "concept": "Cluster Management"
+    },
+    {
+        "library_name": "Checkstyle",
+        "description": "- Static analysis of coding conventions and standards. (LGPL-2.1-or-later)",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "Error Prone",
+        "description": "- Catches common programming mistakes as compile-time errors.",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "Error Prone Support",
+        "description": "- Error Prone extensions: extra bug checkers and a large battery of Refaster templates.",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "Infer",
+        "description": "- Modern static analysis tool for verifying the correctness of code.",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "jQAssistant",
+        "description": "- Static code analysis with Neo4J-based query language. (GPL-3.0-only)",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "NullAway",
+        "description": "- Eliminates NullPointerExceptions with low build-time overhead.",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "PMD",
+        "description": "- Source code analysis for finding bad coding practices.",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "p3c",
+        "description": "- Provides Alibaba's coding guidelines for PMD, IDEA and Eclipse.",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "RefactorFirst",
+        "description": "- Identifies and prioritizes God Classes and Highly Coupled classes.",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "SonarJava",
+        "description": "- Static analyzer for SonarQube & SonarLint. (LGPL-3.0-only)",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "Spoon",
+        "description": "- Library for analyzing and transforming Java source code.",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "Spotbugs",
+        "description": "- Static analysis of bytecode to find potential bugs. (LGPL-2.1-only)",
+        "concept": "Code Analysis"
+    },
+    {
+        "library_name": "Clover",
+        "description": "- Relies on source-code instrumentation instead of bytecode instrumentation.",
+        "concept": "Code Coverage"
+    },
+    {
+        "library_name": "Cobertura",
+        "description": "- Relies on offline (or static) bytecode instrumentation and class loading to collect code coverage metrics. (GPL-2.0-only)",
+        "concept": "Code Coverage"
+    },
+    {
+        "library_name": "JaCoCo",
+        "description": "- Framework that enables collection of code coverage metrics, using both offline and runtime bytecode instrumentation.",
+        "concept": "Code Coverage"
+    },
+    {
+        "library_name": "ADT4J",
+        "description": "- JSR-269 code generator for algebraic data types.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "Auto",
+        "description": "- Generates factory, service, and value classes.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "Avaje Http Server",
+        "description": "- Generates Lightweight JAX-RS style http servers using Javalin or Helidon (Nima) SE.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "Bootify",
+        "description": "- Browser-based Spring Boot app generation with JPA model and REST API.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "FreeBuilder",
+        "description": "- Automatically generates the Builder pattern.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "Geci",
+        "description": "- Discovers files that need generated code, updates automatically and writes to the source with a convenient API.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "Immutables",
+        "description": "- Annotation processors to generate simple, safe and consistent value objects.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "JavaPoet",
+        "description": "- API to generate source files.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "JHipster",
+        "description": "- Yeoman source code generator for Spring Boot and AngularJS.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "Joda-Beans",
+        "description": "- Small framework that adds queryable properties to Java, enhancing JavaBeans.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "JPA Buddy",
+        "description": "- Plugin for IntelliJ IDEA. Provides visual tools for generating JPA entities, Spring Data JPA repositories, Liquibase changelogs and SQL scripts. Offers automatic Liquibase/Flyway script generation by comparing model to DB, and reverse engineering JPA entities from DB tables.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "Lombok",
+        "description": "- Code generator that aims to reduce verbosity.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "Record-Builder",
+        "description": "- Companion builder class, withers and templates for Java records.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "Telosys",
+        "description": "- Simple and light code generator available as an Eclipse Plugin and also as a CLI.",
+        "concept": "Code Generators"
+    },
+    {
+        "library_name": "ANTLR",
+        "description": "- Complex full-featured framework for top-down parsing.",
+        "concept": "Compiler-compiler"
+    },
+    {
+        "library_name": "JavaCC",
+        "description": "- Parser generator that generates top-down parsers. Allows lexical state switching and permits extended BNF specifications.",
+        "concept": "Compiler-compiler"
+    },
+    {
+        "library_name": "JFlex",
+        "description": "- Lexical analyzer generator.",
+        "concept": "Compiler-compiler"
+    },
+    {
+        "library_name": "BoofCV",
+        "description": "- Library for image processing, camera calibration, tracking, SFM, MVS, 3D vision, QR Code and much more.",
+        "concept": "Computer Vision"
+    },
+    {
+        "library_name": "ImageJ",
+        "description": "- Medical image processing application with an API.",
+        "concept": "Computer Vision"
+    },
+    {
+        "library_name": "JavaCV",
+        "description": "- Java interface to OpenCV, FFmpeg, and much more.",
+        "concept": "Computer Vision"
+    },
+    {
+        "library_name": "avaje config",
+        "description": "- Loads yaml and properties files, supports dynamic configuration, plugins, file-watching and config event listeners.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "centraldogma",
+        "description": "- Highly-available version-controlled service configuration repository based on Git, ZooKeeper and HTTP/2.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "config",
+        "description": "- Configuration library supporting Java properties, JSON or its human optimized superset HOCON.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "Configurate",
+        "description": "- Configuration library with support for various configuration formats and transformations.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "Curator Framework",
+        "description": "- High-level API for Apache ZooKeeper.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "dotenv",
+        "description": "- Twelve-factor configuration library which uses environment-specific files.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "Externalized Properties",
+        "description": "- Lightweight yet powerful configuration library which supports resolution of properties from external sources and an extensible post-processing/conversion mechanism.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "Gestalt",
+        "description": "-  offers a comprehensive solution to the challenges of configuration management. It allows you to source configuration data from multiple inputs, merge them intelligently, and present them in a structured, type-safe manner.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "ini4j",
+        "description": "- Provides an API for handling Windows' INI files.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "KAConf",
+        "description": "- Annotation-based configuration system for Java and Kotlin.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "microconfig",
+        "description": "- Configuration system designed for microservices which helps to separate configuration from code. The configuration for different services can have common and specific parts and can be dynamically distributed.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "owner",
+        "description": "- Reduces boilerplate of properties.",
+        "concept": "Configuration"
+    },
+    {
+        "library_name": "Choco",
+        "description": "- Off-the-shelf constraint satisfaction problem solver that uses constraint programming techniques.",
+        "concept": "Constraint Satisfaction Problem Solver"
+    },
+    {
+        "library_name": "JaCoP",
+        "description": "- Includes an interface for the FlatZinc language, enabling it to execute MiniZinc models. (AGPL-3.0)",
+        "concept": "Constraint Satisfaction Problem Solver"
+    },
+    {
+        "library_name": "OptaPlanner",
+        "description": "- Business planning and resource scheduling optimization solver.",
+        "concept": "Constraint Satisfaction Problem Solver"
+    },
+    {
+        "library_name": "Timefold",
+        "description": "- Flexible solver with Spring/Quarkus support and quickstarts for the Vehicle Routing Problem, Maintenance Scheduling, Employee Shift Scheduling and much more.",
+        "concept": "Constraint Satisfaction Problem Solver"
+    },
+    {
+        "library_name": "FastCSV",
+        "description": "- Performance-optimized, dependency-free and RFC 4180 compliant.",
+        "concept": "CSV"
+    },
+    {
+        "library_name": "jackson-dataformat-csv",
+        "description": "- Jackson extension for reading and writing CSV.",
+        "concept": "CSV"
+    },
+    {
+        "library_name": "opencsv",
+        "description": "- Simple CSV parser.",
+        "concept": "CSV"
+    },
+    {
+        "library_name": "Super CSV",
+        "description": "- Powerful CSV parser with support for Dozer, Joda-Time and Java 8.",
+        "concept": "CSV"
+    },
+    {
+        "library_name": "uniVocity-parsers",
+        "description": "- One of the fastest and most feature-complete parsers. Also comes with parsers for TSV and fixed-width records.",
+        "concept": "CSV"
+    },
+    {
+        "library_name": "Apache Avro",
+        "description": "- Data interchange format with dynamic typing, untagged data, and absence of manually assigned IDs.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "Apache Orc",
+        "description": "- Fast and efficient columnar storage format for Hadoop-based workloads.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "Apache Parquet",
+        "description": "- Columnar storage format based on assembly algorithms from Google's paper on Dremel.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "Apache Thrift",
+        "description": "- Data interchange format that originated at Facebook.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "Big Queue",
+        "description": "- Fast and persistent queue based on memory-mapped files.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "HyperMinHash-java",
+        "description": "- Probabilistic data structure for computing union, intersection, and set cardinality in loglog space.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "Persistent Collection",
+        "description": "- Persistent and immutable analogue of the Java Collections Framework.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "Protobuf",
+        "description": "- Google's data interchange format.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "RoaringBitmap",
+        "description": "- Fast and efficient compressed bitmap.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "SBE",
+        "description": "- Simple Binary Encoding, one of the fastest message formats around.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "Tape",
+        "description": "- Lightning-fast, transactional, file-based FIFO.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "Wire",
+        "description": "- Clean, lightweight protocol buffers.",
+        "concept": "Data Structures"
+    },
+    {
+        "library_name": "Apache Calcite",
+        "description": "- Dynamic data management framework. It contains many of the pieces that comprise a typical database management system.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Apache Drill",
+        "description": "- Distributed, schema on-the-fly, ANSI SQL query engine for Big Data exploration.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Apache Phoenix",
+        "description": "- High-performance relational database layer over HBase for low-latency applications.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "ArangoDB",
+        "description": "-  Java driver.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Chronicle Map",
+        "description": "- Efficient, in-memory (opt. persisted to disk), off-heap key-value store.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Debezium",
+        "description": "- Low latency data streaming platform for change data capture.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "druid",
+        "description": "- High-performance, column-oriented, distributed data store.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "eXist",
+        "description": "- NoSQL document database and application platform. (LGPL-2.1-only)",
+        "concept": "Database"
+    },
+    {
+        "library_name": "FlexyPool",
+        "description": "- Brings metrics and failover strategies to the most common connection pooling solutions.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Flyway",
+        "description": "- Simple database migration tool.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "H2",
+        "description": "- Small SQL database notable for its in-memory functionality.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "HikariCP",
+        "description": "- High-performance JDBC connection pool.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "HSQLDB",
+        "description": "- HyperSQL 100% Java database.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "JDBI",
+        "description": "- Convenient abstraction of JDBC.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Jedis",
+        "description": "- Small client for interaction with Redis, with methods for commands.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Jest",
+        "description": "- Client for the Elasticsearch REST API.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "jetcd",
+        "description": "- Client library for etcd.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Jinq",
+        "description": "- Typesafe database queries via symbolic execution of Java 8 Lambdas (on top of JPA or jOOQ).",
+        "concept": "Database"
+    },
+    {
+        "library_name": "jOOQ",
+        "description": "- Generates typesafe code based on SQL schema.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Leaf",
+        "description": "- Distributed ID generate service.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Lettuce",
+        "description": "-  is a scalable Redis client for building non-blocking Reactive applications.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Liquibase",
+        "description": "- Database-independent library for tracking, managing and applying database schema changes.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "MapDB",
+        "description": "- Embedded database engine that provides concurrent collections backed on disk or in off-heap memory.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "MariaDB4j",
+        "description": "- Launcher for MariaDB that requires no installation or external dependencies.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Modality",
+        "description": "- Lightweight ORM with database reverse engineering features.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "OpenDJ",
+        "description": "- LDAPv3 compliant directory service, developed for the Java platform, providing a high performance, highly available, and secure store for the identities.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Querydsl",
+        "description": "- Typesafe unified queries.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "QueryStream",
+        "description": "- Build JPA Criteria queries using a Stream-like API.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "QuestDB",
+        "description": "- High-performance SQL database for time series. Supports InfluxDB line protocol, PostgreSQL wire protocol, and REST.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Realm",
+        "description": "- Mobile database to run directly inside phones, tablets or wearables.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Redisson",
+        "description": "- Allows for distributed and scalable data structures on top of a Redis server.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "requery",
+        "description": "- Modern, lightweight but powerful object mapping and SQL generator. Easily map to or create databases, or perform queries and updates from any Java-using platform.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Speedment",
+        "description": "- Database access library that utilizes Java 8's Stream API for querying.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Spring Data JPA MongoDB Expressions",
+        "description": "- Allows you to use MongoDB query language to query your relational database.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Trino",
+        "description": "- Distributed SQL query engine for big data.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Vibur DBCP",
+        "description": "- JDBC connection pool library with advanced performance monitoring capabilities.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "Xodus",
+        "description": "- Highly concurrent transactional schema-less and ACID-compliant embedded database.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "CosId",
+        "description": "- Universal, flexible, high-performance distributed ID generator.",
+        "concept": "Database"
+    },
+    {
+        "library_name": "iCal4j",
+        "description": "- Parse and build iCalendar RFC 5545 data models.",
+        "concept": "Date and Time"
+    },
+    {
+        "library_name": "Jollyday",
+        "description": "- Determines the holidays for a given year, country/name and eventually state/region.",
+        "concept": "Date and Time"
+    },
+    {
+        "library_name": "ThreeTen-Extra",
+        "description": "- Additional date-time classes that complement those in JDK 8.",
+        "concept": "Date and Time"
+    },
+    {
+        "library_name": "Time4J",
+        "description": "- Advanced date and time library. (LGPL-2.1-only)",
+        "concept": "Date and Time"
+    },
+    {
+        "library_name": "Apache DeltaSpike",
+        "description": "- CDI extension framework.",
+        "concept": "Dependency Injection"
+    },
+    {
+        "library_name": "Avaje Inject",
+        "description": "- Microservice-focused compile-time injection framework without reflection.",
+        "concept": "Dependency Injection"
+    },
+    {
+        "library_name": "Dagger",
+        "description": "- Compile-time injection framework without reflection.",
+        "concept": "Dependency Injection"
+    },
+    {
+        "library_name": "Feather",
+        "description": "- Ultra-lightweight, JSR-330-compliant dependency injection library.",
+        "concept": "Dependency Injection"
+    },
+    {
+        "library_name": "Governator",
+        "description": "- Extensions and utilities that enhance Google Guice.",
+        "concept": "Dependency Injection"
+    },
+    {
+        "library_name": "Guice",
+        "description": "- Lightweight and opinionated framework that completes Dagger.",
+        "concept": "Dependency Injection"
+    },
+    {
+        "library_name": "HK2",
+        "description": "- Lightweight and dynamic dependency injection framework.",
+        "concept": "Dependency Injection"
+    },
+    {
+        "library_name": "JayWire",
+        "description": "- Lightweight dependency injection framework. (LGPL-3.0-only)",
+        "concept": "Dependency Injection"
+    },
+    {
+        "library_name": "AspectJ",
+        "description": "- Seamless aspect-oriented programming extension.",
+        "concept": "Development"
+    },
+    {
+        "library_name": "DCEVM",
+        "description": "- JVM modification that allows unlimited redefinition of loaded classes at runtime. (GPL-2.0-only)",
+        "concept": "Development"
+    },
+    {
+        "library_name": "Faux Pas",
+        "description": "- Library that simplifies error handling by circumventing the issue that none of the functional interfaces in the Java Runtime is allowed by default to throw checked exceptions.",
+        "concept": "Development"
+    },
+    {
+        "library_name": "HotswapAgent",
+        "description": "- Unlimited runtime class and resource redefinition. (GPL-2.0-only)",
+        "concept": "Development"
+    },
+    {
+        "library_name": "JavaParser",
+        "description": "- Parse, modify and generate Java code.",
+        "concept": "Development"
+    },
+    {
+        "library_name": "JavaSymbolSolver",
+        "description": "- Symbol solver.",
+        "concept": "Development"
+    },
+    {
+        "library_name": "Manifold",
+        "description": "- Re-energizes Java with powerful features like type-safe metaprogramming, structural typing and extension methods.",
+        "concept": "Development"
+    },
+    {
+        "library_name": "NoException",
+        "description": "- Allows checked exceptions in functional interfaces and converts exceptions to Optional return.",
+        "concept": "Development"
+    },
+    {
+        "library_name": "SneakyThrow",
+        "description": "- Ignores checked exceptions without bytecode manipulation. Can also be used inside Java 8 stream operations.",
+        "concept": "Development"
+    },
+    {
+        "library_name": "Tail",
+        "description": "- Enable infinite recursion using tail call optimization.",
+        "concept": "Development"
+    },
+    {
+        "library_name": "Apache Geode",
+        "description": "- In-memory data management system that provides reliable asynchronous event notifications and guaranteed message delivery.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "Apache Storm",
+        "description": "- Realtime computation system.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "Apache ZooKeeper",
+        "description": "- Coordination service with distributed configuration, synchronization, and naming registry for large distributed systems.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "Atomix",
+        "description": "- Fault-tolerant distributed coordination framework.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "Axon",
+        "description": "- Framework for creating CQRS applications.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "Dropwizard Circuit Breaker",
+        "description": "- Circuit breaker design pattern for Dropwizard. (GPL-2.0-only)",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "Failsafe",
+        "description": "- Simple failure handling with retries and circuit breakers.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "Hazelcast",
+        "description": "- Highly scalable in-memory datagrid with a free open-source version.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "JGroups",
+        "description": "- Toolkit for reliable messaging and cluster creation.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "Quasar",
+        "description": "- Lightweight threads and actors for the JVM.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "resilience4j",
+        "description": "- Functional fault tolerance library.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "OpenIG",
+        "description": "- High-performance reverse proxy server with specialized session management and credential replay functionality.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "ScaleCube Services",
+        "description": "- Embeddable Cluster-Membership library based on SWIM and gossip protocol.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "Zuul",
+        "description": "- Gateway service that provides dynamic routing, monitoring, resiliency, security, and more.",
+        "concept": "Distributed Applications"
+    },
+    {
+        "library_name": "Atomikos",
+        "description": "- Provides transactions for REST, SOA and microservices with support for JTA and XA.",
+        "concept": "Distributed Transactions"
+    },
+    {
+        "library_name": "Bitronix",
+        "description": "- Simple but complete implementation of the JTA 1.1 API.",
+        "concept": "Distributed Transactions"
+    },
+    {
+        "library_name": "Narayana",
+        "description": "- Provides support for traditional ACID and compensation transactions, also complies with JTA, JTS and other standards. (LGPL-2.1-only)",
+        "concept": "Distributed Transactions"
+    },
+    {
+        "library_name": "Seata",
+        "description": "- Delivers high performance and easy to use distributed transaction services under a microservices architecture.",
+        "concept": "Distributed Transactions"
+    },
+    {
+        "library_name": "Artipie",
+        "description": "- Binary artifact management toolkit which hosts them on the file system or S3.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "Boxfuse",
+        "description": "- Deployment of JVM applications to AWS using the principles of immutable infrastructure.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "Capsule",
+        "description": "- Simple and powerful packaging and deployment. A fat JAR on steroids, or a \"Docker for Java\" that supports JVM-optimized containers.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "Central Repository",
+        "description": "- Largest binary component repository available as a free service to the open-source community. Default used by Apache Maven, and available in all other build tools.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "Cloudsmith",
+        "description": "- Fully managed package management SaaS with support for Maven/Gradle/SBT with a free tier.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "Getdown",
+        "description": "- System for deploying Java applications to end-user computers and keeping them up to date. Developed as an alternative to Java Web Start.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "IzPack",
+        "description": "- Setup authoring tool for cross-platform deployments.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "JavaPackager",
+        "description": "- Maven and Gradle plugin which provides an easy way to package Java applications in native Windows, macOS or GNU/Linux executables, and generate installers for them.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "jDeploy",
+        "description": "- Deploy desktop apps as native Mac, Windows or Linux bundles.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "jlink.online",
+        "description": "- Builds optimized runtimes over HTTP.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "Nexus",
+        "description": "- Binary management with proxy and caching capabilities.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "packr",
+        "description": "- Packs JARs, assets and the JVM for native distribution on Windows, Linux and macOS.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "really-executable-jars-maven-plugin",
+        "description": "- Maven plugin for making self-executing JARs.",
+        "concept": "Distribution"
+    },
+    {
+        "library_name": "Apache POI",
+        "description": "- Supports OOXML (XLSX, DOCX, PPTX) as well as OLE2 (XLS, DOC or PPT).",
+        "concept": "Document Processing"
+    },
+    {
+        "library_name": "documents4j",
+        "description": "- API for document format conversion using third-party converters such as MS Word.",
+        "concept": "Document Processing"
+    },
+    {
+        "library_name": "docx4j",
+        "description": "- Create and manipulate Microsoft Open XML files.",
+        "concept": "Document Processing"
+    },
+    {
+        "library_name": "fastexcel",
+        "description": "- High performance library to read and write large Excel (XLSX) worksheets.",
+        "concept": "Document Processing"
+    },
+    {
+        "library_name": "zerocell",
+        "description": "- Annotation-based API for reading data from Excel sheets into POJOs with focus on reduced overhead.",
+        "concept": "Document Processing"
+    },
+    {
+        "library_name": "Cassandre",
+        "description": "- Trading bot framework.",
+        "concept": "Financial"
+    },
+    {
+        "library_name": "Parity",
+        "description": "- Platform for trading venues.",
+        "concept": "Financial"
+    },
+    {
+        "library_name": "Philadelphia",
+        "description": "- Low-latency financial information exchange.",
+        "concept": "Financial"
+    },
+    {
+        "library_name": "Square",
+        "description": "- Integration with the  API.",
+        "concept": "Financial"
+    },
+    {
+        "library_name": "Stripe",
+        "description": "- Integration with the  API.",
+        "concept": "Financial"
+    },
+    {
+        "library_name": "ta4j",
+        "description": "- Library for technical analysis.",
+        "concept": "Financial"
+    },
+    {
+        "library_name": "CATG",
+        "description": "- Concolic unit testing engine. Automatically generates unit tests using formal methods.",
+        "concept": "Formal Verification"
+    },
+    {
+        "library_name": "Checker Framework",
+        "description": "- Pluggable type systems. Includes nullness types, physical units, immutability types and more. (GPL-2.0-only WITH Classpath-exception-2.0)",
+        "concept": "Formal Verification"
+    },
+    {
+        "library_name": "Daikon",
+        "description": "- Detects likely program invariants and generates JML specs based on those invariants.",
+        "concept": "Formal Verification"
+    },
+    {
+        "library_name": "Java Path Finder (JPF)",
+        "description": "- JVM formal verification tool containing a model checker and more. Created by NASA.",
+        "concept": "Formal Verification"
+    },
+    {
+        "library_name": "JMLOK 2.0",
+        "description": "- Detects inconsistencies between code and JML specification through feedback-directed random tests generation, and suggests a likely cause for each nonconformance detected. (GPL-3.0-only)",
+        "concept": "Formal Verification"
+    },
+    {
+        "library_name": "KeY",
+        "description": "- Formal software development tool that aims to integrate design, implementation, formal specification, and formal verification of object-oriented software as seamlessly as possible. Uses JML for specification and symbolic execution for verification. (GPL-2.0-or-later)",
+        "concept": "Formal Verification"
+    },
+    {
+        "library_name": "OpenJML",
+        "description": "- Translates JML specifications into SMT-LIB format and passes the proof problems implied by the program to backend solvers. (GPL-2.0-only)",
+        "concept": "Formal Verification"
+    },
+    {
+        "library_name": "Cyclops",
+        "description": "- Monad and stream utilities, comprehensions, pattern matching, functional extensions for all JDK collections, future streams, trampolines and much more.",
+        "concept": "Functional Programming"
+    },
+    {
+        "library_name": "derive4j",
+        "description": "- Java 8 annotation processor and framework for deriving algebraic data types constructors, pattern-matching and morphisms. (GPL-3.0-only)",
+        "concept": "Functional Programming"
+    },
+    {
+        "library_name": "Fugue",
+        "description": "- Functional extensions to Guava.",
+        "concept": "Functional Programming"
+    },
+    {
+        "library_name": "Functional Java",
+        "description": "- Implements numerous basic and advanced programming abstractions that assist composition-oriented development.",
+        "concept": "Functional Programming"
+    },
+    {
+        "library_name": "jOO\u03bb",
+        "description": "- Extension to Java 8 that aims to fix gaps in lambda by providing numerous missing types and a rich set of sequential Stream API additions.",
+        "concept": "Functional Programming"
+    },
+    {
+        "library_name": "protonpack",
+        "description": "- Collection of stream utilities.",
+        "concept": "Functional Programming"
+    },
+    {
+        "library_name": "StreamEx",
+        "description": "- Enhances Java 8 Streams.",
+        "concept": "Functional Programming"
+    },
+    {
+        "library_name": "Vavr",
+        "description": "- Functional component library that provides persistent data types and functional control structures.",
+        "concept": "Functional Programming"
+    },
+    {
+        "library_name": "FXGL",
+        "description": "- JavaFX Game Development Framework.",
+        "concept": "Game Development"
+    },
+    {
+        "library_name": "JBox2D",
+        "description": "- Port of the renowned C++ 2D physics engine.",
+        "concept": "Game Development"
+    },
+    {
+        "library_name": "jMonkeyEngine",
+        "description": "- Game engine for modern 3D development.",
+        "concept": "Game Development"
+    },
+    {
+        "library_name": "libGDX",
+        "description": "- All-round cross-platform, high-level framework.",
+        "concept": "Game Development"
+    },
+    {
+        "library_name": "Litiengine",
+        "description": "- AWT-based, lightweight 2D game engine.",
+        "concept": "Game Development"
+    },
+    {
+        "library_name": "LWJGL",
+        "description": "- Robust framework that abstracts libraries like OpenGL/CL/AL.",
+        "concept": "Game Development"
+    },
+    {
+        "library_name": "Mini2Dx",
+        "description": "- Beginner-friendly, master-ready framework for rapidly prototyping and building 2D games.",
+        "concept": "Game Development"
+    },
+    {
+        "library_name": "Void2D",
+        "description": "- High-level 2D game engine with built-in physics based on Swing.",
+        "concept": "Game Development"
+    },
+    {
+        "library_name": "Apache SIS",
+        "description": "- Library for developing geospatial applications.",
+        "concept": "Geospatial"
+    },
+    {
+        "library_name": "ArcGIS Maps SDK for Java",
+        "description": "- JavaFX library for adding mapping and GIS functionality to desktop apps.",
+        "concept": "Geospatial"
+    },
+    {
+        "library_name": "Geo",
+        "description": "- Hash utilities in Java.",
+        "concept": "Geospatial"
+    },
+    {
+        "library_name": "GeoTools",
+        "description": "- Library that provides tools for geospatial data. (LGPL-2.1-only)",
+        "concept": "Geospatial"
+    },
+    {
+        "library_name": "GraphHopper",
+        "description": "- Road-routing engine. Used as a Java library or standalone web service.",
+        "concept": "Geospatial"
+    },
+    {
+        "library_name": "H2GIS",
+        "description": "- Spatial extension of the H2 database. (LGPL-3.0-only)",
+        "concept": "Geospatial"
+    },
+    {
+        "library_name": "Jgeohash",
+        "description": "- Library for using the GeoHash algorithm.",
+        "concept": "Geospatial"
+    },
+    {
+        "library_name": "Mapsforge",
+        "description": "- Map rendering based on OpenStreetMap data. (LGPL-3.0-only)",
+        "concept": "Geospatial"
+    },
+    {
+        "library_name": "Spatial4j",
+        "description": "- General-purpose spatial/geospatial library.",
+        "concept": "Geospatial"
+    },
+    {
+        "library_name": "JavaFX",
+        "description": "- Successor of Swing.",
+        "concept": "GUI"
+    },
+    {
+        "library_name": "Scene Builder",
+        "description": "- Visual layout tool for JavaFX applications.",
+        "concept": "GUI"
+    },
+    {
+        "library_name": "SnapKit",
+        "description": "- Modern Java UI library for both desktop and web.",
+        "concept": "GUI"
+    },
+    {
+        "library_name": "SWT",
+        "description": "- Graphical widget toolkit.",
+        "concept": "GUI"
+    },
+    {
+        "library_name": "Agrona",
+        "description": "- Data structures and utility methods that are common in high-performance applications.",
+        "concept": "High Performance"
+    },
+    {
+        "library_name": "Disruptor",
+        "description": "- Inter-thread messaging library.",
+        "concept": "High Performance"
+    },
+    {
+        "library_name": "Eclipse Collections",
+        "description": "- Collections framework inspired by Smalltalk.",
+        "concept": "High Performance"
+    },
+    {
+        "library_name": "fastutil",
+        "description": "- Fast and compact type-specific collections.",
+        "concept": "High Performance"
+    },
+    {
+        "library_name": "HPPC",
+        "description": "- Primitive collections.",
+        "concept": "High Performance"
+    },
+    {
+        "library_name": "JCTools",
+        "description": "- Concurrency tools currently missing from the JDK.",
+        "concept": "High Performance"
+    },
+    {
+        "library_name": "Koloboke",
+        "description": "- Carefully designed extension of the Java Collections Framework with primitive specializations and more.",
+        "concept": "High Performance"
+    },
+    {
+        "library_name": "Apache HttpComponents",
+        "description": "- Toolset of low-level Java components focused on HTTP and associated protocols.",
+        "concept": "HTTP Clients"
+    },
+    {
+        "library_name": "Async Http Client",
+        "description": "- Asynchronous HTTP and WebSocket client library.",
+        "concept": "HTTP Clients"
+    },
+    {
+        "library_name": "Avaje Http Client",
+        "description": "- Wrapper on JDK 11's HttpClient that adds Feign-like interface among other enhancements.",
+        "concept": "HTTP Clients"
+    },
+    {
+        "library_name": "Feign",
+        "description": "- HTTP client binder inspired by Retrofit, JAXRS-2.0, and WebSocket.",
+        "concept": "HTTP Clients"
+    },
+    {
+        "library_name": "Google HTTP Client",
+        "description": "- Pluggable HTTP transport abstraction with support for java.net.HttpURLConnection, Apache HTTP Client, Android, Google App Engine, XML, Gson, Jackson and Protobuf.",
+        "concept": "HTTP Clients"
+    },
+    {
+        "library_name": "methanol",
+        "description": "- HTTP client extensions library.",
+        "concept": "HTTP Clients"
+    },
+    {
+        "library_name": "Retrofit",
+        "description": "- Typesafe REST client.",
+        "concept": "HTTP Clients"
+    },
+    {
+        "library_name": "Ribbon",
+        "description": "- Client-side IPC library that is battle-tested in the cloud.",
+        "concept": "HTTP Clients"
+    },
+    {
+        "library_name": "Riptide",
+        "description": "- Client-side response routing for Spring's RestTemplate.",
+        "concept": "HTTP Clients"
+    },
+    {
+        "library_name": "unirest-java",
+        "description": "- Simplified, lightweight HTTP client library.",
+        "concept": "HTTP Clients"
+    },
+    {
+        "library_name": "hate",
+        "description": "- Builds hypermedia-friendly objects according to HAL specification.",
+        "concept": "Hypermedia Types"
+    },
+    {
+        "library_name": "JSON-LD",
+        "description": "-  implementation.",
+        "concept": "Hypermedia Types"
+    },
+    {
+        "library_name": "Siren4J",
+        "description": "- Library for the Siren specification.",
+        "concept": "Hypermedia Types"
+    },
+    {
+        "library_name": "Eclipse",
+        "description": "- Established open-source project with support for lots of plugins and languages.",
+        "concept": "IDE"
+    },
+    {
+        "library_name": "IntelliJ IDEA",
+        "description": "- Supports many JVM languages and provides good options for Android development. The commercial edition targets the enterprise sector.",
+        "concept": "IDE"
+    },
+    {
+        "library_name": "jGRASP",
+        "description": "- Created to provide software visualizations that work in conjunction with the debugger such as Control Structure Diagrams, UML class diagrams and Object Viewer.",
+        "concept": "IDE"
+    },
+    {
+        "library_name": "NetBeans",
+        "description": "- Provides integration for several Java SE and EE features, from database access to HTML5.",
+        "concept": "IDE"
+    },
+    {
+        "library_name": "SnapCode",
+        "description": "- Modern IDE for Java running in the browser, focused on education.",
+        "concept": "IDE"
+    },
+    {
+        "library_name": "Visual Studio Code",
+        "description": "- Provides Java support for lightweight projects with a simple, modern workflow by using extensions from the internal marketplace.",
+        "concept": "IDE"
+    },
+    {
+        "library_name": "Imgscalr",
+        "description": "- Simple, efficient and hardware-accelerated image-scaling library implemented in pure Java 2D.",
+        "concept": "Imagery"
+    },
+    {
+        "library_name": "Tess4J",
+        "description": "- JNA wrapper for Tesseract OCR API.",
+        "concept": "Imagery"
+    },
+    {
+        "library_name": "Thumbnailator",
+        "description": "- High-quality thumbnail generation library.",
+        "concept": "Imagery"
+    },
+    {
+        "library_name": "TwelveMonkeys",
+        "description": "- Collection of plugins that extend the number of supported image file formats.",
+        "concept": "Imagery"
+    },
+    {
+        "library_name": "ZXing",
+        "description": "- Multi-format 1D/2D barcode image processing library.",
+        "concept": "Imagery"
+    },
+    {
+        "library_name": "image-comparison",
+        "description": "- Library that compares 2 images with the same sizes and shows the differences visually by drawing rectangles. Some parts of the image can be excluded from the comparison.",
+        "concept": "Imagery"
+    },
+    {
+        "library_name": "ClassGraph",
+        "description": "-  (formerly FastClasspathScanner) is an uber-fast, ultra-lightweight, parallelized classpath scanner and module scanner for Java, Scala, Kotlin and other JVM languages.",
+        "concept": "Introspection"
+    },
+    {
+        "library_name": "jOOR",
+        "description": "-  stands for  Object Oriented Reflection. It is a simple wrapper for the java.lang.reflect package.",
+        "concept": "Introspection"
+    },
+    {
+        "library_name": "Mirror",
+        "description": "-  was created to bring light to a simple problem, usually named ReflectionUtil, which is on almost all projects that rely on reflection to do advanced tasks.",
+        "concept": "Introspection"
+    },
+    {
+        "library_name": "Objenesis",
+        "description": "- Allows dynamic instantiation without default constructor, e.g. constructors which have required arguments, side effects or throw exceptions.",
+        "concept": "Introspection"
+    },
+    {
+        "library_name": "ReflectASM",
+        "description": "-  is a very small Java library that provides high performance reflection by using code generation.",
+        "concept": "Introspection"
+    },
+    {
+        "library_name": "Reflections",
+        "description": "-  scans your classpath, indexes the metadata, allows you to query it on runtime and may save and collect that information for many modules within your project.",
+        "concept": "Introspection"
+    },
+    {
+        "library_name": "JobRunr",
+        "description": "- Job scheduling library which utilizes lambdas for fire-and-forget, delayed and recurring jobs. Guarantees execution by single scheduler instance using optimistic locking. Has features for persistence, minimal dependencies and is embeddable.",
+        "concept": "Job Scheduling"
+    },
+    {
+        "library_name": "Quartz",
+        "description": "- Feature-rich, open source job scheduling library that can be integrated within virtually any Java application.",
+        "concept": "Job Scheduling"
+    },
+    {
+        "library_name": "Sundial",
+        "description": "- Lightweight framework to simply define jobs, define triggers and start the scheduler.",
+        "concept": "Job Scheduling"
+    },
+    {
+        "library_name": "Wisp",
+        "description": "- Simple library with minimal footprint and straightforward API.",
+        "concept": "Job Scheduling"
+    },
+    {
+        "library_name": "db-scheduler",
+        "description": "- Persistent and cluster-friendly scheduler.",
+        "concept": "Job Scheduling"
+    },
+    {
+        "library_name": "easy-batch",
+        "description": "- Set up batch jobs with simple processing pipelines. Records are read in sequence from a data source, processed in pipeline and written in batches to a data sink.",
+        "concept": "Job Scheduling"
+    },
+    {
+        "library_name": "shedlock",
+        "description": "- Makes sure that your scheduled tasks are executed at most once at the same time. If a task is being executed on one node, it acquires a lock which prevents execution of the same task from another node or thread.",
+        "concept": "Job Scheduling"
+    },
+    {
+        "library_name": "Avaje Jsonb",
+        "description": "- Reflection-free Json binding via source code generation with Jackson-like annotations.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "DSL-JSON",
+        "description": "- JSON library with advanced compile time databinding.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "Genson",
+        "description": "- Powerful and easy-to-use Java-to-JSON conversion library.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "Gson",
+        "description": "- Serializes objects to JSON and vice versa. Good performance with on-the-fly usage.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "HikariJSON",
+        "description": "- High-performance JSON parser, 2x faster than Jackson.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "jackson-modules-java8",
+        "description": "- Set of Jackson modules for Java 8 datatypes and features.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "Jackson-datatype-money",
+        "description": "- Open-source Jackson module to support JSON serialization and deserialization of JavaMoney data types.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "Jackson",
+        "description": "- Similar to GSON, but offers performance gains if you need to instantiate the library more often.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "JSON-io",
+        "description": "- Convert Java to JSON. Convert JSON to Java. Pretty print JSON. Java JSON serializer.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "jsoniter",
+        "description": "- Fast and flexible library with iterator and lazy parsing API.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "LoganSquare",
+        "description": "- JSON parsing and serializing library based on Jackson's streaming API. Outperforms GSON & Jackson's library.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "Moshi",
+        "description": "- Modern JSON library, less opinionated and uses built-in types like List and Map.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "Yasson",
+        "description": "- Binding layer between classes and JSON documents similar to JAXB.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "fastjson",
+        "description": "- Very fast processor with no additional dependencies and full data binding.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "Jolt",
+        "description": "- JSON to JSON transformation tool.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "JsonPath",
+        "description": "- Extract data from JSON using XPATH-like syntax.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "JsonSurfer",
+        "description": "- Streaming JsonPath processor dedicated to processing big and complicated JSON data.",
+        "concept": "JSON"
+    },
+    {
+        "library_name": "Adopt Open JDK",
+        "description": "- Community-driven OpenJDK builds, including both HotSpot and OpenJ9.",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "Avian",
+        "description": "- JVM with JIT, AOT modes and iOS port.",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "Corretto",
+        "description": "- No-cost, multiplatform, production-ready distribution of OpenJDK by Amazon. (GPL-2.0-only WITH Classpath-exception-2.0)",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "Dragonwell8",
+        "description": "- Downstream version of OpenJDK optimized for online e-commerce, financial, logistics applications.",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "Graal",
+        "description": "- Polyglot embeddable JVM. (GPL-2.0-only WITH Classpath-exception-2.0)",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "Liberica JDK",
+        "description": "- Built from OpenJDK, thoroughly tested and passed the JCK. (GPL-2.0-only WITH Classpath-exception-2.0)",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "OpenJ9",
+        "description": "- High performance, enterprise-calibre, flexibly licensed, openly-governed cross-platform JVM extending and augmenting the runtime technology components from the Eclipse OMR and OpenJDK project.",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "Open JDK",
+        "description": "-  community home. (GPL-2.0-only WITH Classpath-exception-2.0)",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "ParparVM",
+        "description": "- VM with non-blocking, concurrent GC for iOS. (GPL-2.0-only WITH Classpath-exception-2.0)",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "RedHat Open JDK",
+        "description": "- RedHat's OpenJDK distribution. (GPL-2.0-only WITH Classpath-exception-2.0)",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "SAP Machine",
+        "description": "- SAP's no-cost, rigorously tested and JCK-verified OpenJDK friendly fork. (GPL-2.0-only WITH Classpath-exception-2.0)",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "Zulu",
+        "description": "- OpenJDK builds for Windows, Linux, and macOS. (GPL-2.0-only WITH Classpath-exception-2.0)",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "Microsoft JDK",
+        "description": "- Microsoft Build of OpenJDK, Free, Open Source, Freshly Brewed!",
+        "concept": "JVM and JDK"
+    },
+    {
+        "library_name": "Apache Log4j 2",
+        "description": "- Complete rewrite with a powerful plugin and configuration architecture.",
+        "concept": "Logging"
+    },
+    {
+        "library_name": "Echopraxia",
+        "description": "- API designed around structured logging, rich context, and conditional logging. There are Logback and Log4J2 implementations, but 's API is completely dependency-free, meaning it can be implemented with any logging API.",
+        "concept": "Logging"
+    },
+    {
+        "library_name": "Graylog",
+        "description": "- Open-source aggregator suited for extended role and permission management. (GPL-3.0-only)",
+        "concept": "Logging"
+    },
+    {
+        "library_name": "Kibana",
+        "description": "- Analyzes and visualizes log files. Some features require payment.",
+        "concept": "Logging"
+    },
+    {
+        "library_name": "Logback",
+        "description": "- Robust logging library with interesting configuration options via Groovy.",
+        "concept": "Logging"
+    },
+    {
+        "library_name": "Logbook",
+        "description": "- Extensible, open-source library for HTTP request and response logging.",
+        "concept": "Logging"
+    },
+    {
+        "library_name": "Logstash",
+        "description": "- Tool for managing log files.",
+        "concept": "Logging"
+    },
+    {
+        "library_name": "p6spy",
+        "description": "- Enables logging for all JDBC transactions without changes to the code.",
+        "concept": "Logging"
+    },
+    {
+        "library_name": "SLF4J",
+        "description": "- Abstraction layer/simple logging facade.",
+        "concept": "Logging"
+    },
+    {
+        "library_name": "tinylog",
+        "description": "- Lightweight logging framework with static logger class.",
+        "concept": "Logging"
+    },
+    {
+        "library_name": "OpenTracing Toolbox",
+        "description": "- Collection of libraries that build on top of OpenTracing and provide extensions and plugins to existing instrumentations.",
+        "concept": "Logging"
+    },
+    {
+        "library_name": "Apache Flink",
+        "description": "- Fast, reliable, large-scale data processing engine.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "Apache Mahout",
+        "description": "- Scalable algorithms focused on collaborative filtering, clustering and classification.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "DatumBox",
+        "description": "- Provides several algorithms and pre-trained models for natural language processing.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "Deeplearning4j",
+        "description": "- Distributed and multi-threaded deep learning library.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "DJL",
+        "description": "- High-level and engine-agnostic framework for deep learning.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "H2O",
+        "description": "- Analytics engine for statistics over big data.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "Intelligent java",
+        "description": "- Seamlessly integrate with remote deep learning and language models programmatically.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "JSAT",
+        "description": "- Algorithms for pre-processing, classification, regression, and clustering with support for multi-threaded execution. (GPL-3.0-only)",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "m2cgen",
+        "description": "- CLI tool to transpile models into native code.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "Neureka",
+        "description": "- A lightweight, platform independent, OpenCL accelerated nd-array/tensor library.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "oj! Algorithms",
+        "description": "- High-performance mathematics, linear algebra and optimisation needed for data science, machine learning and scientific computing.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "Oryx 2",
+        "description": "- Framework for building real-time, large-scale machine learning applications. Includes end-to-end applications for collaborative filtering, classification, regression, and clustering.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "Siddhi",
+        "description": "- Cloud native streaming and complex event processing engine.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "Smile",
+        "description": "- Statistical Machine Intelligence and Learning Engine provides a set of machine learning algorithms and a visualization library.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "Tribuo",
+        "description": "- Provides tools for classification, regression, clustering, model development and interfaces with other libraries such as scikit-learn, pytorch and TensorFlow.",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "Weka",
+        "description": "- Collection of algorithms for data mining tasks ranging from pre-processing to visualization. (GPL-3.0-only)",
+        "concept": "Machine Learning"
+    },
+    {
+        "library_name": "Aeron",
+        "description": "- Efficient, reliable, unicast and multicast message transport.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "Apache ActiveMQ",
+        "description": "- Message broker that implements JMS and converts synchronous to asynchronous communication.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "Apache Camel",
+        "description": "- Glues together different transport APIs via Enterprise Integration Patterns.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "Apache Kafka",
+        "description": "- High-throughput distributed messaging system.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "Apache Pulsar",
+        "description": "- Distributed pub/sub-messaging system.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "Apache RocketMQ",
+        "description": "- Fast, reliable, and scalable distributed messaging platform.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "Apache Qpid",
+        "description": "-  makes messaging tools that speak AMQP and support many languages and platforms.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "AutoMQ",
+        "description": "-  is a cloud-native, serverless reinvented Kafka that is easily scalable, manage-less and cost-effective.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "Deezpatch",
+        "description": "- Simple, lightweight, and performant dispatch library for decoupling messages (requests and events) and message handlers.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "EventBus",
+        "description": "- Simple publish/subscribe event bus.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "Hermes",
+        "description": "- Fast and reliable message broker built on top of Kafka.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "JeroMQ",
+        "description": "- Implementation of ZeroMQ.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "Nakadi",
+        "description": "- Provides a RESTful API on top of Kafka.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "RabbitMQ Java client",
+        "description": "- RabbitMQ client.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "Smack",
+        "description": "- Cross-platform XMPP client library.",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "NATS client",
+        "description": "- .",
+        "concept": "Messaging"
+    },
+    {
+        "library_name": "ActiveRPC",
+        "description": "- Lightweight and fast library for complex high-load distributed applications and Memcached-like solutions.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "Apollo",
+        "description": "- Libraries for writing composable microservices.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "Armeria",
+        "description": "- Asynchronous RPC/REST client/server library built on top of Java 8, Netty, HTTP/2, Thrift and gRPC.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "consul-api",
+        "description": "- Client for the Consul API: a distributed, highly available and datacenter-aware registry/discovery service.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "Eureka",
+        "description": "- REST-based service registry for resilient load balancing and failover.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "Helidon",
+        "description": "- Two-style approach for writing microservices: Functional-reactive and as an implementation of MicroProfile.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "JDA",
+        "description": "- Wrapping of the Discord REST API and its WebSocket events.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "KeenType",
+        "description": "- Modernized version of a Java-based implementation of the New Typesetting System, which was heavily based on Donald E. Knuth's original TeX.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "kubernetes-client",
+        "description": "- Client provides access to the full Kubernetes & OpenShift REST APIs via a fluent DSL.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "Micronaut",
+        "description": "- Modern full-stack framework with focus on modularity, minimal memory footprint and startup time.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "Nacos",
+        "description": "- Dynamic service discovery, configuration and service management platform for building cloud native applications.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "OpenAI-Java",
+        "description": "- Java libraries for using OpenAI's GPT-3 API.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "Quarkus",
+        "description": "- Kubernetes stack tailored for the HotSpot and Graal VM.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "Sentinel",
+        "description": "- Flow control component enabling reliability, resilience and monitoring for microservices.",
+        "concept": "Microservice"
+    },
+    {
+        "library_name": "AWS SDK for Java 2.0",
+        "description": "- Wrapper around AWS' API.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "CQEngine",
+        "description": "- Ultra-fast, SQL-like queries on Java collections.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Design Patterns",
+        "description": "- Implementation and explanation of the most common design patterns.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "FF4J",
+        "description": "- Feature Flags for Java.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "FizzBuzz Enterprise Edition",
+        "description": "- No-nonsense implementation of FizzBuzz made by serious businessmen for serious business purposes. (No explicit license)",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "IP2Location.io Java SDK",
+        "description": "- Wrapper for the IP2Location.io Geolocation API and the IP2WHOIS domain WHOIS API.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "ISBN core",
+        "description": "- A small library that contains a representation object of ISBN-10 and ISBN-13 and tools to parse, validate and format one.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "J2ObjC",
+        "description": "- Java-to-Objective-C translator for porting Android libraries to iOS.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "JBake",
+        "description": "- Static website generator.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "JBot",
+        "description": "- Framework for building chatbots. (GPL-3.0-only)",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "JCuda",
+        "description": "-  offers Java bindings for CUDA and CUDA-related libraries.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Jimfs",
+        "description": "- In-memory file system.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "JObfuscator",
+        "description": "- Source code obfuscator.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Joda-Money",
+        "description": "- Basic currency and money classes and algorithms not provided by the JDK.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "jOOX",
+        "description": "- Simple wrapper for the org.w3c.dom package, to allow for fluent XML document creation and manipulation with an API inspired by jQuery.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "JPad",
+        "description": "- Snippet runner.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "jsweet",
+        "description": "- Source transpiler to TypeScript/JavaScript.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Maven Wrapper",
+        "description": "- Analogue of Gradle Wrapper for Maven, allows building projects without installing maven.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Membrane Service Proxy",
+        "description": "- Open-source, reverse-proxy framework.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "MinimalFTP",
+        "description": "- Lightweight, small and customizable FTP server.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "LittleProxy",
+        "description": "- High performance HTTP proxy atop Netty's event-based networking library.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Modern Java - A Guide to Java 8",
+        "description": "- Popular Java 8 guide.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Modernizer",
+        "description": "- Detect uses of legacy Java APIs.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "OctoLinker",
+        "description": "- Browser extension which allows to navigate through code on GitHub more efficiently.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "OpenRefine",
+        "description": "- Tool for working with messy data: cleaning, transforming, extending it with web services and linking it to databases.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "PipelinR",
+        "description": "- Small utility library for using handlers and commands with pipelines.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Polyglot for Maven",
+        "description": "- Extensions for Maven 3.3.1+ that allows writing the POM model in dialects other than XML.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "RR4J",
+        "description": "-  is a tool that records java bytecode execution and later allows developers to replay locally.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Simple Java Mail",
+        "description": "- Mailing with a clean and fluent API.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Smooks",
+        "description": "- Framework for fragment-based message processing. (Apache-2.0 OR LGPL-3.0-or-later)",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Svix",
+        "description": "- Library for the  API to send webhooks and verify signatures.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Togglz",
+        "description": "- Implementation of the Feature Toggles pattern.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "TypeTools",
+        "description": "- Tools for resolving generic types.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "XMLBeam",
+        "description": "- Processes XML by using annotations or XPath within code.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "yGuard",
+        "description": "- Obfuscation via renaming and shrinking.",
+        "concept": "Miscellaneous"
+    },
+    {
+        "library_name": "Codename One",
+        "description": "- Cross-platform solution for writing native mobile apps. (GPL-2.0-only WITH Classpath-exception-2.0)",
+        "concept": "Mobile Development"
+    },
+    {
+        "library_name": "MobileUI",
+        "description": "- Cross-platform framework for developing mobile apps with native UI in Java and Kotlin.",
+        "concept": "Mobile Development"
+    },
+    {
+        "library_name": "Multi-OS Engine",
+        "description": "- Open-source, cross-platform engine to develop native mobile (iOS, Android, etc.) apps.",
+        "concept": "Mobile Development"
+    },
+    {
+        "library_name": "Automon",
+        "description": "- Combines the power of AOP with monitoring and/or logging tools.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Datadog",
+        "description": "- Modern monitoring & analytics.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Dropwizard Metrics",
+        "description": "- Expose metrics via JMX or HTTP and send them to a database.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Failsafe Actuator",
+        "description": "- Out of the box monitoring of Failsafe Circuit Breaker in Spring-Boot environment.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Glowroot",
+        "description": "- Open-source Java APM.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "HertzBeat",
+        "description": "- Real-time monitoring system with custom-monitor and agentless.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "hippo4j",
+        "description": "- Dynamic and observable thread pool framework.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "inspectIT",
+        "description": "- Captures detailed run-time information via hooks that can be changed on the fly. It supports tracing over multiple systems via the OpenTracing API and can correlate the data with end user monitoring.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Instrumental",
+        "description": "- Real-time Java application performance monitoring. A commercial service with free development accounts.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Jaeger client",
+        "description": "- .",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "JavaMelody",
+        "description": "- Performance monitoring and profiling.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "jmxtrans",
+        "description": "- Connect to multiple JVMs and query them for their attributes via JMX. Its query language is based on JSON, which allows non-Java programmers to access the JVM attributes. Supports different output writes, including Graphite, Ganglia, and StatsD.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Jolokia",
+        "description": "- JMX over REST.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Micrometer",
+        "description": "- Vendor-neutral metrics/observability facade for the most popular metrics/observability libraries.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Micrometer Tracing",
+        "description": "- Vendor-neutral distributed tracing facade for the most popular tracer libraries.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "nudge4j",
+        "description": "- Remote developer console from the browser for Java 8 via bytecode injection.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Pinpoint",
+        "description": "- Open-source APM tool.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Prometheus",
+        "description": "- Provides a multi-dimensional data model, DSL, autonomous server nodes and much more.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Sentry",
+        "description": "- Integration with , an application error tracking and performance analysis platform.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "SPM",
+        "description": "- Performance monitor with distributing transaction tracing for JVM apps.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Stagemonitor",
+        "description": "- Open-source performance monitoring and transaction tracing for JVM apps.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Sysmon",
+        "description": "- Lightweight platform monitoring tool for Java VMs.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "zipkin",
+        "description": "- Distributed tracing system which gathers timing data needed to troubleshoot latency problems in microservice architectures.",
+        "concept": "Monitoring"
+    },
+    {
+        "library_name": "Aparapi",
+        "description": "- Converts bytecode to OpenCL which allows execution on GPUs.",
+        "concept": "Native"
+    },
+    {
+        "library_name": "JavaCPP",
+        "description": "- Provides efficient and easy access to native C++.",
+        "concept": "Native"
+    },
+    {
+        "library_name": "JNA",
+        "description": "- Work with native libraries without writing JNI. Also provides interfaces to common system libraries.",
+        "concept": "Native"
+    },
+    {
+        "library_name": "JNR",
+        "description": "- Work with native libraries without writing JNI. Also provides interfaces to common system libraries. Same goals as JNA, but faster, and serves as the basis for the upcoming Project Panama.",
+        "concept": "Native"
+    },
+    {
+        "library_name": "CogCompNLP",
+        "description": "- Provides common annotators for plain text input. (Research and Academic Use License)",
+        "concept": "Natural Language Processing"
+    },
+    {
+        "library_name": "CoreNLP",
+        "description": "- Provides a set of fundamental tools for tasks like tagging, named entity recognition, and sentiment analysis. (GPL-3.0-or-later)",
+        "concept": "Natural Language Processing"
+    },
+    {
+        "library_name": "DKPro",
+        "description": "- Collection of reusable NLP tools for linguistic pre-processing, machine learning, lexical resources, etc.",
+        "concept": "Natural Language Processing"
+    },
+    {
+        "library_name": "LingPipe",
+        "description": "- Toolkit for tasks ranging from POS tagging to sentiment analysis.",
+        "concept": "Natural Language Processing"
+    },
+    {
+        "library_name": "Commons-networking",
+        "description": "- Client for server-sent events (SSE).",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "Comsat",
+        "description": "- Integrates standard Java web-related APIs with Quasar fibers and actors.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "Dubbo",
+        "description": "- High-performance RPC framework.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "Grizzly",
+        "description": "- NIO framework. Used as a network layer in Glassfish.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "gRPC",
+        "description": "- RPC framework based on protobuf and HTTP/2.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "KryoNet",
+        "description": "- Provides a clean and simple API for efficient TCP and UDP client/server network communication using NIO and Kryo.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "MINA",
+        "description": "- Abstract, event-driven async I/O API for network operations over TCP/IP and UDP/IP via Java NIO.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "Netty",
+        "description": "- Framework for building high-performance network applications.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "Drift",
+        "description": "- Easy-to-use, annotation-based library for creating Thrift clients and serializable types.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "ServiceTalk",
+        "description": "- Framework built on Netty with APIs tailored to specific protocols and support for multiple programming paradigms.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "sshj",
+        "description": "- Programmatically use SSH, SCP or SFTP.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "TLS Channel",
+        "description": "- Implements a ByteChannel interface over SSLEngine, enabling easy-to-use (socket-like) TLS.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "Undertow",
+        "description": "- Web server providing both blocking and non-blocking APIs based on NIO. Used as a network layer in WildFly. (LGPL-2.1-only)",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "urnlib",
+        "description": "- Represent, parse and encode URNs, as in RFC 2141. (GPL-3.0-only)",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "Fluency",
+        "description": "- High throughput data ingestion logger to Fluentd and Fluent Bit.",
+        "concept": "Networking"
+    },
+    {
+        "library_name": "Apache Cayenne",
+        "description": "- Provides a clean, static API for data access. Also includes a GUI Modeler for working with database mappings, and DB reverse engineering and generation.",
+        "concept": "ORM"
+    },
+    {
+        "library_name": "Doma",
+        "description": "- Database access framework that verifies and generates source code at compile time using annotation processing as well as native SQL templates called two-way SQL.",
+        "concept": "ORM"
+    },
+    {
+        "library_name": "Ebean",
+        "description": "- Provides simple and fast data access.",
+        "concept": "ORM"
+    },
+    {
+        "library_name": "EclipseLink",
+        "description": "- Supports a number of persistence standards: JPA, JAXB, JCA and SDO.",
+        "concept": "ORM"
+    },
+    {
+        "library_name": "Hibernate",
+        "description": "- Robust and widely used, with an active community. (LGPL-2.1-only)",
+        "concept": "ORM"
+    },
+    {
+        "library_name": "MyBatis",
+        "description": "- Couples objects with stored procedures or SQL statements.",
+        "concept": "ORM"
+    },
+    {
+        "library_name": "ObjectiveSql",
+        "description": "- ActiveRecord ORM for rapid development and convention over configuration.",
+        "concept": "ORM"
+    },
+    {
+        "library_name": "Permazen",
+        "description": "- Language-natural persistence layer.",
+        "concept": "ORM"
+    },
+    {
+        "library_name": "SimpleFlatMapper",
+        "description": "- Simple database and CSV mapper.",
+        "concept": "ORM"
+    },
+    {
+        "library_name": "AWS Elastic Beanstalk",
+        "description": "- AWS-based, with support for Tomcat and Jetty.",
+        "concept": "PaaS"
+    },
+    {
+        "library_name": "AWS Lambda",
+        "description": "- Serverless computation.",
+        "concept": "PaaS"
+    },
+    {
+        "library_name": "Google Cloud",
+        "description": "- Google's cloud infrastructure.",
+        "concept": "PaaS"
+    },
+    {
+        "library_name": "Heroku",
+        "description": "- Abstract computing environments.",
+        "concept": "PaaS"
+    },
+    {
+        "library_name": "Microsoft Azure",
+        "description": "- Microsoft's cloud infrastructure.",
+        "concept": "PaaS"
+    },
+    {
+        "library_name": "OpenShift",
+        "description": "- Provides additionally an on-premise solution.",
+        "concept": "PaaS"
+    },
+    {
+        "library_name": "Apache FOP",
+        "description": "- Creates PDFs from XSL-FO.",
+        "concept": "PDF"
+    },
+    {
+        "library_name": "Apache PDFBox",
+        "description": "- Toolbox for creating and manipulating PDFs.",
+        "concept": "PDF"
+    },
+    {
+        "library_name": "Dynamic Jasper",
+        "description": "- Abstraction layer to JasperReports. (LGPL-3.0-only)",
+        "concept": "PDF"
+    },
+    {
+        "library_name": "DynamicReports",
+        "description": "- Simplifies JasperReports. (LGPL-3.0-only)",
+        "concept": "PDF"
+    },
+    {
+        "library_name": "Eclipse BIRT",
+        "description": "- Report engine for creating PDF and other formats (DOCX, XLSX, HTML, etc) using Eclipse-based visual editor.",
+        "concept": "PDF"
+    },
+    {
+        "library_name": "flyingsaucer",
+        "description": "- XML/XHTML and CSS 2.1 renderer. (LGPL-2.1-or-later)",
+        "concept": "PDF"
+    },
+    {
+        "library_name": "iText",
+        "description": "- Creates PDF files programmatically.",
+        "concept": "PDF"
+    },
+    {
+        "library_name": "JasperReports",
+        "description": "- Complex reporting engine. (LGPL-3.0-only)",
+        "concept": "PDF"
+    },
+    {
+        "library_name": "Open HTML to PDF",
+        "description": "- Properly supports modern PDF standards based on flyingsaucer and Apache PDFBox.",
+        "concept": "PDF"
+    },
+    {
+        "library_name": "OpenPDF",
+        "description": "- Open-source iText fork. (LGPL-3.0-only & MPL-2.0)",
+        "concept": "PDF"
+    },
+    {
+        "library_name": "Tabula",
+        "description": "- Extracts tables from PDF files.",
+        "concept": "PDF"
+    },
+    {
+        "library_name": "fastThread",
+        "description": "- Analyze and visualize thread dumps with a free cloud-based upload interface.",
+        "concept": "Performance analysis"
+    },
+    {
+        "library_name": "GCeasy",
+        "description": "- Tool to analyze and visualize GC logs. It provides a free cloud-based upload interface.",
+        "concept": "Performance analysis"
+    },
+    {
+        "library_name": "honest-profiler",
+        "description": "- Low-overhead, bias-free sampling profiler.",
+        "concept": "Performance analysis"
+    },
+    {
+        "library_name": "jHiccup",
+        "description": "- Logs and records platform JVM stalls.",
+        "concept": "Performance analysis"
+    },
+    {
+        "library_name": "JITWatch",
+        "description": "- Analyze the JIT compiler optimisations made by the HotSpot JVM.",
+        "concept": "Performance analysis"
+    },
+    {
+        "library_name": "JMH",
+        "description": "- Harness for building, running, and analysing nano/micro/milli/macro benchmarks written in Java and other languages targeting the JVM. (GPL-2.0 only WITH Classpath-exception-2.0)",
+        "concept": "Performance analysis"
+    },
+    {
+        "library_name": "LatencyUtils",
+        "description": "- Utilities for latency measurement and reporting.",
+        "concept": "Performance analysis"
+    },
+    {
+        "library_name": "BCEL",
+        "description": "- Byte Code Engineering Library - analyze, create, and manipulate Java class files.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "BeanUtils",
+        "description": "- Easy-to-use wrappers around the Java reflection and introspection APIs.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "BeanUtils2",
+        "description": "- Redesign of Commons BeanUtils.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "BSF",
+        "description": "- Bean Scripting Framework - interface to scripting languages, including JSR-223.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Chain",
+        "description": "-  of Responsibility pattern implementation.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "ClassScan",
+        "description": "- Find Class interfaces, methods, fields, and annotations without loading.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "CLI",
+        "description": "- Command-line arguments parser.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "CLI2",
+        "description": "- Redesign of Commons CLI.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Codec",
+        "description": "- General encoding/decoding algorithms, e.g. phonetic, base64 or URL.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Collections",
+        "description": "- Extends or augments the Java  Framework.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Compress",
+        "description": "- Defines an API for working with tar, zip and bzip2 files.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Configuration",
+        "description": "- Reading of configuration/preferences files in various formats.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Convert",
+        "description": "- Commons- aims to provide a single library dedicated to the task of converting an object of one type to another.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "CSV",
+        "description": "- Component for reading and writing comma separated value files.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Daemon",
+        "description": "- Alternative invocation mechanism for unix-daemon-like java code.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "DBCP",
+        "description": "- Database connection pooling services.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "DbUtils",
+        "description": "- JDBC helper library.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Digester",
+        "description": "- XML-to-Java-object mapping utility.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Email",
+        "description": "- Library for sending e-mail from Java.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Exec",
+        "description": "- API for dealing with external process execution and environment management in Java.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "FileUpload",
+        "description": "- File upload capability for your servlets and web applications.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Finder",
+        "description": "- Java library inspired by the UNIX find command.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Flatfile",
+        "description": "- Java library for working with flat data structures.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Functor",
+        "description": "- Function that can be manipulated as an object, or an object representing a single, generic function.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Graph",
+        "description": "- General purpose graph APIs and algorithms.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "I18n",
+        "description": "- Adds the feature of localized message bundles that consist of one or many localized texts that belong together.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Id",
+        "description": "-  is a component used to generate identifiers.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Imaging",
+        "description": "- Image library.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "IO",
+        "description": "- Collection of I/O utilities.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Javaflow",
+        "description": "- Continuation implementation to capture the state of the application.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "JCI",
+        "description": "- Java Compiler Interface.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "JCS",
+        "description": "- Java Caching System.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Jelly",
+        "description": "- XML based scripting and processing engine.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Jexl",
+        "description": "- Expression language which extends the Expression Language of the JSTL.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "JNet",
+        "description": "-  allows to use dynamically register url stream handlers through the java.net API.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "JXPath",
+        "description": "- Utilities for manipulating Java Beans using the XPath syntax.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Lang",
+        "description": "- Provides extra functionality for classes in java.lang.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Logging",
+        "description": "- Wrapper around a variety of logging API implementations.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Math",
+        "description": "- Lightweight, self-contained mathematics and statistics components.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Monitoring",
+        "description": "-  aims to provide a simple but extensible monitoring solution for Java applications.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Nabla",
+        "description": "-  provides automatic differentiation classes that can generate derivative of any function implemented in the Java language.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Net",
+        "description": "- Collection of network utilities and protocol implementations.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "OGNL",
+        "description": "- Object-graph navigation language.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "OpenPGP",
+        "description": "- Interface to signing and verifying data using .",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Performance",
+        "description": "- Small framework for microbenchmark clients, with implementations for Commons DBCP and Pool.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Pipeline",
+        "description": "- Provides a set of pipeline utilities designed around work queues that run in parallel to sequentially process data objects.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Pool",
+        "description": "- Generic object pooling component.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Proxy",
+        "description": "- Library for creating dynamic proxies.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "RDF",
+        "description": "- Common implementation of  1.1 that could be implemented by systems on the JVM.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "RNG",
+        "description": "- Commons Rng provides implementations of pseudo-random numbers generators.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "SCXML",
+        "description": "- Implementation of the State Chart XML specification aimed at creating and maintaining a Java  engine.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Validator",
+        "description": "- Framework to define validators and validation rules in an xml file.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "VFS",
+        "description": "- Virtual File System component for treating files, FTP, SMB, ZIP and such like as a single logical file system.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "Weaver",
+        "description": "- Provides an easy way to enhance (weave) compiled bytecode.",
+        "concept": "Platform"
+    },
+    {
+        "library_name": "ch.vorburger.exec",
+        "description": "- Convenient API around Apache Commons Exec.",
+        "concept": "Processes"
+    },
+    {
+        "library_name": "zt-exec",
+        "description": "- Provides a unified API to Apache Commons Exec and ProcessBuilder.",
+        "concept": "Processes"
+    },
+    {
+        "library_name": "zt-process-killer",
+        "description": "- Stops processes started from Java or the system processes via PID.",
+        "concept": "Processes"
+    },
+    {
+        "library_name": "Akka",
+        "description": "- Toolkit and runtime for building concurrent, distributed, fault-tolerant and event-driven applications.",
+        "concept": "Reactive libraries"
+    },
+    {
+        "library_name": "Reactive Streams",
+        "description": "- Provides a standard for asynchronous stream processing with non-blocking backpressure.",
+        "concept": "Reactive libraries"
+    },
+    {
+        "library_name": "Reactor",
+        "description": "- Library for building reactive fast-data applications.",
+        "concept": "Reactive libraries"
+    },
+    {
+        "library_name": "RxJava",
+        "description": "- Allows for composing asynchronous and event-based programs using observable sequences.",
+        "concept": "Reactive libraries"
+    },
+    {
+        "library_name": "vert.x",
+        "description": "- Polyglot event-driven application framework.",
+        "concept": "Reactive libraries"
+    },
+    {
+        "library_name": "Dropwizard",
+        "description": "- Opinionated framework for setting up modern web applications with Jetty, Jackson, Jersey and Metrics.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "Elide",
+        "description": "- Opinionated framework for JSON- or GraphQL-APIs based on a JPA data model.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "Jersey",
+        "description": "- JAX-RS reference implementation.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "Microserver",
+        "description": "- Convenient, extensible microservices plugin system for Spring & Spring Boot. With more than 30 plugins and growing, it supports both micro-monolith and pure microservices styles.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "Rapidoid",
+        "description": "- Simple, secure and extremely fast framework consisting of an embedded HTTP server, GUI components and dependency injection.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "rest.li",
+        "description": "- Framework for building robust, scalable RESTful architectures using typesafe bindings and asynchronous, non-blocking IO with an end-to-end developer workflow that promotes clean practices, uniform interface design and consistent data modeling.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "RESTEasy",
+        "description": "- Fully certified and portable implementation of the JAX-RS specification.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "RestExpress",
+        "description": "- Thin wrapper on the JBoss Netty HTTP stack that provides scaling and performance.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "Restlet Framework",
+        "description": "- Pioneering framework with powerful routing and filtering capabilities, and a unified client and server API.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "Spark",
+        "description": "- Sinatra inspired framework.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "Crnk",
+        "description": "- Implementation of the JSON API specification to build resource-oriented REST endpoints with sorting, filtering, paging, linking, object graphs, type-safety, bulk updates, integrations and more.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "springdoc-openapi",
+        "description": "- Automates the generation of API documentation using Spring Boot projects.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "Swagger",
+        "description": "- Standard, language-agnostic interface to REST APIs.",
+        "concept": "REST Frameworks"
+    },
+    {
+        "library_name": "BioJava",
+        "description": "- Facilitates processing biological data by providing algorithms, file format parsers, sequencing and 3D visualization commonly used in bioinformatics.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "Chart-FX",
+        "description": "- Scientific charting library with focus on performance optimised real-time data visualisation at 25 Hz update rates for large data sets.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "DataMelt",
+        "description": "- Environment for scientific computation, data analysis and data visualization. (GPL-3.0-or-later)",
+        "concept": "Science"
+    },
+    {
+        "library_name": "Erdos",
+        "description": "- Modular, light and easy graph framework for theoretic algorithms.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "GraphStream",
+        "description": "- Library for modeling and analyzing dynamic graphs.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "JFreeChart",
+        "description": "- 2D chart library for Swing, JavaFX and server-side applications. (LGPL-2.1-only)",
+        "concept": "Science"
+    },
+    {
+        "library_name": "JGraphT",
+        "description": "- Graph library that provides mathematical graph-theory objects and algorithms.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "JGraphX",
+        "description": "- Library for visualizing (mainly Swing) and interacting with node-edge graphs.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "LogicNG",
+        "description": "- Library for creating, manipulating and solving Boolean and Pseudo-Boolean formulas.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "Mines Java Toolkit",
+        "description": "- Library for geophysical scientific computation, visualization and digital signal analysis.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "Morpheus",
+        "description": "- Provides a versatile two-dimensional memory efficient tabular data structure called a DataFrame to enable efficient in-memory analytics for scientific computing on the JVM.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "Orekit",
+        "description": "- A low level space flight dynamics library providing basic elements (orbits, dates, attitude, frames...) and various algorithms (conversions, propagations, pointing...) to handle them.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "Orson-Charts",
+        "description": "- Generates a wide variety of 3D charts that can be displayed with Swing and JavaFX or exported to PDF, SVG, PNG and JPEG. (GPL-3.0-only)",
+        "concept": "Science"
+    },
+    {
+        "library_name": "Tablesaw",
+        "description": "- Includes a data-frame, an embedded column store, and hundreds of methods to transform, summarize, or filter data.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "XChart",
+        "description": "- Light-weight library for plotting data. Many customizable chart types are available.",
+        "concept": "Science"
+    },
+    {
+        "library_name": "Apache Lucene",
+        "description": "- High-performance, full-featured, cross-platform, text search engine library.",
+        "concept": "Search"
+    },
+    {
+        "library_name": "Apache Solr",
+        "description": "- Enterprise search engine optimized for high-volume traffic.",
+        "concept": "Search"
+    },
+    {
+        "library_name": "Elasticsearch",
+        "description": "- Distributed, multitenant-capable, full-text search engine with a RESTful web interface and schema-free JSON documents.",
+        "concept": "Search"
+    },
+    {
+        "library_name": "Indexer4j",
+        "description": "- Simple and light full text indexing and searching library.",
+        "concept": "Search"
+    },
+    {
+        "library_name": "Apache Shiro",
+        "description": "- Performs authentication, authorization, cryptography and session management.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Bouncy Castle",
+        "description": "- All-purpose cryptographic library and JCA provider offering a wide range of functions, from basic helpers to PGP/SMIME operations.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "DependencyCheck",
+        "description": "- Detects publicly disclosed vulnerabilities contained within a project's dependencies.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Cryptomator",
+        "description": "- Multiplatform, transparent, client-side encryption of files in the cloud. (GPL-3.0-only)",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Hdiv",
+        "description": "- Runtime application that repels application security risks included in the OWASP Top 10, including SQL injection, cross-site scripting, cross-site request forgery, data tampering, and brute force attacks.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "jjwt",
+        "description": "- JSON web token for Java and Android.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "jwt-java",
+        "description": "- Easily create and parse JSON Web Tokens and create customized JWT validators using a fluent API.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Jwks RSA",
+        "description": "- JSON Web Key Set parser.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Kalium",
+        "description": "- Binding for the Networking and Cryptography (NaCl) library.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Keycloak",
+        "description": "- Integrated SSO and IDM for browser apps and RESTful web services.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Keywhiz",
+        "description": "- System for distributing and managing secrets.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Nbvcxz",
+        "description": "- Advanced password strength estimation.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "OACC",
+        "description": "- Provides permission-based authorization services.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "OpenAM",
+        "description": "- Access management solution that includes authentication, SSO, authorization, federation, entitlements and web services security.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "OTP-Java",
+        "description": "- One-time password generator library according to RFC 4226 (HOTP) and RFC 6238 (TOTP).",
+        "concept": "Security"
+    },
+    {
+        "library_name": "pac4j",
+        "description": "- Security engine.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Passay",
+        "description": "- Enforce password policy by validating candidate passwords against a configurable rule set.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Password4j",
+        "description": "- User-friendly cryptographic library that supports Argon2, Bcrypt, Scrypt, PBKDF2 and various other cryptographic hash functions.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "SecurityBuilder",
+        "description": "- Fluent Builder API for JCA and JSSE classes and especially X.509 certificates.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "SSLContext-Kickstart",
+        "description": "- High-level SSL context builder for configuring HTTP clients with SSL/TLS.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Themis",
+        "description": "- Multi-platform high-level cryptographic library provides easy-to-use encryption for protecting sensitive data: secure messaging with forward secrecy, secure data storage (AES256GCM); suits for building end-to-end encrypted applications.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Tink",
+        "description": "- Provides a simple and misuse-proof API for common cryptographic tasks.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "Topaz",
+        "description": "- Fine-grained authorization for applications with support for RBAC, ABAC, and ReBAC.",
+        "concept": "Security"
+    },
+    {
+        "library_name": "FlatBuffers",
+        "description": "- Memory-efficient serialization library that can access serialized data without unpacking and parsing it.",
+        "concept": "Serialization"
+    },
+    {
+        "library_name": "FST",
+        "description": "- JDK-compatible, high-performance object graph serialization.",
+        "concept": "Serialization"
+    },
+    {
+        "library_name": "Fury",
+        "description": "- Blazing fast object graph serialization framework powered by JIT and zero-copy.",
+        "concept": "Serialization"
+    },
+    {
+        "library_name": "Kryo",
+        "description": "- Fast and efficient object graph serialization framework.",
+        "concept": "Serialization"
+    },
+    {
+        "library_name": "MessagePack",
+        "description": "- Efficient binary serialization format.",
+        "concept": "Serialization"
+    },
+    {
+        "library_name": "PHP Serializer",
+        "description": "- Serializing objects in the PHP serialization format.",
+        "concept": "Serialization"
+    },
+    {
+        "library_name": "Apache Tomcat",
+        "description": "- Robust, all-round server for Servlet and JSP.",
+        "concept": "Server"
+    },
+    {
+        "library_name": "Apache TomEE",
+        "description": "- Tomcat plus Java EE.",
+        "concept": "Server"
+    },
+    {
+        "library_name": "Jetty",
+        "description": "- Provides a Web server and javax.servlet container, plus support for HTTP/2, WebSocket, OSGi, JMX, JNDI, JAAS and many other integrations.",
+        "concept": "Server"
+    },
+    {
+        "library_name": "nanohttpd",
+        "description": "- Tiny, easily embeddable HTTP server.",
+        "concept": "Server"
+    },
+    {
+        "library_name": "WildFly",
+        "description": "- Formerly known as JBoss and developed by Red Hat with extensive Java EE support. (LGPL-2.1-only)",
+        "concept": "Server"
+    },
+    {
+        "library_name": "Freemarker",
+        "description": "- Library to generate text output (HTML web pages, e-mails, configuration files, source code, etc.) based on templates and changing data.",
+        "concept": "Template Engine"
+    },
+    {
+        "library_name": "Handlebars.java",
+        "description": "- Logicless and semantic Mustache templates.",
+        "concept": "Template Engine"
+    },
+    {
+        "library_name": "Jade4J",
+        "description": "- Implementation of Pug (formerly known as Jade).",
+        "concept": "Template Engine"
+    },
+    {
+        "library_name": "Jamal",
+        "description": "- Extendable template engine embedded into Maven/JavaDoc, supporting multiple extensions (Groovy, Ruby, JavaScript, JShell, PlantUml) with support for snippet handling.",
+        "concept": "Template Engine"
+    },
+    {
+        "library_name": "jstachio",
+        "description": "- Typesafe Mustache templating engine.",
+        "concept": "Template Engine"
+    },
+    {
+        "library_name": "jte",
+        "description": "- Compiles to classes, and uses an easy syntax, several features to make development easier and provides fast execution and a small footprint.",
+        "concept": "Template Engine"
+    },
+    {
+        "library_name": "Jtwig",
+        "description": "- Modular, configurable and fully tested template engine.",
+        "concept": "Template Engine"
+    },
+    {
+        "library_name": "Pebble",
+        "description": "- Inspired by Twig and separates itself with its inheritance feature and its easy-to-read syntax. It ships with built-in autoescaping for security and it includes integrated support for internationalization.",
+        "concept": "Template Engine"
+    },
+    {
+        "library_name": "Rocker",
+        "description": "- Optimized, memory efficient and speedy template engine producing statically typed, plain objects.",
+        "concept": "Template Engine"
+    },
+    {
+        "library_name": "StringTemplate",
+        "description": "- Template engine for generating source code, web pages, emails, or any other formatted text output.",
+        "concept": "Template Engine"
+    },
+    {
+        "library_name": "Thymeleaf",
+        "description": "- Aims to be a substitute for JSP and works for XML files.",
+        "concept": "Template Engine"
+    },
+    {
+        "library_name": "Awaitility",
+        "description": "- DSL for synchronizing asynchronous operations.",
+        "concept": "Testing"
+    },
+    {
+        "library_name": "ConcurrentUnit",
+        "description": "- Toolkit for testing multi-threaded and asynchronous applications.",
+        "concept": "Testing"
+    },
+    {
+        "library_name": "GreenMail",
+        "description": "- In-memory email server for integration testing. Supports SMTP, POP3 and IMAP including SSL. (GPL-2.0-only)",
+        "concept": "Testing"
+    },
+    {
+        "library_name": "Hoverfly Java",
+        "description": "- Native bindings for Hoverfly, a proxy which allows you to simulate HTTP services.",
+        "concept": "Testing"
+    },
+    {
+        "library_name": "Karate",
+        "description": "- DSL that combines API test-automation, mocks and performance-testing making testing REST/HTTP services easy.",
+        "concept": "Testing"
+    },
+    {
+        "library_name": "REST Assured",
+        "description": "- DSL for easy testing of REST/HTTP services.",
+        "concept": "Testing"
+    },
+    {
+        "library_name": "WebTau",
+        "description": "- Test across REST-API, Graph QL, Browser, Database, CLI and Business Logic with consistent set of matchers and concepts.",
+        "concept": "Testing"
+    },
+    {
+        "library_name": "Arthas",
+        "description": "- Allows to troubleshoot production issues for applications without modifying code or restarting servers.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "bucket4j",
+        "description": "- Rate limiting library based on token-bucket algorithm.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "cactoos",
+        "description": "- Collection of object-oriented primitives.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "Chocotea",
+        "description": "- Generates postman collection, environment and integration tests from java code.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "CRaSH",
+        "description": "- Provides a shell into a JVM that's running . Used by Spring Boot and others. (LGPL-2.1-or-later)",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "Dex",
+        "description": "- Java/JavaFX tool capable of powerful ETL and data visualization.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "dregex",
+        "description": "- Regular expression engine that uses deterministic finite automata. It supports some Perl-style features and yet retains linear matching time, and also offers set operations.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "Embulk",
+        "description": "- Bulk data loader that helps data transfer between various databases, storages, file formats, and cloud services.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "fswatch",
+        "description": "- Micro library to watch for directory file system changes, simplifying java.nio.file.WatchService.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "Gephi",
+        "description": "- Cross-platform for visualizing and manipulating large graph networks. (GPL-3.0-only)",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "Guava",
+        "description": "- Collections, caching, primitives support, concurrency libraries, common annotations, string processing, I/O, and more.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "JADE",
+        "description": "- Framework and environment for building and debugging multi-agent systems. (LGPL-2.0-only)",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "Java Diff Utils",
+        "description": "- Utilities for text or data comparison and patching.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "JavaVerbalExpressions",
+        "description": "- Library that helps with constructing difficult regular expressions.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "JGit",
+        "description": "- Lightweight, pure Java library implementing the Git version control system.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "JKScope",
+        "description": "- Java scope functions inspired by Kotlin.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "minio-java",
+        "description": "- Provides simple APIs to access any Amazon S3-compatible object storage server.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "Prot\u00e9g\u00e9",
+        "description": "- Provides an ontology editor and a framework to build knowledge-based systems.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "Semver4j",
+        "description": "- Lightweight library that helps you handling semantic versioning with different modes.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "Underscore-java",
+        "description": "- Port of Underscore.js functions.",
+        "concept": "Utility"
+    },
+    {
+        "library_name": "jabba",
+        "description": "- Java Version Manager inspired by nvm. Supports macOS, Linux and Windows.",
+        "concept": "Version Managers"
+    },
+    {
+        "library_name": "jenv",
+        "description": "- Java Version Manager inspired by rbenv. Can configure globally or per project. Tested on Debian and macOS.",
+        "concept": "Version Managers"
+    },
+    {
+        "library_name": "SDKMan",
+        "description": "- Java Version Manager inspired by RVM and rbenv. Supports UNIX-based platforms and Windows.",
+        "concept": "Version Managers"
+    },
+    {
+        "library_name": "Apache Nutch",
+        "description": "- Highly extensible, highly scalable web crawler for production environments.",
+        "concept": "Web Crawling"
+    },
+    {
+        "library_name": "Crawler4j",
+        "description": "- Simple and lightweight web crawler.",
+        "concept": "Web Crawling"
+    },
+    {
+        "library_name": "jsoup",
+        "description": "- Scrapes, parses, manipulates and cleans HTML.",
+        "concept": "Web Crawling"
+    },
+    {
+        "library_name": "StormCrawler",
+        "description": "- SDK for building low-latency and scalable web crawlers.",
+        "concept": "Web Crawling"
+    },
+    {
+        "library_name": "webmagic",
+        "description": "- Scalable crawler with downloading, url management, content extraction and persistent.",
+        "concept": "Web Crawling"
+    },
+    {
+        "library_name": "ActiveJ",
+        "description": "- Lightweight asynchronous framework built from the ground up for developing high-performance web applications.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Apache Tapestry",
+        "description": "- Component-oriented framework for creating dynamic, robust, highly scalable web applications.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Apache Wicket",
+        "description": "- Component-based web application framework similar to Tapestry, with a stateful GUI.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Blade",
+        "description": "- Lightweight, modular framework that aims to be elegant and simple.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Bootique",
+        "description": "- Minimally opinionated framework for runnable apps.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Firefly",
+        "description": "- Asynchronous framework for rapid development of high-performance web application.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Javalin",
+        "description": "- Microframework for web applications.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Jooby",
+        "description": "- Scalable, fast and modular micro-framework that offers multiple programming models.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Ninja",
+        "description": "- Full-stack web framework.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Pippo",
+        "description": "- Small, highly modularized, Sinatra-like framework.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Play",
+        "description": "- Built on Akka, it provides predictable and minimal resource consumption (CPU, memory, threads) for highly-scalable applications in Java and Scala.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "PrimeFaces",
+        "description": "- JSF framework with both free and commercial/support versions and frontend components.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Ratpack",
+        "description": "- Set of libraries that facilitate fast, efficient, evolvable and well-tested HTTP applications.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Takes",
+        "description": "- Opinionated web framework which is built around the concepts of True Object-Oriented Programming and immutability.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Vaadin",
+        "description": "- Event-driven framework that uses standard web components. Server-side architecture with Ajax on the client side.",
+        "concept": "Web Frameworks"
+    },
+    {
+        "library_name": "Cadence",
+        "description": "- Stateful code platform from Uber.",
+        "concept": "Workflow Orchestration Engines"
+    },
+    {
+        "library_name": "flowable",
+        "description": "- Compact and efficient workflow and business process management platform.",
+        "concept": "Workflow Orchestration Engines"
+    },
+    {
+        "library_name": "Temporal",
+        "description": "- Microservice orchestration platform, forked from Cadence but gRPC based.",
+        "concept": "Workflow Orchestration Engines"
+    }
+]
