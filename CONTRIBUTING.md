@@ -77,7 +77,7 @@ git commit -s -m "your commit message"
 Please install Python 3.10 or 3.11, then 
 
 ```
-git clone git@github.ibm.com:IBM/data-prep-kit.git
+git clone git@github.com:IBM/data-prep-kit.git
 cd data-prep-kit 
 pip install pre-commit
 pip install twine
