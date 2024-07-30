@@ -14,3 +14,5 @@ DATA_PROFILER_NAME=syntactic_construct_extractor
 include $(REPOROOT)/tools/data-profiler/.make.profiler
 
 run-local-sample: .data-profiler.run-local-sample
+
+clean:: .defaults.clean

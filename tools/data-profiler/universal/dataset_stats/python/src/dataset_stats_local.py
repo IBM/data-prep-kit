@@ -44,14 +44,13 @@ if __name__ == "__main__":
     table_list, metadata = profiler.transform(table)
     print(f"\noutput table: {table_list}")
     print(f"output metadata : {metadata}")
-    
+
     # Path to the JSON file where metadata will be saved
     dataset_stats = f"{output_folder}/dataset_stats.json"
     # Write the metadata dictionary to a JSON file
     with open(dataset_stats, "w") as json_file:
         json.dump(metadata, json_file, indent=4)
     print(f"Metadata has been written to {dataset_stats}")
-
 
     # Path to the JSON file where metadata will be saved
     aggregated_profiler = os.path.join(output_folder, "aggregated_profiler.json")
@@ -73,4 +72,4 @@ if __name__ == "__main__":
     with open(aggregated_profiler, "w") as json_file:
         json.dump(existing_data, json_file, indent=4)
 
-    print(f"Metadata has been written to {aggregated_profiler}")   
+    print(f"Metadata has been written to {aggregated_profiler}")

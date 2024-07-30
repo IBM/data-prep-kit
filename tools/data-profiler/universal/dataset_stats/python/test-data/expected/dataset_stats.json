@@ -215,47 +215,17 @@
     "Word count (Maximum)": 7744,
     "Number of programming Languages": 4,
     "Programming languages detected (name, count)": [
-        [
-            "unknown",
-            2287
-        ],
-        [
-            "Text",
-            340
-        ],
-        [
-            "JSON",
-            80
-        ],
-        [
-            "Python",
-            6
-        ],
-        [
-            "Jupyter Notebook",
-            2
-        ]
+        ["unknown", 2287],
+        ["Text", 340],
+        ["JSON", 80],
+        ["Python", 6],
+        ["Jupyter Notebook", 2]
     ],
     "Size of code snippets per programming language (in KB)": [
-        [
-            "unknown",
-            35559.296875
-        ],
-        [
-            "Text",
-            970.26953125
-        ],
-        [
-            "Jupyter Notebook",
-            218.978515625
-        ],
-        [
-            "Python",
-            104.931640625
-        ],
-        [
-            "JSON",
-            39.1640625
-        ]
+        ["unknown", 35559.296875],
+        ["Text", 970.26953125],
+        ["Jupyter Notebook", 218.978515625],
+        ["Python", 104.931640625],
+        ["JSON", 39.1640625]
     ]
 }

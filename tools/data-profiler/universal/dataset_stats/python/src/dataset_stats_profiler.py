@@ -13,15 +13,15 @@
 import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
+
 import numpy as np
 import pandas as pd
-from pygments.lexers import guess_lexer, get_all_lexers
-from pygments.util import ClassNotFound
 import pyarrow as pa
 import pyarrow.parquet as pq
-from langdetect import detect
-
 from data_processing.transform import AbstractTableTransform
+from langdetect import detect
+from pygments.lexers import get_all_lexers, guess_lexer
+from pygments.util import ClassNotFound
 
 
 class DatasetStatsProfiler(AbstractTableTransform):
@@ -61,7 +61,9 @@ class DatasetStatsProfiler(AbstractTableTransform):
             raise TypeError("Expected df to be a pandas DataFrame")
 
         # Convert all columns to string type safely, handling NaN and other types
-        df = df.apply(lambda col: col.map(lambda x: str(x) if not pd.isna(x) else '') if isinstance(col, pd.Series) else col)
+        df = df.apply(
+            lambda col: col.map(lambda x: str(x) if not pd.isna(x) else "") if isinstance(col, pd.Series) else col
+        )
 
         # Print column names for debugging
         print("DataFrame columns:", df.columns)
@@ -77,44 +79,50 @@ class DatasetStatsProfiler(AbstractTableTransform):
         word_counts = self.calculate_word_counts(df, self.config.get("input_code_col"))
 
         # 4. plang
-        prog_langs = self.detect_programming_languages(df, self.config.get("input_code_col"),
-                                                       self.config.get("output_code_col"),
-                                                       self.config.get("code_language_col"))
+        prog_langs = self.detect_programming_languages(
+            df,
+            self.config.get("input_code_col"),
+            self.config.get("output_code_col"),
+            self.config.get("code_language_col"),
+        )
         # 5. Human langs
-        human_langs = self.detect_human_languages(df, self.config.get("instruction_col")) if self.config.get("instruction_col") else None
+        human_langs = (
+            self.detect_human_languages(df, self.config.get("instruction_col"))
+            if self.config.get("instruction_col")
+            else None
+        )
 
         if self.config.get("datatype") == "EPT":
             row_alias = "Files"
         elif self.config.get("datatype") == "SFT":
             row_alias = "Instruction Pairs"
-        
+
         metadata = {
             "Data model": "Dataset statistics",
             f"Number of {row_alias}": total_rows,
             f"Number of Unique {row_alias}": unique_rows,
-
             "Character count (Minimum)": character_counts["min_char_counts"],
             "Character count (Median)": character_counts["median_char_counts"],
             "Character count (Average/Mean)": character_counts["average_char_counts"],
             "Character count (Maximum)": character_counts["max_char_counts"],
             "Character count for percentiles": character_counts["char_len_dict"],
-
             "Word count (Minimum)": word_counts["min_word_counts"],
             "Word count (Median)": word_counts["median_word_counts"],
             "Word count (Average/Mean)": word_counts["average_word_counts"],
             "Word count (Maximum)": word_counts["max_word_counts"],
-
             "Number of programming Languages": prog_langs["num_total_unique_languages"],
             "Programming languages detected (name, count)": prog_langs["sorted_prog_lang_count"],
             "Size of code snippets per programming language (in KB)": prog_langs["language_code_sizes_list"],
-            }
+        }
         if human_langs:
-            metadata.update({
-            f"Number of human languages detected in the {row_alias}": human_langs["num_human_languages"],
-            "Human languages detected (name, count)": human_langs["sorted_human_lang_count"],})
+            metadata.update(
+                {
+                    f"Number of human languages detected in the {row_alias}": human_langs["num_human_languages"],
+                    "Human languages detected (name, count)": human_langs["sorted_human_lang_count"],
+                }
+            )
 
         return [table], metadata
-
 
     def detect_human_languages(self, df: pd.DataFrame, instruction_col: str) -> dict[str, Any]:
         if instruction_col in df.columns:
@@ -124,24 +132,26 @@ class DatasetStatsProfiler(AbstractTableTransform):
                     return detect(text)
                 except:
                     return None
-            languages = df['instruction_col'].apply(detect_language)
+
+            languages = df["instruction_col"].apply(detect_language)
             unique_human_languages = languages.dropna().unique()
             num_human_languages = len(unique_human_languages)
             # Applying detection and creating a new column
-            hlang_data = df['instruction_col'].apply(detect_language)
+            hlang_data = df["instruction_col"].apply(detect_language)
             # Counting occurrences of each language
             human_lang_counts = hlang_data.value_counts(dropna=False)
             sorted_human_lang_count = sorted(human_lang_counts.items(), key=lambda x: x[1], reverse=True)
             return {
-            "num_human_languages": num_human_languages,
-            "sorted_human_lang_count": sorted_human_lang_count,
+                "num_human_languages": num_human_languages,
+                "sorted_human_lang_count": sorted_human_lang_count,
             }
 
-    def detect_programming_languages(self, df: pd.DataFrame, input_code_col: str,
-                                     output_code_col: str, code_language_col: str) -> dict[str, Any]:
+    def detect_programming_languages(
+        self, df: pd.DataFrame, input_code_col: str, output_code_col: str, code_language_col: str
+    ) -> dict[str, Any]:
         def detect_languages(text):
             # Check if the text is empty or NaN before proceeding
-            if pd.isna(text) or text.strip() == '':
+            if pd.isna(text) or text.strip() == "":
                 return None
             try:
                 lexer = guess_lexer(text)
@@ -156,7 +166,9 @@ class DatasetStatsProfiler(AbstractTableTransform):
             for lang in df[code_language_col]:
                 prog_lang_count[lang] = prog_lang_count.get(lang, 0) + 1
 
-            filtered_prog_lang_count = {lang: count for lang, count in prog_lang_count.items() if lang is not None and lang != 'unknown'}
+            filtered_prog_lang_count = {
+                lang: count for lang, count in prog_lang_count.items() if lang is not None and lang != "unknown"
+            }
 
             # Count unique values in the 'code_language' column
             detected_languages_in_input = df[code_language_col].value_counts()
@@ -184,7 +196,9 @@ class DatasetStatsProfiler(AbstractTableTransform):
             all_unique_languages = set(unique_languages_in_input).union(set(unique_languages_in_output))
             num_total_unique_languages = len(all_unique_languages)
 
-        filtered_prog_lang_count = {lang: count for lang, count in prog_lang_count.items() if lang is not None and lang != 'text'}
+        filtered_prog_lang_count = {
+            lang: count for lang, count in prog_lang_count.items() if lang is not None and lang != "text"
+        }
         sorted_prog_lang_count = sorted(filtered_prog_lang_count.items(), key=lambda x: x[1], reverse=True)
 
         def get_language(code_snippet, language):
@@ -193,17 +207,31 @@ class DatasetStatsProfiler(AbstractTableTransform):
             else:
                 return detect_languages(code_snippet)
 
-        detected_languages_and_sizes_input = df.apply(lambda row: (get_language(row[input_code_col], row.get(code_language_col)), len(row[input_code_col].encode('utf-8'))), axis=1)
+        detected_languages_and_sizes_input = df.apply(
+            lambda row: (
+                get_language(row[input_code_col], row.get(code_language_col)),
+                len(row[input_code_col].encode("utf-8")),
+            ),
+            axis=1,
+        )
 
         if output_code_col in df.columns:
-            detected_languages_and_sizes_output = df.apply(lambda row: (get_language(row[output_code_col], row.get(code_language_col)), len(row[output_code_col].encode('utf-8'))), axis=1)
+            detected_languages_and_sizes_output = df.apply(
+                lambda row: (
+                    get_language(row[output_code_col], row.get(code_language_col)),
+                    len(row[output_code_col].encode("utf-8")),
+                ),
+                axis=1,
+            )
         else:
             detected_languages_and_sizes_output = pd.Series([], dtype=object)
 
-        detected_languages_combined = pd.DataFrame(list(detected_languages_and_sizes_input) + list(detected_languages_and_sizes_output),
-                                                columns=['detected_language', 'code_size'])
+        detected_languages_combined = pd.DataFrame(
+            list(detected_languages_and_sizes_input) + list(detected_languages_and_sizes_output),
+            columns=["detected_language", "code_size"],
+        )
 
-        language_code_sizes = detected_languages_combined.groupby('detected_language')['code_size'].sum().divide(1024)
+        language_code_sizes = detected_languages_combined.groupby("detected_language")["code_size"].sum().divide(1024)
         language_code_sizes_list = sorted(language_code_sizes.items(), key=lambda x: x[1], reverse=True)
 
         print(language_code_sizes_list)

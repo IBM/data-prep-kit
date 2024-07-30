@@ -44,7 +44,7 @@ if __name__ == "__main__":
     table_list, metadata = profiler.transform(table)
     print(f"\noutput table: {table_list}")
     print(f"output metadata : {metadata}")
-    
+
     # Path to the JSON file where metadata will be saved
     syntactic_constructs = f"{output_folder}/syntactic_constructs.json"
     # Write the metadata dictionary to a JSON file
@@ -72,4 +72,4 @@ if __name__ == "__main__":
     with open(aggregated_profiler, "w") as json_file:
         json.dump(existing_data, json_file, indent=4)
 
-    print(f"Metadata has been written to {aggregated_profiler}")   
+    print(f"Metadata has been written to {aggregated_profiler}")

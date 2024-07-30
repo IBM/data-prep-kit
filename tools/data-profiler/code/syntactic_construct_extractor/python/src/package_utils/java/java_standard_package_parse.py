@@ -12,22 +12,23 @@
 
 import json
 
+
 def extract_library_names(json_filepath, output_filepath):
     try:
         # Open and read the JSON file
-        with open(json_filepath, 'r') as file:
+        with open(json_filepath, "r") as file:
             data = json.load(file)
-        
+
         # Collect all 'library_name' values
-        library_names = [item['package'] for item in data if 'package' in item]
-        
+        library_names = [item["package"] for item in data if "package" in item]
+
         # Write these names to a text file
-        with open(output_filepath, 'w') as file:
+        with open(output_filepath, "w") as file:
             for name in library_names:
-                file.write(name + '\n')
-        
+                file.write(name + "\n")
+
         print(f"Library names were successfully written to {output_filepath}")
-    
+
     except FileNotFoundError:
         print("Error: The specified file does not exist.")
     except json.JSONDecodeError:
@@ -35,7 +36,8 @@ def extract_library_names(json_filepath, output_filepath):
     except Exception as e:
         print(f"An error occurred: {e}")
 
+
 # Example usage
-json_filepath = 'java_standard_packages.json'
-output_filepath = 'java_standard_packages.txt'
+json_filepath = "java_standard_packages.json"
+output_filepath = "java_standard_packages.txt"
 extract_library_names(json_filepath, output_filepath)
