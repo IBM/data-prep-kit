@@ -164,8 +164,7 @@ class DataAccess:
     def save_job_metadata(self, metadata: dict[str, Any]) -> tuple[dict[str, Any], int]:
         """
         Save job metadata
-        :param metadata: a dictionary, containing the following keys
-        (see https://github.ibm.com/arc/dmf-library/issues/158):
+        :param metadata: a dictionary, containing the following keys:
             "pipeline",
             "job details",
             "code",
