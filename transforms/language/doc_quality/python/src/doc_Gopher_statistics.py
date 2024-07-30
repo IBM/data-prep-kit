@@ -101,8 +101,7 @@ def contains_common_English_words(text: str, ft_lang: str, min_count: int = 2) -
 
 
 """
-Extra heuristic rules for particular Japanese language per TRL team
-Ref: https://github.ibm.com/MMURAOKA/ja_llm/blob/main/src/doc_quality/ja_rule_filters.py
+Extra heuristic rules for particular Japanese language
 """
 
 
