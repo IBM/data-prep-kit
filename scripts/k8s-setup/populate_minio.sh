@@ -22,6 +22,7 @@ echo "copying data"
 mc cp --recursive ${REPOROOT}/transforms/code/code_quality/ray/test-data/input/ kfp/test/code_quality/input
 mc cp --recursive ${REPOROOT}/transforms/code/code2parquet/ray/test-data/input/data-processing-lib.zip kfp/test/code2parquet/input
 mc cp --recursive ${REPOROOT}/transforms/code/code2parquet/ray/test-data/languages/ kfp/test/code2parquet/languages
+mc cp --recursive ${REPOROOT}/transforms/code/issues/ray/test-data/input/ kfp/test/issues/input
 mc cp --recursive ${REPOROOT}/transforms/code/proglang_select/ray/test-data/input/ kfp/test/proglang_select/input
 mc cp --recursive ${REPOROOT}/transforms/code/proglang_select/ray/test-data/languages/ kfp/test/proglang_select/languages
 mc cp --recursive ${REPOROOT}/transforms/code/malware/ray/test-data/input/ kfp/test/malware/input

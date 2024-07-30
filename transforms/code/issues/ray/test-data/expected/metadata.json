@@ -1,0 +1,53 @@
+{
+  "pipeline": "pipeline_id",
+  "job details": {
+    "job category": "preprocessing",
+    "job name": "issues",
+    "job type": "pure python",
+    "job id": "job_id",
+    "start_time": "2024-07-30 22:07:49",
+    "end_time": "2024-07-30 22:07:49",
+    "status": "success"
+  },
+  "code": {
+    "github": "github",
+    "commit_hash": "12345",
+    "path": "path"
+  },
+  "job_input_params": {
+    "min_chars": 200,
+    "max_chars": 7000,
+    "max_events": 10,
+    "max_lines": 80,
+    "events_column_name": "events",
+    "checkpointing": false,
+    "max_files": -1,
+    "random_samples": -1,
+    "files_to_use": [
+      ".parquet"
+    ]
+  },
+  "job_output_stats": {
+    "source_files": 1,
+    "source_size": 51681,
+    "result_files": 1,
+    "result_size": 20247,
+    "processing_time": 0.0971829891204834,
+    "size_before_filter": 100,
+    "size_gb_before_filter": 34848,
+    "size_after_long_comments_truncate": 100,
+    "size_gb_after_long_comments_truncate": 34848,
+    "size_after_bot_filter": 154,
+    "size_gb_after_bot_filter": 65618,
+    "source_doc_count": 100,
+    "result_doc_count": 54
+  },
+  "source": {
+    "name": "/Users/dtsuzuku/granite/data-prep-kit/transforms/code/issues/python/test-data/input",
+    "type": "path"
+  },
+  "target": {
+    "name": "/Users/dtsuzuku/granite/data-prep-kit/transforms/code/issues/python/output",
+    "type": "path"
+  }
+}
