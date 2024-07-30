@@ -92,6 +92,9 @@ PDF2PARQUET_RAY_VERSION=$(DPK_VERSION)
 TEXT_ENCODER_PYTHON_VERSION=$(DPK_VERSION)
 TEXT_ENCODER_RAY_VERSION=$(DPK_VERSION)
 
+HEADER_CLEANSER_PYTHON_VERSION=$(DPK_VERSION) 
+HEADER_CLEANSER_RAY_VERSION=$(DPK_VERSION) 
+
 ################## ################## ################## ################## ################## ##################
 # Begin versions that the repo depends on. 
 
@@ -106,5 +109,3 @@ ifeq ($(KFPv2), 1)
 else
         WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
 endif
-
-
