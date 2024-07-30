@@ -22,10 +22,6 @@ test-lib-src::
 	@# Help: Install the library source into the venv and test 
 	$(MAKE) RULE=test-lib-src .recurse
 
-publish::
-	@# Help: publish image
-	$(MAKE) RULE=publish .recurse
-
 set-versions:  
 	@# Help: Recursively $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse

@@ -9,6 +9,7 @@ REPOROOT=../../../../..
 
 DATA_PROFILER_RUNTIME=python
 DATA_PROFILER_NAME=syntactic_construct_extractor
+DOCKER_IMAGE_VERSION=latest
 
 # include $(REPOROOT)/transforms/.make.transforms
 include $(REPOROOT)/tools/data-profiler/.make.profiler
@@ -18,5 +19,15 @@ venv::	.data-profiler.python-venv
 test::	.data-profiler.python-test
 
 clean:: .data-profiler.clean
+
+image:: .data-profiler.python-image
+
+build:: build-dist image
+
+build-dist:: set-versions .defaults.build-dist 
+
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TOML_VERSION=1.1.0 .defaults.update-toml
 
 run-local-sample: .data-profiler.run-local-sample
