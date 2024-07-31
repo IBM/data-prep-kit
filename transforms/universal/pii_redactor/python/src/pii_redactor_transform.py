@@ -85,9 +85,6 @@ class PIIRedactorTransform(AbstractTableTransform):
                 table = table.add_column(0, "new_contents", [column_data])
         metadata["transformed_table_rows"] = table.num_rows
         metadata["transformed_column_count"] = len(table.column_names)
-        print(f"transformed table=====\n {table}")
-        # print(table)
-        print(f"metadata=============\n {metadata}")
         return [table], metadata
 
 

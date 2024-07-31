@@ -31,8 +31,7 @@ if __name__ == "__main__":
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
     table = data_access.get_table(os.path.join(input_folder, "pii_test_data.parquet"))[0]
-    print(f"input table: {table}")
+
     # Transform the table
     table_list, metadata = transform.transform(table)
-    print(f"\noutput table: {table_list}")
-    print(f"output metadata : {metadata}")
+
