@@ -51,14 +51,6 @@ extra-help:
 	    echo ERROR: DOCKER_HOSTNAME must be defined.;	\
 	fi
 
-.PHONY: .data-profiler.clean
-.data-profiler.clean:: .defaults.clean
-	$(MAKE) minio-stop  
-	-rm -rf output > /dev/null 2>&1			# Created when running local samples
-	-rm -rf python-transform > /dev/null 2>&1	# Created when build ray and spark image 
-	@# Help: Normal cleanups plus stop minio server and rm output dir
-
-
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
 # We install wheel, because it seems to be required for fasttext install on redhat.
