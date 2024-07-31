@@ -40,5 +40,5 @@ class TextEncoderPythonTransformConfiguration(PythonTransformRuntimeConfiguratio
 
 if __name__ == "__main__":
     launcher = PythonTransformLauncher(TextEncoderPythonTransformConfiguration())
-    logger.info("Launching noop transform")
+    logger.info("Launching text_encoder transform")
     launcher.launch()

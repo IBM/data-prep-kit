@@ -16,11 +16,10 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from noop_transform import sleep_cli_param
-from noop_transform_ray import NOOPRayTransformConfiguration
+from text_encoder_transform_ray import TextEncoderRayTransformConfiguration
 
 
-class TestRayNOOPTransform(AbstractTransformLauncherTest):
+class TestRayTextEncoderTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -30,12 +29,11 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
         basedir = "../test-data"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         fixtures = []
-        # launcher = NOOPRayLauncher()
-        launcher = RayTransformLauncher(NOOPRayTransformConfiguration())
+        launcher = RayTransformLauncher(TextEncoderRayTransformConfiguration())
         fixtures.append(
             (
                 launcher,
-                {sleep_cli_param: 0, "run_locally": True},
+                {"run_locally": True},
                 basedir + "/input",
                 basedir + "/expected",
             )

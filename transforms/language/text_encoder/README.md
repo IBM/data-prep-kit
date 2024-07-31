@@ -1,6 +1,8 @@
 # Text encoder Transform 
-The Text encoder transforms serves as a simple exemplar to demonstrate the development
-of a simple 1:1 transform.  Per the set of 
+
+This transform is using sentence encoder models to create embeddings of the text in each row of the input .parquet table.
+
+Per the set of 
 [transform project conventions](../../README.md#transform-project-conventions)
 the following runtimes are available:
 

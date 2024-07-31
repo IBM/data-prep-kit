@@ -111,7 +111,7 @@ class TextEncoderTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{content_column_name_cli_param}",
             default=default_content_column_name,
-            help="Column name to get content",
+            help="Name of the column containing the text to be encoded",
         )
         parser.add_argument(
             f"--{output_embeddings_column_name_cli_param}",
@@ -121,7 +121,7 @@ class TextEncoderTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{model_name_cli_param}",
             default=default_model_name,
-            help="Name of the HF model to use for encoding the text",
+            help="Name of the HF model to use for encoding the text. The default model is BAAI/bge-small-en-v1.5",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:

@@ -13,7 +13,7 @@ The transform can be tuned with the following parameters.
 | Parameter  | Default  | Description  |
 |------------|----------|--------------|
 | `model_name`                    | `BAAI/bge-small-en-v1.5` | The HF model to use for encoding the text. |
-| `content_column_name`           | `contents` | Column name to get content in the input table. |
+| `content_column_name`           | `contents` | Name of the column containing the text to be encoded. |
 | `output_embeddings_column_name` | `embeddings` | Column name to store the embeddings in the output table. |
 | `output_path_column_name`       | `doc_path` | Column name to store the document path of the chunk in the output table. |
 

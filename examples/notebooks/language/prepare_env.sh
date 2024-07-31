@@ -6,16 +6,6 @@ echo $REPO_ROOT
 
 pip install notebook ipywidgets
 
-# requirement_files=(
-# "$REPO_ROOT/tools/ingest2parquet/requirements.txt"
-# )
-
-# # Iterate through the list and install requirements from each file
-# for requirements_file in "${requirement_files[@]}"
-# do
-#   echo "Install packages from $requirements_file"
-#   pip install -r "$requirements_file"
-# done
 
 packages=(
 "$REPO_ROOT/transforms/language/pdf2parquet/python"
@@ -24,8 +14,8 @@ packages=(
 "$REPO_ROOT/transforms/language/lang_id/ray"
 "$REPO_ROOT/transforms/language/doc_quality/python"
 "$REPO_ROOT/transforms/language/doc_quality/ray"
-# "$REPO_ROOT/transforms/language/doc_json_chunk/python"
-# "$REPO_ROOT/transforms/language/doc_json_chunk/ray"
+# "$REPO_ROOT/transforms/language/doc_chunk/python"
+# "$REPO_ROOT/transforms/language/doc_chunk/ray"
 "$REPO_ROOT/transforms/language/text_encoder/python"
 "$REPO_ROOT/transforms/language/text_encoder/ray"
 "$REPO_ROOT/transforms/universal/ededup/python"
