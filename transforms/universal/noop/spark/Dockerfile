@@ -30,9 +30,6 @@ COPY ./src/noop_local_spark.py local/
 COPY test/ test/
 COPY test-data/ test-data/
 
-# copy config
-COPY config/ config/
-
 USER spark
 
 # Set environment
