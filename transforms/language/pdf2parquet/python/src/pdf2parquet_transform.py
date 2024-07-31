@@ -85,6 +85,8 @@ class Pdf2ParquetTransform(AbstractBinaryTransform):
             do_table_structure=self.do_table_structure,
             do_ocr=self.do_ocr,
         )
+        # use text cells predicted from table structure model, instead of matching with pdf cells
+        pipeline_options.table_structure_options.do_cell_matching = False
         self._converter = DocumentConverter(artifacts_path=self.artifacts_path, pipeline_options=pipeline_options)
 
     def _update_metrics(self, num_pages: int, elapse_time: float):
