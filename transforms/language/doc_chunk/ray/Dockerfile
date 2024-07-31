@@ -1,8 +1,6 @@
 ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
 FROM ${BASE_IMAGE}
 
-ENV GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
-
 # install pytest
 RUN pip install --no-cache-dir pytest
 
@@ -13,25 +11,14 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/ 
 RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
 COPY --chown=ray:users python-transform/  python-transform/
-
-RUN \
-    sudo apt-get update \
-    && sudo apt-get install -y git curl wget \
-    && sudo apt-get clean
-RUN \
-    # SSH for git dependencies
-    --mount=type=ssh,uid=1000 \
-    cd python-transform && pip install --no-cache-dir -e .
+RUN cd python-transform && pip install --no-cache-dir -e .
 
 #COPY requirements.txt requirements.txt
 #RUN pip install --no-cache-dir -r  requirements.txt
 
 COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 
-RUN \
-    # SSH for git dependencies
-    --mount=type=ssh,uid=1000 \
-    pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir -e .
 
 # copy the main() entry point to the image 
 COPY ./src/doc_chunk_transform_ray.py .

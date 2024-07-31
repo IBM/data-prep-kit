@@ -1,7 +1,5 @@
 FROM docker.io/python:3.10.14-slim-bullseye
 
-ENV GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no"
-
 RUN pip install --upgrade pip 
 
 # install pytest
@@ -19,18 +17,9 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 
 # END OF STEPS destined for a data-prep-kit base image 
 
-RUN \
-    apt-get update \
-    && apt-get install -y git curl wget \
-    && apt-get clean
-
-
 COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
-RUN \
-    # SSH for git dependencies
-    --mount=type=ssh,uid=1000 \
-    pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir -e .
 
 # copy transform main() entry point to the image 
 COPY ./src/doc_chunk_transform_python.py .
