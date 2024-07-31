@@ -12,7 +12,7 @@ This might include operations such as de-duplication, merging, and splitting.
 The framework uses a plug-in model for the primary functions.  The core
 transformation-specific classes/interfaces are as follows:
 
-* [AbstractTransform](../python/src/data_processing/transform/abstract_transform.py) - 
+* [AbstractBinaryTransform](../python/src/data_processing/transform/binary_transform.py) - 
 a simple, easily-implemented interface allowing the definition transforms
 over arbitrary data types.  Support is provided for both
 [files](../python/src/data_processing/transform/binary_transform.py) of arbitrary data as a byte array and 
