@@ -38,11 +38,11 @@ if __name__ == "__main__":
     transform = LangIdentificationTransform(lang_id_params)
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
-    table = data_access.get_table(os.path.join(input_folder, "test_01.parquet"))
+    table, _ = data_access.get_table(os.path.join(input_folder, "test_01.parquet"))
     print(f"input table: {table}")
     # Transform the table
     try:
-        table_list, metadata = transform.transform(table[0])
+        table_list, metadata = transform.transform(table)
         print(f"\noutput table: {table_list}")
         print(f"output metadata : {metadata}")
     except Exception as e:

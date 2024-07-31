@@ -44,6 +44,10 @@ pdf2parquet_do_ocr_key = f"do_ocr"
 class pdf2parquet_contents_types(str, enum.Enum):
     MARKDOWN = "text/markdown"
     JSON = "application/json"
+
+    def __str__(self):
+        return str(self.value)
+
 pdf2parquet_contents_type_default = pdf2parquet_contents_types.MARKDOWN
 pdf2parquet_do_table_structure_default = True
 pdf2parquet_do_ocr_default = False
