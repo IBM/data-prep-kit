@@ -1,4 +1,4 @@
-PRE_COMMIT = "./pre-commit-config.yaml"
+PRE_COMMIT = "../pre-commit-config.yaml"
 PIPELINE_TEMPLATE_FILE = "simple_pipeline.py"
 
 INPUT_PARAMETERS = "input_parameters"
