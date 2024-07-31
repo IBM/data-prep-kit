@@ -14,8 +14,7 @@ import argparse
 import time
 
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
-from data_processing.runtime.pure_python import PythonTransformRuntimeConfiguration
-from data_processing_spark.runtime.spark import orchestrate, SparkTransformExecutionConfiguration
+from data_processing_spark.runtime.spark import orchestrate, SparkTransformExecutionConfiguration, SparkTransformRuntimeConfiguration
 from data_processing.runtime.transform_launcher import AbstractTransformLauncher
 from data_processing.utils import get_logger
 
@@ -30,7 +29,7 @@ class SparkTransformLauncher(AbstractTransformLauncher):
 
     def __init__(
         self,
-        runtime_config: PythonTransformRuntimeConfiguration,
+        runtime_config: SparkTransformRuntimeConfiguration,
         data_access_factory: DataAccessFactoryBase = DataAccessFactory(),
     ):
         """
