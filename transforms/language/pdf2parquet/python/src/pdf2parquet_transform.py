@@ -110,7 +110,7 @@ class Pdf2ParquetTransform(AbstractBinaryTransform):
         if self.contents_type == pdf2parquet_contents_types.MARKDOWN:
             content_string = doc.render_as_markdown()
         elif self.contents_type == pdf2parquet_contents_types.JSON:
-            content_string = pd.io.json.ujson_dumps(doc.render_as_dict(), double_precision=3)
+            content_string = pd.io.json.ujson_dumps(doc.render_as_dict(), double_precision=2)
         else:
             raise RuntimeError(f"Uknown contents_type {self.contents_type}.")
         num_pages = len(doc.pages)
