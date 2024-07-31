@@ -9,6 +9,14 @@ testing and IDE set up.
 
 Filter gitHub issues based on comments, description, and authors. This originally comes from [bigcode issues filter](https://raw.githubusercontent.com/bigcode-project/bigcode-dataset/main/preprocessing/filtering_issues.py).
 
+Each table record correspond to a single github issue.
+Each input table record is expected to have a column that holds all the events related to each github issue as structure array.
+Each event should have following fields:
+- description (issue-level text, in other word, body of text when opening an issue)
+- comment (reply to the parent issue or one of its comments)
+- author (the name of author who writes description or comment)
+
+
 ## Configuration and command line Options
 
 The set of dictionary keys holding [IssuesTransform](src/issues_transform_python.py) 
