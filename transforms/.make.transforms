@@ -156,7 +156,7 @@ extra-help:
 .transforms.ray-test-image:: .transforms.ray-image .transforms.test-image-help .defaults.test-image-pytest 
 
 .PHONY: .transforms.spark-test-image
-.transforms.spark-test-image:: .transforms.spark-image .transforms.test-image-help .defaults.test-image-pytest 
+.transforms.spark-test-image:: .transforms.spark-image .transforms.test-spark_image-help .defaults.test-image-pytest
 
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest:: .defaults.test-image-pytest 
@@ -165,6 +165,10 @@ extra-help:
 .transforms.test-image-help::
 	@# Help: Test an already-built image (use make image) to be sure the --help option works
 	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) python $(TRANSFORM_RUNTIME_SRC_FILE) --help
+
+.transforms.test-spark_image-help::
+	@# Help: Test an already-built image (use make image) to be sure the --help option works
+	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) python3 src/$(TRANSFORM_RUNTIME_SRC_FILE) --help
 
 .PHONY: test-locals
 test-locals:: .transforms.test-locals
