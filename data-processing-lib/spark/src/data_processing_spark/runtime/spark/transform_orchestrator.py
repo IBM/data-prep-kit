@@ -105,3 +105,6 @@ def orchestrate(
     except Exception as e:
         logger.error(f"Exception during execution {e}: {traceback.print_exc()}")
         return 1
+    finally:
+        # stop spark context at the end. Required for running multiple tests
+        sc.stop()
