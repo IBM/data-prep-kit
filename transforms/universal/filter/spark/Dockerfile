@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=quay.io/dataprep1/data-prep-kit/data-prep-kit-spark-3.5.1:0.1.0
+ARG BASE_IMAGE=quay.io/dataprep1/data-prep-kit/data-prep-kit-spark-3.5.1:0.2.0
 FROM ${BASE_IMAGE}
 
 USER root
@@ -13,6 +13,8 @@ COPY --chown=spark:root data-processing-lib-python/ data-processing-lib-python/
 RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=spark:root data-processing-lib-spark/ data-processing-lib-spark/
 RUN cd data-processing-lib-spark && pip install --no-cache-dir -e .
+COPY --chown=spark:root python-transform/  python-transform/
+RUN cd python-transform && pip install --no-cache-dir -e .
 
 # Install project source
 COPY --chown=spark:root src/ src/
@@ -23,14 +25,11 @@ RUN pip install --no-cache-dir -e .
 COPY ./src/filter_transform_spark.py .
 
 # copy some of the samples in
-COPY ./src/filter_local.py local/
+COPY src/filter_local_spark.py local/
 
 # copy test
 COPY test/ test/
 COPY test-data/ test-data/
-
-# copy config
-COPY config/ config/
 
 USER spark
 
