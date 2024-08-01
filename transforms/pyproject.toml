@@ -1,0 +1,27 @@
+[project]
+name = "data_prep_toolkit_transforms"
+version = "0.0.1.dev0"
+requires-python = ">=3.10"
+description = "Data Preparation Toolkit Transforms"
+license = {text = "Apache-2.0"}
+#dynamic = ["dependencies"]
+
+#[tool.setuptools.dynamic]
+#dependencies = {file = "requirements.txt"}
+
+
+dependencies = [
+	"dpk_lang_id_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/lang_id/python",
+	"dpk_pdf2parquet_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/pdf2parquet/python",
+	"dpk_doc_quality_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/doc_quality/python",
+	"dpk_tokenization_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/tokenization/python",
+	"dpk_ededup_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/ededup/python",
+	"dpk_docid_transform_ray @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/doc_id/ray",
+]
+
+[tool.setuptools.packages]
+#find = {}  # Scanning implicit namespaces is active by default
+# OR
+find = {namespaces = false}  # Disable implicit namespaces
+
+
