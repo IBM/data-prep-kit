@@ -1,18 +1,26 @@
 # Spark Framework 
-The Spark runtime extends the base framework with the following set of components:
+The Spark runtime implementation is roughly based on the ideas from 
+[here](https://wrightturn.wordpress.com/2015/07/22/getting-spark-data-from-aws-s3-using-boto-and-pyspark/).
+Spark itself is basically used for execution parallelization, but all data access is based on the
+framework's [data access](data-access-factory.md), thus preserving all the implemented features. At 
+the start of the execution, the list of files to process is obtained (using data access framework)
+and then split between Spark workers for reading actual data, its transformation and writing it back.
 
 ## Transforms
 
-* [AbstractSparkTransform](../spark/src/data_processing_spark/runtime/spark/spark_transform.py) - this
-  is the base class for all spark-based transforms over spark DataFrames.
-* [SparkTransformConfiguration](../spark/src/data_processing_spark/runtime/spark/spark_transform_config.py) - this
-  is simple extension of the base  TransformConfiguration class to hold the transformation class
-  (an extension of AbstractSparkTransform).
+* [SparkTransformRuntimeConfiguration](../spark/src/data_processing_spark/transform/runtime_configuration.py) allows
+    to configure transform to use PySpark
+
 
 ## Runtime
 
-* [SparkTransformLauncher](../spark/src/data_processing_spark/runtime/spark/spark_launcher.py) - this is a 
-class generally used to implement `main()` that makes use of a `SparkTransformConfiguration` to 
-start the Spark runtime and execute the transform over the specified set of input files.
-* [SparkTransformRuntimeConfiguration](../spark/src/data_processing_spark/runtime/spark/runtime_config.py) - this 
-class is a simple extension of the transform's base TransformConfiguration class. 
+Spark runtime extends the base framework with the following set of components:
+* [SparkTransformExecutionConfiguration](../spark/src/data_processing_spark/runtime/spark/execution_configuration.py)
+  allows to configure Spark execution
+* [SparkTransformFileProcessor](../spark/src/data_processing_spark/runtime/spark/transform_file_processor.py) extends
+  [AbstractTransformFileProcessor](../python/src/data_processing/runtime/transform_file_processor.py) to work on
+  PySpark
+* [SparkTransformLauncher](../spark/src/data_processing_spark/runtime/spark/transform_launcher.py) allows
+  to launch PySpark runtime and execute a transform
+* [orchestrate](../spark/src/data_processing_spark/runtime/spark/transform_orchestrator.py) function orchestrates Spark
+  based execution

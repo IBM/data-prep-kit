@@ -14,10 +14,11 @@ transformation-specific classes/interfaces are as follows:
 
 * [AbstractBinaryTransform](../python/src/data_processing/transform/binary_transform.py) - 
 a simple, easily-implemented interface allowing the definition transforms
-over arbitrary data types.  Support is provided for both
-[files](../python/src/data_processing/transform/binary_transform.py) of arbitrary data as a byte array and 
-[parquet/arrow](../python/src/data_processing/transform/table_transform.py) tables.
-* [TransformConfiguration](../python/src/data_processing/transform/transform_configuration.py) - defines
+of arbitrary data as a byte array. Additionally
+[table](../python/src/data_processing/transform/table_transform.py) transform interface
+is provided allowing definition of transforms operating on 
+[pyarrow](https://arrow.apache.org/docs/python/index.html) tables.
+* [TransformConfiguration](../python/src/data_processing/runtime//transform_configuration.py) - defines
 the transform short name, its implementation class,  and command line configuration
 parameters.
 
