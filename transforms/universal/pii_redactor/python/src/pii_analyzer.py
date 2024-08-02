@@ -63,5 +63,5 @@ class PIIAnalyzerEngine:
             List[RecognizerResult]: Results of the PII analysis.
         """
         analyzer = AnalyzerEngine(nlp_engine=self.nlp_engine, registry=self.registry)
-        result = analyzer.analyze(text=text, language=language, entities=self.supported_entities)
+        result = analyzer.analyze(text=text, language=language, entities=self.supported_entities, score_threshold=0.8)
         return result
