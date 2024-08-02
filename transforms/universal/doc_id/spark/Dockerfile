@@ -24,14 +24,11 @@ RUN pip install --no-cache-dir -e .
 COPY ./src/doc_id_transform_spark.py .
 
 # copy some of the samples in
-COPY ./src/doc_id_local.py local/
+COPY src/doc_id_local_spark.py local/
 
 # copy test
 COPY test/ test/
 COPY test-data/ test-data/
-
-# copy config
-COPY config/ config/
 
 USER spark
 

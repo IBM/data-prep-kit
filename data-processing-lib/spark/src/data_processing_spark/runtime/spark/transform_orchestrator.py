@@ -47,7 +47,8 @@ def orchestrate(
         logger.error("No DataAccess instance provided - exiting")
         return 1
     # initialize Spark
-    conf = SparkConf().setAppName(runtime_config.get_name()).set('spark.driver.host', '127.0.0.1')
+    conf = (SparkConf().setAppName(runtime_config.get_name())
+             .set('spark.driver.host', '127.0.0.1'))
     sc = SparkContext(conf=conf)
     execution_params = sc.broadcast(runtime_config.get_input_params())
     transform_class = sc.broadcast(runtime_config.get_transform_class())
@@ -108,3 +109,4 @@ def orchestrate(
     finally:
         # stop spark context at the end. Required for running multiple tests
         sc.stop()
+

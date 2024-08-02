@@ -1,6 +1,8 @@
 # Spark Framework 
 The Spark runtime implementation is roughly based on the ideas from 
-[here](https://wrightturn.wordpress.com/2015/07/22/getting-spark-data-from-aws-s3-using-boto-and-pyspark/).
+[here](https://wrightturn.wordpress.com/2015/07/22/getting-spark-data-from-aws-s3-using-boto-and-pyspark/),
+[here][https://medium.com/how-to-become-a-data-architect/get-best-performance-for-pyspark-jobs-using-parallelize-48c8fa03a21e].
+and [here](https://medium.com/@shuklaprashant9264/alternate-of-for-loop-in-pyspark-25a00888ec35)
 Spark itself is basically used for execution parallelization, but all data access is based on the
 framework's [data access](data-access-factory.md), thus preserving all the implemented features. At 
 the start of the execution, the list of files to process is obtained (using data access framework)
