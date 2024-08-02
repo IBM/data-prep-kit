@@ -4,10 +4,7 @@ version = "0.0.1.dev0"
 requires-python = ">=3.10"
 description = "Data Preparation Toolkit Transforms"
 license = {text = "Apache-2.0"}
-#dynamic = ["dependencies"]
 
-#[tool.setuptools.dynamic]
-#dependencies = {file = "requirements.txt"}
 
 
 dependencies = [
