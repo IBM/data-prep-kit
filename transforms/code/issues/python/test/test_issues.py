@@ -26,7 +26,6 @@ class TestIssuesTransform(AbstractTableTransformTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
         cli = [
             "--issues_events_column_name", "events",
             "--issues_min_chars", "200",
