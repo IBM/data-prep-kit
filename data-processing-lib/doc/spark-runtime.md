@@ -7,6 +7,23 @@ Spark itself is basically used for execution parallelization, but all data acces
 framework's [data access](data-access-factory.md), thus preserving all the implemented features. At 
 the start of the execution, the list of files to process is obtained (using data access framework)
 and then split between Spark workers for reading actual data, its transformation and writing it back.
+The implementation is based on Spark RDD (For comparison of the three Apache Spark APIs: 
+RDDs, DataFrames, and Datasets see this 
+[Databricks blog post](https://www.databricks.com/blog/2016/07/14/a-tale-of-three-apache-spark-apis-rdds-dataframes-and-datasets.html))
+As defined by Databricks:
+```text
+RDD was the primary user-facing API in Spark since its inception. At the core, an RDD is an 
+immutable distributed collection of elements of your data, partitioned across nodes in your 
+cluster that can be operated in parallel with a low-level API that offers transformations 
+and actions.
+```
+This APIs fits perfectly into what we are implementing. It allows us to fully leverage our 
+existing DataAccess APIs thus preserving all of the investments into flexible, reliable data 
+access. Additionally RDDs flexible low-level control allows us to work on partition level, 
+thus limiting the amount of initialization and set up.
+Note that in our approach transform's processing is based on either binary or parquet data, 
+not Spark DataFrames or DataSet. We are not currently supporting supporting these Spark APIs, 
+as they are not well mapped into what we are implementing.
 
 ## Transforms
 

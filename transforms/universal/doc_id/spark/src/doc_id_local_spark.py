@@ -41,7 +41,6 @@ params = {
     doc_column_name_cli_param: "contents",
     hash_column_name_cli_param: "hash_column",
     int_column_name_cli_param: "int_id_column",
-
 }
 if __name__ == "__main__":
     # Set the simulated command line args

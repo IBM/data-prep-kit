@@ -47,6 +47,8 @@ class DocIDTransform(AbstractTableTransform):
         self.doc_column = config.get(doc_column_name_key, doc_column_name_default)
         self.hash_column = config.get(hash_column_name_key, None)
         self.int_column = config.get(int_column_name_key, None)
+        self.start_index = config.get("index", 0) * 2147483647
+        self.logger.debug(f"starting index {self.start_index}")
         if self.hash_column is None and self.int_column is None:
             raise RuntimeError("At least one of hash or integer column names must be specified.")
 
@@ -66,6 +68,12 @@ class DocIDTransform(AbstractTableTransform):
             for n in range(table.num_rows):
                 doc_ids[n] = TransformUtils.str_to_hash(docs[n].as_py())
             table = TransformUtils.add_column(table=table, name=self.hash_column, content=doc_ids)
+        if self.int_column is not None:
+            # add integer document id
+            int_doc_ids = list(range(self.start_index, table.num_rows + self.start_index))
+            self.logger.debug(f"int ids {int_doc_ids}")
+            self.start_index += table.num_rows
+            table = TransformUtils.add_column(table=table, name=self.int_column, content=int_doc_ids)
         return [table], {}
 
 
