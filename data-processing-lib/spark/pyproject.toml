@@ -12,7 +12,7 @@ authors = [
 ]
 dependencies = [
     "data-prep-toolkit==0.2.1.dev0",	
-    "pyspark>=3.5.1"
+    "pyspark>=3.5.1",
     "psutil>=6.0.0"
 ]
 
