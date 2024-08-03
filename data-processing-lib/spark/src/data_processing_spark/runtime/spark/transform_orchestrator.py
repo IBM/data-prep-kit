@@ -58,9 +58,14 @@ def orchestrate(
         d_access = daf.value.create_data_access()
         statistics = {}
         file_processor = SparkTransformFileProcessor(d_access=d_access, transform_params=execution_params.value,
-                                                     transform_class=transform_class.value, statistics=statistics)
+                                                     statistics=statistics, transform_class=transform_class.value)
+        first = True
         for f in iterator:
-            file_processor.process_file(f_name=f)
+            if first:
+                print(f"partition {f}")
+                file_processor.create_transform(partition=int(f[1]))
+                first = False
+            file_processor.process_file(f_name=f[0])
         file_processor.flush()
         return list(statistics.items())
 
@@ -73,7 +78,7 @@ def orchestrate(
         logger.info(f"Number of files is {len(files)}, source profile {profile}")
         # process data
         logger.debug("Begin processing files")
-        stats_rdd = sc.parallelize(files).mapPartitions(process_partition)
+        stats_rdd = sc.parallelize(files).zipWithIndex().mapPartitions(process_partition)
         stats = dict(stats_rdd.reduceByKey(lambda a, b: a+b).collect())
         return_code = 0
         status = "success"

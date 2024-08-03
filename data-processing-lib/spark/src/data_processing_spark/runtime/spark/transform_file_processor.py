@@ -31,11 +31,15 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
         # Create data access
         self.data_access = d_access
         # Add data access ant statistics to the processor parameters
-        transform_params["data_access"] = self.data_access
-        # Create local processor
-        self.transform = transform_class(transform_params)
-        # Create statistics
+        self.transform_params = transform_params | {"data_access" : d_access}
+        self.transform_class = transform_class
+        self.transform = None
+        # set up statistics
         self.stats = statistics
+
+    def create_transform(self, partition: int):
+        # Create local processor
+        self.transform = self.transform_class(self.transform_params | {"index": partition})
 
     def _publish_stats(self, stats: dict[str, Any]) -> None:
         for key, val in stats.items():
