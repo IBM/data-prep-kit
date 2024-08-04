@@ -35,7 +35,7 @@ doc_column_name_default = "contents"
 
 class DocIDTransform(AbstractTableTransform):
     """
-    Implements schema modification of a pyarrow Table.
+    Spark specific DocID transformer implementation
     """
 
     def __init__(self, config: dict[str, Any]):

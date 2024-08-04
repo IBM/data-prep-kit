@@ -38,10 +38,22 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
         self.stats = statistics
 
     def create_transform(self, partition: int):
+        """
+        Create transform
+        :param partition: partition number
+        :return: None
+        """
         # Create local processor
         self.transform = self.transform_class(self.transform_params | {"index": partition})
 
     def _publish_stats(self, stats: dict[str, Any]) -> None:
+        """
+        Publish statistics (to the local dictionary)
+        :param stats: statistics dictionary
+        :return: None
+        """
         for key, val in stats.items():
+            # for all key/values
             if val > 0:
+                # for values greater then 0
                 self.stats[key] = self.stats.get(key, 0) + val
