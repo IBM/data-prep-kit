@@ -55,18 +55,31 @@ def orchestrate(
     daf = sc.broadcast(data_access_factory)
 
     def process_partition(iterator):
+        """
+        process partitions
+        :param iterator: iterator of records
+        :return:
+        """
+        # create data access
         d_access = daf.value.create_data_access()
+        # local statistics dictionary
         statistics = {}
+        # create file processor
         file_processor = SparkTransformFileProcessor(d_access=d_access, transform_params=execution_params.value,
                                                      statistics=statistics, transform_class=transform_class.value)
         first = True
         for f in iterator:
+            # for every file
             if first:
-                print(f"partition {f}")
+                logger.debug(f"partition {f}")
+                # create transform with partition number
                 file_processor.create_transform(partition=int(f[1]))
                 first = False
+            # process file
             file_processor.process_file(f_name=f[0])
+        # flush
         file_processor.flush()
+        # return partition's statistics
         return list(statistics.items())
 
     try:
@@ -78,11 +91,14 @@ def orchestrate(
         logger.info(f"Number of files is {len(files)}, source profile {profile}")
         # process data
         logger.debug("Begin processing files")
+        # process files split by partitions
         stats_rdd = sc.parallelize(files).zipWithIndex().mapPartitions(process_partition)
+        # build overall statistics
         stats = dict(stats_rdd.reduceByKey(lambda a, b: a+b).collect())
         return_code = 0
         status = "success"
     except Exception as e:
+        # process execution exception
         logger.error(f"Exception during execution {e}: {traceback.print_exc()}")
         return_code = 1
         status = "failure"
