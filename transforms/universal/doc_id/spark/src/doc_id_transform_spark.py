@@ -47,6 +47,7 @@ class DocIDTransform(AbstractTableTransform):
         self.doc_column = config.get(doc_column_name_key, doc_column_name_default)
         self.hash_column = config.get(hash_column_name_key, None)
         self.int_column = config.get(int_column_name_key, None)
+        # here we compute starting index for partition as a partition index times max 32 bit integer
         self.start_index = config.get("index", 0) * 2147483647
         self.logger.debug(f"starting index {self.start_index}")
         if self.hash_column is None and self.int_column is None:
