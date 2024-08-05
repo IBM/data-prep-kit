@@ -13,8 +13,8 @@
 import os
 import sys
 
-from data_processing_spark.runtime.spark import SparkTransformLauncher
 from data_processing.utils import ParamsUtils
+from data_processing_spark.runtime.spark import SparkTransformLauncher
 from noop_transform_spark import NOOPSparkTransformConfiguration
 
 

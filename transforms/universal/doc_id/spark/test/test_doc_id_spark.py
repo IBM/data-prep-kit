@@ -12,7 +12,9 @@
 
 import os
 
-from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
+from data_processing.test_support.launch.transform_test import (
+    AbstractTransformLauncherTest,
+)
 from data_processing_spark.runtime.spark import SparkTransformLauncher
 from doc_id_transform_spark import (
     DocIDSparkTransformConfiguration,

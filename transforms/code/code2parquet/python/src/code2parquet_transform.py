@@ -22,10 +22,7 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.data_access import DataAccess, DataAccessFactory
-from data_processing.transform import (
-    AbstractBinaryTransform,
-    TransformConfiguration,
-)
+from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, str2bool
 
 

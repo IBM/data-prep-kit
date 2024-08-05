@@ -14,10 +14,13 @@ import argparse
 import time
 
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
-from data_processing_spark.runtime.spark import orchestrate, SparkTransformExecutionConfiguration
-from data_processing_spark.transform import SparkTransformRuntimeConfiguration
 from data_processing.runtime.transform_launcher import AbstractTransformLauncher
 from data_processing.utils import get_logger
+from data_processing_spark.runtime.spark import (
+    SparkTransformExecutionConfiguration,
+    orchestrate,
+)
+from data_processing_spark.transform import SparkTransformRuntimeConfiguration
 
 
 logger = get_logger(__name__)

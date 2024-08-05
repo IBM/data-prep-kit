@@ -10,12 +10,14 @@
 # limitations under the License.
 ################################################################################
 
-from filter_transform import FilterTransformConfiguration
 from data_processing.utils import get_logger
 from data_processing_spark.runtime.spark import SparkTransformLauncher
 from data_processing_spark.transform import SparkTransformRuntimeConfiguration
+from filter_transform import FilterTransformConfiguration
+
 
 logger = get_logger(__name__)
+
 
 class FilterSparkTransformConfiguration(SparkTransformRuntimeConfiguration):
     """

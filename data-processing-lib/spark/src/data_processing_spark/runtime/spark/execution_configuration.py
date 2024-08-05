@@ -53,9 +53,7 @@ class SparkTransformExecutionConfiguration(TransformExecutionConfiguration):
         typically determined based on the cluster configuration or the available resources
         (number of workers).    
         """
-        parser.add_argument(f"--{cli_prefix}parallelization", type=int,
-                            default=-1,
-                            help="parallelization.")
+        parser.add_argument(f"--{cli_prefix}parallelization", type=int, default=-1, help="parallelization.")
         return TransformExecutionConfiguration.add_input_params(self, parser=parser)
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:

@@ -12,7 +12,9 @@
 
 import os
 
-from data_processing.test_support.launch.transform_test import AbstractTransformLauncherTest
+from data_processing.test_support.launch.transform_test import (
+    AbstractTransformLauncherTest,
+)
 from data_processing_spark.runtime.spark import SparkTransformLauncher
 from noop_transform_spark import NOOPSparkTransformConfiguration
 
@@ -28,7 +30,5 @@ class TestSparkNOOPTransform(AbstractTransformLauncherTest):
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         fixtures = []
         launcher = SparkTransformLauncher(NOOPSparkTransformConfiguration())
-        fixtures.append(
-            (launcher, {"noop_sleep_sec": 1}, basedir + "/input", basedir + "/expected")
-        )
+        fixtures.append((launcher, {"noop_sleep_sec": 1}, basedir + "/input", basedir + "/expected"))
         return fixtures
