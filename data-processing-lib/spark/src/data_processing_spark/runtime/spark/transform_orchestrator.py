@@ -92,10 +92,11 @@ def orchestrate(
         # process files split by partitions
         logger.debug(f"parallelization {execution_config.parallelization}")
         if execution_config.parallelization > 0:
-            stats_rdd = (sc.parallelize(files, execution_config.parallelization)
-                         .zipWithIndex().mapPartitions(process_partition))
+            source_rdd = sc.parallelize(files, execution_config.parallelization)
         else:
-            stats_rdd = sc.parallelize(files).zipWithIndex().mapPartitions(process_partition)
+            source_rdd = sc.parallelize(files)
+        logger.info(f"using {source_rdd.getNumPartitions()} partitions")
+        stats_rdd = source_rdd.zipWithIndex().mapPartitions(process_partition)
         # build overall statistics
         stats = dict(stats_rdd.reduceByKey(lambda a, b: a+b).collect())
         return_code = 0
