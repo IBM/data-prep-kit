@@ -11,6 +11,7 @@
 ################################################################################
 
 import argparse
+from typing import Any
 
 from data_processing.runtime import TransformExecutionConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger
@@ -32,6 +33,30 @@ class SparkTransformExecutionConfiguration(TransformExecutionConfiguration):
         Initialization
         """
         super().__init__(name=name, print_params=False)
+        self.parallelization = -1
+
+    def add_input_params(self, parser: argparse.ArgumentParser) -> None:
+        """
+        This method adds transformer specific parameter to parser
+        :param parser: parser
+        :return: None
+        """
+        """
+        This determines how many partitions the RDD should be divided into. See 
+        https://sparktpoint.com/how-to-create-rdd-using-parallelize/ for the explanation
+        of this parameter
+        If you specify a positive value of the parameter, Spark will attempt to evenly 
+        distribute the data from seq into that many partitions. For example, if you have 
+        a collection of 100 elements and you specify numSlices as 4, Spark will try 
+        to create 4 partitions with approximately 25 elements in each partition.
+        If you don’t specify this parameter, Spark will use a default value, which is 
+        typically determined based on the cluster configuration or the available resources
+        (number of workers).    
+        """
+        parser.add_argument(f"--{cli_prefix}parallelization", type=int,
+                            default=-1,
+                            help="parallelization.")
+        return TransformExecutionConfiguration.add_input_params(self, parser=parser)
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
         """
@@ -49,6 +74,17 @@ class SparkTransformExecutionConfiguration(TransformExecutionConfiguration):
             "job type": "spark",
             "job id": captured["job_id"],
         }
+        self.parallelization = captured["parallelization"]
         # if the user did not define actor max_restarts set it up for fault tolerance
         logger.info(f"job details {self.job_details}")
+        logger.info(f"RDD parallelization {self.parallelization}")
         return True
+
+    def get_input_params(self) -> dict[str, Any]:
+        """
+        get input parameters for job_input_params in metadata
+        :return: dictionary of parameters
+        """
+        return {
+            "RDD parallelization": self.parallelization,
+        }
