@@ -78,6 +78,7 @@ def orchestrate(
         # return partition's statistics
         return list(statistics.items())
 
+    num_partitions = 0
     try:
         # Get files to process
         files, profile, retries = data_access.get_files_to_process()
@@ -93,7 +94,8 @@ def orchestrate(
             source_rdd = sc.parallelize(files, execution_config.parallelization)
         else:
             source_rdd = sc.parallelize(files)
-        logger.info(f"Parallelizing execution. Using {source_rdd.getNumPartitions()} partitions")
+        num_partitions = source_rdd.getNumPartitions()
+        logger.info(f"Parallelizing execution. Using {num_partitions} partitions")
         stats_rdd = source_rdd.zipWithIndex().mapPartitions(process_partition)
         # build overall statistics
         stats = dict(stats_rdd.reduceByKey(lambda a, b: a+b).collect())
@@ -119,7 +121,7 @@ def orchestrate(
                            },
             "code": execution_config.code_location,
             "job_input_params": input_params | data_access_factory.get_input_params(),
-            "execution_stats": {"execution time, min": (time.time() - start_time) / 60},
+            "execution_stats": {"num partitions": num_partitions, "execution time, min": (time.time() - start_time) / 60},
             "job_output_stats": stats,
         }
         logger.debug(f"Saving job metadata: {metadata}.")
