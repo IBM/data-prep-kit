@@ -36,6 +36,8 @@ class TestRayTextEncoderTransform(AbstractTransformLauncherTest):
                 {"run_locally": True},
                 basedir + "/input",
                 basedir + "/expected",
+                # this is added as a fixture to remove these columns from comparison
+                ["embeddings"],
             )
         )
         return fixtures
