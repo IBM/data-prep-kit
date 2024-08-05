@@ -14,7 +14,7 @@ import pyarrow as pa
 from data_processing.test_support.transform.table_transform_test import (
     AbstractTableTransformTest,
 )
-from text_encoder import TextEncoderTransform
+from text_encoder_transform import TextEncoderTransform
 
 
 table = pa.Table.from_pydict(
