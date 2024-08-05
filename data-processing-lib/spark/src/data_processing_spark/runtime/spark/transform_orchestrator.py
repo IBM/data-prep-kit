@@ -48,8 +48,7 @@ def orchestrate(
     conf = (SparkConf().setAppName(runtime_config.get_name())
             .set('spark.driver.host', '127.0.0.1'))
     sc = SparkContext(conf=conf)
-    execution_params = sc.broadcast(runtime_config.get_input_params())
-    transform_class = sc.broadcast(runtime_config.get_transform_class())
+    transform_config = sc.broadcast(runtime_config)
     daf = sc.broadcast(data_access_factory)
 
     def process_partition(iterator):
@@ -58,13 +57,12 @@ def orchestrate(
         :param iterator: iterator of records
         :return:
         """
-        # create data access
-        d_access = daf.value.create_data_access()
         # local statistics dictionary
         statistics = {}
         # create file processor
-        file_processor = SparkTransformFileProcessor(d_access=d_access, transform_params=execution_params.value,
-                                                     statistics=statistics, transform_class=transform_class.value)
+        file_processor = SparkTransformFileProcessor(data_access_factory=daf.value,
+                                                     runtime_configuration=transform_config.value,
+                                                     statistics=statistics)
         first = True
         for f in iterator:
             # for every file
