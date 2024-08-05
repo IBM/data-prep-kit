@@ -15,9 +15,7 @@ from datetime import datetime
 import time
 
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.runtime import (
-    TransformRuntimeConfiguration,
-)
+from data_processing.runtime import TransformRuntimeConfiguration
 from data_processing.utils import get_logger
 from pyspark import SparkContext, SparkConf
 from data_processing_spark.runtime.spark import SparkTransformFileProcessor, SparkTransformExecutionConfiguration
@@ -48,7 +46,7 @@ def orchestrate(
         return 1
     # initialize Spark
     conf = (SparkConf().setAppName(runtime_config.get_name())
-             .set('spark.driver.host', '127.0.0.1'))
+            .set('spark.driver.host', '127.0.0.1'))
     sc = SparkContext(conf=conf)
     execution_params = sc.broadcast(runtime_config.get_input_params())
     transform_class = sc.broadcast(runtime_config.get_transform_class())
@@ -92,7 +90,12 @@ def orchestrate(
         # process data
         logger.debug("Begin processing files")
         # process files split by partitions
-        stats_rdd = sc.parallelize(files).zipWithIndex().mapPartitions(process_partition)
+        logger.debug(f"parallelization {execution_config.parallelization}")
+        if execution_config.parallelization > 0:
+            stats_rdd = (sc.parallelize(files, execution_config.parallelization)
+                         .zipWithIndex().mapPartitions(process_partition))
+        else:
+            stats_rdd = sc.parallelize(files).zipWithIndex().mapPartitions(process_partition)
         # build overall statistics
         stats = dict(stats_rdd.reduceByKey(lambda a, b: a+b).collect())
         return_code = 0
@@ -106,11 +109,11 @@ def orchestrate(
     try:
         # build and save metadata
         logger.debug("Building job metadata")
-        input_params = runtime_config.get_transform_metadata()
+        input_params = runtime_config.get_transform_metadata() | execution_config.get_input_params()
         metadata = {
             "pipeline": execution_config.pipeline_id,
-            "job details": execution_config.job_details
-                           | {
+            "job details": execution_config.job_details |
+                           {
                                "start_time": start_ts,
                                "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                                "status": status,
@@ -130,4 +133,3 @@ def orchestrate(
     finally:
         # stop spark context at the end. Required for running multiple tests
         sc.stop()
-
