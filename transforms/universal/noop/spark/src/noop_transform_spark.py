@@ -9,10 +9,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-from noop_transform import NOOPTransformConfiguration
 from data_processing.utils import get_logger
 from data_processing_spark.runtime.spark import SparkTransformLauncher
 from data_processing_spark.transform import SparkTransformRuntimeConfiguration
+from noop_transform import NOOPTransformConfiguration
+
 
 logger = get_logger(__name__)
 

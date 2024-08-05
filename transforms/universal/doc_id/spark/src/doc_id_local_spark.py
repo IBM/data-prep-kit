@@ -12,13 +12,14 @@
 import os
 import sys
 
-from data_processing_spark.runtime.spark import SparkTransformLauncher
 from data_processing.utils import ParamsUtils
+from data_processing_spark.runtime.spark import SparkTransformLauncher
 from doc_id_transform_spark import (
+    DocIDSparkTransformConfiguration,
     doc_column_name_cli_param,
     hash_column_name_cli_param,
     int_column_name_cli_param,
-    DocIDSparkTransformConfiguration)
+)
 
 
 # create parameters

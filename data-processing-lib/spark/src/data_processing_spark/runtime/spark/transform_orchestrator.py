@@ -10,15 +10,18 @@
 # limitations under the License.
 ################################################################################
 
+import time
 import traceback
 from datetime import datetime
-import time
 
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime import TransformRuntimeConfiguration
 from data_processing.utils import get_logger
-from pyspark import SparkContext, SparkConf
-from data_processing_spark.runtime.spark import SparkTransformFileProcessor, SparkTransformExecutionConfiguration
+from data_processing_spark.runtime.spark import (
+    SparkTransformExecutionConfiguration,
+    SparkTransformFileProcessor,
+)
+from pyspark import SparkConf, SparkContext
 
 
 logger = get_logger(__name__)
@@ -45,8 +48,7 @@ def orchestrate(
         logger.error("No DataAccess instance provided - exiting")
         return 1
     # initialize Spark
-    conf = (SparkConf().setAppName(runtime_config.get_name())
-            .set('spark.driver.host', '127.0.0.1'))
+    conf = SparkConf().setAppName(runtime_config.get_name()).set("spark.driver.host", "127.0.0.1")
     sc = SparkContext(conf=conf)
     transform_config = sc.broadcast(runtime_config)
     daf = sc.broadcast(data_access_factory)
@@ -60,9 +62,9 @@ def orchestrate(
         # local statistics dictionary
         statistics = {}
         # create file processor
-        file_processor = SparkTransformFileProcessor(data_access_factory=daf.value,
-                                                     runtime_configuration=transform_config.value,
-                                                     statistics=statistics)
+        file_processor = SparkTransformFileProcessor(
+            data_access_factory=daf.value, runtime_configuration=transform_config.value, statistics=statistics
+        )
         first = True
         for f in iterator:
             # for every file
@@ -98,7 +100,7 @@ def orchestrate(
         logger.info(f"Parallelizing execution. Using {num_partitions} partitions")
         stats_rdd = source_rdd.zipWithIndex().mapPartitions(process_partition)
         # build overall statistics
-        stats = dict(stats_rdd.reduceByKey(lambda a, b: a+b).collect())
+        stats = dict(stats_rdd.reduceByKey(lambda a, b: a + b).collect())
         return_code = 0
         status = "success"
     except Exception as e:
@@ -113,15 +115,18 @@ def orchestrate(
         input_params = runtime_config.get_transform_metadata() | execution_config.get_input_params()
         metadata = {
             "pipeline": execution_config.pipeline_id,
-            "job details": execution_config.job_details |
-                           {
-                               "start_time": start_ts,
-                               "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                               "status": status,
-                           },
+            "job details": execution_config.job_details
+            | {
+                "start_time": start_ts,
+                "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "status": status,
+            },
             "code": execution_config.code_location,
             "job_input_params": input_params | data_access_factory.get_input_params(),
-            "execution_stats": {"num partitions": num_partitions, "execution time, min": (time.time() - start_time) / 60},
+            "execution_stats": {
+                "num partitions": num_partitions,
+                "execution time, min": (time.time() - start_time) / 60,
+            },
             "job_output_stats": stats,
         }
         logger.debug(f"Saving job metadata: {metadata}.")

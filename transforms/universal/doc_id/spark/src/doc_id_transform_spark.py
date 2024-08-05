@@ -16,8 +16,9 @@ from typing import Any
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils
-from data_processing_spark.transform import SparkTransformRuntimeConfiguration
 from data_processing_spark.runtime.spark import SparkTransformLauncher
+from data_processing_spark.transform import SparkTransformRuntimeConfiguration
+
 
 short_name = "doc_id"
 cli_prefix = f"{short_name}_"
@@ -145,7 +146,6 @@ class DocIDSparkTransformConfiguration(SparkTransformRuntimeConfiguration):
         Initialization
         """
         super().__init__(transform_config=DocIDTransformConfiguration())
-
 
 
 if __name__ == "__main__":
