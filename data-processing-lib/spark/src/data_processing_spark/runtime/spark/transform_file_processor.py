@@ -13,8 +13,8 @@
 from typing import Any
 
 from data_processing.runtime import AbstractTransformFileProcessor
-from data_processing.data_access import data_access
-from data_processing.transform import AbstractBinaryTransform
+from data_processing.data_access import DataAccessFactoryBase
+from data_processing_spark.transform import SparkTransformRuntimeConfiguration
 
 
 class SparkTransformFileProcessor(AbstractTransformFileProcessor):
@@ -22,19 +22,21 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
     This is the class implementing the actual work/actor processing of a single file
     """
 
-    def __init__(self, d_access: data_access, transform_params: dict[str, Any],
-                 transform_class: type[AbstractBinaryTransform], statistics: dict[str, Any]):
+    def __init__(
+            self, data_access_factory: DataAccessFactoryBase,
+            runtime_configuration: SparkTransformRuntimeConfiguration,
+            statistics: dict[str, Any]
+    ):
         """
         Init method
         """
-        super().__init__()
-        # Create data access
-        self.data_access = d_access
+        super().__init__(data_access_factory=data_access_factory,
+                         transform_parameters=runtime_configuration.get_transform_params())
         # Add data access ant statistics to the processor parameters
-        self.transform_params = transform_params | {"data_access" : d_access}
-        self.transform_class = transform_class
+        self.runtime_configuration = runtime_configuration
         self.transform = None
         # set up statistics
+        self.transform_params["statistics"] = statistics
         self.stats = statistics
 
     def create_transform(self, partition: int):
@@ -44,7 +46,8 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
         :return: None
         """
         # Create local processor
-        self.transform = self.transform_class(self.transform_params | {"index": partition})
+        self.transform = (self.runtime_configuration.get_transform_class()
+                          (self.transform_params | {"partition_index": partition}))
 
     def _publish_stats(self, stats: dict[str, Any]) -> None:
         """
