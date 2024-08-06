@@ -31,8 +31,13 @@ class TestPythonTextEncoderTransform(AbstractTransformLauncherTest):
         fixtures = []
         launcher = PythonTransformLauncher(TextEncoderPythonTransformConfiguration())
         fixtures.append(
-            (launcher, {}, basedir + "/input", basedir + "/expected"),
-            # this is added as a fixture to remove these columns from comparison
-            ["embeddings"],
+            (
+                launcher,
+                {},
+                basedir + "/input",
+                basedir + "/expected",
+                # this is added as a fixture to remove these columns from comparison
+                ["embeddings"],
+            ),
         )
         return fixtures
