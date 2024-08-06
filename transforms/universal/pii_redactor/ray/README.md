@@ -1,4 +1,4 @@
-# NOOP Ray Transform 
+# PII Redactor Ray Transform 
 Please see the set of
 [transform project conventions](../../../README.md#transform-project-conventions)
 for details on general project conventions, transform configuration,
@@ -21,9 +21,9 @@ the set of
 ### Running the samples
 To run the samples, use the following `make` targets
 
-* `run-cli-sample` - runs src/noop_transform.py using command line args
-* `run-local-sample` - runs src/noop_local_ray.py
-* `run-s3-sample` - runs src/noop_s3_ray.py
+* `run-cli-sample` - runs src/pii_redactor_transform.py using command line args
+* `run-local-sample` - runs src/pii_redactor_local_ray.py
+* `run-s3-sample` - runs src/pii_redactor_s3_ray.py
     * Requires prior installation of minio, depending on your platform (e.g., from [here](https://min.io/docs/minio/macos/index.html)
      and [here](https://min.io/docs/minio/linux/index.html) 
      and invocation of `make minio-start` to load data into local minio for S3 access.

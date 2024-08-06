@@ -45,5 +45,5 @@ class PIIRedactorRayTransformConfiguration(RayTransformRuntimeConfiguration):
 
 if __name__ == "__main__":
     launcher = RayTransformLauncher(PIIRedactorRayTransformConfiguration())
-    logger.info("Launching noop transform")
+    logger.info("Launching pii redactor transform")
     launcher.launch()
