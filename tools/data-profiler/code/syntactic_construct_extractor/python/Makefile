@@ -28,7 +28,7 @@ test:: .data-profiler.python-test
 
 .data-profiler.python-test: .data-profiler.python-venv
 	@echo "Running Python tests..."
-	venv/bin/pytest tests/
+	venv/bin/pytest test/
 
 clean:: .data-profiler.clean
 
