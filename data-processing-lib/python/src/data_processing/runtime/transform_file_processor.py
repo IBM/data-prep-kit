@@ -9,12 +9,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
 import time
 import traceback
 from typing import Any
 
-from data_processing.utils import TransformUtils, get_logger
+from data_processing.utils import TransformUtils, UnrecoverableException, get_logger
 
 
 class AbstractTransformFileProcessor:
@@ -66,6 +65,11 @@ class AbstractTransformFileProcessor:
             self.last_extension = name_extension[1]
             # save results
             self._submit_file(t_start=t_start, out_files=out_files, stats=stats)
+        # Process unrecoverable exceptions
+        except UnrecoverableException as _:
+            self.logger.warning(f"Transform has thrown unrecoverable exception processing file {f_name}. Exiting...")
+            raise UnrecoverableException
+        # Process other exceptions
         except Exception as e:
             self.logger.warning(f"Exception {e} processing file {f_name}: {traceback.format_exc()}")
             self._publish_stats({"transform execution exception": 1})

@@ -2,6 +2,8 @@ ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
 
 FROM ${BASE_IMAGE}
 
+RUN pip install --upgrade --no-cache-dir pip 
+
 # install pytest
 RUN pip install --no-cache-dir pytest
 
@@ -31,8 +33,10 @@ RUN sudo apt remove gcc g++ -y \
     && sudo rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 USER ray
 
-# copy source data
+# copy the main() entry point to the image 
 COPY ./src/lang_id_transform_ray.py .
+
+# copy some of the samples in
 COPY ./src/lang_id_local_ray.py local/
 
 # copy test

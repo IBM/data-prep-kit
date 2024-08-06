@@ -1,6 +1,6 @@
 FROM docker.io/python:3.10.14-slim-bullseye
 
-RUN pip install --upgrade pip 
+RUN pip install --upgrade --no-cache-dir pip 
 
 # install pytest
 RUN pip install --no-cache-dir pytest
@@ -37,8 +37,10 @@ USER dpk
 #COPY requirements.txt requirements.txt
 #RUN pip install --no-cache-dir -r  requirements.txt
 
-# copy source data
+# copy the main() entry point to the image 
 COPY ./src/lang_id_transform_python.py .
+
+# copy some of the samples in
 COPY ./src/lang_id_local.py local/
 
 # copy test

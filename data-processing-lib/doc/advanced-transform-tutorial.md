@@ -92,40 +92,42 @@ metadata.
 
 ```python
     def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
-        if not TransformUtils.validate_columns(table=table, required=[self.doc_column]):
-            return [], {}
-        # Inner variables
-        hashes = set()
-        unique = []
-        hd = {}
-        # Compute unique hashes for the table
-        for text in table[self.doc_column]:
-            # Compute doc hash
-            h = TransformUtils.str_to_hash(TransformUtils.normalize_string(str(text)))
-            if h not in hashes:  # Processing this hash for the first time
-                hashes.add(h)  # Remember it locally
-                hd[h] = str(text)
-                if len(hd) >= REQUEST_LEN:  # time to check remotely
-                    unique = unique + self._process_remote_hashes(hd=hd)
-                    hd = {}
-        if len(hd) > 0:  # Process remaining hashes
-            unique = unique + self._process_remote_hashes(hd=hd)
-    
-        # Remove duplicates
-        unique_set = set(unique)
-        mask = [False] * table.num_rows
-        index = 0
-        for text in table[self.doc_column]:
-            str_text = str(text)
-            if str_text in unique_set:
-                mask[index] = True
-                unique_set.remove(str_text)
-            index += 1
-        # Create output table
-        out_table = table.filter(mask)
-        # report statistics
-        stats = {"source_documents": table.num_rows, "result_documents": out_table.num_rows}
-        return [out_table], stats
+
+
+  if not TransformUtils.validate_columns(table=table, required=[self.doc_column]):
+    return [], {}
+# Inner variables
+hashes = set()
+unique = []
+hd = {}
+# Compute unique hashes for the table
+for text in table[self.doc_column]:
+  # Compute doc hash
+  h = TransformUtils.str_to_hash(TransformUtils.normalize_string(str(text)))
+  if h not in hashes:  # Processing this hash for the first time
+    hashes.add(h)  # Remember it locally
+    hd[h] = str(text)
+    if len(hd) >= REQUEST_LEN:  # time to check remotely
+      unique = unique + self._process_cached_hashes(hd=hd)
+      hd = {}
+if len(hd) > 0:  # Process remaining hashes
+  unique = unique + self._process_cached_hashes(hd=hd)
+
+# Remove duplicates
+unique_set = set(unique)
+mask = [False] * table.num_rows
+index = 0
+for text in table[self.doc_column]:
+  str_text = str(text)
+  if str_text in unique_set:
+    mask[index] = True
+    unique_set.remove(str_text)
+  index += 1
+# Create output table
+out_table = table.filter(mask)
+# report statistics
+stats = {"source_documents": table.num_rows, "result_documents": out_table.num_rows}
+return [out_table], stats
 ```
 The single input to this method is the in-memory pyarrow table to be transformed.
 The return of this function is a list of tables and optional metadata.  In this

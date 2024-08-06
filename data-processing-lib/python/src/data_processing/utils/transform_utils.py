@@ -56,7 +56,8 @@ class TransformUtils:
         :param doc: string to normalize
         :return: normalized string
         """
-        return doc.replace(" ", "").replace("\n", "").lower().translate(str.maketrans("", "", string.punctuation))
+        return (doc.replace(" ", "").replace("\n", "").lower()
+                .translate(str.maketrans("", "", string.punctuation)))
 
     @staticmethod
     def str_to_hash(val: str) -> str:
@@ -160,7 +161,9 @@ class TransformUtils:
         try:
             # convert table to bytes
             writer = pa.BufferOutputStream()
-            pq.write_table(table=table, where=writer)
+            # Update default snappy compression to ZSTD.
+            # See https://arrow.apache.org/docs/python/generated/pyarrow.parquet.write_table.html
+            pq.write_table(table=table, where=writer, compression="ZSTD")
             return bytes(writer.getvalue())
         except Exception as e:
             logger.error(f"Failed to convert arrow table to byte array, exception {e}. Skipping it")

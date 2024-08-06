@@ -2,6 +2,8 @@ ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
 
 FROM ${BASE_IMAGE}
 
+RUN pip install --upgrade --no-cache-dir pip 
+
 # install pytest
 RUN pip install --no-cache-dir pytest
 
@@ -21,8 +23,10 @@ COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
-# copy source 
+# copy the main() entry point to the image 
 COPY src/code2parquet_transform_ray.py .
+
+# copy some of the samples in
 COPY src/code2parquet_local_ray.py local/
 
 # copy test

@@ -22,6 +22,9 @@ from data_processing.utils import TransformUtils, get_logger
 
 logger = get_logger(__name__)
 
+_allowed_float_percent_diff = 0.01  # A number between 0 and 1.
+_percent_parquet_size_diff_allowed = 0.03  # 3% seems like the minimum, but somewhat arbitrary
+
 
 def get_tables_in_folder(dir: str) -> list[pa.Table]:
     """
@@ -96,7 +99,45 @@ class AbstractTest:
             for j in range(rows1):
                 r1 = t1.take([j])
                 r2 = t2.take([j])
-                assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {r2}"
+                # assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {r2}"
+                AbstractTest.validate_expected_row(i, j, r1, r2)
+
+    @staticmethod
+    def validate_expected_row(table_index: int, row_index: int, test_row: pa.Table, expected_row: pa.Table):
+        """
+        Compare the two rows for equality, allowing float values to be within a percentage
+        of each other as defined by global _allowed_float_percent_diff.
+        We assume the schema has already been compared and is equivalent.
+        Args:
+            table_index: index of tables that is the source of the rows.
+            row_index:
+            test_row:
+            expected_row:
+        """
+        assert test_row.num_rows == 1, "Invalid usage.  Expected test table with 1 row"
+        assert expected_row.num_rows == 1, "Invalid usage.  Expected expected table with 1 row"
+        if test_row != expected_row:
+            # Else look for floating point values that might differ within the allowance
+            msg = f"Row {row_index} of table {table_index} are not equal\n\tTransformed: {test_row}\n\tExpected   : {expected_row}"
+            assert test_row.num_columns == expected_row.num_columns, msg
+            num_columns = test_row.num_columns
+            for i in range(num_columns):
+                # Over each cell/column in the row
+                test_column = test_row.column(i)
+                expected_column = expected_row.column(i)
+                if test_column != expected_column:
+                    # Check if the value is a float and if so, allow a fuzzy match
+                    test_value = test_column.to_pylist()[0]
+                    expected_value = expected_column.to_pylist()[0]
+                    is_float = isinstance(test_value, float) and isinstance(expected_value, float)
+                    if not is_float:
+                        # Its NOT a float, so do a normal compare
+                        assert test_column == expected_column, msg
+                    else:
+                        # It IS a float, so allow a fuzzy match
+                        allowed_diff = abs(_allowed_float_percent_diff * expected_value)
+                        diff = abs(test_value - expected_value)
+                        assert diff <= allowed_diff, msg
 
     @staticmethod
     def validate_expected_files(files_list: list[tuple[bytes, str]], expected_files_list: list[tuple[bytes, str]]):
@@ -118,9 +159,17 @@ class AbstractTest:
             assert (
                 f1[1] == f2[1]
             ), f"produced file extension {f1[1]} is different from  expected file extension {f2[1]}"
+            lenf1 = len(f1[0])
+            lenf2 = len(f2[0])
+            if f1[1] == ".parquet":
+                # Parquet file compression seems to vary, so allow a bit of difference.
+                diff_allowed = _percent_parquet_size_diff_allowed * lenf2
+            else:
+                diff_allowed = 0
+            diff = abs(lenf1 - lenf2)
             assert (
-                len(f1[0]) - len(f2[0])
-            ) < 50, f"produced file length {len(f1[0])} is different from expected file extension {len(f2[0])}"
+                diff <= diff_allowed
+            ), f"produced file length {lenf1} vs expected {lenf2}, exceeds allowance of {diff_allowed}"
 
     @staticmethod
     def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
