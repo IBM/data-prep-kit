@@ -14,9 +14,11 @@ DOCKER_IMAGE_VERSION=latest
 # include $(REPOROOT)/transforms/.make.transforms
 include $(REPOROOT)/tools/data-profiler/.make.profiler
 
-venv::	.data-profiler.python-venv
+.PHONY: venv test clean image build build-dist set-versions run-local-sample minio-stop
 
-test::	.data-profiler.python-test
+venv:: .data-profiler.python-venv
+
+test:: .data-profiler.python-test
 
 clean:: .data-profiler.clean
 
@@ -30,4 +32,9 @@ build-dist:: set-versions .defaults.build-dist
 set-versions:
 	$(MAKE) TOML_VERSION=1.1.0 .defaults.update-toml
 
-run-local-sample: .data-profiler.run-local-sample
+run-local-sample:: .data-profiler.run-local-sample
+
+minio-stop:
+	@echo "Stopping MinIO..."
+	# Add the actual command to stop MinIO
+	docker stop minio || true

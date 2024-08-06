@@ -84,7 +84,7 @@ extra-help:
 # Assumes the runtime-specific venv has already been built.
 .PHONY: .data-profiler.test-src
 .data-profiler.test-src::  .defaults.test-src .data-profiler.test-locals
-	@# Help: Run the transform's tests and any '*local' .py files
+	@# Help: Run the profiler's tests and any '*local' .py files
 
 .PHONY: test-locals
 test-locals:: .data-profiler.test-locals
