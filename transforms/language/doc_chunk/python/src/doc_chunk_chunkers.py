@@ -23,7 +23,7 @@ from llama_index.core.node_parser import MarkdownNodeParser
 class ChunkingExecutor(metaclass=ABCMeta):
     @abstractmethod
     def chunk(self, content: str) -> Iterator[dict]:
-        pass
+        raise NotImplemented("The chunk() method must be implemented")
 
 class DLJsonChunker(ChunkingExecutor):
     def __init__(self, output_chunk_column_name: str, output_jsonpath_column_name: str, output_pageno_column_name_key: str, output_bbox_column_name_key: str):

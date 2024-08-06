@@ -1,6 +1,7 @@
 # chunk documents Transform 
 This transform is chunking documents from their JSON representation to a list of chunks.
-It relies on documents converted with the Docling library in the [pdf2parquet transform](../pdf2parquet).
+It relies on documents converted with the Docling library in the [pdf2parquet transform](../pdf2parquet),
+which provides the required JSON structure.
 
 
 * [python](python/README.md) - provides the base python-based transformation 

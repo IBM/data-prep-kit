@@ -5,7 +5,7 @@ It relies on .parquet files created by the [pdf2parquet transform](../pdf2parque
 `contents_type: "application/json"` argument, which the [Docling library](https://github.com/DS4SD/docling)
 to convert PDF documents to its rich JSON representation.
 
-The new .parquet table will contain one row for each document component in the source table.
+The new .parquet table will contain one row for each document component (paragraph, table, etc) in the source table.
 
 
 ## Running
@@ -17,7 +17,7 @@ The transform can be tuned with the following parameters.
 
 | Parameter  | Default  | Description  |
 |------------|----------|--------------|
-| `chunking_type`        | `dl_json` | Chunking type to apply. Valid options are `li_markdown` for using the LlamaIndex [Markdown chunking](https://docs.llamaindex.ai/en/stable/module_guides/loading/node_parsers/modules/#markdownnodeparser), `dl_json` for using the [Docling JSON chunking](). |
+| `chunking_type`        | `dl_json` | Chunking type to apply. Valid options are `li_markdown` for using the LlamaIndex [Markdown chunking](https://docs.llamaindex.ai/en/stable/module_guides/loading/node_parsers/modules/#markdownnodeparser), `dl_json` for using the [Docling JSON chunking](https://github.ibm.com/DeepSearch/quackling). |
 | `content_column_name_key`        | `contents` | Name of the column containing the text to be chunked. |
 | `output_chunk_column_name_key`   | `contents` | Column name to store the chunks in the output table. |
 | `output_jsonpath_column_name_key`| `doc_jsonpath` | Column name to store the document path of the chunk in the output table. |
