@@ -18,7 +18,17 @@ include $(REPOROOT)/tools/data-profiler/.make.profiler
 
 venv:: .data-profiler.python-venv
 
+.data-profiler.python-venv:
+	@echo "Setting up Python virtual environment..."
+	python -m venv venv
+	venv/bin/pip install -U pip setuptools wheel
+	venv/bin/pip install .
+
 test:: .data-profiler.python-test
+
+.data-profiler.python-test: .data-profiler.python-venv
+	@echo "Running Python tests..."
+	venv/bin/pytest tests/
 
 clean:: .data-profiler.clean
 
