@@ -395,7 +395,7 @@ class RayRemoteJobs:
             sys.exit(1)
         if data_access is None:
             return
-        # Here data access is either S3 or lakehouse both of which contain self.output_folder
+        # Here data access is S3 which contains self.output_folder
         try:
             output_folder = data_access.get_output_folder()
         except Exception as e:
