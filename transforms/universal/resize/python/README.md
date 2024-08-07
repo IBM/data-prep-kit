@@ -36,10 +36,6 @@ Only one of the _max_rows_per_table_ and _max_mbytes_per_table_ may be used.
 
 ## Running
 
-We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/resize_local_ray.py), [s3](src/resize_s3_ray.py) and [lakehouse](src/resize_lakehouse.py)
-
-
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
