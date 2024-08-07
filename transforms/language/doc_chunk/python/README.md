@@ -1,11 +1,13 @@
-# chunk documents Transform 
+# Chunk documents Transform 
 
-This transform is chunking documents from their JSON representation to a list of text chunks.
-It relies on .parquet files created by the [pdf2parquet transform](../pdf2parquet) with the
-`contents_type: "application/json"` argument, which the [Docling library](https://github.com/DS4SD/docling)
-to convert PDF documents to its rich JSON representation.
+This transform is chunking documents. It supports multiple _chunker modules_ (see the `chunking_type` parameter).
 
-The new .parquet table will contain one row for each document component (paragraph, table, etc) in the source table.
+When using documents converted to JSON, the transform leverages the [Quackling](https://github.com/DS4SD/quackling) `HierarchicalChunker`
+to chunk according to the document layout segmentation, i.e. respecting the original document components as paragraphs, tables, enumerations, etc.
+It relies on documents converted with the Docling library in the [pdf2parquet transform](../pdf2parquet) using the option `contents_type: "application/json"`,
+which provides the required JSON structure.
+
+When using documents converted to Markdown, the transform leverages the [Llama Index](https://docs.llamaindex.ai/en/stable/module_guides/loading/node_parsers/modules/#markdownnodeparser) `MarkdownNodeParser`, which is relying on its internal Markdown splitting logic.
 
 
 ## Running

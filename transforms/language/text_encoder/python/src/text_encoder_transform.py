@@ -48,7 +48,7 @@ class TextEncoderTransform(AbstractTableTransform):
         super().__init__(config)
         from data_processing.utils import get_logger
 
-        self.logger = get_logger(__name__ + "config")
+        self.logger = get_logger(__name__)
 
         self.model_name = config.get(model_name_key, default_model_name)
         self.content_column_name = config.get(
@@ -121,7 +121,7 @@ class TextEncoderTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{model_name_cli_param}",
             default=default_model_name,
-            help="Name of the HF model to use for encoding the text. The default model is BAAI/bge-small-en-v1.5",
+            help=f"Name of the HF model to use for encoding the text. The default model is {default_model_name}",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
