@@ -16,7 +16,21 @@ In this transform, following metrics will be included:
   - > 30% ending with an ellipsis.
   - Require that 80% of words in a document contain at least one alphabetic character, and apply a "stop word" filter, to remove documents that do NOT contain at least TWO of the following English words: the, be, to, of, and, that, have, with; this adequately deals with ostensibly English documents that contain no coherent English text.
 
-
+| output column name | data type | description | supported language |
+|-|-|-|-|
+| docq_total_words | int | the total number of words | ALL |
+| docq_mean_word_len | int | the mean of words' lengths | ALL |
+| docq_symbol_to_word_ratio | int | the ratio of symbol-to-word ratio (Reference for symbols like emojis: https://textacy.readthedocs.io/en/0.11.0/api_reference/preprocessing.html, currently used symbol: `#`, `...`) | ALL |
+| docq_sentence_count | int | the number of sentences | ALL |
+| docq_curly_bracket_ratio | float | the ratio between the number of occurrences of `{` or `}` over the text length | ALL |
+| docq_lorem_ipsum_ratio | float | the ratio between the number of occurrences of `lorem ipsum` over the text length. Lorem ipsum, or lipsum as it is sometimes known, is dummy text used in laying out print, graphic or web designs. | ALL |
+| docq_contain_bad_word | bool | whether text containst bad words | ALL |
+| docq_bullet_point_ratio | int | the ratio of lines starting with a bullet point | ALL |
+| docq_ellipsis_line_ratio | int | the ratio of lines ending with an ellipsis | ALL |
+| docq_alphabet_word_ratio | int | the ratio of words having at least one alphabetic character | ALL |
+| docq_contain_common_en_words | bool | whether the given `text` contains common English words like `the`, `and`, `to`, `that`, `of`, `with`, `be`, and `have`| ALL |
+| docq_avg_ja_sentence_len | int | average sentence length for an input text, inspired by an OSS HojiChar. | ja |
+| docq_first_ja_alphabet_pos | int | first position of occurrence of Japanese alphabets (i.e., Hiragana or Katakana) | ja |
 
 ## Configuration and command line Options
 

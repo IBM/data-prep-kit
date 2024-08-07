@@ -60,8 +60,6 @@ def c4_sentence_count(text: str, ft_lang: str) -> int:
     Return counting number of sentences from given `text`.
     In C4 paper (page6), it's recommended to remove any webpage with fewer than 3 sentences
     Currently support for ja and 5 european languages: de, en, es, fr, pt.
-    Note: sentence split has been done in `liss_actor.py` using pyizumo,
-    so consider relying on its sentence counts (during HAP filtering) rather than this simplified implementation
     """
 
     if ft_lang == "ja":
