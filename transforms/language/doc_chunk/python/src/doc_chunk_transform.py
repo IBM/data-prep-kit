@@ -18,7 +18,6 @@ from typing import Any
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
-
 from doc_chunk_chunkers import ChunkingExecutor, DLJsonChunker, LIMarkdown
 
 
@@ -37,12 +36,14 @@ output_jsonpath_column_name_cli_param = f"{cli_prefix}{output_jsonpath_column_na
 output_pageno_column_name_cli_param = f"{cli_prefix}{output_pageno_column_name_key}"
 output_bbox_column_name_cli_param = f"{cli_prefix}{output_bbox_column_name_key}"
 
+
 class chunking_types(str, enum.Enum):
     LI_MARKDOWN = "li_markdown"
     DL_JSON = "dl_json"
 
     def __str__(self):
         return str(self.value)
+
 
 default_content_column_name = "contents"
 default_chunking_type = chunking_types.DL_JSON
@@ -75,8 +76,12 @@ class DocChunkTransform(AbstractTableTransform):
         self.output_chunk_column_name = config.get(output_chunk_column_name_key, default_output_chunk_column_name)
 
         # Parameters for Docling JSON chunking
-        self.output_jsonpath_column_name = config.get(output_jsonpath_column_name_key, default_output_jsonpath_column_name)
-        self.output_pageno_column_name_key = config.get(output_pageno_column_name_key, default_output_pageno_column_name)
+        self.output_jsonpath_column_name = config.get(
+            output_jsonpath_column_name_key, default_output_jsonpath_column_name
+        )
+        self.output_pageno_column_name_key = config.get(
+            output_pageno_column_name_key, default_output_pageno_column_name
+        )
         self.output_bbox_column_name_key = config.get(output_bbox_column_name_key, default_output_bbox_column_name)
 
         # Initialize chunker
@@ -97,8 +102,7 @@ class DocChunkTransform(AbstractTableTransform):
             raise RuntimeError(f"{self.chunking_type=} is not valid.")
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
-        """
-        """
+        """ """
         self.logger.debug(f"Transforming one table with {len(table)} rows")
 
         # make sure that the content column exists
@@ -108,16 +112,14 @@ class DocChunkTransform(AbstractTableTransform):
         for batch in table.to_batches():
             for row in batch.to_pylist():
                 content: str = row[self.content_column_name]
-                new_row = {
-                    k: v
-                    for k, v in row.items()
-                    if k not in (self.content_column_name, )
-                }
+                new_row = {k: v for k, v in row.items() if k not in (self.content_column_name,)}
                 for chunk in self.chunker.chunk(content):
-                    data.append({
-                        **new_row,
-                        **chunk,
-                    })
+                    data.append(
+                        {
+                            **new_row,
+                            **chunk,
+                        }
+                    )
 
         table = pa.Table.from_pylist(data)
         metadata = {
@@ -140,7 +142,7 @@ class DocChunkTransformConfiguration(TransformConfiguration):
             transform_class=DocChunkTransform,
         )
 
-        self.logger = get_logger(__name__)
+        self.logger = get_logger(__name__ + "cfg")  # workaround issue #481
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """

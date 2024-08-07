@@ -27,9 +27,7 @@ content_column_name_key = "content_column_name"
 output_embeddings_column_name_key = "output_embeddings_column_name"
 model_name_cli_param = f"{cli_prefix}{model_name_key}"
 content_column_name_cli_param = f"{cli_prefix}{content_column_name_key}"
-output_embeddings_column_name_cli_param = (
-    f"{cli_prefix}{output_embeddings_column_name_key}"
-)
+output_embeddings_column_name_cli_param = f"{cli_prefix}{output_embeddings_column_name_key}"
 
 default_model_name = "BAAI/bge-small-en-v1.5"
 default_content_column_name = "contents"
@@ -51,25 +49,19 @@ class TextEncoderTransform(AbstractTableTransform):
         self.logger = get_logger(__name__)
 
         self.model_name = config.get(model_name_key, default_model_name)
-        self.content_column_name = config.get(
-            content_column_name_key, default_content_column_name
-        )
+        self.content_column_name = config.get(content_column_name_key, default_content_column_name)
         self.output_embeddings_column_name = config.get(
             output_embeddings_column_name_key, default_output_embeddings_column_name
         )
 
         self.model = SentenceTransformer(self.model_name)
 
-    def transform(
-        self, table: pa.Table, file_name: str = None
-    ) -> tuple[list[pa.Table], dict[str, Any]]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """ """
         self.logger.debug(f"Transforming one table with {len(table)} rows")
 
         # make sure that the content column exists
-        TransformUtils.validate_columns(
-            table=table, required=[self.content_column_name]
-        )
+        TransformUtils.validate_columns(table=table, required=[self.content_column_name])
 
         embeddings = list(
             map(
@@ -77,9 +69,7 @@ class TextEncoderTransform(AbstractTableTransform):
                 table[self.content_column_name].to_pylist(),
             ),
         )
-        result = TransformUtils.add_column(
-            table=table, name=self.output_embeddings_column_name, content=embeddings
-        )
+        result = TransformUtils.add_column(table=table, name=self.output_embeddings_column_name, content=embeddings)
 
         metadata = {"nfiles": 1, "nrows": len(result)}
         return [result], metadata
@@ -99,7 +89,7 @@ class TextEncoderTransformConfiguration(TransformConfiguration):
         )
         from data_processing.utils import get_logger
 
-        self.logger = get_logger(__name__)
+        self.logger = get_logger(__name__ + "cfg")  # workaround issue #481
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
