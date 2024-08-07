@@ -513,7 +513,7 @@ def execute_ray_jobs(
                 name=name,
                 ns=ns,
                 script=exec_script_name,
-                data_access_params={f"{cli_prefix}s3_config": config_value, f"{cli_prefix}s3_cred": s3_creds},
+                data_access_params={f"{cli_prefix}s3_config": conf, f"{cli_prefix}s3_cred": s3_creds},
                 params=launch_params,
                 additional_params=additional_params,
                 remote_jobs=remote_jobs,
