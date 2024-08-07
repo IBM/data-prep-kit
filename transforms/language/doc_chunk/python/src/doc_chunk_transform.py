@@ -67,7 +67,7 @@ class DocChunkTransform(AbstractTableTransform):
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of DocChunkTransformConfiguration class
         super().__init__(config)
-        self.logger = get_logger(__name__)
+        self.logger = get_logger(__name__ + "config")
 
         self.chunking_type = config.get(chunking_type_key, default_chunking_type)
 

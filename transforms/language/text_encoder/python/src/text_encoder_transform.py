@@ -48,7 +48,7 @@ class TextEncoderTransform(AbstractTableTransform):
         super().__init__(config)
         from data_processing.utils import get_logger
 
-        self.logger = get_logger(__name__)
+        self.logger = get_logger(__name__ + "config")
 
         self.model_name = config.get(model_name_key, default_model_name)
         self.content_column_name = config.get(
