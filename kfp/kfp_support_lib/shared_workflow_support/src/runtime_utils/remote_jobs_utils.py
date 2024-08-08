@@ -33,8 +33,7 @@ from python_apiserver_client.params import (
 from ray.job_submission import JobStatus
 from runtime_utils import KFPUtils
 
-short_name = "KFP"
-cli_prefix = f"{short_name}_"
+cli_prefix = "KFP"
 
 logger = get_logger(__name__)
 
