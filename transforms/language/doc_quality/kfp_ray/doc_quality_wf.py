@@ -25,7 +25,7 @@ import kfp.dsl as dsl
 task_image = "quay.io/dataprep1/data-prep-kit/doc_quality-ray:latest"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "docq_transform_ray.py"
+EXEC_SCRIPT_NAME: str = "doc_quality_transform_ray.py"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
@@ -49,7 +49,7 @@ def compute_exec_params_func(
     docq_doc_content_column: str,
     docq_bad_word_filepath: str,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
@@ -105,9 +105,9 @@ def doc_quality(
     # Ray cluster
     ray_name: str = "doc_quality-kfp-ray",  # name of Ray cluster
     ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", '
-    '"image": "' + task_image + '", "image_pull_policy": "Always" }',
+    '"image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image_pull_secret": "", "image": "' + task_image + '", "image_pull_policy": "Always" }',
+    '"image_pull_secret": "", "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/doc_quality/input/', 'output_folder': 'test/doc_quality/output/'}",

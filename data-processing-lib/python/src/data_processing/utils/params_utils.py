@@ -92,7 +92,7 @@ class ParamsUtils:
         return all_text
 
     @staticmethod
-    def get_config_parameter(params: dict[str, Any]) -> str:
+    def get_config_parameter(params: dict[str, Any], cli_prefix: str = "data_") -> str:
         """
         Get the key name of the config parameter
         :param params: original parameters
@@ -100,8 +100,9 @@ class ParamsUtils:
         """
         # find config parameter
         config = None
+        print(params)
         for key in params.keys():
-            if key.startswith("data") and key.endswith("config"):
+            if key.startswith(cli_prefix) and key.endswith("config"):
                 if params[key] is not None and params[key] != "None" and len(params[key]) > 0:
                     config = key
                     break
