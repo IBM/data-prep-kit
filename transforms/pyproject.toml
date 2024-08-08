@@ -8,7 +8,9 @@ license = {text = "Apache-2.0"}
 
 
 dependencies = [
-	"dpk_lang_id_transform_python @ git+https://github.com/IBM/data-prep-kit.git@td#subdirectory=transforms/language/lang_id/python",
+	"dpk_text_encoder_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/text_encoder/python",
+	"dpk_doc_chunk_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/doc_chunk/python",
+	"dpk_lang_id_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/lang_id/python",
 	"dpk_pdf2parquet_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/pdf2parquet/python",
 	"dpk_doc_quality_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/doc_quality/python",
 	"dpk_ededup_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/ededup/python",
@@ -18,7 +20,7 @@ dependencies = [
 	"dpk_code_quality_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/code_quality/python",
 	"dpk_code2parquet_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/code2parquet/python",
 #	"dpk_header_cleanser_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/header_cleanser/python",
-	"dpk_malware_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/malware/python",
+#	"dpk_malware_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/malware/python",
 	"dpk_proglang_select_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/proglang_select/python",
 ]
 
