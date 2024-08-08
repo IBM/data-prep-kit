@@ -50,7 +50,6 @@ def get_dominant_language_repo_packing(table, language_column="language", title_
 
     if len(top_languages) == 1:
         # case 1: single most popular language, choose most popular
-        print(f"Single most promiment langauge:  {most_occuring}")
         return most_occuring
 
     second_most_occuring = top_languages[1]
@@ -60,13 +59,11 @@ def get_dominant_language_repo_packing(table, language_column="language", title_
     if top_languages_info[most_occuring] == top_languages_info[second_most_occuring]:
         # multiple languages
         # case 2: equally popular, check probable language, choose probable language
-        print(f"{most_occuring} and {second_most_occuring} are equally prominent in the repo")
         # detect using special files
         languages_guessed_from_special_files = guess_languages_from_special_files(df, title_column)
         lang_set = set([most_occuring, second_most_occuring])
         chosen_lang_set = lang_set.intersection(languages_guessed_from_special_files)
         if len(chosen_lang_set) > 0:
-            print(f"guessed:{languages_guessed_from_special_files}, chosen set:{chosen_lang_set}")
             # when there is a language common in top_languages and
             # languages_guessed_from_special_files, the order in which it appears in
             # top_languages is used for choosing the language

@@ -118,32 +118,3 @@ def sort_by_path(
             return original_df_cp, None
         else:
             return original_df_cp
-
-
-def configure_log():
-    local_log_path = os.path.join("/tmp", "logger.log")
-    logger = logging.getLogger("ray")
-    logger.setLevel(logging.INFO)
-    if not logger.handlers:
-        file_handler = logging.FileHandler(local_log_path)
-        # formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s',)
-        formatter = colorlog.ColoredFormatter(
-            "%(log_color)s%(asctime)s - %(levelname)s - %(message)s",
-            log_colors={
-                "DEBUG": "white",
-                "INFO": "green",
-                "WARNING": "yellow",
-                "ERROR": "red",
-                "CRITICAL": "red,bg_white",
-            },
-            reset=True,
-            style="%",
-        )
-        file_handler.setFormatter(formatter)
-
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setFormatter(formatter)
-        console_handler.setLevel(logging.INFO)
-        logger.addHandler(console_handler)
-        logger.addHandler(file_handler)
-    return logger
