@@ -11,17 +11,29 @@
 ################################################################################
 
 from typing import Any
-from data_processing.utils import get_logger, PipInstaller, TransformRuntime, TransformsConfiguration
+
 from data_processing.runtime.pure_python import invoke_transform
+from data_processing.utils import (
+    PipInstaller,
+    TransformRuntime,
+    TransformsConfiguration,
+    get_logger,
+)
 from data_processing_ray.runtime.ray import RayTransformLauncher
+
 
 project = "https://github.com/IBM/data-prep-kit.git"
 logger = get_logger(__name__)
 
 
-def execute_ray_transform(configuration: TransformsConfiguration, name: str,
-                          params: dict[str, Any], input_folder: str, output_folder: str,
-                          s3_config: dict[str, Any] = None) -> bool:
+def execute_ray_transform(
+    configuration: TransformsConfiguration,
+    name: str,
+    params: dict[str, Any],
+    input_folder: str,
+    output_folder: str,
+    s3_config: dict[str, Any] = None,
+) -> bool:
     """
     Execute Ray transform
     :param configuration: transforms configuration
@@ -33,16 +45,18 @@ def execute_ray_transform(configuration: TransformsConfiguration, name: str,
     :return: True/False - execution result
     """
     # get transform configuration
-    r_subdirectory, r_l_name, extra_libraries, t_class = (configuration.get_configuration(transform=name,
-                                                                                          runtime=TransformRuntime.RAY))
+    r_subdirectory, r_l_name, extra_libraries, t_class = configuration.get_configuration(
+        transform=name, runtime=TransformRuntime.RAY
+    )
     if r_subdirectory is None:
         return False
-    p_subdirectory, p_l_name, _, _ = (configuration.get_configuration(transform=name, runtime=TransformRuntime.PYTHON))
+    p_subdirectory, p_l_name, _, _ = configuration.get_configuration(transform=name, runtime=TransformRuntime.PYTHON)
 
     installer = PipInstaller()
     # Ray installer can depend on Python installer, if this is the case install Python one first
     p_installed = False
     if p_subdirectory is not None and not installer.validate(name=r_l_name):
+        # install corresponding python transform library, if required
         if not installer.install(project=project, subdirectory=p_subdirectory, name=p_l_name):
             logger.warning(f"failed to install transform {name}")
             return False
@@ -61,8 +75,15 @@ def execute_ray_transform(configuration: TransformsConfiguration, name: str,
             return False
         r_installed = True
     # invoke transform
-    res = invoke_transform(name=name, t_class=t_class, launcher=RayTransformLauncher, input_folder=input_folder,
-                           output_folder=output_folder, s3_config=s3_config, params=params | {"run_locally": True})
+    res = invoke_transform(
+        name=name,
+        t_class=t_class,
+        launcher=RayTransformLauncher,
+        input_folder=input_folder,
+        output_folder=output_folder,
+        s3_config=s3_config,
+        params=params | {"run_locally": True},
+    )
     # clean up
     if p_installed:
         # we installed transformer, uninstall it

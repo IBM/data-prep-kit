@@ -12,9 +12,8 @@
 
 import os
 
-from data_processing.utils import get_logger
+from data_processing.utils import ParamsUtils, TransformsConfiguration, get_logger
 from data_processing_ray.runtime.ray import execute_ray_transform
-from data_processing.utils import TransformsConfiguration, ParamsUtils
 
 
 logger = get_logger(__name__)
@@ -30,19 +29,25 @@ def test_configuration():
     logger.info(f"available transforms {transforms}")
     assert len(transforms) == 13
 
+
 def test_execution():
-    input_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                             "../../../../../transforms/universal/noop/ray/test-data/input"))
-    output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                              "../../../../../transforms/universal/noop/ray/output"))
+    input_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../../../../../transforms/universal/noop/ray/test-data/input")
+    )
+    output_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../../../../../transforms/universal/noop/ray/output")
+    )
     worker_options = {"num_cpus": 0.8}
     t_configuration = TransformsConfiguration()
     res = execute_ray_transform(
-        configuration = t_configuration,
+        configuration=t_configuration,
         name="noop",
         input_folder=input_dir,
         output_folder=output_dir,
-        params={"noop_sleep_sec": 1,
-                "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
-                "runtime_num_workers": 3})
+        params={
+            "noop_sleep_sec": 1,
+            "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
+            "runtime_num_workers": 3,
+        },
+    )
     assert res == True

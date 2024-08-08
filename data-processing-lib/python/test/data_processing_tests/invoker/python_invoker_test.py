@@ -12,9 +12,9 @@
 
 import os
 
-from data_processing.utils import get_logger
 from data_processing.runtime.pure_python import execute_python_transform
-from data_processing.utils import TransformsConfiguration
+from data_processing.utils import TransformsConfiguration, get_logger
+
 
 logger = get_logger(__name__)
 
@@ -29,16 +29,20 @@ def test_configuration():
     logger.info(f"available transforms {transforms}")
     assert len(transforms) == 13
 
+
 def test_execution():
-    input_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                             "../../../../../transforms/universal/noop/python/test-data/input"))
-    output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                              "../../../../../transforms/universal/noop/python/output"))
+    input_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../../../../../transforms/universal/noop/python/test-data/input")
+    )
+    output_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "../../../../../transforms/universal/noop/python/output")
+    )
     t_configuration = TransformsConfiguration()
     res = execute_python_transform(
-        configuration = t_configuration,
+        configuration=t_configuration,
         name="noop",
         input_folder=input_dir,
         output_folder=output_dir,
-        params={"noop_sleep_sec": 1})
+        params={"noop_sleep_sec": 1},
+    )
     assert res == True

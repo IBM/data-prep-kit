@@ -18,8 +18,9 @@ from typing import Any
 import ray
 from data_processing.utils import GB, UnrecoverableException
 from ray.actor import ActorHandle
-from ray.util.actor_pool import ActorPool
 from ray.exceptions import RayError
+from ray.util.actor_pool import ActorPool
+
 
 class RayUtils:
     """
@@ -85,7 +86,7 @@ class RayUtils:
         # filer out available ones
         nnodes = 0
         for node in nodes:
-            if node['Alive']:
+            if node["Alive"]:
                 nnodes += 1
         return nnodes
 

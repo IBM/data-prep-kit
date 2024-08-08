@@ -15,13 +15,13 @@ import os
 
 import pyarrow as pa
 import pyarrow.parquet as pq
-from data_processing.utils import str2bool
 from data_processing.test_support.transform import AbstractTableTransformTest
+from data_processing.utils import str2bool
 from header_cleanser_transform import (
-    HeaderCleanserTransform,
     COLUMN_KEY,
-    LICENSE_KEY,
     COPYRIGHT_KEY,
+    LICENSE_KEY,
+    HeaderCleanserTransform,
 )
 
 
@@ -40,9 +40,9 @@ class TestHeaderCleanserTransform(AbstractTableTransformTest):
         expected_output_dir: str,
     ) -> tuple[HeaderCleanserTransform, pa.Table, pa.Table, list[dict]]:
         config = {
-            COLUMN_KEY : column,
-            LICENSE_KEY : license,
-            COPYRIGHT_KEY : copyright,
+            COLUMN_KEY: column,
+            LICENSE_KEY: license,
+            COPYRIGHT_KEY: copyright,
         }
         input_df = pq.read_table(os.path.join(input_dir, "test1.parquet"))
         expected_output_df = pq.read_table(os.path.join(expected_output_dir, "test1.parquet"))
@@ -55,7 +55,7 @@ class TestHeaderCleanserTransform(AbstractTableTransformTest):
         fixtures = []
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/"))
         # test for both license and copyright removal
-        column_name = 'contents'
+        column_name = "contents"
         license = True
         copyright = True
         input_dir = os.path.join(basedir, "input")
@@ -84,7 +84,7 @@ class TestHeaderCleanserTransform(AbstractTableTransformTest):
         )
 
         # test for only copyright removal
-        column_name = 'contents'
+        column_name = "contents"
         license = False
         copyright = True
         input_dir = os.path.join(basedir, "input")

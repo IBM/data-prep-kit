@@ -12,10 +12,17 @@
 
 import sys
 from typing import Any
-from data_processing.utils import ParamsUtils, get_logger
+
 from data_processing.runtime.pure_python import PythonTransformLauncher
-from data_processing.utils import PipInstaller, TransformRuntime, TransformsConfiguration
 from data_processing.runtime.transform_launcher import AbstractTransformLauncher
+from data_processing.utils import (
+    ParamsUtils,
+    PipInstaller,
+    TransformRuntime,
+    TransformsConfiguration,
+    get_logger,
+)
+
 
 project = "https://github.com/IBM/data-prep-kit.git"
 logger = get_logger(__name__)
@@ -27,15 +34,22 @@ def _import_class(name):
     :param name: name
     :return:
     """
-    components = name.split('.')
+    components = name.split(".")
     mod = __import__(components[0])
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return mod
 
 
-def invoke_transform(name: str, t_class: str, launcher: AbstractTransformLauncher,
-                     input_folder: str, output_folder: str, s3_config: dict[str, Any], params: dict[str, Any]) -> bool:
+def invoke_transform(
+    name: str,
+    t_class: str,
+    launcher: AbstractTransformLauncher,
+    input_folder: str,
+    output_folder: str,
+    s3_config: dict[str, Any],
+    params: dict[str, Any],
+) -> bool:
     """
     Invoke transform
     :param name: transform name
@@ -51,18 +65,23 @@ def invoke_transform(name: str, t_class: str, launcher: AbstractTransformLaunche
     if s3_config is None:
         logger.info("Using local data")
         data_params = {
-            "data_local_config": ParamsUtils.convert_to_ast({
-                "input_folder": input_folder,
-                "output_folder": output_folder,
-            })}
+            "data_local_config": ParamsUtils.convert_to_ast(
+                {
+                    "input_folder": input_folder,
+                    "output_folder": output_folder,
+                }
+            )
+        }
     else:
         logger.info("Using data from S3")
         data_params = {
-            "data_s3_conf": ParamsUtils.convert_to_ast({
-                "input_folder": input_folder,
-                "output_folder": output_folder,
-            }),
-            "data_s3_config": ParamsUtils.convert_to_ast(s3_config)
+            "data_s3_conf": ParamsUtils.convert_to_ast(
+                {
+                    "input_folder": input_folder,
+                    "output_folder": output_folder,
+                }
+            ),
+            "data_s3_config": ParamsUtils.convert_to_ast(s3_config),
         }
     # create configuration
     klass = _import_class(t_class)
@@ -83,9 +102,14 @@ def invoke_transform(name: str, t_class: str, launcher: AbstractTransformLaunche
     return res
 
 
-def execute_python_transform(configuration: TransformsConfiguration, name: str,
-                             params: dict[str, Any], input_folder: str, output_folder: str,
-                             s3_config: dict[str, Any] = None) -> bool:
+def execute_python_transform(
+    configuration: TransformsConfiguration,
+    name: str,
+    params: dict[str, Any],
+    input_folder: str,
+    output_folder: str,
+    s3_config: dict[str, Any] = None,
+) -> bool:
     """
     Execute Python transform
     :param configuration: transforms configuration
@@ -97,8 +121,9 @@ def execute_python_transform(configuration: TransformsConfiguration, name: str,
     :return: True/False - execution result
     """
     # get transform configuration
-    subdirectory, l_name, extra_libraries, t_class = (configuration.get_configuration(transform=name,
-                                                                                      runtime=TransformRuntime.PYTHON))
+    subdirectory, l_name, extra_libraries, t_class = configuration.get_configuration(
+        transform=name, runtime=TransformRuntime.PYTHON
+    )
     if subdirectory is None:
         return False
 
@@ -106,14 +131,21 @@ def execute_python_transform(configuration: TransformsConfiguration, name: str,
     # Check if transformer already installed
     installed = False
     if not installer.validate(name=l_name):
-        # transformer is not installed, install it
+        # transformer is already installed, skip it, otherwise, install it
         if not installer.install(project=project, subdirectory=subdirectory, name=l_name):
             logger.warning(f"failed to install transform {name}")
             return False
         installed = True
     # invoke transform
-    res = invoke_transform(name=name, t_class=t_class, launcher=PythonTransformLauncher, input_folder=input_folder,
-                           output_folder=output_folder, s3_config=s3_config, params=params)
+    res = invoke_transform(
+        name=name,
+        t_class=t_class,
+        launcher=PythonTransformLauncher,
+        input_folder=input_folder,
+        output_folder=output_folder,
+        s3_config=s3_config,
+        params=params,
+    )
     if installed:
         # we installed transformer, uninstall it
         if not installer.uninstall(name=l_name):

@@ -33,12 +33,26 @@ class TestPythonDocChunkTransform(AbstractTransformLauncherTest):
         launcher = PythonTransformLauncher(DocChunkPythonTransformConfiguration())
 
         # Run with JSON Chunker
-        fixtures.append((launcher, {
-            chunking_type_cli_param: chunking_types.DL_JSON,
-        }, basedir + "/input", basedir + "/expected"))
+        fixtures.append(
+            (
+                launcher,
+                {
+                    chunking_type_cli_param: chunking_types.DL_JSON,
+                },
+                basedir + "/input",
+                basedir + "/expected",
+            )
+        )
 
         # Run with Markdown chunker
-        fixtures.append((launcher, {
-            chunking_type_cli_param: chunking_types.LI_MARKDOWN,
-        }, basedir + "/input_md", basedir + "/expected_md"))
+        fixtures.append(
+            (
+                launcher,
+                {
+                    chunking_type_cli_param: chunking_types.LI_MARKDOWN,
+                },
+                basedir + "/input_md",
+                basedir + "/expected_md",
+            )
+        )
         return fixtures

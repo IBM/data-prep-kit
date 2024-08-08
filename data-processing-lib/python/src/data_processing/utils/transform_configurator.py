@@ -10,10 +10,12 @@
 # limitations under the License.
 ################################################################################
 
-from enum import Enum
-import os
 import json
+import os
+from enum import Enum
+
 from data_processing.utils import get_logger
+
 
 default_configuration = f"{os.path.abspath(os.path.dirname(__file__))}/transform_configuration.json"
 logger = get_logger(__name__)
@@ -24,6 +26,7 @@ class TransformRuntime(Enum):
     """
     Supported runtimes and extensions
     """
+
     PYTHON = "python"
     RAY = "ray"
     SPARK = "spark"
@@ -33,6 +36,7 @@ class TransformsConfiguration:
     """
     Configurations for existing transforms
     """
+
     def __init__(self, configuration_file: str = default_configuration):
         """
         Initialization - loading transforms dictionary
@@ -49,8 +53,9 @@ class TransformsConfiguration:
         """
         return list(self.transforms.keys())
 
-    def get_configuration(self, transform: str, runtime: TransformRuntime = TransformRuntime.PYTHON)\
-            -> tuple[str, str, list[str], str]:
+    def get_configuration(
+        self, transform: str, runtime: TransformRuntime = TransformRuntime.PYTHON
+    ) -> tuple[str, str, list[str], str]:
         """
         Get configuration for a given transform/runtime
         :param transform: transform name

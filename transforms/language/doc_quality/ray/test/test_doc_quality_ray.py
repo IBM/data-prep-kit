@@ -15,9 +15,8 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from doc_quality_transform_ray import (
-    DocQualityRayTransformConfiguration
-)
+from doc_quality_transform_ray import DocQualityRayTransformConfiguration
+
 
 class TestRayDocQualityTransform(AbstractTransformLauncherTest):
     """
@@ -31,11 +30,10 @@ class TestRayDocQualityTransform(AbstractTransformLauncherTest):
             "docq_text_lang": "en",
             "docq_doc_content_column": "contents",
             "docq_bad_word_filepath": os.path.join(basedir, "ldnoobw", "en"),
-            "run_locally": True
+            "run_locally": True,
         }
         basedir = os.path.abspath(os.path.join(basedir, "test-data"))
         fixtures = []
         launcher = RayTransformLauncher(DocQualityRayTransformConfiguration())
         fixtures.append((launcher, cli_params, os.path.join(basedir, "input"), os.path.join(basedir, "expected")))
         return fixtures
-
