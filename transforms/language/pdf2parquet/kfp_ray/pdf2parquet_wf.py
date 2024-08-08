@@ -113,7 +113,7 @@ def pdf2parquet(
     data_num_samples: int = -1,
     data_files_to_use: str = "['.pdf']",
     # orchestrator
-    runtime_actor_options: str = "{'num_cpus': 0.8}",
+    runtime_actor_options: str = "{'num_cpus': 4}",
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
     # pdf2parquet parameters
