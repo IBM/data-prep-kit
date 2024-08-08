@@ -21,7 +21,7 @@ from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, Component
 EXEC_SCRIPT_NAME: str = "header_cleanser_transform_ray.py"
 PREFIX: str = ""
 
-task_image = "quay.io/dataprep1/data-prep-kit/header-cleanser-ray:latest"
+task_image = "quay.io/dataprep1/data-prep-kit/header_cleanser-ray:latest"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"

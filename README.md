@@ -78,6 +78,8 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 | Code (from zip) to Parquet       | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Document quality                 | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | PDF to Parquet (convert)         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| Split document to chunks         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| Text encoder                     | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Profiler                         |                    |:white_check_mark:|                  |:white_check_mark:      |
 | Tokenizer                        | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 

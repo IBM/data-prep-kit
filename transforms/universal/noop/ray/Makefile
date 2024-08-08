@@ -36,7 +36,7 @@ setup:: .transforms.setup
 set-versions: 
 	$(MAKE) TRANSFORM_PYTHON_VERSION=${NOOP_PYTHON_VERSION} TOML_VERSION=$(NOOP_RAY_VERSION) .transforms.set-versions 
         
-build-dist:: set-versions .defaults.build-dist 
+build-dist:: .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 
