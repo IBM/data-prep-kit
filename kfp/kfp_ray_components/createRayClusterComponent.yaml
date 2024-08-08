@@ -4,14 +4,14 @@ description: Creates Ray cluster
 inputs:
     - { name: ray_name, type: String, description: "Ray cluster user name" }
     - { name: run_id, type: String, description: "The KFP Run ID" }
-    - { name: ray_head_options, type: String, default: "", description: "ray head configuration" }
-    - { name: ray_worker_options, type: String, default: "", description: "ray worker configuration" }
+    - { name: ray_head_options, type: JsonObject, default: "{}", description: "ray head configuration" }
+    - { name: ray_worker_options, type: JsonObject, default: "{}", description: "ray worker configuration" }
     - { name: server_url, type: String, default: "", description: "url of api server" }
     - { name: additional_params, type: String, default: "{}", description: "additional parameters" }
 
 implementation:
     container:
-        image: "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
+        image: "quay.io/dataprep1/data-prep-kit/kfp-data-processing_v2:0.2.2.dev0"
         # command is a list of strings (command-line arguments).
         # The YAML language has two syntaxes for lists and you can use either of them.
         # Here we use the "flow syntax" - comma-separated strings inside square brackets.
