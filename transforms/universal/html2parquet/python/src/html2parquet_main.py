@@ -4,14 +4,17 @@ from typing import Any
 import zipfile
 import io
 import trafilatura
+from datetime import datetime
+
 
 import pyarrow as pa
+
+#distabled for now
 # from data_processing_ray.runtime.ray import RayTransformLauncher
 # from data_processing_ray.runtime.ray.runtime_configuration import (
 #   RayTransformRuntimeConfiguration,
 # )
 # import data_processing
-# print(dir(data_processing))
 
 
 from data_processing.transform import AbstractTableTransform, AbstractBinaryTransform, TransformConfiguration
@@ -27,7 +30,6 @@ class HtmlToParquetTransform(AbstractTableTransform):
         Converts raw data file (ZIP) to Parquet format
         """
         # We currently only process .zip files
-        print("transform_binary")
         if TransformUtils.get_file_extension(file_name)[1] != ".zip":
             self.logger.warning(f"Got unsupported file type {file_name}, skipping")
             return [], {}
@@ -37,17 +39,20 @@ class HtmlToParquetTransform(AbstractTableTransform):
         with zipfile.ZipFile(io.BytesIO(bytes(byte_array))) as opened_zip:
             # Loop through each file member in the ZIP archive
             for member in opened_zip.infolist():
-                if not member.is_dir():
+                if not member.is_dir() and '__MACOSX' not in member.filename:
                     with opened_zip.open(member) as file:
                         try:
                             # Read the content of the file
                             content_bytes = file.read()
                             #use Tra something library
                             content_string = trafilatura.extract(content_bytes)
-                            print("content_string:", content_string)
                             row_data = {
-                                "filename": member.filename,
-                                "contents": content_string
+                                "title": member.filename,
+                                "document": TransformUtils.get_file_basename(file_name),
+                                "contents": content_string,
+                                "document_id": TransformUtils.str_to_hash(content_string),
+                                "size": len(content_string),
+                                "date_acquired": datetime.now().isoformat(),
                             }
 
                             data.append(row_data)
@@ -59,13 +64,12 @@ class HtmlToParquetTransform(AbstractTableTransform):
 
 
  
-    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
-        print("transform")
-        if self.sleep is not None:
-            time.sleep(self.sleep)
-        # Add some sample metadata.
-        metadata = {"nfiles": 1, "nrows": len(table)}
-        return [table], metadata
+    # def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
+    #     if self.sleep is not None:
+    #         time.sleep(self.sleep)
+    #     # Add some sample metadata.
+    #     metadata = {"nfiles": 1, "nrows": len(table)}
+    #     return [table], metadata
 
 
 short_name = "html2parquet"
@@ -100,7 +104,7 @@ class HtmlToParquetTransformConfiguration(TransformConfiguration):
     def apply_input_params(self, args: Namespace) -> bool:
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         if captured.get(sleep_key) < 0:
-            print(f"Parameter html2parquet_sleep_sec should be non-negative. you specified {args.noop_sleep_sec}")
+            print(f"Parameter html2parquet_sleep_sec should be non-negative. you specified {args.html2parquet_sleep_sec}")
             return False
         self.params = captured
         return True
