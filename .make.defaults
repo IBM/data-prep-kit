@@ -39,7 +39,9 @@ DOCKER_FILE?=Dockerfile
 DOCKER?=docker
 DOCKER_PLATFORM?=linux/amd64
 # Can be used by transforms or others to add args to the "docker build" command in .defaults.image target
-DOCKER_EXTRA_BUILD_ARGS=
+DOCKER_BUILD_EXTRA_ARGS=
+# Can be used by transforms or others to add args to the "pip install" commands referencing toml or requirements.txt files
+PIP_INSTALL_EXTRA_ARGS=
 DOCKER_HOSTNAME?=quay.io
 DOCKER_NAMESPACE ?= dataprep1/data-prep-kit
 DOCKER_REGISTRY_USER?=$(DPK_DOCKER_REGISTRY_USER)
@@ -216,7 +218,7 @@ __check_defined = \
 	if [ -e pyproject.toml ]; then 	\
 		touch pyproject.toml;	\
 	fi
-	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE) $(DOCKER_EXTRA_BUILD_ARGS)	\
+	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE) $(DOCKER_BUILD_EXTRA_ARGS)	\
 		--platform $(DOCKER_PLATFORM)  			\
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
@@ -299,7 +301,7 @@ endif
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
-	pip install $${extra_url}  -e $(PYTHON_PROJECT_DIR);
+	pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_DIR);
 	@echo Done installing source from $(PYTHON_PROJECT_DIR) into venv
 
 # Install local requirements last as it generally includes our lib source
@@ -477,10 +479,10 @@ endif
 	fi;								\
 	if [ -e requirements.txt ]; then				\
 		echo Installing requirements from requirements.txt;	\
-		pip install $$extra_url -r requirements.txt;		\
+		pip install $(PIP_INSTALL_EXTRA_ARGS) $$extra_url -r requirements.txt;		\
 	elif [ -e pyproject.toml ]; then				\
 		echo Installing from pyproject.toml;			\
-		pip install $$extra_url -e .;				\
+		pip install $(PIP_INSTALL_EXTRA_ARGS) $$extra_url -e .;	\
 	fi
 
 .PHONY: .defaults.check.installed
