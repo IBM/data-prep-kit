@@ -35,15 +35,14 @@ class PythonTransformFileProcessor(AbstractTransformFileProcessor):
         :param statistics - reference to statistics class
         :param runtime_configuration: transform configuration class
         """
-        # Create data access
-        super().__init__()
-        self.data_access = data_access_factory.create_data_access()
-        # Add data access and statistics to the processor parameters
-        transform_params = dict(runtime_configuration.get_transform_params())
-        transform_params["data_access"] = self.data_access
-        transform_params["statistics"] = statistics
+        # invoke superclass
+        super().__init__(
+            data_access_factory=data_access_factory,
+            transform_parameters=dict(runtime_configuration.get_transform_params()),
+        )
+        self.transform_params["statistics"] = statistics
         # Create local processor
-        self.transform = runtime_configuration.get_transform_class()(transform_params)
+        self.transform = runtime_configuration.get_transform_class()(self.transform_params)
         # Create statistics
         self.stats = statistics
 

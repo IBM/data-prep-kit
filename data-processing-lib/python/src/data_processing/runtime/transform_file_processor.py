@@ -13,6 +13,8 @@ import time
 import traceback
 from typing import Any
 
+from data_processing.data_access import DataAccessFactoryBase
+from data_processing.runtime import TransformRuntimeConfiguration
 from data_processing.utils import TransformUtils, UnrecoverableException, get_logger
 
 
@@ -21,17 +23,26 @@ class AbstractTransformFileProcessor:
     This is the the base class implementing processing of a single binary file
     """
 
-    def __init__(self):
+    def __init__(
+            self,
+            data_access_factory: DataAccessFactoryBase,
+            transform_parameters: dict[str, Any],
+    ):
         """
         Init method
+        :param data_access_factory: Data Access Factory
+        :param transform_parameters: Transform parameters
         """
-        self.data_access = None
         self.transform = None
         self.stats = None
         self.last_file_name = None
         self.last_extension = None
         self.last_file_name_next_index = None
         self.logger = get_logger(__name__)
+        self.data_access = data_access_factory.create_data_access()
+        # Add data access and statistics to the processor parameters
+        self.transform_params = transform_parameters
+        self.transform_params["data_access"] = self.data_access
 
     def process_file(self, f_name: str) -> None:
         """

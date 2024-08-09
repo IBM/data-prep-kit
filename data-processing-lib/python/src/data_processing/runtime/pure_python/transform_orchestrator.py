@@ -15,11 +15,12 @@ import traceback
 from datetime import datetime
 
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.runtime import (
-    TransformExecutionConfiguration,
-    TransformRuntimeConfiguration,
+from data_processing.runtime.pure_python import (
+    PythonTransformFileProcessor,
+    PythonTransformExecutionConfiguration,
+    PythonTransformRuntimeConfiguration,
+    process_transforms,
 )
-from data_processing.runtime.pure_python import PythonTransformFileProcessor
 from data_processing.transform import TransformStatistics
 from data_processing.utils import get_logger
 
@@ -29,8 +30,8 @@ logger = get_logger(__name__)
 
 def orchestrate(
     data_access_factory: DataAccessFactoryBase,
-    runtime_config: TransformRuntimeConfiguration,
-    execution_config: TransformExecutionConfiguration,
+    runtime_config: PythonTransformRuntimeConfiguration,
+    execution_config: PythonTransformExecutionConfiguration,
 ) -> int:
     """
     orchestrator for transformer execution
@@ -54,34 +55,40 @@ def orchestrate(
         if len(files) == 0:
             logger.error("No input files to process - exiting")
             return 0
+        if retries > 0:
+            statistics.add_stats({"data access retries": retries})
         logger.info(f"Number of files is {len(files)}, source profile {profile}")
         # Print interval
         print_interval = int(len(files) / 100)
         if print_interval == 0:
             print_interval = 1
-        if retries > 0:
-            statistics.add_stats({"data access retries": retries})
-        # create executor
-        executor = PythonTransformFileProcessor(
-            data_access_factory=data_access_factory, statistics=statistics, runtime_configuration=runtime_config
-        )
-        # process data
-        logger.debug(f"{runtime_config.get_name()} Begin processing files")
-        t_start = time.time()
-        completed = 0
-        for path in files:
-            executor.process_file(path)
-            completed += 1
-            if completed % print_interval == 0:
-                logger.info(
-                    f"Completed {completed} files ({100 * completed / len(files)}%) "
-                    f"in {(time.time() - t_start)/60} min"
-                )
-        logger.debug(f"Done processing {completed} files, waiting for flush() completion.")
-        # invoke flush to ensure that all results are returned
-        start = time.time()
-        executor.flush()
-        logger.info(f"done flushing in {time.time() - start} sec")
+        if execution_config.multiprocessing:
+            # using multiprocessor pool for execution
+            statistics = process_transforms(files=files, size=execution_config.num_processors,
+                                            data_access_factory=data_access_factory, print_interval=print_interval,
+                                            runtime_configuration=runtime_config)
+        else:
+            # create executor
+            executor = PythonTransformFileProcessor(
+                data_access_factory=data_access_factory, statistics=statistics, runtime_configuration=runtime_config
+            )
+            # process data
+            logger.debug(f"{runtime_config.get_name()} Begin processing files")
+            t_start = time.time()
+            completed = 0
+            for path in files:
+                executor.process_file(path)
+                completed += 1
+                if completed % print_interval == 0:
+                    logger.info(
+                        f"Completed {completed} files ({100 * completed / len(files)}%) "
+                        f"in {(time.time() - t_start)/60} min"
+                    )
+            logger.info(f"Done processing {completed} files, waiting for flush() completion.")
+            # invoke flush to ensure that all results are returned
+            start = time.time()
+            executor.flush()
+            logger.info(f"done flushing in {time.time() - start} sec")
         status = "success"
         return_code = 0
     except Exception as e:
@@ -104,7 +111,7 @@ def orchestrate(
                 "status": status,
             },
             "code": execution_config.code_location,
-            "job_input_params": input_params | data_access_factory.get_input_params(),
+            "job_input_params": input_params | data_access_factory.get_input_params() | execution_config.get_input_params(),
             "job_output_stats": stats,
         }
         logger.debug(f"Saving job metadata: {metadata}.")

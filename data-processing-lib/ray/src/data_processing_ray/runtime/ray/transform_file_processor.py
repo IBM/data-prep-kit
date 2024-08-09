@@ -31,16 +31,14 @@ class RayTransformFileProcessor(AbstractTransformFileProcessor):
             transform_params: dictionary of parameters for local transform creation
             statistics: object reference to statistics
         """
-        super().__init__()
-        # Create data access
-        self.data_access = params.get("data_access_factory", None).create_data_access()
-        # Add data access ant statistics to the processor parameters
-        transform_params = params.get("transform_params", None)
-        transform_params["data_access"] = self.data_access
+        super().__init__(
+            data_access_factory=params.get("data_access_factory", None),
+            transform_parameters=dict(params.get("transform_params", {})),
+        )
+        self.transform_params["statistics"] = params.get("statistics", None)
         # Create local processor
-        self.transform = params.get("transform_class", None)(transform_params)
+        self.transform = params.get("transform_class", None)(self.transform_params)
         # Create statistics
         self.stats = params.get("statistics", None)
-
     def _publish_stats(self, stats: dict[str, Any]) -> None:
         self.stats.add_stats.remote(stats)
