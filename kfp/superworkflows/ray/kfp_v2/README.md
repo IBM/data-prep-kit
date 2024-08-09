@@ -4,7 +4,7 @@ As in [super pipelines of KFP v1](../../../doc/multi_transform_pipeline.md), we 
 
 One example of chaining `noop` and `document id` transforms can be found [here](superpipeline_noop_docId_v2.py). When running this pipeline it appears as hierarchical graph with two nested pipelines, one for each transform as shown in the following screenshots.
 
-`root` Layer 
+`root` Layer
 ![nested_pipeline](nested_pipeline.png)
 
 `root -> noop-ray-pipeline` Layer
