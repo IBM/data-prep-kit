@@ -48,3 +48,59 @@ class PythonTransformFileProcessor(AbstractTransformFileProcessor):
 
     def _publish_stats(self, stats: dict[str, Any]) -> None:
         self.stats.add_stats(stats)
+
+
+class PythonPoolTransformFileProcessor(AbstractTransformFileProcessor):
+    """
+    This is the class implementing the worker class processing of a single file
+    """
+
+    def __init__(
+            self,
+            data_access_factory: DataAccessFactoryBase,
+            runtime_configuration: PythonTransformRuntimeConfiguration,
+    ):
+        """
+        Init method
+        :param data_access_factory - data access factory
+        :param runtime_configuration: transform configuration class
+        """
+        super().__init__(
+            data_access_factory=data_access_factory,
+            transform_parameters=dict(runtime_configuration.get_transform_params()),
+        )
+        # Add data access and statistics to the processor parameters
+        self.transform_params["data_access"] = self.data_access
+        self.transform_class = runtime_configuration.get_transform_class()
+        self.transform = None
+
+    def process_file(self, f_name: str) -> dict[str, Any]:
+        # re initialize statistics
+        self.stats = {}
+        if self.transform is None:
+            # create transform. Make sure to do this locally
+            self.transform = self.transform_class(self.transform_params)
+        # Invoke superclass method
+        super().process_file(f_name=f_name)
+        # return collected statistics
+        return self.stats
+
+    def flush(self) -> dict[str, Any]:
+        # re initialize statistics
+        self.stats = {}
+        # Invoke superclass method
+        super().flush()
+        # return collected statistics
+        return self.stats
+
+    def _publish_stats(self, stats: dict[str, Any]) -> None:
+        """
+        Publish statistics (to the local dictionary)
+        :param stats: statistics dictionary
+        :return: None
+        """
+        for key, val in stats.items():
+            # for all key/values
+            if val > 0:
+                # for values greater then 0
+                self.stats[key] = self.stats.get(key, 0) + val
