@@ -12,6 +12,7 @@ class PIIAnonymizer:
     def __init__(self, operator="replace"):
         self.anonymizer = AnonymizerEngine()
         self._is_valid_operator(operator)
+        self.operator_config = {"DEFAULT": OperatorConfig(operator, None)}
 
     def _is_valid_operator(self, operator):
         valid_operators = {"replace", "redact"}
@@ -19,7 +20,8 @@ class PIIAnonymizer:
             raise UnsupoortedOperatorException(
                 f"{operator} is not supported for anonymizing.replace or redact is the " f"supported operators"
             )
+
         return True
 
-    def anonymize_text(self, text, analyze_results, operator="replace"):
-        return self.anonymizer.anonymize(text, analyze_results, operators={"DEFAULT": OperatorConfig(operator, None)})
+    def anonymize_text(self, text, analyze_results):
+        return self.anonymizer.anonymize(text, analyze_results, operators=self.operator_config)

@@ -15,8 +15,9 @@ SPACY_MODEL = "en_core_web_sm"
 
 
 class PIIAnalyzerEngine:
-    def __init__(self, supported_entities=None):
+    def __init__(self, supported_entities=None, score_threshold=None):
         self.supported_entities = supported_entities
+        self.score_threshold = score_threshold
         self.nlp_engine, self.registry = self._create_nlp_engine()
 
     def _create_nlp_engine(self):
@@ -61,7 +62,10 @@ class PIIAnalyzerEngine:
 
         Returns:
             List[RecognizerResult]: Results of the PII analysis.
+            List[entity_types]: Types of PII entities identified in the given input text
         """
         analyzer = AnalyzerEngine(nlp_engine=self.nlp_engine, registry=self.registry)
-        result = analyzer.analyze(text=text, language=language, entities=self.supported_entities, score_threshold=0.6)
-        return result
+        analyze_results = analyzer.analyze(text=text, language=language, entities=self.supported_entities,
+                                           score_threshold=self.score_threshold)
+        entity_types = [result.entity_type for result in analyze_results]
+        return analyze_results, entity_types

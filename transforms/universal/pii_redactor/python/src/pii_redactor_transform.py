@@ -13,19 +13,25 @@ from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logge
 from pii_analyzer import PIIAnalyzerEngine
 from pii_anonymizer import PIIAnonymizer
 
-
 short_name = "pii_redactor"
 cli_prefix = short_name + "_"
 supported_entities_key = "entities"
-anonymizer_operator_key = "operator"
+redaction_operator_key = "operator"
 doc_contents_key = "contents"
+score_threshold_key = "score_threshold"
 
 supported_entities_cli_param = f"{cli_prefix}{supported_entities_key}"
-anonymizer_operator_cli_param = f"{cli_prefix}{anonymizer_operator_key}"
+redaction_operator_cli_param = f"{cli_prefix}{redaction_operator_key}"
 doc_contents_cli_param = f"{cli_prefix}{doc_contents_key}"
+score_threshold_cli_param = f"{cli_prefix}{score_threshold_key}"
 
-default_supported_entities = ["PERSON", "EMAIL_ADDRESS", "ORGANIZATION", "DATE_TIME"]
-"""By default it supports person name, email address.To know more about entities refer https://microsoft.github.io/presidio/supported_entities/
+default_score_threshold_key = 0.6
+"""
+The default score_threshold value will be 0.6. At this range false positives are reduced significantly
+"""
+
+default_supported_entities = ["PERSON", "EMAIL_ADDRESS", "ORGANIZATION", "DATE_TIME", "CREDIT_CARD", "PHONE_NUMBER"]
+"""By default it supports person name, email address, organization, date, credti card, phone number.To know more about entities refer https://microsoft.github.io/presidio/supported_entities/
 """
 
 default_anonymizer_operator = "replace"
@@ -43,10 +49,13 @@ class PIIRedactorTransform(AbstractTableTransform):
 
         self.log = get_logger(__name__)
         self.supported_entities = config.get(supported_entities_key, default_supported_entities)
-        self.anonymizer_operator = config.get(anonymizer_operator_key, default_anonymizer_operator)
+        self.redaction_operator = config.get(redaction_operator_key, default_anonymizer_operator)
         self.doc_contents_key = config.get(doc_contents_key, doc_contents_key)
-        self.analyzer = PIIAnalyzerEngine(supported_entities=self.supported_entities)
-        self.anonymizer = PIIAnonymizer(operator=self.anonymizer_operator)
+        score_threshold_value = config.get(score_threshold_key, default_score_threshold_key)
+
+        self.analyzer = PIIAnalyzerEngine(supported_entities=self.supported_entities,
+                                          score_threshold=score_threshold_value)
+        self.anonymizer = PIIAnonymizer(operator=self.redaction_operator.lower())
 
     def _analyze_pii(self, text: str):
         return self.analyzer.analyze_text(text)
@@ -54,9 +63,9 @@ class PIIRedactorTransform(AbstractTableTransform):
     def _redact_pii(self, text: str):
         text = text.strip()
         if text:
-            analyze_results = self._analyze_pii(text)
+            analyze_results, entity_types = self._analyze_pii(text)
             anonymized_results = self.anonymizer.anonymize_text(text, analyze_results)
-            return anonymized_results.text
+            return anonymized_results.text, entity_types
 
     def transform(self, table: pa.Table, file_name: Optional[str] = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -70,9 +79,9 @@ class PIIRedactorTransform(AbstractTableTransform):
         TransformUtils.validate_columns(table=table, required=[self.doc_contents_key])
         metadata = {"original_table_rows": table.num_rows, "original_column_count": len(table.column_names)}
 
-
-        column_data = pa.array(table[self.doc_contents_key].to_pandas().apply(self._redact_pii))
-        table = table.add_column(0, "new_contents", [column_data])
+        redacted_texts, entity_types_list = zip(*table[self.doc_contents_key].to_pandas().apply(self._redact_pii))
+        table = table.add_column(0, "new_contents", [redacted_texts])
+        table = table.add_column(0, "detected_pii", [entity_types_list])
         metadata["transformed_table_rows"] = table.num_rows
         metadata["transformed_column_count"] = len(table.column_names)
 
@@ -97,15 +106,15 @@ class PIIRedactorTransformConfiguration(TransformConfiguration):
             type=ast.literal_eval,
             required=False,
             default=ast.literal_eval("[]"),
-            help=f"list of entities to be redacted from the input data: {json.dumps(default_supported_entities, indent=2, default=str)}. "
-            f"To know more about entities refer https://microsoft.github.io/presidio/supported_entities/",
+            help=f"List of entities to be redacted from the input data: {json.dumps(default_supported_entities, indent=2, default=str)}. "
+                 f"To know more about entities refer https://microsoft.github.io/presidio/supported_entities/",
         )
         parser.add_argument(
-            f"--{anonymizer_operator_cli_param}",
+            f"--{redaction_operator_cli_param}",
             type=str,
             required=False,
             default="replace",
-            help="anonymization technique to be applied on detected pii data.Supported techniques redact, replace",
+            help="Redaction technique to be applied on detected pii data.Supported techniques redact, replace",
         )
 
         parser.add_argument(
@@ -113,7 +122,17 @@ class PIIRedactorTransformConfiguration(TransformConfiguration):
             type=str,
             required=True,
             default="contents",
-            help="mention the column name which needs to be transformed for pii",
+            help="Mention the column name which needs to be transformed for pii",
+        )
+
+        parser.add_argument(
+            f"--{score_threshold_cli_param}",
+            type=float,
+            required=False,
+            default=0.6,
+            help="The score_threshold is a parameter that "
+                 "sets the minimum confidence score required for an entity to be considered a match."
+                 "Provide a value above 0.6"
         )
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:

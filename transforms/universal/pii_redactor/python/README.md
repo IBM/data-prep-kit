@@ -11,6 +11,8 @@ The transform detects the following PII entities by default:
 - **EMAIL_ADDRESS**: Email addresses
 - **ORGANIZATION**: Names of organizations
 - **DATE_TIME**: Dates and times
+- **PHONE_NUMBER**: Phone number
+- **CREDIT_CARD**: Credit card numbers
 
 You can configure the entities to detect by passing the required entities as argument param ( **--pii_redactor_entities** ).
 To know more about different entity types supported - [Entities](https://microsoft.github.io/presidio/supported_entities/)
@@ -29,23 +31,34 @@ You can choose the redaction technique by passing it as an argument parameter (*
 
 The input data should be a `py.Table` with a column containing the text where PII detection and redaction will be applied. By default, this column is named `contents`, but this can be configured.
 
-**Example Input Table Structure:**
+**Example Input Table Structure:** Table 1: Sample input to the pii redactor transform
 
-| contents               | doc_id |
-|------------------------|--------|
-| My name is JohnDoe    | doc001 |
-| I work at apple        | doc002 |
+| contents            | doc_id |
+|---------------------|--------|
+| My name is John Doe | doc001 |
+| I work at apple     | doc002 |
+
 
 ### Output
 
-The output table will include the original columns plus an additional column `new_contents` with redacted text.
+The output table will include the original columns plus an additional column `new_contents` with redacted text and `detected_pii` 
+column consisting the type of PII entities detected in that document for replace operator.
 
-**Example Output Table Structure:**
+**Example Output Table Structure for replace operator:**
 
-| contents               | doc_id | new_contents           |
-|------------------------|--------|------------------------|
-| My name is JohnDoe    | doc001 | My name is <NAME>     |
-| I work at apple        | doc002 | I work at <ORGANIZATION> |
+| contents            | doc_id | new_contents             | detected_pii       |
+|---------------------|--------|--------------------------|--------------------|
+| My name is John Doe | doc001 | My name is `<PERSON>`    | `[<PERSON>]`       |
+| I work at apple     | doc002 | I work at `<ORGANIZATION>` | `[<ORGANIZATION>]` |
+
+When `redact` operator is chosen the output will look like below
+ 
+**Example Output Table Structure for redact operator**
+
+| contents            | doc_id | new_contents             | detected_pii       |
+|---------------------|--------|--------------------------|--------------------|
+| My name is John Doe | doc001 | My name is  | `[<PERSON>]`       |
+| I work at apple     | doc002 | I work at | `[<ORGANIZATION>]` |
 
 ## Running
 
@@ -57,9 +70,11 @@ the [python launcher](../../../../data-processing-lib/doc/python-launcher-option
 ```
   --pii_redactor_entities PII_ENTITIES
                         list of PII entities to be captured for example: ["PERSON", "EMAIL"]
-  --pii_redactor_operator ANONYMIZATION_OPERATOR
+  --pii_redactor_operator REDACTOR_OPERATOR
                         Two redaction techniques are supported - replace(default), redact 
   --pii_redactor_contents PII_CONTENT_COLUMN_NAME
-                        mention the column name for which pii redation transform has to be applied
-
+                        mention the column name for which pii redaction transform has to be applied
+  --pii_redactor_score_threshold SCORE_THRESHOLD
+                        The score_threshold is a parameter that sets the minimum confidence score required for an entity to be considered a match.
+                        Provide a value above 0.6
 ```
