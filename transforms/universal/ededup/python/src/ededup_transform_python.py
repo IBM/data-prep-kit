@@ -31,6 +31,7 @@ class EdedupPythonTransform(EdedupTransformBase):
         """
         super().__init__(config)
         self.filter = HashFilter({})
+        self.stats = config.get("statistics", None)
 
     def _process_cached_hashes(self, hd: dict[str, str]) -> list[str]:
         """
@@ -50,7 +51,12 @@ class EdedupPythonTransform(EdedupTransformBase):
         :return: additional metadata
         """
         h_size, h_memory = self.filter.get_hash_size()
-        return [], {"number of hashes": h_size, "hash memory, GB": h_memory}
+        m_data = {"number of hashes": h_size, "hash memory, GB": h_memory}
+        if self.stats is not None:
+            stats = self.stats.get_execution_stats()
+            dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 1))
+            m_data = m_data | {"de duplication %": dedup_prst}
+        return [], m_data
 
 
 class EdedupPythonTransformConfiguration(PythonTransformRuntimeConfiguration):

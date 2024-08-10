@@ -335,7 +335,6 @@ class DataAccessS3(DataAccess):
     ) -> tuple[dict[str, bytes], int]:
         """
         Get a list of byte content of files. The path here is an absolute path and can be anywhere.
-        The current limitation for S3 and Lakehouse is that it has to be in the same bucket
         :param path: file path
         :param extensions: a list of file extensions to include. If None, then all files from this and
                            child ones will be returned

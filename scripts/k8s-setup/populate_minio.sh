@@ -29,6 +29,9 @@ mc cp --recursive ${REPOROOT}/transforms/code/header_cleanser/ray/test-data/inpu
 # language
 mc cp --recursive ${REPOROOT}/transforms/language/lang_id/ray/test-data/input/ kfp/test/lang_id/input
 mc cp --recursive ${REPOROOT}/transforms/language/doc_quality/ray/test-data/input/ kfp/test/doc_quality/input
+mc cp --recursive ${REPOROOT}/transforms/language/pdf2parquet/ray/test-data/input/2206.01062.pdf kfp/test/pdf2parquet/input
+mc cp --recursive ${REPOROOT}/transforms/language/text_encoder/ray/test-data/input/ kfp/test/text_encoder/input
+mc cp --recursive ${REPOROOT}/transforms/language/doc_chunk/ray/test-data/input/ kfp/test/doc_chunk/input
 # universal
 mc cp --recursive ${REPOROOT}/transforms/universal/doc_id/ray/test-data/input/ kfp/test/doc_id/input
 mc cp --recursive ${REPOROOT}/transforms/universal/ededup/ray/test-data/input/ kfp/test/ededup/input

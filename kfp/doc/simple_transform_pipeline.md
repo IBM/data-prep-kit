@@ -139,8 +139,6 @@ The parameters used here are as follows:
 **Note** that here we are specifying initial values for all parameters that will be propagated to the workflow UI
 (see below)
 
-**Note** Parameters are defining both S3 and Lakehouse configuration, but only one at a time can be used.
-
 ### Pipeline definition <a name = "pipeline"></a> 
 
 Now, when all components and input parameters are defined, we can implement pipeline wiring defining sequence of 

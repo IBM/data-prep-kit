@@ -456,10 +456,10 @@ endif
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
 .PHONY: .defaults.venv
-.defaults.venv::	.check_python_version .defaults.create-venv .defaults.install-local-requirements-venv
+.defaults.venv: .defaults.create-venv .defaults.install-local-requirements-venv
 
 .PHONY: .defaults.create-venv
-.defaults.create-venv:
+.defaults.create-venv: .check_python_version
 	@# Help: Create the virtual environment using requirements.txt or pyproject.toml
 	$(PYTHON) -m venv venv
 	@source venv/bin/activate;		\
