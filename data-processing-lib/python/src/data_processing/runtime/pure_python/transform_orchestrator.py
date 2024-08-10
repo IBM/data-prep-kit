@@ -66,11 +66,13 @@ def orchestrate(
         if execution_config.multiprocessing:
             # using multiprocessor pool for execution
             statistics = _process_transforms_multiprocessor(files=files, size=execution_config.num_processors,
-                                                           data_access_factory=data_access_factory, print_interval=print_interval,
-                                                           runtime_configuration=runtime_config)
+                                                            data_access_factory=data_access_factory,
+                                                            print_interval=print_interval,
+                                                            runtime_configuration=runtime_config)
         else:
-            _process_transforms(files=files, data_access_factory=data_access_factory, print_interval= print_interval,
-                               statistics=statistics, runtime_configuration=runtime_config)
+            # using sequential execution
+            _process_transforms(files=files, data_access_factory=data_access_factory, print_interval=print_interval,
+                                statistics=statistics, runtime_configuration=runtime_config)
         status = "success"
         return_code = 0
     except Exception as e:
@@ -93,7 +95,8 @@ def orchestrate(
                 "status": status,
             },
             "code": execution_config.code_location,
-            "job_input_params": input_params | data_access_factory.get_input_params() | execution_config.get_input_params(),
+            "job_input_params":
+                input_params | data_access_factory.get_input_params() | execution_config.get_input_params(),
             "job_output_stats": stats,
         }
         logger.debug(f"Saving job metadata: {metadata}.")
@@ -104,8 +107,9 @@ def orchestrate(
         logger.error(f"Exception during execution {e}: {traceback.print_exc()}")
         return 1
 
+
 def _process_transforms(files: list[str], print_interval: int, data_access_factory: DataAccessFactoryBase,
-                       statistics: TransformStatistics, runtime_configuration: PythonTransformRuntimeConfiguration) \
+                        statistics: TransformStatistics, runtime_configuration: PythonTransformRuntimeConfiguration) \
         -> None:
     """
     Process transforms sequentially
@@ -140,9 +144,10 @@ def _process_transforms(files: list[str], print_interval: int, data_access_facto
     executor.flush()
     logger.info(f"done flushing in {time.time() - start} sec")
 
+
 def _process_transforms_multiprocessor(files: list[str], size: int, print_interval: int,
-                                      data_access_factory: DataAccessFactoryBase,
-                                      runtime_configuration: PythonTransformRuntimeConfiguration) \
+                                       data_access_factory: DataAccessFactoryBase,
+                                       runtime_configuration: PythonTransformRuntimeConfiguration) \
         -> TransformStatistics:
     """
     Process transforms using multiprocessing pool

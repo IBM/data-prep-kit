@@ -61,11 +61,13 @@ class PythonTransformExecutionConfiguration(TransformExecutionConfiguration):
         self.num_processors = captured["num_processors"]
         # print them
         if self.multiprocessing:
-            logger.info(f"multiprocessing {self.multiprocessing}")
-        else:
-            if self.num_processors <= 0:
-                logger.error(f"number of processors for multiprocessing is {self.num_processors}. Should be positive")
+            # we are using multiprocessing
+            if self.num_processors <= 1:
+                logger.error(f"number of processors for multiprocessing is {self.num_processors}. Should be greater then 1")
             logger.info(f"multiprocessing {self.multiprocessing}, num processors {self.num_processors}")
+        else:
+            # sequential processing
+            logger.info(f"multiprocessing {self.multiprocessing}")
         return True
 
     def get_input_params(self) -> dict[str, Any]:
