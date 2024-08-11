@@ -33,14 +33,14 @@ component_spec_path = "../../../../kfp/kfp_ray_components/"
 # compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 def compute_exec_params_func(
-    worker_options: str,
-    actor_options: str,
+    worker_options: dict,
+    actor_options: dict,
     data_s3_config: str,
     data_max_files: int,
     data_num_samples: int,
     runtime_pipeline_id: str,
     runtime_job_id: str,
-    runtime_code_location: str,
+    runtime_code_location: dict,
     proglang_select_allowed_langs_file: str,
     proglang_select_language_column: str,
 ) -> dict:
@@ -50,11 +50,11 @@ def compute_exec_params_func(
         "data_s3_config": data_s3_config,
         "data_max_files": data_max_files,
         "data_num_samples": data_num_samples,
-        "runtime_num_workers": KFPUtils.default_compute_execution_params(worker_options, actor_options),
-        "runtime_worker_options": actor_options,
+        "runtime_num_workers": KFPUtils.default_compute_execution_params(str(worker_options), str(actor_options)),
+        "runtime_worker_options": str(actor_options),
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
-        "runtime_code_location": runtime_code_location,
+        "runtime_code_location": str(runtime_code_location),
         "proglang_select_allowed_langs_file": proglang_select_allowed_langs_file,
         "proglang_select_language_column": proglang_select_language_column,
     }

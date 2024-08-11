@@ -31,14 +31,14 @@ component_spec_path = "../../../../kfp/kfp_ray_components/"
 # compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 def compute_exec_params_func(
-    worker_options: str,
-    actor_options: str,
+    worker_options: dict,
+    actor_options: dict,
     data_s3_config: str,
     data_max_files: int,
     data_num_samples: int,
     runtime_pipeline_id: str,
     runtime_job_id: str,
-    runtime_code_location: str,
+    runtime_code_location: dict,
     text_encoder_model_name: str,
     text_encoder_content_column_name: str,
     text_encoder_output_embeddings_column_name: str,
@@ -49,11 +49,11 @@ def compute_exec_params_func(
         "data_s3_config": data_s3_config,
         "data_max_files": data_max_files,
         "data_num_samples": data_num_samples,
-        "runtime_num_workers": KFPUtils.default_compute_execution_params(worker_options, actor_options),
-        "runtime_worker_options": actor_options,
+        "runtime_num_workers": KFPUtils.default_compute_execution_params(str(worker_options), str(actor_options)),
+        "runtime_worker_options": str(actor_options),
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
-        "runtime_code_location": runtime_code_location,
+        "runtime_code_location": str(runtime_code_location),
         "text_encoder_model_name": text_encoder_model_name,
         "text_encoder_content_column_name": text_encoder_content_column_name,
         "text_encoder_output_embeddings_column_name": text_encoder_output_embeddings_column_name,
@@ -101,9 +101,8 @@ def text_encoder(
     # Ray cluster
     ray_name: str = "text-encoder-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
-    ray_head_options: str = '{"cpu": 1, "memory": 4, ' '"image": "' + task_image + '"}',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image": "' + task_image + '"}',
+    ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image},
+    ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image},
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "[{'input_folder': 'test/text_encoder/input/', 'output_folder': 'test/text_encoder/output/'}]",
@@ -111,9 +110,9 @@ def text_encoder(
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
-    runtime_actor_options: str = "{'num_cpus': 0.8}",
+    runtime_actor_options: dict = {'num_cpus': 0.8},
     runtime_pipeline_id: str = "pipeline_id",
-    runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    runtime_code_location: dict = {'github': 'github', 'commit_hash': '12345', 'path': 'path'},
     # text_encoder parameters
     text_encoder_model_name: str = "BAAI/bge-small-en-v1.5",
     text_encoder_content_column_name: str = "contents",
