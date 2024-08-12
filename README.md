@@ -66,6 +66,8 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 
 | Modules                          | Python-only        | Ray              | Spark            | KFP on Ray             |
 |----------------------------------|--------------------|------------------|------------------|------------------------|
+| Universal (Code & Language)      |                    |                  |                  |                        | 
+|----------------------------------|--------------------|------------------|------------------|------------------------|
 | No-op / template                 | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 | Doc ID annotation                | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 | Programming language annnotation | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      | 
@@ -74,7 +76,13 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 | Code quality annotation          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Malware annotation               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Filter on annotations            | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
+|----------------------------------|--------------------|------------------|------------------|------------------------|
+| Language-only                    |                    |                  |                  |                        |
+|----------------------------------|--------------------|------------------|------------------|------------------------|
 | Language identification          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+|----------------------------------|--------------------|------------------|------------------|------------------------|
+| Code-only                        |                    |                  |                  |                        |
+|----------------------------------|--------------------|------------------|------------------|------------------------|
 | Code (from zip) to Parquet       | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Document quality                 | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | PDF to Parquet (convert)         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
