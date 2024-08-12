@@ -94,6 +94,7 @@ def orchestrate(
         # Compute execution statistics
         logger.debug("Computing execution stats")
         stats = statistics.get_execution_stats()
+        stats["processing_time"] = round(stats["processing_time"], 3)
         # build and save metadata
         logger.debug("Building job metadata")
         input_params = runtime_config.get_transform_metadata()
@@ -146,14 +147,14 @@ def _process_transforms(files: list[str], print_interval: int, data_access_facto
         completed += 1
         if completed % print_interval == 0:
             logger.info(
-                f"Completed {completed} files ({100 * completed / len(files)}%) "
-                f"in {(time.time() - t_start)/60} min"
+                f"Completed {completed} files ({round(100 * completed / len(files), 2)}%) "
+                f"in {round((time.time() - t_start)/60., 3)} min"
             )
     logger.info(f"Done processing {completed} files, waiting for flush() completion.")
     # invoke flush to ensure that all results are returned
     start = time.time()
     executor.flush()
-    logger.info(f"done flushing in {time.time() - start} sec")
+    logger.info(f"done flushing in {round(time.time() - start, 3)} sec")
 
 
 def _process_transforms_multiprocessor(files: list[str], size: int, print_interval: int,
@@ -186,8 +187,8 @@ def _process_transforms_multiprocessor(files: list[str], size: int, print_interv
             if completed % print_interval == 0:
                 # print intermediate statistics
                 logger.info(
-                    f"Completed {completed} files ({100 * completed / len(files)}%) "
-                    f"in {(time.time() - t_start)/60} min"
+                    f"Completed {completed} files ({round(100 * completed / len(files), 2)}%) "
+                    f"in {round((time.time() - t_start)/60., 3)} min"
                 )
         logger.info(f"Done processing {completed} files, waiting for flush() completion.")
         results = [{}] * size

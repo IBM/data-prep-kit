@@ -85,7 +85,7 @@ class PythonTransformLauncher(AbstractTransformLauncher):
         except Exception as e:
             logger.info(f"Exception running orchestration\n{e}")
         finally:
-            logger.info(f"Completed execution in {(time.time() - start)/60.} min, execution result {res}")
+            logger.info(f"Completed execution in {round((time.time() - start)/60., 3)} min, execution result {res}")
             return res
 
     def launch(self) -> int:

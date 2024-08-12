@@ -184,13 +184,13 @@ class RayUtils:
                     object_memory_gauge=object_memory_gauge,
                 )
                 if completed % print_interval == 0:
-                    logger.info(f"Completed {completed} files in {(time.time() - t_start)/60} min")
+                    logger.info(f"Completed {completed} files in {round((time.time() - t_start)/60., 3)} min")
         # Wait for completion
         files_completed_gauge.set(completed)
         # Wait for completion
         logger.info(
-            f"Completed {completed} files ({100 * completed / len(files)}%)  "
-            f"in {(time.time() - t_start)/60} min. Waiting for completion"
+            f"Completed {completed} files ({round(100 * completed / len(files), 3)}%)  "
+            f"in {round((time.time() - t_start)/60., 3)} min. Waiting for completion"
         )
         while executors.has_next():
             while True:
@@ -213,7 +213,7 @@ class RayUtils:
                 object_memory_gauge=object_memory_gauge,
             )
 
-        logger.info(f"Completed processing {completed} files in {(time.time() - t_start)/60.} min")
+        logger.info(f"Completed processing {completed} files in {round((time.time() - t_start)/60, 3)} min")
         return actor_failures
 
     @staticmethod
