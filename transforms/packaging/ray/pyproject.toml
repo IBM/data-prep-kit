@@ -3,48 +3,52 @@ name = "data_prep_toolkit_transforms_ray"
 version = "0.2.1.dev0"
 requires-python = ">=3.10,<3.12"
 keywords = ["transforms", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
-description = "Data Preparation Toolkit Transforms"
+description = "Data Preparation Toolkit Transforms using Ray"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     { name = "Maroun Touma", email = "touma@us.ibm.com" },
 ]
 
-
 dependencies = [
-## Code
-	"dpk_code_quality_transform_ray        @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/code_quality/ray",
-	"dpk_code2parquet_transform_ray        @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/code2parquet/ray",
-	"dpk_header_cleanser_transform_ray     @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/header_cleanser/ray ; platform_system != 'Darwin'",
-	"dpk_malware_transform_ray             @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/malware/ray",
-	"dpk_proglang_select_transform_ray     @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/proglang_select/ray",
-	"dpk_repo_level_order_transform_ray    @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/repo_level_ordering/ray",
-## Language
-	"dpk_doc_chunk_transform_ray    @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/doc_chunk/ray",
-	"dpk_doc_quality_transform_ray  @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/doc_quality/ray",
-	"dpk_lang_id_transform_ray      @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/lang_id/ray",
-	"dpk_pdf2parquet_transform_ray  @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/pdf2parquet/ray",
-	"dpk_text_encoder_transform_ray @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/text_encoder/ray",
-## Universal
-	"dpk_docid_transform_ray        @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/doc_id/ray",
-	"dpk_ededup_transform_ray       @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/ededup/ray",
-	"dpk_fdedup_transform_ray       @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/fdedup/ray",
-	"dpk_filter_transform_ray       @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/filter/ray",
-    "dpk_resize_transform_ray       @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/resize/ray",
-	"dpk_profiler_transform_ray     @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/profiler/ray",
-	"dpk_tokenization_transform_ray @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/tokenization/ray",
+	"data_prep_toolkit_transforms==0.2.1.dev0",
+	"data-prep-toolkit-ray==0.2.1.dev0",
+	"scancode-toolkit==32.1.0 ; platform_system != 'Darwin'",
+	"parameterized",
+	"pandas",
+	"networkx==3.3",
+	"colorlog==6.8.2",
+	"func-timeout==4.3.5",
+	"pandas==2.2.2",
+	"emerge-viz==2.0.0",
+	"tqdm==4.66.3",
+	"mmh3==4.1.0",
+	"xxhash==3.4.1",
+	"tqdm==4.66.3",
+	"scipy==1.12.0",
 ]
-
-[project_urls]
-Repository = "https://github.com/IBM/data-prep-kit"
-Issues = "https://github.com/IBM/data-prep-kit/issues"
-Documentation = "https://ibm.github.io/data-prep-kit/"
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages]
-find = {namespaces = false}  # Disable implicit namespaces
+
+[options]
+package_dir = ["src"]
+
+[options.packages.find]
+where = ["src/"]
+
+[tool.pytest.ini_options]
+# Currently we use low coverage since we have to run tests separately (see makefile)
+#addopts = "--cov --cov-report term-missing --cov-fail-under 25"
+markers = ["unit: unit tests", "integration: integration tests"]
+
+[tool.coverage.run]
+include = ["src/*"]
+
+
+
+
 
 

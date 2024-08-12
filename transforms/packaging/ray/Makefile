@@ -7,24 +7,28 @@ REPOROOT=../../..
 
 # $(REPOROOT)/.make.versions file contains the versions
 
-#TRANSFORM_NAME=doc_quality
-
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORMS_NAMES = code/code_quality \
-    	code/code2parquet \
-    	code/header_cleanser \
-		code/code_quality \
-		code/proglang_select \
-		language/doc_chunk \
-		language/doc_quality \
-		language/lang_id \
-		language/pdf2parquet \
-		language/text_encoder \
-		universal/ededup \
-		universal/filter \
-		universal/resize \
-		universal/tokenization
+
+## Ray Transforms:  `find . -name src | grep ray/src`
+TRANSFORMS_NAMES = code/proglang_select \
+	code/header_cleanser \
+	code/code_quality \
+	code/repo_level_ordering \
+	code/code2parquet \
+	language/doc_quality \
+	language/doc_chunk \
+	language/lang_id \
+	language/text_encoder \
+	language/pdf2parquet \
+	universal/fdedup \
+	universal/tokenization \
+	universal/ededup \
+	universal/profiler \
+	universal/doc_id \
+	universal/filter \
+	universal/resize
+
 
 venv: 
 	$(MAKE) .defaults.create-venv
@@ -36,20 +40,24 @@ test::	setup venv test-src
 
 clean:: .transforms.clean
 	-rm -fr src
+	-rm -fr *.egg-info
+	-rm -fr dist
+	-rm -fr build
 
 image:: .transforms.python-image
 
 test-src:: 
 	source venv/bin/activate;       \
 	for T in $(TRANSFORMS_NAMES); do                    \
-	    echo running unit test on: $$T ; \
-		$(PYTEST) $(REPOROOT)/transforms/$$T/python/test; \
+	    echo running unit test on: $$T/ray/test ; \
+		$(PYTEST) $(REPOROOT)/transforms/$$T/ray/test; \
 	done;
 
 test-with-pypi:
+	$(MAKE) clean
 	$(MAKE) .defaults.create-venv
 	source venv/bin/activate;       \
-	$(PYTHON) -m pip install data_prep_toolkit_transforms==0.2.1.dev0 
+	$(PYTHON) -m pip install data_prep_toolkit_transforms_ray==0.2.1.dev0 
 	$(MAKE) test-src
 
 
@@ -58,18 +66,18 @@ setup: .transforms.setup
 
 src:
 	for T in $(TRANSFORMS_NAMES); do                    \
-	    echo copy src from  $$T ; \
-		cp -R $(REPOROOT)/transforms/$$T/python/src/ src/ ; \
-		rm -fr *.egg-info ; \
-		rm -fr dist ; \
-		rm -fr build ; \
+	    echo copy src from  $$T/ray/src ; \
+		cp -R $(REPOROOT)/transforms/$$T/ray/src/ src/ ; \
 	done;
+	-rm -fr *.egg-info
+	-rm -fr dist
+	-rm -fr build
 
 
 build:: build-dist
         
 publish:: publish-dist
-        
+
 build-dist:: .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist

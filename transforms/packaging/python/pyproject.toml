@@ -11,35 +11,53 @@ authors = [
 ]
 
 dependencies = [
-## Code
-	"dpk_code_quality_transform_python    @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/code_quality/python",
-	"dpk_code2parquet_transform_python    @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/code2parquet/python",
-	"dpk_header_cleanser_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/header_cleanser/python ; platform_system != 'Darwin'",
-	"dpk_malware_transform_python         @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/malware/python",
-	"dpk_proglang_select_transform_python @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/code/proglang_select/python",
-## Language
-	"dpk_doc_chunk_transform_python       @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/doc_chunk/python",
-	"dpk_doc_quality_transform_python     @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/doc_quality/python",
-	"dpk_lang_id_transform_python         @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/lang_id/python",
-	"dpk_pdf2parquet_transform_python     @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/pdf2parquet/python",
-	"dpk_text_encoder_transform_python    @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/language/text_encoder/python",
-## Universal
-	"dpk_ededup_transform_python          @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/ededup/python",
-	"dpk_filter_transform_python          @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/filter/python",
-	"dpk_resize_transform_python          @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/resize/python",
-	"dpk_tokenization_transform_python    @ git+https://github.com/IBM/data-prep-kit.git#subdirectory=transforms/universal/tokenization/python",
+	"data-prep-toolkit==0.2.1.dev0",
+	"argparse",
+	"boto3==1.34.69",
+	"bs4==0.0.2",
+	"clamd==1.0.2",
+	"docling[ocr]==1.1.2",
+	"duckdb==0.10.1",
+	"fasttext==0.9.2",
+	"filetype >=1.2.0, <2.0.0",
+	"huggingface-hub >= 0.21.4, <1.0.0",
+	"langcodes==3.3.0",
+	"mmh3==4.1.0",
+	"numpy==1.26.4",
+	"pandas",
+	"parameterized",
+	"pyarrow==16.1.0",
+	"python-dateutil>=2.8.2",
+	"pytz>=2020.1",
+	"quackling==0.1.0",
+	"scancode-toolkit==32.1.0 ; platform_system != 'Darwin'",
+	"sentence-transformers==3.0.1",
+	"transformers==4.38.2",
+	"tzdata>=2022.7",
+	"xxhash==3.4.1",
 ]
-
-[project_urls]
-Repository = "https://github.com/IBM/data-prep-kit"
-Issues = "https://github.com/IBM/data-prep-kit/issues"
-Documentation = "https://ibm.github.io/data-prep-kit/"
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages]
-find = {namespaces = false}  # Disable implicit namespaces
+
+[options]
+package_dir = ["src"]
+
+[options.packages.find]
+where = ["src/"]
+
+[tool.pytest.ini_options]
+# Currently we use low coverage since we have to run tests separately (see makefile)
+#addopts = "--cov --cov-report term-missing --cov-fail-under 25"
+markers = ["unit: unit tests", "integration: integration tests"]
+
+[tool.coverage.run]
+include = ["src/*"]
+
+
+
+
 
 
