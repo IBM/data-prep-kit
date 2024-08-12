@@ -67,7 +67,7 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 | Modules                          | Python-only        | Ray              | Spark            | KFP on Ray             |
 |----------------------------------|--------------------|------------------|------------------|------------------------|
 | **Universal (Code & Language)**  |                    |                  |                  |                        | 
-| [No-op / template] (/transforms/universal/noop/python/README.md)                 | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
+| [No-op / template](/transforms/universal/noop/python/README.md)                 | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 | Doc ID annotation                | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 | Exact dedup filter               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Fuzzy dedup filter               |                    |:white_check_mark:|                  |:white_check_mark:      |
