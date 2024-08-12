@@ -61,7 +61,7 @@ Data modalities supported:
 Support for additional data modalities is expected in the future and additional data formats is welcome!
 
 ## Data Preparation Modules <a name = "modules"></a>
-The below matrix shows the the combination of modules and supported runtimes. All the modules can be accessed [here](/transforms) and can be combined to form data processing pipelines, as shown in [examples](/examples) folder. 
+The below matrix shows the the combination of modules and supported runtimes. All the modules can be accessed [here](/transforms) and can be combined to form data processing pipelines, as shown in [examples](/examples) folder. The modules are under three major categories of 1) Universal (apply to both code and language), 2) Language-only and 3) Code-only plus an additional category of Import/Export tables. 
 
 
 | Modules                          | Python-only        | Ray              | Spark            | KFP on Ray             |
@@ -69,22 +69,27 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 | **Universal (Code & Language)**  |                    |                  |                  |                        | 
 | No-op / template                 | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 | Doc ID annotation                | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-| Programming language annnotation | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      | 
 | Exact dedup filter               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Fuzzy dedup filter               |                    |:white_check_mark:|                  |:white_check_mark:      |
-| Code quality annotation          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| Malware annotation               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Filter on annotations            | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
+| Profiler                         |                    |:white_check_mark:|                  |:white_check_mark:      |
+| Resize                           | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| Tokenizer                        | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | **Language-only**                |                    |                  |                  |                        |
 | Language identification          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| **Code-only**                    |                    |                  |                  |                        |
-| Code (from zip) to Parquet       | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Document quality                 | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| PDF to Parquet (convert)         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Split document to chunks         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Text encoder                     | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| Profiler                         |                    |:white_check_mark:|                  |:white_check_mark:      |
-| Tokenizer                        | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| **Code-only**                    |                    |                  |                  |                        |
+| Programming language annnotation | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| Code quality annotation          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| Malware annotation               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| Header cleanser                  | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| Repo level order                 |                    |:white_check_mark:|                  |                        |
+| **Import/Export tables**         |                    |                  |                  |                        |
+| Code (from zip) to Parquet       | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| PDF to Parquet (convert)         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+
 
 Contributors are welcome to add new modules as well as add runtime support for existing modules!
 
