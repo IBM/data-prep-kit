@@ -11,6 +11,7 @@
 ################################################################################
 
 import time
+from typing import Any
 from multiprocessing import Pool
 import traceback
 from datetime import datetime
@@ -22,7 +23,7 @@ from data_processing.runtime.pure_python import (
     PythonTransformFileProcessor,
     PythonPoolTransformFileProcessor,
 )
-from data_processing.transform import TransformStatistics
+from data_processing.transform import TransformStatistics, AbstractBinaryTransform
 from data_processing.utils import get_logger
 
 
@@ -50,6 +51,8 @@ def orchestrate(
     if data_access is None:
         logger.error("No DataAccess instance provided - exiting")
         return 1
+    # create additional execution parameters
+    runtime = runtime_config.create_transform_runtime()
     try:
         # Get files to process
         files, profile, retries = data_access.get_files_to_process()
@@ -63,16 +66,24 @@ def orchestrate(
         print_interval = int(len(files) / 100)
         if print_interval == 0:
             print_interval = 1
+        logger.debug(f"{runtime_config.get_name()} Begin processing files")
         if execution_config.multiprocessing:
             # using multiprocessor pool for execution
             statistics = _process_transforms_multiprocessor(files=files, size=execution_config.num_processors,
                                                             data_access_factory=data_access_factory,
                                                             print_interval=print_interval,
-                                                            runtime_configuration=runtime_config)
+                                                            transform_params=runtime.get_transform_config(
+                                                                data_access_factory=data_access_factory,
+                                                                statistics=statistics, files=files),
+                                                            transform_class=runtime_config.get_transform_class())
         else:
             # using sequential execution
-            _process_transforms(files=files, data_access_factory=data_access_factory, print_interval=print_interval,
-                                statistics=statistics, runtime_configuration=runtime_config)
+            _process_transforms(files=files, data_access_factory=data_access_factory,
+                                print_interval=print_interval, statistics=statistics,
+                                transform_params=runtime.get_transform_config(
+                                    data_access_factory=data_access_factory,
+                                    statistics=statistics, files=files),
+                                transform_class=runtime_config.get_transform_class())
         status = "success"
         return_code = 0
     except Exception as e:
@@ -86,6 +97,7 @@ def orchestrate(
         # build and save metadata
         logger.debug("Building job metadata")
         input_params = runtime_config.get_transform_metadata()
+        runtime.compute_execution_stats(stats=statistics)
         metadata = {
             "pipeline": execution_config.pipeline_id,
             "job details": execution_config.job_details
@@ -109,25 +121,24 @@ def orchestrate(
 
 
 def _process_transforms(files: list[str], print_interval: int, data_access_factory: DataAccessFactoryBase,
-                        statistics: TransformStatistics, runtime_configuration: PythonTransformRuntimeConfiguration) \
-        -> None:
+                        statistics: TransformStatistics, transform_params: dict[str, Any],
+                        transform_class: type[AbstractBinaryTransform]) -> None:
     """
     Process transforms sequentially
     :param files: list of files to process
     :param statistics: statistics class
     :param print_interval: print interval
     :param data_access_factory: data access factory
-    :param runtime_configuration: transform configuration
+    :param transform_params - transform parameters
+    :param transform_class: transform class
     :return: metadata for the execution
 
     :return: None
     """
     # create executor
-    executor = PythonTransformFileProcessor(
-        data_access_factory=data_access_factory, statistics=statistics, runtime_configuration=runtime_configuration
-    )
+    executor = PythonTransformFileProcessor(data_access_factory=data_access_factory, statistics=statistics,
+                                            transform_params=transform_params, transform_class=transform_class)
     # process data
-    logger.debug(f"{runtime_configuration.get_name()} Begin processing files")
     t_start = time.time()
     completed = 0
     for path in files:
@@ -146,23 +157,23 @@ def _process_transforms(files: list[str], print_interval: int, data_access_facto
 
 
 def _process_transforms_multiprocessor(files: list[str], size: int, print_interval: int,
-                                       data_access_factory: DataAccessFactoryBase,
-                                       runtime_configuration: PythonTransformRuntimeConfiguration) \
-        -> TransformStatistics:
+                                       data_access_factory: DataAccessFactoryBase, transform_params: dict[str, Any],
+                                       transform_class: type[AbstractBinaryTransform]) -> TransformStatistics:
     """
     Process transforms using multiprocessing pool
     :param files: list of files to process
     :param size: pool size
     :param print_interval: print interval
     :param data_access_factory: data access factory
-    :param runtime_configuration: transform configuration
+    :param transform_params - transform parameters
+    :param transform_class: transform class
     :return: metadata for the execution
     """
     # result statistics
     statistics = TransformStatistics()
     # create processor
     processor = PythonPoolTransformFileProcessor(data_access_factory=data_access_factory,
-                                                 runtime_configuration=runtime_configuration)
+                                                 transform_params=transform_params, transform_class=transform_class)
     completed = 0
     t_start = time.time()
     # create multiprocessing pool

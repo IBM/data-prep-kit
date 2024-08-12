@@ -14,8 +14,7 @@ from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime import AbstractTransformFileProcessor
-from data_processing.runtime.pure_python import PythonTransformRuntimeConfiguration
-from data_processing.transform import TransformStatistics
+from data_processing.transform import AbstractBinaryTransform, TransformStatistics
 
 
 class PythonTransformFileProcessor(AbstractTransformFileProcessor):
@@ -27,22 +26,24 @@ class PythonTransformFileProcessor(AbstractTransformFileProcessor):
         self,
         data_access_factory: DataAccessFactoryBase,
         statistics: TransformStatistics,
-        runtime_configuration: PythonTransformRuntimeConfiguration,
+        transform_params: dict[str, Any],
+        transform_class: type[AbstractBinaryTransform],
     ):
         """
         Init method
         :param data_access_factory - data access factory
         :param statistics - reference to statistics class
-        :param runtime_configuration: transform configuration class
+        :param transform_params - transform parameters
+        :param transform_class: transform class
         """
         # invoke superclass
         super().__init__(
             data_access_factory=data_access_factory,
-            transform_parameters=dict(runtime_configuration.get_transform_params()),
+            transform_parameters=dict(transform_params),
         )
         self.transform_params["statistics"] = statistics
         # Create local processor
-        self.transform = runtime_configuration.get_transform_class()(self.transform_params)
+        self.transform = transform_class(self.transform_params)
         # Create statistics
         self.stats = statistics
 
@@ -58,20 +59,22 @@ class PythonPoolTransformFileProcessor(AbstractTransformFileProcessor):
     def __init__(
             self,
             data_access_factory: DataAccessFactoryBase,
-            runtime_configuration: PythonTransformRuntimeConfiguration,
+            transform_params: dict[str, Any],
+            transform_class: type[AbstractBinaryTransform],
     ):
         """
         Init method
         :param data_access_factory - data access factory
-        :param runtime_configuration: transform configuration class
+        :param transform_params - transform parameters
+        :param transform_class: transform class
         """
         super().__init__(
             data_access_factory=data_access_factory,
-            transform_parameters=dict(runtime_configuration.get_transform_params()),
+            transform_parameters=dict(transform_params),
         )
         # Add data access and statistics to the processor parameters
         self.transform_params["data_access"] = self.data_access
-        self.transform_class = runtime_configuration.get_transform_class()
+        self.transform_class = transform_class
         self.transform = None
 
     def process_file(self, f_name: str) -> dict[str, Any]:
