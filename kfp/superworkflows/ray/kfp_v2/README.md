@@ -24,7 +24,9 @@ Another useful feature of the KFP v2 is the `Json` editor for the `dict` type in
 
 ### How to compile the superpipeline
 ```
+cd kfp/superworkflows/ray/kfp_v2/
+make clean
 export KFPv2=1
 export PYTHONPATH=../../../../transforms
-python3 superpipeline_noop_docId_v2.py
+make workflow-build
 ```
