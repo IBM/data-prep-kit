@@ -9,7 +9,7 @@ from datetime import datetime
 
 import pyarrow as pa
 
-#distabled for now
+# disabled for now
 # from data_processing_ray.runtime.ray import RayTransformLauncher
 # from data_processing_ray.runtime.ray.runtime_configuration import (
 #   RayTransformRuntimeConfiguration,
@@ -17,13 +17,13 @@ import pyarrow as pa
 # import data_processing
 
 
-from data_processing.transform import AbstractTableTransform, AbstractBinaryTransform, TransformConfiguration
+from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, get_logger, TransformUtils
 
 
-class HtmlToParquetTransform(AbstractTableTransform):
+class HtmlToParquetTransform(AbstractBinaryTransform):
     def __init__(self, config: dict[str, Any]):
-        self.sleep = config.get("sleep", 1)
+        pass
 
     def transform_binary(self, file_name: str, byte_array: bytes) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
@@ -44,7 +44,7 @@ class HtmlToParquetTransform(AbstractTableTransform):
                         try:
                             # Read the content of the file
                             content_bytes = file.read()
-                            #use Tra something library
+                            # Use Trafilatura library
                             content_string = trafilatura.extract(content_bytes)
                             row_data = {
                                 "title": member.filename,
@@ -62,22 +62,10 @@ class HtmlToParquetTransform(AbstractTableTransform):
         table = pa.Table.from_pylist(data)
         return [(TransformUtils.convert_arrow_to_binary(table=table), ".parquet")], {"number of rows": number_of_rows}
 
-
- 
-    # def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
-    #     if self.sleep is not None:
-    #         time.sleep(self.sleep)
-    #     # Add some sample metadata.
-    #     metadata = {"nfiles": 1, "nrows": len(table)}
-    #     return [table], metadata
-
+logger = get_logger(__name__)
 
 short_name = "html2parquet"
 cli_prefix = f"{short_name}_"
-sleep_key = "sleep_sec"
-pwd_key = "pwd"
-sleep_cli_param = f"{cli_prefix}{sleep_key}"
-pwd_cli_param = f"{cli_prefix}{pwd_key}"
 
 
 class HtmlToParquetTransformConfiguration(TransformConfiguration):
@@ -85,30 +73,12 @@ class HtmlToParquetTransformConfiguration(TransformConfiguration):
         super().__init__(
             name=short_name,
             transform_class=HtmlToParquetTransform,
-            remove_from_metadata=[pwd_key],
         )
     def add_input_params(self, parser: ArgumentParser) -> None:
-        parser.add_argument(
-            f"--{sleep_cli_param}",
-            type=int,
-            default=1,
-            help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
-        )
-        parser.add_argument(
-            f"--{pwd_cli_param}",
-            type=str,
-            default="nothing",
-            help="A dummy password which should be filtered out of the metadata",
-        )
+        pass 
 
     def apply_input_params(self, args: Namespace) -> bool:
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
-        if captured.get(sleep_key) < 0:
-            print(f"Parameter html2parquet_sleep_sec should be non-negative. you specified {args.html2parquet_sleep_sec}")
-            return False
-        self.params = captured
+        self.params = self.params | captured
+        logger.info(f"html2parquet parameters are : {self.params}")
         return True
-from data_processing.runtime.pure_python import PythonTransformLauncher
-if __name__ == "__main__":
-    launcher = PythonTransformLauncher(runtime_config=HtmlToParquetTransformConfiguration())
-    launcher.launch()

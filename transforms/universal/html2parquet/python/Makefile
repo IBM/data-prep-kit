@@ -7,7 +7,7 @@ REPOROOT=../../../..
 
 # $(REPOROOT)/.make.versions file contains the versions
 
-TRANSFORM_NAME=noop
+TRANSFORM_NAME= html2parquet
 
 include $(REPOROOT)/transforms/.make.transforms
 
@@ -33,7 +33,7 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(NOOP_PYTHON_VERSION) TOML_VERSION=$(NOOP_PYTHON_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(HTML2PARQUET_PYTHON_VERSION) TOML_VERSION=$(HTML2PARQUET_PYTHON_VERSION) .transforms.set-versions 
         
 build-dist:: set-versions .defaults.build-dist 
 
