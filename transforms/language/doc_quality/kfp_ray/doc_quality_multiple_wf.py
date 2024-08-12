@@ -105,8 +105,8 @@ TASK_NAME: str = "doc_quality"
 def doc_quality(
     # Ray cluster
     ray_name: str = "doc_quality-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = {"cpu": 1, "memory": 4, "image": task_image, "image_pull_policy": "Always"},
-    ray_worker_options: str = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image, "image_pull_policy": "Always"},
+    ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image, "image_pull_policy": "Always"},
+    ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image, "image_pull_policy": "Always"},
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "[{'input_folder': 'test/doc_quality/input/', 'output_folder': 'test/doc_quality/output/'}]",
