@@ -68,13 +68,13 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 |----------------------------------|--------------------|------------------|------------------|------------------------|
 | **Universal (Code & Language)**  |                    |                  |                  |                        | 
 | [No-op / template](/transforms/universal/noop/python/README.md)                 | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-| Doc ID annotation                | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-| Exact dedup filter               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| Fuzzy dedup filter               |                    |:white_check_mark:|                  |:white_check_mark:      |
-| Filter on annotations            | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-| Profiler                         |                    |:white_check_mark:|                  |:white_check_mark:      |
-| Resize                           | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| Tokenizer                        | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Doc ID annotation](/transforms/universal/doc_id/ray/README.md)                | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
+| [Exact dedup filter](/transforms/universal/ededup/ray/README.md)               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Fuzzy dedup filter](/transforms/universal/fdedup/ray/README.md)               |                    |:white_check_mark:|                  |:white_check_mark:      |
+| [Filter on annotations](/transforms/universal/filter/python/README.md)            | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
+| [Profiler](/transforms/universal/profiler/ray/README.md)                        |                    |:white_check_mark:|                  |:white_check_mark:      |
+| [Resize](/transforms/universal/resize/python)                           | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Tokenizer](/transforms/universal/tokenization/python/README.md)                        | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | **Language-only**                |                    |                  |                  |                        |
 | Language identification          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | Document quality                 | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
