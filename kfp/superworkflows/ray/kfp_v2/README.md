@@ -17,10 +17,10 @@ Another useful feature of the KFP v2 is the `Json` editor for the `dict` type in
 ![json_param](json_param.png)
 
 ## Main differences from KFP v1 superpipeline:
-- It is not required to upload the transforms pipelines before running the superpipeline.
-- It created just one run that includes all the nested transfroms and their sub-tasks.
+- It is not required to upload the transforms pipelines before running the superpipeline. So, when compiling the superpipeline code it gets the up to date versions of the transforms.
+- It creates just one run that includes all the nested transfroms and their sub-tasks.
 - No need for additional component as `executeSubWorkflowComponent.yaml`. All the implementation in the same pipeline file.
-- One missing thing in this implementation is the overriding parameters option.
+- In superpipelines of KFP v1 there exists an option to override the common parameters with specific values for each one of the transforms. This option is missing in the KFP v2 superpipelines.
 
 ### How to compile the superpipeline
 ```
