@@ -19,9 +19,7 @@ from text_encoder_transform_ray import TextEncoderRayTransformConfiguration
 
 
 # create parameters
-input_folder = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "test-data", "input")
-)
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
 local_conf = {
     "input_folder": input_folder,

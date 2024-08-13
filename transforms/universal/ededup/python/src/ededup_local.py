@@ -15,6 +15,7 @@ import os
 from data_processing.data_access import DataAccessLocal
 from ededup_transform_python import EdedupPythonTransform
 
+
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
