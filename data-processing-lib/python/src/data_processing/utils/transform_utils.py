@@ -56,8 +56,7 @@ class TransformUtils:
         :param doc: string to normalize
         :return: normalized string
         """
-        return (doc.replace(" ", "").replace("\n", "").lower()
-                .translate(str.maketrans("", "", string.punctuation)))
+        return doc.replace(" ", "").replace("\n", "").lower().translate(str.maketrans("", "", string.punctuation))
 
     @staticmethod
     def str_to_hash(val: str) -> str:

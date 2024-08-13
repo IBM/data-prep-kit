@@ -59,8 +59,7 @@ def zip_to_table(data_access: DataAccess, file_path, detect_prog_lang: Any) -> p
                                 "hash": TransformUtils.str_to_hash(content_string),
                                 "size": TransformUtils.deep_get_size(content_string),
                                 "date_acquired": datetime.now().isoformat(),
-                                "repo_name" :os.path.splitext(os.path.basename(zip_name))[0]
-                                
+                                "repo_name": os.path.splitext(os.path.basename(zip_name))[0],
                             }
                             if detect_prog_lang:
                                 lang = detect_prog_lang.get_lang_from_ext(ext)

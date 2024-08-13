@@ -15,7 +15,13 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import LOCAL_TO_DISK, MB, CLIArgumentProvider, UnrecoverableException, get_logger
+from data_processing.utils import (
+    LOCAL_TO_DISK,
+    MB,
+    CLIArgumentProvider,
+    UnrecoverableException,
+    get_logger,
+)
 
 
 max_rows_per_table_key = "max_rows_per_table"
@@ -69,7 +75,7 @@ class ResizeTransform(AbstractTableTransform):
                 self.logger.debug(
                     f"concatenating buffer with {self.buffer.num_rows} rows to table with {table.num_rows} rows"
                 )
-                #table = pa.concat_tables([self.buffer, table], unicode_promote_options="permissive")
+                # table = pa.concat_tables([self.buffer, table], unicode_promote_options="permissive")
                 table = pa.concat_tables([self.buffer, table])
                 self.buffer = None
                 self.logger.debug(f"concatenated table has {table.num_rows} rows")

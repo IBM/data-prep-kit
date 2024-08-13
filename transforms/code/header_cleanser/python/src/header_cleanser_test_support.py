@@ -20,8 +20,8 @@ from data_processing.test_support.launch.transform_test import (
 from header_cleanser_transform import (
     HeaderCleanserPythonTransformConfiguration,
     column_cli_params,
-    license_cli_params,
     copyright_cli_params,
+    license_cli_params,
 )
 
 
@@ -53,7 +53,7 @@ class AbstractPythonHeaderCleanserTransformTest(AbstractTransformLauncherTest):
                 launcher,
                 args
                 | {
-                    column_cli_params: 'contents',
+                    column_cli_params: "contents",
                     license_cli_params: True,
                     copyright_cli_params: True,
                 },
@@ -68,7 +68,7 @@ class AbstractPythonHeaderCleanserTransformTest(AbstractTransformLauncherTest):
                 launcher,
                 args
                 | {
-                    column_cli_params: 'contents',
+                    column_cli_params: "contents",
                     license_cli_params: False,
                     copyright_cli_params: True,
                 },
@@ -83,7 +83,7 @@ class AbstractPythonHeaderCleanserTransformTest(AbstractTransformLauncherTest):
                 launcher,
                 args
                 | {
-                    column_cli_params: 'contents',
+                    column_cli_params: "contents",
                     license_cli_params: True,
                     copyright_cli_params: False,
                 },

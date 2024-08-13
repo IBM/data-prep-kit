@@ -12,14 +12,14 @@
 
 import os
 
+import pyarrow.parquet as pq
 from data_processing.data_access import DataAccessLocal
 from header_cleanser_transform import (
-    HeaderCleanserTransform,
     COLUMN_KEY,
-    LICENSE_KEY,
     COPYRIGHT_KEY,
+    LICENSE_KEY,
+    HeaderCleanserTransform,
 )
-import pyarrow.parquet as pq
 
 
 # create parameters
@@ -31,7 +31,7 @@ local_conf = {
 }
 
 header_cleanser_params = {
-    COLUMN_KEY: 'contents',
+    COLUMN_KEY: "contents",
     COPYRIGHT_KEY: True,
     LICENSE_KEY: True,
 }
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # Create and configure the transform.
     transform = HeaderCleanserTransform(header_cleanser_params)
     # Use the local data access to read a parquet table.
-    table,_ = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
+    table, _ = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
     print(f"input table has {table.num_rows} rows")
     # Transform the table
     table_list, metadata = transform.transform(table)
