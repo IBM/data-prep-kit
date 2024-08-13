@@ -49,7 +49,9 @@ def compute_word_statistics(text: str, symbols: list = ["#", "..."]) -> tuple[in
     return total_words, mean_word_len, symbol_to_word_ratio
 
 
-def compute_bullet_point_ellipsis_alphabet_word_ratio(text: str, bullets: list = ["-", "*"]) -> tuple[float, float, float]:
+def compute_bullet_point_ellipsis_alphabet_word_ratio(
+    text: str, bullets: list = ["-", "*"]
+) -> tuple[float, float, float]:
     """
     Given a text document:
         - Compute the ratio of lines starting with a bullet point (should be <=90%)
