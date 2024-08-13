@@ -45,6 +45,7 @@ To learn more consider the following:
 * [Transform Exceptions](transform-exceptions.md)
 * [Transform Runtimes](transform-runtimes.md)
 * [Transform Examples](transform-tutorial-examples.md)
+* [Simplified transform APIs](simplified_transform_apis.md)
 * [Data Access Factory](data-access-factory.md)
 * [Testing Transforms](transform-testing.md)
 * [Utilities](transformer-utilities.md)
