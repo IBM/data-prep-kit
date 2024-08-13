@@ -10,14 +10,13 @@ data processing
 `Note` some of transformers, for example, exact dedup do not support multi processing Python
 runtime, as they rely on a shared classes, which are not supported by this runtime
 
-To support multiprocessing pool based runtime, Python execution introduced 2 additional 
-parameters:
-* `runtime_multiprocessing` flag. By default this flag is `False`, which means that sequential
-execution is used. Setting it to `True` switches to multiprocessing pool runtime.
-* `runtime_num_processors` defines the number of processors used by the multiprocessing pool. 
-Default number of processors is 5.
+To support multiprocessing pool based runtime, Python execution introduced an additional 
+parameter:
+* `runtime_num_processors` defines the number of processors to use for execution. If this number
+is greater then 0, multiprocessing pool runtime is used with number of processor equal to 
+`num_processors`. Default number of processors is 0.
 
-Usage of these parameters allows user to choose the type of Python execution runtime and configure
+Usage of this parameter allows user to choose the type of Python execution runtime and configure
 parallelism in the case of multiprocessing pool.
 
 A `PythonTransformLauncher` class is provided that enables the running of the transform.  For example,

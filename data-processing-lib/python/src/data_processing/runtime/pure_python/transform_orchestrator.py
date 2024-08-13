@@ -67,7 +67,7 @@ def orchestrate(
         if print_interval == 0:
             print_interval = 1
         logger.debug(f"{runtime_config.get_name()} Begin processing files")
-        if execution_config.multiprocessing:
+        if execution_config.num_processors > 0:
             # using multiprocessor pool for execution
             statistics = _process_transforms_multiprocessor(files=files, size=execution_config.num_processors,
                                                             data_access_factory=data_access_factory,

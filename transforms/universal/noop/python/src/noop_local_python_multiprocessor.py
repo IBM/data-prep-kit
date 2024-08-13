@@ -33,7 +33,6 @@ params = {
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
-    "runtime_multiprocessing": True,
     "runtime_num_processors": 2,
     # noop params
     "noop_sleep_sec": 1,

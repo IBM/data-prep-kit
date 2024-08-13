@@ -33,7 +33,6 @@ class PythonTransformExecutionConfiguration(TransformExecutionConfiguration):
         Initialization
         """
         super().__init__(name=name, print_params=False)
-        self.multiprocessing = False
         self.num_processors = 0
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
@@ -42,8 +41,7 @@ class PythonTransformExecutionConfiguration(TransformExecutionConfiguration):
         :param parser: parser
         :return:
         """
-        parser.add_argument(f"--{cli_prefix}multiprocessing", type=bool, default=False, help="use multiprocessing pool for execution")
-        parser.add_argument(f"--{cli_prefix}num_processors", type=int, default=5, help="size of multiprocessing pool")
+        parser.add_argument(f"--{cli_prefix}num_processors", type=int, default=0, help="size of multiprocessing pool")
 
         return TransformExecutionConfiguration.add_input_params(self, parser=parser)
 
@@ -57,17 +55,11 @@ class PythonTransformExecutionConfiguration(TransformExecutionConfiguration):
             return False
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         # store parameters locally
-        self.multiprocessing = captured["multiprocessing"]
         self.num_processors = captured["num_processors"]
         # print them
-        if self.multiprocessing:
+        if self.num_processors > 0:
             # we are using multiprocessing
-            if self.num_processors <= 1:
-                logger.error(f"number of processors for multiprocessing is {self.num_processors}. Should be greater then 1")
-            logger.info(f"multiprocessing {self.multiprocessing}, num processors {self.num_processors}")
-        else:
-            # sequential processing
-            logger.info(f"multiprocessing {self.multiprocessing}")
+            logger.info(f"using multiprocessing, num processors {self.num_processors}")
         return True
 
     def get_input_params(self) -> dict[str, Any]:
@@ -76,6 +68,5 @@ class PythonTransformExecutionConfiguration(TransformExecutionConfiguration):
         :return: dictionary of parameters
         """
         return {
-            "multiprocessing": self.multiprocessing,
             "num_processors": self.num_processors
         }

@@ -33,6 +33,6 @@ class TestPythonNOOPTransform(AbstractTransformLauncherTest):
         launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
         fixtures.append((
             launcher,
-            {sleep_cli_param: 0, "runtime_multiprocessing": True,"runtime_num_processors": 2},
+            {sleep_cli_param: 0, "runtime_num_processors": 2},
             basedir + "/input", basedir + "/expected"))
         return fixtures
