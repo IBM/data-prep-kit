@@ -39,10 +39,10 @@ This code uses DPK to
 Here is the code: 
 
 - Python version: TODO
-- Ray version: [rag_1_process_ray.ipynb](rag_1_process_ray.ipynb)
+- Ray version: [rag_1A_process_ray.ipynb](rag_1A_process_ray.ipynb)
 
 Here is how to execute the code
 
 - `make jupyter`  - this will start Jupyter
 - Go to Jupyter URL printed on terminal
-- And run the notebook: [rag_1_process_ray.ipynb](rag_1_process_ray.ipynb)
+- And run the notebook: [rag_1A_process_ray.ipynb](rag_1A_process_ray.ipynb)
