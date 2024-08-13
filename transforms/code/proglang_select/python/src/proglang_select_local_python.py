@@ -16,11 +16,11 @@ import sys
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 from proglang_select_transform import (
-    ProgLangSelectTransformConfiguration,
     lang_allowed_langs_file_key,
     lang_lang_column_key,
     lang_output_column_key,
 )
+from proglang_select_transform_python import ProgLangSelectPythonConfiguration
 
 
 # create parameters
@@ -56,6 +56,6 @@ params = {
 if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = PythonTransformLauncher(ProgLangSelectTransformConfiguration())
+    launcher = PythonTransformLauncher(ProgLangSelectPythonConfiguration())
     # launch
     launcher.launch()

@@ -24,28 +24,34 @@ from data_processing_ray.runtime.ray import RayTransformLauncher
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
-from ray.util.metrics import Gauge, Counter
-from pdf2parquet_transform import Pdf2ParquetTransformConfiguration, Pdf2ParquetTransform
+from pdf2parquet_transform import (
+    Pdf2ParquetTransform,
+    Pdf2ParquetTransformConfiguration,
+)
+from ray.util.metrics import Counter, Gauge
 
 
 logger = get_logger(__name__)
 
+
 class Pdf2ParquetRayTransform(Pdf2ParquetTransform):
     def __init__(self, config: dict):
-        """
-        """
+        """ """
         super().__init__(config)
 
         self.doc_counter = Counter("worker_pdf_doc_count", "Number of PDF documents converted by the worker")
         self.page_counter = Counter("worker_pdf_pages_count", "Number of PDF pages converted by the worker")
-        self.page_convert_gauge = Gauge("worker_pdf_page_avg_convert_time", "Average time for converting a single PDF page on each worker")
+        self.page_convert_gauge = Gauge(
+            "worker_pdf_page_avg_convert_time", "Average time for converting a single PDF page on each worker"
+        )
         self.doc_convert_gauge = Gauge("worker_pdf_convert_time", "Time spent converting a single document")
-    
+
     def _update_metrics(self, num_pages: int, elapse_time: float):
         self.page_convert_gauge.set(elapse_time / num_pages)
         self.doc_convert_gauge.set(elapse_time)
         self.doc_counter.inc(1)
         self.page_counter.inc(num_pages)
+
 
 class Pdf2ParquetRayTransformConfiguration(RayTransformRuntimeConfiguration):
     """
@@ -58,7 +64,6 @@ class Pdf2ParquetRayTransformConfiguration(RayTransformRuntimeConfiguration):
         :param base_configuration - base configuration class
         """
         super().__init__(transform_config=Pdf2ParquetTransformConfiguration(transform_class=Pdf2ParquetRayTransform))
-
 
 
 if __name__ == "__main__":

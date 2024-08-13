@@ -10,12 +10,12 @@
 # limitations under the License.
 ################################################################################
 
+import os
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-import os
 import pyarrow as pa
-from data_processing.data_access import DataAccessFactory, DataAccess
+from data_processing.data_access import DataAccess, DataAccessFactory
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
 from doc_c4_statistics import (
@@ -31,6 +31,7 @@ from doc_Gopher_statistics import (
     contains_common_English_words,
     find_first_japanese_alphabet_position,
 )
+
 
 logger = get_logger(__name__)
 
@@ -49,6 +50,7 @@ default_doc_content_column = "contents"
 data_factory_internal_key = f"{cli_prefix}data_factory"
 files_to_use_internal_key = f"{cli_prefix}files_to_use"
 
+
 class DocQualityTransform(AbstractTableTransform):
     """
     Implements a transform to calculate document quality.
@@ -65,7 +67,7 @@ class DocQualityTransform(AbstractTableTransform):
         super().__init__(config)
         self.text_lang = config.get(text_lang_key, default_text_lang)
         self.doc_content_column = config.get(doc_content_column_key, default_doc_content_column)
-        
+
         daf = config.get(data_factory_internal_key, None)
         bad_word_filepath = config.get(bad_word_filepath_key, None)
         if bad_word_filepath is not None:
@@ -73,11 +75,14 @@ class DocQualityTransform(AbstractTableTransform):
                 logger.info(f"Load badwords found locally from {bad_word_filepath}")
                 self.re_pattern = c4_load_ldnoobw_words(ft_lang=self.text_lang, file_path=bad_word_filepath)
             else:
-                if daf is None: 
-                    raise RuntimeError(f"Did not find DataAccessFactory instance under {data_factory_internal_key} key. This is required when bad word file is not in the local file system.")
+                if daf is None:
+                    raise RuntimeError(
+                        f"Did not find DataAccessFactory instance under {data_factory_internal_key} key. This is required when bad word file is not in the local file system."
+                    )
                 logger.info(f"Load badwords from remote")
                 data_access = daf.create_data_access()
                 import tempfile
+
                 with tempfile.TemporaryDirectory() as temp_dir:
                     # use a temporary directory until model is loaded to memory
                     bad_word_filepath = self._write_locally(data_access, bad_word_filepath, temp_dir)
@@ -87,7 +92,7 @@ class DocQualityTransform(AbstractTableTransform):
         filename = os.path.basename(path)
         content, _ = data_access.get_file(path)
         temp_file_path = os.path.join(temp_dir, filename)
-        with open(temp_file_path, 'wb') as temp_file:
+        with open(temp_file_path, "wb") as temp_file:
             temp_file.write(content)
         return temp_file_path
 
@@ -185,6 +190,7 @@ class DocQualityTransformConfiguration(TransformConfiguration):
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args.
     """
+
     def __init__(self):
         super().__init__(
             name=short_name,
@@ -201,9 +207,7 @@ class DocQualityTransformConfiguration(TransformConfiguration):
         (e.g, noop_, pii_, etc.)
         """
         parser.add_argument(
-            f"--{text_lang_cli_param}",
-            default=default_text_lang,
-            help="language used in the text content"
+            f"--{text_lang_cli_param}", default=default_text_lang, help="language used in the text content"
         )
         parser.add_argument(
             f"--{doc_content_column_cli_param}",
@@ -225,9 +229,13 @@ class DocQualityTransformConfiguration(TransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
-        self.params = self.params | captured | {
-            data_factory_internal_key: self.daf,
-        }
+        self.params = (
+            self.params
+            | captured
+            | {
+                data_factory_internal_key: self.daf,
+            }
+        )
         logger.info(f"doc_quality parameters are : {self.params}")
         # Validate and populate the transform's DataAccessFactory
         return self.daf.apply_input_params(args)

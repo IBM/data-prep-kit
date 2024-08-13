@@ -12,10 +12,15 @@
 from typing import Any
 
 import pyarrow as pa
-
-from ededup_transform_base import EdedupTransformBase, EdedupTransformConfigurationBase, HashFilter
-from data_processing.runtime.pure_python.runtime_configuration import PythonTransformRuntimeConfiguration
-from data_processing.runtime.pure_python import PythonTransformLauncher
+from data_processing.runtime.pure_python import (
+    PythonTransformLauncher,
+    PythonTransformRuntimeConfiguration,
+)
+from ededup_transform_base import (
+    EdedupTransformBase,
+    EdedupTransformConfigurationBase,
+    HashFilter,
+)
 
 
 class EdedupPythonTransform(EdedupTransformBase):
