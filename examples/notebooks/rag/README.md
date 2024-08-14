@@ -91,10 +91,4 @@ Run this code in jupyter environment that was started above
 
 For comparision, we can use [Llama-index](https://docs.llamaindex.ai/) framework to process PDFs and query
 
-### 6.1 - Processing Code
-
-code : [rag_2A_llamaindex_process.ipynb](rag_2A_llamaindex_process.ipynb)
-
-### 6.2 - Query Code
-
-code : [rag_2B_llamaindex_query_llama_replicate.ipynb](rag_2B_llamaindex_query_llama_replicate.ipynb)
+Code: [rag_2A_llamaindex_process_and_query.ipynb](rag_2A_llamaindex_process_and_query.ipynb)
