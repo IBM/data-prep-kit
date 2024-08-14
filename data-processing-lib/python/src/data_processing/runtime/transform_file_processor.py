@@ -133,6 +133,12 @@ class AbstractTransformFileProcessor:
                 self.logger.debug(
                     f"Transform did not produce a transformed file for " f"file {self.last_file_name}.parquet"
                 )
+                self._publish_stats(
+                    {
+                        "result_files": len(out_files),
+                        "processing_time": time.time() - t_start,
+                    }
+                )
             case 1:
                 # we have exactly 1 output file
                 file_ext = out_files[0]
