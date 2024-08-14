@@ -11,12 +11,15 @@
 ################################################################################
 
 import os
+import sys
 
-from ededup_transform_base import HashFilter
-from ededup_transform_python import EdedupPythonTransform
-from data_processing.data_access import DataAccessLocal
+from data_processing.runtime.pure_python import PythonTransformLauncher
+from data_processing.utils import ParamsUtils
+from ededup_transform_python import EdedupPythonTransformConfiguration
 
 
+# create launcher
+launcher = PythonTransformLauncher(EdedupPythonTransformConfiguration())
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
@@ -24,19 +27,20 @@ local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
+code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
+params = {
+    # Data access. Only required parameters are specified
+    "data_local_config": ParamsUtils.convert_to_ast(local_conf),
+    # orchestrator
+    "runtime_pipeline_id": "pipeline_id",
+    "runtime_job_id": "job_id",
+    "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
+    # ededup parameters
+    "ededup_doc_column": "contents",
+    "ededup_use_snapshot": True,
+    "ededup_snapshot_directory": input_folder + "/snapshot",
+}
+sys.argv = ParamsUtils.dict_to_req(d=params)
 
-ededup_params = {"doc_column": "contents", "filter": HashFilter({})}
-
-if __name__ == "__main__":
-    # Here we show how to run outside of ray
-    # Filter transform needs a DataAccess to ready the domain list.
-    data_access = DataAccessLocal(local_conf)
-    # Create and configure the transform.
-    transform = EdedupPythonTransform(ededup_params)
-    # Use the local data access to read a parquet table.
-    table, _ = data_access.get_table(os.path.join(input_folder, "sample1.parquet"))
-    print(f"input table has {table.num_rows} rows")
-    # Transform the table
-    table_list, metadata = transform.transform(table)
-    print(f"\noutput table has {table_list[0].num_rows} rows")
-    print(f"output metadata : {metadata}")
+# launch
+launcher.launch()

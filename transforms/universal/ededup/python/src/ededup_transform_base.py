@@ -12,13 +12,22 @@
 
 from argparse import ArgumentParser, Namespace
 from typing import Any
+import pickle
 
 import pyarrow as pa
 from data_processing.transform import (
     AbstractTableTransform,
     TransformConfiguration,
 )
-from data_processing.utils import GB, CLIArgumentProvider, TransformUtils
+from data_processing.utils import (
+    GB,
+    CLIArgumentProvider,
+    TransformUtils,
+    SnapshotUtils,
+    UnrecoverableException,
+    str2bool,
+    get_logger
+)
 
 
 REQUEST_LEN = 8192
@@ -35,7 +44,25 @@ class HashFilter:
         """
         initialize set of local hashes
         """
-        self.hashes = set()
+        self.logger = get_logger(__name__)
+        self.actor_id = params.get("id", 1)
+        data_access_factory = params.get("data_access_factory", None)
+        if data_access_factory is None:
+            self.data_access = None
+            self.hashes = set()
+        else:
+            self.data_access = data_access_factory.create_data_access()
+            snapshot = params.get("snapshot", None)
+            if snapshot is None:
+                self.hashes = set()
+            else:
+                try:
+                    b_hashes, _ = self.data_access.get_file(snapshot)
+                    self.hashes = pickle.loads(b_hashes)
+                except Exception as e:
+                    self.logger.warning(f"Failed to load hashes collector {self.actor_id} with exception {e}")
+                    raise UnrecoverableException("failed to load hashes")
+
 
     def get_unique(self, ha: list[str]) -> list[str]:
         """
@@ -58,6 +85,21 @@ class HashFilter:
         """
         return len(self.hashes), TransformUtils.deep_get_size(self.hashes) / GB
 
+    def snapshot(self) -> None:
+        """
+        Snapshot content
+        :return: None
+        """
+        try:
+            # pickle content
+            b_doc = pickle.dumps(self.hashes)
+            # Save it
+            self.data_access.save_file(
+                f"{SnapshotUtils.get_snapshot_folder(self.data_access)}hash_collector_{self.actor_id}", b_doc
+            )
+        except Exception as e:
+            self.logger.warning(f"Failed to snapshot doc collector {self.actor_id} with exception {e}")
+            raise e
 
 class EdedupTransformBase(AbstractTableTransform):
     """
@@ -77,6 +119,7 @@ class EdedupTransformBase(AbstractTableTransform):
         """
         De duping table content.
         :param table: table
+        :param file_name: file name
         :return: resulting table, statistics
         """
         # make sure that the doc column exists
@@ -143,6 +186,15 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
         Add Transform-specific arguments to the given  parser.
         """
         parser.add_argument(f"--{cli_prefix}doc_column", type=str, default="contents", help="key for accessing data")
+        parser.add_argument(
+            f"--{cli_prefix}use_snapshot",
+            type=lambda x: bool(str2bool(x)),
+            default=False,
+            help="flag to continue with snapshot",
+        )
+        # by default, snapshot file is from the output directory. This parameter can overwrite
+        # default location by explicitly defining the snapshot directory
+        parser.add_argument(f"--{cli_prefix}snapshot_directory", type=str, default=None, help="location of snapshot file")
 
     def apply_input_params(self, args: Namespace) -> bool:
         """

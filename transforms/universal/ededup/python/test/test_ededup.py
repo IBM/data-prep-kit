@@ -16,6 +16,7 @@ from typing import Tuple
 from data_processing.test_support import get_tables_in_folder
 from data_processing.test_support.transform import AbstractTableTransformTest
 from ededup_transform_python import EdedupPythonTransform
+from ededup_transform_base import HashFilter
 
 
 class TestEdedupTransform(AbstractTableTransformTest):
@@ -28,11 +29,8 @@ class TestEdedupTransform(AbstractTableTransformTest):
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
         input_dir = os.path.join(basedir, "input")
         input_tables = get_tables_in_folder(input_dir)
-        expected_metadata_list = [
-            {"source_documents": 5, "result_documents": 3},
-            {"number of hashes": 3, "hash memory, GB": 5.168840289115906e-07},
-        ]
-        config = {"doc_column": "contents"}
+        expected_metadata_list = [{'result_documents': 3, 'source_documents': 5},{}]
+        config = {"doc_column": "contents", "filter": HashFilter({})}
         expected_tables = get_tables_in_folder(os.path.join(basedir, "expected"))
         return [
             (EdedupPythonTransform(config), input_tables, expected_tables, expected_metadata_list),
