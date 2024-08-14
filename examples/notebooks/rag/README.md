@@ -41,9 +41,16 @@ Here is the code:
 - Python version: TODO
 - Ray version: [rag_1A_dpk_process_ray.ipynb](rag_1A_dpk_process_ray.ipynb)
 
-Here is how to execute the code
+Here is how to execute the code:
 
-- `make jupyter`  - this will start Jupyter
+```bash
+## go to project dir (assumes repo name is 'data-prep-kit')
+cd data-prep-kit/examples/notebooks/rag
+
+make jupyter
+## This will fireup jupyter in the correct env
+```
+
 - Go to Jupyter URL printed on terminal
 - And run the notebook: [rag_1A_dpk_process_ray.ipynb](rag_1A_dpk_process_ray.ipynb)
 

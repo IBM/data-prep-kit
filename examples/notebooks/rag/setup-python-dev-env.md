@@ -26,6 +26,9 @@ python --version
 
 
 ```bash
+## go to project dir (assumes repo name is 'data-prep-kit')
+cd data-prep-kit/examples/notebooks/rag
+
 make   clean
 make   venv
 ```
@@ -43,6 +46,9 @@ If you make any modifications to   `requirements.txt`  or DPK modules are update
 ## Step-4: Test the created venv
 
 ```bash
+## go to project dir (assumes repo name is 'data-prep-kit')
+cd data-prep-kit/examples/notebooks/rag
+
 # activate env
 source   venv/bin/activate
 
