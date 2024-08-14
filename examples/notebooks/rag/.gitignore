@@ -1,1 +1,6 @@
 output/
+final_output/
+storage/
+
+*.db
+*.db.lock
