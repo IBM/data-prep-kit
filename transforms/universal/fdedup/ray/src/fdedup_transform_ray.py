@@ -19,13 +19,12 @@ import mmh3
 import numpy as np
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccessFactoryBase
+from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import (
     RANDOM_SEED,
     CLIArgumentProvider,
     TransformUtils,
-    SnapshotUtils,
     str2bool,
 )
 from data_processing_ray.runtime.ray import (

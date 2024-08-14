@@ -11,11 +11,10 @@
 ################################################################################
 from typing import Any
 
-from data_processing.data_access import DataAccessFactoryBase
+from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
 from data_processing.transform import TransformStatistics
 from data_processing.utils import (
     UnrecoverableException,
-    SnapshotUtils,
     get_logger
 )
 
@@ -104,11 +103,13 @@ class EdedupPythonRuntime(DefaultPythonTransformRuntime):
         :param stats: output of statistics as aggregated across all calls to all transforms.
         :return: job execution statistics.  These are generally reported as metadata by the Ray Orchestrator.
         """
+        # compute and add additional statistics
         h_size, h_memory = self.filter.get_hash_size()
         stats.add_stats({"number of hashes": h_size, "hash memory, GB": h_memory})
         current = stats.get_execution_stats()
         dedup_prst = 100 * (1.0 - current.get("result_documents", 1) / current.get("source_documents", 1))
         stats.add_stats({"de duplication %": dedup_prst})
+        # snapshot execution result
         self.filter.snapshot()
 
 

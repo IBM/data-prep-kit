@@ -135,6 +135,7 @@ def orchestrate(
         # Compute execution statistics
         logger.debug("Computing execution stats")
         stats = runtime.compute_execution_stats(ray.get(statistics.get_execution_stats.remote()))
+        stats["processing_time"] = round(stats["processing_time"], 3)
 
         # build and save metadata
         logger.debug("Building job metadata")
@@ -148,7 +149,7 @@ def orchestrate(
             | preprocessing_params.get_input_params(),
             "execution_stats": resources
             | {
-                "execution time, min": (time.time() - start_time) / 60,
+                "execution time, min": round((time.time() - start_time) / 60.,3)
             },
             "job_output_stats": stats,
         }

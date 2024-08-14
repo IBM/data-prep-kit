@@ -19,7 +19,6 @@ from data_processing.utils import TransformUtils
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
-    RayUtils,
 )
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
@@ -108,12 +107,12 @@ class EdedupRayRuntime(DefaultRayTransformRuntime):
         :return: dictionary of transform init params
         """
         # create hashes
-        self.filters = RayUtils.create_actors(
-            clazz=ray.remote(HashFilter),
-            params={},
-            actor_options={"num_cpus": self.params.get("hash_cpu", 0.5)},
-            n_actors=self.params.get("num_hashes", 1),
-        )
+        n_filters = self.params.get("num_hashes", 1)
+        self.filters = [None] * n_filters
+        for i in range(n_filters):
+            self.filters[i] = (ray.remote(HashFilter).options(num_cpus=self.params.get("hash_cpu", 0.5))
+                               .remote({"id": i, "data_access_factory": data_access_factory}))
+
         return {"hashes": self.filters} | self.params
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
@@ -135,6 +134,12 @@ class EdedupRayRuntime(DefaultRayTransformRuntime):
                 sum_hash_mem = sum_hash_mem + h_memory
             remote_replies = not_ready
         dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 1))
+        # snapshot execution results
+        remote_replies = [f.snapshot.remote() for f in self.filters]
+        while remote_replies:
+            # Wait for replies
+            ready, not_ready = ray.wait(remote_replies)
+            remote_replies = not_ready
         return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
 
 
@@ -170,7 +175,10 @@ class EdedupTransformConfiguration(EdedupTransformConfigurationBase):
 
 class EdedupRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=EdedupTransformConfiguration(), runtime_class=EdedupRayRuntime)
+        super().__init__(
+            transform_config=EdedupTransformConfiguration(),
+            runtime_class=EdedupRayRuntime
+        )
 
 
 if __name__ == "__main__":

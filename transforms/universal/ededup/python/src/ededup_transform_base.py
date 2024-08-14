@@ -23,11 +23,11 @@ from data_processing.utils import (
     GB,
     CLIArgumentProvider,
     TransformUtils,
-    SnapshotUtils,
     UnrecoverableException,
     str2bool,
     get_logger
 )
+from data_processing.data_access import SnapshotUtils
 
 
 REQUEST_LEN = 8192
@@ -63,6 +63,13 @@ class HashFilter:
                     self.logger.warning(f"Failed to load hashes collector {self.actor_id} with exception {e}")
                     raise UnrecoverableException("failed to load hashes")
 
+    def add_hashes(self, hashes: set[str]) -> None:
+        """
+        Adding hashes
+        :param hashes: set of hashes to add
+        :return: None
+        """
+        self.hashes.update(hashes)
 
     def get_unique(self, ha: list[str]) -> list[str]:
         """
@@ -100,6 +107,7 @@ class HashFilter:
         except Exception as e:
             self.logger.warning(f"Failed to snapshot doc collector {self.actor_id} with exception {e}")
             raise e
+
 
 class EdedupTransformBase(AbstractTableTransform):
     """
@@ -194,7 +202,11 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
         )
         # by default, snapshot file is from the output directory. This parameter can overwrite
         # default location by explicitly defining the snapshot directory
-        parser.add_argument(f"--{cli_prefix}snapshot_directory", type=str, default=None, help="location of snapshot file")
+        parser.add_argument(
+            f"--{cli_prefix}snapshot_directory",
+            type=str,
+            default=None,
+            help="location of snapshot file")
 
     def apply_input_params(self, args: Namespace) -> bool:
         """

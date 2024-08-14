@@ -15,7 +15,8 @@ from typing import Any, Iterator, Union
 
 import numpy as np
 import ray
-from data_processing.utils import GB, RANDOM_SEED, TransformUtils, SnapshotUtils, get_logger
+from data_processing.utils import GB, RANDOM_SEED, TransformUtils, get_logger
+from data_processing.data_access import SnapshotUtils
 from data_processing_ray.runtime.ray import RayUtils
 import pickle
 from ray.actor import ActorHandle
