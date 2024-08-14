@@ -26,7 +26,7 @@ if __name__ == "__main__":
     transform = HtmlToParquetTransform(html2parquet_params)
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
-    file_to_process = os.path.join(input_folder, "html_zip.zip")
+    file_to_process = os.path.join(input_folder, "hmlt_test1.html")
     byte_array, _ = data_access.get_file(file_to_process)
     print(f"input file: {file_to_process}")
     # Transform the table

@@ -29,7 +29,7 @@ class TestPythonHtmlToParquetTransform(AbstractTransformLauncherTest):
         basedir = "../test-data"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         config = {
-            "data_files_to_use": ast.literal_eval("['.zip']"),
+            "data_files_to_use": ast.literal_eval("['.html','.zip']"),
         }
 
         fixtures = []

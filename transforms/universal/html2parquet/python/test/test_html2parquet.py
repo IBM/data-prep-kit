@@ -31,13 +31,13 @@ class TestHtmlToParquetTransform(AbstractBinaryTransformTest):
             os.path.join(os.path.dirname(__file__), "../test-data")
         )
         input_dir = os.path.join(basedir, "input")
-        input_files = get_files_in_folder(input_dir, ".zip")
+        input_files = get_files_in_folder(input_dir, ".html")
         input_files = [(name, binary) for name, binary in input_files.items()]
         expected_metadata_list = [{"nrows": 1, "nsuccess": 1, "nfail": 0, "nskip": 0}, {}]
         config = {}
 
         expected_files = [
-            os.path.join(basedir, "expected", TransformUtils.get_file_basename(input_file).replace(".zip", ".parquet"))
+            os.path.join(basedir, "expected", TransformUtils.get_file_basename(input_file).replace(".html", ".parquet"))
             for input_file, _ in input_files
         ]
 
