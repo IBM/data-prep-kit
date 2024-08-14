@@ -43,6 +43,8 @@ def compute_exec_params_func(
     lang_id_model_kind: str,
     lang_id_model_url: str,
     lang_id_content_column_name: str,
+    lang_id_output_lang_column_name: str,
+    lang_id_output_score_column_name: str,
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -59,6 +61,8 @@ def compute_exec_params_func(
         "lang_id_model_kind": lang_id_model_kind,
         "lang_id_model_url": lang_id_model_url,
         "lang_id_content_column_name": lang_id_content_column_name,
+        "lang_id_output_lang_column_name": lang_id_output_lang_column_name,
+        "lang_id_output_score_column_name": lang_id_output_score_column_name,
     }
 
 
@@ -121,6 +125,8 @@ def lang_id(
     lang_id_model_kind: str = "fasttext",
     lang_id_model_url: str = "facebook/fasttext-language-identification",
     lang_id_content_column_name: str = "text",
+    lang_id_output_lang_column_name: str = "lang",
+    lang_id_output_score_column_name: str = "score",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
@@ -159,6 +165,8 @@ def lang_id(
     :param lang_id_model_kind - what kind of model you want to use for language identification
     :param lang_id_model_url - url that model locates
     :param lang_id_content_column_name - name of the column containing documents
+    :param lang_id_output_lang_column_name - name of the output column to hold predicted language code
+    :param lang_id_output_score_column_name - name of the output column to hold score of prediction
     :return: None
     """
     # create clean_up task
@@ -180,6 +188,8 @@ def lang_id(
             lang_id_model_kind=lang_id_model_kind,
             lang_id_model_url=lang_id_model_url,
             lang_id_content_column_name=lang_id_content_column_name,
+            lang_id_output_lang_column_name=lang_id_output_lang_column_name,
+            lang_id_output_score_column_name=lang_id_output_score_column_name,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster

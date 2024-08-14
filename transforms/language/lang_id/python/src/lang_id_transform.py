@@ -77,7 +77,8 @@ class LangIdentificationTransform(AbstractTableTransform):
                 f"column to store score of language identification ({self.output_score_column_name}) already exist"
             )
         self.logger.debug(f"Transforming one table with {len(table)} rows")
-        table, stats = get_lang_ds_pa(table, self.nlp_langid, self.content_column_name)
+        table, stats = get_lang_ds_pa(
+            table, self.nlp_langid, self.content_column_name, self.output_lang_column_name, self.output_score_column_name)
         self.logger.debug(f"Transformed one table with {len(table)} rows")
         return [table], stats
 
