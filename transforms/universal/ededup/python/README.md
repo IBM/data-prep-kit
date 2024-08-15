@@ -39,7 +39,6 @@ the [python launcher](../../../../data-processing-lib/doc/python-launcher-option
 ```
 These correspond to the configuration keys described above.
 
-
 To use the transform image to transform your data, please refer to the 
 [running images quickstart](../../../../doc/quick-start/run-transform-image.md),
 substituting the name of this transform image and runtime as appropriate.
