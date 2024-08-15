@@ -27,7 +27,7 @@ local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
-worker_options = {"num_cpus": 0.8}
+worker_options = {"num_cpus": 0.5}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
     # where to run
@@ -36,7 +36,7 @@ params = {
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # orchestrator
     "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "runtime_num_workers": 3,
+    "runtime_num_workers": 2,
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_creation_delay": 0,
