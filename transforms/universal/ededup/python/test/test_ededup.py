@@ -30,7 +30,7 @@ class TestEdedupTransform(AbstractTableTransformTest):
         input_dir = os.path.join(basedir, "input")
         input_tables = get_tables_in_folder(input_dir)
         expected_metadata_list = [{'result_documents': 3, 'source_documents': 5},{}]
-        config = {"doc_column": "contents", "filter": HashFilter({})}
+        config = {"doc_column": "contents", "doc_id_column": "document_id", "filter": HashFilter({})}
         expected_tables = get_tables_in_folder(os.path.join(basedir, "expected"))
         return [
             (EdedupPythonTransform(config), input_tables, expected_tables, expected_metadata_list),

@@ -122,6 +122,7 @@ class EdedupTransformBase(AbstractTableTransform):
         """
         super().__init__(config)
         self.doc_column = config.get("doc_column", "contents")
+        self.doc_id_column = config.get("doc_id_column", "document_id")
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -131,18 +132,22 @@ class EdedupTransformBase(AbstractTableTransform):
         :return: resulting table, statistics
         """
         # make sure that the doc column exists
-        TransformUtils.validate_columns(table=table, required=[self.doc_column])
+        TransformUtils.validate_columns(table=table, required=[self.doc_column, self.doc_id_column])
         # Inner variables
+        docs = table[self.doc_column]
+        doc_ids = table[self.doc_id_column]
         hashes = set()
         unique = []
         hd = {}
         # Compute unique hashes for the table
-        for text in table[self.doc_column]:
+        for n in range(table.num_rows):
+            doc = docs[n].as_py()
+            doc_id = doc_ids[n].as_py()
             # Compute doc hash
-            h = TransformUtils.str_to_hash(TransformUtils.normalize_string(str(text)))
+            h = TransformUtils.str_to_hash(TransformUtils.normalize_string(str(doc)))
             if h not in hashes:  # Processing this hash for the first time
                 hashes.add(h)  # Remember it locally
-                hd[h] = str(text)
+                hd[h] = doc_id
                 if len(hd) >= REQUEST_LEN:  # time to check remotely
                     unique = unique + self._process_cached_hashes(hd=hd)
                     hd = {}
@@ -154,14 +159,22 @@ class EdedupTransformBase(AbstractTableTransform):
         mask = [False] * table.num_rows
         removed = []
         index = 0
-        for text in table[self.doc_column]:
-            str_text = str(text)
-            if str_text in unique_set:
+        for id in table[self.doc_id_column]:
+            str_id = str(id)
+            if str_id in unique_set:
                 mask[index] = True
-                unique_set.remove(str_text)
+                unique_set.remove(str_id)
+            else:
+                removed.append(str_id)
             index += 1
         # Create output table
         out_table = table.filter(mask)
+        # populate removed columns
+        if out_table.num_rows > 0:
+            # we can only add removed if the file is not empty
+            removed_column = [[]] * out_table.num_rows
+            removed_column[0] = removed
+            out_table = TransformUtils.add_column(table=out_table, name="removed", content=removed_column)
         # report statistics
         stats = {"source_documents": table.num_rows, "result_documents": out_table.num_rows}
         return [out_table], stats
@@ -195,6 +208,10 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
         Add Transform-specific arguments to the given  parser.
         """
         parser.add_argument(f"--{cli_prefix}doc_column", type=str, default="contents", help="key for accessing data")
+        parser.add_argument(
+            f"--{cli_prefix}doc_id_column",
+            type=str, default="document_id",
+            help="key for accessing doc id")
         parser.add_argument(
             f"--{cli_prefix}use_snapshot",
             type=lambda x: bool(str2bool(x)),

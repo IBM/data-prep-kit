@@ -31,5 +31,5 @@ class TestRayResizeTransform(AbstractTransformLauncherTest):
         fixtures = []
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
         launcher = PythonTransformLauncher(EdedupPythonTransformConfiguration())
-        config = {"ededup_doc_column": "contents"}
+        config = {"ededup_doc_column": "contents", "ededup_doc_id_column": "document_id"}
         return [(launcher, config, basedir + "/input", basedir + "/expected")]

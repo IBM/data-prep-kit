@@ -45,6 +45,7 @@ params = {
     "ededup_hash_cpu": 0.5,
     "ededup_num_hashes": 3,
     "ededup_doc_column": "contents",
+    "ededup_doc_id_column": "document_id",
     "ededup_use_snapshot": True,
     "ededup_snapshot_directory": input_folder + "/snapshot",
 }

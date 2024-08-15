@@ -37,6 +37,7 @@ params = {
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # ededup parameters
     "ededup_doc_column": "contents",
+    "ededup_doc_id_column": "document_id",
     "ededup_use_snapshot": True,
     "ededup_snapshot_directory": input_folder + "/snapshot",
 }

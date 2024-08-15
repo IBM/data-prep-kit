@@ -45,6 +45,7 @@ params = {
     "ededup_hash_cpu": 0.5,
     "ededup_num_hashes": 2,
     "ededup_doc_column": "contents",
+    "ededup_doc_id_column": "document_id",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

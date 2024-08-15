@@ -14,6 +14,7 @@ The set of dictionary keys holding [EdedupPythonTransform](src/ededup_transform_
 configuration for values are as follows:
 
 * _ededup_doc_column_ - specifies the name of the column containing a document
+* _ededup_doc_id_column_ - specifies the name of the column containing a document id
 * _ededup_use_snapshot_ - specifies that ededup execution starts from a set of already seen hashes. This can be used
   for the incremental ededup execution
 * _snapshot_directory_ - specifies a directory from which transforms are read. If this is not specified, a default
@@ -29,6 +30,8 @@ the [python launcher](../../../../data-processing-lib/doc/python-launcher-option
 ```
   --ededup_doc_column EDEDUP_DOC_COLUMN
                         key for accessing data
+  --ededup_doc_id_column EDEDUP_DOC_ID_COLUMN
+                        key for accessing doc id
   --ededup_use_snapshot EDEDUP_USE_SNAPSHOT
                         flag to continue from snapshot
   --ededup_snapshot_directory EDEDUP_SNAPSHOT_DIRECTORY

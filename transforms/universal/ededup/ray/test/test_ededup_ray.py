@@ -34,6 +34,7 @@ class TestRayEdedupTransform(AbstractTransformLauncherTest):
             "ededup_hash_cpu": 0.5,
             "ededup_num_hashes": 2,
             "ededup_doc_column": "contents",
+            "ededup_doc_id_column": "document_id",
         }
         launcher = RayTransformLauncher(EdedupRayTransformConfiguration())
         fixtures = [(launcher, config, basedir + "/input", basedir + "/expected")]
