@@ -65,7 +65,7 @@ class Html2ParquetTransform(AbstractBinaryTransform):
             with zipfile.ZipFile(io.BytesIO(bytes(byte_array))) as opened_zip:
                 # Loop through each file member in the ZIP archive
                 for member in opened_zip.infolist():
-                    if not member.is_dir() and '__MACOSX' not in member.filename and TransformUtils.get_file_extension(member.filename)[1] == ".html":
+                    if not member.is_dir() and TransformUtils.get_file_extension(member.filename)[1] == ".html":
                         with opened_zip.open(member) as file:
                             try:
                                 # Read the content of the file
