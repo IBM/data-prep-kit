@@ -5,8 +5,8 @@
     "job name": "pdf2parquet",
     "job type": "pure python",
     "job id": "job_id",
-    "start_time": "2024-08-14 19:05:08",
-    "end_time": "2024-08-14 19:05:57",
+    "start_time": "2024-08-15 00:57:38",
+    "end_time": "2024-08-15 00:58:43",
     "status": "success"
   },
   "code": {
@@ -33,16 +33,16 @@
     "source_size": 8925664,
     "result_files": 2,
     "result_size": 63785,
-    "processing_time": 34.185,
+    "processing_time": 52.743,
     "nrows": 3,
     "nsuccess": 3
   },
   "source": {
-    "name": "data-prep-kit/transforms/language/pdf2parquet/python/test-data/input",
+    "name": "/data/docling-dev/data-prep-kit/transforms/language/pdf2parquet/python/test-data/input",
     "type": "path"
   },
   "target": {
-    "name": "data-prep-kit/transforms/language/pdf2parquet/python/output",
+    "name": "/data/docling-dev/data-prep-kit/transforms/language/pdf2parquet/python/output",
     "type": "path"
   }
 }
