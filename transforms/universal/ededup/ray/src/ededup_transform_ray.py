@@ -12,10 +12,11 @@
 
 from argparse import ArgumentParser, Namespace
 from typing import Any
+import pickle
 
 import ray
-from data_processing.data_access import DataAccessFactoryBase
-from data_processing.utils import TransformUtils
+from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
+from data_processing.utils import TransformUtils, UnrecoverableException
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
@@ -93,8 +94,10 @@ class EdedupRayRuntime(DefaultRayTransformRuntime):
             hash_cpu - cpus per hash instance
             num_hashes - number of hashes
         """
+        from data_processing.utils import get_logger
         super().__init__(params)
         self.filters = []
+        self.logger = get_logger(__name__)
 
     def get_transform_config(
         self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
@@ -112,6 +115,44 @@ class EdedupRayRuntime(DefaultRayTransformRuntime):
         for i in range(n_filters):
             self.filters[i] = (ray.remote(HashFilter).options(num_cpus=self.params.get("hash_cpu", 0.5))
                                .remote({"id": i, "data_access_factory": data_access_factory}))
+        if self.params.get("use_snapshot", False):
+            # we are using snapshots. Note here that the amount of files might be different
+            # from the current amount of hashes
+            snapshot_path = self.params.get("snapshot_directory", None)
+            if snapshot_path is None or len(snapshot_path) == 0:
+                snapshot_path = f"{SnapshotUtils.get_snapshot_folder(data_access_factory.create_data_access())}"
+            data_access = data_access_factory.create_data_access()
+            # get snapshot files
+            files, retries = data_access.get_folder_files(path=snapshot_path)
+            if retries > 0:
+                statistics.add_stats.remote({"data access retries": retries})
+            self.logger.info(f"Found the following snapshot files {files.keys()}")
+            # process snapshot files
+            for file in files.keys():
+                # load the file
+                try:
+                    b_hashes, _ = data_access.get_file(file)
+                    snaps = pickle.loads(b_hashes)
+                except Exception as e:
+                    self.logger.warning(f"Failed to load hashes from file {file} with exception {e}")
+                    raise UnrecoverableException("failed to load hashes")
+                request = [[] for _ in range(len(self.filters))]
+                for h in snaps:
+                    request[TransformUtils.str_to_int(h) % len(self.filters)].append(h)
+                # Submit requests to appropriate hash actors
+                remote_replies = []
+                i = 0
+                for req in request:
+                    if len(req) > 0:  # Only submit if the length is greater then 0
+                        remote_replies.append(self.filters[i].add_hashes.remote(req))
+                    i = i + 1
+                # Process replies
+                unique = []
+                while remote_replies:
+                    # Wait for replies
+                    ready, not_ready = ray.wait(remote_replies)
+                    # Continue waiting for not completed replies
+                    remote_replies = not_ready
 
         return {"hashes": self.filters} | self.params
 
