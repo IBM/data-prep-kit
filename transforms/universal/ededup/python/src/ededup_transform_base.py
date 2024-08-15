@@ -152,6 +152,7 @@ class EdedupTransformBase(AbstractTableTransform):
         # Remove duplicates
         unique_set = set(unique)
         mask = [False] * table.num_rows
+        removed = []
         index = 0
         for text in table[self.doc_column]:
             str_text = str(text)
@@ -198,7 +199,7 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
             f"--{cli_prefix}use_snapshot",
             type=lambda x: bool(str2bool(x)),
             default=False,
-            help="flag to continue with snapshot",
+            help="flag to continue from snapshot",
         )
         # by default, snapshot file is from the output directory. This parameter can overwrite
         # default location by explicitly defining the snapshot directory
@@ -206,7 +207,7 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
             f"--{cli_prefix}snapshot_directory",
             type=str,
             default=None,
-            help="location of snapshot file")
+            help="location of snapshot files")
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
