@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 # Set REPOROOT
 REPO_ROOT=$(cd ../../../ && pwd && cd - > /dev/null )
