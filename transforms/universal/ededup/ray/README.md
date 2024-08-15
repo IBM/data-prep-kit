@@ -45,14 +45,22 @@ configuration for values are as follows:
 * _hash_cpu_ - specifies an amount of CPUs per hash actor
 * _num_hashes_ - specifies number of hash actors
 * _doc_column_ - specifies name of the column containing documents
-* _ededup_doc_id_column_ - specifies the name of the column containing a document id
-* _ededup_use_snapshot_ - specifies that ededup execution starts from a set of already seen hashes. This can be used 
+* _doc_id_column_ - specifies the name of the column containing a document id
+* _use_snapshot_ - specifies that ededup execution starts from a set of already seen hashes. This can be used 
 for the incremental ededup execution
-* _snapshot_directory_ - specifies a directory from which transforms are read. If this is not specified, a default 
+* _snapshot_directory_ - specifies a directory from which snapshots are read. If this is not specified, a default 
 location (output_folder/snapshot is used)
 
 
 We also provide an [estimate](src/cluster_estimator.py) to roughly determine cluster size for running transformer.
+
+## Snapshotting
+
+In the current implementation we also provide snapshotting. At the end of execution, the content
+of the hash cache to storage (local disk or S3). The reason this is done is to enable incremental 
+execution of dedup. You can run dedup on a set of existing files and snapshot the hash cache. Now 
+when additional files come in, instead of running dedup on all the files, you can load snapshot
+from the previous run and run dedup only on new files
 
 ## Running
 
