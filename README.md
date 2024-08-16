@@ -57,6 +57,7 @@ Data modalities supported:
 * Code - support for code datasets as downloaded .zip files of GitHub repositories converted to
 [parquet](https://arrow.apache.org/docs/python/parquet.html) files. 
 * Language - supports for natural language datasets, and like the code transformations, will operate on parquet files.
+* Universal - supports code and natrual langauge datasets, and can operate on with parquet files, zip archives, or individual HTML files.
 
 Support for additional data modalities is expected in the future and additional data formats is welcome!
 
@@ -89,6 +90,7 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 | **Import/Export tables**         |                    |                  |                  |                        |
 | [Code (from zip) to Parquet](/transforms/code/code2parquet/python/README.md)       | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | [PDF to Parquet](/transforms/language/pdf2parquet/python/README.md)         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+|[HTML to Parquet](/transforms/universal/html2parquet/python/README.md)                 |:white_check_mark:|                  |                  |                        |
 
 
 Contributors are welcome to add new modules as well as add runtime support for existing modules!
