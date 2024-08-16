@@ -11,21 +11,16 @@
 ################################################################################
 import os
 
-from workflow_support.compile_utils import (
-    ONE_HOUR_SEC,
-    ONE_WEEK_SEC,
-    ComponentUtils,
-)
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
 task_image = "quay.io/dataprep1/data-prep-kit/doc_quality-ray:latest"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "docq_transform_ray.py"
+EXEC_SCRIPT_NAME: str = "doc_quality_transform_ray.py"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
@@ -49,7 +44,7 @@ def compute_exec_params_func(
     docq_doc_content_column: str,
     docq_bad_word_filepath: str,
 ) -> dict:
-    from workflow_support.runtime_utils import KFPUtils
+    from runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
@@ -80,8 +75,10 @@ if os.getenv("KFPv2", "0") == "1":
     compute_exec_params_op = dsl.component_decorator.component(
         func=compute_exec_params_func, base_image=base_kfp_image
     )
-    print("WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the " +
-          "same version of the same pipeline !!!")
+    print(
+        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the "
+        + "same version of the same pipeline !!!"
+    )
     run_id = uuid.uuid4().hex
 else:
     compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
@@ -104,10 +101,9 @@ TASK_NAME: str = "doc_quality"
 def doc_quality(
     # Ray cluster
     ray_name: str = "doc_quality-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", '
-    '"image": "' + task_image + '", "image_pull_policy": "Always" }',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", ' '"image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image_pull_secret": "", "image": "' + task_image + '", "image_pull_policy": "Always" }',
+    '"image_pull_secret": "", "image": "' + task_image + '" }',
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/doc_quality/input/', 'output_folder': 'test/doc_quality/output/'}",
@@ -205,7 +201,6 @@ def doc_quality(
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
-
 
 
 if __name__ == "__main__":

@@ -14,8 +14,11 @@ from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-from data_processing.transform import AbstractTransform
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.transform import (
+    AbstractTableTransform,
+    AbstractTransform,
+    TransformConfiguration,
+)
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils
 
 

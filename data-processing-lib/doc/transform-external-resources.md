@@ -19,7 +19,8 @@ In the next sections we cover the following:
 ## Defining Transform-specific Resource Locations 
 
 Each transform has a _configuration_ class that defines the command line options with which the
-transform can be configured.  In the example below, the [DataAccessFactory](../ray/src/data_processing_ray/data_access/data_access_factory.py)
+transform can be configured.  In the example below, the 
+[DataAccessFactory](../python/src/data_processing/data_access/data_access_factory.py)
  is used in the _configuration_ to add transform-specific arguments that allow a `DataAccessFactory` to be
 initialized specifically for the transform.  The initialized `DataAcessFactory` is then made available to
 the transform's initializer to enable it to read from transform-specific location.  Note that

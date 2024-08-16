@@ -16,11 +16,12 @@ import sys
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 from doc_quality_transform import (
-    text_lang_cli_param,
-    doc_content_column_cli_param,
     bad_word_filepath_cli_param,
+    doc_content_column_cli_param,
+    text_lang_cli_param,
 )
 from doc_quality_transform_python import DocQualityPythonTransformConfiguration
+
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
@@ -31,7 +32,7 @@ local_conf = {
 }
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
-model_path=os.path.join(basedir, "models")
+model_path = os.path.join(basedir, "models")
 if not os.path.exists(model_path):
     model_path = os.path.abspath(os.path.join(basedir, "..", "models"))
 

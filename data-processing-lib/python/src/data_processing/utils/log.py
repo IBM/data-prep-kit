@@ -26,7 +26,13 @@ def get_log_level(name: str = None) -> str:
     return level_name
 
 
+__logger_cache = {}
+
+
 def get_logger(name: str, level=None, file=None) -> logging.Logger:
+    logger = __logger_cache.get(name, None)
+    if logger is not None:
+        return logger
     logger = logging.getLogger(name)
     if level is None:
         level = get_log_level(name)
@@ -50,6 +56,7 @@ def get_logger(name: str, level=None, file=None) -> logging.Logger:
         logger.addHandler(f_handler)
 
     # Add handlers to the logger
+    __logger_cache[name] = logger
     return logger
 
 

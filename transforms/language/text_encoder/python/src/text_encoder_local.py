@@ -17,9 +17,7 @@ from text_encoder_transform import TextEncoderTransform
 
 
 # create parameters
-input_folder = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "test-data", "input")
-)
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 
 params = {}
 if __name__ == "__main__":

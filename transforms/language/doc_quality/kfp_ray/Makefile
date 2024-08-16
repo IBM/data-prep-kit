@@ -35,11 +35,11 @@ workflow-build: workflow-venv
 	$(MAKE) $(YAML_WF)
 
 .PHONY: workflow-test
-workflow-test:
-	$(MAKE) .transforms_workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=doc_quality_wf.yaml
+workflow-test: workflow-build
+	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=doc_quality_wf.yaml
 
 .PHONY: workflow-upload
 workflow-upload:
 	@for file in $(YAML_WF); do \
-		$(MAKE) .transforms_workflows.upload-pipeline PIPELINE_FILE=$$file; \
+		$(MAKE) .workflows.upload-pipeline PIPELINE_FILE=$$file; \
 	done

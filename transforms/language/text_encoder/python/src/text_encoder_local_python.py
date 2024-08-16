@@ -19,9 +19,7 @@ from text_encoder_transform_python import TextEncoderPythonTransformConfiguratio
 
 
 # create parameters
-input_folder = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "test-data", "input")
-)
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
 local_conf = {
     "input_folder": input_folder,
@@ -41,8 +39,6 @@ if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = PythonTransformLauncher(
-        runtime_config=TextEncoderPythonTransformConfiguration()
-    )
+    launcher = PythonTransformLauncher(runtime_config=TextEncoderPythonTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

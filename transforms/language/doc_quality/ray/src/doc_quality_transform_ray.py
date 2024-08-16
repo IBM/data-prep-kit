@@ -21,19 +21,21 @@ from doc_quality_transform import DocQualityTransformConfiguration
 
 logger = get_logger(__name__)
 
+
 class DocQualityRayTransformConfiguration(RayTransformRuntimeConfiguration):
     """
     Implements the RayTransformConfiguration for Document Quality as required by the RayTransformLauncher.
     Document Quality does not use a RayRuntime class so the superclass only needs the base
     python-only configuration.
     """
-    
+
     def __init__(self):
         """
         Initialization
         :param base_configuration - base configuration class
         """
         super().__init__(transform_config=DocQualityTransformConfiguration())
+
 
 if __name__ == "__main__":
     launcher = RayTransformLauncher(DocQualityRayTransformConfiguration())

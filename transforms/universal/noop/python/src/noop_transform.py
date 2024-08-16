@@ -42,9 +42,6 @@ class NOOPTransform(AbstractTableTransform):
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of NOOPTransformConfiguration class
         super().__init__(config)
-        from data_processing.utils import get_logger
-
-        self.logger = get_logger(__name__)
         self.sleep = config.get("sleep_sec", 1)
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:

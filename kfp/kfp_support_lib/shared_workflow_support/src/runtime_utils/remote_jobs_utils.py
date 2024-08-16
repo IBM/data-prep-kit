@@ -34,6 +34,8 @@ from ray.job_submission import JobStatus
 from runtime_utils import KFPUtils
 
 
+cli_prefix = "KFP"
+
 logger = get_logger(__name__)
 
 
@@ -437,7 +439,7 @@ def _execute_remote_job(
 
     logger.info(f"submitted job successfully, submission id {submission}")
     # create data access
-    data_factory = DataAccessFactory()
+    data_factory = DataAccessFactory(cli_arg_prefix=cli_prefix)
     data_factory.apply_input_params(args=data_access_params)
     data_access = data_factory.create_data_access()
     # print execution log
@@ -481,7 +483,7 @@ def execute_ray_jobs(
         wait_interval=additional_params.get("wait_interval", 2),
     )
     # find config parameter
-    config = ParamsUtils.get_config_parameter(e_params)
+    config = ParamsUtils.get_config_parameter(params=e_params)
     if config is None:
         exit(1)
     # get config value
@@ -493,7 +495,7 @@ def execute_ray_jobs(
             name=name,
             ns=ns,
             script=exec_script_name,
-            data_access_params={config: config_value, "data_s3_cred": s3_creds},
+            data_access_params={f"{cli_prefix}s3_config": config_value, f"{cli_prefix}s3_cred": s3_creds},
             params=e_params,
             additional_params=additional_params,
             remote_jobs=remote_jobs,
@@ -511,7 +513,7 @@ def execute_ray_jobs(
                 name=name,
                 ns=ns,
                 script=exec_script_name,
-                data_access_params={config: conf, "data_s3_cred": s3_creds},
+                data_access_params={f"{cli_prefix}s3_config": conf, f"{cli_prefix}s3_cred": s3_creds},
                 params=launch_params,
                 additional_params=additional_params,
                 remote_jobs=remote_jobs,
