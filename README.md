@@ -75,12 +75,12 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 | [Profiler](/transforms/universal/profiler/ray/README.md) | |:white_check_mark:| |:white_check_mark: |  
 | [Resize](/transforms/universal/resize/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
 | [Tokenizer](/transforms/universal/tokenization/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: | 
-| [PII Redactor](/transforms/universal/pii_redactor/python/README.md)| :white_check_mark:| :white_check_mark: | | :white_check_mark: |
 | **Language-only** | | | | |  
 | [Language identification](/transforms/language/lang_id/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
 | [Document quality](/transforms/language/doc_quality/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
 | [Document chunking for RAG](/transforms/language/doc_chunk/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
 | [Text/Chunk encoder/embedding](/transforms/language/text_encoder/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [PII Annotator/Redactor](/transforms/universal/pii_redactor/python/README.md)| :white_check_mark:| :white_check_mark: | | :white_check_mark: |
 | **Code-only** | | | | |  
 | [Programming language annnotation](/transforms/code/proglang_select/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
 | [Code quality annotation](/transforms/code/code_quality/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
