@@ -175,7 +175,7 @@ def invoke_sub_workflow(
         print(f"Sub workflow {name} execution failed with error {error} and status {status}")
         sys.exit(1)
 
-    print(f"Sub workflow {name} execution completed successfully in {(time.time() - start) / 60.} min")
+    print(f"Sub workflow {name} execution completed successfully in {round((time.time() - start) / 60.,3)} min")
     print(f"output path = {output_folder_prefix}")
     Path(args.output_folder).parent.mkdir(parents=True, exist_ok=True)
     Path(args.output_folder).write_text(output_folder_prefix)

@@ -13,7 +13,9 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
+from ededup_transform_base import HashFilter
 from ededup_transform_python import EdedupPythonTransform
+
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
@@ -23,7 +25,7 @@ local_conf = {
     "output_folder": output_folder,
 }
 
-ededup_params = {"doc_column": "contents"}
+ededup_params = {"doc_column": "contents", "filter": HashFilter({})}
 
 if __name__ == "__main__":
     # Here we show how to run outside of ray

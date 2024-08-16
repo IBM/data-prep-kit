@@ -21,7 +21,7 @@ from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, Component
 EXEC_SCRIPT_NAME: str = "header_cleanser_transform_ray.py"
 PREFIX: str = ""
 
-task_image = "quay.io/dataprep1/data-prep-kit/header-cleanser-ray:latest"
+task_image = "quay.io/dataprep1/data-prep-kit/header_cleanser-ray:latest"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
@@ -43,7 +43,6 @@ def compute_exec_params_func(
     header_cleanser_contents_column_name: str,
     header_cleanser_license: bool,
     header_cleanser_copyright: bool,
-
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -58,7 +57,7 @@ def compute_exec_params_func(
         "runtime_code_location": runtime_code_location,
         "header_cleanser_contents_column_name": header_cleanser_contents_column_name,
         "header_cleanser_license": header_cleanser_license,
-        "header_cleanser_copyright":header_cleanser_copyright,
+        "header_cleanser_copyright": header_cleanser_copyright,
     }
 
 
@@ -106,7 +105,7 @@ def header_cleanser(
     # Ray cluster
     ray_name: str = "header_cleanser-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
-    ray_head_options: str = '{"cpu": 4, "memory": 4, "image": "' + task_image + '" }',
+    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
     ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, \
             "image": "'
     + task_image

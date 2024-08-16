@@ -18,3 +18,19 @@ We can launch a jupyter notebook to try out the library or transforms or to buil
 `make jupyter`
 
 It will launch browser with the jupyter notebook where we can try out the transforms.
+
+## Demo API notebokk
+
+**Prepare virtualenv**
+
+`make venv`
+
+**Activate virtualenv**
+
+`. ./venv/bin/activate`
+
+**Run notebook**
+
+`jupyter notebook`
+
+

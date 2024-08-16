@@ -569,7 +569,7 @@ class BucketsHashProcessor:
                     docs[d] = NO_SIMILARITY
             if very_long:
                 self.logger.info(
-                    f"Processed long ({bucket_len}) bucket in {(time.time() - start) / 60} "
+                    f"Processed long ({bucket_len}) bucket in {round((time.time() - start) / 60.,3)} "
                     f"min; "
                     f"docs chains {len(set_list)}"
                 )

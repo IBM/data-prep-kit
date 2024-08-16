@@ -37,7 +37,7 @@ setup:: .transforms.setup
 set-versions: 
 	$(MAKE) TRANSFORM_PYTHON_VERSION=dummy TOML_VERSION=$(REPO_LVL_ORDER_RAY_VERSION) .transforms.set-versions 
         
-build-dist:: set-versions .defaults.build-dist 
+build-dist:: .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 

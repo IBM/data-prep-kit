@@ -24,8 +24,13 @@ from data_processing_ray.runtime.ray import (
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
+from ededup_transform_base import (
+    EdedupTransformBase,
+    EdedupTransformConfigurationBase,
+    HashFilter,
+    cli_prefix,
+)
 from ray.actor import ActorHandle
-from ededup_transform_base import EdedupTransformBase, EdedupTransformConfigurationBase, HashFilter, cli_prefix
 
 
 class EdedupRayTransform(EdedupTransformBase):
@@ -76,7 +81,7 @@ class EdedupRayTransform(EdedupTransformBase):
         return unique
 
 
-class EdedupRuntime(DefaultRayTransformRuntime):
+class EdedupRayRuntime(DefaultRayTransformRuntime):
     """
     Exact dedup runtime support
     """
@@ -165,7 +170,7 @@ class EdedupTransformConfiguration(EdedupTransformConfigurationBase):
 
 class EdedupRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=EdedupTransformConfiguration(), runtime_class=EdedupRuntime)
+        super().__init__(transform_config=EdedupTransformConfiguration(), runtime_class=EdedupRayRuntime)
 
 
 if __name__ == "__main__":

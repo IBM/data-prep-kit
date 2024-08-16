@@ -12,8 +12,6 @@ nav:
           - KFP Pipeline: kfp/doc/simple_transform_pipeline.md
 theme:
     name: "material"
-    favicon: "data-processing-lib/doc/favicon.ico"
-    logo: "data-processing-lib/doc/logo-ibm.png"
     palette:
         primary: black
     #  palette:

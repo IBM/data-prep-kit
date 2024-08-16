@@ -54,9 +54,6 @@ class LangIdentificationTransform(AbstractTableTransform):
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of LangIdentificationTransformConfiguration class
-        from data_processing.utils import get_logger
-
-        self.logger = get_logger(__name__)
         super().__init__(config)
         self.nlp_langid = LangModelFactory.create_model(
             config.get(model_kind_key), config.get(model_url_key), config.get(model_credential_key)
@@ -80,7 +77,8 @@ class LangIdentificationTransform(AbstractTableTransform):
                 f"column to store score of language identification ({self.output_score_column_name}) already exist"
             )
         self.logger.debug(f"Transforming one table with {len(table)} rows")
-        table, stats = get_lang_ds_pa(table, self.nlp_langid, self.content_column_name)
+        table, stats = get_lang_ds_pa(
+            table, self.nlp_langid, self.content_column_name, self.output_lang_column_name, self.output_score_column_name)
         self.logger.debug(f"Transformed one table with {len(table)} rows")
         return [table], stats
 

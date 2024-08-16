@@ -12,10 +12,14 @@ This transform will identify language of each text with confidence score with fa
 The set of dictionary keys holding [LangIdentificationTransform](src/lang_id_transform.py) 
 configuration for values are as follows:
 
-* _lang_id_model_credential_ - specifies the credential you use to get model. This will be huggingface token. [Guide to get huggingface token](https://huggingface.co/docs/hub/security-tokens)
-* _lang_id_model_kind_ - specifies what kind of model you want to use for language identification. Currently, only `fasttext` is available.
-* _lang_id_model_url_ - specifies url that model locates. For fasttext, this will be repo name of the model, like `facebook/fasttext-language-identification`
-* _lang_id_content_column_name_ - specifies name of the column containing documents
+| Key name  | Default  | Description |
+|------------|----------|--------------|
+| _model_credential_ | _unset_ | specifies the credential you use to get model. This will be huggingface token. [Guide to get huggingface token](https://huggingface.co/docs/hub/security-tokens) |
+| _model_kind_ | _unset_ | specifies what kind of model you want to use for language identification. Currently, only `fasttext` is available. |
+| _model_url_ | _unset_ |  specifies url that model locates. For fasttext, this will be repo nme of the model, like `facebook/fasttext-language-identification` |
+| _content_column_name_ | `contents` | specifies name of the column containing documents |
+| _output_lang_column_name_ | `lang` | specifies name of the output column to hold predicted language code |
+| _output_score_column_name_ | `score` | specifies name of the output column to hold score of prediction |
 
 ## Running
 
@@ -28,6 +32,8 @@ the [python launcher](../../../../data-processing-lib/doc/python-launcher-option
   --lang_id_model_kind LANG_ID_MODEL_KIND   what kind of model you want to use for language identification. Currently, only `fasttext` is available.
   --lang_id_model_url LANG_ID_MODEL_URL   url that model locates. For fasttext, this will be repo name of the model, like `facebook/fasttext-language-identification`
   --lang_id_content_column_name LANG_ID_CONTENT_COLUMN_NAME   A name of the column containing documents
+  --lang_id_output_lang_column_name LANG_ID_OUTPUT_LANG_COLUMN_NAME   Column name to store identified language
+  --lang_id_output_score_column_name LANG_ID_OUTPUT_SCORE_COLUMN_NAME   Column name to store the score of language identification
 ```
 These correspond to the configuration keys described above.
 

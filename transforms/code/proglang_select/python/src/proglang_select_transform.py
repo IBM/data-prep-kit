@@ -48,9 +48,6 @@ class ProgLangSelectTransform(AbstractTableTransform):
         """
 
         super().__init__(config)
-        from data_processing.utils import get_logger
-
-        self.logger = get_logger(__name__)
         self.lang_column = config.get(lang_lang_column_key, "")
         self.output_column = config.get(lang_output_column_key, lang_default_output_column)
         # languages_include_ref = config.get(lang_allowed_languages, None)
