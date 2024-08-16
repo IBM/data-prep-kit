@@ -19,7 +19,7 @@ from data_processing.test_support.launch.transform_test import (
 from ededup_transform_python import EdedupPythonTransformPuntimeConfiguration
 
 
-class TestRayEdedupTransform(AbstractTransformLauncherTest):
+class TestPythonEdedupTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.

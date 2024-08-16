@@ -12,16 +12,7 @@ This is a python version of ededup
 
 ## Configuration and command line Options
 
-The set of dictionary keys holding [EdedupPythonTransform](src/ededup_transform_python.py) 
-configuration for values are as follows:
-
-* _doc_column_ - specifies the name of the column containing a document
-* _doc_id_column_ - specifies the name of the column containing a document id
-* _use_snapshot_ - specifies that ededup execution starts from a set of already seen hashes. This can be used
-  for the incremental ededup execution
-* _snapshot_directory_ - specifies a directory from which snapshots are read. If this is not specified, a default
-
-the `transform()` method of `EdedupPythonTransform` filters out duplicate documents. 
+See [common](../README.md) ededup parameters
 
 ## Running
 

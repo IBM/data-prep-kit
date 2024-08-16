@@ -42,7 +42,7 @@ class EdedupPythonTransform(EdedupTransformBase):
             doc_column - name of the doc column
         """
         super().__init__(config)
-        self.filter = config.get("filter", None)
+        self.filter = config.get("filter", HashFilter({}))
         if self.filter is None:
             raise UnrecoverableException("filter is not provided")
 
