@@ -29,4 +29,3 @@ class SnapshotUtils:
         if not output_folder.endswith("/"):
             output_folder += "/"
         return f"{output_folder}snapshot/"
-

@@ -10,9 +10,9 @@
 # limitations under the License.
 ################################################################################
 
+import pickle
 from argparse import ArgumentParser, Namespace
 from typing import Any
-import pickle
 
 import ray
 from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
@@ -95,6 +95,7 @@ class EdedupRayRuntime(DefaultRayTransformRuntime):
             num_hashes - number of hashes
         """
         from data_processing.utils import get_logger
+
         super().__init__(params)
         self.filters = []
         self.logger = get_logger(__name__)
@@ -113,8 +114,11 @@ class EdedupRayRuntime(DefaultRayTransformRuntime):
         n_filters = self.params.get("num_hashes", 1)
         self.filters = [None] * n_filters
         for i in range(n_filters):
-            self.filters[i] = (ray.remote(HashFilter).options(num_cpus=self.params.get("hash_cpu", 0.5))
-                               .remote({"id": i, "data_access_factory": data_access_factory}))
+            self.filters[i] = (
+                ray.remote(HashFilter)
+                .options(num_cpus=self.params.get("hash_cpu", 0.5))
+                .remote({"id": i, "data_access_factory": data_access_factory})
+            )
         if self.params.get("use_snapshot", False):
             # we are using snapshots. Note here that the amount of files might be different
             # from the current amount of hashes
@@ -184,7 +188,7 @@ class EdedupRayRuntime(DefaultRayTransformRuntime):
         return {"number of hashes": sum_hash, "hash memory, GB": sum_hash_mem, "de duplication %": dedup_prst} | stats
 
 
-class EdedupTransformConfiguration(EdedupTransformConfigurationBase):
+class EdedupRayTransformConfiguration(EdedupTransformConfigurationBase):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -214,14 +218,11 @@ class EdedupTransformConfiguration(EdedupTransformConfigurationBase):
         return True
 
 
-class EdedupRayTransformConfiguration(RayTransformRuntimeConfiguration):
+class EdedupRayTransformRuntimeConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(
-            transform_config=EdedupTransformConfiguration(),
-            runtime_class=EdedupRayRuntime
-        )
+        super().__init__(transform_config=EdedupRayTransformConfiguration(), runtime_class=EdedupRayRuntime)
 
 
 if __name__ == "__main__":
-    launcher = RayTransformLauncher(EdedupRayTransformConfiguration())
+    launcher = RayTransformLauncher(EdedupRayTransformRuntimeConfiguration())
     launcher.launch()

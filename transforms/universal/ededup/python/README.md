@@ -31,9 +31,9 @@ the options provided by
 the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 ```
   --ededup_doc_column EDEDUP_DOC_COLUMN
-                        key for accessing data
+                        name of the column containing document
   --ededup_doc_id_column EDEDUP_DOC_ID_COLUMN
-                        key for accessing doc id
+                        name of the column containing document id
   --ededup_use_snapshot EDEDUP_USE_SNAPSHOT
                         flag to continue from snapshot
   --ededup_snapshot_directory EDEDUP_SNAPSHOT_DIRECTORY

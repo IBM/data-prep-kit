@@ -15,11 +15,11 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from ededup_transform_ray import EdedupRayTransformConfiguration
+from ededup_transform_ray import EdedupRayTransformRuntimeConfiguration
 
 
 # create launcher
-launcher = RayTransformLauncher(EdedupRayTransformConfiguration())
+launcher = RayTransformLauncher(EdedupRayTransformRuntimeConfiguration())
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))

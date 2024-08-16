@@ -16,7 +16,7 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from ededup_transform_ray import EdedupRayTransformConfiguration
+from ededup_transform_ray import EdedupRayTransformRuntimeConfiguration
 
 
 class TestRayEdedupTransform(AbstractTransformLauncherTest):
@@ -38,6 +38,6 @@ class TestRayEdedupTransform(AbstractTransformLauncherTest):
             "ededup_use_snapshot": True,
             "ededup_snapshot_directory": basedir + "/input/snapshot",
         }
-        launcher = RayTransformLauncher(EdedupRayTransformConfiguration())
+        launcher = RayTransformLauncher(EdedupRayTransformRuntimeConfiguration())
         fixtures = [(launcher, config, basedir + "/input", basedir + "/incremental")]
         return fixtures

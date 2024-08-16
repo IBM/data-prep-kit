@@ -8,5 +8,5 @@ the following runtimes are available:
   in a Python runtime
 * [ray](ray/README.md) - enables running of the base python transformation
 in a Ray runtime
-* [kfp](kfp_ray/README.md) - enables running ray docker image 
+* [kfp](kfp_ray/README.md) - enables running the ray docker image 
 in a kubernetes cluster using a generated `yaml` file.

@@ -9,21 +9,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+from argparse import Namespace
 from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
-from data_processing.transform import TransformStatistics
-from data_processing.utils import (
-    UnrecoverableException,
-    get_logger
-)
-
 from data_processing.runtime.pure_python import (
+    DefaultPythonTransformRuntime,
     PythonTransformLauncher,
     PythonTransformRuntimeConfiguration,
-    DefaultPythonTransformRuntime,
 )
-
+from data_processing.transform import TransformStatistics
+from data_processing.utils import UnrecoverableException, get_logger
 from ededup_transform_base import (
     EdedupTransformBase,
     EdedupTransformConfigurationBase,
@@ -32,6 +28,7 @@ from ededup_transform_base import (
 
 
 logger = get_logger(__name__)
+
 
 class EdedupPythonTransform(EdedupTransformBase):
     """
@@ -66,12 +63,13 @@ class EdedupPythonRuntime(DefaultPythonTransformRuntime):
     """
     Exact dedup runtime support
     """
+
     def __init__(self, params: dict[str, Any]):
         super().__init__(params=params)
         self.filter = None
 
     def get_transform_config(
-            self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics, files: list[str]
+        self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics, files: list[str]
     ) -> dict[str, Any]:
         """
         Get the dictionary of configuration that will be provided to the transform's initializer.
@@ -87,7 +85,10 @@ class EdedupPythonRuntime(DefaultPythonTransformRuntime):
         if self.params.get("use_snapshot", False):
             snapshot_path = self.params.get("snapshot_directory", None)
             if snapshot_path is None or len(snapshot_path) == 0:
-                snapshot_path = f"{SnapshotUtils.get_snapshot_folder(data_access_factory.create_data_access())}hash_collector_1"
+                snapshot_path = (
+                    f"{SnapshotUtils.get_snapshot_folder(data_access_factory.create_data_access())}"
+                    f"hash_collector_1"
+                )
             else:
                 snapshot_path = f"{snapshot_path}/hash_collector_1"
             logger.info(f"continuing from the hash snapshot {snapshot_path}")
@@ -113,15 +114,33 @@ class EdedupPythonRuntime(DefaultPythonTransformRuntime):
         self.filter.snapshot()
 
 
+class EdedupPythonTransformConfiguration(EdedupTransformConfigurationBase):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
 
-class EdedupPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
+    def __init__(self):
+        super().__init__(transform_class=EdedupPythonTransform)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        if args.runtime_num_processors > 0:
+            self.logger.info(
+                f"ededup does not support multiprocessing. Runtime_num_processors should be 0, "
+                f"current {args.runtime_num_processors}"
+            )
+            return False
+        return super().apply_input_params(args=args)
+
+
+class EdedupPythonTransformPuntimeConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(
-            transform_config=EdedupTransformConfigurationBase(transform_class=EdedupPythonTransform),
+            transform_config=EdedupPythonTransformConfiguration(),
             runtime_class=EdedupPythonRuntime,
         )
 
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(EdedupPythonTransformConfiguration())
+    launcher = PythonTransformLauncher(EdedupPythonTransformPuntimeConfiguration())
     launcher.launch()

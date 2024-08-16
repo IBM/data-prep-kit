@@ -23,9 +23,9 @@ class AbstractTransformFileProcessor:
     """
 
     def __init__(
-            self,
-            data_access_factory: DataAccessFactoryBase,
-            transform_parameters: dict[str, Any],
+        self,
+        data_access_factory: DataAccessFactoryBase,
+        transform_parameters: dict[str, Any],
     ):
         """
         Init method

@@ -69,15 +69,15 @@ When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to
 [the options provided by the launcher](../../../../data-processing-lib/doc/ray-launcher-options.md).
 
-```shell
+```
   --ededup_hash_cpu EDEDUP_HASH_CPU
                         number of CPUs per hash
   --ededup_num_hashes EDEDUP_NUM_HASHES
                         number of hash actors to use
   --ededup_doc_column EDEDUP_DOC_COLUMN
-                        key for accessing data
+                        name of the column containing document
   --ededup_doc_id_column EDEDUP_DOC_ID_COLUMN
-                        key for accessing doc id
+                        name of the column containing document id
   --ededup_use_snapshot EDEDUP_USE_SNAPSHOT
                         flag to continue from snapshot
   --ededup_snapshot_directory EDEDUP_SNAPSHOT_DIRECTORY

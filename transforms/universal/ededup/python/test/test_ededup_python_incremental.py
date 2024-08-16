@@ -16,8 +16,7 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-
-from ededup_transform_python import EdedupPythonTransformConfiguration
+from ededup_transform_python import EdedupPythonTransformPuntimeConfiguration
 
 
 class TestRayResizeTransform(AbstractTransformLauncherTest):
@@ -29,7 +28,11 @@ class TestRayResizeTransform(AbstractTransformLauncherTest):
     def get_test_transform_fixtures(self) -> list[tuple]:
         # The following based on 3 identical input files of about 39kbytes, and 200 rows
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
-        launcher = PythonTransformLauncher(EdedupPythonTransformConfiguration())
-        config = {"ededup_doc_column": "contents", "ededup_doc_id_column": "document_id", "ededup_use_snapshot": True,
-                  "ededup_snapshot_directory": basedir + "/input/snapshot"}
+        launcher = PythonTransformLauncher(EdedupPythonTransformPuntimeConfiguration())
+        config = {
+            "ededup_doc_column": "contents",
+            "ededup_doc_id_column": "document_id",
+            "ededup_use_snapshot": True,
+            "ededup_snapshot_directory": basedir + "/input/snapshot",
+        }
         return [(launcher, config, basedir + "/input", basedir + "/incremental")]

@@ -10,15 +10,15 @@
 # limitations under the License.
 ################################################################################
 
+import pickle
 import time
 from typing import Any, Iterator, Union
 
 import numpy as np
 import ray
-from data_processing.utils import GB, RANDOM_SEED, TransformUtils, get_logger
 from data_processing.data_access import SnapshotUtils
+from data_processing.utils import GB, RANDOM_SEED, TransformUtils, get_logger
 from data_processing_ray.runtime.ray import RayUtils
-import pickle
 from ray.actor import ActorHandle
 from ray.util import ActorPool
 from scipy.integrate import quad as integrate
@@ -259,7 +259,8 @@ class DocsMinHash:
         try:
             b_doc = pickle.dumps(self.docs)
             self.data_access.save_file(
-                f"{SnapshotUtils.get_snapshot_folder(self.data_access)}minhash/minhash_collector_{self.actor_id}", b_doc
+                f"{SnapshotUtils.get_snapshot_folder(self.data_access)}minhash/minhash_collector_{self.actor_id}",
+                b_doc,
             )
         except Exception as e:
             self.logger.warning(f"Failed to snapshot minhash collector {self.actor_id} with exception {e}")
@@ -387,7 +388,8 @@ class BucketsHash:
         try:
             b_buckets = pickle.dumps(self.buckets)
             self.data_access.save_file(
-                f"{SnapshotUtils.get_snapshot_folder(self.data_access)}buckets/buckets_collector_{self.actor_id}", b_buckets
+                f"{SnapshotUtils.get_snapshot_folder(self.data_access)}buckets/buckets_collector_{self.actor_id}",
+                b_buckets,
             )
         except Exception as e:
             self.logger.warning(f"Failed to snapshot buckets collector {self.actor_id} with exception {e}")

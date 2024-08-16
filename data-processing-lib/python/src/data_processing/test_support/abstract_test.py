@@ -16,8 +16,8 @@ from abc import abstractmethod
 from filecmp import dircmp
 
 import pyarrow as pa
-from data_processing.utils import TransformUtils, get_logger
 from data_processing.data_access import DataAccessLocal
+from data_processing.utils import TransformUtils, get_logger
 
 
 logger = get_logger(__name__)

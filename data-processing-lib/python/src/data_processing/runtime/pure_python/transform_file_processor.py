@@ -57,10 +57,10 @@ class PythonPoolTransformFileProcessor(AbstractTransformFileProcessor):
     """
 
     def __init__(
-            self,
-            data_access_factory: DataAccessFactoryBase,
-            transform_params: dict[str, Any],
-            transform_class: type[AbstractBinaryTransform],
+        self,
+        data_access_factory: DataAccessFactoryBase,
+        transform_params: dict[str, Any],
+        transform_class: type[AbstractBinaryTransform],
     ):
         """
         Init method

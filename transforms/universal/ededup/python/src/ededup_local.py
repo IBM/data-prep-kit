@@ -12,9 +12,9 @@
 
 import os
 
+from data_processing.data_access import DataAccessLocal
 from ededup_transform_base import HashFilter
 from ededup_transform_python import EdedupPythonTransform
-from data_processing.data_access import DataAccessLocal
 
 
 # create parameters

@@ -10,11 +10,12 @@
 # limitations under the License.
 ################################################################################
 
+import pickle
 from argparse import ArgumentParser, Namespace
 from typing import Any
-import pickle
 
 import pyarrow as pa
+from data_processing.data_access import SnapshotUtils
 from data_processing.transform import (
     AbstractTableTransform,
     TransformConfiguration,
@@ -24,10 +25,9 @@ from data_processing.utils import (
     CLIArgumentProvider,
     TransformUtils,
     UnrecoverableException,
+    get_logger,
     str2bool,
-    get_logger
 )
-from data_processing.data_access import SnapshotUtils
 
 
 REQUEST_LEN = 8192
@@ -207,11 +207,17 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
         """
         Add Transform-specific arguments to the given  parser.
         """
-        parser.add_argument(f"--{cli_prefix}doc_column", type=str, default="contents", help="key for accessing data")
+        parser.add_argument(
+            f"--{cli_prefix}doc_column",
+            type=str,
+            default="contents",
+            help="name of the column containing document")
         parser.add_argument(
             f"--{cli_prefix}doc_id_column",
-            type=str, default="document_id",
-            help="key for accessing doc id")
+            type=str,
+            default="document_id",
+            help="name of the column containing document id"
+        )
         parser.add_argument(
             f"--{cli_prefix}use_snapshot",
             type=lambda x: bool(str2bool(x)),
@@ -221,10 +227,8 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
         # by default, snapshot file is from the output directory. This parameter can overwrite
         # default location by explicitly defining the snapshot directory
         parser.add_argument(
-            f"--{cli_prefix}snapshot_directory",
-            type=str,
-            default=None,
-            help="location of snapshot files")
+            f"--{cli_prefix}snapshot_directory", type=str, default=None, help="location of snapshot files"
+        )
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
