@@ -62,7 +62,7 @@ Data modalities supported:
 Support for additional data modalities is expected in the future and additional data formats are welcome!
 
 ## Data Preparation Modules <a name = "modules"></a>
-The below matrix shows the the combination of modules and supported runtimes. All the modules can be accessed [here](transforms) and can be combined to form data processing pipelines, as shown in [examples](examples) folder. The modules are under three major categories: 1) Universal (apply to both code and language) 2) Language-only and 3) Code-only. We start with a set of modules for ingestion of various data formats.  
+Matrix below shows the the combination of modules and supported runtimes. All the modules can be accessed [here](transforms) and can be combined to form data processing pipelines, as shown in the [examples](examples) folder. The modules are under three major categories: 1) Universal (apply to both code and language) 2) Language-only and 3) Code-only. We start with a set of modules for ingestion of various data formats.  
 
 
 | Modules                          | Python-only        | Ray              | Spark            | KFP on Ray             |
@@ -79,7 +79,7 @@ The below matrix shows the the combination of modules and supported runtimes. Al
 | [Profiler](transforms/universal/profiler/ray/README.md)                        |                    |:white_check_mark:|                  |:white_check_mark:      |
 | [Resize](transforms/universal/resize/python/README.md)                           | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | [Tokenizer](transforms/universal/tokenization/python/README.md)                        | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [No-op / template](transforms/universal/noop/python/README.md)                 | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check-mark:      |
+| [No-op / template](transforms/universal/noop/python/README.md)                 | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 | **Language-only**                |                    |                  |                  |                        |
 | [Language identification](transforms/language/lang_id/python/README.md)          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | [Document quality](transforms/language/doc_quality/python/README.md)                 | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
