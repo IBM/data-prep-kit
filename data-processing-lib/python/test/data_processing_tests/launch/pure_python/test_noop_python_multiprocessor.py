@@ -16,8 +16,7 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from noop_transform import sleep_cli_param
-from noop_transform_python import NOOPPythonTransformConfiguration
+from data_processing.test_support.transform import NOOPPythonTransformConfiguration
 
 
 class TestPythonNOOPTransform(AbstractTransformLauncherTest):
@@ -27,12 +26,12 @@ class TestPythonNOOPTransform(AbstractTransformLauncherTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        basedir = "../test-data"
+        basedir = "../../../../test-data/data_processing/python/noop/"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         fixtures = []
         launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
         fixtures.append((
             launcher,
-            {sleep_cli_param: 0, "runtime_num_processors": 2},
+            {"noop_sleep_sec": 0, "runtime_num_processors": 2},
             basedir + "/input", basedir + "/expected"))
         return fixtures
