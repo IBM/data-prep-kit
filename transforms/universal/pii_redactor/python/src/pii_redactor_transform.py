@@ -13,16 +13,19 @@ from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logge
 from pii_analyzer import PIIAnalyzerEngine
 from pii_anonymizer import PIIAnonymizer
 
+
 short_name = "pii_redactor"
 cli_prefix = short_name + "_"
 supported_entities_key = "entities"
 redaction_operator_key = "operator"
-doc_contents_key = "contents"
+doc_transformed_contents_key = "transformed_contents"
 score_threshold_key = "score_threshold"
+pii_contents_column = "contents"
+
 
 supported_entities_cli_param = f"{cli_prefix}{supported_entities_key}"
 redaction_operator_cli_param = f"{cli_prefix}{redaction_operator_key}"
-doc_contents_cli_param = f"{cli_prefix}{doc_contents_key}"
+doc_transformed_contents_cli_param = f"{cli_prefix}{doc_transformed_contents_key}"
 score_threshold_cli_param = f"{cli_prefix}{score_threshold_key}"
 
 default_score_threshold_key = 0.6
@@ -50,11 +53,12 @@ class PIIRedactorTransform(AbstractTableTransform):
         self.log = get_logger(__name__)
         self.supported_entities = config.get(supported_entities_key, default_supported_entities)
         self.redaction_operator = config.get(redaction_operator_key, default_anonymizer_operator)
-        self.doc_contents_key = config.get(doc_contents_key, doc_contents_key)
+        self.doc_contents_key = config.get(doc_transformed_contents_key)
         score_threshold_value = config.get(score_threshold_key, default_score_threshold_key)
 
-        self.analyzer = PIIAnalyzerEngine(supported_entities=self.supported_entities,
-                                          score_threshold=score_threshold_value)
+        self.analyzer = PIIAnalyzerEngine(
+            supported_entities=self.supported_entities, score_threshold=score_threshold_value
+        )
         self.anonymizer = PIIAnonymizer(operator=self.redaction_operator.lower())
 
     def _analyze_pii(self, text: str):
@@ -76,11 +80,12 @@ class PIIRedactorTransform(AbstractTableTransform):
         :return: A new Arrow table with the transformed column.
         """
 
-        TransformUtils.validate_columns(table=table, required=[self.doc_contents_key])
+        TransformUtils.validate_columns(table=table, required=[pii_contents_column])
         metadata = {"original_table_rows": table.num_rows, "original_column_count": len(table.column_names)}
 
-        redacted_texts, entity_types_list = zip(*table[self.doc_contents_key].to_pandas().apply(self._redact_pii))
-        table = table.add_column(0, "new_contents", [redacted_texts])
+        # column_data, entity_types = pa.array(table[self.doc_contents_key].to_pandas().apply(self._redact_pii))
+        redacted_texts, entity_types_list = zip(*table[pii_contents_column].to_pandas().apply(self._redact_pii))
+        table = table.add_column(0, self.doc_contents_key, [redacted_texts])
         table = table.add_column(0, "detected_pii", [entity_types_list])
         metadata["transformed_table_rows"] = table.num_rows
         metadata["transformed_column_count"] = len(table.column_names)
@@ -107,7 +112,7 @@ class PIIRedactorTransformConfiguration(TransformConfiguration):
             required=False,
             default=ast.literal_eval("[]"),
             help=f"List of entities to be redacted from the input data: {json.dumps(default_supported_entities, indent=2, default=str)}. "
-                 f"To know more about entities refer https://microsoft.github.io/presidio/supported_entities/",
+            f"To know more about entities refer https://microsoft.github.io/presidio/supported_entities/",
         )
         parser.add_argument(
             f"--{redaction_operator_cli_param}",
@@ -118,11 +123,11 @@ class PIIRedactorTransformConfiguration(TransformConfiguration):
         )
 
         parser.add_argument(
-            f"--{doc_contents_cli_param}",
+            f"--{doc_transformed_contents_cli_param}",
             type=str,
             required=True,
-            default="contents",
-            help="Mention the column name which needs to be transformed for pii",
+            default="new_contents",
+            help="Mention column name in which transformed contents will be added",
         )
 
         parser.add_argument(
@@ -131,8 +136,8 @@ class PIIRedactorTransformConfiguration(TransformConfiguration):
             required=False,
             default=0.6,
             help="The score_threshold is a parameter that "
-                 "sets the minimum confidence score required for an entity to be considered a match."
-                 "Provide a value above 0.6"
+            "sets the minimum confidence score required for an entity to be considered a match."
+            "Provide a value above 0.6",
         )
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:

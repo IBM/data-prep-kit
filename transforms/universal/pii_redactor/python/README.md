@@ -29,7 +29,7 @@ You can choose the redaction technique by passing it as an argument parameter (*
 
 ### Input
 
-The input data should be a `py.Table` with a column containing the text where PII detection and redaction will be applied. By default, this column is named `contents`, but this can be configured.
+The input data should be a `py.Table` with a column containing the text where PII detection and redaction will be applied. By default, this column is named `contents`.
 
 **Example Input Table Structure:** Table 1: Sample input to the pii redactor transform
 
@@ -41,24 +41,24 @@ The input data should be a `py.Table` with a column containing the text where PI
 
 ### Output
 
-The output table will include the original columns plus an additional column `new_contents` with redacted text and `detected_pii` 
+The output table will include the original columns plus an additional column `new_contents` which is configurable with redacted text and `detected_pii` 
 column consisting the type of PII entities detected in that document for replace operator.
 
 **Example Output Table Structure for replace operator:**
 
-| contents            | doc_id | new_contents             | detected_pii       |
-|---------------------|--------|--------------------------|--------------------|
-| My name is John Doe | doc001 | My name is `<PERSON>`    | `[<PERSON>]`       |
-| I work at apple     | doc002 | I work at `<ORGANIZATION>` | `[<ORGANIZATION>]` |
+| contents            | doc_id | new_contents             | detected_pii     |
+|---------------------|--------|--------------------------|------------------|
+| My name is John Doe | doc001 | My name is `<PERSON>`    | `[PERSON]`       |
+| I work at apple     | doc002 | I work at `<ORGANIZATION>` | `[ORGANIZATION]` |
 
 When `redact` operator is chosen the output will look like below
  
 **Example Output Table Structure for redact operator**
 
-| contents            | doc_id | new_contents             | detected_pii       |
-|---------------------|--------|--------------------------|--------------------|
-| My name is John Doe | doc001 | My name is  | `[<PERSON>]`       |
-| I work at apple     | doc002 | I work at | `[<ORGANIZATION>]` |
+| contents            | doc_id | new_contents             | detected_pii     |
+|---------------------|--------|--------------------------|------------------|
+| My name is John Doe | doc001 | My name is  | `[PERSON]`       |
+| I work at apple     | doc002 | I work at | `[ORGANIZATION]` |
 
 ## Running
 
@@ -72,8 +72,8 @@ the [python launcher](../../../../data-processing-lib/doc/python-launcher-option
                         list of PII entities to be captured for example: ["PERSON", "EMAIL"]
   --pii_redactor_operator REDACTOR_OPERATOR
                         Two redaction techniques are supported - replace(default), redact 
-  --pii_redactor_contents PII_CONTENT_COLUMN_NAME
-                        mention the column name for which pii redaction transform has to be applied
+  --pii_redactor_transformed_contents PII_TRANSFORMED_CONTENT_COLUMN_NAME
+                        Mention the column name in which transformed contents will be added. This is required argument. 
   --pii_redactor_score_threshold SCORE_THRESHOLD
                         The score_threshold is a parameter that sets the minimum confidence score required for an entity to be considered a match.
                         Provide a value above 0.6

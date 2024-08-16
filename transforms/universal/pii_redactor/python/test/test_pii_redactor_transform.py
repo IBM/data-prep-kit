@@ -1,37 +1,8 @@
-import pyarrow as pa
 from data_processing.test_support.transform.table_transform_test import (
     AbstractTableTransformTest,
 )
-from pii_redactor_transform import PIIRedactorTransform, doc_contents_key
-
-
-table = pa.Table.from_pydict(
-    {
-        "contents": pa.array(
-            [
-                "My name is Tom chandler. Captain of the ship",
-                "I work at Apple " "and I like to " "eat apples",
-                "My email is tom@chadler.com and dob is 31.05.1987",
-            ]
-        ),
-        "doc_id": pa.array(["doc1", "doc2", "doc3"]),
-    }
-)
-expected_table = table.add_column(
-    0,
-    "new_contents",
-    [
-        [
-            "My name is <PERSON>. Captain of the ship",
-            "I work at <ORGANIZATION> and I like to eat apples",
-            "My email is <EMAIL_ADDRESS> and dob is <DATE_TIME>",
-        ]
-    ],
-)  # We're a noop after all.
-expected_metadata_list = [
-    {"original_table_rows": 3, "original_column_count": 2, "transformed_table_rows": 3, "transformed_column_count": 3},
-    {},
-]  # transform() result  # flush() result
+from pii_redactor_transform import PIIRedactorTransform, doc_transformed_contents_key
+from test_data import expected_metadata_list, expected_table, table
 
 
 class TestPIIRedactTransform(AbstractTableTransformTest):
@@ -43,7 +14,7 @@ class TestPIIRedactTransform(AbstractTableTransformTest):
     def get_test_transform_fixtures(self) -> list[tuple]:
         fixtures = [
             (
-                PIIRedactorTransform({doc_contents_key: doc_contents_key}),
+                PIIRedactorTransform({doc_transformed_contents_key: doc_transformed_contents_key}),
                 [table],
                 [expected_table],
                 expected_metadata_list,

@@ -15,7 +15,7 @@ import os
 from data_processing.data_access import DataAccessLocal
 from pii_redactor_transform import (
     PIIRedactorTransform,
-    doc_contents_key,
+    doc_transformed_contents_key,
     supported_entities_key,
 )
 
@@ -23,7 +23,7 @@ from pii_redactor_transform import (
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 
-pii_config = {supported_entities_key: ["PERSON"], doc_contents_key: "contents"}
+pii_config = {supported_entities_key: ["PERSON"], doc_transformed_contents_key: "new_contents"}
 if __name__ == "__main__":
     # Here we show how to run outside of the runtime
     # Create and configure the transform.
@@ -31,8 +31,7 @@ if __name__ == "__main__":
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
     table = data_access.get_table(os.path.join(input_folder, "pii_test_data.parquet"))[0]
-    print(f"input table: {table}")
+
     # Transform the table
     table_list, metadata = transform.transform(table)
-    print(f"\noutput table: {table_list}")
-    print(f"output metadata : {metadata}")
+

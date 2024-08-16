@@ -15,7 +15,7 @@ import sys
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
-from pii_redactor_transform import doc_contents_cli_param
+from pii_redactor_transform import doc_transformed_contents_cli_param
 from pii_redactor_transform_python import PIIRedactorPythonTransformConfiguration
 
 
@@ -27,7 +27,7 @@ local_conf = {
     "output_folder": output_folder,
 }
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
-params = {doc_contents_cli_param: "contents"}
+params = {doc_transformed_contents_cli_param: "contents"}
 if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)
