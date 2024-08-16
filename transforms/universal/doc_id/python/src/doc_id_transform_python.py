@@ -10,25 +10,23 @@
 # limitations under the License.
 ################################################################################
 
-from argparse import ArgumentParser, Namespace
+from argparse import Namespace
 from typing import Any
 
-import pyarrow as pa
-import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.runtime.pure_python.runtime_configuration import (
+from data_processing.transform import TransformStatistics
+from data_processing.runtime.pure_python import (
+    DefaultPythonTransformRuntime,
     PythonTransformRuntimeConfiguration,
+    PythonTransformLauncher
 )
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import CLIArgumentProvider, TransformUtils
-from data_processing_ray.runtime.ray import (
-    DefaultRayTransformRuntime,
-    RayTransformLauncher,
+from doc_id_transform_base import (
+    IDGenerator,
+    DocIDTransformBase,
+    DocIDTransformConfigurationBase,
+    start_id_key,
+    id_generator_key
 )
-from data_processing_ray.runtime.ray.runtime_configuration import (
-    RayTransformRuntimeConfiguration,
-)
-from doc_id_transform_base import IDGenerator, DocIDTransformBase, DocIDTransformConfigurationBase
 
 
 class DocIDPythonTransform(DocIDTransformBase):
@@ -45,14 +43,17 @@ class DocIDPythonTransform(DocIDTransformBase):
 
     def get_starting_id(self, n_rows: int) -> int:
         """
-        Get starting Id
+        Get starting ID
         :param n_rows - number of rows in the table
         :return: starting id for the table
         """
-        self.id_generator.get_ids(n_rows=n_rows)
+        return self.id_generator.get_ids(n_rows=n_rows)
 
 
-class DocIDPythonTransformConfiguration(TransformConfiguration):
+class DocIDPythonTransformConfiguration(DocIDTransformConfigurationBase):
+
+    def __init__(self):
+        super().__init__(transform_class=DocIDPythonTransform)
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -60,12 +61,59 @@ class DocIDPythonTransformConfiguration(TransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
-        if captured.get(hash_column_name_key) is None and captured.get(int_column_name_key) is None:
-            self.logger.info("One of hash or int id column names must be specified.")
+        if args.runtime_num_processors > 0:
+            self.logger.info(
+                f"doc_id does not support multiprocessing. Runtime_num_processors should be 0, "
+                f"current {args.runtime_num_processors}"
+            )
             return False
+        return super().apply_input_params(args=args)
 
-        self.params = self.params | captured
-        self.logger.info(f"Doc id parameters are : {self.params}")
-        return True
 
+class DocIDPythonRuntime(DefaultPythonTransformRuntime):
+    """
+    Exact dedup runtime support
+    """
+
+    def __init__(self, params: dict[str, Any]):
+        super().__init__(params=params)
+        self.id_generator = None
+
+    def get_transform_config(
+            self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics, files: list[str]
+    ) -> dict[str, Any]:
+        """
+        Get the dictionary of configuration that will be provided to the transform's initializer.
+        This is the opportunity for this runtime to create a new set of configuration based on the
+        config/params provided to this instance's initializer.  This may include the addition
+        of new configuration data such as ray shared memory, new actors, etc., that might be needed and
+        expected by the transform in its initializer and/or transform() methods.
+        :param data_access_factory - data access factory class being used by the RayOrchestrator.
+        :param statistics - reference to statistics actor
+        :param files - list of files to process
+        :return: dictionary of transform init params
+        """
+        self.id_generator = IDGenerator(self.params.get(start_id_key, 1))
+        return self.params | {id_generator_key: self.id_generator}
+
+    def compute_execution_stats(self, stats: TransformStatistics) -> None:
+        """
+        Update/augment the given statistics object with runtime-specific additions/modifications.
+        :param stats: output of statistics as aggregated across all calls to all transforms.
+        :return: job execution statistics.  These are generally reported as metadata by the Ray Orchestrator.
+        """
+        # compute and add additional statistics
+        stats.add_stats({"final id": self.id_generator.get_current})
+
+
+class DocIDPythonTransformRuntimeConfiguration(PythonTransformRuntimeConfiguration):
+    def __init__(self):
+        super().__init__(
+            transform_config=DocIDPythonTransformConfiguration(),
+            runtime_class=DocIDPythonRuntime,
+        )
+
+
+if __name__ == "__main__":
+    launcher = PythonTransformLauncher(DocIDPythonTransformRuntimeConfiguration())
+    launcher.launch()
