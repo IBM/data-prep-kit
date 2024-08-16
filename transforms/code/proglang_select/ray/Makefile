@@ -32,7 +32,7 @@ publish-image:: .transforms.publish-image-ray
 set-versions:
 	$(MAKE) TRANSFORM_PYTHON_VERSION=$(PROGLANG_SELECT_PYTHON_VERSION) TOML_VERSION=$(PROGLANG_SELECT_RAY_VERSION) .transforms.set-versions
         
-build-dist:: set-versions .defaults.build-dist 
+build-dist:: .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 

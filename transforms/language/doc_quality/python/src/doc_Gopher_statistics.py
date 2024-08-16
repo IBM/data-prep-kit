@@ -25,7 +25,7 @@ hirakata_pat = re.compile(r"[ぁ-んァ-ン]")  # pattern for Japanese alphabets
 kuten_pat = re.compile(r"。")
 
 
-def compute_word_statistics(text: str, symbols: list = ["#", "..."]) -> tuple[int, int, int]:
+def compute_word_statistics(text: str, symbols: list = ["#", "..."]) -> tuple[int, int, float]:
     """
     Given a text document:
         - Count the total number of words (should be between 50 and 100,000 words)
@@ -49,7 +49,9 @@ def compute_word_statistics(text: str, symbols: list = ["#", "..."]) -> tuple[in
     return total_words, mean_word_len, symbol_to_word_ratio
 
 
-def compute_bullet_point_ellipsis_alphabet_word_ratio(text: str, bullets: list = ["-", "*"]) -> tuple[int, int, int]:
+def compute_bullet_point_ellipsis_alphabet_word_ratio(
+    text: str, bullets: list = ["-", "*"]
+) -> tuple[float, float, float]:
     """
     Given a text document:
         - Compute the ratio of lines starting with a bullet point (should be <=90%)

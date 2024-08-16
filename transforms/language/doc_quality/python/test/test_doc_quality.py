@@ -11,13 +11,14 @@
 ################################################################################
 
 import os
+
 import pyarrow as pa
-from data_processing.test_support.transform.table_transform_test import AbstractTableTransformTest
-from data_processing.transform import get_transform_config
-from doc_quality_transform import (
-    DocQualityTransform,
-    DocQualityTransformConfiguration
+from data_processing.test_support.transform.table_transform_test import (
+    AbstractTableTransformTest,
 )
+from data_processing.transform import get_transform_config
+from doc_quality_transform import DocQualityTransform, DocQualityTransformConfiguration
+
 
 class TestDocQualityTransform(AbstractTableTransformTest):
     """
@@ -28,9 +29,12 @@ class TestDocQualityTransform(AbstractTableTransformTest):
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
         cli = [
-            "--docq_text_lang", "en",
-            "--docq_doc_content_column", "contents",
-            "--docq_bad_word_filepath", os.path.join(basedir, "ldnoobw", "en"),
+            "--docq_text_lang",
+            "en",
+            "--docq_doc_content_column",
+            "contents",
+            "--docq_bad_word_filepath",
+            os.path.join(basedir, "ldnoobw", "en"),
         ]
         transformConfig = DocQualityTransformConfiguration()
         config = get_transform_config(transformConfig, cli)

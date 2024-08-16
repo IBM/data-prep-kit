@@ -11,6 +11,8 @@ This is a simple transformer that is resizing the input tables to a specified si
 * resizing based on in-memory size of the tables.
 * resized based on the number of rows in the tables. 
 
+Tables can be either split into smaller sizes or aggregated into larger sizes.
+
 ## Building
 
 A [docker file](Dockerfile) that can be used for building docker image. You can use
@@ -35,10 +37,6 @@ configuration for values are as follows:
 Only one of the _max_rows_per_table_ and _max_mbytes_per_table_ may be used.
 
 ## Running
-
-We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/resize_local_ray.py), [s3](src/resize_s3_ray.py) and [lakehouse](src/resize_lakehouse.py)
-
 
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),

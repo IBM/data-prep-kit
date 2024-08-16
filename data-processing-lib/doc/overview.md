@@ -17,7 +17,7 @@ a simple, easily-implemented interface allowing the definition transforms
 over arbitrary data types.  Support is provided for both
 [files](../python/src/data_processing/transform/binary_transform.py) of arbitrary data as a byte array and 
 [parquet/arrow](../python/src/data_processing/transform/table_transform.py) tables.
-* [TransformConfiguration](../python/src/data_processing/runtime//transform_configuration.py) - defines
+* [TransformConfiguration](../python/src/data_processing/transform/transform_configuration.py) - defines
 the transform short name, its implementation class,  and command line configuration
 parameters.
 
@@ -45,6 +45,7 @@ To learn more consider the following:
 * [Transform Exceptions](transform-exceptions.md)
 * [Transform Runtimes](transform-runtimes.md)
 * [Transform Examples](transform-tutorial-examples.md)
+* [Simplified transform APIs](simplified_transform_apis.md)
 * [Data Access Factory](data-access-factory.md)
 * [Testing Transforms](transform-testing.md)
 * [Utilities](transformer-utilities.md)

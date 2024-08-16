@@ -29,7 +29,7 @@ publish-image:: .transforms.publish-image-spark
 set-versions:
 	$(MAKE) TRANSFORM_PYTHON_VERSION=dummy TOML_VERSION=$(DOC_ID_SPARK_VERSION) .transforms.set-versions
         
-build-dist:: set-versions .defaults.build-dist 
+build-dist:: .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 

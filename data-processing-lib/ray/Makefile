@@ -20,8 +20,7 @@ set-versions: .check-env
 
 build:: build-dist 
 
-#build:: set-versions .defaults.build-dist 
-build-dist :: set-versions .defaults.build-dist 
+build-dist :: .defaults.build-dist 
 
 publish:: publish-dist  
 

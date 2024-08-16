@@ -11,6 +11,7 @@
 ################################################################################
 
 import os
+
 import pyarrow as pa
 from data_processing.data_access.data_access_local import DataAccessLocal
 from data_processing.test_support import get_files_in_folder
@@ -27,9 +28,7 @@ class TestPdf2ParquetTransform(AbstractBinaryTransformTest):
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         dal = DataAccessLocal()
-        basedir = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "../test-data")
-        )
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
         input_dir = os.path.join(basedir, "input")
         input_files = get_files_in_folder(input_dir, ".pdf")
         input_files = [(name, binary) for name, binary in input_files.items()]
@@ -42,8 +41,7 @@ class TestPdf2ParquetTransform(AbstractBinaryTransformTest):
         ]
 
         expected_files = [
-            (dal.get_file(name)[0], TransformUtils.get_file_extension(name)[1])
-            for name in expected_files
+            (dal.get_file(name)[0], TransformUtils.get_file_extension(name)[1]) for name in expected_files
         ]
         return [
             (

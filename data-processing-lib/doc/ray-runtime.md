@@ -12,7 +12,8 @@ class extends transform's base TransformConfiguration implementation to add an o
 * [TransformRuntime](../ray/src/data_processing_ray/runtime/ray/transform_runtime.py) - 
 this provides the ability for the transform implementor to create additional Ray resources 
 and include them in the configuration used to create a transform
-(see, for example, [exact dedup](../../transforms/universal/ededup/ray/src/ededup_transform.py)).
+(see, for example, 
+* [fuzzy dedup](../../transforms/universal/fdedup/ray/src/fdedup_transform_ray.py)
 Many transforms will not need additional resources and can use
 the [DefaultRayTransformRuntime](../ray/src/data_processing_ray/runtime/ray/transform_runtime.py).
 `TransformRuntime` also provide the ability to supplement the statics collected by
@@ -44,18 +45,18 @@ launcher.launch()
 ```
 Note that the launcher defines some additional CLI parameters that are used to control the operation of the 
 [orchestrator and workers](../ray/src/data_processing_ray/runtime/ray/execution_configuration.py) and 
-[data access](../ray/src/data_processing_ray/data_access/data_access_factory.py).  Things such as data access configuration,
+[data access](../python/src/data_processing/data_access/data_access_factory.py).  Things such as data access configuration,
 number of workers, worker resources, etc.
 Discussion of these options is beyond the scope of this document 
-(see [Launcher Options](ray-launcher-options) for a list of available options.)
+(see [Launcher Options](ray-launcher-options.md) for a list of available options.)
 
-## Ray Transform Configuration
+## Transform Configuration
 In general, a transform should be able to run in both the python and Ray runtimes.
 As such we first define the python-only transform configuration, which will then
 be used by the Ray-runtime-specific transform configuration. 
 The python transform configuration implements  
-[TransformConfiguration](../ray/src/data_processing_ray/runtime/runtime_configuration.py)
-and deifnes with transform-specific name, and implementation 
+[TransformConfiguration](../python/src/data_processing/transform/transform_configuration.py)
+and defines with transform-specific name, and implementation 
 and class. In addition, it is responsible for providing transform-specific
 methods to define and capture optional command line arguments.
 ```python
@@ -71,14 +72,14 @@ class YourTransformConfiguration(TransformConfiguration):
     def apply_input_params(self, args: Namespace) -> bool:
         ...
 ```
-Next we define the Ray-runtime specific transform configuration as an exension of
+Next we define the Ray-runtime specific transform configuration as an extension of
 the RayTransformConfiguration and uses the `YourTransformConfiguration` above.
 ```python
     
 class YourTransformConfiguration(RayTransformConfiguration):
     def __init__(self):
         super().__init__(YourTransformConfiguration(),
-                         runtime_class=YourTransformRuntime
+                         runtime_class=YourTransformRuntime)
 ```
 This class provides the ability to create the instance of `YourTransformRuntime` class (see below)
 as needed by the Ray runtime.  Note, that not all transforms will require a `runtime_class`
