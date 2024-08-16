@@ -16,7 +16,6 @@ from typing import Any
 import pyarrow as pa
 from data_processing.transform import (
     AbstractTableTransform,
-    AbstractTransform,
     TransformConfiguration,
 )
 from data_processing.utils import GB, CLIArgumentProvider, TransformUtils
@@ -130,7 +129,7 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
     configuration with CLI args and combining of metadata.
     """
 
-    def __init__(self, transform_class: type[AbstractTransform]):
+    def __init__(self, transform_class: type[AbstractTableTransform]):
         super().__init__(
             name=short_name,
             transform_class=transform_class,
