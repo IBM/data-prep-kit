@@ -21,7 +21,7 @@ It uses the following components, all of which can/do define CLI configuration p
      (e.g., number of workers, memory and cpu, local or remote cluster, etc.). This class has very simple state
      (several dictionaries) and is fully pickleable. As a result framework uses its instance as a
      parameter in remote functions/actors invocation.
-    * [DataAccessFactory](../ray/src/data_processing_ray/data_access/data_access_factory.py) - provides the
+    * [DataAccessFactory](../python/src/data_processing/data_access/data_access_factory.py) - provides the
       configuration for the type of DataAccess to use when reading/writing the input/output data for
       the transforms.  Similar to Transform Orchestrator Configuration, this is a pickleable
       instance that is passed between Launcher, Orchestrator and Workers.
@@ -70,17 +70,17 @@ These statistics are reported as metadata (`metadata.json`) by the orchestrator 
 ## Core Components
 Some of the core components used by the architecture are definfed here:
 
-* [CLIProvider](../ray/src/data_processing_ray/utils/cli_utils.py) - provides a general purpose
+* [CLIProvider](../python/src/data_processing/utils/cli_utils.py) - provides a general purpose
   mechanism for defining, validating and sharing CLI parameters. 
   It is used by the DataAccessFactor and Transform Configuration (below).
 * Data Access is an abstraction layer for different data access supported by the framework. The main components
   of this layer are:
-  * [Data Access](../ray/src/data_processing_ray/data_access/data_access.py) is the basic interface for the data access, and enables the identification of 
+  * [Data Access](../python/src/data_processing/data_access/data_access.py) is the basic interface for the data access, and enables the identification of 
   input files to process, associated output files, checkpointing and general file reading/writing.
     Currently, the framework implements several concrete implementations of the Data Access, including
-    [local data support](../ray/src/data_processing_ray/data_access/data_access_local.py) and
-    [s3](../ray/src/data_processing_ray/data_access/data_access_s3.py). Additional Data Access implementations can be added as required.
-  * [Data Access Factory](../ray/src/data_processing_ray/data_access/data_access_factory.py) is an implementation of the 
+    [local data support](../python/src/data_processing/data_access/data_access_local.py) and
+    [s3](../python/src/data_processing/data_access/data_access_s3.py). Additional Data Access implementations can be added as required.
+  * [Data Access Factory](../python/src/data_processing/data_access/data_access_factory.py) is an implementation of the 
     [factory design pattern](https://www.pentalog.com/blog/design-patterns/factory-method-design-pattern/) for creation
     of the data access instances. Data Access Factory, as a CLIProvider,  enables the definition of CLI 
     parameters that configure the instance of Data Access to be created. Data Access factory has very simple state 
@@ -92,14 +92,11 @@ Some of the core components used by the architecture are definfed here:
 A brief discussion of the Transform components are provided here.
 For a more complete discussion, see the [tutorials](transforms.md).
 
-* [Transform](../ray/src/data_processing_ray/transform/table_transform.py) - defines the methods required
+* [Transform](../python/src/data_processing/transform/table_transform.py) - defines the methods required
 of any transform implementation - `transform()` and `flush()` - and provides the bulk of any transform implementation
 convert one Table to 0 or more new Tables.   In general, this is not tied to the above Ray infrastructure 
 and so can usually be used independent of Ray. 
-* [TransformRuntime ](../ray/src/data_processing_ray/runtime/ray/transform_runtime.py) - this class only needs to be
-extended/implemented when additional Ray components (actors, shared memory objects, etc.) are used
-by the transform. The main method `get_transform_config()` is used to enable these extensions.
-* [TransformConfiguration](../ray/src/data_processing_ray/runtime/ray/transform_runtime.py) - this is the bootstrap
+* [TransformConfiguration](../python/src/data_processing/transform/transform_configuration.py) - this is the bootstrap
   class provided to the Launcher that enables the instantiation of the Transform and the TransformRuntime within
   the architecture.  It is a CLIProvider, which allows it to define transform-specific CLI configuration
   that is made available to the Transform's initializer.

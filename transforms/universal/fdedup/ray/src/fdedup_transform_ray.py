@@ -544,7 +544,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
         RayUtils.wait_for_execution_completion(logger=self.logger, replies=bucket_replies)
         # Wait for pool to complete
         ray.get(bucket_processor_invoker.wait_for_completion.remote())
-        self.logger.info(f"Done processing buckets in {(time.time() - start) / 60} min")
+        self.logger.info(f"Done processing buckets in {round((time.time() - start) / 60.,3)} min")
         # At this point we can save doc actors, in case we would want to restart here
         self.logger.info(f"creating document snapshots")
         doc_replies = [None] * len(self.document_collectors)

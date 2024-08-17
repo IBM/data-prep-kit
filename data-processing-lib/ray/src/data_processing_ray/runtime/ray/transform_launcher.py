@@ -107,7 +107,7 @@ class RayTransformLauncher(AbstractTransformLauncher):
         except Exception as e:
             logger.info(f"Exception running ray remote orchestration\n{e}")
         finally:
-            logger.info(f"Completed execution in {(time.time() - start)/60.} min, execution result {res}")
+            logger.info(f"Completed execution in {round((time.time() - start)/60., 3)} min, execution result {res}")
             ray.shutdown()
             return res
 
