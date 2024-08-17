@@ -10,17 +10,16 @@
 # limitations under the License.
 ################################################################################
 
+import ast
 import os
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from noop_transform import sleep_cli_param
-from noop_transform_python import NOOPPythonTransformConfiguration
+from html2parquet_transform_python import HtmlToParquetPythonTransformConfiguration
 
-
-class TestPythonNOOPTransform(AbstractTransformLauncherTest):
+class TestPythonHtmlToParquetTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -29,10 +28,18 @@ class TestPythonNOOPTransform(AbstractTransformLauncherTest):
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = "../test-data"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        config = {
+            "data_files_to_use": ast.literal_eval("['.html','.zip']"),
+        }
+
         fixtures = []
-        launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
-        fixtures.append((
-            launcher,
-            {sleep_cli_param: 0, "runtime_num_processors": 2},
-            basedir + "/input", basedir + "/expected"))
+        launcher = PythonTransformLauncher(HtmlToParquetPythonTransformConfiguration())
+        fixtures.append(
+            (
+                launcher,
+                config,
+                basedir + "/input",
+                basedir + "/expected",
+            )
+        )
         return fixtures

@@ -12,7 +12,6 @@
 
 import os
 
-import pyarrow as pa
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
@@ -20,7 +19,7 @@ from data_processing.test_support.launch.transform_test import (
 from data_processing.test_support.transform import NOOPPythonTransformConfiguration
 
 
-class TestRayNOOPTransform(AbstractTransformLauncherTest):
+class TestPythonNOOPTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -29,6 +28,10 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = "../../../../test-data/data_processing/python/noop/"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        fixtures = []
         launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
-        fixtures = [(launcher, {"noop_sleep_sec": 0}, basedir + "/input", basedir + "/expected")]
+        fixtures.append((
+            launcher,
+            {"noop_sleep_sec": 0, "runtime_num_processors": 2},
+            basedir + "/input", basedir + "/expected"))
         return fixtures
