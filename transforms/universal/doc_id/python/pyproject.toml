@@ -1,8 +1,8 @@
 [project]
-name = "dpk_docid_transform_ray"
+name = "dpk_docid_transform_python"
 version = "0.2.1.dev0"
 requires-python = ">=3.10"
-description = "docid Ray Transform"
+description = "ededup Python Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -10,8 +10,7 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
 dependencies = [
-    "dpk_docid_transform_python==0.2.1.dev0",
-    "data-prep-toolkit-ray==0.2.1.dev0"
+    "data-prep-toolkit==0.2.1.dev0"
 ]
 
 [build-system]

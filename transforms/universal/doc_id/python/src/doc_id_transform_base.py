@@ -24,7 +24,7 @@ class IDGenerator():
     A class maintaining unique integer ids
     """
 
-    def __init__(self, start: int=1):
+    def __init__(self, start: int=0):
         """
         Initialization
         :param start: starting id number
@@ -79,13 +79,8 @@ class DocIDTransformBase(AbstractTableTransform):
         self.doc_column = config.get(doc_column_name_key, doc_column_name_default)
         self.hash_column = config.get(hash_column_name_key, None)
         self.int_column = config.get(int_column_name_key, None)
-        self.id_generator = config.get(id_generator_key, None)
         if self.hash_column is None and self.int_column is None:
             raise UnrecoverableException("At least one of hash or integer column names must be specified.")
-        if self.id_generator is None and self.int_column is not None:
-            raise UnrecoverableException(
-                "Integer id generator is not defined."
-            )
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -162,7 +157,7 @@ class DocIDTransformConfigurationBase(TransformConfiguration):
         parser.add_argument(
             f"--{start_id_cli_param}",
             type=int,
-            default=1,
+            default=0,
             help="starting integer id",
         )
 

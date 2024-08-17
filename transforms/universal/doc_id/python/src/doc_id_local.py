@@ -13,27 +13,42 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-from doc_id_transform_ray import DocIDTransform
-
+from doc_id_transform_python import DocIDPythonTransform
+from doc_id_transform_base import (IDGenerator,
+                                   doc_column_name_key,
+                                   hash_column_name_key,
+                                   int_column_name_key,
+                                   id_generator_key,
+                                   )
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
+local_conf = {
+    "input_folder": input_folder,
+    "output_folder": output_folder,
+}
 
-doc_id_params = {"doc_column": "contents", "hash_column": "doc_hash"}
+doc_id_params = {doc_column_name_key: "contents",
+                 hash_column_name_key: "hash_column",
+                 int_column_name_key: "int_id_column",
+                 id_generator_key: IDGenerator(5),
+                 }
+doc_column_name_key = "doc_column"
+hash_column_name_key = "hash_column"
+int_column_name_key = "int_column"
+start_id_key = "start_id"
 
 if __name__ == "__main__":
     # Here we show how to run outside of ray
+    # Filter transform needs a DataAccess to ready the domain list.
+    data_access = DataAccessLocal(local_conf)
     # Create and configure the transform.
-    transform = DocIDTransform(doc_id_params)
+    transform = DocIDPythonTransform(doc_id_params)
     # Use the local data access to read a parquet table.
-    data_access = DataAccessLocal()
     table, _ = data_access.get_table(os.path.join(input_folder, "sample1.parquet"))
-    print(f"input table: {table}")
+    print(f"input table has {table.num_rows} rows")
     # Transform the table
     table_list, metadata = transform.transform(table)
-    table = table_list[0]
-    print(f"\noutput table: {table}")
+    print(f"\noutput table has {table_list[0].num_rows} rows")
     print(f"output metadata : {metadata}")
-    column = table["doc_hash"]
-    print(f"hashed column : {column}")
-    print(f"index column : {column}")

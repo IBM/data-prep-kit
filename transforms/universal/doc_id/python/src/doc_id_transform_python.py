@@ -40,6 +40,7 @@ class DocIDPythonTransform(DocIDTransformBase):
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
         super().__init__(config)
+        self.id_generator = config.get(id_generator_key, IDGenerator(config.get(start_id_key, 1)))
 
     def get_starting_id(self, n_rows: int) -> int:
         """
@@ -103,7 +104,7 @@ class DocIDPythonRuntime(DefaultPythonTransformRuntime):
         :return: job execution statistics.  These are generally reported as metadata by the Ray Orchestrator.
         """
         # compute and add additional statistics
-        stats.add_stats({"final id": self.id_generator.get_current})
+        stats.add_stats({"final id": self.id_generator.get_current()})
 
 
 class DocIDPythonTransformRuntimeConfiguration(PythonTransformRuntimeConfiguration):

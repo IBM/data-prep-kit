@@ -14,13 +14,13 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from doc_id_transform_ray import DocIDRayTransformConfiguration
+from doc_id_transform_ray import DocIDRayTransformRuntimeConfiguration
+from doc_id_transform_base import (doc_column_name_cli_param,
+                                   hash_column_name_cli_param,
+                                   int_column_name_cli_param,
+                                   start_id_cli_param,
+                                   )
 
-
-# create launcher
-
-
-launcher = RayTransformLauncher(DocIDRayTransformConfiguration())
 # create parameters
 s3_cred = {
     "access_key": "localminioaccesskey",
@@ -47,11 +47,14 @@ params = {
     "runtime_creation_delay": 0,
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # doc id
-    "doc_id_doc_column": "contents",
-    "doc_id_hash_column": "hash_column",
-    "doc_id_int_column": "int_id_column",
+    doc_column_name_cli_param: "contents",
+    hash_column_name_cli_param: "hash_column",
+    int_column_name_cli_param: "int_id_column",
+    start_id_cli_param: 5,
 }
-sys.argv = ParamsUtils.dict_to_req(d=params)
 
+sys.argv = ParamsUtils.dict_to_req(d=params)
+# create launcher
+launcher = RayTransformLauncher(DocIDRayTransformRuntimeConfiguration())
 # launch
 launcher.launch()
