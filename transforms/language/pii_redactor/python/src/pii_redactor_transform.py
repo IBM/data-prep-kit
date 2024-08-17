@@ -83,7 +83,7 @@ class PIIRedactorTransform(AbstractTableTransform):
         TransformUtils.validate_columns(table=table, required=[pii_contents_column])
         metadata = {"original_table_rows": table.num_rows, "original_column_count": len(table.column_names)}
 
-        # column_data, entity_types = pa.array(table[self.doc_contents_key].to_pandas().apply(self._redact_pii))
+
         redacted_texts, entity_types_list = zip(*table[pii_contents_column].to_pandas().apply(self._redact_pii))
         table = table.add_column(0, self.doc_contents_key, [redacted_texts])
         table = table.add_column(0, "detected_pii", [entity_types_list])

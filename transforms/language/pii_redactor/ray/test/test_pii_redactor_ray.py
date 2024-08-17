@@ -16,7 +16,7 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from pii_redactor_transform import doc_contents_cli_param
+from pii_redactor_transform import doc_transformed_contents_cli_param
 from pii_redactor_transform_ray import PIIRedactorRayTransformConfiguration
 
 
@@ -32,6 +32,6 @@ class TestRayPIIRedactorTransform(AbstractTransformLauncherTest):
         fixtures = []
         launcher = RayTransformLauncher(PIIRedactorRayTransformConfiguration())
         fixtures.append(
-            (launcher, {doc_contents_cli_param: "title", "run_locally": True}, basedir + "/input", basedir + "/expected")
+            (launcher, {doc_transformed_contents_cli_param: "title", "run_locally": True}, basedir + "/input", basedir + "/expected")
         )
         return fixtures
