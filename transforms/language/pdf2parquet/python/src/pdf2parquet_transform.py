@@ -90,8 +90,6 @@ class Pdf2ParquetTransform(AbstractBinaryTransform):
             do_table_structure=self.do_table_structure,
             do_ocr=self.do_ocr,
         )
-        # use text cells predicted from table structure model, instead of matching with pdf cells
-        pipeline_options.table_structure_options.do_cell_matching = False
         self._converter = DocumentConverter(artifacts_path=self.artifacts_path, pipeline_options=pipeline_options)
 
     def _update_metrics(self, num_pages: int, elapse_time: float):
@@ -114,7 +112,7 @@ class Pdf2ParquetTransform(AbstractBinaryTransform):
         if self.contents_type == pdf2parquet_contents_types.MARKDOWN:
             content_string = doc.render_as_markdown()
         elif self.contents_type == pdf2parquet_contents_types.JSON:
-            content_string = pd.io.json.ujson_dumps(doc.render_as_dict(), double_precision=2)
+            content_string = pd.io.json.ujson_dumps(doc.render_as_dict(), double_precision=0)
         else:
             raise RuntimeError(f"Uknown contents_type {self.contents_type}.")
         num_pages = len(doc.pages)

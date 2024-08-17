@@ -47,8 +47,8 @@ Eventually, Data Prep Kit will offer consistent APIs and configurations across t
 Features of the toolkit: 
 
 - It aims to accelerate unstructured data prep for the "long tail" of LLM use cases.
-- It offers a growing set of [module](/transforms) implementations across multiple runtimes, targeting laptop-scale to datacenter-scale processing.
-- It provides a growing set of [sample data procesing pipelines](/examples) that can be used for real enterprise use cases.
+- It offers a growing set of [module](transforms) implementations across multiple runtimes, targeting laptop-scale to datacenter-scale processing.
+- It provides a growing set of [sample data processing pipelines](examples) that can be used for real enterprise use cases.
 - It provides the [Data processing library](data-processing-lib/ray) to enable contribution of new custom modules targeting new use cases.
 - It uses [Kubeflow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp/doc/simple_transform_pipeline.md).
 
@@ -57,38 +57,40 @@ Data modalities supported:
 * Code - support for code datasets as downloaded .zip files of GitHub repositories converted to
 [parquet](https://arrow.apache.org/docs/python/parquet.html) files. 
 * Language - supports for natural language datasets, and like the code transformations, will operate on parquet files.
+* Universal - supports code and natrual langauge datasets, and can operate on with parquet files, zip archives, or individual HTML files.
 
-Support for additional data modalities is expected in the future and additional data formats is welcome!
+Support for additional data modalities is expected in the future and additional data formats are welcome!
 
 ## Data Preparation Modules <a name = "modules"></a>
-The below matrix shows the the combination of modules and supported runtimes. All the modules can be accessed [here](/transforms) and can be combined to form data processing pipelines, as shown in [examples](/examples) folder. The modules are under three major categories: 1) Universal (apply to both code and language) 2) Language-only and 3) Code-only. There is an additional category of Import/Export tables. 
+Matrix below shows the the combination of modules and supported runtimes. All the modules can be accessed [here](transforms) and can be combined to form data processing pipelines, as shown in the [examples](examples) folder. The modules are under three major categories: 1) Universal (apply to both code and language) 2) Language-only and 3) Code-only. We start with a set of modules for ingestion of various data formats.  
 
 
 | Modules                          | Python-only        | Ray              | Spark            | KFP on Ray             |
 |----------------------------------|--------------------|------------------|------------------|------------------------|
+| **Data Ingestion**         |                    |                  |                  |                        |
+| [Code (from zip) to Parquet](transforms/code/code2parquet/python/README.md)       | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [PDF to Parquet](transforms/language/pdf2parquet/python/README.md)         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+|[HTML to Parquet](transforms/universal/html2parquet/python/README.md)                 |:white_check_mark:|                  |                  |                        |
 | **Universal (Code & Language)**  |                    |                  |                  |                        | 
-| [Exact dedup filter](/transforms/universal/ededup/ray/README.md)               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Fuzzy dedup filter](/transforms/universal/fdedup/ray/README.md)               |                    |:white_check_mark:|                  |:white_check_mark:      |
-| [Unique ID annotation](/transforms/universal/doc_id/ray/README.md)                | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-| [No-op / template](/transforms/universal/noop/python/README.md)                 | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-| [Filter on annotations](/transforms/universal/filter/python/README.md)            | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-| [Profiler](/transforms/universal/profiler/ray/README.md)                        |                    |:white_check_mark:|                  |:white_check_mark:      |
-| [Resize](/transforms/universal/resize/python/README.md)                           | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Tokenizer](/transforms/universal/tokenization/python/README.md)                        | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Exact dedup filter](transforms/universal/ededup/ray/README.md)               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Fuzzy dedup filter](transforms/universal/fdedup/ray/README.md)               |                    |:white_check_mark:|                  |:white_check_mark:      |
+| [Unique ID annotation](transforms/universal/doc_id/ray/README.md)                | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
+| [Filter on annotations](transforms/universal/filter/python/README.md)            | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
+| [Profiler](transforms/universal/profiler/ray/README.md)                        |                    |:white_check_mark:|                  |:white_check_mark:      |
+| [Resize](transforms/universal/resize/python/README.md)                           | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Tokenizer](transforms/universal/tokenization/python/README.md)                        | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [No-op / template](transforms/universal/noop/python/README.md)                 | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 | **Language-only**                |                    |                  |                  |                        |
-| [Language identification](/transforms/language/lang_id/python/README.md)          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Document quality](/transforms/language/doc_quality/python/README.md)                 | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Document Chunking for RAG, Chunk embeddings](/transforms/language/doc_chunk/python/README.md)         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Text encoder](/transforms/language/text_encoder/python/README.md)                     | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Language identification](transforms/language/lang_id/python/README.md)          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Document quality](transforms/language/doc_quality/python/README.md)                 | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Document chunking for RAG](transforms/language/doc_chunk/python/README.md)         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Text encoder](transforms/language/text_encoder/python/README.md)                     | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | **Code-only**                    |                    |                  |                  |                        |
-| [Programming language annnotation](/transforms/code/proglang_select/python/README.md) | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Code quality annotation](/transforms/code/code_quality/python/README.md)          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Malware annotation](/transforms/code/malware/python/README.md)               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Header cleanser](/transforms/code/header_cleanser/python/README.md)                  | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Repo level ordering](/transforms/code/repo_level_ordering/ray/README.md)              |                    |:white_check_mark:|                  |                        |
-| **Import/Export tables**         |                    |                  |                  |                        |
-| [Code (from zip) to Parquet](/transforms/code/code2parquet/python/README.md)       | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [PDF to Parquet](/transforms/language/pdf2parquet/python/README.md)         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Programming language annnotation](transforms/code/proglang_select/python/README.md) | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Code quality annotation](transforms/code/code_quality/python/README.md)          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Malware annotation](transforms/code/malware/python/README.md)               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Header cleanser](transforms/code/header_cleanser/python/README.md)                  | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
+| [Semantic file ordering](transforms/code/repo_level_ordering/ray/README.md)              |                    |:white_check_mark:|                  |                        |
 
 
 Contributors are welcome to add new modules as well as add runtime support for existing modules!
@@ -96,7 +98,7 @@ Contributors are welcome to add new modules as well as add runtime support for e
 
 ## Data Processing Framework <a name = "data-proc-lib"></a>
 At the core of the framework, is a data processing library, that provides a systematic way to implement the data processing modules. The library is python-based and enables the application of "transforms" to a one or more input data files to produce one or more output data files. We use the popular [parquet](https://arrow.apache.org/docs/python/parquet.html) format to store the data (code or language). 
-Every parquet file follows a set [schema](/transforms/code/code2parquet/python/README.md). A user can use one or more transforms (or modules) as discussed above to process their data. 
+Every parquet file follows a set [schema](transforms/code/code2parquet/python/README.md). A user can use one or more transforms (or modules) as discussed above to process their data. 
 
 #### Transform Design
 A transform can follow one of the two patterns: annotator or filter.
@@ -114,7 +116,7 @@ or [Spark](https://spark.apache.org) wrappers are provided, to readily scale out
 A generalized workflow is shown [here](doc/data-processing.md).
 
 #### Bring Your Own Transform 
-One can add new transforms by bringing in Python-based processing logic and using the Data Processing Library to build and contribute transforms. We have provided an [example transform](/transforms/universal/noop) that can serve as a template to add new simple transforms. 
+One can add new transforms by bringing in Python-based processing logic and using the Data Processing Library to build and contribute transforms. We have provided an [example transform](transforms/universal/noop) that can serve as a template to add new simple transforms. 
 
 More details on the data processing library are [here](data-processing-lib/doc/overview.md). 
 
@@ -132,7 +134,7 @@ A simple transform pipeline [tutorial](kfp/doc/simple_transform_pipeline.md) exp
 In addition, if you want to combine several transformers in a single pipeline, you can look at [multi-steps pipeline](kfp/doc/multi_transform_pipeline.md) 
 
 When you finish working with the cluster, and want to clean up or destroy it. See the 
-[clean up the cluster](../kfp/doc/setup.md#cleanup)
+[clean up the cluster](kfp/doc/setup.md#cleanup)
 
 ## Acknowledgements <a name = "acknowledgement"></a>
 Thanks to the [BigCode Project](https://github.com/bigcode-project), which served as the source for borrowing few code quality metrics.

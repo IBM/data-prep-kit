@@ -30,8 +30,8 @@ class TestLangIdentificationTransform(AbstractTableTransformTest):
             "model_kind": KIND_FASTTEXT,
             "model_url": "facebook/fasttext-language-identification",
             "content_column_name": "contents",
-            "output_lang_column_name": "ft_lang",
-            "output_score_column_name": "ft_score",
+            "output_lang_column_name": "l",
+            "output_score_column_name": "s",
         }
         table = pa.Table.from_arrays(
             [
@@ -79,7 +79,7 @@ class TestLangIdentificationTransform(AbstractTableTransformTest):
                     ]
                 ),
             ],
-            names=["contents", "ft_lang", "ft_score"],
+            names=["contents", "l", "s"],
         )
         invalid_content_column_name_table = pa.Table.from_arrays(
             [
@@ -105,7 +105,7 @@ class TestLangIdentificationTransform(AbstractTableTransformTest):
                 ),
                 pa.array([1.000]),
             ],
-            names=["contents", "lang", "ft_score"],
+            names=["contents", "lang", "s"],
         )
         invalid_output_score_column_name_table = pa.Table.from_arrays(
             [
@@ -121,7 +121,7 @@ class TestLangIdentificationTransform(AbstractTableTransformTest):
                 ),
                 pa.array([1.000]),
             ],
-            names=["contents", "ft_lang", "score"],
+            names=["contents", "l", "score"],
         )
         return [
             (

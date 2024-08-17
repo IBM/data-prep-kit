@@ -23,7 +23,7 @@ which operates on a Spark DataFrame instead of a pyarrow Table.
 
 
 #### AbstractTableTransform class
-[AbstractTableTransform](../ray/src/data_processing_ray/transform/table_transform.py) 
+[AbstractTableTransform](../python/src/data_processing/transform/table_transform.py) 
 is expected to be extended when implementing a transform of pyarrow Tables.
 In general, when possible a transform should be independent of the runtime in
 which it runs, and the mechanism used to define its configuration
@@ -58,7 +58,7 @@ The return values are handled the same waa as the return values for `transform()
 not need this feature, a default implementation is provided to return an empty list and empty dictionary.
  
 #### TransformConfiguration class
-The [TransformConfiguration](../ray/src/data_processing_ray/runtime/runtime_configuration.py)
+The [TransformConfiguration](../python/src/data_processing/transform/transform_configuration.py)
 serves as an interface and must be implemented by the any `AbstractTableTransform`
 implementation to enable running within and runtime or from a command line to capture 
 transform configuration.  It provides the following configuration:
@@ -72,7 +72,7 @@ It is expected that transforms are initialized with a fixed name, the class of i
 `AbstractTableTransform` implementation and optionally the configuration keys that should not
 be exposed as metadata for a run.
 To support command line configuration, the `TransformConfiguration` extends the
-[CLIArgumentProvider](../ray/src/data_processing_ray/utils/cli_utils.py) class.
+[CLIArgumentProvider](../python/src/data_processing/utils/cli_utils.py) class.
 The set of methods of interest are
 
 * ```__init__(self, name:str, transform_class:type[AbstractTableTransform], list[str]:remove_from_metadata )``` - sets the required fields

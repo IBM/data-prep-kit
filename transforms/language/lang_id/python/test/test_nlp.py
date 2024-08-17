@@ -34,5 +34,8 @@ def test_language_identification():
         ]
     )
     table = pa.Table.from_arrays([documents], names=["contents"])
-    table, stats = get_lang_ds_pa(table, nlp_langid, col_name="contents")
-    assert table["ft_lang"].to_pylist() == ["de", "pt", "ja", "fr", "es"]
+    table, stats = get_lang_ds_pa(table, nlp_langid, "contents", "lang", "score")
+    assert table["lang"].to_pylist() == ["de", "pt", "ja", "fr", "es"]
+    assert len(table["score"].to_pylist()) == len(table["lang"].to_pylist())
+    assert "ft_lang" not in table.column_names
+    assert "ft_score" not in table.column_names
