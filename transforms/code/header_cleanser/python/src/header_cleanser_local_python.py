@@ -18,8 +18,8 @@ from data_processing.utils import ParamsUtils
 from header_cleanser_transform import (
     HeaderCleanserTransformConfiguration,
     column_cli_params,
-    license_cli_params,
     copyright_cli_params,
+    license_cli_params,
 )
 
 
@@ -32,7 +32,7 @@ local_conf = {
 }
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 header_cleanser_params = {
-    column_cli_params: 'contents',
+    column_cli_params: "contents",
     license_cli_params: True,
     copyright_cli_params: True,
 }

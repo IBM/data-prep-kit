@@ -11,6 +11,8 @@ This is a simple transformer that is resizing the input tables to a specified si
 * resizing based on in-memory size of the tables.
 * resized based on the number of rows in the tables. 
 
+Tables can be either split into smaller sizes or aggregated into larger sizes.
+
 ## Building
 
 A [docker file](Dockerfile) that can be used for building docker image. You can use

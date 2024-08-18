@@ -13,6 +13,7 @@ import time
 import traceback
 from typing import Any
 
+from data_processing.data_access import DataAccessFactoryBase
 from data_processing.utils import TransformUtils, UnrecoverableException, get_logger
 
 
@@ -21,17 +22,30 @@ class AbstractTransformFileProcessor:
     This is the the base class implementing processing of a single binary file
     """
 
-    def __init__(self):
+    def __init__(
+            self,
+            data_access_factory: DataAccessFactoryBase,
+            transform_parameters: dict[str, Any],
+    ):
         """
         Init method
+        :param data_access_factory: Data Access Factory
+        :param transform_parameters: Transform parameters
         """
-        self.data_access = None
+        self.logger = get_logger(__name__)
+        # validate parameters
+        if data_access_factory is None:
+            self.logger.error("Transform file processor: data access factory is not specified")
+            raise UnrecoverableException("data access factory is None")
         self.transform = None
         self.stats = None
         self.last_file_name = None
         self.last_extension = None
         self.last_file_name_next_index = None
-        self.logger = get_logger(__name__)
+        self.data_access = data_access_factory.create_data_access()
+        # Add data access and statistics to the processor parameters
+        self.transform_params = transform_parameters
+        self.transform_params["data_access"] = self.data_access
 
     def process_file(self, f_name: str) -> None:
         """
@@ -83,14 +97,15 @@ class AbstractTransformFileProcessor:
         """
         if self.last_file_name is None:
             # for some reason a given worker never processed anything. Happens in testing
-            # when the amount of workers is greater then the amount of files
+            # when the amount of workers is greater than the amount of files
             self.logger.debug("skipping flush, no name for file is defined")
             return
         try:
             t_start = time.time()
             # get flush results
             self.logger.debug(
-                f"Begin flushing transform, last file name {self.last_file_name}, last index {self.last_file_name_next_index}"
+                f"Begin flushing transform, last file name {self.last_file_name}, "
+                f"last index {self.last_file_name_next_index}"
             )
             out_files, stats = self.transform.flush_binary()
             self.logger.debug(f"Done flushing transform, got {len(out_files)} files")
@@ -148,7 +163,7 @@ class AbstractTransformFileProcessor:
                 else:
                     self.last_file_name_next_index += 1
             case _:
-                # we have more then 1 file
+                # we have more than 1 file
                 file_sizes = 0
                 output_file_name = self.data_access.get_output_location(path=self.last_file_name)
                 start_index = self.last_file_name_next_index

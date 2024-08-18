@@ -76,13 +76,14 @@ class TestPythonPdf2JsonParquetTransform(AbstractTransformLauncherTest):
         )
         return fixtures
 
+
 # Temporary disable until we simplify and speedup the test
 # class TestPythonPdf2ParquetWithOcrTransform(AbstractTransformLauncherTest):
 #     """
 #     Extends the super-class to define the test data for the tests defined there.
 #     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
 #     """
-# 
+#
 #     def get_test_transform_fixtures(self) -> list[tuple]:
 #         basedir = "../test-data"
 #         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
@@ -92,7 +93,7 @@ class TestPythonPdf2JsonParquetTransform(AbstractTransformLauncherTest):
 #             "pdf2parquet_do_ocr": True,
 #             "pdf2parquet_do_table_structure": True,
 #         }
-# 
+#
 #         fixtures = []
 #         launcher = PythonTransformLauncher(Pdf2ParquetPythonTransformConfiguration())
 #         fixtures.append(
@@ -106,6 +107,7 @@ class TestPythonPdf2JsonParquetTransform(AbstractTransformLauncherTest):
 #             )
 #         )
 #         return fixtures
+
 
 class TestPythonPdf2ParquetNoTableTransform(AbstractTransformLauncherTest):
     """

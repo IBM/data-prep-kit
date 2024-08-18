@@ -16,13 +16,12 @@ import sys
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from doc_quality_transform import (
-    text_lang_cli_param,
-    doc_content_column_cli_param,
     bad_word_filepath_cli_param,
+    doc_content_column_cli_param,
+    text_lang_cli_param,
 )
-from doc_quality_transform_ray import (
-    DocQualityRayTransformConfiguration,
-)
+from doc_quality_transform_ray import DocQualityRayTransformConfiguration
+
 
 print(os.environ)
 # create parameters
