@@ -135,24 +135,24 @@ extra-help:
 # Here we assume this is used to implement the required "test" target used during ci/cd.
 # As such, and to avoid running out of disk space during ci/cd, we also do a clean at the end
 .PHONY: .transforms.python-test 
-.transforms.python-test::  .transforms.test-src .transforms.python-test-image .transforms.clean
+.transforms.python-test::  .transforms.test-src .transforms.python-test-image
 	@# Help: Run both source and image level tests.
 
 # Here we assume this is used to implement the required "test" target used during ci/cd.
 # As such, and to avoid running out of disk space during ci/cd, we also do a clean at the end
 .PHONY: .transforms.ray-test 
-.transforms.ray-test::  .transforms.test-src .transforms.ray-test-image .transforms.clean
+.transforms.ray-test::  .transforms.test-src .transforms.ray-test-image
 	@# Help: Run both source and image level tests.
 
 # Here we assume this is used to implement the required "test" target used during ci/cd.
 # As such, and to avoid running out of disk space during ci/cd, we also do a clean at the end
 .PHONY: .transforms.spark-test 
-.transforms.spark-test::  .transforms.test-src .transforms.spark-test-image .transforms.clean
+.transforms.spark-test::  .transforms.test-src .transforms.spark-test-image
 	@# Help: Run both source and image level tests.
 
 # Assumes the runtime-specific venv has already been built.
 .PHONY: .transforms.test-src
-.transforms.test-src::  .defaults.test-src .transforms.test-locals
+.transforms.test-src::  .defaults.test-src .transforms.test-locals .transforms.clean
 	@# Help: Run the transform's tests and any '*local' .py files
 
 .PHONY: .transforms.python-test-image
