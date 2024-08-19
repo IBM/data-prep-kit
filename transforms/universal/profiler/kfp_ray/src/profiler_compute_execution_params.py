@@ -12,14 +12,14 @@
 
 
 def profiler_compute_execution_params(
-    worker_options: str,  # ray worker configuration
-    actor_options: str,  # actor's resource requirements
+    worker_options: dict,  # ray worker configuration
+    actor_options: dict,  # actor's resource requirements
     data_s3_config: str,  # s3 configuration
     data_max_files: int,  # max files to process
     data_num_samples: int,  # num samples to process
     runtime_pipeline_id: str,  # pipeline id
     runtime_job_id: str,  # job id
-    runtime_code_location: str,  # code location
+    runtime_code_location: dict,  # code location
     doc_column: str,  # key for accessing data
     aggregator_cpu: float,  # number of CPUs per aggregatotor
     n_samples: int,  # number of samples for parameters computation
@@ -51,14 +51,14 @@ def profiler_compute_execution_params(
     EXECUTION_OF_KB_DOC = 0.00025
 
     # Get cluster parameters
-    w_options = KFPUtils.load_from_json(worker_options.replace("'", '"'))
+    w_options = worker_options
     cluster_cpu = w_options["replicas"] * w_options["cpu"]
     cluster_memory = w_options["replicas"] * w_options["memory"]
     print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_memory}")
     cluster_cpu *= 0.85
     cluster_memory *= 0.85
     # get actor requirements
-    a_options = KFPUtils.load_from_json(actor_options.replace("'", '"'))
+    a_options = actor_options
     actor_cpu = a_options["num_cpus"]
     print(f"actor required cpu {actor_cpu}")
     # get credentials
@@ -112,10 +112,10 @@ def profiler_compute_execution_params(
         "data_max_files": data_max_files,
         "data_num_samples": data_num_samples,
         "runtime_num_workers": n_workers,
-        "runtime_worker_options": actor_options,
+        "runtime_worker_options": str(actor_options),
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
-        "runtime_code_location": runtime_code_location,
+        "runtime_code_location": str(runtime_code_location),
         "profiler_aggregator_cpu": aggregator_cpu,
         "profiler_num_aggregators": n_aggregators,
         "profiler_doc_column": doc_column,
