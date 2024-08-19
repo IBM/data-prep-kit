@@ -96,7 +96,9 @@ TEXT_ENCODER_PYTHON_VERSION=$(DPK_VERSION)
 TEXT_ENCODER_RAY_VERSION=$(DPK_VERSION)
 
 HEADER_CLEANSER_PYTHON_VERSION=$(DPK_VERSION) 
-HEADER_CLEANSER_RAY_VERSION=$(DPK_VERSION) 
+HEADER_CLEANSER_RAY_VERSION=$(DPK_VERSION)
+
+PII_REDACTOR_PYTHON_VERSION=$(DPK_VERSION)
 
 ################## ################## ################## ################## ################## ##################
 # Begin versions that the repo depends on. 

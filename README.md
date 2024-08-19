@@ -65,32 +65,33 @@ Support for additional data modalities is expected in the future and additional 
 Matrix below shows the the combination of modules and supported runtimes. All the modules can be accessed [here](transforms) and can be combined to form data processing pipelines, as shown in the [examples](examples) folder. The modules are under three major categories: 1) Universal (apply to both code and language) 2) Language-only and 3) Code-only. We start with a set of modules for ingestion of various data formats.  
 
 
-| Modules                          | Python-only        | Ray              | Spark            | KFP on Ray             |
-|----------------------------------|--------------------|------------------|------------------|------------------------|
-| **Data Ingestion**         |                    |                  |                  |                        |
-| [Code (from zip) to Parquet](transforms/code/code2parquet/python/README.md)       | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [PDF to Parquet](transforms/language/pdf2parquet/python/README.md)         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-|[HTML to Parquet](transforms/universal/html2parquet/python/README.md)                 |:white_check_mark:|                  |                  |                        |
-| **Universal (Code & Language)**  |                    |                  |                  |                        | 
-| [Exact dedup filter](transforms/universal/ededup/ray/README.md)               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Fuzzy dedup filter](transforms/universal/fdedup/ray/README.md)               |                    |:white_check_mark:|                  |:white_check_mark:      |
-| [Unique ID annotation](transforms/universal/doc_id/ray/README.md)                | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-| [Filter on annotations](transforms/universal/filter/python/README.md)            | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-| [Profiler](transforms/universal/profiler/ray/README.md)                        |                    |:white_check_mark:|                  |:white_check_mark:      |
-| [Resize](transforms/universal/resize/python/README.md)                           | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Tokenizer](transforms/universal/tokenization/python/README.md)                        | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [No-op / template](transforms/universal/noop/python/README.md)                 | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
-| **Language-only**                |                    |                  |                  |                        |
-| [Language identification](transforms/language/lang_id/python/README.md)          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Document quality](transforms/language/doc_quality/python/README.md)                 | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Document chunking for RAG](transforms/language/doc_chunk/python/README.md)         | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Text encoder](transforms/language/text_encoder/python/README.md)                     | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| **Code-only**                    |                    |                  |                  |                        |
-| [Programming language annnotation](transforms/code/proglang_select/python/README.md) | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Code quality annotation](transforms/code/code_quality/python/README.md)          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Malware annotation](transforms/code/malware/python/README.md)               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Header cleanser](transforms/code/header_cleanser/python/README.md)                  | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [Semantic file ordering](transforms/code/repo_level_ordering/ray/README.md)              |                    |:white_check_mark:|                  |                        |
+| Modules | Python-only | Ray | Spark | KFP on Ray |  
+|----------------------------------|--------------------|------------------|------------------|------------------------|  
+| **Universal (Code & Language)** | | | | |  
+| [Exact dedup filter](/transforms/universal/ededup/ray/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [Fuzzy dedup filter](/transforms/universal/fdedup/ray/README.md) | |:white_check_mark:| |:white_check_mark: |  
+| [Unique ID annotation](/transforms/universal/doc_id/ray/README.md) | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark: |  
+| [No-op / template](/transforms/universal/noop/python/README.md) | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark: |  
+| [Filter on annotations](/transforms/universal/filter/python/README.md) | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark: |  
+| [Profiler](/transforms/universal/profiler/ray/README.md) | |:white_check_mark:| |:white_check_mark: |  
+| [Resize](/transforms/universal/resize/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [Tokenizer](/transforms/universal/tokenization/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: | 
+| **Language-only** | | | | |  
+| [Language identification](/transforms/language/lang_id/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [Document quality](/transforms/language/doc_quality/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [Document chunking for RAG](/transforms/language/doc_chunk/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [Text/Chunk encoder/embedding](/transforms/language/text_encoder/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [PII Annotator/Redactor](/transforms/universal/pii_redactor/python/README.md)| :white_check_mark:| :white_check_mark: | | :white_check_mark: |
+| **Code-only** | | | | |  
+| [Programming language annnotation](/transforms/code/proglang_select/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [Code quality annotation](/transforms/code/code_quality/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [Malware annotation](/transforms/code/malware/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [Header cleanser](/transforms/code/header_cleanser/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [Semantic file ordering](/transforms/code/repo_level_ordering/ray/README.md) | |:white_check_mark:| | |  
+| **Import/Export tables** | | | | |  
+| [Code (from zip) to Parquet](/transforms/code/code2parquet/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |  
+| [PDF to Parquet](/transforms/language/pdf2parquet/python/README.md) | :white_check_mark: |:white_check_mark:| |:white_check_mark: |
+
 
 
 Contributors are welcome to add new modules as well as add runtime support for existing modules!
