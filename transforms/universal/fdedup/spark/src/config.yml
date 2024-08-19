@@ -5,7 +5,7 @@ common_args:
     file_ext: .parquet
     default_batch_size: 2
     document_id_column: int_id_column
-    contents_column: text
+    contents_column: contents
     debug: False
     checkpoint_count: 0
     total_document_size: 0
@@ -25,6 +25,7 @@ steps:
           jaccard_similarity_threshold: 0.8
           language: unspecified
           word_shingle_size: 8
+          num_segments: 2
       configs:
           heuristic1: value1
 

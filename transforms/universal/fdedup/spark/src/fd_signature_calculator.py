@@ -87,6 +87,7 @@ class FDSignatureCalculator(SparkTransformerRuntime):
         seed: int,
         configs: str,
         step_name: str,
+        num_segments: int,
     ):
         super().__init__()
         self.input_path = input_path
@@ -116,6 +117,8 @@ class FDSignatureCalculator(SparkTransformerRuntime):
             # if the code is running locally, add Murmur_MH.py to the py files used by the Spark context
             murmur_mh_filepath = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Murmur_MH.py")
             self.spark.sparkContext.addPyFile(murmur_mh_filepath)
+        self.num_segments = num_segments
+        assert num_segments % 2 == 0, f"num_segments must be an even number, cannot be {num_segments}"
         logging.info("Initialized Spark Fuzzy Dedupe")
 
     def create_salt_contents_rdd(self, spark_df: DataFrame, contents_column: str) -> RDD:
@@ -208,7 +211,7 @@ class FDSignatureCalculator(SparkTransformerRuntime):
         :return: an RDD, containing the band hashes, the band indexes, doc IDs, and doc lengths
         """
 
-        def emit_bands2(doc_id: str, minhashes: np.array, b: int, r: int, seed: int = 42):
+        def emit_bands2(doc_id: str, minhashes: np.array, doc_length: int, b: int, r: int, seed: int = 42):
             """
             Return
 
@@ -226,12 +229,13 @@ class FDSignatureCalculator(SparkTransformerRuntime):
             for band_index in range(b):
                 # we create the band hashes by hashing the slice of minhashes
                 band_hash = mmh3.hash64(minhashes[band_index * r : (band_index + 1) * r], seed=seed, signed=True)[0]
-                yield (band_hash, band_index, doc_id)
+                yield (band_hash, band_index, (doc_id, minhashes.astype(np.int32).tolist(), doc_length))
 
         bands = minhashed.flatMap(
             lambda x: emit_bands2(
                 doc_id=x[0],
                 minhashes=np.array(x[1][0]).astype(np.uint32),
+                doc_length=x[1][1],
                 b=minhashlsh_num_bands,
                 r=minhashlsh_length_band,
             )
@@ -284,7 +288,17 @@ class FDSignatureCalculator(SparkTransformerRuntime):
             [
                 StructField("band_hash", LongType(), True),
                 StructField("band_index", IntegerType(), True),
-                StructField(self.document_id_column, LongType(), True),
+                StructField(
+                    "document_data",
+                    StructType(
+                        [
+                            StructField(self.document_id_column, LongType(), True),
+                            StructField("minhashes", ArrayType(IntegerType()), True),
+                            StructField("document_length", IntegerType(), True),
+                        ]
+                    ),
+                    True,
+                ),
             ]
         )
 
@@ -336,10 +350,10 @@ class FDSignatureCalculator(SparkTransformerRuntime):
                 self.language,
                 self.word_shingle_size,
             )
-            minhashed_df = self.spark.createDataFrame(minhashed, schema=minhash_schema)
-            self.write_data(minhashed_df, self.minhash_output_path, data_type="parquet")
-            logging.info(f"Saved minhashed_df to {self.output_path}")
-            logging.info(f"DEBUG: minhashed count: {minhashed.count()}")
+            # minhashed_df = self.spark.createDataFrame(minhashed, schema=minhash_schema)
+            # self.write_data(minhashed_df, self.minhash_output_path, data_type="parquet")
+            # logging.info(f"Saved minhashed_df to {self.output_path}")
+            # logging.info(f"DEBUG: minhashed count: {minhashed.count()}")
 
             # calculate bands
             logging.info(" Calculate bands")
@@ -355,9 +369,76 @@ class FDSignatureCalculator(SparkTransformerRuntime):
             num_bands_partitions = bands.getNumPartitions()
             self.in_out_metadata["num_minhash_bands"] = num_bands_partitions
             self.in_out_metadata["num_bands"] = minhashlsh_num_bands
+            segment_bounds_list = []
+            upper_bound = np.iinfo(np.uint64).max
+            for segment_index in range(self.num_segments // 2):
+                segment_bounds_list.append(np.uint64(segment_index * (upper_bound // self.num_segments)))
+            segment_bounds_list.append(np.uint64(upper_bound // 2))
+            segment_bounds_list.append(np.uint64(upper_bound // 2 + 1))
+            for segment_index in range(self.num_segments // 2 + 1, self.num_segments):
+                segment_bounds_list.append(np.uint64(segment_index * (upper_bound // self.num_segments)))
+            segment_bounds_list.append(np.uint64(upper_bound))
+            segment_bounds = np.array(segment_bounds_list, dtype=np.uint64)
+            segment_bounds = np.array(segment_bounds, dtype=np.int64).tolist()
             for band_ix in range(minhashlsh_num_bands):
                 band_df = bands_df.filter(F.col("band_index") == band_ix).drop("band_index")
-                self.write_data(band_df, os.path.join(self.band_output_path, f"band_{band_ix}"), data_type="parquet")
+                segment_index = 0
+                segment_band_df = band_df.filter(
+                    (F.col("band_hash") >= segment_bounds[segment_index])
+                    & (F.col("band_hash") <= segment_bounds[segment_index + 1])
+                )
+                self.write_data(
+                    segment_band_df,
+                    os.path.join(
+                        self.band_output_path,
+                        f"band={band_ix}",
+                        f"segment={segment_index}",
+                    ),
+                    data_type="parquet",
+                )
+                for segment_index in range(1, self.num_segments // 2):
+                    segment_band_df = band_df.filter(
+                        (F.col("band_hash") > segment_bounds[segment_index])
+                        & (F.col("band_hash") <= segment_bounds[segment_index + 1])
+                    )
+                    self.write_data(
+                        segment_band_df,
+                        os.path.join(
+                            self.band_output_path,
+                            f"band={band_ix}",
+                            f"segment={segment_index}",
+                        ),
+                        data_type="parquet",
+                    )
+                for segment_index in range(self.num_segments // 2, self.num_segments - 1):
+                    segment_band_df = band_df.filter(
+                        (F.col("band_hash") >= segment_bounds[segment_index + 1])
+                        & (F.col("band_hash") < segment_bounds[segment_index + 2])
+                    )
+                    self.write_data(
+                        segment_band_df,
+                        os.path.join(
+                            self.band_output_path,
+                            f"band={band_ix}",
+                            f"segment={segment_index}",
+                        ),
+                        data_type="parquet",
+                    )
+                segment_index = self.num_segments - 1
+                segment_band_df = band_df.filter(
+                    (F.col("band_hash") >= segment_bounds[segment_index + 1])
+                    & (F.col("band_hash") <= segment_bounds[segment_index + 2])
+                )
+                self.write_data(
+                    segment_band_df,
+                    os.path.join(
+                        self.band_output_path,
+                        f"band={band_ix}",
+                        f"segment={segment_index}",
+                    ),
+                    data_type="parquet",
+                )
+
             logging.info(f" Bands calculation complete: number of bands partitions = {num_bands_partitions}")
 
         # plus, now, minds, well
