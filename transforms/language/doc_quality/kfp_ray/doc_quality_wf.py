@@ -11,15 +11,10 @@
 ################################################################################
 import os
 
-from workflow_support.compile_utils import (
-    ONE_HOUR_SEC,
-    ONE_WEEK_SEC,
-    ComponentUtils,
-)
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
 task_image = "quay.io/dataprep1/data-prep-kit/doc_quality-ray:latest"
@@ -80,8 +75,10 @@ if os.getenv("KFPv2", "0") == "1":
     compute_exec_params_op = dsl.component_decorator.component(
         func=compute_exec_params_func, base_image=base_kfp_image
     )
-    print("WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the " +
-          "same version of the same pipeline !!!")
+    print(
+        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the "
+        + "same version of the same pipeline !!!"
+    )
     run_id = uuid.uuid4().hex
 else:
     compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
@@ -104,7 +101,7 @@ TASK_NAME: str = "doc_quality"
 def doc_quality(
     # Ray cluster
     ray_name: str = "doc_quality-kfp-ray",  # name of Ray cluster
-    ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image, "image_pull_policy": ""},
+    ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image, "image_pull_policy": "", "image_pull_secret": ""},
     ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image, "image_pull_policy": ""},
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
@@ -203,7 +200,6 @@ def doc_quality(
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
-
 
 
 if __name__ == "__main__":

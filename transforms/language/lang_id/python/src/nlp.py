@@ -20,12 +20,18 @@ from lang_models import LangModel
 logger = get_logger(__name__)
 
 
-def get_lang_ds_pa(table: pa.table, nlp: LangModel, col_name: str = "contents") -> tuple[pa.table, dict[str, Any]]:
+def get_lang_ds_pa(
+        table: pa.table,
+        nlp: LangModel,
+        content_column_name: str,
+        output_lang_column_name: str,
+        output_score_column_name: str,
+    ) -> tuple[pa.table, dict[str, Any]]:
     detected_language = pa.Table.from_pylist(
         list(
             map(
                 lambda r: {"lang": r[0], "score": r[1]},
-                map(lambda x: nlp.detect_lang(x), table[col_name].to_pylist()),
+                map(lambda x: nlp.detect_lang(x), table[content_column_name].to_pylist()),
             )
         )
     )
@@ -35,6 +41,6 @@ def get_lang_ds_pa(table: pa.table, nlp: LangModel, col_name: str = "contents") 
         d = batch.to_pydict()
         for lang, count in zip(d["lang"], d["lang_count"]):
             stats_dict[lang] = count
-    result = TransformUtils.add_column(table=table, name="ft_lang", content=detected_language["lang"])
-    result = TransformUtils.add_column(table=result, name="ft_score", content=detected_language["score"])
+    result = TransformUtils.add_column(table=table, name=output_lang_column_name, content=detected_language["lang"])
+    result = TransformUtils.add_column(table=result, name=output_score_column_name, content=detected_language["score"])
     return result, stats_dict

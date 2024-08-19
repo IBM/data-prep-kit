@@ -42,9 +42,6 @@ class TokenizationTransform(AbstractTableTransform):
         # of TokenizationTransformConfiguration class
 
         super().__init__(config)
-        from data_processing.utils import get_logger
-
-        self.logger = get_logger(__name__)
         self.tokenizer = config.get("tokenizer", "hf-internal-testing/llama-tokenizer")
         self.tokenizer_args = config.get("tokenizer_args", None)
         self.doc_id_column = config.get("doc_id_column", "document_id")

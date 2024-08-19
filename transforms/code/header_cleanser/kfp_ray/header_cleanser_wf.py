@@ -43,7 +43,6 @@ def compute_exec_params_func(
     header_cleanser_contents_column_name: str,
     header_cleanser_license: bool,
     header_cleanser_copyright: bool,
-
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -58,7 +57,7 @@ def compute_exec_params_func(
         "runtime_code_location": str(runtime_code_location),
         "header_cleanser_contents_column_name": header_cleanser_contents_column_name,
         "header_cleanser_license": header_cleanser_license,
-        "header_cleanser_copyright":header_cleanser_copyright,
+        "header_cleanser_copyright": header_cleanser_copyright,
     }
 
 
