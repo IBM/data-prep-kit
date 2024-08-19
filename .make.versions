@@ -96,13 +96,15 @@ TEXT_ENCODER_PYTHON_VERSION=$(DPK_VERSION)
 TEXT_ENCODER_RAY_VERSION=$(DPK_VERSION)
 
 HEADER_CLEANSER_PYTHON_VERSION=$(DPK_VERSION) 
-HEADER_CLEANSER_RAY_VERSION=$(DPK_VERSION) 
+HEADER_CLEANSER_RAY_VERSION=$(DPK_VERSION)
+
+PII_REDACTOR_PYTHON_VERSION=$(DPK_VERSION)
 
 ################## ################## ################## ################## ################## ##################
 # Begin versions that the repo depends on. 
 
 KFP_v2=2.2.0
-KFP_v2_SDK=2.7.0
+KFP_v2_SDK=2.8.0
 KFP_v1=1.8.5
 KFP_v1_SDK=1.8.22
 RAY=2.24.0
