@@ -4,8 +4,8 @@ description: Creates Ray cluster
 inputs:
     - { name: ray_name, type: String, description: "Ray cluster user name" }
     - { name: run_id, type: String, description: "The KFP Run ID" }
-    - { name: ray_head_options, type: String, default: "", description: "ray head configuration" }
-    - { name: ray_worker_options, type: String, default: "", description: "ray worker configuration" }
+    - { name: ray_head_options, type: JsonObject, default: "{}", description: "ray head configuration" }
+    - { name: ray_worker_options, type: JsonObject, default: "{}", description: "ray worker configuration" }
     - { name: server_url, type: String, default: "", description: "url of api server" }
     - { name: additional_params, type: String, default: "{}", description: "additional parameters" }
 

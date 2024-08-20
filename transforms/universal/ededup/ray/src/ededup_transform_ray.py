@@ -81,7 +81,7 @@ class EdedupRayTransform(EdedupTransformBase):
         return unique
 
 
-class EdedupRuntime(DefaultRayTransformRuntime):
+class EdedupRayRuntime(DefaultRayTransformRuntime):
     """
     Exact dedup runtime support
     """
@@ -170,7 +170,7 @@ class EdedupTransformConfiguration(EdedupTransformConfigurationBase):
 
 class EdedupRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=EdedupTransformConfiguration(), runtime_class=EdedupRuntime)
+        super().__init__(transform_config=EdedupTransformConfiguration(), runtime_class=EdedupRayRuntime)
 
 
 if __name__ == "__main__":
