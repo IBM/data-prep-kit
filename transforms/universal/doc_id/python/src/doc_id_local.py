@@ -13,7 +13,7 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-from doc_id_transform_python import DocIDPythonTransform
+from doc_id_transform_python import DocIDTransform
 from doc_id_transform_base import (IDGenerator,
                                    doc_column_name_key,
                                    hash_column_name_key,
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     # Filter transform needs a DataAccess to ready the domain list.
     data_access = DataAccessLocal(local_conf)
     # Create and configure the transform.
-    transform = DocIDPythonTransform(doc_id_params)
+    transform = DocIDTransform(doc_id_params)
     # Use the local data access to read a parquet table.
     table, _ = data_access.get_table(os.path.join(input_folder, "sample1.parquet"))
     print(f"input table has {table.num_rows} rows")

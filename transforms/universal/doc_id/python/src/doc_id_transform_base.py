@@ -100,12 +100,12 @@ class DocIDTransformBase(AbstractTableTransform):
             table = TransformUtils.add_column(table=table, name=self.hash_column, content=doc_ids)
         if self.int_column is not None:
             # add integer document id
-            sid = self.get_starting_id(table.num_rows)
+            sid = self._get_starting_id(table.num_rows)
             int_doc_ids = list(range(sid, table.num_rows + sid))
             table = TransformUtils.add_column(table=table, name=self.int_column, content=int_doc_ids)
         return [table], {}
 
-    def get_starting_id(self, n_rows: int) -> int:
+    def _get_starting_id(self, n_rows: int) -> int:
         """
         Get starting Id
         :param n_rows - number of rows in the table

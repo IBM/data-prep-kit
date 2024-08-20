@@ -15,7 +15,7 @@ from typing import Tuple
 import pyarrow as pa
 from data_processing.test_support.transform import AbstractTableTransformTest
 from data_processing.utils import TransformUtils
-from doc_id_transform_python import DocIDPythonTransform
+from doc_id_transform_python import DocIDTransform
 from doc_id_transform_base import (IDGenerator,
                                    doc_column_name_key,
                                    hash_column_name_key,
@@ -54,5 +54,5 @@ class TestDocIDTransform(AbstractTableTransformTest):
             int_column_name_key: "doc_int",
             id_generator_key: IDGenerator(5),
         }
-        fixtures.append((DocIDPythonTransform(config), [table], [expected_table], expected_metadata_list))
+        fixtures.append((DocIDTransform(config), [table], [expected_table], expected_metadata_list))
         return fixtures

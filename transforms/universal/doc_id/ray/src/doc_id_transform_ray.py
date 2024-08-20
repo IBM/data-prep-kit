@@ -48,7 +48,7 @@ class DocIDRayTransform(DocIDTransformBase):
                 "There is no id generating actor defined."
             )
 
-    def get_starting_id(self, n_rows: int) -> int:
+    def _get_starting_id(self, n_rows: int) -> int:
         """
         Get starting ID
         :param n_rows - number of rows in the table

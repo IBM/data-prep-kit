@@ -29,7 +29,7 @@ from doc_id_transform_base import (
 )
 
 
-class DocIDPythonTransform(DocIDTransformBase):
+class DocIDTransform(DocIDTransformBase):
     """
     Implements schema modification of a pyarrow Table.
     """
@@ -42,7 +42,7 @@ class DocIDPythonTransform(DocIDTransformBase):
         super().__init__(config)
         self.id_generator = config.get(id_generator_key, IDGenerator(config.get(start_id_key, 1)))
 
-    def get_starting_id(self, n_rows: int) -> int:
+    def _get_starting_id(self, n_rows: int) -> int:
         """
         Get starting ID
         :param n_rows - number of rows in the table
@@ -51,10 +51,10 @@ class DocIDPythonTransform(DocIDTransformBase):
         return self.id_generator.get_ids(n_rows=n_rows)
 
 
-class DocIDPythonTransformConfiguration(DocIDTransformConfigurationBase):
+class DocIDTransformConfiguration(DocIDTransformConfigurationBase):
 
     def __init__(self):
-        super().__init__(transform_class=DocIDPythonTransform)
+        super().__init__(transform_class=DocIDTransform)
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -71,7 +71,7 @@ class DocIDPythonTransformConfiguration(DocIDTransformConfigurationBase):
         return super().apply_input_params(args=args)
 
 
-class DocIDPythonRuntime(DefaultPythonTransformRuntime):
+class DocIDRuntime(DefaultPythonTransformRuntime):
     """
     Exact dedup runtime support
     """
@@ -110,8 +110,8 @@ class DocIDPythonRuntime(DefaultPythonTransformRuntime):
 class DocIDPythonTransformRuntimeConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(
-            transform_config=DocIDPythonTransformConfiguration(),
-            runtime_class=DocIDPythonRuntime,
+            transform_config=DocIDTransformConfiguration(),
+            runtime_class=DocIDRuntime,
         )
 
 
