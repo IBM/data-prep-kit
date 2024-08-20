@@ -16,6 +16,7 @@ import sys
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 from ededup_transform_python import EdedupPythonTransformPuntimeConfiguration
+from ededup_transform_base import doc_column_name_cli_param, int_column_name_cli_param
 
 
 # create launcher
@@ -36,8 +37,8 @@ params = {
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # ededup parameters
-    "ededup_doc_column": "contents",
-    "ededup_doc_id_column": "document_id",
+    doc_column_name_cli_param: "contents",
+    int_column_name_cli_param: "document_id",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

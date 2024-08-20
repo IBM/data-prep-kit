@@ -31,6 +31,13 @@ from ededup_transform_base import (
     cli_prefix,
 )
 from ray.actor import ActorHandle
+from ededup_transform_base import use_snapshot_key
+
+
+hash_cpu_key = "hash_cpu"
+num_hashes_key = "num_hashes"
+hash_cpu_cli_params = f"{cli_prefix}{hash_cpu_key}"
+num_hashes_cli_params = f"{cli_prefix}{num_hashes_key}"
 
 
 class EdedupRayTransform(EdedupTransformBase):
@@ -111,15 +118,15 @@ class EdedupRayRuntime(DefaultRayTransformRuntime):
         :return: dictionary of transform init params
         """
         # create hashes
-        n_filters = self.params.get("num_hashes", 1)
+        n_filters = self.params.get(num_hashes_key, 1)
         self.filters = [None] * n_filters
         for i in range(n_filters):
             self.filters[i] = (
                 ray.remote(HashFilter)
-                .options(num_cpus=self.params.get("hash_cpu", 0.5))
+                .options(num_cpus=self.params.get(hash_cpu_key, 0.5))
                 .remote({"id": i, "data_access_factory": data_access_factory})
             )
-        if self.params.get("use_snapshot", False):
+        if self.params.get(use_snapshot_key, False):
             # we are using snapshots. Note here that the amount of files might be different
             # from the current amount of hashes
             snapshot_path = self.params.get("snapshot_directory", None)
@@ -202,8 +209,8 @@ class EdedupRayTransformConfiguration(EdedupTransformConfigurationBase):
         Add Transform-specific arguments to the given  parser.
         """
         super().add_input_params(parser)
-        parser.add_argument(f"--{cli_prefix}hash_cpu", type=float, default=0.5, help="number of CPUs per hash")
-        parser.add_argument(f"--{cli_prefix}num_hashes", type=int, default=0, help="number of hash actors to use")
+        parser.add_argument(f"--{hash_cpu_cli_params}", type=float, default=0.5, help="number of CPUs per hash")
+        parser.add_argument(f"--{num_hashes_cli_params}", type=int, default=0, help="number of hash actors to use")
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -212,7 +219,7 @@ class EdedupRayTransformConfiguration(EdedupTransformConfigurationBase):
         :return: True, if validate pass or False otherwise
         """
         super().apply_input_params(args)
-        if self.params["num_hashes"] <= 0:
+        if self.params[num_hashes_key] <= 0:
             self.logger.info(f"Number of hashes should be greater then zero, provided {self.params['num_hashes']}")
             return False
         return True

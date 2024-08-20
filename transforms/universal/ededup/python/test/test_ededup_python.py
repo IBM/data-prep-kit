@@ -17,6 +17,7 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from ededup_transform_python import EdedupPythonTransformPuntimeConfiguration
+from ededup_transform_base import doc_column_name_cli_param, int_column_name_cli_param
 
 
 class TestPythonEdedupTransform(AbstractTransformLauncherTest):
@@ -30,5 +31,5 @@ class TestPythonEdedupTransform(AbstractTransformLauncherTest):
         fixtures = []
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
         launcher = PythonTransformLauncher(EdedupPythonTransformPuntimeConfiguration())
-        config = {"ededup_doc_column": "contents", "ededup_doc_id_column": "document_id"}
+        config = {doc_column_name_cli_param: "contents", int_column_name_cli_param: "document_id"}
         return [(launcher, config, basedir + "/input", basedir + "/expected")]

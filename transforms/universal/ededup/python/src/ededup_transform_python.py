@@ -19,12 +19,13 @@ from data_processing.runtime.pure_python import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.transform import TransformStatistics
-from data_processing.utils import UnrecoverableException, get_logger
+from data_processing.utils import get_logger
 from ededup_transform_base import (
     EdedupTransformBase,
     EdedupTransformConfigurationBase,
     HashFilter,
 )
+from ededup_transform_base import use_snapshot_key, snapshot_directory_key
 
 
 logger = get_logger(__name__)
@@ -43,8 +44,6 @@ class EdedupPythonTransform(EdedupTransformBase):
         """
         super().__init__(config)
         self.filter = config.get("filter", HashFilter({}))
-        if self.filter is None:
-            raise UnrecoverableException("filter is not provided")
 
     def _process_cached_hashes(self, hd: dict[str, str]) -> list[str]:
         """
@@ -82,8 +81,8 @@ class EdedupPythonRuntime(DefaultPythonTransformRuntime):
         :param files - list of files to process
         :return: dictionary of transform init params
         """
-        if self.params.get("use_snapshot", False):
-            snapshot_path = self.params.get("snapshot_directory", None)
+        if self.params.get(use_snapshot_key, False):
+            snapshot_path = self.params.get(snapshot_directory_key, None)
             if snapshot_path is None or len(snapshot_path) == 0:
                 snapshot_path = (
                     f"{SnapshotUtils.get_snapshot_folder(data_access_factory.create_data_access())}"

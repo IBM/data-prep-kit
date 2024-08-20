@@ -33,7 +33,14 @@ from data_processing.utils import (
 REQUEST_LEN = 8192
 short_name = "ededup"
 cli_prefix = f"{short_name}_"
-
+doc_column_name_key = "doc_column"
+int_column_name_key = "doc_id_column"
+use_snapshot_key = "use_snapshot"
+snapshot_directory_key = "snapshot_directory"
+doc_column_name_cli_param = f"{cli_prefix}{doc_column_name_key}"
+int_column_name_cli_param = f"{cli_prefix}{int_column_name_key}"
+use_snapshot_cli_param = f"{cli_prefix}{use_snapshot_key}"
+snapshot_directory_cli_param = f"--{cli_prefix}{snapshot_directory_key}"
 
 class HashFilter:
     """
@@ -121,8 +128,8 @@ class EdedupTransformBase(AbstractTableTransform):
             doc_column - name of the doc column
         """
         super().__init__(config)
-        self.doc_column = config.get("doc_column", "contents")
-        self.doc_id_column = config.get("doc_id_column", "document_id")
+        self.doc_column = config.get(doc_column_name_key, "contents")
+        self.doc_id_column = config.get(int_column_name_key, "document_id")
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -208,18 +215,18 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
         Add Transform-specific arguments to the given  parser.
         """
         parser.add_argument(
-            f"--{cli_prefix}doc_column",
+            f"--{doc_column_name_cli_param}",
             type=str,
             default="contents",
             help="name of the column containing document")
         parser.add_argument(
-            f"--{cli_prefix}doc_id_column",
+            f"--{int_column_name_cli_param}",
             type=str,
             default="document_id",
             help="name of the column containing document id"
         )
         parser.add_argument(
-            f"--{cli_prefix}use_snapshot",
+            f"--{use_snapshot_cli_param}",
             type=lambda x: bool(str2bool(x)),
             default=False,
             help="flag to continue from snapshot",
@@ -227,7 +234,7 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
         # by default, snapshot file is from the output directory. This parameter can overwrite
         # default location by explicitly defining the snapshot directory
         parser.add_argument(
-            f"--{cli_prefix}snapshot_directory", type=str, default=None, help="location of snapshot files"
+            f"--{snapshot_directory_cli_param}", type=str, default=None, help="location of snapshot files"
         )
 
     def apply_input_params(self, args: Namespace) -> bool:

@@ -16,6 +16,13 @@ import sys
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from ededup_transform_ray import EdedupRayTransformRuntimeConfiguration
+from ededup_transform_base import (
+    doc_column_name_cli_param,
+    int_column_name_cli_param,
+    use_snapshot_cli_param,
+    snapshot_directory_cli_param,
+)
+from ededup_transform_ray import hash_cpu_cli_params, num_hashes_cli_params
 
 
 # create launcher
@@ -42,12 +49,12 @@ params = {
     "runtime_creation_delay": 0,
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # ededup parameters
-    "ededup_hash_cpu": 0.5,
-    "ededup_num_hashes": 3,
-    "ededup_doc_column": "contents",
-    "ededup_doc_id_column": "document_id",
-    "ededup_use_snapshot": True,
-    "ededup_snapshot_directory": input_folder + "/snapshot",
+    hash_cpu_cli_params: 0.5,
+    num_hashes_cli_params: 2,
+    doc_column_name_cli_param: "contents",
+    int_column_name_cli_param: "document_id",
+    use_snapshot_cli_param: True,
+    snapshot_directory_cli_param: input_folder + "/snapshot",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

@@ -17,6 +17,7 @@ from data_processing.test_support import get_tables_in_folder
 from data_processing.test_support.transform import AbstractTableTransformTest
 from ededup_transform_base import HashFilter
 from ededup_transform_python import EdedupPythonTransform
+from ededup_transform_base import doc_column_name_key, int_column_name_key
 
 
 class TestEdedupTransform(AbstractTableTransformTest):
@@ -30,7 +31,7 @@ class TestEdedupTransform(AbstractTableTransformTest):
         input_dir = os.path.join(basedir, "input")
         input_tables = get_tables_in_folder(input_dir)
         expected_metadata_list = [{"result_documents": 3, "source_documents": 5}, {}]
-        config = {"doc_column": "contents", "doc_id_column": "document_id", "filter": HashFilter({})}
+        config = {doc_column_name_key: "contents", int_column_name_key: "document_id", "filter": HashFilter({})}
         expected_tables = get_tables_in_folder(os.path.join(basedir, "expected"))
         return [
             (EdedupPythonTransform(config), input_tables, expected_tables, expected_metadata_list),
