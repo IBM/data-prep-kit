@@ -15,12 +15,12 @@ import sys
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
-from ededup_transform_python import EdedupPythonTransformPuntimeConfiguration
+from ededup_transform_python import EdedupPythonTransformRuntimeConfiguration
 from ededup_transform_base import doc_column_name_cli_param, int_column_name_cli_param
 
 
 # create launcher
-launcher = PythonTransformLauncher(EdedupPythonTransformPuntimeConfiguration())
+launcher = PythonTransformLauncher(EdedupPythonTransformRuntimeConfiguration())
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))

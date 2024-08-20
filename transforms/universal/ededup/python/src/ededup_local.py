@@ -14,7 +14,7 @@ import os
 
 from data_processing.data_access import DataAccessLocal
 from ededup_transform_base import HashFilter
-from ededup_transform_python import EdedupPythonTransform
+from ededup_transform_python import EdedupTransform
 from ededup_transform_base import doc_column_name_key, int_column_name_key
 
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # Filter transform needs a DataAccess to ready the domain list.
     data_access = DataAccessLocal(local_conf)
     # Create and configure the transform.
-    transform = EdedupPythonTransform(ededup_params)
+    transform = EdedupTransform(ededup_params)
     # Use the local data access to read a parquet table.
     table, _ = data_access.get_table(os.path.join(input_folder, "sample1.parquet"))
     print(f"input table has {table.num_rows} rows and {table.num_columns} columns")

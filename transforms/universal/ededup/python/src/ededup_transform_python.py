@@ -31,7 +31,7 @@ from ededup_transform_base import use_snapshot_key, snapshot_directory_key
 logger = get_logger(__name__)
 
 
-class EdedupPythonTransform(EdedupTransformBase):
+class EdedupTransform(EdedupTransformBase):
     """
     Implements dedup table transformer.
     """
@@ -58,7 +58,7 @@ class EdedupPythonTransform(EdedupTransformBase):
         return unique
 
 
-class EdedupPythonRuntime(DefaultPythonTransformRuntime):
+class EdedupRuntime(DefaultPythonTransformRuntime):
     """
     Exact dedup runtime support
     """
@@ -113,14 +113,14 @@ class EdedupPythonRuntime(DefaultPythonTransformRuntime):
         self.filter.snapshot()
 
 
-class EdedupPythonTransformConfiguration(EdedupTransformConfigurationBase):
+class EdedupTransformConfiguration(EdedupTransformConfigurationBase):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__(transform_class=EdedupPythonTransform)
+        super().__init__(transform_class=EdedupTransform)
 
     def apply_input_params(self, args: Namespace) -> bool:
         if args.runtime_num_processors > 0:
@@ -132,14 +132,14 @@ class EdedupPythonTransformConfiguration(EdedupTransformConfigurationBase):
         return super().apply_input_params(args=args)
 
 
-class EdedupPythonTransformPuntimeConfiguration(PythonTransformRuntimeConfiguration):
+class EdedupPythonTransformRuntimeConfiguration(PythonTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(
-            transform_config=EdedupPythonTransformConfiguration(),
-            runtime_class=EdedupPythonRuntime,
+            transform_config=EdedupTransformConfiguration(),
+            runtime_class=EdedupRuntime,
         )
 
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(EdedupPythonTransformPuntimeConfiguration())
+    launcher = PythonTransformLauncher(EdedupPythonTransformRuntimeConfiguration())
     launcher.launch()
