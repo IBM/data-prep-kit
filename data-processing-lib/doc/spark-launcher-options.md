@@ -1,17 +1,17 @@
 # Spark Launcher Command Line Options
+
+
 A number of command line options are available when launching a transform using Spark.  
 
 The following is a current --help output (a work in progress) for 
 the `NOOPTransform` (note the --noop_sleep_sec and --noop_pwd options):
 
 ```
-usage: noop_transform.py [-h] [--noop_sleep_sec NOOP_SLEEP_SEC] [--noop_pwd NOOP_PWD] [--data_s3_cred DATA_S3_CRED] [--data_s3_config DATA_S3_CONFIG]
-                         [--data_local_config DATA_LOCAL_CONFIG] [--data_max_files DATA_MAX_FILES] [--data_checkpointing DATA_CHECKPOINTING]
-                         [--data_data_sets DATA_DATA_SETS] [--data_files_to_use DATA_FILES_TO_USE] [--data_num_samples DATA_NUM_SAMPLES]
-                         [--runtime_pipeline_id RUNTIME_PIPELINE_ID] [--runtime_job_id RUNTIME_JOB_ID] [--runtime_code_location RUNTIME_CODE_LOCATION]
-                         [--spark_local_config_filepath SPARK_LOCAL_CONFIG_FILEPATH] [--spark_kube_config_filepath SPARK_KUBE_CONFIG_FILEPATH]
+usage: noop_python_runtime.py [-h] [--noop_sleep_sec NOOP_SLEEP_SEC] [--noop_pwd NOOP_PWD] [--data_s3_cred DATA_S3_CRED] [--data_s3_config DATA_S3_CONFIG] [--data_local_config DATA_LOCAL_CONFIG] [--data_max_files DATA_MAX_FILES]
+                              [--data_checkpointing DATA_CHECKPOINTING] [--data_data_sets DATA_DATA_SETS] [--data_files_to_use DATA_FILES_TO_USE] [--data_num_samples DATA_NUM_SAMPLES] [--runtime_pipeline_id RUNTIME_PIPELINE_ID]
+                              [--runtime_job_id RUNTIME_JOB_ID] [--runtime_code_location RUNTIME_CODE_LOCATION]
 
-Driver for noop processing on Spark
+Driver for noop processing
 
 options:
   -h, --help            show this help message and exit
@@ -59,8 +59,5 @@ options:
                         path: Path within the repository
                         Example: { 'github': 'https://github.com/somerepo', 'commit_hash': '1324', 
                         'path': 'transforms/universal/code' }
-  --spark_local_config_filepath SPARK_LOCAL_CONFIG_FILEPATH
-                        Path to spark configuration for run
-  --spark_kube_config_filepath SPARK_KUBE_CONFIG_FILEPATH
-                        Path to Kubernetes-based configuration.
 ```
+

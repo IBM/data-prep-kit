@@ -12,13 +12,8 @@
 
 from typing import Any, TypeVar
 
-from data_processing.transform.abstract_transform import AbstractTransform
 
-
-DATA = TypeVar("DATA")
-
-
-class AbstractBinaryTransform(AbstractTransform[DATA]):
+class AbstractBinaryTransform:
     """
     Converts input binary file to output file(s) (binary)
     Sub-classes must provide the transform() method to provide the conversion of one binary files to 0 or

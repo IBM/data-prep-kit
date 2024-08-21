@@ -10,88 +10,80 @@
 # limitations under the License.
 ################################################################################
 
-import ast
-import json
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-from data_processing.transform import TransformConfiguration
-from data_processing.utils import CLIArgumentProvider, get_logger
-from data_processing_spark.runtime.spark.runtime_config import (
-    SparkTransformRuntimeConfiguration,
-)
-from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
-from data_processing_spark.runtime.spark.spark_transform import AbstractSparkTransform
-from pyspark.sql import DataFrame
-from pyspark.sql.functions import monotonically_increasing_id
-
-
-logger = get_logger(__name__)
+import pyarrow as pa
+from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.utils import CLIArgumentProvider, TransformUtils
+from data_processing_spark.runtime.spark import SparkTransformLauncher
+from data_processing_spark.transform import SparkTransformRuntimeConfiguration
 
 
 short_name = "doc_id"
-cli_prefix = short_name + "_"
+cli_prefix = f"{short_name}_"
+doc_column_name_key = "doc_column"
+hash_column_name_key = "hash_column"
+int_column_name_key = "int_column"
+_id_generator_key = "_id_generator"
 
-doc_id_column_name_key = "column_name"
-""" name of the column that holds the generated document id """
+doc_column_name_cli_param = f"{cli_prefix}{doc_column_name_key}"
+hash_column_name_cli_param = f"{cli_prefix}{hash_column_name_key}"
+int_column_name_cli_param = f"{cli_prefix}{int_column_name_key}"
 
-doc_id_column_name_cli_param = f"{cli_prefix}{doc_id_column_name_key}"
-""" name of the column that holds the generated document id """
-
-captured_arg_keys = [doc_id_column_name_key]
-""" The set of keys captured from the command line """
-
-# defaults
-doc_id_column_name_default = "doc_id"
-""" The default name of the column that holds the generated document id """
+doc_column_name_default = "contents"
 
 
-class DocIDTransform(AbstractSparkTransform):
+class DocIDTransform(AbstractTableTransform):
     """
-    Implements Spark document ID generation - assign each row in a Spark DataFrame
-    a unique integer ID
+    Spark specific DocID transformer implementation
     """
 
     def __init__(self, config: dict[str, Any]):
         """
         Initialize based on the dictionary of configuration information.
-        This is generally called with configuration parsed from the CLI arguments defined
-        by the companion runtime, FilterTransformRuntime.
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
-        # of FilterTransformConfiguration class
         super().__init__(config)
-        self.column_name = config.get(doc_id_column_name_key, doc_id_column_name_default)
+        self.doc_column = config.get(doc_column_name_key, doc_column_name_default)
+        self.hash_column = config.get(hash_column_name_key, None)
+        self.int_column = config.get(int_column_name_key, None)
+        # here we compute starting index for partition as a partition index times max 32 bit integer
+        self.start_index = config.get("partition_index", 0) * 2147483647
+        self.logger.debug(f"starting index {self.start_index}")
+        if self.hash_column is None and self.int_column is None:
+            raise RuntimeError("At least one of hash or integer column names must be specified.")
 
-    def transform(self, data: DataFrame) -> tuple[list[DataFrame], dict[str, Any]]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
-        This implementation filters the input Spark dataframe using a SQL
-        statement and returns the filtered table and execution stats
-        :param data: input Spark DataFrame
-        :return: list of output Spark DataFrames and custom statistics
+        Put Transform-specific to convert one Table to 0 or more tables. It also returns
+        a dictionary of execution statistics - arbitrary dictionary
+        This implementation makes no modifications so effectively implements a copy of the
+        input parquet to the output folder, without modification.
         """
-        # initialize the metadata dictionary
-        total_docs = data.count()
-        total_columns = len(data.columns)
-        metadata = {
-            "total_docs_count": total_docs,
-            "total_columns_count": total_columns,
-        }
+        TransformUtils.validate_columns(table=table, required=[self.doc_column])
 
-        doc_id_df = data.withColumn(self.column_name, monotonically_increasing_id())
-
-        # add global filter stats to metadata
-        metadata["docs_after_doc_id"] = doc_id_df.count()
-        metadata["columns_after_doc_id"] = len(doc_id_df.columns)
-
-        return [doc_id_df], metadata
+        if self.hash_column is not None:
+            # add doc id column
+            docs = table[self.doc_column]
+            doc_ids = [""] * table.num_rows
+            for n in range(table.num_rows):
+                doc_ids[n] = TransformUtils.str_to_hash(docs[n].as_py())
+            table = TransformUtils.add_column(table=table, name=self.hash_column, content=doc_ids)
+        if self.int_column is not None:
+            # add integer document id
+            int_doc_ids = list(range(self.start_index, table.num_rows + self.start_index))
+            self.logger.debug(f"int ids {int_doc_ids}")
+            self.start_index += table.num_rows
+            table = TransformUtils.add_column(table=table, name=self.int_column, content=int_doc_ids)
+        return [table], {}
 
 
 class DocIDTransformConfiguration(TransformConfiguration):
 
     """
     Provides support for configuring and using the associated Transform class include
-    configuration with CLI args.
+    configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
@@ -99,21 +91,31 @@ class DocIDTransformConfiguration(TransformConfiguration):
             name=short_name,
             transform_class=DocIDTransform,
         )
+        from data_processing.utils import get_logger
+
+        self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
-        This will be included in a dictionary used to initialize the DocIDTransform.
-        By convention a common prefix should be used for all mutator-specific CLI args
+        This will be included in a dictionary used to initialize the NOOPTransform.
+        By convention a common prefix should be used for all transform-specific CLI args
         (e.g, noop_, pii_, etc.)
         """
-
         parser.add_argument(
-            f"--{doc_id_column_name_cli_param}",
+            f"--{doc_column_name_cli_param}", type=str, default=doc_column_name_default, help="doc column name"
+        )
+        parser.add_argument(
+            f"--{hash_column_name_cli_param}",
             type=str,
-            required=False,
-            default="doc_id",
-            help="name of the column that holds the generated document ids",
+            default=None,
+            help="Compute document hash and place in the given named column",
+        )
+        parser.add_argument(
+            f"--{int_column_name_cli_param}",
+            type=str,
+            default=None,
+            help="Compute unique integer id and place in the given named column",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
@@ -122,16 +124,21 @@ class DocIDTransformConfiguration(TransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        # Capture the args that are specific to this transform
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        if captured.get(hash_column_name_key) is None and captured.get(int_column_name_key) is None:
+            self.logger.info("One of hash or int id column names must be specified.")
+            return False
+
         self.params = self.params | captured
+        self.logger.info(f"Doc id parameters are : {self.params}")
         return True
 
 
-class DocIDSparkRuntimeConfiguration(SparkTransformRuntimeConfiguration):
+class DocIDSparkTransformConfiguration(SparkTransformRuntimeConfiguration):
     """
-    Implements the SparkTransformConfiguration for DocID as required by the
-    SparkTransformLauncher.
+    Implements the SparkTransformConfiguration for NOOP as required by the PythonTransformLauncher.
+    NOOP does not use a RayRuntime class so the superclass only needs the base
+    python-only configuration.
     """
 
     def __init__(self):
@@ -142,6 +149,5 @@ class DocIDSparkRuntimeConfiguration(SparkTransformRuntimeConfiguration):
 
 
 if __name__ == "__main__":
-    launcher = SparkTransformLauncher(DocIDSparkRuntimeConfiguration())
-    logger.info("Launching doc_id transform")
+    launcher = SparkTransformLauncher(DocIDSparkTransformConfiguration())
     launcher.launch()

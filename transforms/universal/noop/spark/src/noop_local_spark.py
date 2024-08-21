@@ -14,8 +14,8 @@ import os
 import sys
 
 from data_processing.utils import ParamsUtils
-from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
-from noop_transform_spark import NOOPSparkRuntimeConfiguration
+from data_processing_spark.runtime.spark import SparkTransformLauncher
+from noop_transform_spark import NOOPSparkTransformConfiguration
 
 
 # create parameters
@@ -26,15 +26,14 @@ local_conf = {
     "output_folder": output_folder,
 }
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
-config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "config/spark_profile_local.yml"))
 params = {
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # execution info
+    "runtime_parallelization": 2,
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
-    "spark_local_config_filepath": config_path,
     # noop params
     "noop_sleep_sec": 1,
 }
@@ -42,6 +41,6 @@ if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = SparkTransformLauncher(runtime_config=NOOPSparkRuntimeConfiguration())
+    launcher = SparkTransformLauncher(runtime_config=NOOPSparkTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

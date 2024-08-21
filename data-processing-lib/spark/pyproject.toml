@@ -8,12 +8,12 @@ license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     { name = "David Wood", email = "dawood@us.ibm.com" },
-    { name = "Constantin Adam", email = "cmadam@us.ibm.com" },
+    { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
 dependencies = [
     "data-prep-toolkit==0.2.1.dev0",	
     "pyspark>=3.5.1",
-    "pyyaml>=6.0.1",
+    "psutil>=6.0.0"
 ]
 
 [project_urls]

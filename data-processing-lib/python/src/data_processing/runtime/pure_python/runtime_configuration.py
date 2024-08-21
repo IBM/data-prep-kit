@@ -11,15 +11,16 @@
 ################################################################################
 
 from data_processing.runtime import TransformRuntimeConfiguration
-from data_processing.transform import TransformConfiguration
 from data_processing.runtime.pure_python import DefaultPythonTransformRuntime
+from data_processing.transform import TransformConfiguration
 
 
 class PythonTransformRuntimeConfiguration(TransformRuntimeConfiguration):
-    def __init__(self,
-                 transform_config: TransformConfiguration,
-                 runtime_class: type[DefaultPythonTransformRuntime] = DefaultPythonTransformRuntime,
-                 ):
+    def __init__(
+        self,
+        transform_config: TransformConfiguration,
+        runtime_class: type[DefaultPythonTransformRuntime] = DefaultPythonTransformRuntime,
+    ):
         """
         Initialization
         :param transform_config - base configuration class

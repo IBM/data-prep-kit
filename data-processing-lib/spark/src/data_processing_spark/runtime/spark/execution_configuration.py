@@ -23,9 +23,9 @@ logger = get_logger(__name__)
 cli_prefix = "runtime_"
 
 
-class PythonTransformExecutionConfiguration(TransformExecutionConfiguration):
+class SparkTransformExecutionConfiguration(TransformExecutionConfiguration):
     """
-    A class specifying and validating Python orchestrator configuration
+    A class specifying and validating Spark orchestrator configuration
     """
 
     def __init__(self, name: str):
@@ -33,16 +33,27 @@ class PythonTransformExecutionConfiguration(TransformExecutionConfiguration):
         Initialization
         """
         super().__init__(name=name, print_params=False)
-        self.num_processors = 0
+        self.parallelization = -1
 
     def add_input_params(self, parser: argparse.ArgumentParser) -> None:
         """
         This method adds transformer specific parameter to parser
         :param parser: parser
-        :return:
+        :return: None
         """
-        parser.add_argument(f"--{cli_prefix}num_processors", type=int, default=0, help="size of multiprocessing pool")
-
+        """
+        This determines how many partitions the RDD should be divided into. See 
+        https://sparktpoint.com/how-to-create-rdd-using-parallelize/ for the explanation
+        of this parameter
+        If you specify a positive value of the parameter, Spark will attempt to evenly 
+        distribute the data from seq into that many partitions. For example, if you have 
+        a collection of 100 elements and you specify numSlices as 4, Spark will try 
+        to create 4 partitions with approximately 25 elements in each partition.
+        If you don’t specify this parameter, Spark will use a default value, which is 
+        typically determined based on the cluster configuration or the available resources
+        (number of workers).    
+        """
+        parser.add_argument(f"--{cli_prefix}parallelization", type=int, default=-1, help="parallelization.")
         return TransformExecutionConfiguration.add_input_params(self, parser=parser)
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
@@ -55,11 +66,16 @@ class PythonTransformExecutionConfiguration(TransformExecutionConfiguration):
             return False
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         # store parameters locally
-        self.num_processors = captured["num_processors"]
-        # print them
-        if self.num_processors > 0:
-            # we are using multiprocessing
-            logger.info(f"using multiprocessing, num processors {self.num_processors}")
+        self.job_details = {
+            "job category": "preprocessing",
+            "job name": self.name,
+            "job type": "spark",
+            "job id": captured["job_id"],
+        }
+        self.parallelization = captured["parallelization"]
+        # if the user did not define actor max_restarts set it up for fault tolerance
+        logger.info(f"job details {self.job_details}")
+        logger.info(f"RDD parallelization {self.parallelization}")
         return True
 
     def get_input_params(self) -> dict[str, Any]:
@@ -67,4 +83,6 @@ class PythonTransformExecutionConfiguration(TransformExecutionConfiguration):
         get input parameters for job_input_params in metadata
         :return: dictionary of parameters
         """
-        return {"num_processors": self.num_processors}
+        return {
+            "RDD parallelization": self.parallelization,
+        }

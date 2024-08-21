@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=quay.io/dataprep1/data-prep-kit/data-prep-kit-spark-3.5.1:0.1.0
+ARG BASE_IMAGE=quay.io/dataprep1/data-prep-kit/data-prep-kit-spark-3.5.1:0.2.0
 FROM ${BASE_IMAGE}
 
 USER root
@@ -29,9 +29,6 @@ COPY ./src/noop_local_spark.py local/
 # copy test
 COPY test/ test/
 COPY test-data/ test-data/
-
-# copy config
-COPY config/ config/
 
 USER spark
 

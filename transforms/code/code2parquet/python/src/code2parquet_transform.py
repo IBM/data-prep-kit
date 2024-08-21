@@ -22,11 +22,7 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.data_access import DataAccess, DataAccessFactory
-from data_processing.transform import (
-    AbstractBinaryTransform,
-    AbstractTransform,
-    TransformConfiguration,
-)
+from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, str2bool
 
 
@@ -159,7 +155,7 @@ class CodeToParquetTransformConfiguration(TransformConfiguration):
     configuration with CLI args and combining of metadata.
     """
 
-    def __init__(self, transform_class: type[AbstractTransform] = CodeToParquetTransform):
+    def __init__(self, transform_class: type[AbstractBinaryTransform] = CodeToParquetTransform):
         super().__init__(
             name=shortname,
             transform_class=transform_class,
