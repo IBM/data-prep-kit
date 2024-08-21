@@ -1,0 +1,48 @@
+
+venv:  
+	$(MAKE) .defaults.create-venv
+
+test::	setup test-src
+	@# Help: Setup environment, load wheel from pyproject.toml and run unit tests for all transforms
+
+clean:: .transforms.clean
+	-rm -fr src
+
+image:: .transforms.python-image
+
+test-src:: 
+	source venv/bin/activate;       \
+	for T in $(TRANSFORMS_NAMES); do                    \
+	    echo running unit test on: $$T ; \
+		$(PYTEST) $(REPOROOT)/transforms/$$T/$(PACKAGING_RUN_TIME)/test; \
+	done;
+	@# Help: Run all unit tests from the same venv environment (should follow make venv)
+
+
+setup: .transforms.setup venv
+	$(MAKE) src
+	source venv/bin/activate;       \
+	$(PYTHON) -m pip install . 
+	@# Help: Do any default transform setup before running make src
+
+
+src:
+	for T in $(TRANSFORMS_NAMES); do                    \
+	    echo copy src from  $$T ; \
+		cp -R $(REPOROOT)/transforms/$$T/$(PACKAGING_RUN_TIME)/src/ src/ ; \
+		rm -fr *.egg-info ; \
+		rm -fr dist ; \
+		rm -fr build ; \
+	done;
+	@# Help: Setup src folder and remove old distribution
+
+		
+build:: build-dist
+        
+publish:: publish-dist
+        
+build-dist:: .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
+

@@ -1,15 +1,17 @@
-# Define the root of the local git clone for the common rules to be able 
+# Define the root of the local git clone for the common rules to be able
 # know where they are running from.
 REPOROOT=../../..
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
-# to override/redefine the rules below. 
+# to override/redefine the rules below.
 
 # $(REPOROOT)/.make.versions file contains the versions
 
-#TRANSFORM_NAME=doc_quality
-
 include $(REPOROOT)/transforms/.make.transforms
+include ../.make.packaging
+
+PACKAGING_RUN_TIME=python
+DPK_TRNASFORM_REV=0.2.1.dev1
 
 TRANSFORMS_NAMES = code/code_quality \
     	code/code2parquet \
@@ -21,57 +23,20 @@ TRANSFORMS_NAMES = code/code_quality \
 		language/lang_id \
 		language/pdf2parquet \
 		language/text_encoder \
+        language/pii_redactor \
 		universal/ededup \
 		universal/filter \
 		universal/resize \
-		universal/tokenization
-
-venv: 
-	$(MAKE) .defaults.create-venv
-	source venv/bin/activate;       \
-	$(PYTHON) -m pip install . 
-
-
-test::	setup venv test-src
-
-clean:: .transforms.clean
-	-rm -fr src
-
-image:: .transforms.python-image
-
-test-src:: 
-	source venv/bin/activate;       \
-	for T in $(TRANSFORMS_NAMES); do                    \
-	    echo running unit test on: $$T ; \
-		$(PYTEST) $(REPOROOT)/transforms/$$T/python/test; \
-	done;
+		universal/tokenization \
+        universal/html2parquet
 
 test-with-pypi:
 	$(MAKE) .defaults.create-venv
 	source venv/bin/activate;       \
-	$(PYTHON) -m pip install data_prep_toolkit_transforms==0.2.1.dev0 
+	$(PYTHON) -m pip install data_prep_toolkit_transforms==$(DPK_TRNASFORM_REV) 
 	$(MAKE) test-src
+	@# Help: Load wheel from pypi and run all unit tests: final step in verification after deploying to pypi)
 
 
-setup: .transforms.setup 
-	$(MAKE) src
-
-src:
-	for T in $(TRANSFORMS_NAMES); do                    \
-	    echo copy src from  $$T ; \
-		cp -R $(REPOROOT)/transforms/$$T/python/src/ src/ ; \
-		rm -fr *.egg-info ; \
-		rm -fr dist ; \
-		rm -fr build ; \
-	done;
-
-
-build:: build-dist
-        
-publish:: publish-dist
-        
-build-dist:: .defaults.build-dist 
-
-publish-dist:: .defaults.publish-dist
 
 
