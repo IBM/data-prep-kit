@@ -1,0 +1,8 @@
+pyspark
+pyarrow
+pyyaml
+boto3
+kubernetes
+disjoint_set
+mmh3
+scipy
