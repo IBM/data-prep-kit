@@ -30,7 +30,5 @@ class TestRayDocChunkTransform(AbstractTransformLauncherTest):
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         fixtures = []
         launcher = RayTransformLauncher(DocChunkRayTransformConfiguration())
-        fixtures.append(
-            (launcher, {"run_locally": True}, basedir + "/input", basedir + "/expected")
-        )
+        fixtures.append((launcher, {"run_locally": True}, basedir + "/input", basedir + "/expected"))
         return fixtures

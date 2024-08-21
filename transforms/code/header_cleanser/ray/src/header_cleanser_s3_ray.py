@@ -16,8 +16,8 @@ from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from header_cleanser_transform import (
     column_cli_params,
-    license_cli_params,
     copyright_cli_params,
+    license_cli_params,
 )
 from header_cleanser_transform_ray import HeaderCleanserRayTransformConfiguration
 
@@ -34,7 +34,7 @@ s3_conf = {
 }
 
 header_cleanser_params = {
-    column_cli_params: 'contents',
+    column_cli_params: "contents",
     license_cli_params: True,
     copyright_cli_params: True,
 }

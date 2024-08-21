@@ -11,15 +11,10 @@
 ################################################################################
 import os
 
-from workflow_support.compile_utils import (
-    ONE_HOUR_SEC,
-    ONE_WEEK_SEC,
-    ComponentUtils,
-)
-
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
+from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
 task_image = "quay.io/dataprep1/data-prep-kit/doc_quality-ray:latest"
@@ -36,30 +31,30 @@ component_spec_path = "../../../../kfp/kfp_ray_components/"
 # compute execution parameters. Here different tranforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 def compute_exec_params_func(
-    worker_options: str,
-    actor_options: str,
+    worker_options: dict,
+    actor_options: dict,
     data_s3_config: str,
     data_max_files: int,
     data_num_samples: int,
     runtime_pipeline_id: str,
     runtime_job_id: str,
-    runtime_code_location: str,
+    runtime_code_location: dict,
     docq_text_lang: str,
     docq_doc_content_column: str,
     docq_bad_word_filepath: str,
 ) -> dict:
-    
+
     from workflow_support.runtime_utils import KFPUtils
 
     return {
         "data_s3_config": data_s3_config,
         "data_max_files": data_max_files,
         "data_num_samples": data_num_samples,
-        "runtime_num_workers": KFPUtils.default_compute_execution_params(worker_options, actor_options),
-        "runtime_worker_options": actor_options,
+        "runtime_num_workers": KFPUtils.default_compute_execution_params(str(worker_options), str(actor_options)),
+        "runtime_worker_options": str(actor_options),
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
-        "runtime_code_location": runtime_code_location,
+        "runtime_code_location": str(runtime_code_location),
         "docq_text_lang": docq_text_lang,
         "docq_doc_content_column": docq_doc_content_column,
         "docq_bad_word_filepath": docq_bad_word_filepath,
@@ -81,8 +76,9 @@ if os.getenv("KFPv2", "0") == "1":
         func=compute_exec_params_func, base_image=base_kfp_image
     )
     print(
-        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the " +
-        "same version of the same pipeline !!!")
+        "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the "
+        + "same version of the same pipeline !!!"
+    )
     run_id = uuid.uuid4().hex
 else:
     compute_exec_params_op = comp.create_component_from_func(func=compute_exec_params_func, base_image=base_kfp_image)
@@ -105,10 +101,8 @@ TASK_NAME: str = "doc_quality"
 def doc_quality(
     # Ray cluster
     ray_name: str = "doc_quality-kfp-ray",  # name of Ray cluster
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": "", '
-    '"image": "' + task_image + '", "image_pull_policy": "Always" }',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image_pull_secret": "", "image": "' + task_image + '", "image_pull_policy": "Always" }',
+    ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image, "image_pull_policy": "Always"},
+    ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image, "image_pull_policy": "Always"},
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "[{'input_folder': 'test/doc_quality/input/', 'output_folder': 'test/doc_quality/output/'}]",
@@ -116,9 +110,9 @@ def doc_quality(
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
-    runtime_actor_options: str = "{'num_cpus': 0.8}",
+    runtime_actor_options: dict = {'num_cpus': 0.8},
     runtime_pipeline_id: str = "pipeline_id",
-    runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    runtime_code_location: dict = {'github': 'github', 'commit_hash': '12345', 'path': 'path'},
     # doc_quality parameters
     docq_text_lang: str = "en",
     docq_doc_content_column: str = "contents",
@@ -206,7 +200,6 @@ def doc_quality(
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
-
 
 
 if __name__ == "__main__":

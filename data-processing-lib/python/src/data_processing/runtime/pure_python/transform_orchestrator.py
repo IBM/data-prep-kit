@@ -11,16 +11,19 @@
 ################################################################################
 
 import time
+from typing import Any
+from multiprocessing import Pool
 import traceback
 from datetime import datetime
 
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.runtime import (
-    TransformExecutionConfiguration,
-    TransformRuntimeConfiguration,
+from data_processing.runtime.pure_python import (
+    PythonTransformExecutionConfiguration,
+    PythonTransformRuntimeConfiguration,
+    PythonTransformFileProcessor,
+    PythonPoolTransformFileProcessor,
 )
-from data_processing.runtime.pure_python import PythonTransformFileProcessor
-from data_processing.transform import TransformStatistics
+from data_processing.transform import TransformStatistics, AbstractBinaryTransform
 from data_processing.utils import get_logger
 
 
@@ -29,8 +32,8 @@ logger = get_logger(__name__)
 
 def orchestrate(
     data_access_factory: DataAccessFactoryBase,
-    runtime_config: TransformRuntimeConfiguration,
-    execution_config: TransformExecutionConfiguration,
+    runtime_config: PythonTransformRuntimeConfiguration,
+    execution_config: PythonTransformExecutionConfiguration,
 ) -> int:
     """
     orchestrator for transformer execution
@@ -48,40 +51,39 @@ def orchestrate(
     if data_access is None:
         logger.error("No DataAccess instance provided - exiting")
         return 1
+    # create additional execution parameters
+    runtime = runtime_config.create_transform_runtime()
     try:
         # Get files to process
         files, profile, retries = data_access.get_files_to_process()
         if len(files) == 0:
             logger.error("No input files to process - exiting")
             return 0
+        if retries > 0:
+            statistics.add_stats({"data access retries": retries})
         logger.info(f"Number of files is {len(files)}, source profile {profile}")
         # Print interval
         print_interval = int(len(files) / 100)
         if print_interval == 0:
             print_interval = 1
-        if retries > 0:
-            statistics.add_stats({"data access retries": retries})
-        # create executor
-        executor = PythonTransformFileProcessor(
-            data_access_factory=data_access_factory, statistics=statistics, runtime_configuration=runtime_config
-        )
-        # process data
         logger.debug(f"{runtime_config.get_name()} Begin processing files")
-        t_start = time.time()
-        completed = 0
-        for path in files:
-            executor.process_file(path)
-            completed += 1
-            if completed % print_interval == 0:
-                logger.info(
-                    f"Completed {completed} files ({100 * completed / len(files)}%) "
-                    f"in {(time.time() - t_start)/60} min"
-                )
-        logger.debug(f"Done processing {completed} files, waiting for flush() completion.")
-        # invoke flush to ensure that all results are returned
-        start = time.time()
-        executor.flush()
-        logger.info(f"done flushing in {time.time() - start} sec")
+        if execution_config.num_processors > 0:
+            # using multiprocessor pool for execution
+            statistics = _process_transforms_multiprocessor(files=files, size=execution_config.num_processors,
+                                                            data_access_factory=data_access_factory,
+                                                            print_interval=print_interval,
+                                                            transform_params=runtime.get_transform_config(
+                                                                data_access_factory=data_access_factory,
+                                                                statistics=statistics, files=files),
+                                                            transform_class=runtime_config.get_transform_class())
+        else:
+            # using sequential execution
+            _process_transforms(files=files, data_access_factory=data_access_factory,
+                                print_interval=print_interval, statistics=statistics,
+                                transform_params=runtime.get_transform_config(
+                                    data_access_factory=data_access_factory,
+                                    statistics=statistics, files=files),
+                                transform_class=runtime_config.get_transform_class())
         status = "success"
         return_code = 0
     except Exception as e:
@@ -92,9 +94,11 @@ def orchestrate(
         # Compute execution statistics
         logger.debug("Computing execution stats")
         stats = statistics.get_execution_stats()
+        stats["processing_time"] = round(stats["processing_time"], 3)
         # build and save metadata
         logger.debug("Building job metadata")
         input_params = runtime_config.get_transform_metadata()
+        runtime.compute_execution_stats(stats=statistics)
         metadata = {
             "pipeline": execution_config.pipeline_id,
             "job details": execution_config.job_details
@@ -104,7 +108,8 @@ def orchestrate(
                 "status": status,
             },
             "code": execution_config.code_location,
-            "job_input_params": input_params | data_access_factory.get_input_params(),
+            "job_input_params":
+                input_params | data_access_factory.get_input_params() | execution_config.get_input_params(),
             "job_output_stats": stats,
         }
         logger.debug(f"Saving job metadata: {metadata}.")
@@ -114,3 +119,83 @@ def orchestrate(
     except Exception as e:
         logger.error(f"Exception during execution {e}: {traceback.print_exc()}")
         return 1
+
+
+def _process_transforms(files: list[str], print_interval: int, data_access_factory: DataAccessFactoryBase,
+                        statistics: TransformStatistics, transform_params: dict[str, Any],
+                        transform_class: type[AbstractBinaryTransform]) -> None:
+    """
+    Process transforms sequentially
+    :param files: list of files to process
+    :param statistics: statistics class
+    :param print_interval: print interval
+    :param data_access_factory: data access factory
+    :param transform_params - transform parameters
+    :param transform_class: transform class
+    :return: metadata for the execution
+
+    :return: None
+    """
+    # create executor
+    executor = PythonTransformFileProcessor(data_access_factory=data_access_factory, statistics=statistics,
+                                            transform_params=transform_params, transform_class=transform_class)
+    # process data
+    t_start = time.time()
+    completed = 0
+    for path in files:
+        executor.process_file(path)
+        completed += 1
+        if completed % print_interval == 0:
+            logger.info(
+                f"Completed {completed} files ({round(100 * completed / len(files), 2)}%) "
+                f"in {round((time.time() - t_start)/60., 3)} min"
+            )
+    logger.info(f"Done processing {completed} files, waiting for flush() completion.")
+    # invoke flush to ensure that all results are returned
+    start = time.time()
+    executor.flush()
+    logger.info(f"done flushing in {round(time.time() - start, 3)} sec")
+
+
+def _process_transforms_multiprocessor(files: list[str], size: int, print_interval: int,
+                                       data_access_factory: DataAccessFactoryBase, transform_params: dict[str, Any],
+                                       transform_class: type[AbstractBinaryTransform]) -> TransformStatistics:
+    """
+    Process transforms using multiprocessing pool
+    :param files: list of files to process
+    :param size: pool size
+    :param print_interval: print interval
+    :param data_access_factory: data access factory
+    :param transform_params - transform parameters
+    :param transform_class: transform class
+    :return: metadata for the execution
+    """
+    # result statistics
+    statistics = TransformStatistics()
+    # create processor
+    processor = PythonPoolTransformFileProcessor(data_access_factory=data_access_factory,
+                                                 transform_params=transform_params, transform_class=transform_class)
+    completed = 0
+    t_start = time.time()
+    # create multiprocessing pool
+    with Pool(processes=size) as pool:
+        # execute for every input file
+        for result in pool.imap_unordered(processor.process_file, files):
+            completed += 1
+            # accumulate statistics
+            statistics.add_stats(result)
+            if completed % print_interval == 0:
+                # print intermediate statistics
+                logger.info(
+                    f"Completed {completed} files ({round(100 * completed / len(files), 2)}%) "
+                    f"in {round((time.time() - t_start)/60., 3)} min"
+                )
+        logger.info(f"Done processing {completed} files, waiting for flush() completion.")
+        results = [{}] * size
+        # flush
+        for i in range(size):
+            results[i] = pool.apply_async(processor.flush)
+        for s in results:
+            statistics.add_stats(s.get())
+    logger.info(f"done flushing in {time.time() - t_start} sec")
+    return statistics

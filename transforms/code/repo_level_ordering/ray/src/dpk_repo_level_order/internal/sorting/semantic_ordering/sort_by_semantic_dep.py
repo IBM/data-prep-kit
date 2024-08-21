@@ -58,13 +58,13 @@ def sort_sem(files_df: pd.DataFrame, logger: Logger, title_column_name="new_titl
 
         start_time = time.time()
         dep_graph = build_edges(files_df, logger, title_column_name)
-        graph_time = time.time() - start_time
+        graph_time = round(time.time() - start_time, 2)
         logger.info(f"sort_sem: time taken build_edges - {graph_time}")
 
         # Dependency based Topological Sort
         start_time = time.time()
         files_df_sorted = topological_sort_on_df(dep_graph, files_df, logger, title_column_name)
-        sort_time = time.time() - start_time
+        sort_time = round(time.time() - start_time,2)
         logger.info(f"sort_sem: time taken topological sort - {sort_time}")
 
     else:

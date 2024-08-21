@@ -124,7 +124,7 @@ def orchestrate(
         failures = RayUtils.wait_for_execution_completion(logger=logger, replies=replies)
         if failures > 0:
             statistics.add_stats.remote({"actor failures": failures})
-        logger.info(f"done flushing in {time.time() - start} sec")
+        logger.info(f"done flushing in {round(time.time() - start, 3)} sec")
         status = "success"
         return_code = 0
     except Exception as e:

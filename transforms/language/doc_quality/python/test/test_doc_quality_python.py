@@ -19,7 +19,6 @@ from data_processing.test_support.launch.transform_test import (
 from doc_quality_transform_python import DocQualityPythonTransformConfiguration
 
 
-
 class TestPythonDocQualityTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.

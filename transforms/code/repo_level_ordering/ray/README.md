@@ -7,7 +7,7 @@ testing and IDE set up.
 
 ## Summary 
 
-This transform requires the input data to have the following columns atleast: 
+This transform requires the input data to have at least the following columns: 
 
 - repo name: Name of the repo, it is used for grouping in this transform.
 - title : Which is usually file path.
@@ -25,7 +25,7 @@ b) sort the repo content by file path and write a parquet with a single combined
 c) sort the repo content in semantic ordering and write the parquet with multiple rows.
 d) sort the repo content in semantic ordering and write the parquet with a single combined row.
 
-Additionally this transform can grooup the repos in the folders named after the most dominant language in the repo.
+Additionally this transform can grooup the repos in the folders named after the most dominant language in the repo. For more information on this transform, please refer to [here](https://arxiv.org/pdf/2407.13739).
 
 
 ## Configuration and command line Options

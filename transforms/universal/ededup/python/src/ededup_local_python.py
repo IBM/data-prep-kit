@@ -13,8 +13,8 @@
 import os
 import sys
 
-from data_processing.utils import ParamsUtils
 from data_processing.runtime.pure_python import PythonTransformLauncher
+from data_processing.utils import ParamsUtils
 from ededup_transform_python import EdedupPythonTransformConfiguration
 
 
