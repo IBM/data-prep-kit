@@ -12,15 +12,15 @@
 
 import os
 
-from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from noop_transform import sleep_cli_param
-from noop_transform_python import NOOPPythonTransformConfiguration
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from pii_redactor_transform import doc_transformed_contents_cli_param
+from pii_redactor_transform_ray import PIIRedactorRayTransformConfiguration
 
 
-class TestPythonNOOPTransform(AbstractTransformLauncherTest):
+class TestRayPIIRedactorTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -30,9 +30,13 @@ class TestPythonNOOPTransform(AbstractTransformLauncherTest):
         basedir = "../test-data"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         fixtures = []
-        launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
-        fixtures.append((
-            launcher,
-            {sleep_cli_param: 0, "runtime_num_processors": 2},
-            basedir + "/input", basedir + "/expected"))
+        launcher = RayTransformLauncher(PIIRedactorRayTransformConfiguration())
+        fixtures.append(
+            (
+                launcher,
+                {doc_transformed_contents_cli_param: "new_contents", "run_locally": True},
+                basedir + "/input",
+                basedir + "/expected",
+            )
+        )
         return fixtures
