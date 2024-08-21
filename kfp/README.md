@@ -6,7 +6,7 @@
 |-------------------------------------|:----------------------------------------------------------------------------------:|
 | language/lang_id                  |                  [lang_id_wf.py](../transforms/language/lang_id/kfp_ray/lang_id_wf.py)                   |
 | code/malware                        |                  [malware_wf.py](../transforms/code/malware/kfp_ray/malware_wf.py)                     |
-| code/code2parquet                   |                  [code2parquet_wf.py](../transforms/code/code2parquet/kfp_ray/code2parquet_wf.py)                   |
+| code/code2parquet                   |                  [code2parquet_wf.py](../transforms/universal/zip2parquet/kfp_ray/zip2parquet_wf.py)                   |
 | code/code_quality                   |            [code_quality_wf.py](../transforms/code/code_quality/kfp_ray/code_quality_wf.py)            |
 | code/proglang_select                | [proglang_select_wf.py](../transforms/code/proglang_select/kfp_ray/proglang_select_wf.py)              |
 | universal/doc_id                    |                  [doc_id_wf.py](../transforms/universal/doc_id/kfp_ray/doc_id_wf.py)                   |
