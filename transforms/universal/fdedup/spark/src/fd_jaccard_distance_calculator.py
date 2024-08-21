@@ -104,14 +104,15 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
                 StructField("band_hash", LongType(), True),
                 StructField(
                     "document_data",
-                    ArrayType(StructType(
-                        [
-                            StructField(self.document_id_column, LongType(), True),
-                            StructField("minhashes", ArrayType(IntegerType()), True),
-                            StructField("document_length", IntegerType(), True),
-
-                        ]
-                    )),
+                    ArrayType(
+                        StructType(
+                            [
+                                StructField(self.document_id_column, LongType(), True),
+                                StructField("minhashes", ArrayType(IntegerType()), True),
+                                StructField("document_length", IntegerType(), True),
+                            ]
+                        )
+                    ),
                     True,
                 ),
                 StructField("cluster_size", IntegerType(), True),
@@ -149,11 +150,9 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         cluster_band_df = self.spark.createDataFrame([], cluster_schema)
         logging.info(f"Loading clusters for band {band_index}")
         # Band hash and doc_ids
-        # band_cluster_doc_ids_path = os.path.join(
-        #     self.clusters_doc_ids_output_path,
-        #     f"cluster_bands_{band_index}",
-        # )
-        band_cluster_doc_ids_path = os.path.join(self.clusters_doc_ids_output_path, f"cluster_bands={band_index}/segment={band_segment_index}")
+        band_cluster_doc_ids_path = os.path.join(
+            self.clusters_doc_ids_output_path, f"cluster_bands={band_index}/segment={band_segment_index}"
+        )
 
         self.input_files, self.file_stats = self.list_files(
             band_cluster_doc_ids_path,
@@ -301,7 +300,7 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
             combined_data = row.document_data
             print(combined_data)
             doc_list = [doc_id for doc_id, _, _ in combined_data]
-            doc_minhashes = {doc_id: mh for doc_id,mh,_ in combined_data}
+            doc_minhashes = {doc_id: mh for doc_id, mh, _ in combined_data}
             # this is the document we are going to keep
             first_doc = doc_list[0]
             first_mh = doc_minhashes[first_doc]
@@ -357,7 +356,7 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
                 # we cannot slice the band clusters so the only thing we can do is
                 # to setup a batch size so that the data loaded during each batch is
                 # small enough that it does not overflow
-                cluster_band_df = self.load_band_clusters(cluster_schema, band_index,band_segment_index)
+                cluster_band_df = self.load_band_clusters(cluster_schema, band_index, band_segment_index)
                 # exclude the clusters for which all the docs were already removed
                 # if docs2remove_list:
                 #     purged_cluster_df = self.purge_clusters(cluster_band_df, set(docs2remove_list))
@@ -387,12 +386,18 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
                     sorted_cluster_df,
                     doc2remove_schema,
                 )
-                logging.info(f"Band {band_index} Segment {band_segment_index}: docs_to_remove_df has {docs_to_remove_df.count()} rows")
-                logging.info(f"Band {band_index} Segment {band_segment_index}: docs_to_remove_list has {len(docs_to_remove_list)} elements")
+                logging.info(
+                    f"Band {band_index} Segment {band_segment_index}: docs_to_remove_df has {docs_to_remove_df.count()} rows"
+                )
+                logging.info(
+                    f"Band {band_index} Segment {band_segment_index}: docs_to_remove_list has {len(docs_to_remove_list)} elements"
+                )
 
                 docs2remove_list.extend(docs_to_remove_list)
                 docs2remove_list = list(set(docs2remove_list))
-                logging.info(f"After band {band_index} Segment {band_segment_index}, {len(docs2remove_list)} documents marked for removal")
+                logging.info(
+                    f"After band {band_index} Segment {band_segment_index}, {len(docs2remove_list)} documents marked for removal"
+                )
                 # write doc2remove_sdf
                 self.write_data(docs_to_remove_df, self.doc2remove_output_path, self.file_ext)
 
@@ -418,4 +423,4 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         #     logging.error(f"Failed to group by band hash and band number: {ex}")
         # finally:
         self.stop()
-            # logging.info("Stopped the spark session for generating doc signatures")
+        # logging.info("Stopped the spark session for generating doc signatures")
