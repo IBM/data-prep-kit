@@ -90,13 +90,34 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
 
     def define_schemas(self) -> tuple[StructType, StructType, StructType]:
         # Define cluster schema
+        # cluster_schema = StructType(
+        #     [
+        #         StructField("band_hash", LongType(), True),
+        #         StructField("doc_ids", ArrayType(LongType()), True),
+        #         StructField("cluster_size", IntegerType(), True),
+        #     ]
+        # )
+
+        # Define schema
         cluster_schema = StructType(
             [
                 StructField("band_hash", LongType(), True),
-                StructField("doc_ids", ArrayType(LongType()), True),
+                StructField(
+                    "document_data",
+                    ArrayType(StructType(
+                        [
+                            StructField(self.document_id_column, LongType(), True),
+                            StructField("minhashes", ArrayType(IntegerType()), True),
+                            StructField("document_length", IntegerType(), True),
+
+                        ]
+                    )),
+                    True,
+                ),
                 StructField("cluster_size", IntegerType(), True),
             ]
         )
+
         # Define the minhash schema
         minhash_schema = StructType(
             [
@@ -124,14 +145,16 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         )
         return cluster_schema, minhash_schema, doc2remove_schema
 
-    def load_band_clusters(self, cluster_schema: StructType, band_index: int) -> DataFrame:
+    def load_band_clusters(self, cluster_schema: StructType, band_index: int, band_segment_index: int) -> DataFrame:
         cluster_band_df = self.spark.createDataFrame([], cluster_schema)
         logging.info(f"Loading clusters for band {band_index}")
         # Band hash and doc_ids
-        band_cluster_doc_ids_path = os.path.join(
-            self.clusters_doc_ids_output_path,
-            f"cluster_bands_{band_index}",
-        )
+        # band_cluster_doc_ids_path = os.path.join(
+        #     self.clusters_doc_ids_output_path,
+        #     f"cluster_bands_{band_index}",
+        # )
+        band_cluster_doc_ids_path = os.path.join(self.clusters_doc_ids_output_path, f"cluster_bands={band_index}/segment={band_segment_index}")
+
         self.input_files, self.file_stats = self.list_files(
             band_cluster_doc_ids_path,
             self.file_ext,
@@ -232,14 +255,35 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
                 StructType(
                     [
                         StructField("int_id_column", LongType(), True),
-                        StructField("document_length", IntegerType(), True),
                         StructField("minhashes", ArrayType(IntegerType()), True),
+                        StructField("document_length", IntegerType(), True),
                     ]
                 )
             ),
         )
+        #
+        # # Define schema
+        # schema = StructType(
+        #     [
+        #         StructField("band_hash", LongType(), True),
+        #         StructField(
+        #             "document_data",
+        #             ArrayType(StructType(
+        #                 [
+        #                     StructField(self.document_id_column, LongType(), True),
+        #                     StructField("minhashes", ArrayType(IntegerType()), True),
+        #                     StructField("document_length", IntegerType(), True),
+        #
+        #                 ]
+        #             )),
+        #             True,
+        #         ),
+        #         StructField("cluster_size", IntegerType(), True),
+        #     ]
+        # )
+        #
         # Apply the UDF to sort the combined_data array
-        sorted_clusters_df = minhash_cluster_df.withColumn("combined_data", sort_udf(col("combined_data")))
+        sorted_clusters_df = minhash_cluster_df.withColumn("document_data", sort_udf(col("document_data")))
         logging.info(f"sorted_clusters_df has {sorted_clusters_df.count()} rows")
         # first_row = sorted_clusters_df.take(1)[0]
         # print("sorted_clusters_df")
@@ -254,9 +298,10 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         # Define the cluster processing function
         def cluster_processing(row, threshold: float = self.jaccard_similarity_threshold):
             docs_to_remove = []
-            combined_data = row.combined_data
+            combined_data = row.document_data
+            print(combined_data)
             doc_list = [doc_id for doc_id, _, _ in combined_data]
-            doc_minhashes = {doc_id: mh for doc_id, _, mh in combined_data}
+            doc_minhashes = {doc_id: mh for doc_id,mh,_ in combined_data}
             # this is the document we are going to keep
             first_doc = doc_list[0]
             first_mh = doc_minhashes[first_doc]
@@ -279,7 +324,9 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
 
     def run_transform(self):
         num_bands = self.in_out_metadata["num_bands"]
+        num_bands_segments = self.in_out_metadata["num_minhash_bands"]
         num_bands_index = 0
+        num_bands_segment_index = 0
 
         # num_bands = self.get_num_bands_from_metadata()
         cluster_schema, minhash_schema, doc2remove_schema = self.define_schemas()
@@ -304,69 +351,71 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
             self.in_out_metadata[self.execution_name][self.execution_name + "_status"] = "progress"
 
         for band_index in range(num_bands_index, num_bands):
-            # load the clusters calculated for the band (through band hash groupBy)
-            # we cannot slice the band clusters so the only thing we can do is
-            # to setup a batch size so that the data loaded during each batch is
-            # small enough that it does not overflow
-            cluster_band_df = self.load_band_clusters(cluster_schema, band_index)
-            # exclude the clusters for which all the docs were already removed
-            # if docs2remove_list:
-            #     purged_cluster_df = self.purge_clusters(cluster_band_df, set(docs2remove_list))
-            # else:
-            #     purged_cluster_df = cluster_band_df
 
-            purged_cluster_df = cluster_band_df
-            num_clusters = purged_cluster_df.count()
-            logging.info(f"Before re-checking Jaccard distance, band {band_index} has {num_clusters} clusters")
-            num_docs_to_remove = purged_cluster_df.select(sum(col("cluster_size"))).collect()[0][0]
-            # we will keep one document from each cluster, so need to adjust num_docs_to_remove
-            num_docs_to_remove -= num_clusters
-            logging.info(
-                f"Before re-checking Jaccard distance, band {band_index} has {num_docs_to_remove} documents to remove"
-            )
-            # Identify the list of documents to remove:
-            # Sort the documents inside each cluster by size, and double-check
-            # that Jaccard similarity between docs in the same cluster is above
-            # a given threshold
-            minhash_cluster_df = self.add_minhash_to_clusters(
-                purged_cluster_df,
-                minhash_schema,
-            )
-            sorted_cluster_df = self.sort_clusters(minhash_cluster_df)
+            for band_segment_index in range(num_bands_segment_index, num_bands_segments):
+                # load the clusters calculated for the band (through band hash groupBy)
+                # we cannot slice the band clusters so the only thing we can do is
+                # to setup a batch size so that the data loaded during each batch is
+                # small enough that it does not overflow
+                cluster_band_df = self.load_band_clusters(cluster_schema, band_index,band_segment_index)
+                # exclude the clusters for which all the docs were already removed
+                # if docs2remove_list:
+                #     purged_cluster_df = self.purge_clusters(cluster_band_df, set(docs2remove_list))
+                # else:
+                #     purged_cluster_df = cluster_band_df
 
-            docs_to_remove_df, docs_to_remove_list = self.get_docs_to_remove(
-                sorted_cluster_df,
-                doc2remove_schema,
-            )
-            logging.info(f"Band {band_index}: docs_to_remove_df has {docs_to_remove_df.count()} rows")
-            logging.info(f"Band {band_index}: docs_to_remove_list has {len(docs_to_remove_list)} elements")
+                purged_cluster_df = cluster_band_df
+                # num_clusters = purged_cluster_df.count()
+                # logging.info(f"Before re-checking Jaccard distance, band {band_index} has {num_clusters} clusters")
+                # num_docs_to_remove = purged_cluster_df.select(sum(col("cluster_size"))).collect()[0][0]
+                # # we will keep one document from each cluster, so need to adjust num_docs_to_remove
+                # num_docs_to_remove -= num_clusters
+                # logging.info(
+                #     f"Before re-checking Jaccard distance, band {band_index} has {num_docs_to_remove} documents to remove"
+                # )
+                # Identify the list of documents to remove:
+                # Sort the documents inside each cluster by size, and double-check
+                # that Jaccard similarity between docs in the same cluster is above
+                # a given threshold
+                # minhash_cluster_df = self.add_minhash_to_clusters(
+                #     purged_cluster_df,
+                #     minhash_schema,
+                # )
+                sorted_cluster_df = self.sort_clusters(purged_cluster_df)
 
-            docs2remove_list.extend(docs_to_remove_list)
-            docs2remove_list = list(set(docs2remove_list))
-            logging.info(f"After band {band_index}, {len(docs2remove_list)} documents marked for removal")
-            # write doc2remove_sdf
-            self.write_data(docs_to_remove_df, self.doc2remove_output_path, self.file_ext)
+                docs_to_remove_df, docs_to_remove_list = self.get_docs_to_remove(
+                    sorted_cluster_df,
+                    doc2remove_schema,
+                )
+                logging.info(f"Band {band_index} Segment {band_segment_index}: docs_to_remove_df has {docs_to_remove_df.count()} rows")
+                logging.info(f"Band {band_index} Segment {band_segment_index}: docs_to_remove_list has {len(docs_to_remove_list)} elements")
+
+                docs2remove_list.extend(docs_to_remove_list)
+                docs2remove_list = list(set(docs2remove_list))
+                logging.info(f"After band {band_index} Segment {band_segment_index}, {len(docs2remove_list)} documents marked for removal")
+                # write doc2remove_sdf
+                self.write_data(docs_to_remove_df, self.doc2remove_output_path, self.file_ext)
 
     def execute(self):
-        try:
-            # load metadata
-            self.in_out_metadata = self._load_metadata(self.output_path)
-            prefix, step_number, prev_step_name = self.extract_step_info(self.execution_name)
-            if (
-                self.execution_name in self.in_out_metadata
-                and self.execution_name + "_status" in self.in_out_metadata[self.execution_name]
-                and self.in_out_metadata[self.execution_name][self.execution_name + "_status"] == "complete"
-            ):
-                logging.info(f"Skipping {self.step_name} because its complete")
-            elif self.in_out_metadata[prev_step_name][prev_step_name + "_status"] == "complete":
-                self.run_transform()
-                self._save_metadata(self.execution_name, "complete", self.in_out_metadata, self.output_path)
-                logging.info("Finished grouping by band hash and band number")
-            else:
-                logging.info(f"Skipping {self.step_name} because the previous step failed")
-        except Exception as ex:
-            self._save_metadata(self.execution_name, "error", self.in_out_metadata, self.output_path)
-            logging.error(f"Failed to group by band hash and band number: {ex}")
-        finally:
-            self.stop()
-            logging.info("Stopped the spark session for generating doc signatures")
+        # try:
+        # load metadata
+        self.in_out_metadata = self._load_metadata(self.output_path)
+        prefix, step_number, prev_step_name = self.extract_step_info(self.execution_name)
+        if (
+            self.execution_name in self.in_out_metadata
+            and self.execution_name + "_status" in self.in_out_metadata[self.execution_name]
+            and self.in_out_metadata[self.execution_name][self.execution_name + "_status"] == "complete"
+        ):
+            logging.info(f"Skipping {self.step_name} because its complete")
+        elif self.in_out_metadata[prev_step_name][prev_step_name + "_status"] == "complete":
+            self.run_transform()
+            self._save_metadata(self.execution_name, "complete", self.in_out_metadata, self.output_path)
+            logging.info("Finished grouping by band hash and band number")
+        else:
+            logging.info(f"Skipping {self.step_name} because the previous step failed")
+        # except Exception as ex:
+        #     self._save_metadata(self.execution_name, "error", self.in_out_metadata, self.output_path)
+        #     logging.error(f"Failed to group by band hash and band number: {ex}")
+        # finally:
+        self.stop()
+            # logging.info("Stopped the spark session for generating doc signatures")
