@@ -137,15 +137,13 @@ def fdedup_compute_execution_params(
     )
     print(f"Fuzzy parameters: num buckets {num_buckets}, bucket length {length_bucket}")
     # Get cluster parameters
-    w_options = worker_options
-    cluster_cpu = w_options["replicas"] * w_options["cpu"]
-    cluster_memory = w_options["replicas"] * w_options["memory"]
+    cluster_cpu = worker_options["replicas"] * worker_options["cpu"]
+    cluster_memory = worker_options["replicas"] * worker_options["memory"]
     print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_memory}")
     cluster_cpu *= 0.85
     cluster_memory *= 0.85
     # get actor requirements
-    a_options = actor_options,
-    actor_cpu = a_options["num_cpus"]
+    actor_cpu = actor_options["num_cpus"]
     print(f"actor required cpu {actor_cpu}")
     # get credentials
     s3_key, s3_secret, s3_endpoint = KFPUtils.credentials()
