@@ -24,7 +24,7 @@ from doc_id_transform_base import (doc_column_name_cli_param,
                                    )
 
 
-class TestPythonEdedupTransform(AbstractTransformLauncherTest):
+class TestPythonDocIDTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.

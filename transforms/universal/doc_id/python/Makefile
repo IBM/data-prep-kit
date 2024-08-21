@@ -33,7 +33,7 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(EDEDUP_PYTHON_VERSION) TOML_VERSION=$(EDEDUP_PYTHON_VERSION) .transforms.set-versions
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOC_ID_PYTHON_VERSION) TOML_VERSION=$(DOC_ID_PYTHON_VERSION) .transforms.set-versions
         
 build-dist:: .defaults.build-dist 
 
