@@ -20,6 +20,7 @@ from data_processing.transform import AbstractBinaryTransform, TransformConfigur
 from data_processing.utils import CLIArgumentProvider, get_logger, TransformUtils
 
 
+
 class Html2ParquetTransform(AbstractBinaryTransform):
     def __init__(self, config: dict[str, Any]):
         super().__init__(config)  
@@ -55,7 +56,7 @@ class Html2ParquetTransform(AbstractBinaryTransform):
         """
         if TransformUtils.get_file_extension(file_name)[1] not in [".zip", ".html"]:
             error_message = f"Unsupported file type: {file_name}. Only ZIP and HTML files are supported."
-            self.logger.error(error_message)
+            logger.error(error_message)
             raise ValueError(error_message)  # Raising an exception with the error message
         data = []
         number_of_rows = 0
@@ -76,7 +77,7 @@ class Html2ParquetTransform(AbstractBinaryTransform):
                                 data.append(row_data)
                                 number_of_rows += 1
                             except Exception as e:
-                                self.logger.warning(f"Exception {str(e)} processing file {member.filename}, skipping")
+                                logger.warning(f"Exception {str(e)} processing file {member.filename}, skipping")
             
   
         # Process single HTML documents
@@ -92,11 +93,12 @@ class Html2ParquetTransform(AbstractBinaryTransform):
                 number_of_rows += 1
 
             except Exception as e:
-                self.logger.warning(f"Exception {str(e)} processing file {file_name}, skipping")
+                logger.warning(f"Exception {str(e)} processing file {file_name}, skipping")
             
 
         table = pa.Table.from_pylist(data)
         return [(TransformUtils.convert_arrow_to_binary(table=table), ".parquet")], {"number of rows": number_of_rows}
+
 
 logger = get_logger(__name__)
 

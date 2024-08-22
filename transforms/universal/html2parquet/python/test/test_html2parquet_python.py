@@ -17,9 +17,9 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from html2parquet_transform_python import HtmlToParquetPythonTransformConfiguration
+from html2parquet_transform_python import Html2ParquetPythonTransformConfiguration
 
-class TestPythonHtmlToParquetTransform(AbstractTransformLauncherTest):
+class TestPythonHtml2ParquetTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -33,7 +33,7 @@ class TestPythonHtmlToParquetTransform(AbstractTransformLauncherTest):
         }
 
         fixtures = []
-        launcher = PythonTransformLauncher(HtmlToParquetPythonTransformConfiguration())
+        launcher = PythonTransformLauncher(Html2ParquetPythonTransformConfiguration())
         fixtures.append(
             (
                 launcher,
