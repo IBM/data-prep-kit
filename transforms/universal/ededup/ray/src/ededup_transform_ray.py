@@ -127,45 +127,52 @@ class EdedupRayRuntime(DefaultRayTransformRuntime):
                 .remote({"id": i, "data_access_factory": data_access_factory})
             )
         if self.params.get(use_snapshot_key, False):
-            # we are using snapshots. Note here that the amount of files might be different
-            # from the current amount of hashes
-            snapshot_path = self.params.get("snapshot_directory", None)
-            if snapshot_path is None or len(snapshot_path) == 0:
-                snapshot_path = f"{SnapshotUtils.get_snapshot_folder(data_access_factory.create_data_access())}"
-            data_access = data_access_factory.create_data_access()
-            # get snapshot files
-            files, retries = data_access.get_folder_files(path=snapshot_path)
-            if retries > 0:
-                statistics.add_stats.remote({"data access retries": retries})
-            self.logger.info(f"Found the following snapshot files {files.keys()}")
-            # process snapshot files
-            for file in files.keys():
-                # load the file
-                try:
-                    b_hashes, _ = data_access.get_file(file)
-                    snaps = pickle.loads(b_hashes)
-                except Exception as e:
-                    self.logger.warning(f"Failed to load hashes from file {file} with exception {e}")
-                    raise UnrecoverableException("failed to load hashes")
-                request = [[] for _ in range(len(self.filters))]
-                for h in snaps:
-                    request[TransformUtils.str_to_int(h) % len(self.filters)].append(h)
-                # Submit requests to appropriate hash actors
-                remote_replies = []
-                i = 0
-                for req in request:
-                    if len(req) > 0:  # Only submit if the length is greater then 0
-                        remote_replies.append(self.filters[i].add_hashes.remote(req))
-                    i = i + 1
-                # Process replies
-                unique = []
-                while remote_replies:
-                    # Wait for replies
-                    ready, not_ready = ray.wait(remote_replies)
-                    # Continue waiting for not completed replies
-                    remote_replies = not_ready
-
+            self._load_snapshots(data_access_factory=data_access_factory, statistics=statistics)
         return {"hashes": self.filters} | self.params
+
+    def _load_snapshots(self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle) -> None:
+        """
+        Load snapshots
+        :param data_access_factory - data access factory
+        :param statistics - reference to the statistics object
+        :return: None
+        """
+        # we are using snapshots. Note here that the amount of files might be different
+        # from the current amount of hashes
+        snapshot_path = self.params.get("snapshot_directory", None)
+        if snapshot_path is None or len(snapshot_path) == 0:
+            snapshot_path = f"{SnapshotUtils.get_snapshot_folder(data_access_factory.create_data_access())}"
+        data_access = data_access_factory.create_data_access()
+        # get snapshot files
+        files, retries = data_access.get_folder_files(path=snapshot_path)
+        if retries > 0:
+            statistics.add_stats.remote({"data access retries": retries})
+        self.logger.info(f"Found the following snapshot files {files.keys()}")
+        # process snapshot files
+        for file in files.keys():
+            # load the file
+            try:
+                b_hashes, _ = data_access.get_file(file)
+                snaps = pickle.loads(b_hashes)
+            except Exception as e:
+                self.logger.warning(f"Failed to load hashes from file {file} with exception {e}")
+                raise UnrecoverableException("failed to load hashes")
+            request = [[] for _ in range(len(self.filters))]
+            for h in snaps:
+                request[TransformUtils.str_to_int(h) % len(self.filters)].append(h)
+            # Submit requests to appropriate hash actors
+            remote_replies = []
+            i = 0
+            for req in request:
+                if len(req) > 0:  # Only submit if the length is greater then 0
+                    remote_replies.append(self.filters[i].add_hashes.remote(req))
+                i = i + 1
+            # Process replies
+            while remote_replies:
+                # Wait for replies
+                ready, not_ready = ray.wait(remote_replies)
+                # Continue waiting for not completed replies
+                remote_replies = not_ready
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
         """

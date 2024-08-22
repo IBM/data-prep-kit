@@ -19,16 +19,12 @@ from data_processing.runtime.pure_python import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.transform import TransformStatistics
-from data_processing.utils import get_logger
 from ededup_transform_base import (
     EdedupTransformBase,
     EdedupTransformConfigurationBase,
     HashFilter,
 )
 from ededup_transform_base import use_snapshot_key, snapshot_directory_key
-
-
-logger = get_logger(__name__)
 
 
 class EdedupTransform(EdedupTransformBase):
@@ -64,8 +60,12 @@ class EdedupRuntime(DefaultPythonTransformRuntime):
     """
 
     def __init__(self, params: dict[str, Any]):
+        from data_processing.utils import get_logger
         super().__init__(params=params)
         self.filter = None
+        self.logger = get_logger(__name__)
+
+
 
     def get_transform_config(
         self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics, files: list[str]
@@ -90,10 +90,10 @@ class EdedupRuntime(DefaultPythonTransformRuntime):
                 )
             else:
                 snapshot_path = f"{snapshot_path}/hash_collector_1"
-            logger.info(f"continuing from the hash snapshot {snapshot_path}")
+            self.logger.info(f"continuing from the hash snapshot {snapshot_path}")
             self.filter = HashFilter({"data_access_factory": data_access_factory, "id": 1, "snapshot": snapshot_path})
         else:
-            logger.info("Starting from the beginning")
+            self.logger.info("Starting from the beginning")
             self.filter = HashFilter({"data_access_factory": data_access_factory, "id": 1})
         return self.params | {"filter": self.filter}
 
