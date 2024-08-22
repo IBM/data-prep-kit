@@ -39,6 +39,7 @@ The transform can be initialized with the following parameters.
 | `contents_type`         | `text/markdown`        | The output type for the `contents` column. Valid types are `text/markdown` and `application/json`. |
 | `do_table_structure`         | `True`        | If true, detected tables will be processed with the table structure model. |
 | `do_ocr`                     | `True`        | If true, optical character recognization (OCR) will be used to read the content of bitmap parts of the document. |
+| `double_precision`           | `8`           | If set, all floating points (e.g. bounding boxes) are rounded to this precision. For tests it is advised to use 0. |
 
 When invoking the CLI, the parameters must be set as `--pdf2parquet_<name>`, e.g. `--pdf2parquet_do_ocr=true`.
 
