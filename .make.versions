@@ -101,6 +101,9 @@ HEADER_CLEANSER_RAY_VERSION=$(DPK_VERSION)
 
 PII_REDACTOR_PYTHON_VERSION=$(DPK_VERSION)
 
+HTML2PARQUET_PYTHON_VERSION=$(DPK_VERSION)
+
+
 ################## ################## ################## ################## ################## ##################
 # Begin versions that the repo depends on. 
 
