@@ -17,7 +17,9 @@ from pdf2parquet_transform import Pdf2ParquetTransform
 
 
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
+input_folder = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "test-data", "input")
+)
 
 pdf2parquet_params = {}
 if __name__ == "__main__":
@@ -30,6 +32,8 @@ if __name__ == "__main__":
     byte_array, _ = data_access.get_file(file_to_process)
     print(f"input file: {file_to_process}")
     # Transform the table
-    table_list, metadata = transform.transform_binary(file_name=file_to_process, byte_array=byte_array)
+    table_list, metadata = transform.transform_binary(
+        file_name=file_to_process, byte_array=byte_array
+    )
     # print(f"\noutput table: {table_list}")
     print(f"output metadata : {metadata}")
