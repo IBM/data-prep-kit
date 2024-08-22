@@ -26,7 +26,7 @@ if __name__ == "__main__":
     transform = Pdf2ParquetTransform(pdf2parquet_params)
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
-    file_to_process = os.path.join(input_folder, "2206.01062.pdf")
+    file_to_process = os.path.join(input_folder, "redp5110-ch1.pdf")
     byte_array, _ = data_access.get_file(file_to_process)
     print(f"input file: {file_to_process}")
     # Transform the table
