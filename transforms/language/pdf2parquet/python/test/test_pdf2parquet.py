@@ -33,7 +33,9 @@ class TestPdf2ParquetTransform(AbstractBinaryTransformTest):
         input_files = get_files_in_folder(input_dir, ".pdf")
         input_files = [(name, binary) for name, binary in input_files.items()]
         expected_metadata_list = [{"nrows": 1, "nsuccess": 1, "nfail": 0, "nskip": 0}, {}]
-        config = {}
+        config = {
+            "double_precision": 0,
+        }
 
         expected_files = [
             os.path.join(basedir, "expected", TransformUtils.get_file_basename(input_file).replace(".pdf", ".parquet"))

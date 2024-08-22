@@ -36,9 +36,11 @@ params = {
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # pdf2parquet params
+    "pdf2parquet_double_precision": 0,
     # "pdf2parquet_do_table_structure": False,
-    # "pdf2parquet_contents_type": "application/json",
+    # "pdf2parquet_do_ocr": False,
     # "pdf2parquet_contents_type": "text/markdown",
+    # "pdf2parquet_contents_type": "application/json",
 }
 if __name__ == "__main__":
     # Set the simulated command line args

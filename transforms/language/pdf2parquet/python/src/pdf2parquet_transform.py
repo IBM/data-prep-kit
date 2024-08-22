@@ -41,6 +41,7 @@ pdf2parquet_artifacts_path_key = f"artifacts_path"
 pdf2parquet_contents_type_key = f"contents_type"
 pdf2parquet_do_table_structure_key = f"do_table_structure"
 pdf2parquet_do_ocr_key = f"do_ocr"
+pdf2parquet_double_precision_key = f"double_precision"
 
 
 class pdf2parquet_contents_types(str, enum.Enum):
@@ -54,11 +55,13 @@ class pdf2parquet_contents_types(str, enum.Enum):
 pdf2parquet_contents_type_default = pdf2parquet_contents_types.MARKDOWN
 pdf2parquet_do_table_structure_default = True
 pdf2parquet_do_ocr_default = True
+pdf2parquet_double_precision_default = 8
 
 pdf2parquet_artifacts_path_cli_param = f"{cli_prefix}{pdf2parquet_artifacts_path_key}"
 pdf2parquet_contents_type_cli_param = f"{cli_prefix}{pdf2parquet_contents_type_key}"
 pdf2parquet_do_table_structure_cli_param = f"{cli_prefix}{pdf2parquet_do_table_structure_key}"
 pdf2parquet_do_ocr_cli_param = f"{cli_prefix}{pdf2parquet_do_ocr_key}"
+pdf2parquet_double_precision_cli_param = f"{cli_prefix}{pdf2parquet_double_precision_key}"
 
 
 class Pdf2ParquetTransform(AbstractBinaryTransform):
@@ -84,6 +87,7 @@ class Pdf2ParquetTransform(AbstractBinaryTransform):
             pdf2parquet_do_table_structure_key, pdf2parquet_do_table_structure_default
         )
         self.do_ocr = config.get(pdf2parquet_do_ocr_key, pdf2parquet_do_ocr_default)
+        self.double_precision = config.get(pdf2parquet_double_precision_key, pdf2parquet_double_precision_default)
 
         logger.info("Initializing models")
         pipeline_options = PipelineOptions(
@@ -112,7 +116,7 @@ class Pdf2ParquetTransform(AbstractBinaryTransform):
         if self.contents_type == pdf2parquet_contents_types.MARKDOWN:
             content_string = doc.render_as_markdown()
         elif self.contents_type == pdf2parquet_contents_types.JSON:
-            content_string = pd.io.json.ujson_dumps(doc.render_as_dict(), double_precision=0)
+            content_string = pd.io.json.ujson_dumps(doc.render_as_dict(), double_precision=self.double_precision)
         else:
             raise RuntimeError(f"Uknown contents_type {self.contents_type}.")
         num_pages = len(doc.pages)
@@ -272,6 +276,13 @@ class Pdf2ParquetTransformConfiguration(TransformConfiguration):
             type=str2bool,
             help="If true, optical character recognization (OCR) will be used to read the PDF content.",
             default=pdf2parquet_do_ocr_default,
+        )
+        parser.add_argument(
+            f"--{pdf2parquet_double_precision_cli_param}",
+            type=int,
+            required=False,
+            help="If set, all floating points (e.g. bounding boxes) are rounded to this precision. For tests it is advised to use 0.",
+            default=pdf2parquet_double_precision_default,
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
