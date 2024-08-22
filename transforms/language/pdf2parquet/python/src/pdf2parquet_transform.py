@@ -53,7 +53,7 @@ class pdf2parquet_contents_types(str, enum.Enum):
 
 pdf2parquet_contents_type_default = pdf2parquet_contents_types.MARKDOWN
 pdf2parquet_do_table_structure_default = True
-pdf2parquet_do_ocr_default = False
+pdf2parquet_do_ocr_default = True
 
 pdf2parquet_artifacts_path_cli_param = f"{cli_prefix}{pdf2parquet_artifacts_path_key}"
 pdf2parquet_contents_type_cli_param = f"{cli_prefix}{pdf2parquet_contents_type_key}"
