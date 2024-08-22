@@ -11,19 +11,19 @@
 ################################################################################
 
 import time
-from typing import Any
-from multiprocessing import Pool
 import traceback
 from datetime import datetime
+from multiprocessing import Pool
+from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.pure_python import (
-    PythonTransformExecutionConfiguration,
-    PythonTransformRuntimeConfiguration,
-    PythonTransformFileProcessor,
     PythonPoolTransformFileProcessor,
+    PythonTransformExecutionConfiguration,
+    PythonTransformFileProcessor,
+    PythonTransformRuntimeConfiguration,
 )
-from data_processing.transform import TransformStatistics, AbstractBinaryTransform
+from data_processing.transform import AbstractBinaryTransform, TransformStatistics
 from data_processing.utils import get_logger
 
 
@@ -69,21 +69,28 @@ def orchestrate(
         logger.debug(f"{runtime_config.get_name()} Begin processing files")
         if execution_config.num_processors > 0:
             # using multiprocessor pool for execution
-            statistics = _process_transforms_multiprocessor(files=files, size=execution_config.num_processors,
-                                                            data_access_factory=data_access_factory,
-                                                            print_interval=print_interval,
-                                                            transform_params=runtime.get_transform_config(
-                                                                data_access_factory=data_access_factory,
-                                                                statistics=statistics, files=files),
-                                                            transform_class=runtime_config.get_transform_class())
+            statistics = _process_transforms_multiprocessor(
+                files=files,
+                size=execution_config.num_processors,
+                data_access_factory=data_access_factory,
+                print_interval=print_interval,
+                transform_params=runtime.get_transform_config(
+                    data_access_factory=data_access_factory, statistics=statistics, files=files
+                ),
+                transform_class=runtime_config.get_transform_class(),
+            )
         else:
             # using sequential execution
-            _process_transforms(files=files, data_access_factory=data_access_factory,
-                                print_interval=print_interval, statistics=statistics,
-                                transform_params=runtime.get_transform_config(
-                                    data_access_factory=data_access_factory,
-                                    statistics=statistics, files=files),
-                                transform_class=runtime_config.get_transform_class())
+            _process_transforms(
+                files=files,
+                data_access_factory=data_access_factory,
+                print_interval=print_interval,
+                statistics=statistics,
+                transform_params=runtime.get_transform_config(
+                    data_access_factory=data_access_factory, statistics=statistics, files=files
+                ),
+                transform_class=runtime_config.get_transform_class(),
+            )
         status = "success"
         return_code = 0
     except Exception as e:
@@ -108,8 +115,9 @@ def orchestrate(
                 "status": status,
             },
             "code": execution_config.code_location,
-            "job_input_params":
-                input_params | data_access_factory.get_input_params() | execution_config.get_input_params(),
+            "job_input_params": input_params
+            | data_access_factory.get_input_params()
+            | execution_config.get_input_params(),
             "job_output_stats": stats,
         }
         logger.debug(f"Saving job metadata: {metadata}.")
@@ -121,9 +129,14 @@ def orchestrate(
         return 1
 
 
-def _process_transforms(files: list[str], print_interval: int, data_access_factory: DataAccessFactoryBase,
-                        statistics: TransformStatistics, transform_params: dict[str, Any],
-                        transform_class: type[AbstractBinaryTransform]) -> None:
+def _process_transforms(
+    files: list[str],
+    print_interval: int,
+    data_access_factory: DataAccessFactoryBase,
+    statistics: TransformStatistics,
+    transform_params: dict[str, Any],
+    transform_class: type[AbstractBinaryTransform],
+) -> None:
     """
     Process transforms sequentially
     :param files: list of files to process
@@ -137,8 +150,12 @@ def _process_transforms(files: list[str], print_interval: int, data_access_facto
     :return: None
     """
     # create executor
-    executor = PythonTransformFileProcessor(data_access_factory=data_access_factory, statistics=statistics,
-                                            transform_params=transform_params, transform_class=transform_class)
+    executor = PythonTransformFileProcessor(
+        data_access_factory=data_access_factory,
+        statistics=statistics,
+        transform_params=transform_params,
+        transform_class=transform_class,
+    )
     # process data
     t_start = time.time()
     completed = 0
@@ -157,9 +174,14 @@ def _process_transforms(files: list[str], print_interval: int, data_access_facto
     logger.info(f"done flushing in {round(time.time() - start, 3)} sec")
 
 
-def _process_transforms_multiprocessor(files: list[str], size: int, print_interval: int,
-                                       data_access_factory: DataAccessFactoryBase, transform_params: dict[str, Any],
-                                       transform_class: type[AbstractBinaryTransform]) -> TransformStatistics:
+def _process_transforms_multiprocessor(
+    files: list[str],
+    size: int,
+    print_interval: int,
+    data_access_factory: DataAccessFactoryBase,
+    transform_params: dict[str, Any],
+    transform_class: type[AbstractBinaryTransform],
+) -> TransformStatistics:
     """
     Process transforms using multiprocessing pool
     :param files: list of files to process
@@ -173,8 +195,9 @@ def _process_transforms_multiprocessor(files: list[str], size: int, print_interv
     # result statistics
     statistics = TransformStatistics()
     # create processor
-    processor = PythonPoolTransformFileProcessor(data_access_factory=data_access_factory,
-                                                 transform_params=transform_params, transform_class=transform_class)
+    processor = PythonPoolTransformFileProcessor(
+        data_access_factory=data_access_factory, transform_params=transform_params, transform_class=transform_class
+    )
     completed = 0
     t_start = time.time()
     # create multiprocessing pool

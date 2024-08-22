@@ -52,8 +52,8 @@ class TransformStatisticsRay(TransformStatistics):
         :return: None
         """
         for key, val in stats.items():
+            self.stats[key] = self.stats.get(key, 0) + val
             if val > 0:
-                self.stats[key] = self.stats.get(key, 0) + val
                 if key == "source_files":
                     self.source_files_counter.inc(val)
                 if key == "source_size":

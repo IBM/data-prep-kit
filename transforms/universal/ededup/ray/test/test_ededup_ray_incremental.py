@@ -17,7 +17,12 @@ from data_processing.test_support.launch.transform_test import (
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from ededup_transform_ray import EdedupRayTransformRuntimeConfiguration
-from ededup_transform_base import doc_column_name_cli_param, int_column_name_cli_param
+from ededup_transform_base import (
+    doc_column_name_cli_param,
+    int_column_name_cli_param,
+    use_snapshot_cli_param,
+    snapshot_directory_cli_param,
+)
 from ededup_transform_ray import hash_cpu_cli_params, num_hashes_cli_params
 
 
@@ -37,7 +42,9 @@ class TestRayEdedupTransform(AbstractTransformLauncherTest):
             num_hashes_cli_params: 2,
             doc_column_name_cli_param: "contents",
             int_column_name_cli_param: "document_id",
+            use_snapshot_cli_param: True,
+            snapshot_directory_cli_param: basedir + "/input/snapshot",
         }
         launcher = RayTransformLauncher(EdedupRayTransformRuntimeConfiguration())
-        fixtures = [(launcher, config, basedir + "/input", basedir + "/expected")]
+        fixtures = [(launcher, config, basedir + "/input", basedir + "/incremental")]
         return fixtures
