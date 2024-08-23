@@ -20,6 +20,10 @@ setup::
 build::
 	@# Help: Recursively make $@ in subdirs 
 	$(MAKE) RULE=$@ .recurse
+env::
+	@# Help: Recursively create venv in all subdirs 
+	@echo "Do Nothing until all reference are removed"
+	#$(MAKE) RULE=venv .recurse
 
 image:: 
 	@# Help: Recursively make $@ in all subdirs 

@@ -8,6 +8,10 @@ clean::
 build::
 	@# Help: Recursively build all subdirs 
 	$(MAKE) RULE=build .recurse
+env::
+	@# Help: Recursively create venv in all subdirs 
+	@echo "Do Nothing until this is removed from the git action"
+	#$(MAKE) RULE=venv .recurse
 test:: 
 	@# Help: Recursively test in all subdirs 
 	@$(MAKE) RULE=test .recurse

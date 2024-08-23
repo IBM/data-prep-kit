@@ -11,9 +11,10 @@ build::
 setup::
 	@# Help: Recursively make $@ in subdirs 
 	$(MAKE) RULE=$@ .recurse
-venv::
-	@# Help: Recursively make $@ in all subdirs 
-	$(MAKE) RULE=$@ .recurse
+env::
+	@# Help: Recursively create venv in all subdirs 
+	@echo "Do Nothing until this is removed from the git action"
+	#$(MAKE) RULE=venv .recurse
 test:: 
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse

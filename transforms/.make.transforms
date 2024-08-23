@@ -152,10 +152,10 @@ extra-help:
 
 # Assumes the runtime-specific venv has already been built.
 .PHONY: .transforms.test-src
-.transforms.test-src::  .defaults.test-src .transforms.test-locals
+.transforms.test-src::  .defaults.test-src .transforms.test-locals .transforms.clean
 	@echo ">>>>>>>>>>>>>> cleaning up after each transform test >>>>>>>>>>>>>>>>>>>>>>>>>"
-	# Having this in the dependeny does not work...
-	make .transforms.clean
+	# Having this in the dependeny does not seem to work...
+	#make .transforms.clean
 	@# Help: Run the transform's tests and any '*local' .py files
 
 .PHONY: .transforms.python-test-image
