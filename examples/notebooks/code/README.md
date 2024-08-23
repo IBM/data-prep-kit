@@ -15,18 +15,18 @@ python3 -m pip install jupyter
 deactivate
 ```
 
-2. After dependancies are installed, we can launch the jupyter notebook
+2. After jupyter dependancies are installed, we can launch the jupyter notebook
 
 
 ```
 source venv/bin/activate
-jupyter noetbook
+jupyter notebook
 ```
 
 
 It will launch browser with the jupyter notebook where we can try out the transforms.
 
-## Demo API notebokk
+## Demo API notebook
 
 **Prepare virtualenv**
 
