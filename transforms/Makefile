@@ -20,9 +20,6 @@ setup::
 build::
 	@# Help: Recursively make $@ in subdirs 
 	$(MAKE) RULE=$@ .recurse
-venv::
-	@# Help: Recursively make $@ in subdirs 
-	$(MAKE) RULE=$@ .recurse
 
 image:: 
 	@# Help: Recursively make $@ in all subdirs 

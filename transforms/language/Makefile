@@ -8,10 +8,6 @@ clean::
 build::
 	@# Help: Recursively build all subdirs 
 	$(MAKE) RULE=build .recurse
-venv::
-	@# Help: Recursively create venv in all subdirs 
-	@echo Do Nothing... Diable recursive venv
-	#$(MAKE) RULE=venv .recurse
 test:: 
 	@# Help: Recursively test in all subdirs 
 	@$(MAKE) RULE=test .recurse
