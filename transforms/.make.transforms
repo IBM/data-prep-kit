@@ -154,29 +154,29 @@ extra-help:
 .PHONY: .transforms.test-src
 .transforms.test-src::  .defaults.test-src .transforms.test-locals .transforms.clean
 	@echo ">>>>>>>>>>>>>> cleaning up after each transform test >>>>>>>>>>>>>>>>>>>>>>>>>"
-	# Having this in the dependeny does not seem to work...
-	#make .transforms.clean
 	@# Help: Run the transform's tests and any '*local' .py files
 
 .PHONY: .transforms.python-test-image
 .transforms.python-test-image:: .transforms.python-image .transforms.test-image-help .defaults.test-image-pytest
 	@echo ">>>>>>>>>>>>>> cleaning up after each transform test >>>>>>>>>>>>>>>>>>>>>>>>>"
 	make .transforms.clean
+	-$(DOCKER) image prune -a
+
 
 .PHONY: .transforms.ray-test-image
 .transforms.ray-test-image:: .transforms.ray-image .transforms.test-image-help .defaults.test-image-pytest
 	@echo ">>>>>>>>>>>>>> cleaning up after each transform test >>>>>>>>>>>>>>>>>>>>>>>>>"
 	make .transforms.clean
+	-$(DOCKER) image prune -a
 
 .PHONY: .transforms.spark-test-image
 .transforms.spark-test-image:: .transforms.spark-image .transforms.test-image-help .defaults.test-image-pytest
 	@echo ">>>>>>>>>>>>>> cleaning up after each transform test >>>>>>>>>>>>>>>>>>>>>>>>>"
 	make .transforms.clean
+	-$(DOCKER) image prune -a
 
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest:: .defaults.test-image-pytest
-	@echo ">>>>>>>>>>>>>> cleaning up after each transform test >>>>>>>>>>>>>>>>>>>>>>>>>"
-	make .transforms.clean
 
 .PHONY: .transforms.test-image-help
 .transforms.test-image-help::
