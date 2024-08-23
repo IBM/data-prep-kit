@@ -19,7 +19,7 @@ DPK_MINOR_VERSION=2
 DPK_MICRO_VERSION=1
 # The suffix is generally always set in the main/development branch and only nulled out when creating release branches.
 # It can be manually incremented, for example, to allow publishing a new intermediate version wheel to pypi. 
-DPK_VERSION_SUFFIX=.dev0
+DPK_VERSION_SUFFIX=.dev2
 
 DPK_VERSION=$(DPK_MAJOR_VERSION).$(DPK_MINOR_VERSION).$(DPK_MICRO_VERSION)$(DPK_VERSION_SUFFIX)
 
