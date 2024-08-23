@@ -154,7 +154,7 @@ extra-help:
 .PHONY: .transforms.test-src
 .transforms.test-src::  .defaults.test-src .transforms.test-locals
 	@# Help: Run the transform's tests and any '*local' .py files
-	echo ">>>>>>> cleaning up...."
+	@echo ">>>>>>>>>>>>>> cleaning up after each transform test >>>>>>>>>>>>>>>>>>>>>>>>>"
 	make .transforms.clean
 
 .PHONY: .transforms.python-test-image
