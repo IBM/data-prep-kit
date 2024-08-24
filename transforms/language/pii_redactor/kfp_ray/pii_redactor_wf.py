@@ -47,11 +47,11 @@ def compute_exec_params_func(
         "data_s3_config": data_s3_config,
         "data_max_files": data_max_files,
         "data_num_samples": data_num_samples,
-        "runtime_num_workers": KFPUtils.default_compute_execution_params(worker_options, actor_options),
-        "runtime_worker_options": actor_options,
+        "runtime_num_workers": KFPUtils.default_compute_execution_params(str(worker_options), str(actor_options)),
+        "runtime_worker_options": str(actor_options),
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
-        "runtime_code_location": runtime_code_location,
+        "runtime_code_location": str(runtime_code_location),
         "pii_redactor_contents": pii_redactor_contents,
     }
 
@@ -107,9 +107,9 @@ def pii_redactor(
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
-    runtime_actor_options: str = "{'num_cpus': 0.8}",
+    runtime_actor_options: dict = {'num_cpus': 0.8},
     runtime_pipeline_id: str = "pipeline_id",
-    runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    runtime_code_location: dict = {'github': 'github', 'commit_hash': '12345', 'path': 'path'},
     # pii_redactor parameters
     pii_redactor_contents: str = "title",
     # additional parameters

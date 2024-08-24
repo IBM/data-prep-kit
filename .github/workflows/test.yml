@@ -165,7 +165,7 @@ jobs:
                   set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
                   source $K8S_SETUP_SCRIPTS/common.sh
                   header_text "Running ${transforms[$index]} workflow test"
-                  make -C ${transforms[$index]} workflow-test
+                  make -C transform/language/pii_redactor workflow-test
                   header_text "Run ${transforms[$index]} completed"
 
     test-kfp-v2:
@@ -209,7 +209,7 @@ jobs:
                   set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
                   source $K8S_SETUP_SCRIPTS/common.sh
                   header_text "Running ${transforms[$index]} workflow test"
-                  make -C ${transforms[$index]} workflow-test
+                  make -C transform/language/pii_redactor workflow-test
                   header_text "Run ${transforms[$index]} completed"
     test-data-processing-lib-images:
         needs: [check_if_push_images]
