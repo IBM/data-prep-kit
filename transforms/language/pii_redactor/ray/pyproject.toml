@@ -1,6 +1,6 @@
 [project]
 name = "dpk_pii_redactor_transform_ray"
-version = "0.2.1.dev0"
+version = "0.2.1.dev2"
 requires-python = ">=3.10"
 description = "PII Redactor Ray Transform"
 license = {text = "Apache-2.0"}
@@ -10,8 +10,8 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
 ]
 dependencies = [
-    "dpk_pii_redactor_transform_python==0.2.1.dev0",
-    "data-prep-toolkit-ray==0.2.1.dev0",
+    "dpk_pii_redactor_transform_python==0.2.1.dev2",
+    "data-prep-toolkit-ray==0.2.1.dev2",
     "presidio-analyzer>=2.2.355",
     "presidio-anonymizer>=2.2.355",
     "flair>=0.14.0",
