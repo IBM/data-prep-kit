@@ -157,15 +157,12 @@ extra-help:
 
 .PHONY: .transforms.python-test-image
 .transforms.python-test-image:: .transforms.python-image .transforms.test-image-help .defaults.test-image-pytest .transforms.clean
-	@echo ">>>>>>>>>>>>>> cleaning up after each transform test >>>>>>>>>>>>>>>>>>>>>>>>>"
 
 .PHONY: .transforms.ray-test-image
 .transforms.ray-test-image:: .transforms.ray-image .transforms.test-image-help .defaults.test-image-pytest .transforms.clean
-	@echo ">>>>>>>>>>>>>> cleaning up after each transform test >>>>>>>>>>>>>>>>>>>>>>>>>"
 
 .PHONY: .transforms.spark-test-image
 .transforms.spark-test-image:: .transforms.spark-image .transforms.test-image-help .defaults.test-image-pytest .transforms.clean
-	@echo ">>>>>>>>>>>>>> cleaning up after each transform test >>>>>>>>>>>>>>>>>>>>>>>>>"
 
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest:: .defaults.test-image-pytest
