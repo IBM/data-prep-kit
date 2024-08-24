@@ -14,7 +14,8 @@ import os
 
 from data_processing.data_access import DataAccessLocal
 from ededup_transform_base import HashFilter
-from ededup_transform_python import EdedupPythonTransform
+from ededup_transform_python import EdedupTransform
+from ededup_transform_base import doc_column_name_key, int_column_name_key
 
 
 # create parameters
@@ -25,18 +26,18 @@ local_conf = {
     "output_folder": output_folder,
 }
 
-ededup_params = {"doc_column": "contents", "filter": HashFilter({})}
+ededup_params = {doc_column_name_key: "contents", int_column_name_key: "document_id", "filter": HashFilter({})}
 
 if __name__ == "__main__":
     # Here we show how to run outside of ray
     # Filter transform needs a DataAccess to ready the domain list.
     data_access = DataAccessLocal(local_conf)
     # Create and configure the transform.
-    transform = EdedupPythonTransform(ededup_params)
+    transform = EdedupTransform(ededup_params)
     # Use the local data access to read a parquet table.
     table, _ = data_access.get_table(os.path.join(input_folder, "sample1.parquet"))
-    print(f"input table has {table.num_rows} rows")
+    print(f"input table has {table.num_rows} rows and {table.num_columns} columns")
     # Transform the table
     table_list, metadata = transform.transform(table)
-    print(f"\noutput table has {table_list[0].num_rows} rows")
+    print(f"\noutput table has {table_list[0].num_rows} rows and {table_list[0].num_columns} columns")
     print(f"output metadata : {metadata}")
