@@ -1,6 +1,6 @@
 [project]
 name = "dpk_header_cleanser_transform_ray"
-version = "0.2.1.dev0"
+version = "0.2.1.dev2"
 requires-python = ">=3.10"
 description = "License and copyright removal Transform for Ray"
 license = {text = "Apache-2.0"}
@@ -9,8 +9,8 @@ authors = [
     { name = "Yash kalathiya", email = "yashkalathiya164@gmail.com" },
 ]
 dependencies = [
-    "dpk-header-cleanser-transform-python==0.2.1.dev0",
-    "data-prep-toolkit-ray==0.2.1.dev0",
+    "dpk-header-cleanser-transform-python==0.2.1.dev2",
+    "data-prep-toolkit-ray==0.2.1.dev2",
     "scancode-toolkit==32.1.0",
 ]
 

@@ -1,6 +1,6 @@
 [project]
 name = "dpk_text_encoder_transform_python"
-version = "0.2.1.dev0"
+version = "0.2.1.dev2"
 requires-python = ">=3.10"
 description = "Text Encoder Python Transform"
 license = {text = "Apache-2.0"}
@@ -11,7 +11,7 @@ authors = [
     { name = "Peter Staar", email = "taa@zurich.ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit==0.2.1.dev0",
+    "data-prep-toolkit==0.2.1.dev2",
     "sentence-transformers==3.0.1",
 ]
 

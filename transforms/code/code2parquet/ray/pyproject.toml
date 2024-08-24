@@ -1,6 +1,6 @@
 [project]
 name = "dpk_code2parquet_transform_ray"
-version = "0.2.1.dev0"
+version = "0.2.1.dev2"
 requires-python = ">=3.10"
 description = "code2parquet Ray Transform"
 license = {text = "Apache-2.0"}
@@ -10,8 +10,8 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit-ray==0.2.1.dev0",
-    "dpk-code2parquet-transform-python==0.2.1.dev0",
+    "data-prep-toolkit-ray==0.2.1.dev2",
+    "dpk-code2parquet-transform-python==0.2.1.dev2",
     "parameterized",
     "pandas",
 ]

@@ -1,6 +1,6 @@
 [project]
 name = "dpk_lang_id_transform_python"
-version = "0.2.1.dev0"
+version = "0.2.1.dev2"
 requires-python = ">=3.10"
 description = "Language Identification Python Transform"
 license = {text = "Apache-2.0"}
@@ -9,7 +9,7 @@ authors = [
     { name = "Daiki Tsuzuku", email = "dtsuzuku@jp.ibm.com" }
 ]
 dependencies = [
-    "data-prep-toolkit==0.2.1.dev0",
+    "data-prep-toolkit==0.2.1.dev2",
     "fasttext==0.9.2",
     "langcodes==3.3.0",
     "huggingface-hub >= 0.21.4, <1.0.0",

@@ -1,6 +1,6 @@
 [project]
 name = "dpk_docid_transform_python"
-version = "0.2.1.dev0"
+version = "0.2.1.dev2"
 requires-python = ">=3.10"
 description = "ededup Python Transform"
 license = {text = "Apache-2.0"}

@@ -1,6 +1,6 @@
 [project]
 name = "dpk_doc_chunk_transform_python"
-version = "0.2.1.dev0"
+version = "0.2.1.dev2"
 requires-python = ">=3.10"
 description = "chunk documents Python Transform"
 license = {text = "Apache-2.0"}
@@ -11,7 +11,7 @@ authors = [
     { name = "Christoph Auer", email = "cau@zurich.ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit==0.2.1.dev0",
+    "data-prep-toolkit==0.2.1.dev2",
     "quackling==0.1.0",
 ]
 

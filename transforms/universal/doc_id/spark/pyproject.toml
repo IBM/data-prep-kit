@@ -1,6 +1,6 @@
 [project]
 name = "dpk_doc_id_transform_spark"
-version = "0.2.1.dev0"
+version = "0.2.1.dev2"
 requires-python = ">=3.10"
 description = "Doc ID Spark Transform"
 license = {text = "Apache-2.0"}
@@ -10,7 +10,7 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit-spark==0.2.1.dev0",
+    "data-prep-toolkit-spark==0.2.1.dev2",
 ]
 
 [build-system]

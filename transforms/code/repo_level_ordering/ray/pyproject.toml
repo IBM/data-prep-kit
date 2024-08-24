@@ -1,6 +1,6 @@
 [project]
 name = "dpk_repo_level_order_transform_ray"
-version = "0.2.1.dev0"
+version = "0.2.1.dev2"
 requires-python = ">=3.10"
 description = "repo_level_order Ray Transform"
 license = {text = "Apache-2.0"}
@@ -11,7 +11,7 @@ authors = [
     { name = "Shanmukha Guttula", email = "shagutt1@in.ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit-ray==0.2.1.dev0",
+    "data-prep-toolkit-ray==0.2.1.dev2",
     "networkx==3.3",
     "colorlog==6.8.2",
     "func-timeout==4.3.5",
