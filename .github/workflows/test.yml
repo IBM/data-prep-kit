@@ -160,18 +160,10 @@ jobs:
                   make -C $K8S_SETUP_SCRIPTS setup
                   make -C kfp/kfp_support_lib test
                   make -C transforms workflow-build
+                  dir=("code"  "universal") && index=$(($RANDOM % 2)) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs/ -type d  -maxdepth 1 ))
+                  # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
+                  set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
                   source $K8S_SETUP_SCRIPTS/common.sh
-                  while :
-                  do
-                    dir=("code"  "universal" "language") && index=$(($RANDOM % ${#dir[@]})) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs -type d  -maxdepth 1 -mindepth 1 ))
-                    # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
-                    set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
-                    if [ -d ${transforms[$index]}/kfp_ray ]; then
-                      header_text "Running ${transforms[$index]} workflow test"
-                      break
-                    fi
-                  done  
-                  make -C ${transforms[$index]} workflow-test
                   header_text "Running ${transforms[$index]} workflow test"
                   make -C transform/language/pii_redactor workflow-test
                   header_text "Run ${transforms[$index]} completed"
@@ -212,18 +204,10 @@ jobs:
                   make -C $K8S_SETUP_SCRIPTS setup
                   make -C kfp/kfp_support_lib test
                   make -C transforms workflow-build
+                  dir=("code"  "universal") && index=$(($RANDOM % 2)) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs/ -type d  -maxdepth 1 ))
+                  # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
+                  set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
                   source $K8S_SETUP_SCRIPTS/common.sh
-                  while :
-                  do
-                    dir=("code"  "universal" "language") && index=$(($RANDOM % ${#dir[@]})) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs -type d  -maxdepth 1 -mindepth 1 ))
-                    # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
-                    set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
-                    if [ -d ${transforms[$index]}/kfp_ray ]; then
-                      header_text "Running ${transforms[$index]} workflow test"
-                      break
-                    fi
-                  done 
-                  make -C ${transforms[$index]} workflow-test
                   header_text "Running ${transforms[$index]} workflow test"
                   make -C transform/language/pii_redactor workflow-test
                   header_text "Run ${transforms[$index]} completed"
