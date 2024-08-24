@@ -171,7 +171,7 @@ jobs:
                       break
                     fi
                   done  
-                  make -C language/pii_redactor workflow-test
+                  make -C transforms/language/pii_redactor workflow-test
                   header_text "Run ${transforms[$index]} completed"
 
     test-kfp-v2:
@@ -221,7 +221,7 @@ jobs:
                       break
                     fi
                   done 
-                  make -C language/pii_redactor workflow-test
+                  make -C transforms/language/pii_redactor workflow-test
                   header_text "Run ${transforms[$index]} completed"
     test-data-processing-lib-images:
         needs: [check_if_push_images]
