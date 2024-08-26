@@ -405,8 +405,12 @@ endif
 .PHONY: .defaults.test-image-pytest
 .defaults.test-image-pytest:: 
 	# Put this 2nd so its help showss up instead of .defaults.image help
-	@# Help: Test $(DOCKER_LOCAL_IMAGE) using test source inside the image. 
-	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) pytest -s test 
+	@# Help: Test $(DOCKER_LOCAL_IMAGE) using test source inside the image.
+	@if [ -f "$(REPOROOT)/.env" ];	then	\
+	    $(DOCKER) run -t --env-file=$(REPOROOT)/.env --rm $(DOCKER_LOCAL_IMAGE) pytest -s test;	\
+	else	\
+	    $(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) pytest -s test;	\
+	fi
 	
 .PHONY: .defaults.test-locals
 .defaults.test-locals::
