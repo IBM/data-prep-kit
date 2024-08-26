@@ -1,5 +1,21 @@
 # Quick Start for Data Prep Kit 
-Here we provided short examples of various uses of the Data Prep Kit.
+Here we provided short examples of various uses of the Data Prep Kit. Most users who want to jump right in can use standard pip install to deploy one of the followings to their virtual python environment:
+
+- Deploy the latest release of the data prep toolkit library
+
+`pip install data-prep-toolkit`
+
+or 
+-  deploy the latest releases of the data prep toolkit library and all python transforms
+
+`pip install data-prep-toolkit-transforms`
+
+or 
+-  deploy the latest releases of the data prep toolkit library, all python transforms and all ray transforms
+
+`pip install data-prep-toolkit-transforms-ray`
+
+
 
 ## Running transforms 
 
