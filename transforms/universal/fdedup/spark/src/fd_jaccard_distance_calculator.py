@@ -402,25 +402,25 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
                 self.write_data(docs_to_remove_df, self.doc2remove_output_path, self.file_ext)
 
     def execute(self):
-        # try:
-        # load metadata
-        self.in_out_metadata = self._load_metadata(self.output_path)
-        prefix, step_number, prev_step_name = self.extract_step_info(self.execution_name)
-        if (
-            self.execution_name in self.in_out_metadata
-            and self.execution_name + "_status" in self.in_out_metadata[self.execution_name]
-            and self.in_out_metadata[self.execution_name][self.execution_name + "_status"] == "complete"
-        ):
-            logging.info(f"Skipping {self.step_name} because its complete")
-        elif self.in_out_metadata[prev_step_name][prev_step_name + "_status"] == "complete":
-            self.run_transform()
-            self._save_metadata(self.execution_name, "complete", self.in_out_metadata, self.output_path)
-            logging.info("Finished grouping by band hash and band number")
-        else:
-            logging.info(f"Skipping {self.step_name} because the previous step failed")
-        # except Exception as ex:
-        #     self._save_metadata(self.execution_name, "error", self.in_out_metadata, self.output_path)
-        #     logging.error(f"Failed to group by band hash and band number: {ex}")
-        # finally:
-        self.stop()
-        # logging.info("Stopped the spark session for generating doc signatures")
+        try:
+            # load metadata
+            self.in_out_metadata = self._load_metadata(self.output_path)
+            prefix, step_number, prev_step_name = self.extract_step_info(self.execution_name)
+            if (
+                self.execution_name in self.in_out_metadata
+                and self.execution_name + "_status" in self.in_out_metadata[self.execution_name]
+                and self.in_out_metadata[self.execution_name][self.execution_name + "_status"] == "complete"
+            ):
+                logging.info(f"Skipping {self.step_name} because its complete")
+            elif self.in_out_metadata[prev_step_name][prev_step_name + "_status"] == "complete":
+                self.run_transform()
+                self._save_metadata(self.execution_name, "complete", self.in_out_metadata, self.output_path)
+                logging.info("Finished grouping by band hash and band number")
+            else:
+                logging.info(f"Skipping {self.step_name} because the previous step failed")
+        except Exception as ex:
+            self._save_metadata(self.execution_name, "error", self.in_out_metadata, self.output_path)
+            logging.error(f"Failed to group by band hash and band number: {ex}")
+        finally:
+            self.stop()
+            logging.info("Stopped the spark session for generating doc signatures")
