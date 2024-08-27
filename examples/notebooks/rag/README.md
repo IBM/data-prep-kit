@@ -6,12 +6,10 @@ This folder has examples of RAG applications with data prep kit (DPK).
 
 ```bash
 ## Clone this repo
-git  clone   https://github.com/sujee/data-prep-kit
+git  clone   https://github.com/IBM/data-prep-kit
 
 cd data-prep-kit
-
-## checkout the branch
-git checkout rag-example1
+## All commands from here on out, assume you are in project root directory
 ```
 
 ## Step-1: Setup Python Environment
