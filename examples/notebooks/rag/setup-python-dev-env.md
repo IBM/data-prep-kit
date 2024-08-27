@@ -1,10 +1,11 @@
 # Setup a Local Python Dev Environment
 
-## Step-1: Anaconda Python environment
+## Step-1: Setup Python env
+
+### Option A (Recommended): Anaconda Python environment
 
 You can install Anaconda by following the [guide here](https://www.anaconda.com/download/).
 
-## Step-2: Create a custom environment
 
 We will create an environment for this workshop with all the required libraries installed.
 
@@ -22,41 +23,41 @@ python --version
 # should say : 3.11
 ```
 
-## Step-3: Create a Venv
-
+Install dependencies
 
 ```bash
-## go to project dir (assumes repo name is 'data-prep-kit')
-cd data-prep-kit/examples/notebooks/rag
+cd examples/notebooks/rag
 
-make   clean
-make   venv
+pip  install  -r requirements.txt
 ```
 
-This command will 
+### Option B: Python virtual env
 
-- create a python virtual environmnet in `venv` directory.
-- install DPK modules
-- any dependencies listed in `requirements.txt`
-
-We only have to run this command once.
-
-If you make any modifications to   `requirements.txt`  or DPK modules are updated, run this step again.
-
-## Step-4: Test the created venv
+Make sure you have python version 3.11 installed
 
 ```bash
-## go to project dir (assumes repo name is 'data-prep-kit')
-cd data-prep-kit/examples/notebooks/rag
-
-# activate env
-source   venv/bin/activate
-
 ## Check python version
 python --version
 # should say : 3.11
 ```
 
-To deactivate
+Create a venv
 
-`deactivate`
+```bash
+cd examples/notebooks/rag
+
+
+python -m venv venv
+
+## activate venv
+source ./venv/bin/activate
+
+## Install requirements
+pip install -r requirements.txt
+```
+
+## Step-2: Launch Jupyter
+
+`jupyter lab`
+
+This will open a browser window.  Run the notebooks as indicated

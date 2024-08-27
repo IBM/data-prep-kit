@@ -1,3 +1,7 @@
+## Data prep kit
+data-prep-toolkit-transforms-ray==0.2.1.dev1
+
+
 # Milvus
 pymilvus
 pymilvus[model]
@@ -12,14 +16,6 @@ sentence-transformers
 ## --- Parquet
 pandas
 pyarrow
-
-## DPK 
-parameterized
-scipy
-networkx
-colorlog
-func-timeout
-emerge-viz
 
 ## --- Replicate
 replicate
