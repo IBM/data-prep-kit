@@ -10,9 +10,22 @@
 # limitations under the License.
 ################################################################################
 
-# There is no local test for fdedup
-# This is just a place holder t satisfy overall framework
+from data_processing.data_access import DataAccess
 
 
-def test_ededup():
-    pass
+class SnapshotUtils:
+    """
+    Class implementing support methods for snapshotting
+    """
+
+    @staticmethod
+    def get_snapshot_folder(data_access: DataAccess) -> str:
+        """
+        Get snapshot folder from data access
+        :param data_access: data access class
+        :return: output folder
+        """
+        output_folder = data_access.get_output_folder()
+        if not output_folder.endswith("/"):
+            output_folder += "/"
+        return f"{output_folder}snapshot/"

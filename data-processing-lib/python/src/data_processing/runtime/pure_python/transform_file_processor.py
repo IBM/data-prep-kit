@@ -57,10 +57,10 @@ class PythonPoolTransformFileProcessor(AbstractTransformFileProcessor):
     """
 
     def __init__(
-            self,
-            data_access_factory: DataAccessFactoryBase,
-            transform_params: dict[str, Any],
-            transform_class: type[AbstractBinaryTransform],
+        self,
+        data_access_factory: DataAccessFactoryBase,
+        transform_params: dict[str, Any],
+        transform_class: type[AbstractBinaryTransform],
     ):
         """
         Init method
@@ -104,6 +104,4 @@ class PythonPoolTransformFileProcessor(AbstractTransformFileProcessor):
         """
         for key, val in stats.items():
             # for all key/values
-            if val > 0:
-                # for values greater then 0
-                self.stats[key] = self.stats.get(key, 0) + val
+            self.stats[key] = self.stats.get(key, 0) + val

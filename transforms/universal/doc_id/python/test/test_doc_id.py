@@ -15,11 +15,14 @@ from typing import Tuple
 import pyarrow as pa
 from data_processing.test_support.transform import AbstractTableTransformTest
 from data_processing.utils import TransformUtils
-from doc_id_transform_ray import (
-    DocIDTransform,
-    doc_column_name_key,
-    hash_column_name_key,
-)
+from doc_id_transform_python import DocIDTransform
+from doc_id_transform_base import (IDGenerator,
+                                   doc_column_name_key,
+                                   hash_column_name_key,
+                                   int_column_name_key,
+                                   id_generator_key,
+                                   )
+
 
 
 table = pa.Table.from_pydict(
@@ -31,7 +34,7 @@ expected_table = pa.Table.from_pydict(
     {
         "doc": pa.array(["Tom", "Joe"]),
         "doc_hash": pa.array([TransformUtils.str_to_hash("Tom"), TransformUtils.str_to_hash("Joe")]),
-        # "doc_int": pa.array([0, 1]),   Can't generate integer doc ids outside of Ray
+        "doc_int": pa.array([5, 6]),
     }
 )
 expected_metadata_list = [{}, {}]  # transform() result  # flush() result
@@ -48,7 +51,8 @@ class TestDocIDTransform(AbstractTableTransformTest):
         config = {
             doc_column_name_key: "doc",
             hash_column_name_key: "doc_hash",
-            # int_column_name_key: "doc_int",    Can't generate integer ids outside of ray
+            int_column_name_key: "doc_int",
+            id_generator_key: IDGenerator(5),
         }
         fixtures.append((DocIDTransform(config), [table], [expected_table], expected_metadata_list))
         return fixtures
