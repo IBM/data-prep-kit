@@ -55,16 +55,16 @@ docker-save-image::
 
 .PHONY: workflow-venv
 workflow-venv:
-	$(MAKE) -C kfp_ray workflow-venv
+#	$(MAKE) -C kfp_ray workflow-venv
 
 .PHONY: workflow-test
 workflow-test:
-	$(MAKE) -C kfp_ray workflow-test
+#	$(MAKE) -C kfp_ray workflow-test
 
 .PHONY: workflow-upload
 workflow-upload:
-	$(MAKE) -C kfp_ray workflow-upload
+#	$(MAKE) -C kfp_ray workflow-upload
 
 .PHONY: workflow-build
 workflow-build:
-	$(MAKE) -C  kfp_ray workflow-build
+#	$(MAKE) -C  kfp_ray workflow-build
