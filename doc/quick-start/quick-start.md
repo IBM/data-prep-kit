@@ -1,19 +1,37 @@
 # Quick Start for Data Prep Kit 
-Here we provided short examples of various uses of the Data Prep Kit. Most users who want to jump right in can use standard pip install to deploy one of the followings to their virtual python environment:
+Here we provided short examples of various uses of the Data Prep Kit. Most users who want to jump right in can use standard pip install to deploy the data-prep-kit and the python or ray transforms to their virtual python environment. 
 
-- Deploy the latest release of the data prep toolkit library
+- When setting up a virtual environment it is recommended to use python3.11 as in the example below using conda:
 
-`pip install data-prep-toolkit`
+    - setup a virtual environment (example using conda) <br>
+        `conda create -n data-prep-kit-1 -y python=3.11`
+<br>
+
+    - activate the new conda environment<br>
+        `conda activate data-prep-kit-1`
+<br>
+
+    - make sure env is swithced to data-prep-kit-1 and Check python version. <br>
+        `python --version`
+        <br> The command above should say: should say : 3.11
+<br>
+
+    - install jupyter lab<br>
+        `pip3 install jupyterlab`   
+<br><br>
+
+- Deploy the latest release of the data prep toolkit library<br>
+    `pip3 install data-prep-toolkit`
 
 or 
 -  deploy the latest releases of the data prep toolkit library and all python transforms
 
-`pip install data-prep-toolkit-transforms`
+    `pip3 install data-prep-toolkit-transforms`
 
 or 
 -  deploy the latest releases of the data prep toolkit library, all python transforms and all ray transforms
 
-`pip install data-prep-toolkit-transforms-ray`
+    `pip3 install data-prep-toolkit-transforms-ray`
 
 
 
