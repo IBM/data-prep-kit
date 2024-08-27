@@ -1,58 +1,70 @@
-# Define the root of the local git clone for the common rules to be able 
-# know where they are running from.
-REPOROOT=../../../..
-# Include a library of common .transform.* targets which most
-# transforms should be able to reuse.  However, feel free
-# to override/redefine the rules below. 
+REPOROOT=../../..
+# Use make help, to see the available rules
+include $(REPOROOT)/.make.defaults
 
-# $(REPOROOT)/.make.versions file contains the versions
+setup::
+	@# Help: Recursively make $@ all subdirs
+	$(MAKE) RULE=$@ .recurse
 
-TRANSFORM_NAME=ededup
+clean::
+	@# Help: Recursively make $@ all subdirs
+	$(MAKE) RULE=$@ .recurse
 
-include $(REPOROOT)/transforms/.make.transforms
+build::
+	@# Help: Recursively make $@ in subdirs
+	$(MAKE) RULE=$@ .recurse
+venv::
+	@# Help: Recursively make $@ in subdirs
+	$(MAKE) RULE=$@ .recurse
 
-venv::	.transforms.python-venv
+image::
+	@# Help: Recursively make $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
-test::	.transforms.python-test
-
-clean:: .transforms.clean
-
-image:: .transforms.python-image
-
-test-src:: .transforms.test-src
-
-setup:: .transforms.setup
-
-build:: build-dist image
-
-publish: publish-image
-
-publish-image:: .transforms.publish-image-python
-
-setup:: .transforms.setup
-
-# distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(EDEDUP_PYTHON_VERSION) TOML_VERSION=$(EDEDUP_PYTHON_VERSION) .transforms.set-versions
-        
-build-dist:: .defaults.build-dist 
+	@# Help: Recursively $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
-publish-dist:: .defaults.publish-dist
+publish::
+	@# Help: Recursively make $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
-test-image:: .transforms.python-test-image
+test-image::
+	@# Help: Recursively make $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
-run-cli-sample: .transforms.run-cli-python-sample
+test::
+	@# Help: Recursively make $@ in all subdirs
+	@$(MAKE) RULE=$@ .recurse
 
-run-local-sample: .transforms.run-local-sample
+test-src::
+	@# Help: Recursively make $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
 
-run-local-python-sample: .transforms.run-local-python-sample
+kind-load-image::
+	@# Help: Recursively make $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
 
-#run-s3-ray-sample: .transforms.run-s3-ray-sample
+docker-load-image::
+	@# Help: Recursively make $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
 
-minio-start:	.minio-start
+docker-save-image::
+	@# Help: Recursively make $@ in all subdirs
+	$(MAKE) RULE=$@ .recurse
 
-kind-load-image:: .transforms.kind-load-image
+.PHONY: workflow-venv
+workflow-venv:
+	$(MAKE) -C kfp_ray workflow-venv
 
-docker-load-image: .defaults.docker-load-image
+.PHONY: workflow-test
+workflow-test:
+	$(MAKE) -C kfp_ray workflow-test
 
-docker-save-image: .defaults.docker-save-image
+.PHONY: workflow-upload
+workflow-upload:
+	$(MAKE) -C kfp_ray workflow-upload
+
+.PHONY: workflow-build
+workflow-build:
+	$(MAKE) -C  kfp_ray workflow-build
