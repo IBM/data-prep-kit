@@ -10,22 +10,37 @@
 # limitations under the License.
 ################################################################################
 
+import pickle
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
+from data_processing.data_access import SnapshotUtils
 from data_processing.transform import (
     AbstractTableTransform,
-    AbstractTransform,
     TransformConfiguration,
 )
-from data_processing.utils import GB, CLIArgumentProvider, TransformUtils
+from data_processing.utils import (
+    GB,
+    CLIArgumentProvider,
+    TransformUtils,
+    UnrecoverableException,
+    get_logger,
+    str2bool,
+)
 
 
 REQUEST_LEN = 8192
 short_name = "ededup"
 cli_prefix = f"{short_name}_"
-
+doc_column_name_key = "doc_column"
+int_column_name_key = "doc_id_column"
+use_snapshot_key = "use_snapshot"
+snapshot_directory_key = "snapshot_directory"
+doc_column_name_cli_param = f"{cli_prefix}{doc_column_name_key}"
+int_column_name_cli_param = f"{cli_prefix}{int_column_name_key}"
+use_snapshot_cli_param = f"{cli_prefix}{use_snapshot_key}"
+snapshot_directory_cli_param = f"--{cli_prefix}{snapshot_directory_key}"
 
 class HashFilter:
     """
@@ -36,7 +51,32 @@ class HashFilter:
         """
         initialize set of local hashes
         """
-        self.hashes = set()
+        self.logger = get_logger(__name__)
+        self.actor_id = params.get("id", 1)
+        data_access_factory = params.get("data_access_factory", None)
+        if data_access_factory is None:
+            self.data_access = None
+            self.hashes = set()
+        else:
+            self.data_access = data_access_factory.create_data_access()
+            snapshot = params.get("snapshot", None)
+            if snapshot is None:
+                self.hashes = set()
+            else:
+                try:
+                    b_hashes, _ = self.data_access.get_file(snapshot)
+                    self.hashes = pickle.loads(b_hashes)
+                except Exception as e:
+                    self.logger.warning(f"Failed to load hashes collector {self.actor_id} with exception {e}")
+                    raise UnrecoverableException("failed to load hashes")
+
+    def add_hashes(self, hashes: set[str]) -> None:
+        """
+        Adding hashes
+        :param hashes: set of hashes to add
+        :return: None
+        """
+        self.hashes.update(hashes)
 
     def get_unique(self, ha: list[str]) -> list[str]:
         """
@@ -59,6 +99,22 @@ class HashFilter:
         """
         return len(self.hashes), TransformUtils.deep_get_size(self.hashes) / GB
 
+    def snapshot(self) -> None:
+        """
+        Snapshot content
+        :return: None
+        """
+        try:
+            # pickle content
+            b_doc = pickle.dumps(self.hashes)
+            # Save it
+            self.data_access.save_file(
+                f"{SnapshotUtils.get_snapshot_folder(self.data_access)}hash_collector_{self.actor_id}", b_doc
+            )
+        except Exception as e:
+            self.logger.warning(f"Failed to snapshot doc collector {self.actor_id} with exception {e}")
+            raise e
+
 
 class EdedupTransformBase(AbstractTableTransform):
     """
@@ -72,27 +128,33 @@ class EdedupTransformBase(AbstractTableTransform):
             doc_column - name of the doc column
         """
         super().__init__(config)
-        self.doc_column = config.get("doc_column", "contents")
+        self.doc_column = config.get(doc_column_name_key, "contents")
+        self.doc_id_column = config.get(int_column_name_key, "document_id")
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         De duping table content.
         :param table: table
+        :param file_name: file name
         :return: resulting table, statistics
         """
         # make sure that the doc column exists
-        TransformUtils.validate_columns(table=table, required=[self.doc_column])
+        TransformUtils.validate_columns(table=table, required=[self.doc_column, self.doc_id_column])
         # Inner variables
+        docs = table[self.doc_column]
+        doc_ids = table[self.doc_id_column]
         hashes = set()
         unique = []
         hd = {}
         # Compute unique hashes for the table
-        for text in table[self.doc_column]:
+        for n in range(table.num_rows):
+            doc = docs[n].as_py()
+            doc_id = doc_ids[n].as_py()
             # Compute doc hash
-            h = TransformUtils.str_to_hash(TransformUtils.normalize_string(str(text)))
+            h = TransformUtils.str_to_hash(TransformUtils.normalize_string(str(doc)))
             if h not in hashes:  # Processing this hash for the first time
                 hashes.add(h)  # Remember it locally
-                hd[h] = str(text)
+                hd[h] = doc_id
                 if len(hd) >= REQUEST_LEN:  # time to check remotely
                     unique = unique + self._process_cached_hashes(hd=hd)
                     hd = {}
@@ -102,15 +164,24 @@ class EdedupTransformBase(AbstractTableTransform):
         # Remove duplicates
         unique_set = set(unique)
         mask = [False] * table.num_rows
+        removed = []
         index = 0
-        for text in table[self.doc_column]:
-            str_text = str(text)
-            if str_text in unique_set:
+        for id in table[self.doc_id_column]:
+            str_id = str(id)
+            if str_id in unique_set:
                 mask[index] = True
-                unique_set.remove(str_text)
+                unique_set.remove(str_id)
+            else:
+                removed.append(str_id)
             index += 1
         # Create output table
         out_table = table.filter(mask)
+        # populate removed columns
+        if out_table.num_rows > 0:
+            # we can only add removed if the file is not empty
+            removed_column = [[]] * out_table.num_rows
+            removed_column[0] = removed
+            out_table = TransformUtils.add_column(table=out_table, name="removed", content=removed_column)
         # report statistics
         stats = {"source_documents": table.num_rows, "result_documents": out_table.num_rows}
         return [out_table], stats
@@ -130,7 +201,7 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
     configuration with CLI args and combining of metadata.
     """
 
-    def __init__(self, transform_class: type[AbstractTransform]):
+    def __init__(self, transform_class: type[AbstractTableTransform]):
         super().__init__(
             name=short_name,
             transform_class=transform_class,
@@ -143,7 +214,28 @@ class EdedupTransformConfigurationBase(TransformConfiguration):
         """
         Add Transform-specific arguments to the given  parser.
         """
-        parser.add_argument(f"--{cli_prefix}doc_column", type=str, default="contents", help="key for accessing data")
+        parser.add_argument(
+            f"--{doc_column_name_cli_param}",
+            type=str,
+            default="contents",
+            help="name of the column containing document")
+        parser.add_argument(
+            f"--{int_column_name_cli_param}",
+            type=str,
+            default="document_id",
+            help="name of the column containing document id"
+        )
+        parser.add_argument(
+            f"--{use_snapshot_cli_param}",
+            type=lambda x: bool(str2bool(x)),
+            default=False,
+            help="flag to continue from snapshot",
+        )
+        # by default, snapshot file is from the output directory. This parameter can overwrite
+        # default location by explicitly defining the snapshot directory
+        parser.add_argument(
+            f"--{snapshot_directory_cli_param}", type=str, default=None, help="location of snapshot files"
+        )
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
