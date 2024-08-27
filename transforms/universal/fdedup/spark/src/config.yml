@@ -35,24 +35,27 @@ steps:
       args:
           seed: 42
           default_batch_size: 2
+          num_segments: 2
+          jaccard_similarity_threshold: 0.8
       configs:
           heuristic1: value2
+
+    #    - name: step#3
+    #      udf_path: "fd_jaccard_distance_calculator.py"
+    #      udf_class: "FDJaccardDistanceCalculator"
+    #      args:
+    #          seed: 42
+    #          default_batch_size: 300
+    #          num_permutations: 64
+    #          jaccard_similarity_threshold: 0.8
+    #          language: unspecified
+    #          word_shingle_size: 8
+    #          salting_size: 1
+    #          num_segments: 2
+    #      configs:
+    #          heuristic1: value2
 
     - name: step#3
-      udf_path: "fd_jaccard_distance_calculator.py"
-      udf_class: "FDJaccardDistanceCalculator"
-      args:
-          seed: 42
-          default_batch_size: 300
-          num_permutations: 64
-          jaccard_similarity_threshold: 0.8
-          language: unspecified
-          word_shingle_size: 8
-          salting_size: 1
-      configs:
-          heuristic1: value2
-
-    - name: step#4
       udf_path: "fd_clean_data.py"
       udf_class: "FDCleanData"
       args:

@@ -41,6 +41,7 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         seed: int,
         configs: str,
         step_name: str,
+        num_segments: int,
     ):
         super().__init__()
         self.input_path = input_path
@@ -73,6 +74,7 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
         self.in_out_metadata = {}
         self.execution_name = "execution_" + self.step_name
         self.init_io(self.input_path, self.output_path)
+        self.num_segments = num_segments
         server_port_https = int(os.getenv("KUBERNETES_SERVICE_PORT_HTTPS", "-1"))
         if server_port_https == -1:
             # if the code is running locally, add Murmur_MH.py to the py files used by the Spark context
@@ -323,7 +325,7 @@ class FDJaccardDistanceCalculator(SparkTransformerRuntime):
 
     def run_transform(self):
         num_bands = self.in_out_metadata["num_bands"]
-        num_bands_segments = self.in_out_metadata["num_minhash_bands"]
+        num_bands_segments = self.num_segments
         num_bands_index = 0
         num_bands_segment_index = 0
 
