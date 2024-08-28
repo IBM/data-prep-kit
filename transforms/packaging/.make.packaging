@@ -2,29 +2,28 @@
 venv:  
 	$(MAKE) .defaults.create-venv
 
-test::	setup test-src
-	@# Help: Setup environment, load wheel from pyproject.toml and run unit tests for all transforms
+test::	test-src
 
 clean:: .transforms.clean
 	-rm -fr src
 
 image:: .transforms.python-image
 
-test-src:: 
+run-ut::
 	source venv/bin/activate;       \
 	for T in $(TRANSFORMS_NAMES); do                    \
 	    echo running unit test on: $$T ; \
 		$(PYTEST) $(REPOROOT)/transforms/$$T/$(PACKAGING_RUN_TIME)/test; \
 	done;
-	@# Help: Run all unit tests from the same venv environment (should follow make venv)
+	@# Help: Setup environment and run unit tests for all transforms
 
 
 setup: .transforms.setup venv
 	$(MAKE) src
 	source venv/bin/activate;       \
 	$(PYTHON) -m pip install . 
-	@# Help: Do any default transform setup before running make src
-
+	@# Help: Do any default transform setup before running make src and setting up a test environment
+	
 
 src:
 	for T in $(TRANSFORMS_NAMES); do                    \
@@ -41,7 +40,7 @@ build:: build-dist
         
 publish:: publish-dist
         
-build-dist:: .defaults.build-dist 
+build-dist:: src .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 

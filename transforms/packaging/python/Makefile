@@ -11,7 +11,6 @@ include $(REPOROOT)/transforms/.make.transforms
 include ../.make.packaging
 
 PACKAGING_RUN_TIME=python
-DPK_TRNASFORM_REV=0.2.1.dev1
 
 TRANSFORMS_NAMES = code/code_quality \
     	code/code2parquet \
@@ -23,18 +22,26 @@ TRANSFORMS_NAMES = code/code_quality \
 		language/lang_id \
 		language/pdf2parquet \
 		language/text_encoder \
-        language/pii_redactor \
 		universal/ededup \
 		universal/filter \
 		universal/resize \
 		universal/tokenization \
-        universal/html2parquet
+		universal/doc_id \
+		universal/resize
+
+
+test-src:: .transforms.setup venv
+	source venv/bin/activate && cd ../../../data-processing-lib/python && $(PYTHON) -m pip install .
+	source venv/bin/activate && cd ../python && $(MAKE) src && $(PYTHON) -m pip install .
+	$(MAKE) run-ut
+	@# Help: Do any default transform setup before running make src and setting up a test environment
 
 test-with-pypi:
+	$(MAKE) clean
 	$(MAKE) .defaults.create-venv
 	source venv/bin/activate;       \
 	$(PYTHON) -m pip install data_prep_toolkit_transforms==$(DPK_TRNASFORM_REV) 
-	$(MAKE) test-src
+	$(MAKE) run-ut
 	@# Help: Load wheel from pypi and run all unit tests: final step in verification after deploying to pypi)
 
 

@@ -11,7 +11,6 @@ include $(REPOROOT)/transforms/.make.transforms
 include ../.make.packaging
 
 PACKAGING_RUN_TIME=ray
-DPK_TRNASFORM_REV=0.2.1.dev0
 
 ## Ray Transforms:  `find . -name src | grep ray/src`
 TRANSFORMS_NAMES = code/proglang_select \
@@ -24,7 +23,6 @@ TRANSFORMS_NAMES = code/proglang_select \
 	language/lang_id \
 	language/text_encoder \
 	language/pdf2parquet \
-	language/pii_redactor \
 	universal/fdedup \
 	universal/tokenization \
 	universal/ededup \
@@ -33,16 +31,14 @@ TRANSFORMS_NAMES = code/proglang_select \
 	universal/filter \
 	universal/resize
 
-test-with-local-python:
-	$(MAKE) clean
-	$(MAKE) .defaults.create-venv
-	source venv/bin/activate;       \
-	cd ../python; \
-	$(PYTHON) -m pip install . ; \
-	cd ../ray; \
-	$(PYTHON) -m pip install . ; \
-	$(PYTHON) -m pip install data_prep_toolkit_transforms_ray==$(DPK_TRNASFORM_REV)
-	$(MAKE) test-src
+test-src:: .transforms.setup venv
+	source venv/bin/activate && cd ../../../data-processing-lib/python && $(PYTHON) -m pip install .
+	source venv/bin/activate && cd ../../../data-processing-lib/ray && $(PYTHON) -m pip install .
+	source venv/bin/activate && cd ../python && $(MAKE) src && $(PYTHON) -m pip install .
+	source venv/bin/activate &&  cd ../ray && $(MAKE) src && $(PYTHON) -m pip install .
+	$(MAKE) run-ut
+	@# Help: Do any default transform setup before running make src and setting up a test environment
+
 
 test-with-pypi:
 	$(MAKE) clean
