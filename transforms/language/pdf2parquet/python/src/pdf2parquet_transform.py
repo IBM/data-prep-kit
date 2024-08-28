@@ -310,7 +310,7 @@ class Pdf2ParquetTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{pdf2parquet_do_ocr_cli_param}",
             type=str2bool,
-            help="If true, optical character recognization (OCR) will be used to read the PDF content.",
+            help="If true, optical character recognition (OCR) will be used to read the PDF content.",
             default=pdf2parquet_do_ocr_default,
         )
         parser.add_argument(
