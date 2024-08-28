@@ -3,9 +3,9 @@ common_args:
     input_path: ${FD_INPUT_PATH}
     output_path: ${FD_OUTPUT_PATH}
     file_ext: .parquet
-    default_batch_size: 2
+    default_batch_size: ${FD_DEFAULT_BATCH_SIZE}
     document_id_column: int_id_column
-    contents_column: contents
+    contents_column: ${FD_CONTENTS_COLUMN}
     debug: False
     checkpoint_count: 0
     total_document_size: 0
@@ -25,7 +25,7 @@ steps:
           jaccard_similarity_threshold: 0.8
           language: unspecified
           word_shingle_size: 8
-          num_segments: 2
+          num_segments: ${FD_NUM_SEGMENTS}
       configs:
           heuristic1: value1
 
@@ -34,8 +34,8 @@ steps:
       udf_class: "FDClustersCalculator"
       args:
           seed: 42
-          default_batch_size: 2
-          num_segments: 2
+          default_batch_size: ${FD_DEFAULT_BATCH_SIZE}
+          num_segments: ${FD_NUM_SEGMENTS}
           jaccard_similarity_threshold: 0.8
       configs:
           heuristic1: value2
