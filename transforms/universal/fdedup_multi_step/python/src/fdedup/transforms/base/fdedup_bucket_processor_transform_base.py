@@ -16,15 +16,15 @@ from typing import Any
 
 from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
 from data_processing.utils import UnrecoverableException, CLIArgumentProvider
-from fdedup.transforms.base import threshold_key, num_permutations_key
+from fdedup.transforms.base import threshold_key, num_permutations_key, minhash_snapshot_directory_key
 
 # configuration parameters
 short_name = "fdedup_bucket_processor"
-cli_prefix = f"{short_name}_"
-minhash_snapshot_directory_key = "minhash_snapshot_directory"
-bucket_processor_num_permutations_cli_param = f"{cli_prefix}{num_permutations_key}"
-bucket_processor_threshold_cli_param = f"{cli_prefix}{threshold_key}"
-bucket_processor_minhash_snapshot_directory_cli_param = f"--{cli_prefix}{minhash_snapshot_directory_key}"
+bucket_processor_cli_prefix = f"{short_name}_"
+bucket_processor_num_permutations_cli_param = f"{bucket_processor_cli_prefix}{num_permutations_key}"
+bucket_processor_threshold_cli_param = f"{bucket_processor_cli_prefix}{threshold_key}"
+bucket_processor_minhash_snapshot_directory_cli_param = \
+    f"--{bucket_processor_cli_prefix}{minhash_snapshot_directory_key}"
 
 # Execution parameter
 LONG_BUCKET = 5000
@@ -146,6 +146,6 @@ class FdedupBucketProcessorTransformConfigurationBase(TransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        captured = CLIArgumentProvider.capture_parameters(args, bucket_processor_cli_prefix, False)
         self.params = self.params | captured
         return True

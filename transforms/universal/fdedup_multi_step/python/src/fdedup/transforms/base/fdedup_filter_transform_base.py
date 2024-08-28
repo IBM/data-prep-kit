@@ -21,22 +21,21 @@ from data_processing.utils import (
     TransformUtils,
 )
 from data_processing.utils import UnrecoverableException
+from fdedup.transforms.base import doc_column_name_key, int_column_name_key
 
 # configuration parameters
 short_name = "fdedup_filter"
-cli_prefix = f"{short_name}_"
-doc_column_name_key = "doc_column"
-int_column_name_key = "doc_id_column"
+filter_cli_prefix = f"{short_name}_"
 cluster_column_name_key = "cluster_column"
 removed_docs_column_name_key = "removed_docs_column"
 doc_id_snapshot_directory_key = "docid_snapshot_directory"
 doc_id_cache_key = "doc_id_cache"
 
-filter_doc_column_name_cli_param = f"{cli_prefix}{doc_column_name_key}"
-filter_int_column_name_cli_param = f"{cli_prefix}{int_column_name_key}"
-filter_cluster_column_name_cli_param = f"--{cli_prefix}{cluster_column_name_key}"
-filter_removed_docs_column_name_cli_param = f"--{cli_prefix}{removed_docs_column_name_key}"
-filter_doc_id_snapshot_directory_cli_param = f"--{cli_prefix}{doc_id_snapshot_directory_key}"
+filter_doc_column_name_cli_param = f"{filter_cli_prefix}{doc_column_name_key}"
+filter_int_column_name_cli_param = f"{filter_cli_prefix}{int_column_name_key}"
+filter_cluster_column_name_cli_param = f"--{filter_cli_prefix}{cluster_column_name_key}"
+filter_removed_docs_column_name_cli_param = f"--{filter_cli_prefix}{removed_docs_column_name_key}"
+filter_doc_id_snapshot_directory_cli_param = f"--{filter_cli_prefix}{doc_id_snapshot_directory_key}"
 
 
 class FdedupFilterTransformBase(AbstractTableTransform):
@@ -163,6 +162,6 @@ class FdedupFilterTransformConfigurationBase(TransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        captured = CLIArgumentProvider.capture_parameters(args, filter_cli_prefix, False)
         self.params = self.params | captured
         return True

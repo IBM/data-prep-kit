@@ -22,7 +22,7 @@ from fdedup.transforms.base import (preprocessor_doc_column_name_cli_param,
                                     preprocessor_num_permutations_cli_param,
                                     preprocessor_threshold_cli_param,
                                     shingles_size_cli_param,
-                                    use_snapshot_cli_param)
+                                    preprocessor_minhash_snapshot_directory_cli_param)
 from fdedup.transforms.python import FdedupPreprocessorPythonTransformRuntimeConfiguration
 
 
@@ -42,6 +42,5 @@ class TestPythonFdedupPreprocessorTransform(AbstractTransformLauncherTest):
                   preprocessor_num_permutations_cli_param: 64,
                   preprocessor_threshold_cli_param: .8,
                   shingles_size_cli_param: 5,
-                  use_snapshot_cli_param: False,
                   }
         return [(launcher, config, basedir + "/input", basedir + "/preprocessor")]

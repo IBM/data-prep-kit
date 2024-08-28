@@ -13,19 +13,24 @@
 import os
 import sys
 
-from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
+from data_processing_ray.runtime.ray import RayTransformLauncher
 from fdedup.transforms.base import (preprocessor_doc_column_name_cli_param,
                                     preprocessor_int_column_name_cli_param,
                                     delimiters_cli_param,
                                     preprocessor_num_permutations_cli_param,
                                     preprocessor_threshold_cli_param,
                                     shingles_size_cli_param,
-                                    preprocessor_minhash_snapshot_directory_cli_param)
-from fdedup.transforms.python import FdedupPreprocessorPythonTransformRuntimeConfiguration
+                                    )
+from fdedup_ray.transforms import (FdedupPreprocessorRayTransformRuntimeConfiguration,
+                                   preprocessor_bucket_cpu_cli_param,
+                                   preprocessor_minhash_cpu_cli_param,
+                                   preprocessor_num_buckets_cli_param,
+                                   preprocessor_num_minhash_cli_param,
+                                   )
 
 # create launcher
-launcher = PythonTransformLauncher(FdedupPreprocessorPythonTransformRuntimeConfiguration())
+launcher = RayTransformLauncher(FdedupPreprocessorRayTransformRuntimeConfiguration())
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../output"))
@@ -35,6 +40,8 @@ local_conf = {
 }
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
+    # where to run
+    "run_locally": True,
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     # orchestrator
@@ -46,8 +53,14 @@ params = {
     preprocessor_int_column_name_cli_param: "Unnamed: 0",
     delimiters_cli_param: " ",
     preprocessor_num_permutations_cli_param: 64,
-    preprocessor_threshold_cli_param: .8,
     shingles_size_cli_param: 5,
+    preprocessor_threshold_cli_param: .8,
+    preprocessor_num_buckets_cli_param: 1,
+    preprocessor_bucket_cpu_cli_param: .5,
+    preprocessor_num_minhash_cli_param: 1,
+    preprocessor_minhash_cpu_cli_param: .5,
+
+
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

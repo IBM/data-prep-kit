@@ -14,7 +14,7 @@ from typing import Any
 from argparse import Namespace
 import numpy as np
 from data_processing.utils import UnrecoverableException, RANDOM_SEED
-from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
+from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import TransformStatistics
 from data_processing.runtime.pure_python import (DefaultPythonTransformRuntime,
                                                  PythonTransformLauncher,
@@ -24,7 +24,8 @@ from fdedup.utils import BucketsHash, DocsMinHash, MurmurMH, fuzzy_optimal_param
 from fdedup.transforms.base import (FdedupPreprocessorTransformBase,
                                     FdedupPreprocessorTransformConfigurationBase,
                                     buckets_cache_key, minhashes_cache_key, mn_min_hash_key,
-                                    threshold_key, num_permutations_key, use_snapshot_key)
+                                    threshold_key, num_permutations_key,
+                                    buckets_snapshot_directory_key, minhash_snapshot_directory_key)
 
 
 class FdedupPreprocessorTransform(FdedupPreprocessorTransformBase):
@@ -80,7 +81,8 @@ class FdedupPreprocessorRuntime(DefaultPythonTransformRuntime):
         self.logger = get_logger(__name__)
         self.threshold = params.get(threshold_key, 0.8)
         self.num_permutations = params.get(num_permutations_key, 64)
-        self.snapshot = params.get(use_snapshot_key, False)
+        self.minhash_directory = params.get(minhash_snapshot_directory_key, None)
+        self.buckets_directory = params.get(buckets_snapshot_directory_key, None)
 
     def get_transform_config(
             self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics, files: list[str]
@@ -105,14 +107,16 @@ class FdedupPreprocessorRuntime(DefaultPythonTransformRuntime):
         )
         self.logger.info(f"Fuzzy: num buckets {num_buckets}, bucket length {length_bucket}")
         mn_min_hash = MurmurMH(num_perm=self.num_permutations, seed=RANDOM_SEED)
-        data_access = data_access_factory.create_data_access()
-        if self.snapshot:
-            # restarting from snapshot
-            mh_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}minhash/minhash_collector_0"
-            b_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}buckets/buckets_collector_0"
-        else:
+        if self.minhash_directory is None or len(self.minhash_directory) == 0:
             mh_path = None
-            b_path = None
+        else:
+            # restarting from snapshot
+            mh_path = self.minhash_directory
+        if self.buckets_directory is None or len(self.buckets_directory) == 0:
+           b_path = None
+        else:
+            # restarting from snapshot
+            b_path = self.buckets_directory
         self.minhashes = DocsMinHash({"id": 0, "data_access": data_access_factory, "snapshot": mh_path})
         self.buckets = BucketsHash({"id": 0, "data_access": data_access_factory, "snapshot": b_path})
         return self.params | {mn_min_hash_key: mn_min_hash, minhashes_cache_key: self.minhashes,
@@ -152,7 +156,6 @@ class FdedupPreprocessorTransformConfiguration(FdedupPreprocessorTransformConfig
         super().apply_input_params(args=args)
         self.logger.info(f"fuzzy dedup preprocessing params are {self.params}")
         return True
-
 
 
 class FdedupPreprocessorPythonTransformRuntimeConfiguration(PythonTransformRuntimeConfiguration):

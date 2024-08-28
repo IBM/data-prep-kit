@@ -265,10 +265,10 @@ class DocsMinHash:
         Snapshotting itself
         """
         try:
-            b_doc = pickle.dumps(self.minhashes)
+            minhashes = pickle.dumps(self.minhashes)
             self.data_access.save_file(
                 f"{SnapshotUtils.get_snapshot_folder(self.data_access)}minhash/minhash_collector_{self.actor_id}",
-                b_doc,
+                minhashes,
             )
         except Exception as e:
             self.logger.warning(f"Failed to snapshot minhash collector {self.actor_id} with exception {e}")

@@ -22,27 +22,22 @@ from data_processing.utils import (
     CLIArgumentProvider,
     TransformUtils,
 )
-from data_processing.utils import str2bool, UnrecoverableException
+from data_processing.utils import UnrecoverableException
 
 # performance
 REQUEST_LEN = 4096
 
 # configuration parameters
 short_name = "fdedup_preprocessor"
-cli_prefix = f"{short_name}_"
+preprocessor_cli_prefix = f"{short_name}_"
 doc_column_name_key = "doc_column"
 int_column_name_key = "doc_id_column"
-"""
-bucket_cpu_key = "bucket_cpu"
-minhash_cpu_key = "minhash_cpu"
-num_buckets_key = "num_buckets"
-num_minhash_key = "num_minhashes"
-"""
 delimiters_key = "delimiter"
 num_permutations_key = "num_permutations"
 threshold_key = "threshold"
 shingles_size_key = "shingles_size"
-use_snapshot_key = "use_snapshot"
+minhash_snapshot_directory_key = "minhash_snapshot_directory"
+buckets_snapshot_directory_key = "buckets_snapshot_directory"
 # internal parameters
 mn_min_hash_key = "mn_min_hash"
 num_bands_key = "num_bands"
@@ -50,19 +45,14 @@ length_band_key = "length_band"
 buckets_cache_key = "buckets_cache"
 minhashes_cache_key = "minhashes_cache"
 
-preprocessor_doc_column_name_cli_param = f"{cli_prefix}{doc_column_name_key}"
-preprocessor_int_column_name_cli_param = f"{cli_prefix}{int_column_name_key}"
-"""
-bucket_cpu_cli_param = f"{cli_prefix}{bucket_cpu_key}"
-minhash_cpu_cli_param = f"{cli_prefix}{minhash_cpu_key}"
-num_buckets_cli_param = f"{cli_prefix}{num_buckets_key}"
-num_minhash_cli_param = f"{cli_prefix}{num_minhash_key}"
-"""
-delimiters_cli_param = f"{cli_prefix}{delimiters_key}"
-preprocessor_num_permutations_cli_param = f"{cli_prefix}{num_permutations_key}"
-preprocessor_threshold_cli_param = f"{cli_prefix}{threshold_key}"
-shingles_size_cli_param = f"{cli_prefix}{shingles_size_key}"
-use_snapshot_cli_param = f"{cli_prefix}{use_snapshot_key}"
+preprocessor_doc_column_name_cli_param = f"{preprocessor_cli_prefix}{doc_column_name_key}"
+preprocessor_int_column_name_cli_param = f"{preprocessor_cli_prefix}{int_column_name_key}"
+delimiters_cli_param = f"{preprocessor_cli_prefix}{delimiters_key}"
+preprocessor_num_permutations_cli_param = f"{preprocessor_cli_prefix}{num_permutations_key}"
+preprocessor_threshold_cli_param = f"{preprocessor_cli_prefix}{threshold_key}"
+shingles_size_cli_param = f"{preprocessor_cli_prefix}{shingles_size_key}"
+preprocessor_minhash_snapshot_directory_cli_param = f"{preprocessor_cli_prefix}{minhash_snapshot_directory_key}"
+preprocessor_buckets_snapshot_directory_cli_param = f"{preprocessor_cli_prefix}{buckets_snapshot_directory_key}"
 
 
 class FdedupPreprocessorTransformBase(AbstractTableTransform):
@@ -221,31 +211,6 @@ class FdedupPreprocessorTransformConfigurationBase(TransformConfiguration):
             default="int_document_id",
             help="integer document id column name"
         )
-        """
-        parser.add_argument(
-            f"--{bucket_cpu_cli_param}",
-            type=float,
-            default=0.5,
-            help="number of CPUs per bucket hash"
-        )
-        parser.add_argument(
-            f"--{minhash_cpu_cli_param}",
-            type=float,
-            default=0.5,
-            help="number of CPUs per minhash hash"
-        )
-        parser.add_argument(
-            f"--{num_minhash_cli_param}",
-            type=int,
-            default=1,
-            help="number of minhash caches to use"
-        )
-        parser.add_argument(
-            f"--{num_buckets_key}",
-            type=int,
-            default=1, help="number of bucket hashes to use"
-        )
-        """
         parser.add_argument(
             f"--{preprocessor_num_permutations_cli_param}",
             type=int,
@@ -269,10 +234,16 @@ class FdedupPreprocessorTransformConfigurationBase(TransformConfiguration):
             help="delimiter for splitting document"
         )
         parser.add_argument(
-            f"--{use_snapshot_cli_param}",
-            type=lambda x: bool(str2bool(x)),
-            default=False,
-            help="flag to continue from snapshot",
+            f"--{preprocessor_minhash_snapshot_directory_cli_param}",
+            type=str,
+            default=None,
+            help="minhash snapshot directory key",
+        )
+        parser.add_argument(
+            f"--{preprocessor_buckets_snapshot_directory_cli_param}",
+            type=str,
+            default=None,
+            help="buckets snapshot directory key",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
@@ -281,6 +252,6 @@ class FdedupPreprocessorTransformConfigurationBase(TransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
-        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        captured = CLIArgumentProvider.capture_parameters(args, preprocessor_cli_prefix, False)
         self.params = self.params | captured
         return True
