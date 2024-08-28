@@ -1,15 +1,20 @@
 # Setup a Local Python Dev Environment
 
-## Step-1: Setup Python env
+We can use 
 
-### Option A (Recommended): Anaconda Python environment
+- Option-A: Use Anaconda environment
+- Option-B: Use python virtual env
+
+Just follow one.  (A) is recommended!
+
+## Option A (Recommended): Anaconda Python environment
 
 You can install Anaconda by following the [guide here](https://www.anaconda.com/download/).
 
 
 We will create an environment for this workshop with all the required libraries installed.
 
-**Make sure python version is 3.11**
+### A-1: Setup a conda env
 
 ```bash
 conda create -n data-prep-kit-1 -y python=3.11
@@ -23,7 +28,7 @@ python --version
 # should say : 3.11
 ```
 
-Install dependencies
+### A-2: Install dependencies
 
 ```bash
 cd examples/notebooks/rag
@@ -33,10 +38,16 @@ pip  install  -r requirements.txt
 
 If any issues see [troubleshooting tips](#troubleshooting-tips)
 
+### A-3: Start Jupyter
 
-### Option B: Python virtual env
+`jupyter lab`
 
-Make sure you have python version 3.11 installed
+This will usually open a browser window/tab.  We will use this to run the notebooks
+
+
+## Option B: Python virtual env
+
+### B-1: Have python version 3.11
 
 ```bash
 ## Check python version
@@ -44,7 +55,7 @@ python --version
 # should say : 3.11
 ```
 
-Create a venv
+### B-2: Create a venv
 
 ```bash
 cd examples/notebooks/rag
@@ -62,11 +73,13 @@ pip install -r requirements.txt
 If any issues see [troubleshooting tips](#troubleshooting-tips)
 
 
-## Step-2: Launch Jupyter
+### B-3: Launch Jupyter
 
-`jupyter lab`
+`./venv/bin/jupyter lab`
 
-This will open a browser window.  Run the notebooks as indicated
+This will usually open a browser window/tab.  We will use this to run the notebooks
+
+**Note:**: Make sure to run `./venv/bin/jupyter lab`, so it can load installed dependencies correctly.
 
 ## Troubleshooting Tips
 

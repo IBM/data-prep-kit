@@ -43,7 +43,9 @@ Here is the code:
 
 Our vector database is [Milvus](https://milvus.io/)
 
-Code: [rag_1B_load_data_into_milvus.ipynb](rag_1B_load_data_into_milvus.ipynb)
+Run the code: [rag_1B_load_data_into_milvus.ipynb](rag_1B_load_data_into_milvus.ipynb)
+
+Be sure to [shutdown the notebook](#tips-close-the-notebook-kernels-to-release-the-dblock) before proceeding to the next step
 
 
 ## Step-4: Perform vector search (RAG stage 5 & 6)
@@ -51,6 +53,8 @@ Code: [rag_1B_load_data_into_milvus.ipynb](rag_1B_load_data_into_milvus.ipynb)
 Let's do a few searches on our data.
 
 Code: [rag_1C_vector_search.ipynb](rag_1C_vector_search.ipynb)
+
+Be sure to [shutdown the notebook](#tips-close-the-notebook-kernels-to-release-the-dblock) before proceeding to the next step
 
 
 ## Step-5: Query the documents using LLM (RAG steps 5, 6, 7, 8 & 9)
@@ -84,6 +88,19 @@ For comparision, we can use [Llama-index](https://docs.llamaindex.ai/) framework
 
 Code: [rag_2A_llamaindex_process.ipynb](rag_2A_llamaindex_process.ipynb)
 
+Be sure to [shutdown the notebook](#tips-close-the-notebook-kernels-to-release-the-dblock) before proceeding to the next step
+
+
 ### Step 6.2 - Query documents with LLM
 
 code: [rag_2B_llamaindex_query.ipynb](rag_2B_llamaindex_query.ipynb)
+
+
+## Tips: Close the notebook kernels, to release the db.lock
+
+When using embedded database, the program maintains a lock on the database file.  If the lock is active, other notebooks may not be able to access the same database.
+
+Here is how to close kernels:
+
+- In **vscode**:  **Restart the kernel**. This will end the current kernel session and release the db.lock
+- In **Jupyter** : Go to  `File --> Close and shutdown notebook`.  This will end the current kernel session and release the db.lock
