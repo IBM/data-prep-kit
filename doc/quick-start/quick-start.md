@@ -4,31 +4,37 @@ Here we provided short examples of various uses of the Data Prep Kit. Most users
 - When setting up a virtual environment it is recommended to use python3.11 as in the example below using conda. 
 
 
-    - setup a virtual environment (example using conda) <br>
+    - setup a virtual environment (example using conda)
+ \
         `conda create -n data-prep-kit-1 -y python=3.11`
-<br>
+ 
 
-    - Install the gcc/g++ that is required while building fastext:<br>
-        
+    - Install the gcc/g++ that is required while building fastext:
+\
         `conda install gcc_linux-64`
-
+\
         `conda install gxx_linux-64`
-<br>
 
-    - activate the new conda environment<br>
+
+    - activate the new conda environment
+\
         `conda activate data-prep-kit-1`
-<br>
 
-    - make sure env is switched to data-prep-kit-1 and Check python version. <br>
+
+    - make sure env is switched to data-prep-kit-1 and Check python version.
+\
         `python --version`
-        <br> The command above should say: 3.11
+\
+        The command above should say: 3.11
+
+
+    - install jupyter lab
+\
+        `pip3 install jupyterlab`
+
 <br>
+- Deploy the latest release of the data prep toolkit library
 
-    - install jupyter lab<br>
-        `pip3 install jupyterlab`   
-<br><br>
-
-- Deploy the latest release of the data prep toolkit library<br>
     `pip3 install data-prep-toolkit`
 
 or 
