@@ -31,18 +31,18 @@ Here we provided short examples of various uses of the Data Prep Kit. Most users
     - install jupyter lab
 \
         `pip3 install jupyterlab`
-
-<br>
+ 
+then
 - Deploy the latest release of the data prep toolkit library
 
     `pip3 install data-prep-toolkit`
 
-or 
+    or 
 -  Deploy the latest releases of the data prep toolkit library and all python transforms
 
     `pip3 install data-prep-toolkit-transforms`
 
-or 
+    or 
 -  Deploy the latest releases of the data prep toolkit library, all python transforms and all ray transforms
 
     `pip3 install data-prep-toolkit-transforms-ray`
