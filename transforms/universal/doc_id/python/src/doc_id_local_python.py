@@ -15,8 +15,12 @@ import sys
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
-from doc_id_transform_ray import DocIDTransformConfiguration
-
+from doc_id_transform_python import DocIDPythonTransformRuntimeConfiguration
+from doc_id_transform_base import (doc_column_name_cli_param,
+                                   hash_column_name_cli_param,
+                                   int_column_name_cli_param,
+                                   start_id_cli_param,
+                                   )
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
@@ -34,13 +38,15 @@ params = {
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # doc id params
-    "doc_id_doc_column": "contents",
-    "doc_id_hash_column": "hash_column",
+    doc_column_name_cli_param: "contents",
+    hash_column_name_cli_param: "hash_column",
+    int_column_name_cli_param: "int_id_column",
+    start_id_cli_param: 5,
 }
 if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = PythonTransformLauncher(runtime_config=DocIDTransformConfiguration())
+    launcher = PythonTransformLauncher(runtime_config=DocIDPythonTransformRuntimeConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

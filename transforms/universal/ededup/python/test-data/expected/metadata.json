@@ -5,8 +5,8 @@
         "job name": "ededup",
         "job type": "pure python",
         "job id": "job_id",
-        "start_time": "2024-07-23 10:00:27",
-        "end_time": "2024-07-23 10:00:27",
+        "start_time": "2024-08-15 13:43:33",
+        "end_time": "2024-08-15 13:43:33",
         "status": "success"
     },
     "code": {
@@ -16,30 +16,35 @@
     },
     "job_input_params": {
         "doc_column": "contents",
+        "doc_id_column": "document_id",
+        "use_snapshot": false,
+        "snapshot_directory": null,
         "checkpointing": false,
         "max_files": -1,
         "random_samples": -1,
-        "files_to_use": [".parquet"]
+        "files_to_use": [".parquet"],
+        "num_processors": 0
     },
     "job_output_stats": {
         "source_files": 1,
         "source_size": 36132,
         "result_files": 1,
-        "result_size": 36114,
-        "processing_time": 0.03925919532775879,
+        "result_size": 36288,
+        "processing_time": 0.035,
         "source_documents": 5,
         "result_documents": 3,
         "source_doc_count": 5,
         "result_doc_count": 3,
         "number of hashes": 3,
-        "hash memory, GB": 5.168840289115906e-7
+        "hash memory, GB": 5.168840289115906e-7,
+        "de duplication %": 40.0
     },
     "source": {
-        "name": "/Users/borisl/Projects/data-prep-kit/transforms/universal/ededup/python/test-data/input",
+        "name": "/Users/borisl/IdeaProjects/data-prep-kit/transforms/universal/ededup/python/test-data/input",
         "type": "path"
     },
     "target": {
-        "name": "/Users/borisl/Projects/data-prep-kit/transforms/universal/ededup/python/output",
+        "name": "/Users/borisl/IdeaProjects/data-prep-kit/transforms/universal/ededup/python/output",
         "type": "path"
     }
 }

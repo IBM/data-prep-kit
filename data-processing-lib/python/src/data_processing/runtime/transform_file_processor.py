@@ -23,9 +23,9 @@ class AbstractTransformFileProcessor:
     """
 
     def __init__(
-            self,
-            data_access_factory: DataAccessFactoryBase,
-            transform_parameters: dict[str, Any],
+        self,
+        data_access_factory: DataAccessFactoryBase,
+        transform_parameters: dict[str, Any],
     ):
         """
         Init method
@@ -85,7 +85,7 @@ class AbstractTransformFileProcessor:
             raise UnrecoverableException
         # Process other exceptions
         except Exception as e:
-            self.logger.warning(f"Exception {e} processing file {f_name}: {traceback.format_exc()}")
+            self.logger.warning(f"Exception processing file {f_name}: {traceback.format_exc()}")
             self._publish_stats({"transform execution exception": 1})
 
     def flush(self) -> None:
@@ -132,6 +132,12 @@ class AbstractTransformFileProcessor:
                 # no output file - save input file name for flushing
                 self.logger.debug(
                     f"Transform did not produce a transformed file for " f"file {self.last_file_name}.parquet"
+                )
+                self._publish_stats(
+                    {
+                        "result_files": len(out_files),
+                        "processing_time": time.time() - t_start,
+                    }
                 )
             case 1:
                 # we have exactly 1 output file
