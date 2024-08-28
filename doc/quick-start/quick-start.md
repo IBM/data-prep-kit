@@ -8,7 +8,7 @@ Here we provided short examples of various uses of the Data Prep Kit. Most users
         `conda create -n data-prep-kit-1 -y python=3.11`
 <br>
 
-    - Install the gcc/g++ that is required while building fastext:
+    - Install the gcc/g++ that is required while building fastext:<br>
         
         `conda install gcc_linux-64`
 
