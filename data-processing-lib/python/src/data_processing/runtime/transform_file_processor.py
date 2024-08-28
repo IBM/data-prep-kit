@@ -85,7 +85,7 @@ class AbstractTransformFileProcessor:
             raise UnrecoverableException
         # Process other exceptions
         except Exception as e:
-            self.logger.warning(f"Exception {e} processing file {f_name}: {traceback.format_exc()}")
+            self.logger.warning(f"Exception processing file {f_name}: {traceback.format_exc()}")
             self._publish_stats({"transform execution exception": 1})
 
     def flush(self) -> None:
