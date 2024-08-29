@@ -33,10 +33,11 @@ class TestPythonNOOPTransform(AbstractTransformLauncherTest):
         launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
         input_dir = os.path.join(src_file_dir, "../test-data/input")
         expected_dir = os.path.join(src_file_dir, "../test-data/expected")
+        transform_config = {sleep_cli_param: 0}
         fixtures.append(
             (
                 launcher,
-                {sleep_cli_param: 0},
+                transform_config,
                 input_dir,
                 expected_dir,
                 [],  # optional list of column names to ignore in comparing test-generated with expected.
