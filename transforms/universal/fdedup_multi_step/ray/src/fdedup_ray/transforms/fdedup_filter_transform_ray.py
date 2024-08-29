@@ -11,13 +11,18 @@
 ################################################################################
 
 from typing import Any
+import ray
+from ray.actor import ActorHandle
 from argparse import Namespace
 from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
-from data_processing.transform import TransformStatistics
-from data_processing.runtime.pure_python import (DefaultPythonTransformRuntime,
-                                                 PythonTransformLauncher,
-                                                 PythonTransformRuntimeConfiguration
-                                                 )
+from data_processing_ray.runtime.ray.runtime_configuration import (
+    RayTransformRuntimeConfiguration,
+)
+from data_processing_ray.runtime.ray import (
+    DefaultRayTransformRuntime,
+    RayTransformLauncher,
+    RayUtils,
+)
 from fdedup.utils import DocCollector
 from fdedup.transforms.base import (FdedupFilterTransformBase,
                                     FdedupFilterTransformConfigurationBase,
@@ -26,7 +31,10 @@ from fdedup.transforms.base import (FdedupFilterTransformBase,
                                     )
 
 
-class FdedupFilterTransform(FdedupFilterTransformBase):
+
+
+
+class FdedupFilterTransformRay(FdedupFilterTransformBase):
     """
     Fdedup filter Python version
     """
@@ -47,11 +55,28 @@ class FdedupFilterTransform(FdedupFilterTransformBase):
         :param ids: table ids
         :return: unique ids and clusters
         """
-        # Remove doc ids that are already removed
-        return self.doc_id_cache.filter(ids)
+        request = [[] for _ in range(len(self.doc_id_cache))]
+        for value in ids:
+            doc_id = value
+            request[doc_id % len(self.doc_id_cache)].append(doc_id)
+        remote_replies = []
+        i = 0
+        for req in request:
+            if len(req) > 0:  # Only submit if the length is greater then 0
+                remote_replies.append(self.doc_id_cache[i].filter.remote(req))
+            i += 1
+        # Process replies
+        unique = {}
+        while remote_replies:
+            # Wait for replies
+            ready, not_ready = ray.wait(remote_replies)
+            reply = ray.get(ready)[0]
+            unique.update(reply)
+            remote_replies = not_ready
+        return self.doc_id_cache.filter(ids.to_pylist())
 
 
-class FdedupFilterRuntime(DefaultPythonTransformRuntime):
+class FdedupFilterRuntimeRay(DefaultRayTransformRuntime):
     """
     fuzzy dedup filter runtime support
     """
@@ -63,7 +88,7 @@ class FdedupFilterRuntime(DefaultPythonTransformRuntime):
         self.doc_collector = None
 
     def get_transform_config(
-            self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics, files: list[str]
+            self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
     ) -> dict[str, Any]:
         """
         Get the dictionary of configuration that will be provided to the transform's initializer.
@@ -79,32 +104,52 @@ class FdedupFilterRuntime(DefaultPythonTransformRuntime):
         data_access = data_access_factory.create_data_access()
         snapshot_path = self.params.get(doc_id_snapshot_directory_key, None)
         if snapshot_path is None or len(snapshot_path) == 0:
-            doc_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}docs/doc_collector_0"
+            doc_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}docs"
         else:
-            doc_path = f"{snapshot_path}/doc_collector_0"
+            doc_path = snapshot_path
+
+
+
         self.doc_collector = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": doc_path})
         return self.params | {doc_id_cache_key: self.doc_collector}
 
-    def compute_execution_stats(self, stats: TransformStatistics) -> None:
+    def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
         """
-        Update/augment the given statistics object with runtime-specific additions/modifications.
+        Update/augment the given stats object with runtime-specific additions/modifications.
         :param stats: output of statistics as aggregated across all calls to all transforms.
         :return: job execution statistics.  These are generally reported as metadata by the Ray Orchestrator.
         """
         # compute and add additional statistics
-        current = stats.get_execution_stats()
-        dedup_prst = 100 * (1.0 - current.get("result_documents", 1) / current.get("source_documents", 1))
-        stats.add_stats({"de duplication %": dedup_prst})
+        dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 1))
+        return {"de duplication %": dedup_prst} | stats
 
 
-class FdedupFilterTransformConfiguration(FdedupFilterTransformConfigurationBase):
+class FdedupFilterTransformConfigurationRay(FdedupFilterTransformConfigurationBase):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
     """
 
     def __init__(self):
-        super().__init__(transform_class=FdedupFilterTransform)
+        super().__init__(transform_class=FdedupFilterTransformRay)
+
+    def add_input_params(self, parser: ArgumentParser) -> None:
+        """
+        Add Transform-specific arguments to the given  parser.
+        """
+        super().add_input_params(parser)
+        parser.add_argument(
+            f"--{preprocessor_bucket_cpu_cli_param}",
+            type=float,
+            default=0.5,
+            help="number of CPUs per doc-id hash"
+        )
+        parser.add_argument(
+            f"--{preprocessor_num_minhash_cli_param}",
+            type=int,
+            default=1,
+            help="number of doc id caches to use"
+        )
 
     def apply_input_params(self, args: Namespace) -> bool:
         if args.runtime_num_processors > 0:
@@ -118,14 +163,14 @@ class FdedupFilterTransformConfiguration(FdedupFilterTransformConfigurationBase)
         return True
 
 
-class FdedupFilterPythonTransformRuntimeConfiguration(PythonTransformRuntimeConfiguration):
+class FdedupFilterRayTransformRuntimeConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(
-            transform_config=FdedupFilterTransformConfiguration(),
-            runtime_class=FdedupFilterRuntime,
+            transform_config=FdedupFilterTransformConfigurationRay(),
+            runtime_class=FdedupFilterRuntimeRay,
         )
 
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(FdedupFilterPythonTransformRuntimeConfiguration())
+    launcher = RayTransformLauncher(FdedupFilterRayTransformRuntimeConfiguration())
     launcher.launch()

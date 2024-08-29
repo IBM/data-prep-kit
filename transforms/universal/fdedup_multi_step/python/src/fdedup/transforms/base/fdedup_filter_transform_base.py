@@ -73,7 +73,7 @@ class FdedupFilterTransformBase(AbstractTableTransform):
         TransformUtils.validate_columns(table=table, required=[self.doc_column, self.doc_id_column])
         # inner variables
         ids = table.column(self.doc_id_column)
-        unique = self._get_unique_ids(ids)
+        unique = self._get_unique_ids(ids.to_pylist())
         # Filter out table
         mask = []
         clusters = []

@@ -11,7 +11,7 @@
 ################################################################################
 
 from argparse import Namespace
-from typing import Any, Union
+from typing import Any
 
 from data_processing.utils import UnrecoverableException, RANDOM_SEED
 from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
@@ -53,6 +53,9 @@ class PythonBucketsHashProcessor(BucketsHashProcessor):
         :param removed: removed documents
         :return: None
         """
+        # Remove doc ids that are already removed
+        for did in removed:
+            docs.pop(did, None)
         self.docs_collector.add_documents((list(docs.items()), removed))
 
     def _get_minhashes_docs(self, doc_ids: list[int]) -> dict[int, tuple[int, list[int]]]:
@@ -81,7 +84,7 @@ class FdedupBucketProcessorTransform(FdedupBucketProcessorTransformBase):
             self.logger.error("processor is not defined")
             raise UnrecoverableException("processor is not defined")
 
-    def _submit_bucket_processing(self, buckets: list[Union[tuple[int, int], tuple[int, list[int]]]]) -> None:
+    def _submit_bucket_processing(self, buckets: list[tuple[int, list[int]]]) -> None:
         """
         Submit buckets for processing. We are doing this to achieve better processing parallelism
         :param buckets: buckets
@@ -154,7 +157,7 @@ class FdedupBucketProcessorRuntime(DefaultPythonTransformRuntime):
         # build buckets
         buckets = {}
         for key, value in docs.items():
-            buckets[value[1]] =  buckets.get(value[1], []) + [key]
+            buckets[value[1]] = buckets.get(value[1], []) + [key]
         self.buckets.add_buckets(list(buckets.items()))
         self.doc_collector.snapshot()
         self.minhashes.snapshot()

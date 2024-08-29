@@ -254,14 +254,9 @@ class FdedupRayPreprocessorRuntime(DefaultRayTransformRuntime):
             sum_buckets_mem += b_memory
             replies = not_ready
         # create snapshots
-        replies = [collector.snapshot.remote() for collector in self.minhashes]
-        while replies:
-            ready, not_ready = ray.wait(replies)
-            replies = not_ready
-        replies = [collector.snapshot.remote() for collector in self.buckets]
-        while replies:
-            ready, not_ready = ray.wait(replies)
-            replies = not_ready
+        replies_m = [collector.snapshot.remote() for collector in self.minhashes]
+        replies_b = [collector.snapshot.remote() for collector in self.buckets]
+        RayUtils.wait_for_execution_completion(logger=self.logger, replies=list(replies_m + replies_b))
         # return updated statistics
         return {"number of buckets": sum_buckets, "bucket memory, GB": sum_buckets_mem,
                 "number of minhashes": sum_mh, "minhashes memory, GB": sum_mh_mem} | stats

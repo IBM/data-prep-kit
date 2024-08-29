@@ -477,3 +477,5 @@ class BucketsHashProcessor:
         self._submit_generated_docs(docs, removed)
         # peg stats
         self.stats.add_stats({"generated doc_ids": len(docs), "bucket processing time": time.time() - t_start})
+
+
