@@ -37,8 +37,9 @@ The transform can be initialized with the following parameters.
 |------------|----------|--------------|
 | `artifacts_path`             | <unset> | Path where to Docling models artifacts are located, if unset they will be downloaded and fetched from the [HF_HUB_CACHE](https://huggingface.co/docs/huggingface_hub/en/guides/manage-cache) folder. |
 | `contents_type`         | `text/markdown`        | The output type for the `contents` column. Valid types are `text/markdown` and `application/json`. |
-| `do_table_structure`         | `True`        | If true, detected tables will be processed with the table structure model.                                                                   |
-| `do_ocr`                     | `False`        | If true, optical character recognization (OCR) will be used to read the PDF content model.                                                                   |
+| `do_table_structure`         | `True`        | If true, detected tables will be processed with the table structure model. |
+| `do_ocr`                     | `True`        | If true, optical character recognition (OCR) will be used to read the content of bitmap parts of the document. |
+| `double_precision`           | `8`           | If set, all floating points (e.g. bounding boxes) are rounded to this precision. For tests it is advised to use 0. |
 
 When invoking the CLI, the parameters must be set as `--pdf2parquet_<name>`, e.g. `--pdf2parquet_do_ocr=true`.
 
