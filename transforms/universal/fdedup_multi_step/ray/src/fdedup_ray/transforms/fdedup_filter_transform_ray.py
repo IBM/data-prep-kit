@@ -11,6 +11,7 @@
 ################################################################################
 
 from typing import Any
+from argparse import Namespace, ArgumentParser
 import ray
 from ray.actor import ActorHandle
 from argparse import Namespace
@@ -26,12 +27,14 @@ from data_processing_ray.runtime.ray import (
 from fdedup.utils import DocCollector
 from fdedup.transforms.base import (FdedupFilterTransformBase,
                                     FdedupFilterTransformConfigurationBase,
-                                    doc_id_snapshot_directory_key,
+                                    doc_id_snapshot_directory_key, filter_cli_prefix,
                                     doc_id_cache_key,
                                     )
+from fdedup_ray.transforms import docid_cpu_key, num_docid_key
 
 
-
+filter_docid_cpu_cli_param = f"{filter_cli_prefix}{docid_cpu_key}"
+filter_num_docid_cli_param = f"{filter_cli_prefix}{num_docid_key}"
 
 
 class FdedupFilterTransformRay(FdedupFilterTransformBase):
@@ -73,7 +76,7 @@ class FdedupFilterTransformRay(FdedupFilterTransformBase):
             reply = ray.get(ready)[0]
             unique.update(reply)
             remote_replies = not_ready
-        return self.doc_id_cache.filter(ids.to_pylist())
+        return unique
 
 
 class FdedupFilterRuntimeRay(DefaultRayTransformRuntime):
@@ -86,6 +89,9 @@ class FdedupFilterRuntimeRay(DefaultRayTransformRuntime):
         self.logger = get_logger(__name__)
         super().__init__(params=params)
         self.doc_collector = None
+        self.n_docid = params.get(num_docid_key, 1)
+        self.docid_cpu = params.get(docid_cpu_key, .5)
+
 
     def get_transform_config(
             self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
@@ -107,10 +113,16 @@ class FdedupFilterRuntimeRay(DefaultRayTransformRuntime):
             doc_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}docs"
         else:
             doc_path = snapshot_path
-
-
-
-        self.doc_collector = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": doc_path})
+        self.doc_collector = [None] * self.n_docid
+        files, retries = data_access.get_folder_files(path=doc_path)
+        if retries > 0:
+            statistics.add_stats.remote({"data access retries": retries})
+        for file in files.keys():
+            i = int(file[file.rfind("_") + 1:])
+            self.doc_collector[i] = ray.remote(DocCollector).options(**{"num_cpus": self.docid_cpu}).remote(
+                {"id": i, "data_access": data_access_factory, "snapshot": file}
+            )
+        self.logger.info(f"Created {len(self.doc_collector)} doc collectors")
         return self.params | {doc_id_cache_key: self.doc_collector}
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
@@ -139,25 +151,19 @@ class FdedupFilterTransformConfigurationRay(FdedupFilterTransformConfigurationBa
         """
         super().add_input_params(parser)
         parser.add_argument(
-            f"--{preprocessor_bucket_cpu_cli_param}",
+            f"--{filter_docid_cpu_cli_param}",
             type=float,
             default=0.5,
             help="number of CPUs per doc-id hash"
         )
         parser.add_argument(
-            f"--{preprocessor_num_minhash_cli_param}",
+            f"--{filter_num_docid_cli_param}",
             type=int,
             default=1,
             help="number of doc id caches to use"
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
-        if args.runtime_num_processors > 0:
-            self.logger.info(
-                f"fdedup does not support multiprocessing. Runtime_num_processors should be 0, "
-                f"current {args.runtime_num_processors}"
-            )
-            return False
         super().apply_input_params(args=args)
         self.logger.info(f"fuzzy dedup filter params are {self.params}")
         return True

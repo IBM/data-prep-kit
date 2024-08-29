@@ -20,7 +20,7 @@ from fdedup.transforms.base import (bucket_processor_num_permutations_cli_param,
                                     bucket_processor_threshold_cli_param,
                                     bucket_processor_minhash_snapshot_directory_cli_param,
                                     )
-from fdedup_ray.transforms import (FdedupBucketProcessorPythonTransformRuntimeConfiguration,
+from fdedup_ray.transforms import (FdedupBucketProcessorRayTransformRuntimeConfiguration,
                                    bucket_processor_bucket_cpu_cli_param,
                                    bucket_processor_minhash_cpu_cli_param,
                                    bucket_processor_docid_cpu_cli_param,
@@ -32,7 +32,7 @@ from fdedup_ray.transforms import (FdedupBucketProcessorPythonTransformRuntimeCo
                                    )
 
 # create launcher
-launcher = RayTransformLauncher(FdedupBucketProcessorPythonTransformRuntimeConfiguration())
+launcher = RayTransformLauncher(FdedupBucketProcessorRayTransformRuntimeConfiguration())
 # create parameters
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../test-data/input/snapshot/"))
 input_folder = os.path.join(basedir, "buckets")
@@ -52,7 +52,6 @@ params = {
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
-    # fdedup parameters
     # fdedup parameters
     bucket_processor_num_permutations_cli_param: 64,
     bucket_processor_threshold_cli_param: .8,

@@ -428,7 +428,7 @@ class FdedupBucketProcessorTransformConfiguration(FdedupBucketProcessorTransform
         return True
 
 
-class FdedupBucketProcessorPythonTransformRuntimeConfiguration(RayTransformRuntimeConfiguration):
+class FdedupBucketProcessorRayTransformRuntimeConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
         super().__init__(
             transform_config=FdedupBucketProcessorTransformConfiguration(),
@@ -437,5 +437,5 @@ class FdedupBucketProcessorPythonTransformRuntimeConfiguration(RayTransformRunti
 
 
 if __name__ == "__main__":
-    launcher = RayTransformLauncher(FdedupBucketProcessorPythonTransformRuntimeConfiguration())
+    launcher = RayTransformLauncher(FdedupBucketProcessorRayTransformRuntimeConfiguration())
     launcher.launch()

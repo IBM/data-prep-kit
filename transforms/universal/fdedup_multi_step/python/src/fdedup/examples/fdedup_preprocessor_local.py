@@ -16,8 +16,10 @@ from data_processing.data_access import DataAccessFactory
 from data_processing.utils import RANDOM_SEED
 from fdedup.utils import BucketsHash, MurmurMH, DocsMinHash
 from fdedup.transforms.base import (doc_column_name_key, int_column_name_key, shingles_size_key,
+                                    num_bands_key, length_band_key,
                                     delimiters_key, mn_min_hash_key, minhashes_cache_key, buckets_cache_key)
 from fdedup.transforms.python import FdedupPreprocessorTransform
+from fdedup.utils import fuzzy_optimal_param
 
 
 # create parameters
@@ -28,13 +30,21 @@ local_conf = {
     "output_folder": output_folder,
 }
 
+num_buckets, length_bucket = fuzzy_optimal_param(
+    threshold=.8,
+    num_perm=64,
+    false_positive_weight=0.5,
+    false_negative_weight=0.5,
+)
 data_access_factory = DataAccessFactory()
 data_access_factory.apply_input_params({"data_local_config": local_conf})
 mn_min_hash = MurmurMH(num_perm=64, seed=RANDOM_SEED)
 minhash_collector = DocsMinHash({"id": 0, "data_access": data_access_factory, "snapshot": None})
 bucket_collector = BucketsHash({"id": 0, "data_access": data_access_factory, "snapshot": None})
 
-fdedup_params = {doc_column_name_key: "contents", int_column_name_key: "Unnamed: 0", shingles_size_key: 5,
+fdedup_params = {num_bands_key: num_buckets, length_band_key: length_bucket,
+                 doc_column_name_key: "contents", int_column_name_key: "Unnamed: 0",
+                 shingles_size_key: 5,
                  delimiters_key: " ", mn_min_hash_key: mn_min_hash, minhashes_cache_key: minhash_collector,
                  buckets_cache_key: bucket_collector}
 

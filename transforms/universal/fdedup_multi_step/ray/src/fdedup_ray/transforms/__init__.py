@@ -6,7 +6,7 @@ from fdedup_ray.transforms.fdedup_preprocessor_transform_ray import (FdedupPrepr
                                                                      preprocessor_num_buckets_cli_param,
                                                                      preprocessor_num_minhash_cli_param,
                                                                      )
-from fdedup_ray.transforms.fdedup_bucket_processor_transform_ray import (FdedupBucketProcessorPythonTransformRuntimeConfiguration,
+from fdedup_ray.transforms.fdedup_bucket_processor_transform_ray import (FdedupBucketProcessorRayTransformRuntimeConfiguration,
                                                                          docid_cpu_key, num_docid_key,
                                                                          bucket_processor_bucket_cpu_cli_param,
                                                                          bucket_processor_minhash_cpu_cli_param,
@@ -17,3 +17,6 @@ from fdedup_ray.transforms.fdedup_bucket_processor_transform_ray import (FdedupB
                                                                          bucket_processor_num_docid_cli_param,
                                                                          bucket_processor_num_processors_cli_param,
                                                                          )
+from fdedup_ray.transforms.fdedup_filter_transform_ray import (FdedupFilterRayTransformRuntimeConfiguration,
+                                                               filter_num_docid_cli_param,
+                                                               filter_docid_cpu_cli_param)

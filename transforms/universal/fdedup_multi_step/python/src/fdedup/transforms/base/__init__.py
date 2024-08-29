@@ -28,6 +28,7 @@ from fdedup.transforms.base.fdedup_preprocessor_transform_base import (
 from fdedup.transforms.base.fdedup_bucket_processor_transform_base import (
     FdedupBucketProcessorTransformBase,
     FdedupBucketProcessorTransformConfigurationBase,
+
     bucket_processor_cli_prefix,
     bucket_processor_threshold_cli_param,
     bucket_processor_num_permutations_cli_param,
@@ -41,6 +42,7 @@ from fdedup.transforms.base.fdedup_filter_transform_base import (
     removed_docs_column_name_key,
     doc_id_snapshot_directory_key,
     doc_id_cache_key,
+    filter_cli_prefix,
     filter_doc_column_name_cli_param,
     filter_int_column_name_cli_param,
     filter_cluster_column_name_cli_param,
