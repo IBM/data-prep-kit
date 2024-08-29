@@ -19,7 +19,6 @@ from ray.actor import ActorHandle
 
 from data_processing.utils import UnrecoverableException, RANDOM_SEED
 from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
-from data_processing.transform import TransformStatistics
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,

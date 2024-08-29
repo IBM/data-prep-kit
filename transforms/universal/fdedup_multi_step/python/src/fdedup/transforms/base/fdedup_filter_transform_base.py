@@ -16,7 +16,6 @@ from typing import Any
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import (
-    RANDOM_SEED,
     CLIArgumentProvider,
     TransformUtils,
 )
@@ -77,7 +76,7 @@ class FdedupFilterTransformBase(AbstractTableTransform):
         # Filter out table
         mask = []
         clusters = []
-        removed =[]
+        removed = []
         # Actual filtering
         for n in range(table.num_rows):
             doc_id = ids[n].as_py()
