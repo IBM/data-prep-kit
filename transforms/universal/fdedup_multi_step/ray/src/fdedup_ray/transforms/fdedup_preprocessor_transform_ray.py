@@ -29,7 +29,7 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
 from fdedup.utils import BucketsHash, DocsMinHash, MurmurMH, fuzzy_optimal_param
 from fdedup.transforms.base import (FdedupPreprocessorTransformBase,
                                     FdedupPreprocessorTransformConfigurationBase,
-                                    preprocessor_cli_prefix,
+                                    preprocessor_cli_prefix, num_bands_key, length_band_key,
                                     buckets_cache_key, minhashes_cache_key, mn_min_hash_key,
                                     threshold_key, num_permutations_key, minhash_snapshot_directory_key,
                                     buckets_snapshot_directory_key,
@@ -224,7 +224,8 @@ class FdedupRayPreprocessorRuntime(DefaultRayTransformRuntime):
                         ready, not_ready = ray.wait(remote_replies)
                         remote_replies = not_ready
         self.logger.info(f"Created {len(self.buckets)} bucket collectors")
-        return self.params | {mn_min_hash_key: mn_min_hash, minhashes_cache_key: self.minhashes,
+        return self.params | {num_bands_key: num_buckets, length_band_key: length_bucket,
+                              mn_min_hash_key: mn_min_hash, minhashes_cache_key: self.minhashes,
                               buckets_cache_key: self.buckets}
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:

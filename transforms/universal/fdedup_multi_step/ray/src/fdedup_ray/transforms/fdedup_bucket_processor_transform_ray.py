@@ -267,6 +267,7 @@ class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
             self.minhashes[i] = ray.remote(DocsMinHash).options(**{"num_cpus": self.minhash_cpu}).remote(
                 {"id": i, "data_access": data_access_factory, "snapshot": file}
             )
+        self.logger.info(f"Created {len(self.minhashes)} minhash collectors")
         # create buckets
         self.buckets = [None] * self.n_buckets
         for i in range(self.n_buckets):
@@ -277,6 +278,7 @@ class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
         for i in range(self.n_docid):
             self.doc_collectors[i] = ray.remote(DocCollector).options(**{"num_cpus": self.docid_cpu}).remote(
                 {"id": i, "data_access": data_access_factory, "snapshot": None})
+        self.logger.info(f"Created {len(self.doc_collectors)} doc collectors")
         # processors
         processor_config = {"threshold": self.threshold,
                             "mn_min_hash": mn_min_hash,
@@ -289,8 +291,10 @@ class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
             RayBucketsHashProcessor.options(**{"num_cpus": self.processor_cpu}).remote(processor_config)
             for _ in range(self.n_processors)
         ]
+        self.logger.info(f"Created {len(self.bucket_processors)} bucket processors")
         # invoker
         self.invoker = BucketsHashProcessorInvoker.options(**{"num_cpus": .5}).remote(self.bucket_processors)
+        self.logger.info("Created processor invoker")
         return self.params | {processor_key: self.invoker}
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:

@@ -25,6 +25,7 @@ from fdedup.transforms.base import (FdedupPreprocessorTransformBase,
                                     FdedupPreprocessorTransformConfigurationBase,
                                     buckets_cache_key, minhashes_cache_key, mn_min_hash_key,
                                     threshold_key, num_permutations_key,
+                                    num_bands_key, length_band_key,
                                     buckets_snapshot_directory_key, minhash_snapshot_directory_key)
 
 
@@ -113,13 +114,14 @@ class FdedupPreprocessorRuntime(DefaultPythonTransformRuntime):
             # restarting from snapshot
             mh_path = self.minhash_directory
         if self.buckets_directory is None or len(self.buckets_directory) == 0:
-           b_path = None
+            b_path = None
         else:
             # restarting from snapshot
             b_path = self.buckets_directory
         self.minhashes = DocsMinHash({"id": 0, "data_access": data_access_factory, "snapshot": mh_path})
         self.buckets = BucketsHash({"id": 0, "data_access": data_access_factory, "snapshot": b_path})
-        return self.params | {mn_min_hash_key: mn_min_hash, minhashes_cache_key: self.minhashes,
+        return self.params | {num_bands_key: num_buckets, length_band_key: length_bucket,
+                              mn_min_hash_key: mn_min_hash, minhashes_cache_key: self.minhashes,
                               buckets_cache_key: self.buckets}
 
     def compute_execution_stats(self, stats: TransformStatistics) -> None:
