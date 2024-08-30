@@ -32,8 +32,8 @@ TRANSFORMS_NAMES = code/proglang_select \
 	universal/resize
 
 test-src:: .transforms.setup venv
-	source venv/bin/activate && cd ../../../data-processing-lib/python && $(PYTHON) -m pip install .
-	source venv/bin/activate && cd ../../../data-processing-lib/ray && $(PYTHON) -m pip install .
+#	source venv/bin/activate && cd ../../../data-processing-lib/python && $(PYTHON) -m pip install .
+#	source venv/bin/activate && cd ../../../data-processing-lib/ray && $(PYTHON) -m pip install .
 	source venv/bin/activate && cd ../python && $(MAKE) src && $(PYTHON) -m pip install .
 	source venv/bin/activate &&  cd ../ray && $(MAKE) src && $(PYTHON) -m pip install .
 	$(MAKE) run-ut

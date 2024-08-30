@@ -31,7 +31,7 @@ TRANSFORMS_NAMES = code/code_quality \
 
 
 test-src:: .transforms.setup venv
-	source venv/bin/activate && cd ../../../data-processing-lib/python && $(PYTHON) -m pip install .
+#	source venv/bin/activate && cd ../../../data-processing-lib/python && $(PYTHON) -m pip install .
 	source venv/bin/activate && cd ../python && $(MAKE) src && $(PYTHON) -m pip install .
 	$(MAKE) run-ut
 	@# Help: Do any default transform setup before running make src and setting up a test environment
