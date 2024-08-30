@@ -18,7 +18,7 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 # END OF STEPS destined for a data-prep-kit base image 
 
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
-RUN pip install --no-cache-dir -e .
+RUN pip install ${PIP_INSTALL_EXTRA_ARGS} --no-cache-dir -e .
 
 # copy transform main() entry point to the image 
 COPY ./src/text_encoder_transform_python.py .

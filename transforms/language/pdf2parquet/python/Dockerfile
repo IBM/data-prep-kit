@@ -24,7 +24,7 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 # END OF STEPS destined for a data-prep-kit base image 
 
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
-RUN pip install --no-cache-dir -e .
+RUN pip install ${PIP_INSTALL_EXTRA_ARGS} --no-cache-dir -e .
 
 # Download models
 RUN python -c 'from deepsearch_glm.utils.load_pretrained_models import load_pretrained_nlp_models; load_pretrained_nlp_models(verbose=True);'
