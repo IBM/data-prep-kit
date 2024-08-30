@@ -39,9 +39,9 @@ DOCKER_FILE?=Dockerfile
 DOCKER?=docker
 DOCKER_PLATFORM?=linux/amd64
 # Can be used by transforms or others to add args to the "docker build" command in .defaults.image target
-DOCKER_BUILD_EXTRA_ARGS=
+DOCKER_BUILD_EXTRA_ARGS?=
 # Can be used by transforms or others to add args to the "pip install" commands referencing toml or requirements.txt files
-PIP_INSTALL_EXTRA_ARGS=
+PIP_INSTALL_EXTRA_ARGS?=
 DOCKER_HOSTNAME?=quay.io
 DOCKER_NAMESPACE ?= dataprep1/data-prep-kit
 DOCKER_REGISTRY_USER?=$(DPK_DOCKER_REGISTRY_USER)
