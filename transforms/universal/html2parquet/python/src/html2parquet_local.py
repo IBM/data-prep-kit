@@ -13,7 +13,7 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-from html2parquet_transform import HtmlToParquetTransform
+from html2parquet_transform import Html2ParquetTransform
 
 
 # create parameters
@@ -23,10 +23,10 @@ html2parquet_params = {}
 if __name__ == "__main__":
     # Here we show how to run outside of the runtime
     # Create and configure the transform.
-    transform = HtmlToParquetTransform(html2parquet_params)
+    transform = Html2ParquetTransform(html2parquet_params)
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
-    file_to_process = os.path.join(input_folder, "hmlt_test1.html")
+    file_to_process = os.path.join(input_folder, "test1.html")
     byte_array, _ = data_access.get_file(file_to_process)
     print(f"input file: {file_to_process}")
     # Transform the table

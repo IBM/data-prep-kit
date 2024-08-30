@@ -67,6 +67,4 @@ class PythonTransformExecutionConfiguration(TransformExecutionConfiguration):
         get input parameters for job_input_params in metadata
         :return: dictionary of parameters
         """
-        return {
-            "num_processors": self.num_processors
-        }
+        return {"num_processors": self.num_processors}

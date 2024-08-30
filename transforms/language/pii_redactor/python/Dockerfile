@@ -1,6 +1,6 @@
 FROM docker.io/python:3.10.14-slim-bullseye
 
-RUN pip install --upgrade pip 
+RUN pip install --upgrade --no-cache-dir pip 
 
 # install pytest
 RUN pip install --no-cache-dir pytest

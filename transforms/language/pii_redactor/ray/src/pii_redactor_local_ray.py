@@ -27,6 +27,7 @@ local_conf = {
 }
 worker_options = {"num_cpus": 0.8}
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
+
 params = {
     # where to run
     "run_locally": True,
@@ -42,7 +43,7 @@ params = {
     # pii redactor params
     "pii_redactor_entities": ["PERSON", "EMAIL_ADDRESS"],
     "pii_redactor_operator": "replace",
-    "pii_redactor_contents": "title",
+    "pii_redactor_transformed_contents": "title",
 }
 if __name__ == "__main__":
     # Set the simulated command line args

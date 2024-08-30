@@ -3,23 +3,30 @@
 We can launch a jupyter notebook to try out the library or transforms or to build a usecase.
 
 
-## One time Step
+## Setup simple environment with Jupyter notebook
 
-1. Run this step install the dependancies. 
+1. Prepare virtual env
 
-**Prepare virtualenv**
 
-`make venv`
+```
+python3 -m venv venv
+source venv/bin/activate
+python3 -m pip install jupyter
+deactivate
+```
 
-## Launch
+2. After jupyter dependancies are installed, we can launch the jupyter notebook
 
-2. After dependancies are installed, we can launch the jupyter notebook
 
-`make jupyter`
+```
+source venv/bin/activate
+jupyter notebook
+```
+
 
 It will launch browser with the jupyter notebook where we can try out the transforms.
 
-## Demo API notebokk
+## Demo API notebook
 
 **Prepare virtualenv**
 

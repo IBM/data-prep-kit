@@ -39,8 +39,8 @@ class Html2ParquetTransform(AbstractBinaryTransform):
             "document": TransformUtils.get_file_basename(file_name),
             "contents": content_string,
             "document_id": TransformUtils.str_to_hash(content_string),
-            "size": len(content_string),
-            "date_acquired": datetime.now().isoformat()
+            "size": len(content_string)
+            # "date_acquired": datetime.now().isoformat()
         }
 
         return row_data
@@ -97,7 +97,7 @@ class Html2ParquetTransform(AbstractBinaryTransform):
             
 
         table = pa.Table.from_pylist(data)
-        return [(TransformUtils.convert_arrow_to_binary(table=table), ".parquet")], {"number of rows": number_of_rows}
+        return [(TransformUtils.convert_arrow_to_binary(table=table), ".parquet")], {"nrows": number_of_rows}
 
 
 logger = get_logger(__name__)

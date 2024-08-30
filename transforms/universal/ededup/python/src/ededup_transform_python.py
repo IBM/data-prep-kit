@@ -9,21 +9,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+from argparse import Namespace
 from typing import Any
 
-import pyarrow as pa
+from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
 from data_processing.runtime.pure_python import (
+    DefaultPythonTransformRuntime,
     PythonTransformLauncher,
     PythonTransformRuntimeConfiguration,
 )
+from data_processing.transform import TransformStatistics
 from ededup_transform_base import (
     EdedupTransformBase,
     EdedupTransformConfigurationBase,
     HashFilter,
 )
+from ededup_transform_base import use_snapshot_key, snapshot_directory_key
 
 
-class EdedupPythonTransform(EdedupTransformBase):
+class EdedupTransform(EdedupTransformBase):
     """
     Implements dedup table transformer.
     """
@@ -35,8 +39,7 @@ class EdedupPythonTransform(EdedupTransformBase):
             doc_column - name of the doc column
         """
         super().__init__(config)
-        self.filter = HashFilter({})
-        self.stats = config.get("statistics", None)
+        self.filter = config.get("filter", HashFilter({}))
 
     def _process_cached_hashes(self, hd: dict[str, str]) -> list[str]:
         """
@@ -50,25 +53,93 @@ class EdedupPythonTransform(EdedupTransformBase):
             unique.append(hd[uh])
         return unique
 
-    def flush(self) -> tuple[list[pa.Table], dict[str, Any]]:
+
+class EdedupRuntime(DefaultPythonTransformRuntime):
+    """
+    Exact dedup runtime support
+    """
+
+    def __init__(self, params: dict[str, Any]):
+        from data_processing.utils import get_logger
+        super().__init__(params=params)
+        self.filter = None
+        self.logger = get_logger(__name__)
+
+
+
+    def get_transform_config(
+        self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics, files: list[str]
+    ) -> dict[str, Any]:
         """
-        We are implementing flush here to compute additional statistics
-        :return: additional metadata
+        Get the dictionary of configuration that will be provided to the transform's initializer.
+        This is the opportunity for this runtime to create a new set of configuration based on the
+        config/params provided to this instance's initializer.  This may include the addition
+        of new configuration data such as ray shared memory, new actors, etc., that might be needed and
+        expected by the transform in its initializer and/or transform() methods.
+        :param data_access_factory - data access factory class being used by the RayOrchestrator.
+        :param statistics - reference to statistics actor
+        :param files - list of files to process
+        :return: dictionary of transform init params
         """
+        if self.params.get(use_snapshot_key, False):
+            snapshot_path = self.params.get(snapshot_directory_key, None)
+            if snapshot_path is None or len(snapshot_path) == 0:
+                snapshot_path = (
+                    f"{SnapshotUtils.get_snapshot_folder(data_access_factory.create_data_access())}"
+                    f"hash_collector_1"
+                )
+            else:
+                snapshot_path = f"{snapshot_path}/hash_collector_1"
+            self.logger.info(f"continuing from the hash snapshot {snapshot_path}")
+            self.filter = HashFilter({"data_access_factory": data_access_factory, "id": 1, "snapshot": snapshot_path})
+        else:
+            self.logger.info("Starting from the beginning")
+            self.filter = HashFilter({"data_access_factory": data_access_factory, "id": 1})
+        return self.params | {"filter": self.filter}
+
+    def compute_execution_stats(self, stats: TransformStatistics) -> None:
+        """
+        Update/augment the given statistics object with runtime-specific additions/modifications.
+        :param stats: output of statistics as aggregated across all calls to all transforms.
+        :return: job execution statistics.  These are generally reported as metadata by the Ray Orchestrator.
+        """
+        # compute and add additional statistics
         h_size, h_memory = self.filter.get_hash_size()
-        m_data = {"number of hashes": h_size, "hash memory, GB": h_memory}
-        if self.stats is not None:
-            stats = self.stats.get_execution_stats()
-            dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 1))
-            m_data = m_data | {"de duplication %": dedup_prst}
-        return [], m_data
+        stats.add_stats({"number of hashes": h_size, "hash memory, GB": h_memory})
+        current = stats.get_execution_stats()
+        dedup_prst = 100 * (1.0 - current.get("result_documents", 1) / current.get("source_documents", 1))
+        stats.add_stats({"de duplication %": dedup_prst})
+        # snapshot execution result
+        self.filter.snapshot()
 
 
-class EdedupPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
+class EdedupTransformConfiguration(EdedupTransformConfigurationBase):
+    """
+    Provides support for configuring and using the associated Transform class include
+    configuration with CLI args and combining of metadata.
+    """
+
     def __init__(self):
-        super().__init__(transform_config=EdedupTransformConfigurationBase(transform_class=EdedupPythonTransform))
+        super().__init__(transform_class=EdedupTransform)
+
+    def apply_input_params(self, args: Namespace) -> bool:
+        if args.runtime_num_processors > 0:
+            self.logger.info(
+                f"ededup does not support multiprocessing. Runtime_num_processors should be 0, "
+                f"current {args.runtime_num_processors}"
+            )
+            return False
+        return super().apply_input_params(args=args)
+
+
+class EdedupPythonTransformRuntimeConfiguration(PythonTransformRuntimeConfiguration):
+    def __init__(self):
+        super().__init__(
+            transform_config=EdedupTransformConfiguration(),
+            runtime_class=EdedupRuntime,
+        )
 
 
 if __name__ == "__main__":
-    launcher = PythonTransformLauncher(EdedupPythonTransformConfiguration())
+    launcher = PythonTransformLauncher(EdedupPythonTransformRuntimeConfiguration())
     launcher.launch()

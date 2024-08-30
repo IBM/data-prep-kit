@@ -10,15 +10,15 @@
 # limitations under the License.
 ################################################################################
 
+import pickle
 import time
 from typing import Any, Iterator, Union
 
 import numpy as np
 import ray
-from data_processing.data_access import DataAccess
+from data_processing.data_access import SnapshotUtils
 from data_processing.utils import GB, RANDOM_SEED, TransformUtils, get_logger
 from data_processing_ray.runtime.ray import RayUtils
-from ray import cloudpickle
 from ray.actor import ActorHandle
 from ray.util import ActorPool
 from scipy.integrate import quad as integrate
@@ -28,18 +28,6 @@ NO_SIMILARITY = -1
 REQUEST_LEN = 4096
 LONG_BUCKET = 5000
 LONG_BUCKET_PRINT = 1000
-
-
-def get_snapshot_folder(data_access: DataAccess) -> str:
-    """
-    Get output folder from data access
-    :param data_access: data access class
-    :return: output folder
-    """
-    output_folder = data_access.get_output_folder()
-    if not output_folder.endswith("/"):
-        output_folder += "/"
-    return f"{output_folder}snapshot/"
 
 
 def fuzzy_optimal_param(
@@ -150,7 +138,7 @@ class DocCollector:
         else:
             try:
                 bids, _ = self.data_access.get_file(snapshot)
-                self.ids = cloudpickle.loads(bids)
+                self.ids = pickle.loads(bids)
             except Exception as e:
                 self.logger.warning(f"Failed to load doc collector {self.actor_id} with exception {e}")
                 raise e
@@ -195,9 +183,9 @@ class DocCollector:
         Snapshotting itself
         """
         try:
-            b_doc = cloudpickle.dumps(self.ids)
+            b_doc = pickle.dumps(self.ids)
             self.data_access.save_file(
-                f"{get_snapshot_folder(self.data_access)}docs/doc_collector_{self.actor_id}", b_doc
+                f"{SnapshotUtils.get_snapshot_folder(self.data_access)}docs/doc_collector_{self.actor_id}", b_doc
             )
         except Exception as e:
             self.logger.warning(f"Failed to snapshot doc collector {self.actor_id} with exception {e}")
@@ -237,7 +225,7 @@ class DocsMinHash:
         else:
             try:
                 bdocs, _ = self.data_access.get_file(snapshot)
-                self.docs = cloudpickle.loads(bdocs)
+                self.docs = pickle.loads(bdocs)
             except Exception as e:
                 self.logger.warning(f"Failed to load minhash collector {self.actor_id} with exception {e}")
                 raise e
@@ -269,9 +257,10 @@ class DocsMinHash:
         Snapshotting itself
         """
         try:
-            b_doc = cloudpickle.dumps(self.docs)
+            b_doc = pickle.dumps(self.docs)
             self.data_access.save_file(
-                f"{get_snapshot_folder(self.data_access)}minhash/minhash_collector_{self.actor_id}", b_doc
+                f"{SnapshotUtils.get_snapshot_folder(self.data_access)}minhash/minhash_collector_{self.actor_id}",
+                b_doc,
             )
         except Exception as e:
             self.logger.warning(f"Failed to snapshot minhash collector {self.actor_id} with exception {e}")
@@ -310,7 +299,7 @@ class BucketsHash:
         else:
             try:
                 b_buckets, _ = self.data_access.get_file(snapshot)
-                self.buckets = cloudpickle.loads(b_buckets)
+                self.buckets = pickle.loads(b_buckets)
             except Exception as e:
                 self.logger.warning(f"Failed to load buckets collector {self.actor_id} with exception {e}")
                 raise e
@@ -397,9 +386,10 @@ class BucketsHash:
         Snapshotting itself
         """
         try:
-            b_buckets = cloudpickle.dumps(self.buckets)
+            b_buckets = pickle.dumps(self.buckets)
             self.data_access.save_file(
-                f"{get_snapshot_folder(self.data_access)}buckets/buckets_collector_{self.actor_id}", b_buckets
+                f"{SnapshotUtils.get_snapshot_folder(self.data_access)}buckets/buckets_collector_{self.actor_id}",
+                b_buckets,
             )
         except Exception as e:
             self.logger.warning(f"Failed to snapshot buckets collector {self.actor_id} with exception {e}")

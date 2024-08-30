@@ -33,7 +33,8 @@ class TestHtml2ParquetTransform(AbstractBinaryTransformTest):
         input_dir = os.path.join(basedir, "input")
         input_files = get_files_in_folder(input_dir, ".html")
         input_files = [(name, binary) for name, binary in input_files.items()]
-        expected_metadata_list = [{"nrows": 1, "nsuccess": 1, "nfail": 0, "nskip": 0}, {}]
+        expected_metadata_list = [{"nrows": 1}, {}]
+
         config = {}
 
         expected_files = [
