@@ -44,6 +44,7 @@ llama-index-vector-stores-milvus
 
 # --- Utils
 python-dotenv==1.0.0
+humanfriendly
 
 ## --- Jupyter Utils
 jupyterlab
