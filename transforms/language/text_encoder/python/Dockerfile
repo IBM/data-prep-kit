@@ -10,6 +10,8 @@ RUN useradd -ms /bin/bash dpk
 USER dpk
 WORKDIR /home/dpk
 
+ARG PIP_INSTALL_EXTRA_ARGS
+
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
 COPY --chown=dpk:root data-processing-lib-python/ data-processing-lib-python/

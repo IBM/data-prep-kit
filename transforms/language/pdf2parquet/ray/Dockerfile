@@ -7,6 +7,8 @@ RUN pip install --upgrade --no-cache-dir pip
 # install pytest
 RUN pip install --no-cache-dir pytest
 
+ARG PIP_INSTALL_EXTRA_ARGS
+
 RUN \
     sudo apt-get update \
     # for opencv, towhee
