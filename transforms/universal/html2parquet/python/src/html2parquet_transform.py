@@ -39,8 +39,8 @@ class Html2ParquetTransform(AbstractBinaryTransform):
             "document": TransformUtils.get_file_basename(file_name),
             "contents": content_string,
             "document_id": TransformUtils.str_to_hash(content_string),
-            "size": len(content_string)
-            # "date_acquired": datetime.now().isoformat()
+            "size": len(content_string),
+            "date_acquired": datetime.now().isoformat()
         }
 
         return row_data
