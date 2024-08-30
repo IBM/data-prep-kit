@@ -26,6 +26,8 @@ installing the python transforms will also install  `data-prep-toolkit`
 	* filter
 	* resize
 	* tokenization
+	* doc_id
+	
 
 
 

@@ -12,6 +12,11 @@ include ../.make.packaging
 
 PACKAGING_RUN_TIME=ray
 
+# Excluded from build
+# ./code/malware/ray
+# ./language/pii_redactor/ray
+
+
 ## Ray Transforms:  `find . -name src | grep ray/src`
 TRANSFORMS_NAMES = code/proglang_select \
 	code/header_cleanser \
@@ -39,6 +44,11 @@ test-src:: .transforms.setup venv
 	$(MAKE) run-ut
 	@# Help: Do any default transform setup before running make src and setting up a test environment
 
+test-with-python-pypi:
+	$(MAKE) clean
+	$(MAKE) .defaults.create-venv
+	source venv/bin/activate &&  cd ../ray && $(MAKE) src && $(PYTHON) -m pip install .
+	$(MAKE) test-src
 
 test-with-pypi:
 	$(MAKE) clean

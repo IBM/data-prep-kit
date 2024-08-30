@@ -12,10 +12,15 @@ include ../.make.packaging
 
 PACKAGING_RUN_TIME=python
 
+
+#Excluded List
+# ./code/malware
+# ./language/pii_redactor
+# ./universal/html2parquet
+
 TRANSFORMS_NAMES = code/code_quality \
-    	code/code2parquet \
-    	code/header_cleanser \
-		code/code_quality \
+	    	code/code2parquet \
+    		code/header_cleanser \
 		code/proglang_select \
 		language/doc_chunk \
 		language/doc_quality \
@@ -26,8 +31,7 @@ TRANSFORMS_NAMES = code/code_quality \
 		universal/filter \
 		universal/resize \
 		universal/tokenization \
-		universal/doc_id \
-		universal/resize
+		universal/doc_id
 
 
 test-src:: .transforms.setup venv
