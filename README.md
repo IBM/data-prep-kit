@@ -65,7 +65,6 @@ The matrix below shows the the combination of modules and supported runtimes. Al
 | [Profiler](transforms/universal/profiler/ray/README.md)                        |                    |:white_check_mark:|                  |:white_check_mark:      |
 | [Resize](transforms/universal/resize/python/README.md)                           | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | [Tokenizer](transforms/universal/tokenization/python/README.md)                        | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
-| [No-op / template](transforms/universal/noop/python/README.md)                 | :white_check_mark: |:white_check_mark:|:white_check_mark:|:white_check_mark:      |
 | **Language-only**                |                    |                  |                  |                        |
 | [Language identification](transforms/language/lang_id/python/README.md)          | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | [Document quality](transforms/language/doc_quality/python/README.md)                 | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
