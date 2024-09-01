@@ -11,9 +11,10 @@
 ################################################################################
 
 import os
-import sys
 
-from data_processing.utils import ParamsUtils
+from data_processing.test_support.launch.transform_test import (
+    AbstractTransformLauncherTest,
+)
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from fdedup.transforms.base import (filter_doc_column_name_cli_param,
                                     filter_int_column_name_cli_param,
@@ -27,36 +28,23 @@ from fdedup_ray.transforms import (FdedupFilterRayTransformRuntimeConfiguration,
                                    filter_num_docid_cli_param,
                                    )
 
-# create launcher
-launcher = RayTransformLauncher(FdedupFilterRayTransformRuntimeConfiguration())
-# create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../test-data/input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../output"))
-local_conf = {
-    "input_folder": input_folder,
-    "output_folder": output_folder,
-}
-code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
-params = {
-    # where to run
-    "run_locally": True,
-    # Data access. Only required parameters are specified
-    "data_local_config": ParamsUtils.convert_to_ast(local_conf),
-    # orchestrator
-    "runtime_pipeline_id": "pipeline_id",
-    "runtime_job_id": "job_id",
-    "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
-    # fdedup parameters
-    filter_doc_column_name_cli_param: "contents",
-    filter_int_column_name_cli_param: "Unnamed: 0",
-    filter_cluster_column_name_cli_param: "cluster",
-    filter_removed_docs_column_name_cli_param: "removed",
-    filter_doc_id_snapshot_directory_cli_param: os.path.join(input_folder, "snapshot/docs"),
-    filter_docid_cpu_cli_param: .5,
-    filter_num_docid_cli_param: 1,
-}
+class TestRayFdedupFilterTransform(AbstractTransformLauncherTest):
+    """
+    Extends the super-class to define the test data for the tests defined there.
+    The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
+    """
 
-sys.argv = ParamsUtils.dict_to_req(d=params)
+    def get_test_transform_fixtures(self) -> list[tuple]:
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
+        launcher = RayTransformLauncher(FdedupFilterRayTransformRuntimeConfiguration())
+        config = {"run_locally": True,
+                  filter_doc_column_name_cli_param: "contents",
+                  filter_int_column_name_cli_param: "Unnamed: 0",
+                  filter_cluster_column_name_cli_param: "cluster",
+                  filter_removed_docs_column_name_cli_param: "removed",
+                  filter_doc_id_snapshot_directory_cli_param: os.path.join(basedir, "input/snapshot/docs"),
+                  filter_docid_cpu_cli_param: .5,
+                  filter_num_docid_cli_param: 1,
+                  }
+        return [(launcher, config, basedir + "/input", basedir + "/filter")]
 
-# launch
-launcher.launch()

@@ -302,7 +302,6 @@ class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
         :param stats: output of statistics as aggregated across all calls to all transforms.
         :return: job execution statistics.  These are generally reported as metadata by the Ray Orchestrator.
         """
-        # compute and add additional statistics
         # Get document collector statistics
         sum_docs = 0
         sum_docs_mem = 0

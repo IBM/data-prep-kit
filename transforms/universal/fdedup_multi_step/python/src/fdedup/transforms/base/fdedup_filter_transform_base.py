@@ -32,9 +32,9 @@ doc_id_cache_key = "doc_id_cache"
 
 filter_doc_column_name_cli_param = f"{filter_cli_prefix}{doc_column_name_key}"
 filter_int_column_name_cli_param = f"{filter_cli_prefix}{int_column_name_key}"
-filter_cluster_column_name_cli_param = f"--{filter_cli_prefix}{cluster_column_name_key}"
-filter_removed_docs_column_name_cli_param = f"--{filter_cli_prefix}{removed_docs_column_name_key}"
-filter_doc_id_snapshot_directory_cli_param = f"--{filter_cli_prefix}{doc_id_snapshot_directory_key}"
+filter_cluster_column_name_cli_param = f"{filter_cli_prefix}{cluster_column_name_key}"
+filter_removed_docs_column_name_cli_param = f"{filter_cli_prefix}{removed_docs_column_name_key}"
+filter_doc_id_snapshot_directory_cli_param = f"{filter_cli_prefix}{doc_id_snapshot_directory_key}"
 
 
 class FdedupFilterTransformBase(AbstractTableTransform):

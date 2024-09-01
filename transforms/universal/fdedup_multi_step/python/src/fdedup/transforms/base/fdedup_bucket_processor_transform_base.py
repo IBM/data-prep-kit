@@ -24,7 +24,7 @@ bucket_processor_cli_prefix = f"{short_name}_"
 bucket_processor_num_permutations_cli_param = f"{bucket_processor_cli_prefix}{num_permutations_key}"
 bucket_processor_threshold_cli_param = f"{bucket_processor_cli_prefix}{threshold_key}"
 bucket_processor_minhash_snapshot_directory_cli_param = \
-    f"--{bucket_processor_cli_prefix}{minhash_snapshot_directory_key}"
+    f"{bucket_processor_cli_prefix}{minhash_snapshot_directory_key}"
 
 # Execution parameter
 LONG_BUCKET = 5000
