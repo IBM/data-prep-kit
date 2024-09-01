@@ -9,7 +9,6 @@
 <?  [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/kylelobo/The-Documentation-Compendium.svg)](https://github.com/IBM/data-prep-kit/pulls) ?>
 </div> 
 
----
 Data Prep Kit is a community project to democratize and accelerate unstructured data preparation for LLM app developers. 
 With the explosive growth of LLM-enabled use cases, developers are faced with the enormous challenge of preparing use case-specific unstructured data to fine-tune, instruct-tune the LLMs or build RAG applications.
 As the variety of use cases grows, so does the need to support:
@@ -24,11 +23,9 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 ![alt text](doc/Data-prep-kit-diagram.png)
 
 
-
 ## 📝 Table of Contents
 - [About](#about)
-- [Quick Start](doc/quick-start/quick-start.md)
-- [Data Preparation Modules](#modules)
+- [Getting Started](#gettingstarted)
 - [Data Processing Framework](#data-proc-lib)
 - [Repository Use and Navigation](doc/repo.md)
 - [How to Contribute](CONTRIBUTING.md)
@@ -49,17 +46,9 @@ Features of the toolkit:
 - It provides the [Data processing library](data-processing-lib/ray) to enable contribution of new custom modules targeting new use cases.
 - It uses [Kubeflow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/)-based [workflow automation](kfp/doc/simple_transform_pipeline.md).
 
-Data modalities supported: 
+Data modalities supported _today_: Code and Natural Language.
 
-* Code - support for code datasets as downloaded .zip files of GitHub repositories converted to
-[parquet](https://arrow.apache.org/docs/python/parquet.html) files. 
-* Language - supports for natural language datasets, and like the code transformations, will operate on parquet files.
-* Universal - supports code and natrual langauge datasets, and can operate on with parquet files, zip archives, or individual HTML files.
-
-Support for additional data modalities is expected in the future and additional data formats are welcome!
-
-## Data Preparation Modules <a name = "modules"></a>
-Matrix below shows the the combination of modules and supported runtimes. All the modules can be accessed [here](transforms) and can be combined to form data processing pipelines, as shown in the [examples](examples) folder. The modules are under three major categories: 1) Universal (apply to both code and language) 2) Language-only and 3) Code-only. We start with a set of modules for ingestion of various data formats.  
+The matrix below shows the the combination of modules and supported runtimes. All the modules can be accessed [here](transforms) and can be combined to form data processing pipelines, as shown in the [examples](examples) folder. 
 
 
 | Modules                          | Python-only        | Ray              | Spark            | KFP on Ray             |
@@ -91,7 +80,35 @@ Matrix below shows the the combination of modules and supported runtimes. All th
 | [Semantic file ordering](transforms/code/repo_level_ordering/ray/README.md)              |                    |:white_check_mark:|                  |                        |
 
 
-Contributors are welcome to add new modules as well as add runtime support for existing modules!
+Contributors are welcome to add new modules to expand to other data modalities as well as add runtime support for existing modules!
+
+## &#x1F680; Getting Started <a name = "gettingstarted"></a>
+
+Follow these steps to quickly set up and deploy the Data Prep Kit in your virtual Python environment.
+
+### Create a Virtual Environment
+
+```bash
+conda create -n data-prep-kit -y python=3.11
+conda activate data-prep-kit
+python --version
+```
+Check if the python version is 3.11. 
+
+If you are using a linux system, install gcc using the below commands:
+
+```bash
+conda install gcc_linux-64
+conda install gxx_linux-64
+```
+Next, install the data prep toolkit library. This library installs both the python and ray versions of the transforms.
+```bash
+pip3 install data-prep-toolkit-transforms-ray
+pip3 install jupyterlab
+
+```
+### Run your first transform
+
 
 
 ## Data Processing Framework <a name = "data-proc-lib"></a>
