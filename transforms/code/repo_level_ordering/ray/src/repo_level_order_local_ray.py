@@ -47,18 +47,16 @@ repo_level_params = {
     "repo_lvl_sorting_algo": "SORT_SEMANTIC_NORMALISED",
     "repo_lvl_store_type": "local",
     "repo_lvl_store_backend_dir": "/tmp/mystore",
+    "repo_lvl_language_column": "language",
+    "repo_lvl_sorting_enabled": True,
+    #    "repo_lvl_output_by_langs": True,
+    #    "repo_lvl_combine_rows": True,
 }
 
-repo_level_flags = [
-    "repo_lvl_output_by_langs",
-    "repo_lvl_combine_rows",
-    "repo_lvl_sorting_enabled",
-]
 
 if __name__ == "__main__":
     # Set the simulated command line args
-    d = ParamsUtils.dict_to_req(d=params | repo_level_params)
-    sys.argv = d + [f"--{flag}" for flag in repo_level_flags]
+    sys.argv = ParamsUtils.dict_to_req(d=params | repo_level_params)
     # create launcher
     launcher = RayTransformLauncher(RepoLevelOrderRayTransformConfiguration())
     # Launch the ray actor(s) to process the input
