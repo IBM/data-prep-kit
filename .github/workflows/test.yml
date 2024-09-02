@@ -13,7 +13,7 @@ on:
             - "dev"
             - "releases/**"
 env:
-  KFP_BLACK_LIST: "doc_chunk-ray,pdf2parquet-ray"
+  KFP_BLACK_LIST: "doc_chunk-ray,pdf2parquet-ray,pii_redactor"
 
 jobs:
     check_if_push_images:
