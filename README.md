@@ -106,6 +106,11 @@ pip3 install data-prep-toolkit-transforms-ray
 pip3 install jupyterlab
 
 ```
+Test, your installation. If you are able to import these data-prep-kit libraries successfully, your installation has succeeded. 
+```bash
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from data_processing.runtime.pure_python import PythonTransformLauncher
+```
 ### Run your first transform
 
 
