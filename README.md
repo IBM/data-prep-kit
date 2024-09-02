@@ -115,6 +115,8 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 
 Let's try a simple transform to extract content from PDF files. This [notebook](examples/notebooks/Run_your_first_transform.ipynb) demonstrates how to run a data preparation transformation that extracts content from PDF files using the data-prep-kit, leveraging Ray for parallel execution while still allowing local processing.
 
+Explore more examples [here](examples/notebooks).
+
 ## Data Processing Framework <a name = "data-proc-lib"></a>
 At the core of the framework, is a data processing library, that provides a systematic way to implement the data processing modules. The library is python-based and enables the application of "transforms" to a one or more input data files to produce one or more output data files. We use the popular [parquet](https://arrow.apache.org/docs/python/parquet.html) format to store the data (code or language). 
 Every parquet file follows a set [schema](transforms/code/code2parquet/python/README.md). A user can use one or more transforms (or modules) as discussed above to process their data. 
