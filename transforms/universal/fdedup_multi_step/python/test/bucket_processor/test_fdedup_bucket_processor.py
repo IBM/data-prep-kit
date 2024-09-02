@@ -18,7 +18,7 @@ from data_processing.data_access import DataAccessFactory
 from data_processing.utils import RANDOM_SEED
 from data_processing.test_support.transform import AbstractBinaryTransformTest
 from data_processing.transform import TransformStatistics
-from fdedup.utils import DocsMinHash, MurmurMH, DocCollector
+from fdedup.utils import DocsMinHash, DocCollector
 from fdedup.transforms.python import PythonBucketsHashProcessor, FdedupBucketProcessorTransform, processor_key
 
 
@@ -34,12 +34,10 @@ class TestFdedupPreprocessorTransform(AbstractBinaryTransformTest):
         input_files = get_files_in_folder(dir=input_dir, ext="")
         input_files = [(name, binary) for name, binary in input_files.items()]
         data_access_factory = DataAccessFactory()
-        mn_min_hash = MurmurMH(num_perm=64, seed=RANDOM_SEED)
         minhashes = DocsMinHash({"id": 0, "data_access": data_access_factory,
                                  "snapshot": os.path.join(basedir, "snapshot/minhash/minhash_collector_0")})
         doc_collector = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": None})
         bucket_processor = PythonBucketsHashProcessor({"threshold": .8,
-                                                       "mn_min_hash": mn_min_hash,
                                                        "docs_collector": doc_collector,
                                                        "minhash_collector": minhashes,
                                                        "statistics": TransformStatistics(),

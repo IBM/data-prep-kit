@@ -22,6 +22,9 @@ from scipy.integrate import quad as integrate
 NO_SIMILARITY = -1
 LONG_BUCKET = 5000
 
+def jaccard_distance(mh1: np.array, mh2: np.array) -> float:
+    return np.count_nonzero(mh1 == mh2)
+
 
 def fuzzy_optimal_param(
         threshold: float,
@@ -103,10 +106,6 @@ class MurmurMH:
         # make all even pseudo random numbers odd by adding 1
         permutations[permutations % 2 == 0] += 1
         return permutations
-
-    @staticmethod
-    def jaccard(mh1: np.array, mh2: np.array) -> float:
-        return np.count_nonzero(mh1 == mh2)
 
 
 class DocCollector:
@@ -360,21 +359,20 @@ class BucketsHashProcessor:
         :param params - dictionary of parameters containing the following keys
             docs_collector - pointer to the docs collector
             minhash_collector - pointer to the minhash collector
-            mn_min_hash - MurmurMH class
             threshold - threshold
             statistics - pointer to statistics
             print_interval - print interval
         """
         from data_processing.utils import get_logger
+        from fdedup.utils import jaccard_distance
 
         self.threshold = params.get("threshold", .8)
-        self.mn_min_hash = params.get("mn_min_hash", None)
         self.docs_collector = params.get("docs_collector", None)
         self.minhash_collector = params.get("minhash_collector", None)
         self.stats = params.get("statistics", None)
         self.print_interval = params.get("print_interval", 10)
         self.logger = get_logger(__name__)
-        if self.mn_min_hash is None or self.docs_collector is None or self.minhash_collector is None or self.stats is None:
+        if self.docs_collector is None or self.minhash_collector is None or self.stats is None:
             self.logger.error(f"Not all processor parameters are defined: mn_min_hash {self.mn_min_hash}; "
                               f"docs_collector {self.docs_collector}; minhash_collector {self.minhash_collector} "
                               f"stats {self.stats}")
@@ -431,7 +429,7 @@ class BucketsHashProcessor:
                 for other_doc_id in bucket:
                     if other_doc_id in unvisited:
                         other_mh = hashes[other_doc_id][1]
-                        if self.mn_min_hash.jaccard(current_mh, other_mh) >= self.threshold:
+                        if jaccard_distance(current_mh, other_mh) >= self.threshold:
                             current_set.add(other_doc_id)
                             unvisited.discard(other_doc_id)
                 set_list.append(current_set)

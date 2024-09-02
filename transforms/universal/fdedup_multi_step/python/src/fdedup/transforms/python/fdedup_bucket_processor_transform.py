@@ -123,7 +123,6 @@ class FdedupBucketProcessorRuntime(DefaultPythonTransformRuntime):
         :param files - list of files to process
         :return: dictionary of transform init params
         """
-        mn_min_hash = MurmurMH(num_perm=self.num_permutations, seed=RANDOM_SEED)
         data_access = data_access_factory.create_data_access()
         # create support classes
         snapshot_path = self.params.get(minhash_snapshot_directory_key, None)
@@ -135,7 +134,6 @@ class FdedupBucketProcessorRuntime(DefaultPythonTransformRuntime):
         self.buckets = BucketsHash({"id": 0, "data_access": data_access_factory, "snapshot": None})
         self.doc_collector = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": None})
         self.bucket_processor = PythonBucketsHashProcessor({"threshold": self.threshold,
-                                                            "mn_min_hash": mn_min_hash,
                                                             "docs_collector": self.doc_collector,
                                                             "minhash_collector": self.minhashes,
                                                             "statistics": statistics,
