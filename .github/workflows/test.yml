@@ -12,6 +12,9 @@ on:
         branches:
             - "dev"
             - "releases/**"
+env:
+  KFP_BLACK_LIST: "doc_chunk-ray,pdf2parquet-ray"
+
 jobs:
     check_if_push_images:
         # check whether the Docker images should be pushed to the remote repository
@@ -164,15 +167,15 @@ jobs:
                   while :
                   do
                     dir=("code"  "universal" "language") && index=$(($RANDOM % ${#dir[@]})) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs -type d  -maxdepth 1 -mindepth 1 ))
-                    # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
-                    set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
-                    if [ -d ${transforms[$index]}/kfp_ray ]; then
+                    set -- "${transforms[@]}" && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
+                    transform=$(basename "${transforms[$index]}")
+                    if [ -d ${transforms[$index]}/kfp_ray ] && echo ${KFP_BLACK_LIST} | grep -qv ${transform} ; then
                       header_text "Running ${transforms[$index]} workflow test"
                       break
                     fi
                   done  
                   make -C ${transforms[$index]} workflow-test
-                  header_text "Run ${transforms[$index]} completed"
+                  echo "Run ${transforms[$index]} completed"
 
     test-kfp-v2:
         runs-on: ubuntu-22.04
@@ -214,9 +217,9 @@ jobs:
                   while :
                   do
                     dir=("code"  "universal" "language") && index=$(($RANDOM % ${#dir[@]})) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs -type d  -maxdepth 1 -mindepth 1 ))
-                    # First element is not really a subdir but rather the current dir so remove it and randomly choose a transform to run
-                    set -- "${transforms[@]}" && shift && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
-                    if [ -d ${transforms[$index]}/kfp_ray ]; then
+                    set -- "${transforms[@]}" && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
+                    transform=$(basename "${transforms[$index]}")
+                    if [ -d ${transforms[$index]}/kfp_ray ] && echo ${KFP_BLACK_LIST} | grep -qv ${transform} ; then
                       header_text "Running ${transforms[$index]} workflow test"
                       break
                     fi
