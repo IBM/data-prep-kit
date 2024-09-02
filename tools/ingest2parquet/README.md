@@ -2,7 +2,7 @@
 
 **Please note: This tool is deprecated and will be removed soon. 
 It is superseded by the transform-based implementation, 
-[code2parquet](../../transforms/code/code2parquet),  providing identical capability, 
+[code2parquet](../../transforms/universal/zip2parquet),  providing identical capability, 
 but with support for ray-based scalability.**
 
 ## Summary 
