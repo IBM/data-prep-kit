@@ -12,15 +12,16 @@
 
 from argparse import Namespace
 from typing import Any
+import numpy as np
 
-from data_processing.utils import UnrecoverableException, RANDOM_SEED
+from data_processing.utils import UnrecoverableException
 from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
 from data_processing.transform import TransformStatistics
 from data_processing.runtime.pure_python import (DefaultPythonTransformRuntime,
                                                  PythonTransformLauncher,
                                                  PythonTransformRuntimeConfiguration
                                                  )
-from fdedup.utils import DocsMinHash, MurmurMH, DocCollector, BucketsHash, BucketsHashProcessor
+from fdedup.utils import DocsMinHash, DocCollector, BucketsHash, BucketsHashProcessor
 from fdedup.transforms.base import (FdedupBucketProcessorTransformBase,
                                     FdedupBucketProcessorTransformConfigurationBase,
                                     threshold_key, num_permutations_key, minhash_snapshot_directory_key)
@@ -58,7 +59,7 @@ class PythonBucketsHashProcessor(BucketsHashProcessor):
             docs.pop(did, None)
         self.docs_collector.add_documents((list(docs.items()), removed))
 
-    def _get_minhashes_docs(self, doc_ids: list[int]) -> dict[int, tuple[int, list[int]]]:
+    def _get_minhashes_docs(self, doc_ids: list[int]) -> dict[int, tuple[int, np.array]]:
         """
         Get minhashes for documents by submitting requests to an appropriate doc collectors
         :param doc_ids: doc ids

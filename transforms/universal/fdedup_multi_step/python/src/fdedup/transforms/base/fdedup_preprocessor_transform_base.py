@@ -25,7 +25,7 @@ from data_processing.utils import (
 from data_processing.utils import UnrecoverableException
 
 # performance
-REQUEST_LEN = 4096
+REQUEST_LEN = 8192
 
 # configuration parameters
 short_name = "fdedup_preprocessor"

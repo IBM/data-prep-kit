@@ -13,6 +13,7 @@
 from argparse import Namespace, ArgumentParser
 from typing import Any
 import time
+import numpy as np
 import ray
 from ray.util import ActorPool
 from ray.actor import ActorHandle
@@ -157,7 +158,7 @@ class RayBucketsHashProcessor(BucketsHashProcessor):
         # Process replies
         RayUtils.wait_for_execution_completion(logger=self.logger, replies=remote_replies)
 
-    def _get_minhashes_docs(self, doc_ids: list[int]) -> dict[int, tuple[int, list[int]]]:
+    def _get_minhashes_docs(self, doc_ids: list[int]) -> dict[int, tuple[int, np.array]]:
         """
         Get minhashes for documents by submitting requests to an appropriate doc collectors
         :param doc_ids: doc ids
