@@ -6,14 +6,22 @@ REPOROOT=../../../..
 # to override/redefine the rules below. 
 
 # $(REPOROOT)/.make.versions file contains the versions
+include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=pdf2parquet
 
 RUN_ARGS=" --data_local_config \"{ 'input_folder' : '../test-data/input', 'output_folder' : '../output'}\"  \
 	--data_files_to_use \"['.pdf','.zip']\" "
 
+LINUX_WITH_CPU_TORCH?=true
+OS := $(shell uname -s)
+ifeq ($(OS),Linux)
+	ifeq ($(LINUX_WITH_CPU_TORCH),true)
+	PIP_INSTALL_EXTRA_ARGS=--extra-index-url=https://download.pytorch.org/whl/cpu
+	DOCKER_BUILD_EXTRA_ARGS=--build-arg PIP_INSTALL_EXTRA_ARGS=${PIP_INSTALL_EXTRA_ARGS}
+	endif
+endif
 
-include $(REPOROOT)/transforms/.make.transforms
 
 venv::	.transforms.python-venv
 

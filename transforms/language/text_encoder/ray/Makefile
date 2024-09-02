@@ -9,6 +9,15 @@ include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=text_encoder
 
+LINUX_WITH_CPU_TORCH?=true
+OS := $(shell uname -s)
+ifeq ($(OS),Linux)
+	ifeq ($(LINUX_WITH_CPU_TORCH),true)
+	PIP_INSTALL_EXTRA_ARGS=--extra-index-url=https://download.pytorch.org/whl/cpu
+	DOCKER_BUILD_EXTRA_ARGS=--build-arg PIP_INSTALL_EXTRA_ARGS=${PIP_INSTALL_EXTRA_ARGS}
+	endif
+endif
+
 BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
 

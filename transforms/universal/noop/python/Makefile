@@ -6,10 +6,10 @@ REPOROOT=../../../..
 # to override/redefine the rules below. 
 
 # $(REPOROOT)/.make.versions file contains the versions
+include $(REPOROOT)/transforms/.make.transforms
 
 TRANSFORM_NAME=noop
 
-include $(REPOROOT)/transforms/.make.transforms
 
 venv::	.transforms.python-venv
 

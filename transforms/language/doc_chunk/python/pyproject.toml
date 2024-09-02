@@ -12,7 +12,13 @@ authors = [
 ]
 dependencies = [
     "data-prep-toolkit==0.2.1.dev0",
-    "quackling==0.1.0",
+    # replicating here the quackling deps
+    # for some reason this is needed, otherwise one gets into
+    # conflicts with ray
+    "docling>=1.8.2,<2.0.0",
+    "llama-index-core>=0.11.1,<0.12.0",
+    "docling-core>=1.1.2,<2.0.0",
+    "quackling==0.1.1",
 ]
 
 [build-system]
