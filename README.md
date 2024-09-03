@@ -113,7 +113,11 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 ```
 ### Run your first transform
 
-Let's try a simple transform to extract content from PDF files. This [notebook](examples/notebooks/Run_your_first_transform.ipynb) demonstrates how to run a data preparation transformation that extracts content from PDF files using the data-prep-kit, leveraging Ray for parallel execution while still allowing local processing.
+Let's try a simple transform to extract content from PDF files. This [notebook](examples/notebooks/Run_your_first_transform.ipynb) demonstrates how to run a data preparation transformation that extracts content from PDF files using the data-prep-kit, leveraging Ray for parallel execution while still allowing local processing. To run this notebook, launch jupyter from the same virtual environment using the command below. 
+
+```bash
+jupyter-lab
+```
 
 Explore more examples [here](examples/notebooks).
 
