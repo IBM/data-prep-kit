@@ -116,8 +116,12 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 Let's try a simple transform to extract content from PDF files. This [notebook](examples/notebooks/Run_your_first_transform.ipynb) demonstrates how to run a data preparation transformation that extracts content from PDF files using the data-prep-kit, leveraging Ray for parallel execution while still allowing local processing. To run this notebook, launch jupyter from the same virtual environment using the command below. 
 
 ```bash
+conda install ipykernel
+# Add the Conda environment to Jupyter
+python -m ipykernel install --user --name=data-prep-kit --display-name "dataprepkit"
 jupyter-lab
 ```
+After opening the jupyter notebook, change the kernel to dataprepkit. 
 
 Explore more examples [here](examples/notebooks).
 
