@@ -11,7 +11,7 @@
 
 Data Prep Kit is a community project to democratize and accelerate unstructured data preparation for LLM app developers. 
 With the explosive growth of LLM-enabled use cases, developers are faced with the enormous challenge of preparing use case-specific unstructured data to fine-tune, instruct-tune the LLMs or to build RAG applications for LLMs.
-As the variety of use cases grows, so does the need to support:
+As the variety of use cases grow, so does the need to support:
 
 - New ways of transforming the data to enhance the performance of the resulting LLMs for each specific use case.
 - A large variety in the scale of data to be processed, from laptop-scale to datacenter-scale
@@ -142,9 +142,12 @@ The annotator design also allows a user to verify the results of the processing 
 A general purpose [SQL-based filter transform](transforms/universal/filter) enables a powerful mechanism for identifying columns and rows of interest for downstream processing.
 For a new module to be added, a user can pick the right design based on the processing to be applied. More details [here](transforms).
 
-One can add new transforms by bringing in Python-based processing logic and using the Data Processing Library to build and contribute transforms. We have provided an [example transform](transforms/universal/noop) that can serve as a template to add new simple transforms. One can follow the step by step [tutorial](data-processing-lib/doc/simplest-transform-tutorial.md) to help you add your own new transform. For more details, we encourage the reader to go through the [architectural overview](../../data-processing-lib/doc/overview.md) for the details on [transforms](../../data-processing-lib/doc/transforms.md) and [runtimes](../../data-processing-lib/doc/transform-runtimes.md). More details on the data processing library are [here](data-processing-lib/doc/overview.md). 
+One can leverage Python-based processing logic and the Data Processing Library to easily build and contribute new transforms. We have provided an [example transform](transforms/universal/noop) that can serve as a template to add new simple transforms. Follow the step by step [tutorial](data-processing-lib/doc/simplest-transform-tutorial.md) to help you add your own new transform. 
 
-Additionally, you can explore our [video](https://www.youtube.com/watch?v=0WUMG6HIgMg) that provide a step-by-step, example-driven tutorial on how to add a new module. 
+For a deeper understanding of the library's architecture, its transforms, and available runtimes, we encourage the reader to consult the comprehensive [overview document] (../../data-processing-lib/doc/overview.md) alongside dedicated sections on [transforms] (../../data-processing-lib/doc/transforms.md) and [runtimes] (../../data-processing-lib/doc/transform-runtimes.md).
+
+Additionally, check out our video tutorial (https://www.youtube.com/watch?v=0WUMG6HIgMg) for a visual, example-driven guide on adding custom modules.
+
 
 ## 💻 -> 🖥️☁️ From laptop to cluster <a name = "laptop_cluster"></a>
 Data-prep-kit provides the flexibility to transition your projects from proof-of-concept (PoC) stage to full-scale production mode, offering all the necessary tools to run your data transformations at high volume. In this section, we enable you how to run your transforms at scale and how to automate them. 
