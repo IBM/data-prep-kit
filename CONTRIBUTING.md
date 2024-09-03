@@ -18,7 +18,7 @@ are not interested in accepting into the code base.
 
 ### Fixing bugs
 
-If you would like to fix a bug, please raise an issue before sending a
+If you would like to fix a bug, please raise an issue, before sending a
 pull request so it can be tracked.
 
 ### Merge approval
