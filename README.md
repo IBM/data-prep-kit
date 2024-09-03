@@ -10,7 +10,7 @@
 </div> 
 
 Data Prep Kit is a community project to democratize and accelerate unstructured data preparation for LLM app developers. 
-With the explosive growth of LLM-enabled use cases, developers are faced with the enormous challenge of preparing use case-specific unstructured data to fine-tune and instruct-tune the LLMs or to build RAG applications for LLMs.
+With the explosive growth of LLM-enabled use cases, developers are faced with the enormous challenge of preparing use case-specific unstructured data to fine-tune, instruct-tune the LLMs or to build RAG applications for LLMs.
 As the variety of use cases grows, so does the need to support:
 
 - New ways of transforming the data to enhance the performance of the resulting LLMs for each specific use case.
