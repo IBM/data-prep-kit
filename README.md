@@ -121,11 +121,10 @@ Explore more examples [here](examples/notebooks).
 
 Now that you have run a single transform, the next step is to explore how to put these transforms together to run a data prep pipeline for an end to end use case like fine tuning model or building a RAG application. This [notebook](examples/notebooks/code/sample-notebook.ipynb) gives an example of how to build an end to end data prep pipeline for fine tuning for code LLMs. You can also explore how to build a RAG pipeline [here](examples/notebooks/rag).
 
-## Data Processing Framework <a name = "data-proc-lib"></a>
+### Add your own transform
+
 At the core of the framework, is a data processing library, that provides a systematic way to implement the data processing modules. The library is python-based and enables the application of "transforms" to a one or more input data files to produce one or more output data files. We use the popular [parquet](https://arrow.apache.org/docs/python/parquet.html) format to store the data (code or language). 
 Every parquet file follows a set [schema](transforms/code/code2parquet/python/README.md). A user can use one or more transforms (or modules) as discussed above to process their data. 
-
-#### Transform Design
 A transform can follow one of the two patterns: annotator or filter.
 
 - **Annotator** An annotator transform adds information during the processing by adding one more columns to the parquet files.
@@ -133,7 +132,9 @@ The annotator design also allows a user to verify the results of the processing 
 
 - **Filter** A filter transform processes the data and outputs the transformed data, e.g., exact deduplication.
 A general purpose [SQL-based filter transform](transforms/universal/filter) enables a powerful mechanism for identifying columns and rows of interest for downstream processing.
-For a new module to be added, a user can pick the right design based on the processing to be applied. More details [here](transforms). 
+For a new module to be added, a user can pick the right design based on the processing to be applied. More details [here](transforms).
+
+One can add new transforms by bringing in Python-based processing logic and using the Data Processing Library to build and contribute transforms. We have provided an [example transform](transforms/universal/noop) that can serve as a template to add new simple transforms. One can follow the step by step [tutorial](data-processing-lib/doc/simplest-transform-tutorial.md) to help you add your own new transform. For more details, we encourage the reader to go through the [architectural overview](../../data-processing-lib/doc/overview.md) for the details on [transforms](../../data-processing-lib/doc/transforms.md) and [runtimes](../../data-processing-lib/doc/transform-runtimes.md). More details on the data processing library are [here](data-processing-lib/doc/overview.md). 
 
 #### Scaling of Transforms
 To enable processing of large data volumes leveraging multi-mode clusters, [Ray](https://docs.ray.io/en/latest/index.html) 
