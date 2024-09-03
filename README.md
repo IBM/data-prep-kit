@@ -170,7 +170,7 @@ You can run transforms via docker image or using virtual environments. This [doc
 ## Talks and Papers
 1. [Granite Code Models: A Family of Open Foundation Models for Code Intelligence](https://arxiv.org/abs/2405.04324)
 2. [Scaling Granite Code Models to 128K Context](https://arxiv.org/abs/2407.13739)
-3. Talk on "Building Successful LLM Apps: The Power of high quality data" to students across 40+ universities. [Video](https://www.youtube.com/watch?v=u_2uiZBBVIE) Slides(TBA)
+3. Talk on "Building Successful LLM Apps: The Power of high quality data" [Video](https://www.youtube.com/watch?v=u_2uiZBBVIE) Slides(TBA)
 4. Talk on "Hands on session for fine tuning LLMs" [Video](https://www.youtube.com/watch?v=VEHIA3E64DM)
 5. Talk on "Build your own data preparation module using data-prep-kit" [Video](https://www.youtube.com/watch?v=0WUMG6HIgMg)
 
