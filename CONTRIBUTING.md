@@ -3,7 +3,7 @@ Our project welcomes external contributions. If you have an itch, please feel
 free to scratch it.
 
 To contribute code or documentation, please submit a pull request. You can get started with open issues with the label - good first issue. 
-Before embarking on a more ambitious contribution, please quickly [get in touch](#communication) with us.
+Before embarking on a more ambitious contribution, please quickly get in touch with us via raising an issue.
 
 **Note: We appreciate your effort, and want to avoid a situation where a contribution
 requires extensive rework (by you or by us), sits in backlog for a long time, or
