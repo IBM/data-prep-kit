@@ -22,7 +22,6 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
-    RayUtils,
 )
 from fdedup.utils import DocCollector
 from fdedup.transforms.base import (FdedupFilterTransformBase,
@@ -30,11 +29,11 @@ from fdedup.transforms.base import (FdedupFilterTransformBase,
                                     doc_id_snapshot_directory_key, filter_cli_prefix,
                                     doc_id_cache_key,
                                     )
-from fdedup_ray.transforms import docid_cpu_key, num_docid_key
+from fdedup_ray.transforms import doc_id_cpu_key, num_doc_id_key
 
 
-filter_docid_cpu_cli_param = f"{filter_cli_prefix}{docid_cpu_key}"
-filter_num_docid_cli_param = f"{filter_cli_prefix}{num_docid_key}"
+filter_docid_cpu_cli_param = f"{filter_cli_prefix}{doc_id_cpu_key}"
+filter_num_docid_cli_param = f"{filter_cli_prefix}{num_doc_id_key}"
 
 
 class FdedupFilterTransformRay(FdedupFilterTransformBase):
@@ -89,8 +88,8 @@ class FdedupFilterRuntimeRay(DefaultRayTransformRuntime):
         self.logger = get_logger(__name__)
         super().__init__(params=params)
         self.doc_collector = None
-        self.n_docid = params.get(num_docid_key, 1)
-        self.docid_cpu = params.get(docid_cpu_key, .5)
+        self.n_docid = params.get(num_doc_id_key, 1)
+        self.docid_cpu = params.get(doc_id_cpu_key, .5)
 
 
     def get_transform_config(

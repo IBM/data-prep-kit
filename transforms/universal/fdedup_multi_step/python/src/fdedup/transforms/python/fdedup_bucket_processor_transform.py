@@ -44,7 +44,6 @@ class PythonBucketsHashProcessor(BucketsHashProcessor):
             mn_min_hash - MurmurMH class
             threshold - threshold
             statistics - pointer to statistics
-            print_interval - print interval
         """
         super().__init__(params)
 
@@ -97,7 +96,7 @@ class FdedupBucketProcessorTransform(FdedupBucketProcessorTransformBase):
         """
         self.processor.process_buckets(buckets)
 
-    def _save_buckets(self, buckets: dict[int, list[int]]) -> None:
+    def _save_buckets(self, file_name: str, buckets: dict[int, list[int]]) -> None:
         """
         save buckets
         :param buckets: buckets
@@ -154,8 +153,7 @@ class FdedupBucketProcessorRuntime(DefaultPythonTransformRuntime):
         self.bucket_processor = PythonBucketsHashProcessor({"threshold": self.threshold,
                                                             "docs_collector": self.doc_collector,
                                                             "minhash_collector": self.minhashes,
-                                                            "statistics": statistics,
-                                                            "print_interval": 10})
+                                                            "statistics": statistics})
         return self.params | {processor_key: self.bucket_processor, buckets_cache_key: self.buckets}
 
     def compute_execution_stats(self, stats: TransformStatistics) -> None:

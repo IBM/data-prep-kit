@@ -26,23 +26,27 @@ from data_processing_ray.runtime.ray import (
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
-from fdedup.utils import BucketsHash, DocsMinHash, MurmurMH, fuzzy_optimal_param
+from fdedup.utils import BucketsHash, DocCollector, DocsMinHash, MurmurMH, fuzzy_optimal_param
 from fdedup.transforms.base import (FdedupPreprocessorTransformBase,
                                     FdedupPreprocessorTransformConfigurationBase,
                                     preprocessor_cli_prefix, num_bands_key, length_band_key,
                                     buckets_cache_key, minhashes_cache_key, mn_min_hash_key,
                                     threshold_key, num_permutations_key, minhash_snapshot_directory_key,
-                                    buckets_snapshot_directory_key,
+                                    buckets_snapshot_directory_key, doc_id_snapshot_directory_key, doc_id_cache_key
                                     )
 
 bucket_cpu_key = "bucket_cpu"
 minhash_cpu_key = "minhash_cpu"
+doc_id_cpu_key = "doc_id_cpu"
 num_buckets_key = "num_buckets"
 num_minhash_key = "num_minhashes"
+num_doc_id_key = "num_doc_id"
 
 preprocessor_bucket_cpu_cli_param = f"{preprocessor_cli_prefix}{bucket_cpu_key}"
+preprocessor_doc_id_cpu_cli_param = f"{preprocessor_cli_prefix}{doc_id_cpu_key}"
 preprocessor_minhash_cpu_cli_param = f"{preprocessor_cli_prefix}{minhash_cpu_key}"
 preprocessor_num_buckets_cli_param = f"{preprocessor_cli_prefix}{num_buckets_key}"
+preprocessor_num_doc_id_cli_param = f"{preprocessor_cli_prefix}{num_doc_id_key}"
 preprocessor_num_minhash_cli_param = f"{preprocessor_cli_prefix}{num_minhash_key}"
 
 
@@ -60,8 +64,9 @@ class FdedupRayPreprocessorTransform(FdedupPreprocessorTransformBase):
             mn_min_hash - MurmurMH class
             num_bands - number of bands
             length_band - band length
-            buckets - bucket class
-            minhashes - minhash class
+            buckets - bucket cache
+            minhashes - minhash cache
+            docid - docid cache
             delimiter - delimiter
         """
         # superclass initialization
@@ -72,6 +77,9 @@ class FdedupRayPreprocessorTransform(FdedupPreprocessorTransformBase):
         self.minhashes = config.get(minhashes_cache_key, None)
         if self.minhashes is None:
             raise UnrecoverableException("minhashes cache is not defined")
+        self.docid = config.get(doc_id_cache_key, None)
+        if self.docid is None:
+            raise UnrecoverableException("doc id cache is not defined")
 
     def _submit_buckets_minhashes(
             self, buckets: dict[int, list[int]], minhashes: list[tuple[int, int, np.array]]
@@ -82,6 +90,9 @@ class FdedupRayPreprocessorTransform(FdedupPreprocessorTransformBase):
         :param minhashes: minhashes
         :return: None
         """
+        # remove local duplicates
+        buckets, minhashes, docs, removed = (
+            self._remove_local_duplicates(buckets=buckets, minhashes=minhashes))
         # buckets requests
         request = [[] for _ in range(len(self.buckets))]
         for key, value in buckets.items():
@@ -103,6 +114,20 @@ class FdedupRayPreprocessorTransform(FdedupPreprocessorTransformBase):
             if len(req) > 0:  # Only submit if the length is greater then 0
                 remote_replies.append(self.minhashes[i].add_minhashes.remote(req))
             i += 1
+        # doc id requests
+        request = [([], []) for _ in range(len(self.docid))]
+        for key, value in docs.items():
+            req_tuple = request[key % len(self.docid)]
+            req_tuple[0].append((key, value))
+        for did in removed:
+            req_tuple = request[did % len(self.docid)]
+            req_tuple[1].append(did)
+        # Submit requests and wait for replies
+        i = 0
+        for req in request:
+            if len(req[0]) > 0 or len(req[1]) > 0:  # Only submit if the request has data
+                remote_replies.append(self.docid[i].add_documents.remote(req))
+            i += 1
         # wait for completion
         RayUtils.wait_for_execution_completion(logger=self.logger, replies=remote_replies)
 
@@ -116,15 +141,19 @@ class FdedupRayPreprocessorRuntime(DefaultRayTransformRuntime):
         from data_processing.utils import get_logger
         super().__init__(params=params)
         self.buckets = None
+        self.docid = None
         self.minhashes = None
         self.logger = get_logger(__name__)
         self.threshold = params.get(threshold_key, 0.8)
         self.num_permutations = params.get(num_permutations_key, 64)
         self.minhash_snapshot = params.get(minhash_snapshot_directory_key, None)
         self.buckets_snapshot = params.get(buckets_snapshot_directory_key, None)
+        self.docid_snapshot = params.get(doc_id_snapshot_directory_key, None)
         self.n_buckets = params.get(num_buckets_key, 1)
+        self.n_docid = params.get(num_doc_id_key, 1)
         self.n_minhash = params.get(num_minhash_key, 1)
         self.bucket_cpu = params.get(bucket_cpu_key, .5)
+        self.docid_cpu = params.get(doc_id_cpu_key, .5)
         self.minhash_cpu = params.get(minhash_cpu_key, .5)
 
     def get_transform_config(
@@ -175,17 +204,57 @@ class FdedupRayPreprocessorRuntime(DefaultRayTransformRuntime):
                 request = [[] for _ in range(self.n_minhash)]
                 for mh in minhashes:
                     request[mh[0] % self.n_minhash].append(mh)
-                    # Submit requests to appropriate hash actors
-                    remote_replies = []
-                    i = 0
-                    for req in request:
-                        if len(req) > 0:  # Only submit if the length is greater then 0
-                            remote_replies.append(self.minhashes[i].add_minhashes.remote(req))
-                        i = i + 1
-                    # Process replies
-                    while remote_replies:
-                        ready, not_ready = ray.wait(remote_replies)
-                        remote_replies = not_ready
+                # Submit requests to appropriate hash actors
+                remote_replies = []
+                i = 0
+                for req in request:
+                    if len(req) > 0:  # Only submit if the length is greater then 0
+                        remote_replies.append(self.minhashes[i].add_minhashes.remote(req))
+                    i = i + 1
+                # Process replies
+                while remote_replies:
+                    ready, not_ready = ray.wait(remote_replies)
+                    remote_replies = not_ready
+        self.logger.info(f"Created {len(self.minhashes)} minhash collectors")
+        # create doc ids
+        self.docid = [None] * self.n_docid
+        for i in range(self.n_docid):
+            self.docid[i] = ray.remote(DocCollector).options(**{"num_cpus": self.docid_cpu}).remote(
+                {"id": i, "data_access": data_access_factory, "snapshot": None}
+            )
+        if self.docid_snapshot is not None and len(self.docid_snapshot) > 0:
+            # get snapshot files. Note here that the amount of files might differ from the
+            # the amount of minhashes.
+            files, retries = data_access.get_folder_files(path=self.docid_snapshot)
+            if retries > 0:
+                statistics.add_stats.remote({"data access retries": retries})
+            for file in files.keys():
+                # load the file
+                try:
+                    d_hashes, _ = data_access.get_file(file)
+                    docs, removed = pickle.loads(d_hashes)
+                except Exception as e:
+                    self.logger.warning(f"Failed to load docs from file {file} with exception {e}")
+                    raise UnrecoverableException("failed to load logs")
+                # Add snapshotted docs
+                request = [([], []) for _ in range(len(self.n_docid))]
+                for key, value in docs.items():
+                    req_tuple = request[key % len(self.docs_collector)]
+                    req_tuple[0].append((key, value))
+                for did in removed:
+                    req_tuple = request[did % len(self.docs_collector)]
+                    req_tuple[1].append(did)
+                # Submit requests to appropriate hash actors
+                remote_replies = []
+                i = 0
+                for req in request:
+                    if len(req) > 0:  # Only submit if the length is greater then 0
+                        remote_replies.append(self.minhashes[i].add_minhashes.remote(req))
+                    i = i + 1
+                # Process replies
+                while remote_replies:
+                    ready, not_ready = ray.wait(remote_replies)
+                    remote_replies = not_ready
         self.logger.info(f"Created {len(self.minhashes)} minhash collectors")
         # create buckets
         self.buckets = [None] * self.n_buckets
@@ -212,21 +281,21 @@ class FdedupRayPreprocessorRuntime(DefaultRayTransformRuntime):
                 request = [[] for _ in range(self.n_buckets)]
                 for b in buckets:
                     request[b[0] % self.n_buckets].append(b)
-                    # Submit requests to appropriate hash actors
-                    remote_replies = []
-                    i = 0
-                    for req in request:
-                        if len(req) > 0:  # Only submit if the length is greater then 0
-                            remote_replies.append(self.buckets[i].add_buckets.remote(req))
-                        i = i + 1
-                    # Process replies
-                    while remote_replies:
-                        ready, not_ready = ray.wait(remote_replies)
-                        remote_replies = not_ready
+                # Submit requests to appropriate hash actors
+                remote_replies = []
+                i = 0
+                for req in request:
+                    if len(req) > 0:  # Only submit if the length is greater then 0
+                        remote_replies.append(self.buckets[i].add_buckets.remote(req))
+                    i = i + 1
+                # Process replies
+                while remote_replies:
+                    ready, not_ready = ray.wait(remote_replies)
+                    remote_replies = not_ready
         self.logger.info(f"Created {len(self.buckets)} bucket collectors")
         return self.params | {num_bands_key: num_buckets, length_band_key: length_bucket,
                               mn_min_hash_key: mn_min_hash, minhashes_cache_key: self.minhashes,
-                              buckets_cache_key: self.buckets}
+                              doc_id_cache_key: self.docid, buckets_cache_key: self.buckets}
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
         """
@@ -254,13 +323,31 @@ class FdedupRayPreprocessorRuntime(DefaultRayTransformRuntime):
             sum_buckets += b_amount
             sum_buckets_mem += b_memory
             replies = not_ready
+        # compute doc id usage
+        sum_docs = 0
+        sum_docs_memory = 0
+        sum_removed = 0
+        sum_removed_memory = 0
+        replies = [collector.get_size.remote() for collector in self.docid]
+        while replies:
+            ready, not_ready = ray.wait(replies)
+            d_size, d_memory, r_size, r_memory = ray.get(ready)[0]
+            sum_docs += d_size
+            sum_docs_memory += d_memory
+            sum_removed += r_size
+            sum_removed_memory += r_memory
+            replies = not_ready
+
         # create snapshots
         replies_m = [collector.snapshot.remote() for collector in self.minhashes]
+        replies_d = [collector.snapshot.remote() for collector in self.docid]
         replies_b = [collector.snapshot.remote() for collector in self.buckets]
-        RayUtils.wait_for_execution_completion(logger=self.logger, replies=list(replies_m + replies_b))
+        RayUtils.wait_for_execution_completion(logger=self.logger, replies=list(replies_m + replies_b + replies_d))
         # return updated statistics
         return {"number of buckets": sum_buckets, "bucket memory, GB": sum_buckets_mem,
-                "number of minhashes": sum_mh, "minhashes memory, GB": sum_mh_mem} | stats
+                "number of minhashes": sum_mh, "minhashes memory, GB": sum_mh_mem,
+                "number of docs": sum_docs, "docs_memory, GB": sum_docs_memory,
+                "number of removed": sum_removed, "removed_memory, GB": sum_removed_memory} | stats
 
 
 class FdedupPreprocessorTransformConfiguration(FdedupPreprocessorTransformConfigurationBase):
@@ -284,6 +371,12 @@ class FdedupPreprocessorTransformConfiguration(FdedupPreprocessorTransformConfig
             help="number of CPUs per bucket hash"
         )
         parser.add_argument(
+            f"--{preprocessor_doc_id_cpu_cli_param}",
+            type=float,
+            default=0.5,
+            help="number of CPUs per doc id hash"
+        )
+        parser.add_argument(
             f"--{preprocessor_minhash_cpu_cli_param}",
             type=float,
             default=0.5,
@@ -294,6 +387,12 @@ class FdedupPreprocessorTransformConfiguration(FdedupPreprocessorTransformConfig
             type=int,
             default=1,
             help="number of minhash caches to use"
+        )
+        parser.add_argument(
+            f"--{preprocessor_num_doc_id_cli_param}",
+            type=int,
+            default=1,
+            help="number of doc id caches to use"
         )
         parser.add_argument(
             f"--{preprocessor_num_buckets_cli_param}",

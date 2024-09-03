@@ -301,15 +301,14 @@ class BucketsHash:
                 self.logger.warning(f"Failed to load buckets collector {self.actor_id} with exception {e}")
                 raise e
 
-    def add_buckets(self, bck: list[tuple[int, list[int]]]) -> None:
+    def add_buckets(self, bck: list[tuple[[int, list[int]]]]) -> None:
         """
         Add additional buckets to hash
         :param bck: bucket information
         :return: None
         """
-        for bucket in bck:
-            b_hash = bucket[0]
-            self.buckets[b_hash] = self.buckets.get(b_hash, []) + bucket[1]
+        for b_hash, bucket in bck:
+            self.buckets[b_hash] = self.buckets.get(b_hash, []) + bucket
 
     def remove_docs(self, removed: set[int]) -> None:
         """

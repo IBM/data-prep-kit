@@ -70,8 +70,10 @@ class FdedupPreprocessorTransform(FdedupPreprocessorTransformBase):
         :param minhashes: minhashes
         :return: None
         """
+        # remove local duplicates
         buckets, minhashes, docs, removed = (
             self._remove_local_duplicates(buckets=buckets, minhashes=minhashes))
+        # populate cache
         self.minhashes.add_minhashes(updates=minhashes)
         self.buckets.add_buckets(bck=list(buckets.items()))
         self.docid.add_documents(dr=(list(docs.items()), removed))

@@ -25,8 +25,10 @@ from fdedup.transforms.base import (preprocessor_doc_column_name_cli_param,
 from fdedup_ray.transforms import (FdedupPreprocessorRayTransformRuntimeConfiguration,
                                    preprocessor_bucket_cpu_cli_param,
                                    preprocessor_minhash_cpu_cli_param,
+                                   preprocessor_doc_id_cpu_cli_param,
                                    preprocessor_num_buckets_cli_param,
                                    preprocessor_num_minhash_cli_param,
+                                   preprocessor_num_doc_id_cli_param
                                    )
 
 # create launcher
@@ -57,10 +59,10 @@ params = {
     preprocessor_threshold_cli_param: .8,
     preprocessor_num_buckets_cli_param: 1,
     preprocessor_bucket_cpu_cli_param: .5,
+    preprocessor_num_doc_id_cli_param: 1,
+    preprocessor_doc_id_cpu_cli_param: .5,
     preprocessor_num_minhash_cli_param: 1,
     preprocessor_minhash_cpu_cli_param: .5,
-
-
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

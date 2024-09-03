@@ -64,7 +64,7 @@ class FdedupBucketProcessorTransformBase(AbstractBinaryTransform):
             self.logger.warning(f"Failed to load buckets collector with exception {e}")
             raise UnrecoverableException("Failed to unpickle buckets")
         # save buckets
-        self._save_buckets(buckets)
+        self._save_buckets(file_name=file_name, buckets=buckets)
         # split buckets into short and long. Long buckets can take very long to process
         long_buckets = []
         short_buckets = []
@@ -105,7 +105,7 @@ class FdedupBucketProcessorTransformBase(AbstractBinaryTransform):
         """
         raise NotImplementedError
 
-    def _save_buckets(self, buckets: dict[int, list[int]]) -> None:
+    def _save_buckets(self, file_name: str, buckets: dict[int, list[int]]) -> None:
         """
         save buckets
         :param buckets: buckets

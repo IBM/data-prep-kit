@@ -19,6 +19,7 @@ from data_processing_ray.runtime.ray import RayTransformLauncher
 from fdedup.transforms.base import (bucket_processor_num_permutations_cli_param,
                                     bucket_processor_threshold_cli_param,
                                     bucket_processor_minhash_snapshot_directory_cli_param,
+                                    bucket_processor_doc_id_snapshot_directory_cli_param,
                                     )
 from fdedup_ray.transforms import (FdedupBucketProcessorRayTransformRuntimeConfiguration,
                                    bucket_processor_bucket_cpu_cli_param,
@@ -56,6 +57,7 @@ params = {
     bucket_processor_num_permutations_cli_param: 64,
     bucket_processor_threshold_cli_param: .8,
     bucket_processor_minhash_snapshot_directory_cli_param: os.path.join(basedir, "minhash"),
+    bucket_processor_doc_id_snapshot_directory_cli_param: os.path.join(basedir, "docs"),
     bucket_processor_bucket_cpu_cli_param: .5,
     bucket_processor_minhash_cpu_cli_param: .5,
     bucket_processor_docid_cpu_cli_param: .5,

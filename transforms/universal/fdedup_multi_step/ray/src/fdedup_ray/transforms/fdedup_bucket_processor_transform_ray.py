@@ -18,7 +18,7 @@ import ray
 from ray.util import ActorPool
 from ray.actor import ActorHandle
 
-from data_processing.utils import UnrecoverableException, RANDOM_SEED
+from data_processing.utils import UnrecoverableException
 from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
@@ -31,23 +31,23 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
 from fdedup.utils import DocsMinHash, DocCollector, BucketsHash, BucketsHashProcessor
 from fdedup.transforms.base import (FdedupBucketProcessorTransformBase,
                                     FdedupBucketProcessorTransformConfigurationBase,
-                                    bucket_processor_cli_prefix,
-                                    threshold_key, num_permutations_key, minhash_snapshot_directory_key)
+                                    bucket_processor_cli_prefix, buckets_cache_key,
+                                    threshold_key, num_permutations_key,
+                                    minhash_snapshot_directory_key, doc_id_snapshot_directory_key)
 from fdedup.transforms.python import processor_key
-from fdedup_ray.transforms import bucket_cpu_key, minhash_cpu_key, num_buckets_key, num_minhash_key
+from fdedup_ray.transforms import (bucket_cpu_key, minhash_cpu_key, doc_id_cpu_key,
+                                   num_buckets_key, num_doc_id_key, num_minhash_key)
 
 # configuration parameters
-docid_cpu_key = "docid_cpu"
 bucket_processor_cpu_key = "processor cpu"
-num_docid_key = "num_docid"
 num_bucket_processors_key = "num_processors"
 bucket_processor_bucket_cpu_cli_param = f"{bucket_processor_cli_prefix}{bucket_cpu_key}"
 bucket_processor_minhash_cpu_cli_param = f"{bucket_processor_cli_prefix}{minhash_cpu_key}"
-bucket_processor_docid_cpu_cli_param = f"{bucket_processor_cli_prefix}{docid_cpu_key}"
+bucket_processor_docid_cpu_cli_param = f"{bucket_processor_cli_prefix}{doc_id_cpu_key}"
 bucket_processor_processor_cpu_cli_param = f"{bucket_processor_cli_prefix}{bucket_processor_cpu_key}"
 bucket_processor_num_buckets_cli_param = f"{bucket_processor_cli_prefix}{num_buckets_key}"
 bucket_processor_num_minhash_cli_param = f"{bucket_processor_cli_prefix}{num_minhash_key}"
-bucket_processor_num_docid_cli_param = f"{bucket_processor_cli_prefix}{num_docid_key}"
+bucket_processor_num_docid_cli_param = f"{bucket_processor_cli_prefix}{num_doc_id_key}"
 bucket_processor_num_processors_cli_param = f"{bucket_processor_cli_prefix}{num_bucket_processors_key}"
 
 
@@ -126,7 +126,6 @@ class RayBucketsHashProcessor(BucketsHashProcessor):
             mn_min_hash - MurmurMH class
             threshold - threshold
             statistics - pointer to statistics
-            print_interval - print interval
         """
         super().__init__(params)
 
@@ -201,6 +200,9 @@ class FdedupBucketProcessorTransform(FdedupBucketProcessorTransformBase):
         if self.processor is None:
             self.logger.error("processor is not defined")
             raise UnrecoverableException("processor is not defined")
+        self.buckets = config.get(buckets_cache_key, None)
+        if self.buckets is None:
+            raise UnrecoverableException("buckets cache is not defined")
 
     def _submit_bucket_processing(self, buckets: list[tuple[int, list[int]]]) -> None:
         """
@@ -209,6 +211,15 @@ class FdedupBucketProcessorTransform(FdedupBucketProcessorTransformBase):
         :return: None
         """
         ray.get(self.processor.submit_for_processing.remote(buckets))
+
+    def _save_buckets(self, file_name: str, buckets: dict[int, list[int]]) -> None:
+        """
+        save buckets
+        :param buckets: buckets
+        :return: None
+        """
+        i = int(file_name[file_name.rfind("_") + 1:])
+        self.buckets[i].add_buckets.remote(list(buckets.items()))
 
 
 class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
@@ -229,11 +240,11 @@ class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
         self.num_permutations = params.get(num_permutations_key, 64)
         self.n_buckets = params.get(num_buckets_key, 1)
         self.n_minhash = params.get(num_minhash_key, 1)
-        self.n_docid = params.get(num_docid_key, 1)
+        self.n_docid = params.get(num_doc_id_key, 1)
         self.n_processors = params.get(num_bucket_processors_key, 1)
         self.bucket_cpu = params.get(bucket_cpu_key, .5)
         self.minhash_cpu = params.get(minhash_cpu_key, .5)
-        self.docid_cpu = params.get(docid_cpu_key, .5)
+        self.docid_cpu = params.get(doc_id_cpu_key, .5)
         self.processor_cpu = params.get(bucket_processor_cpu_key, .8)
 
     def get_transform_config(
@@ -256,7 +267,7 @@ class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
         if snapshot_path is None or len(snapshot_path) == 0:
             mh_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}minhash/"
         else:
-            mh_path = f"{snapshot_path}"
+            mh_path = snapshot_path
         self.minhashes = [None] * self.n_minhash
         files, retries = data_access.get_folder_files(path=mh_path)
         if retries > 0:
@@ -273,18 +284,26 @@ class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
             self.buckets[i] = ray.remote(BucketsHash).options(**{"num_cpus": self.bucket_cpu}).remote(
                 {"id": i, "data_access": data_access_factory, "snapshot": None})
         # doc collectors
+        snapshot_path = self.params.get(doc_id_snapshot_directory_key, None)
+        if snapshot_path is None or len(snapshot_path) == 0:
+            d_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}docs/"
+        else:
+            d_path = snapshot_path
         self.doc_collectors = [None] * self.n_docid
-        for i in range(self.n_docid):
+        files, retries = data_access.get_folder_files(path=d_path)
+        if retries > 0:
+            statistics.add_stats.remote({"data access retries": retries})
+        for file in files.keys():
+            i = int(file[file.rfind("_") + 1:])
             self.doc_collectors[i] = ray.remote(DocCollector).options(**{"num_cpus": self.docid_cpu}).remote(
-                {"id": i, "data_access": data_access_factory, "snapshot": None})
+                {"id": i, "data_access": data_access_factory, "snapshot": file}
+            )
         self.logger.info(f"Created {len(self.doc_collectors)} doc collectors")
         # processors
         processor_config = {"threshold": self.threshold,
                             "docs_collector": self.doc_collectors,
                             "minhash_collector": self.minhashes,
-                            "statistics": statistics,
-                            "print_interval": 100
-                            }
+                            "statistics": statistics}
         self.bucket_processors = [
             RayBucketsHashProcessor.options(**{"num_cpus": self.processor_cpu}).remote(processor_config)
             for _ in range(self.n_processors)
@@ -293,7 +312,7 @@ class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
         # invoker
         self.invoker = BucketsHashProcessorInvoker.options(**{"num_cpus": .5}).remote(self.bucket_processors)
         self.logger.info("Created processor invoker")
-        return self.params | {processor_key: self.invoker}
+        return self.params | {processor_key: self.invoker, buckets_cache_key: self.buckets}
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
         """

@@ -45,7 +45,7 @@ num_bands_key = "num_bands"
 length_band_key = "length_band"
 buckets_cache_key = "buckets_cache"
 minhashes_cache_key = "minhashes_cache"
-doc_id_snapshot_directory_key = "docid_snapshot_directory"
+doc_id_snapshot_directory_key = "doc_id_snapshot_directory"
 
 preprocessor_doc_column_name_cli_param = f"{preprocessor_cli_prefix}{doc_column_name_key}"
 preprocessor_int_column_name_cli_param = f"{preprocessor_cli_prefix}{int_column_name_key}"

@@ -51,7 +51,7 @@ params = {
     filter_int_column_name_cli_param: "Unnamed: 0",
     filter_cluster_column_name_cli_param: "cluster",
     filter_removed_docs_column_name_cli_param: "removed",
-    filter_doc_id_snapshot_directory_cli_param: os.path.join(input_folder, "snapshot/docs"),
+    filter_doc_id_snapshot_directory_cli_param: os.path.join(input_folder, "../bucket_processor/snapshot/docs"),
     filter_docid_cpu_cli_param: .5,
     filter_num_docid_cli_param: 1,
 }
