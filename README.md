@@ -29,6 +29,7 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 - [Scaling transforms from laptop to cluster](#laptop_cluster)
 - [Repository Use and Navigation](doc/repo.md)
 - [How to Contribute](CONTRIBUTING.md)
+- [Papers and Talks](#talks_papers)
 
 ## &#x1F4D6; About <a name = "about"></a>
 Data Prep Kit is a toolkit for streamlining data preparation for developers looking to build LLM-enabled applications via fine-tuning, RAG or instruction-tuning.
@@ -166,7 +167,7 @@ When you finish working with the cluster, and want to clean up or destroy it. Se
 You can run transforms via docker image or using virtual environments. This [document](doc/quick-start/run-transform-venv.md) shows how to run a transform using virtual environment. You can follow this [document](doc/quick-start/run-transform-image.md) to run using docker image. 
 
 
-## Talks and Papers
+## Talks and Papers <a name = "talks_papers"></a>
 1. [Granite Code Models: A Family of Open Foundation Models for Code Intelligence](https://arxiv.org/abs/2405.04324)
 2. [Scaling Granite Code Models to 128K Context](https://arxiv.org/abs/2407.13739)
 3. Talk on "Building Successful LLM Apps: The Power of high quality data" [Video](https://www.youtube.com/watch?v=u_2uiZBBVIE) Slides(TBA)
