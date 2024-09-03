@@ -136,17 +136,17 @@ For a new module to be added, a user can pick the right design based on the proc
 
 One can add new transforms by bringing in Python-based processing logic and using the Data Processing Library to build and contribute transforms. We have provided an [example transform](transforms/universal/noop) that can serve as a template to add new simple transforms. One can follow the step by step [tutorial](data-processing-lib/doc/simplest-transform-tutorial.md) to help you add your own new transform. For more details, we encourage the reader to go through the [architectural overview](../../data-processing-lib/doc/overview.md) for the details on [transforms](../../data-processing-lib/doc/transforms.md) and [runtimes](../../data-processing-lib/doc/transform-runtimes.md). More details on the data processing library are [here](data-processing-lib/doc/overview.md). 
 
-#### Scaling of Transforms
+Additionally, you can explore our [video](https://www.youtube.com/watch?v=0WUMG6HIgMg) that provide a step-by-step, example-driven tutorial on how to add a new module. 
+
+## From laptop to cluster
+Data-prep-kit provides the flexibility to transition your projects from proof-of-concept (PoC) stage to full-scale production mode, offering all the necessary tools to run your data transformations at high volume. In this section, we enable you how to run your transforms at scale and how to automate them. 
+
+### Scaling of Transforms
 To enable processing of large data volumes leveraging multi-mode clusters, [Ray](https://docs.ray.io/en/latest/index.html) 
 or [Spark](https://spark.apache.org) wrappers are provided, to readily scale out the Python implementations.
 A generalized workflow is shown [here](doc/data-processing.md).
 
-#### Bring Your Own Transform 
-One can add new transforms by bringing in Python-based processing logic and using the Data Processing Library to build and contribute transforms. We have provided an [example transform](transforms/universal/noop) that can serve as a template to add new simple transforms. 
-
-More details on the data processing library are [here](data-processing-lib/doc/overview.md). 
-
-#### Automation
+### Automation
 The toolkit also supports transform execution automation based on 
 [Kubeflow pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) (KFP),
 tested on a locally deployed [Kind cluster](https://kind.sigs.k8s.io/) and external OpenShift clusters. There is an 
@@ -162,8 +162,17 @@ In addition, if you want to combine several transformers in a single pipeline, y
 When you finish working with the cluster, and want to clean up or destroy it. See the 
 [clean up the cluster](kfp/doc/setup.md#cleanup)
 
-## Acknowledgements <a name = "acknowledgement"></a>
-Thanks to the [BigCode Project](https://github.com/bigcode-project), which served as the source for borrowing few code quality metrics.
+### Run your first transform using command line options
+
+You can run transforms via docker image or using virtual environments. This [document](doc/quick-start/run-transform-venv.md) shows how to run a transform using virtual environment. You can follow this [document](doc/quick-start/run-transform-image.md) to run using docker image. 
+
+
+## Talks and Papers
+1. [Granite Code Models: A Family of Open Foundation Models for Code Intelligence](https://arxiv.org/abs/2405.04324)
+2. [Scaling Granite Code Models to 128K Context](https://arxiv.org/abs/2407.13739)
+3. Talk on "Building Successful LLM Apps: The Power of high quality data" to students across 40+ universities. [Video](https://www.youtube.com/watch?v=u_2uiZBBVIE) Slides(TBA)
+4. Talk on "Hands on session for fine tuning LLMs" [Video](https://www.youtube.com/watch?v=VEHIA3E64DM)
+5. Talk on "Build your own data preparation module using data-prep-kit" [Video](https://www.youtube.com/watch?v=0WUMG6HIgMg)
 
 
 
