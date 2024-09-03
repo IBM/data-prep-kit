@@ -1,53 +1,66 @@
 # Quick Start for Data Prep Kit 
 Here we provided short examples of various uses of the Data Prep Kit. Most users who want to jump right in can use standard pip install to deploy the data-prep-kit and the python or ray transforms to their virtual python environment. 
 
-- When setting up a virtual environment it is recommended to use python3.11 as in the example below using conda. 
+When setting up a __virtual environment__ it is recommended to use __python3.11__ as in the example below using conda. 
+
+**setup a virtual environment (example using conda)**
+
+```shell
+conda create -n data-prep-kit-1 -y python=3.11
+```
+
+**Install the gcc/g++ that is required while building fastext:**
+
+```shell
+conda install gcc_linux-64
+conda install gxx_linux-64
+```
 
 
-    - setup a virtual environment (example using conda)
- \
-        `conda create -n data-prep-kit-1 -y python=3.11`
- 
+**activate the new conda environment**
 
-    - Install the gcc/g++ that is required while building fastext:
-\
-        `conda install gcc_linux-64`
-\
-        `conda install gxx_linux-64`
+```shell
+conda activate data-prep-kit-1
+```
 
+make sure env is switched to data-prep-kit-1 and Check python version.
 
-    - activate the new conda environment
-\
-        `conda activate data-prep-kit-1`
+```shell
+python --version
+The command above should say: 3.11
+```
 
+**install jupyter lab**
 
-    - make sure env is switched to data-prep-kit-1 and Check python version.
-\
-        `python --version`
-\
-        The command above should say: 3.11
+```shell
+pip3 install jupyterlab
+``` 
 
-
-    - install jupyter lab
-\
-        `pip3 install jupyterlab`
- 
 then
-- Deploy the latest release of the data prep toolkit library
 
-    `pip3 install data-prep-toolkit`
+**Deploy the latest release of the data prep toolkit library**
 
-    or 
--  Deploy the latest releases of the data prep toolkit library and all python transforms
+```shell
+pip3 install data-prep-toolkit
+```
 
-    `pip3 install data-prep-toolkit-transforms`
-
-    or 
--  Deploy the latest releases of the data prep toolkit library, all python transforms and all ray transforms
-
-    `pip3 install data-prep-toolkit-transforms-ray`
+or 
 
 
+**Deploy the latest releases of the data prep toolkit library and all python transforms**
+
+```shell
+pip3 install data-prep-toolkit-transforms
+```
+
+or 
+
+
+**Deploy the latest releases of the data prep toolkit library, all python transforms and all ray transforms**
+
+```shell
+pip3 install data-prep-toolkit-transforms-ray
+```
 
 ## Running transforms 
 
