@@ -138,7 +138,7 @@ One can add new transforms by bringing in Python-based processing logic and usin
 
 Additionally, you can explore our [video](https://www.youtube.com/watch?v=0WUMG6HIgMg) that provide a step-by-step, example-driven tutorial on how to add a new module. 
 
-## From laptop to cluster <a name = "laptop_cluster"></a>
+## 💻 -> 🖥️☁️ From laptop to cluster <a name = "laptop_cluster"></a>
 Data-prep-kit provides the flexibility to transition your projects from proof-of-concept (PoC) stage to full-scale production mode, offering all the necessary tools to run your data transformations at high volume. In this section, we enable you how to run your transforms at scale and how to automate them. 
 
 ### Scaling of Transforms
@@ -167,7 +167,7 @@ When you finish working with the cluster, and want to clean up or destroy it. Se
 You can run transforms via docker image or using virtual environments. This [document](doc/quick-start/run-transform-venv.md) shows how to run a transform using virtual environment. You can follow this [document](doc/quick-start/run-transform-image.md) to run using docker image. 
 
 
-## Talks and Papers <a name = "talks_papers"></a>
+## 🎤 + 📄 Talks and Papers <a name = "talks_papers"></a>
 1. [Granite Code Models: A Family of Open Foundation Models for Code Intelligence](https://arxiv.org/abs/2405.04324)
 2. [Scaling Granite Code Models to 128K Context](https://arxiv.org/abs/2407.13739)
 3. Talk on "Building Successful LLM Apps: The Power of high quality data" [Video](https://www.youtube.com/watch?v=u_2uiZBBVIE) Slides(TBA)
