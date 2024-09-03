@@ -2,11 +2,8 @@
 Our project welcomes external contributions. If you have an itch, please feel
 free to scratch it.
 
-To contribute code or documentation, please submit a pull request. 
-
-A good way to familiarize yourself with the codebase and contribution process is
-to look for and tackle low-hanging fruit in the issues. 
-Before embarking on a more ambitious contribution, please quickly [get in touch](#communication) with us.
+To contribute code or documentation, please submit a pull request. You can get started with open issues with the label - good first issue. 
+Before embarking on a more ambitious contribution, please quickly get in touch with us via raising an issue.
 
 **Note: We appreciate your effort, and want to avoid a situation where a contribution
 requires extensive rework (by you or by us), sits in backlog for a long time, or
@@ -14,14 +11,14 @@ cannot be accepted at all!**
 
 ### Proposing new features
 
-If you would like to implement a new feature, please raise an issue.
+If you would like to implement a new feature, please raise an issue, 
 before sending a pull request so the feature can be discussed. This is to avoid
 you wasting your valuable time working on a feature that the project developers
 are not interested in accepting into the code base.
 
 ### Fixing bugs
 
-If you would like to fix a bug, please raise an issue before sending a
+If you would like to fix a bug, please raise an issue, before sending a
 pull request so it can be tracked.
 
 ### Merge approval
@@ -71,18 +68,6 @@ and include flag `-s | --sign-off` when you commit a change to your local git re
 
 ```
 git commit -s -m "your commit message"
-```
-
-## Overall Setup
-Please install Python 3.10 or 3.11, then 
-
-```
-git clone git@github.com:IBM/data-prep-kit.git
-cd data-prep-kit 
-pip install pre-commit
-pip install twine
-pre-commit install
-make help 
 ```
 
 ## Transform Setup and Testing

@@ -1,5 +1,5 @@
 [project]
-name = "dpk_docid_transform_python"
+name = "dpk_doc_id_transform_python"
 version = "0.2.1.dev0"
 requires-python = ">=3.10"
 description = "ededup Python Transform"

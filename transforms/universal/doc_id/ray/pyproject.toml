@@ -1,5 +1,5 @@
 [project]
-name = "dpk_docid_transform_ray"
+name = "dpk_doc_id_transform_ray"
 version = "0.2.1.dev0"
 requires-python = ">=3.10"
 description = "docid Ray Transform"
@@ -10,7 +10,7 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
 dependencies = [
-    "dpk_docid_transform_python==0.2.1.dev0",
+    "dpk_doc_id_transform_python==0.2.1.dev0",
     "data-prep-toolkit-ray==0.2.1.dev0"
 ]
 

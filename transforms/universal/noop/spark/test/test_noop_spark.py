@@ -29,19 +29,26 @@ class TestSparkNOOPTransform(AbstractSparkTransformLauncherTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        proj_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        basedir = os.path.join(proj_dir, "test-data")
-        config_file_path = os.path.join(proj_dir, "config", "spark_profile_local.yml")
+
+        src_file_dir = os.path.abspath(os.path.dirname(__file__))
         fixtures = []
+
         launcher = SparkTransformLauncher(NOOPSparkRuntimeConfiguration())
+        input_dir = os.path.join(src_file_dir, "../test-data/input")
+        expected_dir = os.path.join(src_file_dir, "../test-data/expected")
+        config_file_path = os.path.join(src_file_dir, "../config/spark_profile_local.yml")
+        runtime_config = {local_config_path_cli: config_file_path}
+        transform_config = {sleep_cli_param: 0}
         fixtures.append(
             (
                 launcher,
-                {sleep_cli_param: 0, local_config_path_cli: config_file_path},
-                basedir + "/input",
-                basedir + "/expected",
+                transform_config | runtime_config,
+                input_dir,
+                expected_dir,
+                [],  # optional list of column names to ignore in comparing test-generated with expected.
             )
         )
+
         return fixtures
 
     def _validate_metadata_content(self, test_generated: dict, expected: dict, ignore_columns: list[str] = []):
