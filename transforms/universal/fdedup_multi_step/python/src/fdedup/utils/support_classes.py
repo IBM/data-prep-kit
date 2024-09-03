@@ -311,6 +311,14 @@ class BucketsHash:
             b_hash = bucket[0]
             self.buckets[b_hash] = self.buckets.get(b_hash, []) + bucket[1]
 
+    def remove_docs(self, removed: set[int]) -> None:
+        """
+        Remove removed documents
+        :param removed: set of removed documents
+        :return: None
+        """
+        self.buckets = remove_docs_buckets(buckets=self.buckets, removed=removed)
+
     def snapshot(self) -> None:
         """
         Snapshot itself
@@ -405,7 +413,8 @@ class BucketsHashProcessor:
             hashes = self._get_minhashes_docs(bucket)
             b_docs, b_removed = (
                 process_buckets_locally(b_hash=b_hash, bucket=bucket, minhashes=hashes, threshold=self.threshold))
-            docs, removed = merge_doc_ids(current_ids=docs, current_removed=removed, new_ids=b_docs, new_removed=b_removed)
+            docs, removed = (
+                merge_doc_ids(current_ids=docs, current_removed=removed, new_ids=b_docs, new_removed=b_removed))
             if very_long:
                 self.logger.info(
                     f"Processed long ({bucket_len}) bucket in {round((time.time() - start) / 60.,3)} min ")
@@ -496,3 +505,19 @@ def merge_doc_ids(current_ids: dict[int, tuple[int, int]], current_removed: set[
         else:
             current_ids[key] = val
     return current_ids, current_removed
+
+
+def remove_docs_buckets(buckets: dict[int, list[int]], removed: set[int]) -> dict[int, list[int]]:
+    """
+    Remove removed documents from buckets
+    :param buckets: buckets dictionary
+    :param removed: removed documents set
+    :return: buckets without removed docs
+    """
+    for key in buckets.keys():
+        value = [e for e in buckets[key] if e not in removed]
+        if len(value) == 0:
+            buckets.pop(key, None)
+        else:
+            buckets[key] = value
+    return buckets

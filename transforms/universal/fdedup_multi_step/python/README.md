@@ -22,13 +22,16 @@ Each of the steps has its own configuration options
 * _threshold_ -specifies threshold for Jaccardi distance comparison (default .8)
 * _shingles_size_ - specifies number of worgs per shingle (default 5)
 * _delimiter_ - specifies delimiter for word splitting(default "")
-* _use_snapshot_ - specifies flag to continue from snapshot (default False)
+* _minhash_snapshot_directory_ - specifies minhash snapshot directory (default - None)
+* _buckets_snapshot_directory_ - specifies buckets snapshot directory (default - None)
+* _docid_snapshot_directory_ - specifies doc id snapshot directory (default - None)
 
 ### Bucket processor
 
 * _num_permutations_ - specifies number of permutations for fuzzy dedup (default 64. Has to be the same as in preprocessing)
 * _threshold_ -specifies threshold for Jaccardi distance comparison (default .8. Has to be the same as in preprocessing)
-* _minhash_snapshot_directory_ - specifies directory for minhash snapshots (default None. in this case use "output/snapshot/minhash")
+* _minhash_snapshot_directory_ - specifies location of minhash snapshot files (default `output/snapshot/minhash`)
+* _docid_snapshot_directory_ - specifies location of doc id snapshot files (default `output/snapshot/docs`)
 
 ### Filter
 
@@ -36,7 +39,7 @@ Each of the steps has its own configuration options
 * _doc_id_column_ - specifies the name of the column containing a document id (default "int_document_id". Has to be the same as in preprocessing)
 * _cluster_column_ - specifies the name of the `cluster` column (default "cluster")
 * _removed_docs_column_ - specifies the name of the `removed docs` column (default "removed". Note that only the first row has values, the rest are empty arrays)
-* _docid_snapshot_directory_ - specifies directory for doc_id snapshots (default None. in this case use "output/snapshot/docs")
+* _docid_snapshot_directory_ - specifies directory for doc_id snapshots (default `output/snapshot/docs`)
 
 
 ## Launch Command Line Options 
@@ -48,7 +51,7 @@ They are different for different steps'
 ### Preprocessor
 
 ```
-  --fdedup_preprocessor_doc_column FDEDUP_PREPROCESSOR_DOC_COLUMN
+ --fdedup_preprocessor_doc_column FDEDUP_PREPROCESSOR_DOC_COLUMN
                         document column name
   --fdedup_preprocessor_doc_id_column FDEDUP_PREPROCESSOR_DOC_ID_COLUMN
                         integer document id column name
@@ -60,19 +63,25 @@ They are different for different steps'
                         number of words in shingle
   --fdedup_preprocessor_delimiter FDEDUP_PREPROCESSOR_DELIMITER
                         delimiter for splitting document
-  --fdedup_preprocessor_use_snapshot FDEDUP_PREPROCESSOR_USE_SNAPSHOT
-                        flag to continue from snapshot
+  --fdedup_preprocessor_minhash_snapshot_directory FDEDUP_PREPROCESSOR_MINHASH_SNAPSHOT_DIRECTORY
+                        minhash snapshot directory
+  --fdedup_preprocessor_buckets_snapshot_directory FDEDUP_PREPROCESSOR_BUCKETS_SNAPSHOT_DIRECTORY
+                        buckets snapshot directory
+  --fdedup_preprocessor_docid_snapshot_directory FDEDUP_PREPROCESSOR_DOCID_SNAPSHOT_DIRECTORY
+                        doc id snapshot directory
 ```
 
 ### Bucket processor
 
-```
+```  
   --fdedup_bucket_processor_num_permutations FDEDUP_BUCKET_PROCESSOR_NUM_PERMUTATIONS
                         number of permutations
   --fdedup_bucket_processor_threshold FDEDUP_BUCKET_PROCESSOR_THRESHOLD
                         threshold
-  ----fdedup_bucket_processor_minhash_snapshot_directory FDEDUP_BUCKET_PROCESSOR_MINHASH_SNAPSHOT_DIRECTORY
+  --fdedup_bucket_processor_minhash_snapshot_directory FDEDUP_BUCKET_PROCESSOR_MINHASH_SNAPSHOT_DIRECTORY
                         location of minhash snapshot files
+  --fdedup_bucket_processor_docid_snapshot_directory FDEDUP_BUCKET_PROCESSOR_DOCID_SNAPSHOT_DIRECTORY
+                        location of doc id snapshot files
 ```
 
 ### Filter

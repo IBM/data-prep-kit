@@ -10,6 +10,7 @@ from fdedup.transforms.base.fdedup_preprocessor_transform_base import (
     num_permutations_key,
     minhash_snapshot_directory_key,
     buckets_snapshot_directory_key,
+    doc_id_snapshot_directory_key,
     doc_column_name_key,
     int_column_name_key,
     shingles_size_key,
@@ -22,7 +23,8 @@ from fdedup.transforms.base.fdedup_preprocessor_transform_base import (
     preprocessor_threshold_cli_param,
     shingles_size_cli_param,
     preprocessor_minhash_snapshot_directory_cli_param,
-    preprocessor_buckets_snapshot_directory_cli_param
+    preprocessor_docid_snapshot_directory_cli_param,
+    preprocessor_buckets_snapshot_directory_cli_param,
 )
 
 from fdedup.transforms.base.fdedup_bucket_processor_transform_base import (
@@ -33,6 +35,7 @@ from fdedup.transforms.base.fdedup_bucket_processor_transform_base import (
     bucket_processor_threshold_cli_param,
     bucket_processor_num_permutations_cli_param,
     bucket_processor_minhash_snapshot_directory_cli_param,
+    bucket_processor_doc_id_snapshot_directory_cli_param,
 )
 
 from fdedup.transforms.base.fdedup_filter_transform_base import (
@@ -40,7 +43,6 @@ from fdedup.transforms.base.fdedup_filter_transform_base import (
     FdedupFilterTransformConfigurationBase,
     cluster_column_name_key,
     removed_docs_column_name_key,
-    doc_id_snapshot_directory_key,
     doc_id_cache_key,
     filter_cli_prefix,
     filter_doc_column_name_cli_param,

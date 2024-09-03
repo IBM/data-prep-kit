@@ -39,7 +39,7 @@ class TestPythonFdedupPreprocessorTransform(AbstractTransformLauncherTest):
                   filter_int_column_name_cli_param: "Unnamed: 0",
                   filter_cluster_column_name_cli_param: "cluster",
                   filter_removed_docs_column_name_cli_param: "removed",
-                  filter_doc_id_snapshot_directory_cli_param: os.path.join(basedir, "input/snapshot/docs"),
+                  filter_doc_id_snapshot_directory_cli_param: os.path.join(basedir, "bucket_processor/snapshot/docs"),
 
                       }
         return [(launcher, config, basedir + "/input", basedir + "/filter")]

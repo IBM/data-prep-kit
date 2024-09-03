@@ -20,6 +20,7 @@ from data_processing.test_support.launch.transform_test import (
 from fdedup.transforms.base import (bucket_processor_num_permutations_cli_param,
                                     bucket_processor_threshold_cli_param,
                                     bucket_processor_minhash_snapshot_directory_cli_param,
+                                    bucket_processor_doc_id_snapshot_directory_cli_param,
                                     )
 from fdedup.transforms.python import FdedupBucketProcessorPythonTransformRuntimeConfiguration
 
@@ -38,5 +39,6 @@ class TestPythonFdedupBucketProcessorTransform(AbstractTransformLauncherTest):
                   bucket_processor_num_permutations_cli_param: 64,
                   bucket_processor_threshold_cli_param: .8,
                   bucket_processor_minhash_snapshot_directory_cli_param: os.path.join(basedir, "input/snapshot/minhash"),
+                  bucket_processor_doc_id_snapshot_directory_cli_param: os.path.join(basedir, "input/snapshot/docs"),
                   }
         return [(launcher, config, basedir + "/input/snapshot/buckets", basedir + "/bucket_processor")]

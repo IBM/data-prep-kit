@@ -15,11 +15,11 @@ from typing import Tuple
 
 from data_processing.test_support import get_files_in_folder
 from data_processing.data_access import DataAccessFactory
-from data_processing.utils import RANDOM_SEED
 from data_processing.test_support.transform import AbstractBinaryTransformTest
 from data_processing.transform import TransformStatistics
-from fdedup.utils import DocsMinHash, DocCollector
+from fdedup.utils import BucketsHash, DocsMinHash, DocCollector
 from fdedup.transforms.python import PythonBucketsHashProcessor, FdedupBucketProcessorTransform, processor_key
+from fdedup.transforms.base import buckets_cache_key
 
 
 class TestFdedupPreprocessorTransform(AbstractBinaryTransformTest):
@@ -36,14 +36,16 @@ class TestFdedupPreprocessorTransform(AbstractBinaryTransformTest):
         data_access_factory = DataAccessFactory()
         minhashes = DocsMinHash({"id": 0, "data_access": data_access_factory,
                                  "snapshot": os.path.join(basedir, "snapshot/minhash/minhash_collector_0")})
-        doc_collector = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": None})
+        doc_collector = DocCollector({"id": 0, "data_access": data_access_factory,
+                                      "snapshot": os.path.join(basedir, "snapshot/docs/doc_collector_0")})
+        buckets = BucketsHash({"id": 0, "data_access": data_access_factory, "snapshot": None})
         bucket_processor = PythonBucketsHashProcessor({"threshold": .8,
                                                        "docs_collector": doc_collector,
                                                        "minhash_collector": minhashes,
                                                        "statistics": TransformStatistics(),
                                                        "print_interval": 10})
-        fdedup_params = {processor_key: bucket_processor}
-        expected_metadata_list = [{'long buckets': 0, 'short buckets': 3}, {}]
+        fdedup_params = {processor_key: bucket_processor, buckets_cache_key: buckets}
+        expected_metadata_list = [{'long buckets': 0, 'short buckets': 15}, {}]
         return [
             (FdedupBucketProcessorTransform(fdedup_params), input_files, [], expected_metadata_list),
         ]

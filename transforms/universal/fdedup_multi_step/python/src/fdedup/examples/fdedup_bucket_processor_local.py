@@ -13,10 +13,11 @@
 import os
 
 from data_processing.data_access import DataAccessFactory
-from data_processing.utils import RANDOM_SEED
 from data_processing.transform import TransformStatistics
-from fdedup.utils import DocsMinHash, DocCollector
-from fdedup.transforms.python import PythonBucketsHashProcessor, FdedupBucketProcessorTransform, processor_key
+from fdedup.utils import DocsMinHash, DocCollector, BucketsHash
+from fdedup.transforms.python import (PythonBucketsHashProcessor, FdedupBucketProcessorTransform,
+                                      processor_key,)
+from fdedup.transforms.base import buckets_cache_key
 
 
 # create parameters
@@ -32,13 +33,15 @@ data_access_factory = DataAccessFactory()
 data_access_factory.apply_input_params({"data_local_config": local_conf})
 minhashes = DocsMinHash({"id": 0, "data_access": data_access_factory,
                          "snapshot": os.path.join(basedir, "snapshot/minhash/minhash_collector_0")})
-doc_collector = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": None})
+doc_collector = DocCollector({"id": 0, "data_access": data_access_factory,
+                              "snapshot": os.path.join(basedir, "snapshot/docs/doc_collector_0")})
+buckets = BucketsHash({"id": 0, "data_access": data_access_factory, "snapshot": None})
 bucket_processor = PythonBucketsHashProcessor({"threshold": .8,
                                                "docs_collector": doc_collector,
                                                "minhash_collector": minhashes,
                                                "statistics": TransformStatistics(),
                                                "print_interval": 10})
-fdedup_params = {processor_key: bucket_processor}
+fdedup_params = {processor_key: bucket_processor, buckets_cache_key: buckets}
 
 if __name__ == "__main__":
     # Create and configure the transform.
@@ -49,3 +52,4 @@ if __name__ == "__main__":
     # Transform the buckets file
     _, metadata = transform.transform_binary(file_name=f_name, byte_array=bucket)
     print(f"Metadata {metadata}")
+

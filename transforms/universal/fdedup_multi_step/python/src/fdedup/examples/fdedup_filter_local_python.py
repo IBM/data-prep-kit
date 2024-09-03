@@ -45,7 +45,7 @@ params = {
     filter_int_column_name_cli_param: "Unnamed: 0",
     filter_cluster_column_name_cli_param: "cluster",
     filter_removed_docs_column_name_cli_param: "removed",
-    filter_doc_id_snapshot_directory_cli_param: os.path.join(input_folder, "snapshot/docs"),
+    filter_doc_id_snapshot_directory_cli_param: os.path.join(input_folder, "../bucket_processor/snapshot/docs"),
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

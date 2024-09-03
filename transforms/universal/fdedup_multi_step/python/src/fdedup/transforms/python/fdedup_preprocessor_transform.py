@@ -20,13 +20,14 @@ from data_processing.runtime.pure_python import (DefaultPythonTransformRuntime,
                                                  PythonTransformLauncher,
                                                  PythonTransformRuntimeConfiguration
                                                  )
-from fdedup.utils import BucketsHash, DocsMinHash, MurmurMH, fuzzy_optimal_param
+from fdedup.utils import BucketsHash, DocCollector, DocsMinHash, MurmurMH, fuzzy_optimal_param
 from fdedup.transforms.base import (FdedupPreprocessorTransformBase,
                                     FdedupPreprocessorTransformConfigurationBase,
                                     buckets_cache_key, minhashes_cache_key, mn_min_hash_key,
-                                    threshold_key, num_permutations_key,
+                                    doc_id_cache_key, threshold_key, num_permutations_key,
                                     num_bands_key, length_band_key,
-                                    buckets_snapshot_directory_key, minhash_snapshot_directory_key)
+                                    buckets_snapshot_directory_key, minhash_snapshot_directory_key,
+                                    doc_id_snapshot_directory_key)
 
 
 class FdedupPreprocessorTransform(FdedupPreprocessorTransformBase):
@@ -45,6 +46,7 @@ class FdedupPreprocessorTransform(FdedupPreprocessorTransformBase):
             length_band band length
             buckets - bucket class
             minhashes - minhash class
+            docid - docid class
             delimiter - delimiter
         """
         # superclass initialization
@@ -55,6 +57,9 @@ class FdedupPreprocessorTransform(FdedupPreprocessorTransformBase):
         self.minhashes = config.get(minhashes_cache_key, None)
         if self.minhashes is None:
             raise UnrecoverableException("minhashes cache is not defined")
+        self.docid = config.get(doc_id_cache_key, None)
+        if self.docid is None:
+            raise UnrecoverableException("doc id cache is not defined")
 
     def _submit_buckets_minhashes(
             self, buckets: dict[int, list[int]], minhashes: list[tuple[int, int, np.array]]
@@ -65,8 +70,11 @@ class FdedupPreprocessorTransform(FdedupPreprocessorTransformBase):
         :param minhashes: minhashes
         :return: None
         """
+        buckets, minhashes, docs, removed = (
+            self._remove_local_duplicates(buckets=buckets, minhashes=minhashes))
         self.minhashes.add_minhashes(updates=minhashes)
         self.buckets.add_buckets(bck=list(buckets.items()))
+        self.docid.add_documents(dr=(list(docs.items()), removed))
 
 
 class FdedupPreprocessorRuntime(DefaultPythonTransformRuntime):
@@ -79,11 +87,13 @@ class FdedupPreprocessorRuntime(DefaultPythonTransformRuntime):
         super().__init__(params=params)
         self.buckets = None
         self.minhashes = None
+        self.docid = None
         self.logger = get_logger(__name__)
         self.threshold = params.get(threshold_key, 0.8)
         self.num_permutations = params.get(num_permutations_key, 64)
         self.minhash_directory = params.get(minhash_snapshot_directory_key, None)
         self.buckets_directory = params.get(buckets_snapshot_directory_key, None)
+        self.docid_directory = params.get(doc_id_snapshot_directory_key, None)
 
     def get_transform_config(
             self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics, files: list[str]
@@ -118,11 +128,16 @@ class FdedupPreprocessorRuntime(DefaultPythonTransformRuntime):
         else:
             # restarting from snapshot
             b_path = self.buckets_directory
+        if self.docid_directory is None or len(self.docid_directory) == 0:
+            d_path = None
+        else:
+            d_path = self.docid_directory
         self.minhashes = DocsMinHash({"id": 0, "data_access": data_access_factory, "snapshot": mh_path})
         self.buckets = BucketsHash({"id": 0, "data_access": data_access_factory, "snapshot": b_path})
+        self.docid = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": d_path})
         return self.params | {num_bands_key: num_buckets, length_band_key: length_bucket,
                               mn_min_hash_key: mn_min_hash, minhashes_cache_key: self.minhashes,
-                              buckets_cache_key: self.buckets}
+                              buckets_cache_key: self.buckets, doc_id_cache_key: self.docid}
 
     def compute_execution_stats(self, stats: TransformStatistics) -> None:
         """
@@ -133,10 +148,14 @@ class FdedupPreprocessorRuntime(DefaultPythonTransformRuntime):
         # compute and add additional statistics
         b_size, b_memory = self.buckets.get_size()
         m_size, m_memory = self.minhashes.get_size()
+        d_size, d_memory, r_size, r_memory = self.docid.get_size()
         stats.add_stats({"number of buckets": b_size, "bucket memory, GB": b_memory,
-                         "number of minhashes": m_size, "minhashes memory, GB": m_memory})
+                         "number of minhashes": m_size, "minhashes memory, GB": m_memory,
+                         "number of docs": d_size, "docs_memory, GB": d_memory,
+                         "number of removed": r_size, "removed_memory, GB": r_memory})
         self.buckets.snapshot()
         self.minhashes.snapshot()
+        self.docid.snapshot()
 
 
 class FdedupPreprocessorTransformConfiguration(FdedupPreprocessorTransformConfigurationBase):

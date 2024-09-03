@@ -20,14 +20,13 @@ from data_processing.utils import (
     TransformUtils,
 )
 from data_processing.utils import UnrecoverableException
-from fdedup.transforms.base import doc_column_name_key, int_column_name_key
+from fdedup.transforms.base import doc_column_name_key, int_column_name_key, doc_id_snapshot_directory_key
 
 # configuration parameters
 short_name = "fdedup_filter"
 filter_cli_prefix = f"{short_name}_"
 cluster_column_name_key = "cluster_column"
 removed_docs_column_name_key = "removed_docs_column"
-doc_id_snapshot_directory_key = "docid_snapshot_directory"
 doc_id_cache_key = "doc_id_cache"
 
 filter_doc_column_name_cli_param = f"{filter_cli_prefix}{doc_column_name_key}"

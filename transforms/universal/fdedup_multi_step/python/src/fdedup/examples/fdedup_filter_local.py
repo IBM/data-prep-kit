@@ -33,7 +33,7 @@ local_conf = {
 
 data_access_factory = DataAccessFactory()
 data_access_factory.apply_input_params({"data_local_config": local_conf})
-id_file = os.path.join(input_folder, "snapshot/docs/doc_collector_0")
+id_file = os.path.join(input_folder, "../bucket_processor/snapshot/docs/doc_collector_0")
 doc_collector = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": id_file})
 fdedup_params = {doc_column_name_key: "contents", int_column_name_key: "Unnamed: 0",
                  cluster_column_name_key: "cluster", removed_docs_column_name_key: "removed",

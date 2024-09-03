@@ -16,7 +16,8 @@ from typing import Any
 
 from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
 from data_processing.utils import UnrecoverableException, CLIArgumentProvider
-from fdedup.transforms.base import threshold_key, num_permutations_key, minhash_snapshot_directory_key
+from fdedup.transforms.base import (threshold_key, num_permutations_key,
+                                    minhash_snapshot_directory_key, doc_id_snapshot_directory_key)
 
 # configuration parameters
 short_name = "fdedup_bucket_processor"
@@ -25,6 +26,8 @@ bucket_processor_num_permutations_cli_param = f"{bucket_processor_cli_prefix}{nu
 bucket_processor_threshold_cli_param = f"{bucket_processor_cli_prefix}{threshold_key}"
 bucket_processor_minhash_snapshot_directory_cli_param = \
     f"{bucket_processor_cli_prefix}{minhash_snapshot_directory_key}"
+bucket_processor_doc_id_snapshot_directory_cli_param = \
+    f"{bucket_processor_cli_prefix}{doc_id_snapshot_directory_key}"
 
 # Execution parameter
 LONG_BUCKET = 5000
@@ -43,7 +46,6 @@ class FdedupBucketProcessorTransformBase(AbstractBinaryTransform):
         from data_processing.utils import get_logger
         self.logger = get_logger(__name__)
         super().__init__(config)
-        self.buckets = None
 
     def transform_binary(self, file_name: str, byte_array: bytes) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
@@ -57,15 +59,17 @@ class FdedupBucketProcessorTransformBase(AbstractBinaryTransform):
         """
         self.logger.debug(f"Processing file {file_name}")
         try:
-            self.buckets = pickle.loads(byte_array)
+            buckets = pickle.loads(byte_array)
         except Exception as e:
             self.logger.warning(f"Failed to load buckets collector with exception {e}")
             raise UnrecoverableException("Failed to unpickle buckets")
+        # save buckets
+        self._save_buckets(buckets)
         # split buckets into short and long. Long buckets can take very long to process
         long_buckets = []
         short_buckets = []
-        while len(self.buckets) > 0:
-            b_hash, bucket = self.buckets.popitem()
+        while len(buckets) > 0:
+            b_hash, bucket = buckets.popitem()
             if len(bucket) > LONG_BUCKET:
                 # It is long
                 if len(bucket) > 2 * LONG_BUCKET:
@@ -101,6 +105,14 @@ class FdedupBucketProcessorTransformBase(AbstractBinaryTransform):
         """
         raise NotImplementedError
 
+    def _save_buckets(self, buckets: dict[int, list[int]]) -> None:
+        """
+        save buckets
+        :param buckets: buckets
+        :return: None
+        """
+        raise NotImplementedError
+
 
 class FdedupBucketProcessorTransformConfigurationBase(TransformConfiguration):
     """
@@ -131,13 +143,19 @@ class FdedupBucketProcessorTransformConfigurationBase(TransformConfiguration):
             default=0.8,
             help="threshold"
         )
-        # by default, snapshot file is from the output directory. This parameter can overwrite
+        # by default, snapshot file is from the output directory. These parameters can overwrite
         # default location of minhash/buckets snapshot by explicitly defining the snapshot directory
         parser.add_argument(
             f"--{bucket_processor_minhash_snapshot_directory_cli_param}",
             type=str,
             default=None,
             help="location of minhash snapshot files"
+        )
+        parser.add_argument(
+            f"--{bucket_processor_doc_id_snapshot_directory_cli_param}",
+            type=str,
+            default=None,
+            help="location of doc id snapshot files"
         )
 
     def apply_input_params(self, args: Namespace) -> bool:

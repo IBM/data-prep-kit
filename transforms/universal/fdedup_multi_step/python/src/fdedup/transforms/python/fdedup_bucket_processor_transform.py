@@ -24,7 +24,8 @@ from data_processing.runtime.pure_python import (DefaultPythonTransformRuntime,
 from fdedup.utils import DocsMinHash, DocCollector, BucketsHash, BucketsHashProcessor
 from fdedup.transforms.base import (FdedupBucketProcessorTransformBase,
                                     FdedupBucketProcessorTransformConfigurationBase,
-                                    threshold_key, num_permutations_key, minhash_snapshot_directory_key)
+                                    threshold_key, num_permutations_key, buckets_cache_key,
+                                    minhash_snapshot_directory_key, doc_id_snapshot_directory_key)
 
 # configuration parameters
 processor_key = "processor"
@@ -78,12 +79,15 @@ class FdedupBucketProcessorTransform(FdedupBucketProcessorTransformBase):
         Initialize based on the dictionary of configuration information.
         :param config: initialization parameters , with the following keys
             processor - bucket processor
+            buckets - buckets cache
         """
         super().__init__(config)
         self.processor = config.get(processor_key, None)
         if self.processor is None:
-            self.logger.error("processor is not defined")
             raise UnrecoverableException("processor is not defined")
+        self.buckets = config.get(buckets_cache_key, None)
+        if self.buckets is None:
+            raise UnrecoverableException("buckets cache is not defined")
 
     def _submit_bucket_processing(self, buckets: list[tuple[int, list[int]]]) -> None:
         """
@@ -92,6 +96,14 @@ class FdedupBucketProcessorTransform(FdedupBucketProcessorTransformBase):
         :return: None
         """
         self.processor.process_buckets(buckets)
+
+    def _save_buckets(self, buckets: dict[int, list[int]]) -> None:
+        """
+        save buckets
+        :param buckets: buckets
+        :return: None
+        """
+        self.buckets.add_buckets(list(buckets.items()))
 
 
 class FdedupBucketProcessorRuntime(DefaultPythonTransformRuntime):
@@ -132,14 +144,19 @@ class FdedupBucketProcessorRuntime(DefaultPythonTransformRuntime):
         else:
             mh_path = f"{snapshot_path}/minhash_collector_0"
         self.minhashes = DocsMinHash({"id": 0, "data_access": data_access_factory, "snapshot": mh_path})
+        snapshot_path = self.params.get(doc_id_snapshot_directory_key, None)
+        if snapshot_path is None or len(snapshot_path) == 0:
+            doc_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}docs/doc_collector_0"
+        else:
+            doc_path = f"{snapshot_path}/doc_collector_0"
+        self.doc_collector = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": doc_path})
         self.buckets = BucketsHash({"id": 0, "data_access": data_access_factory, "snapshot": None})
-        self.doc_collector = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": None})
         self.bucket_processor = PythonBucketsHashProcessor({"threshold": self.threshold,
                                                             "docs_collector": self.doc_collector,
                                                             "minhash_collector": self.minhashes,
                                                             "statistics": statistics,
                                                             "print_interval": 10})
-        return self.params | {processor_key: self.bucket_processor}
+        return self.params | {processor_key: self.bucket_processor, buckets_cache_key: self.buckets}
 
     def compute_execution_stats(self, stats: TransformStatistics) -> None:
         """
@@ -151,13 +168,11 @@ class FdedupBucketProcessorRuntime(DefaultPythonTransformRuntime):
         d_size, d_memory, r_size, r_memory = self.doc_collector.get_size()
         stats.add_stats({"number of documents": d_size, "documents memory, GB": d_memory,
                          "number of removed": r_size, "removed memory, GB": r_memory})
+        # remove removed documents from cache
         docs, removed = self.doc_collector.get_content()
         self.minhashes.remove_minhashes(removed)
-        # build buckets
-        buckets = {}
-        for key, value in docs.items():
-            buckets[value[1]] = buckets.get(value[1], []) + [key]
-        self.buckets.add_buckets(list(buckets.items()))
+        self.buckets.remove_docs(removed)
+        # snapshot content
         self.doc_collector.snapshot()
         self.minhashes.snapshot()
         self.buckets.snapshot()

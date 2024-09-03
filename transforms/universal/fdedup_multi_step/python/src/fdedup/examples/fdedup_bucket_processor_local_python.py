@@ -19,6 +19,7 @@ from data_processing.utils import ParamsUtils
 from fdedup.transforms.base import (bucket_processor_num_permutations_cli_param,
                                     bucket_processor_threshold_cli_param,
                                     bucket_processor_minhash_snapshot_directory_cli_param,
+                                    bucket_processor_doc_id_snapshot_directory_cli_param,
                                     )
 from fdedup.transforms.python import FdedupBucketProcessorPythonTransformRuntimeConfiguration
 
@@ -45,6 +46,7 @@ params = {
     bucket_processor_num_permutations_cli_param: 64,
     bucket_processor_threshold_cli_param: .8,
     bucket_processor_minhash_snapshot_directory_cli_param: os.path.join(basedir, "minhash"),
+    bucket_processor_doc_id_snapshot_directory_cli_param: os.path.join(basedir, "docs"),
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

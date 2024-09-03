@@ -23,6 +23,7 @@ from data_processing.utils import (
     TransformUtils,
 )
 from data_processing.utils import UnrecoverableException
+from fdedup.utils import process_buckets_locally, merge_doc_ids, remove_docs_buckets, NO_SIMILARITY
 
 # performance
 REQUEST_LEN = 8192
@@ -44,6 +45,7 @@ num_bands_key = "num_bands"
 length_band_key = "length_band"
 buckets_cache_key = "buckets_cache"
 minhashes_cache_key = "minhashes_cache"
+doc_id_snapshot_directory_key = "docid_snapshot_directory"
 
 preprocessor_doc_column_name_cli_param = f"{preprocessor_cli_prefix}{doc_column_name_key}"
 preprocessor_int_column_name_cli_param = f"{preprocessor_cli_prefix}{int_column_name_key}"
@@ -53,6 +55,7 @@ preprocessor_threshold_cli_param = f"{preprocessor_cli_prefix}{threshold_key}"
 shingles_size_cli_param = f"{preprocessor_cli_prefix}{shingles_size_key}"
 preprocessor_minhash_snapshot_directory_cli_param = f"{preprocessor_cli_prefix}{minhash_snapshot_directory_key}"
 preprocessor_buckets_snapshot_directory_cli_param = f"{preprocessor_cli_prefix}{buckets_snapshot_directory_key}"
+preprocessor_docid_snapshot_directory_cli_param = f"{preprocessor_cli_prefix}{doc_id_snapshot_directory_key}"
 
 
 class FdedupPreprocessorTransformBase(AbstractTableTransform):
@@ -71,6 +74,7 @@ class FdedupPreprocessorTransformBase(AbstractTableTransform):
             num_bands - number of bands
             length_band band length
             delimiter - delimiter
+            threshold jaccard treshold
         """
         from data_processing.utils import get_logger
         self.logger = get_logger(__name__)
@@ -80,6 +84,7 @@ class FdedupPreprocessorTransformBase(AbstractTableTransform):
         self.word_shingle_size = config.get(shingles_size_key, 5)
         self.delimiter = config.get(delimiters_key, " ")
         self.mn_min_hash = config.get(mn_min_hash_key, None)
+        self.threshold = config.get(threshold_key, .8)
         if self.mn_min_hash is None:
             raise UnrecoverableException("Minhash class is not provided")
         self.num_bands = config.get(num_bands_key, 1)
@@ -111,6 +116,36 @@ class FdedupPreprocessorTransformBase(AbstractTableTransform):
             ]
             for i in range(self.num_bands)
         ]
+
+    def _remove_local_duplicates(self, buckets: dict[int, list[int]], minhashes: list[tuple[int, int, np.array]]) \
+            -> tuple[dict[int, list[int]], list[tuple[int, int, np.array]], dict[int, tuple[int, int]], set[int]]:
+        """
+        Remove local duplicates
+        :param buckets: buckets
+        :param minhashes: minhashes
+        :return: buckets, minhashes and docs without local duplicates
+        """
+        docs = {}
+        removed = set()
+        minhashes_dict = {key: (v1, v2) for key, v1, v2 in minhashes}
+        for b_hash, bucket in buckets.items():
+            if len(bucket) == 1:
+                # This hash has a single document
+                if bucket[0] not in docs:
+                    docs[bucket[0]] = (NO_SIMILARITY, b_hash)
+                continue
+            b_docs, b_removed = (
+                process_buckets_locally(b_hash=b_hash, bucket=bucket, minhashes=minhashes_dict,
+                                        threshold=self.threshold))
+            docs, removed = (
+                merge_doc_ids(current_ids=docs, current_removed=removed, new_ids=b_docs, new_removed=b_removed))
+        # remove minhashes for removed docs
+        for cid in removed:
+            minhashes_dict.pop(cid, None)
+        minhashes = [(key, value[0], value[1]) for key, value in minhashes_dict.items()]
+        # rebuild buckets
+        buckets = remove_docs_buckets(buckets=buckets, removed=removed)
+        return buckets, minhashes, docs, removed
 
     def _submit_buckets_minhashes(
             self, buckets: dict[int, list[int]], minhashes: list[tuple[int, int, np.array]]
@@ -237,13 +272,19 @@ class FdedupPreprocessorTransformConfigurationBase(TransformConfiguration):
             f"--{preprocessor_minhash_snapshot_directory_cli_param}",
             type=str,
             default=None,
-            help="minhash snapshot directory key",
+            help="minhash snapshot directory",
         )
         parser.add_argument(
             f"--{preprocessor_buckets_snapshot_directory_cli_param}",
             type=str,
             default=None,
-            help="buckets snapshot directory key",
+            help="buckets snapshot directory",
+        )
+        parser.add_argument(
+            f"--{preprocessor_docid_snapshot_directory_cli_param}",
+            type=str,
+            default=None,
+            help="doc id snapshot directory",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
