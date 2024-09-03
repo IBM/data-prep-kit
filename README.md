@@ -25,11 +25,10 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 
 ## 📝 Table of Contents
 - [About](#about)
-- [Getting Started](#gettingstarted)
-- [Data Processing Framework](#data-proc-lib)
+- [Run your first transform](#gettingstarted)
+- [Scaling transforms from laptop to cluster](#laptop_cluster)
 - [Repository Use and Navigation](doc/repo.md)
 - [How to Contribute](CONTRIBUTING.md)
-- [Acknowledgments](#acknowledgement)
 
 ## &#x1F4D6; About <a name = "about"></a>
 Data Prep Kit is a toolkit for streamlining data preparation for developers looking to build LLM-enabled applications via fine-tuning, RAG or instruction-tuning.
@@ -138,7 +137,7 @@ One can add new transforms by bringing in Python-based processing logic and usin
 
 Additionally, you can explore our [video](https://www.youtube.com/watch?v=0WUMG6HIgMg) that provide a step-by-step, example-driven tutorial on how to add a new module. 
 
-## From laptop to cluster
+## From laptop to cluster <a name = "laptop_cluster"></a>
 Data-prep-kit provides the flexibility to transition your projects from proof-of-concept (PoC) stage to full-scale production mode, offering all the necessary tools to run your data transformations at high volume. In this section, we enable you how to run your transforms at scale and how to automate them. 
 
 ### Scaling of Transforms
