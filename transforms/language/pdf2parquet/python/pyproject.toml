@@ -11,7 +11,8 @@ authors = [
 ]
 dependencies = [
     "data-prep-toolkit==0.2.1.dev0",
-    "docling[ocr]==1.4.0",
+    "docling-parse==1.0.0",
+    "docling==1.7.0",
     "filetype >=1.2.0, <2.0.0",
 ]
 

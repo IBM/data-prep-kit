@@ -9,8 +9,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+import os
 
 import pyarrow as pa
+from data_processing.test_support import get_tables_in_folder
 from data_processing.test_support.transform.table_transform_test import (
     AbstractTableTransformTest,
 )
@@ -29,7 +31,14 @@ class TestNOOPTransform(AbstractTableTransformTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
+        src_file_dir = os.path.abspath(os.path.dirname(__file__))
+        input_dir = os.path.join(src_file_dir, "../test-data/input")
+        expected_dir = os.path.join(src_file_dir, "../test-data/expected")
+        input_tables = get_tables_in_folder(input_dir)
+        expected_tables = get_tables_in_folder(expected_dir)
+        expected_metadata_list = [{"nfiles": 1, "nrows": 7}, {}]
+        config = {sleep_key: 0}
         fixtures = [
-            (NOOPTransform({sleep_key: 0}), [table], [expected_table], expected_metadata_list),
+            (NOOPTransform(config), input_tables, expected_tables, expected_metadata_list),
         ]
         return fixtures

@@ -42,6 +42,10 @@ class FSStore:
         item = os.path.basename(item)
         self._write_values(self.fs, self.backend_path, key, item)
 
+    def put_dict(self, dicta):
+        for k, v in dicta.items():
+            self.put(k, v)
+
     def get(self, key):
         # normalize keys, since we are creating folders for keys
         key = self._normalize_key(key)
@@ -53,6 +57,13 @@ class FSStore:
 
     def remove(self, key):
         return self._delete_values(self.fs, self.backend_path, key)
+
+    def items_kv(self):
+        kvs = []
+        for k in self.items():
+            kv = (k, self.get(k))
+            kvs.append(kv)
+        return kvs
 
     def __repr__(self):
         return f"keys: {self.items()}"
