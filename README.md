@@ -131,10 +131,14 @@ If there are no errors, you are good to go!
 
 Let's try a simple transform to extract content from PDF files. We have following notebooks that demonstrate how to run a data preparation transformation that extracts content from PDF files using the data-prep-kit.
 
-- Option 1: Pure python notebook : [examples/notebooks/Run_your_first_transform_python.ipynb](examples/notebooks/Run_your_first_transform_python.ipynb) - easiest to get started
-- Option 2: This one uses Ray framework for parallel execution while still allowing local processing : [examples/notebooks/Run_your_first_transform_ray.ipynb](examples/notebooks/Run_your_first_transform_ray.ipynb)
+**Notebook versions**
 
-You can try either one, or both 😄
+You can try one or all 😄
+
+- Option 1: Google Colab friendly notebook (no setup necessary, easiest to get started): [examples/notebooks/Run_your_first_transform_colab.ipynb](examples/notebooks/Run_your_first_transform_colab.ipynb)  | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IBM/data-prep-kit/blob/dev/examples/notebooks/Run_your_first_transform_colab.ipynb)
+- Option 2: Pure python notebook (runs locally) : [examples/notebooks/Run_your_first_transform_python.ipynb](examples/notebooks/Run_your_first_transform_python.ipynb) - easiest to get started
+- Option 3: Ray version (runs locally): This one uses Ray framework for parallel execution while still allowing local processing - [examples/notebooks/Run_your_first_transform_ray.ipynb](examples/notebooks/Run_your_first_transform_ray.ipynb)
+
 
 To run the notebooks, launch jupyter from the same virtual environment you created using the command below. 
 
