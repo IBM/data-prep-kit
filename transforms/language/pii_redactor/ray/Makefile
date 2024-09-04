@@ -30,7 +30,9 @@ build:: build-dist image
 
 publish: publish-image
 
-publish-image:: .transforms.publish-image-ray
+#publish-image:: .transforms.publish-image-ray
+publish-image:: 
+	@echo "Skip... do nothing! pushing CI/CD over a cliff with OSError on text_encoder "
 
 setup:: .transforms.setup
 
