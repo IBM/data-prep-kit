@@ -1,3 +1,4 @@
+import enum
 import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
@@ -23,13 +24,23 @@ from data_processing.utils import CLIArgumentProvider, get_logger, TransformUtil
 
 class Html2ParquetTransform(AbstractBinaryTransform):
     def __init__(self, config: dict[str, Any]):
-        super().__init__(config)  
+        super().__init__(config)
+
+        self.output_format = config.get(html2parquet_output_format_key, html2parquet_output_format.MARKDOWN)
+        if not isinstance(self.output_format, html2parquet_output_format):
+            self.output_format = html2parquet_output_format[self.output_format]  
 
     def _convert_html2parquet(self, member_filename:str, file_name:str, content_bytes: bytes) -> dict:
         title = member_filename if member_filename else TransformUtils.get_file_basename(file_name)
         
         # Use Trafilatura library
-        content_string = trafilatura.extract(content_bytes)
+        if self.output_format == html2parquet_output_format.MARKDOWN:
+            content_string = trafilatura.extract(content_bytes, output_format="markdown")
+        elif self.output_format == html2parquet_output_format.TEXT:
+            content_string = trafilatura.extract(content_bytes)
+        else:
+            raise RuntimeError(f"Uknown output_format {self.output_format}.")
+
 
         if content_string is None:
             raise RuntimeError("Failed in converting.")
@@ -104,6 +115,17 @@ logger = get_logger(__name__)
 
 short_name = "html2parquet"
 cli_prefix = f"{short_name}_"
+html2parquet_output_format_key = f"output_format"
+
+class html2parquet_output_format(str, enum.Enum):
+    MARKDOWN = "markdown"
+    TEXT = "text"
+
+    def __str__(self):
+        return str(self.value)
+
+html2parquet_output_format_default = html2parquet_output_format.MARKDOWN
+html2parquet_output_format_cli_param = f"{cli_prefix}{html2parquet_output_format_key}"
 
 
 class Html2ParquetTransformConfiguration(TransformConfiguration):
@@ -113,7 +135,16 @@ class Html2ParquetTransformConfiguration(TransformConfiguration):
             transform_class=Html2ParquetTransform,
         )
     def add_input_params(self, parser: ArgumentParser) -> None:
-        pass 
+        parser.add_argument(
+            f"--{html2parquet_output_format_cli_param}",
+            type=html2parquet_output_format,
+            choices=list(html2parquet_output_format),
+            help="Output format for the contents column.",
+            default=html2parquet_output_format.MARKDOWN,
+        ) 
 
     def apply_input_params(self, args: Namespace) -> bool:
+        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        self.params = self.params | captured
+        logger.info(f"html2parquet parameters are : {self.params}")
         return True

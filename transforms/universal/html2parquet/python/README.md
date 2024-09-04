@@ -19,3 +19,10 @@ The output format will contain the following colums
 }
 ```
 ## Parameters
+The transform can be initialized with the following parameters.
+
+| Parameter  | Default  | Description  |
+|------------|----------|--------------|
+| `output_format`         | `markdown`        | The output type for the `contents` column. Valid types are `markdown` and `text`. |
+
+When invoking the CLI, the parameters must be set as `--html2parquet_<name>`, e.g. `--html2parquet_output_format='markdown'`.

@@ -30,6 +30,7 @@ class TestPythonHtml2ParquetTransform(AbstractTransformLauncherTest):
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         config = {
             "data_files_to_use": ast.literal_eval("['.html','.zip']"),
+            "html2parquet_output_format": "markdown",
         }
 
         fixtures = []
