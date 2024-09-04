@@ -14,13 +14,12 @@ import os
 
 from data_processing.data_access import DataAccessFactory
 from data_processing.utils import RANDOM_SEED
-from fdedup.utils import BucketsHash, MurmurMH, DocCollector, DocsMinHash
+from fdedup.utils import BucketsHash, MurmurMH, DocCollector, DocsMinHash, FdedupSupport
 from fdedup.transforms.base import (doc_column_name_key, int_column_name_key, shingles_size_key,
                                     num_bands_key, length_band_key,
                                     delimiters_key, mn_min_hash_key, minhashes_cache_key,
                                     buckets_cache_key, doc_id_cache_key)
 from fdedup.transforms.python import FdedupPreprocessorTransform
-from fdedup.utils import fuzzy_optimal_param
 
 
 # create parameters
@@ -31,7 +30,8 @@ local_conf = {
     "output_folder": output_folder,
 }
 
-num_buckets, length_bucket = fuzzy_optimal_param(
+
+num_buckets, length_bucket = FdedupSupport.fuzzy_optimal_param(
     threshold=.8,
     num_perm=64,
     false_positive_weight=0.5,

@@ -1,8 +1,8 @@
 [project]
-name = "dpk_fdedup_transform_python"
+name = "dpk_fdedup_transform_ray"
 version = "0.2.1.dev0"
 requires-python = ">=3.10"
-description = "fdedup multi step Python Transform"
+description = "fdedup multi step Ray Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -10,10 +10,9 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit==0.2.1.dev0",
-    "mmh3==4.1.0",
-    "xxhash==3.4.1",
-    "scipy==1.12.0"
+    "data-prep-toolkit-ray==0.2.1.dev0",
+    "dpk_fdedup_transform_python==0.2.1.dev0",
+    "tqdm==4.66.3",
 ]
 
 [build-system]

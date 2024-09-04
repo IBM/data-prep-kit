@@ -76,13 +76,10 @@ class FdedupFilterRuntime(DefaultPythonTransformRuntime):
         :param files - list of files to process
         :return: dictionary of transform init params
         """
-        data_access = data_access_factory.create_data_access()
-        snapshot_path = self.params.get(doc_id_snapshot_directory_key, None)
-        if snapshot_path is None or len(snapshot_path) == 0:
-            doc_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}docs/doc_collector_0"
-        else:
-            doc_path = f"{snapshot_path}/doc_collector_0"
-        self.doc_collector = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": doc_path})
+        from fdedup.utils import FdedupSupport
+        self.doc_collector = FdedupSupport.createDocIDCurrent(
+            data_access_factory=data_access_factory, directory=self.params.get(doc_id_snapshot_directory_key, None)
+        )
         return self.params | {doc_id_cache_key: self.doc_collector}
 
     def compute_execution_stats(self, stats: TransformStatistics) -> None:

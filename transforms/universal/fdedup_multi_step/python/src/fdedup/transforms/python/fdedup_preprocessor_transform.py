@@ -20,7 +20,7 @@ from data_processing.runtime.pure_python import (DefaultPythonTransformRuntime,
                                                  PythonTransformLauncher,
                                                  PythonTransformRuntimeConfiguration
                                                  )
-from fdedup.utils import BucketsHash, DocCollector, DocsMinHash, MurmurMH, fuzzy_optimal_param
+from fdedup.utils import BucketsHash, DocCollector, DocsMinHash, MurmurMH, FdedupSupport
 from fdedup.transforms.base import (FdedupPreprocessorTransformBase,
                                     FdedupPreprocessorTransformConfigurationBase,
                                     buckets_cache_key, minhashes_cache_key, mn_min_hash_key,
@@ -111,8 +111,9 @@ class FdedupPreprocessorRuntime(DefaultPythonTransformRuntime):
         :param files - list of files to process
         :return: dictionary of transform init params
         """
+        from fdedup.utils import FdedupSupport
         # compute fuzzy dedup parameters
-        num_buckets, length_bucket = fuzzy_optimal_param(
+        num_buckets, length_bucket = FdedupSupport.fuzzy_optimal_param(
             threshold=self.threshold,
             num_perm=self.num_permutations,
             false_positive_weight=0.5,
@@ -120,23 +121,12 @@ class FdedupPreprocessorRuntime(DefaultPythonTransformRuntime):
         )
         self.logger.info(f"Fuzzy: num buckets {num_buckets}, bucket length {length_bucket}")
         mn_min_hash = MurmurMH(num_perm=self.num_permutations, seed=RANDOM_SEED)
-        if self.minhash_directory is None or len(self.minhash_directory) == 0:
-            mh_path = None
-        else:
-            # restarting from snapshot
-            mh_path = self.minhash_directory
-        if self.buckets_directory is None or len(self.buckets_directory) == 0:
-            b_path = None
-        else:
-            # restarting from snapshot
-            b_path = self.buckets_directory
-        if self.docid_directory is None or len(self.docid_directory) == 0:
-            d_path = None
-        else:
-            d_path = self.docid_directory
-        self.minhashes = DocsMinHash({"id": 0, "data_access": data_access_factory, "snapshot": mh_path})
-        self.buckets = BucketsHash({"id": 0, "data_access": data_access_factory, "snapshot": b_path})
-        self.docid = DocCollector({"id": 0, "data_access": data_access_factory, "snapshot": d_path})
+        self.minhashes = FdedupSupport.createMinhash(data_access_factory=data_access_factory,
+                                                     directory=self.minhash_directory)
+        self.buckets = FdedupSupport.createBucket(data_access_factory=data_access_factory,
+                                                  directory=self.buckets_directory)
+        self.docid = FdedupSupport.createDocID(data_access_factory=data_access_factory,
+                                               directory=self.docid_directory)
         return self.params | {num_bands_key: num_buckets, length_band_key: length_bucket,
                               mn_min_hash_key: mn_min_hash, minhashes_cache_key: self.minhashes,
                               buckets_cache_key: self.buckets, doc_id_cache_key: self.docid}

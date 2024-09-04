@@ -26,7 +26,7 @@ from data_processing_ray.runtime.ray import (
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
-from fdedup.utils import BucketsHash, DocCollector, DocsMinHash, MurmurMH, fuzzy_optimal_param
+from fdedup.utils import BucketsHash, DocCollector, DocsMinHash, MurmurMH
 from fdedup.transforms.base import (FdedupPreprocessorTransformBase,
                                     FdedupPreprocessorTransformConfigurationBase,
                                     preprocessor_cli_prefix, num_bands_key, length_band_key,
@@ -170,8 +170,9 @@ class FdedupRayPreprocessorRuntime(DefaultRayTransformRuntime):
         :param files - list of files to process
         :return: dictionary of transform init params
         """
+        from fdedup.utils import FdedupSupport
         # compute fuzzy dedup parameters
-        num_buckets, length_bucket = fuzzy_optimal_param(
+        num_buckets, length_bucket = FdedupSupport.fuzzy_optimal_param(
             threshold=self.threshold,
             num_perm=self.num_permutations,
             false_positive_weight=0.5,

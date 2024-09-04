@@ -8,7 +8,7 @@ testing and IDE set up.
 Also see [here](../README.md) on details of implementation
 
 ## Summary 
-This is a python version of multi step fuzzy dedup
+This is a Python version of multi step fuzzy dedup
 
 ## Configuration and command line Options
 

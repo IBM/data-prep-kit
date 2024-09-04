@@ -17,68 +17,9 @@ from typing import Any, Iterator
 import numpy as np
 from data_processing.data_access import SnapshotUtils
 from data_processing.utils import GB, RANDOM_SEED, TransformUtils, UnrecoverableException
-from scipy.integrate import quad as integrate
 
 NO_SIMILARITY = -1
 LONG_BUCKET = 5000
-
-
-def jaccard_distance(mh1: np.array, mh2: np.array) -> float:
-    return len(np.intersect1d(mh1, mh2))/len(np.union1d(mh1, mh2))
-
-
-def fuzzy_optimal_param(
-        threshold: float,
-        num_perm: int,
-        false_positive_weight: float,
-        false_negative_weight: float,
-) -> tuple[int, int]:
-    """
-    Computes parameters for fuzzy dedup
-    :param threshold: filtering threshold
-    :param num_perm: number of permutations
-    :param false_positive_weight: false positive weight
-    :param false_negative_weight: false negative weight
-    :return: number of buckets and bucket length
-    """
-
-    def _false_positive_probability(ths: float, b: int, r: int) -> float:
-        """
-        Compute false positive probability
-        :param ths: filtering threshold
-        :param b: permutation
-        :param r: rel permutation
-        :return: probability
-        """
-        _probability = lambda s: 1 - (1 - s ** float(r)) ** float(b)
-        a, err = integrate(_probability, 0.0, ths)
-        return a
-
-    def _false_negative_probability(ths: float, b: int, r: int) -> float:
-        """
-        Compute false negative probability
-        :param ths: filtering threshold
-        :param b: permutation
-        :param r: rel permutation
-        :return: probability
-        """
-        _probability = lambda s: 1 - (1 - (1 - s ** float(r)) ** float(b))
-        a, err = integrate(_probability, ths, 1.0)
-        return a
-
-    min_error = float("inf")
-    opt = (0, 0)
-    for perm in range(1, num_perm + 1):
-        max_r = int(num_perm / perm)
-        for rel in range(1, max_r + 1):
-            fp = _false_positive_probability(threshold, perm, rel)
-            fn = _false_negative_probability(threshold, perm, rel)
-            error = fp * false_positive_weight + fn * false_negative_weight
-            if error < min_error:
-                min_error = error
-                opt = (perm, rel)
-    return opt
-
 
 class MurmurMH:
     def __init__(self, num_perm: int, seed: int = RANDOM_SEED):
@@ -113,7 +54,6 @@ class DocCollector:
     """
     Class collecting de duped document IDs
     """
-
     def __init__(self, params: dict[str, Any]):
         """
         Initializer
@@ -143,9 +83,10 @@ class DocCollector:
         :param dr: documents to keep and documents to remove
         :return:
         """
+        from fdedup.utils import FdedupSupport
         docs = {key: value for key, value in dr[0]}
         self.ids, self.removed = (
-            merge_doc_ids(current_ids=self.ids, current_removed=self.removed, new_ids=docs, new_removed=dr[1]))
+            FdedupSupport.merge_doc_ids(current_ids=self.ids, current_removed=self.removed, new_ids=docs, new_removed=dr[1]))
 
     def filter(self, docs: list[int]) -> dict[int, int]:
         """
@@ -316,7 +257,9 @@ class BucketsHash:
         :param removed: set of removed documents
         :return: None
         """
-        self.buckets = remove_docs_buckets(buckets=self.buckets, removed=removed)
+
+        from fdedup.utils import FdedupSupport
+        self.buckets = FdedupSupport.remove_docs_buckets(buckets=self.buckets, removed=removed)
 
     def snapshot(self) -> None:
         """
@@ -396,6 +339,7 @@ class BucketsHashProcessor:
         :param buckets: buckets
         :return: none
         """
+        from fdedup.utils import FdedupSupport
         t_start = time.time()
         docs = {}
         removed = set()
@@ -411,9 +355,9 @@ class BucketsHashProcessor:
             very_long = bucket_len > LONG_BUCKET
             hashes = self._get_minhashes_docs(bucket)
             b_docs, b_removed = (
-                process_buckets_locally(b_hash=b_hash, bucket=bucket, minhashes=hashes, threshold=self.threshold))
+                FdedupSupport.process_buckets_locally(b_hash=b_hash, bucket=bucket, minhashes=hashes, threshold=self.threshold))
             docs, removed = (
-                merge_doc_ids(current_ids=docs, current_removed=removed, new_ids=b_docs, new_removed=b_removed))
+                FdedupSupport.merge_doc_ids(current_ids=docs, current_removed=removed, new_ids=b_docs, new_removed=b_removed))
             if very_long:
                 self.logger.info(
                     f"Processed long ({bucket_len}) bucket in {round((time.time() - start) / 60.,3)} min ")
@@ -421,102 +365,3 @@ class BucketsHashProcessor:
         self._submit_generated_docs(docs, removed)
         # peg stats
         self.stats.add_stats({"generated doc_ids": len(docs), "bucket processing time": time.time() - t_start})
-
-
-def process_buckets_locally(b_hash: int, bucket: list[int], minhashes: dict[int, tuple[int, np.array]],
-                            threshold: float) -> tuple[dict[int, tuple[int, int]], set[int]]:
-    """
-    process buckets with multiple documents
-    :param b_hash: bucket hash
-    :param bucket: list of documents
-    :param minhashes: minhashes
-    :param threshold: distance threshold
-    :return: tuple of generated documents and removed
-    """
-    docs = {}
-    removed = set()
-    set_list = []
-    unvisited = set(bucket)
-    # combine similar documents
-    while len(unvisited) > 0:
-        current_doc_id = unvisited.pop()
-        current_mh = minhashes[current_doc_id][1]
-        current_set = set()
-        current_set.add(current_doc_id)
-        for other_doc_id in bucket:
-            if other_doc_id in unvisited:
-                other_mh = minhashes[other_doc_id][1]
-                if jaccard_distance(current_mh, other_mh) >= threshold:
-                    current_set.add(other_doc_id)
-                    unvisited.discard(other_doc_id)
-        set_list.append(current_set)
-    # process created sets
-    for current_set in set_list:
-        if len(current_set) == 1:
-            # this is 1 element set
-            d = current_set.pop()
-            if d not in docs:
-                docs[d] = (NO_SIMILARITY, b_hash)
-            continue
-        for i, doc_id in enumerate(current_set):
-            if i == 0:
-                cluster_id = doc_id
-                remaining = doc_id
-                min_len = minhashes[doc_id][0]
-                max_len = min_len
-                continue
-            c_len = minhashes[doc_id][0]
-            if c_len > max_len:
-                max_len = c_len
-                remaining = doc_id
-                continue
-            if c_len <= min_len:
-                min_len = c_len
-                cluster_id = doc_id
-        current_set.discard(remaining)
-        docs, removed = merge_doc_ids(current_ids=docs, current_removed=removed,
-                                      new_ids={remaining: (cluster_id, b_hash)}, new_removed=current_set)
-        return docs, removed
-
-
-def merge_doc_ids(current_ids: dict[int, tuple[int, int]], current_removed: set[int],
-                  new_ids: dict[int, tuple[int, int]], new_removed: set[int]) \
-        -> tuple[dict[int, tuple[int, int]], set[int]]:
-    """
-    Merge document ids
-    :param current_ids: current ids
-    :param current_removed: current removed
-    :param new_ids: new ids
-    :param new_removed: new removed
-    :return: resulting ids and removed
-    """
-    # process documents to remove
-    for did in new_removed:
-        current_ids.pop(did, None)
-    current_removed.update(new_removed)
-    # process documents to keep
-    for key, val in new_ids.items():
-        if key in current_removed:
-            continue
-        if key in current_ids and val[0] == NO_SIMILARITY:
-            # Do not update existing docs with NO_SIMILARITY
-            continue
-        else:
-            current_ids[key] = val
-    return current_ids, current_removed
-
-
-def remove_docs_buckets(buckets: dict[int, list[int]], removed: set[int]) -> dict[int, list[int]]:
-    """
-    Remove removed documents from buckets
-    :param buckets: buckets dictionary
-    :param removed: removed documents set
-    :return: buckets without removed docs
-    """
-    for key in buckets.keys():
-        value = [e for e in buckets[key] if e not in removed]
-        if len(value) == 0:
-            buckets.pop(key, None)
-        else:
-            buckets[key] = value
-    return buckets

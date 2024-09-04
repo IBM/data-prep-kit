@@ -23,7 +23,7 @@ from data_processing.utils import (
     TransformUtils,
 )
 from data_processing.utils import UnrecoverableException
-from fdedup.utils import process_buckets_locally, merge_doc_ids, remove_docs_buckets, NO_SIMILARITY
+from fdedup.utils import NO_SIMILARITY
 
 # performance
 REQUEST_LEN = 8192
@@ -125,6 +125,7 @@ class FdedupPreprocessorTransformBase(AbstractTableTransform):
         :param minhashes: minhashes
         :return: buckets, minhashes and docs without local duplicates
         """
+        from fdedup.utils import FdedupSupport
         docs = {}
         removed = set()
         minhashes_dict = {key: (v1, v2) for key, v1, v2 in minhashes}
@@ -135,16 +136,16 @@ class FdedupPreprocessorTransformBase(AbstractTableTransform):
                     docs[bucket[0]] = (NO_SIMILARITY, b_hash)
                 continue
             b_docs, b_removed = (
-                process_buckets_locally(b_hash=b_hash, bucket=bucket, minhashes=minhashes_dict,
+                FdedupSupport.process_buckets_locally(b_hash=b_hash, bucket=bucket, minhashes=minhashes_dict,
                                         threshold=self.threshold))
             docs, removed = (
-                merge_doc_ids(current_ids=docs, current_removed=removed, new_ids=b_docs, new_removed=b_removed))
+                FdedupSupport.merge_doc_ids(current_ids=docs, current_removed=removed, new_ids=b_docs, new_removed=b_removed))
         # remove minhashes for removed docs
         for cid in removed:
             minhashes_dict.pop(cid, None)
         minhashes = [(key, value[0], value[1]) for key, value in minhashes_dict.items()]
         # rebuild buckets
-        buckets = remove_docs_buckets(buckets=buckets, removed=removed)
+        buckets = FdedupSupport.remove_docs_buckets(buckets=buckets, removed=removed)
         return buckets, minhashes, docs, removed
 
     def _submit_buckets_minhashes(

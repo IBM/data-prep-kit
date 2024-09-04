@@ -39,7 +39,7 @@ from fdedup_ray.transforms import (bucket_cpu_key, minhash_cpu_key, doc_id_cpu_k
                                    num_buckets_key, num_doc_id_key, num_minhash_key)
 
 # configuration parameters
-bucket_processor_cpu_key = "processor cpu"
+bucket_processor_cpu_key = "processor_cpu"
 num_bucket_processors_key = "num_processors"
 bucket_processor_bucket_cpu_cli_param = f"{bucket_processor_cli_prefix}{bucket_cpu_key}"
 bucket_processor_minhash_cpu_cli_param = f"{bucket_processor_cli_prefix}{minhash_cpu_key}"
