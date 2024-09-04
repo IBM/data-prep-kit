@@ -336,17 +336,35 @@ class FdedupSupportRay:
         :param logger: logger
         :return: None
         """
-        if minhash_actors is None:
-            replies_m = []
-        else:
-            replies_m = [collector.snapshot.remote() for collector in minhash_actors]
-        if doc_actors is None:
-            replies_d = []
-        else:
-            replies_d = [collector.snapshot.remote() for collector in doc_actors]
-        if bucket_actors is None:
-            replies_b = []
-        else:
-            replies_b = [collector.snapshot.remote() for collector in bucket_actors]
+        replies_m = [collector.snapshot.remote() for collector in minhash_actors]
+        replies_d = [collector.snapshot.remote() for collector in doc_actors]
+        replies_b = [collector.snapshot.remote() for collector in bucket_actors]
         RayUtils.wait_for_execution_completion(logger=logger, replies=list(replies_m + replies_b + replies_d))
 
+    @staticmethod
+    def get_unique_ids(actors: list[ActorHandle], ids: list[int]) -> dict[int, int]:
+        """
+        Get unique IDs
+        :param actors: list of actors
+        :param ids: ids
+        :return: unique ids
+        """
+        request = [[] for _ in range(len(actors))]
+        for value in ids:
+            doc_id = value
+            request[doc_id % len(actors)].append(doc_id)
+        remote_replies = []
+        i = 0
+        for req in request:
+            if len(req) > 0:  # Only submit if the length is greater then 0
+                remote_replies.append(actors[i].filter.remote(req))
+            i += 1
+        # Process replies
+        unique = {}
+        while remote_replies:
+            # Wait for replies
+            ready, not_ready = ray.wait(remote_replies)
+            reply = ray.get(ready)[0]
+            unique.update(reply)
+            remote_replies = not_ready
+        return unique

@@ -11,11 +11,10 @@
 ################################################################################
 
 from typing import Any
-from argparse import Namespace, ArgumentParser
-import ray
+from argparse import ArgumentParser
 from ray.actor import ActorHandle
 from argparse import Namespace
-from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
+from data_processing.data_access import DataAccessFactoryBase
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
@@ -23,7 +22,6 @@ from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
 )
-from fdedup.utils import DocCollector
 from fdedup.transforms.base import (FdedupFilterTransformBase,
                                     FdedupFilterTransformConfigurationBase,
                                     doc_id_snapshot_directory_key, filter_cli_prefix,
@@ -57,26 +55,8 @@ class FdedupFilterTransformRay(FdedupFilterTransformBase):
         :param ids: table ids
         :return: unique ids and clusters
         """
-        request = [[] for _ in range(len(self.doc_id_cache))]
-        for value in ids:
-            doc_id = value
-            request[doc_id % len(self.doc_id_cache)].append(doc_id)
-        remote_replies = []
-        i = 0
-        for req in request:
-            if len(req) > 0:  # Only submit if the length is greater then 0
-                remote_replies.append(self.doc_id_cache[i].filter.remote(req))
-            i += 1
-        # Process replies
-        unique = {}
-        while remote_replies:
-            # Wait for replies
-            ready, not_ready = ray.wait(remote_replies)
-            reply = ray.get(ready)[0]
-            unique.update(reply)
-            remote_replies = not_ready
-        return unique
-
+        from fdedup_ray.utils import FdedupSupportRay
+        return FdedupSupportRay.get_unique_ids(actors=self.doc_id_cache, ids=ids)
 
 class FdedupFilterRuntimeRay(DefaultRayTransformRuntime):
     """

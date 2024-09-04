@@ -22,8 +22,7 @@ from data_processing.utils import UnrecoverableException
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
-    RayTransformLauncher,
-    RayUtils,
+    RayTransformLauncher
 )
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
