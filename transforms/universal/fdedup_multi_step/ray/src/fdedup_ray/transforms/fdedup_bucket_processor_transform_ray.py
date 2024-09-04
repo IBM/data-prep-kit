@@ -19,7 +19,7 @@ from ray.util import ActorPool
 from ray.actor import ActorHandle
 
 from data_processing.utils import UnrecoverableException
-from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
+from data_processing.data_access import DataAccessFactoryBase
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
@@ -28,7 +28,7 @@ from data_processing_ray.runtime.ray import (
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
-from fdedup.utils import DocsMinHash, DocCollector, BucketsHash, BucketsHashProcessor
+from fdedup.utils import BucketsHash, BucketsHashProcessor
 from fdedup.transforms.base import (FdedupBucketProcessorTransformBase,
                                     FdedupBucketProcessorTransformConfigurationBase,
                                     bucket_processor_cli_prefix, buckets_cache_key,
@@ -136,26 +136,12 @@ class RayBucketsHashProcessor(BucketsHashProcessor):
         :param removed: removed documents
         :return: None
         """
+        from fdedup_ray.utils import FdedupSupportRay
         # Remove doc ids that are already removed
         for did in removed:
             docs.pop(did, None)
-        # Build remote requests
-        request = [([], []) for _ in range(len(self.docs_collector))]
-        for key, value in docs.items():
-            req_tuple = request[key % len(self.docs_collector)]
-            req_tuple[0].append((key, value))
-        for did in removed:
-            req_tuple = request[did % len(self.docs_collector)]
-            req_tuple[1].append(did)
-        # Submit requests and wait for replies
-        remote_replies = []
-        i = 0
-        for req in request:
-            if len(req[0]) > 0 or len(req[1]) > 0:  # Only submit if the request has data
-                remote_replies.append(self.docs_collector[i].add_documents.remote(req))
-            i += 1
-        # Process replies
-        RayUtils.wait_for_execution_completion(logger=self.logger, replies=remote_replies)
+        # update cache
+        FdedupSupportRay.update_doc_ids(docs=docs, removed=removed, doc_actors=self.docs_collector, logger=self.logger)
 
     def _get_minhashes_docs(self, doc_ids: list[int]) -> dict[int, tuple[int, np.array]]:
         """
@@ -261,44 +247,23 @@ class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
         :param files - list of files to process
         :return: dictionary of transform init params
         """
+        from fdedup_ray.utils import FdedupSupportRay
         data_access = data_access_factory.create_data_access()
         # create minhashes
-        snapshot_path = self.params.get(minhash_snapshot_directory_key, None)
-        if snapshot_path is None or len(snapshot_path) == 0:
-            mh_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}minhash/"
-        else:
-            mh_path = snapshot_path
-        self.minhashes = [None] * self.n_minhash
-        files, retries = data_access.get_folder_files(path=mh_path)
-        if retries > 0:
-            statistics.add_stats.remote({"data access retries": retries})
-        for file in files.keys():
-            i = int(file[file.rfind("_") + 1:])
-            self.minhashes[i] = ray.remote(DocsMinHash).options(**{"num_cpus": self.minhash_cpu}).remote(
-                {"id": i, "data_access": data_access_factory, "snapshot": file}
-            )
-        self.logger.info(f"Created {len(self.minhashes)} minhash collectors")
+        self.minhashes = FdedupSupportRay.create_minhashes_current(
+            data_access_factory=data_access_factory, n_actors=self.n_minhash, actor_cpu=self.minhash_cpu,
+            directory=self.params.get(minhash_snapshot_directory_key, None), statistics=statistics,
+            logger=self.logger)
         # create buckets
         self.buckets = [None] * self.n_buckets
         for i in range(self.n_buckets):
             self.buckets[i] = ray.remote(BucketsHash).options(**{"num_cpus": self.bucket_cpu}).remote(
                 {"id": i, "data_access": data_access_factory, "snapshot": None})
+        self.logger.info(f"Created {len(self.buckets)} bucket collectors")
         # doc collectors
-        snapshot_path = self.params.get(doc_id_snapshot_directory_key, None)
-        if snapshot_path is None or len(snapshot_path) == 0:
-            d_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}docs/"
-        else:
-            d_path = snapshot_path
-        self.doc_collectors = [None] * self.n_docid
-        files, retries = data_access.get_folder_files(path=d_path)
-        if retries > 0:
-            statistics.add_stats.remote({"data access retries": retries})
-        for file in files.keys():
-            i = int(file[file.rfind("_") + 1:])
-            self.doc_collectors[i] = ray.remote(DocCollector).options(**{"num_cpus": self.docid_cpu}).remote(
-                {"id": i, "data_access": data_access_factory, "snapshot": file}
-            )
-        self.logger.info(f"Created {len(self.doc_collectors)} doc collectors")
+        self.doc_collectors = FdedupSupportRay.create_doc_id_current(
+            data_access_factory=data_access_factory, n_actors=self.n_docid, actor_cpu=self.docid_cpu,
+            directory=self.params.get(doc_id_snapshot_directory_key, None), statistics=statistics, logger=self.logger)
         # processors
         processor_config = {"threshold": self.threshold,
                             "docs_collector": self.doc_collectors,
@@ -320,54 +285,21 @@ class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
         :param stats: output of statistics as aggregated across all calls to all transforms.
         :return: job execution statistics.  These are generally reported as metadata by the Ray Orchestrator.
         """
-        # Get document collector statistics
-        sum_docs = 0
-        sum_docs_mem = 0
-        sum_removed = 0
-        sum_removed_mem = 0
-        remote_replies = [collector.get_size.remote() for collector in self.doc_collectors]
-        while remote_replies:
-            ready, not_ready = ray.wait(remote_replies)
-            d_amount, d_memory, r_amount, r_memory = ray.get(ready)[0]
-            sum_docs += d_amount
-            sum_docs_mem += d_memory
-            sum_removed += r_amount
-            sum_removed_mem += r_memory
-            remote_replies = not_ready
-        # update minhashes and buckets
-        remote_replies = []
-        for collector in self.doc_collectors:
-            # for every doc collector
-            docs, removed = ray.get(collector.get_content.remote())
-            # update minhashes
-            request = [[] for _ in range(self.n_minhash)]
-            for d in removed:
-                request[d % self.n_minhash].append(d)
-            i = 0
-            for req in request:
-                if len(req) > 0:  # Only submit if the length is greater then 0
-                    remote_replies.append(self.minhashes[i].remove_minhashes.remote(req))
-                i = i + 1
-            # build buckets
-            buckets = {}
-            for key, value in docs.items():
-                buckets[value[1]] = buckets.get(value[1], []) + [key]
-            request = [[] for _ in range(self.n_buckets)]
-            for key, value in buckets.items():
-                request[key % self.n_buckets].append((key, value))
-            i = 0
-            for req in request:
-                if len(req) > 0:  # Only submit if the length is greater then 0
-                    remote_replies.append(self.buckets[i].add_buckets.remote(req))
-                i += 1
-        RayUtils.wait_for_execution_completion(logger=self.logger, replies=remote_replies)
-        # snapshot hash
-        replies_m = [collector.snapshot.remote() for collector in self.minhashes]
-        replies_b = [collector.snapshot.remote() for collector in self.buckets]
-        replies_d = [collector.snapshot.remote() for collector in self.doc_collectors]
-        RayUtils.wait_for_execution_completion(logger=self.logger, replies=list(replies_m + replies_b + replies_d))
-        return {"number of documents": sum_docs, "documents memory, GB": sum_docs_mem,
-                "number of removed": sum_removed, "removed memory, GB": sum_removed_mem} | stats
+        from fdedup_ray.utils import FdedupSupportRay
+        # compute minhash usage
+        sum_mh, sum_mh_mem = FdedupSupportRay.get_minhash_stats(self.minhashes)
+        # compute buckets usage
+        sum_buckets, sum_buckets_mem = FdedupSupportRay.get_bucket_stats(self.buckets)
+        # compute doc id usage
+        sum_docs, sum_docs_memory, sum_removed, sum_removed_memory = FdedupSupportRay.get_doc_stats(self.doc_collectors)
+        # create snapshots
+        FdedupSupportRay.snapshot_caches(bucket_actors=self.buckets, doc_actors=self.doc_collectors,
+                                         minhash_actors=self.minhashes, logger=self.logger)
+        # return updated statistics
+        return {"number of buckets": sum_buckets, "bucket memory, GB": sum_buckets_mem,
+                "number of minhashes": sum_mh, "minhashes memory, GB": sum_mh_mem,
+                "number of docs": sum_docs, "docs_memory, GB": sum_docs_memory,
+                "number of removed": sum_removed, "removed_memory, GB": sum_removed_memory} | stats
 
 
 class FdedupBucketProcessorTransformConfiguration(FdedupBucketProcessorTransformConfigurationBase):

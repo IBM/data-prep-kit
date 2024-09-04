@@ -106,22 +106,10 @@ class FdedupFilterRuntimeRay(DefaultRayTransformRuntime):
         :param files - list of files to process
         :return: dictionary of transform init params
         """
-        data_access = data_access_factory.create_data_access()
-        snapshot_path = self.params.get(doc_id_snapshot_directory_key, None)
-        if snapshot_path is None or len(snapshot_path) == 0:
-            doc_path = f"{SnapshotUtils.get_snapshot_folder(data_access)}docs"
-        else:
-            doc_path = snapshot_path
-        self.doc_collector = [None] * self.n_docid
-        files, retries = data_access.get_folder_files(path=doc_path)
-        if retries > 0:
-            statistics.add_stats.remote({"data access retries": retries})
-        for file in files.keys():
-            i = int(file[file.rfind("_") + 1:])
-            self.doc_collector[i] = ray.remote(DocCollector).options(**{"num_cpus": self.docid_cpu}).remote(
-                {"id": i, "data_access": data_access_factory, "snapshot": file}
-            )
-        self.logger.info(f"Created {len(self.doc_collector)} doc collectors")
+        from fdedup_ray.utils import FdedupSupportRay
+        self.doc_collector = FdedupSupportRay.create_doc_id_current(
+            data_access_factory=data_access_factory, n_actors=self.n_docid, actor_cpu=self.docid_cpu,
+            directory=self.params.get(doc_id_snapshot_directory_key, None), statistics=statistics, logger=self.logger)
         return self.params | {doc_id_cache_key: self.doc_collector}
 
     def compute_execution_stats(self, stats: dict[str, Any]) -> dict[str, Any]:
