@@ -247,7 +247,6 @@ class FdedupBucketProcessorRuntime(DefaultRayTransformRuntime):
         :return: dictionary of transform init params
         """
         from fdedup_ray.utils import FdedupSupportRay
-        data_access = data_access_factory.create_data_access()
         # create minhashes
         self.minhashes = FdedupSupportRay.create_minhashes_current(
             data_access_factory=data_access_factory, n_actors=self.n_minhash, actor_cpu=self.minhash_cpu,

@@ -58,6 +58,7 @@ class FdedupFilterTransformRay(FdedupFilterTransformBase):
         from fdedup_ray.utils import FdedupSupportRay
         return FdedupSupportRay.get_unique_ids(actors=self.doc_id_cache, ids=ids)
 
+
 class FdedupFilterRuntimeRay(DefaultRayTransformRuntime):
     """
     fuzzy dedup filter runtime support
@@ -70,7 +71,6 @@ class FdedupFilterRuntimeRay(DefaultRayTransformRuntime):
         self.doc_collector = None
         self.n_docid = params.get(num_doc_id_key, 1)
         self.docid_cpu = params.get(doc_id_cpu_key, .5)
-
 
     def get_transform_config(
             self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]
