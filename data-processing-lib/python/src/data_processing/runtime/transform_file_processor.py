@@ -9,6 +9,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+import os.path
 import time
 import traceback
 from typing import Any
@@ -170,9 +171,17 @@ class AbstractTransformFileProcessor:
                 if start_index is None:
                     start_index = 0
                 count = len(out_files)
+                # get array of paths from stats
+                paths = stats.get("paths", None)
                 for index in range(count):
                     file_ext = out_files[index]
-                    output_name_indexed = f"{output_file_name}_{start_index + index}{file_ext[1]}"
+                    if paths is not None:
+                        dir_name = os.path.dirname(output_file_name)
+                        file_name = os.path.basename(output_file_name)
+                        output_name_indexed = os.path.join(dir_name, paths[index], f"{file_name}{file_ext[1]}")
+                    else:
+                        output_name_indexed = f"{output_file_name}_{start_index + index}{file_ext[1]}"
+
                     file_sizes += len(file_ext[0])
                     self.logger.debug(
                         f"Writing transformed file {self.last_file_name}{self.last_extension}, {index + 1} "
