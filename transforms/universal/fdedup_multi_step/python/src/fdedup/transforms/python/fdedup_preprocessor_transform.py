@@ -20,7 +20,7 @@ from data_processing.runtime.pure_python import (DefaultPythonTransformRuntime,
                                                  PythonTransformLauncher,
                                                  PythonTransformRuntimeConfiguration
                                                  )
-from fdedup.utils import BucketsHash, DocCollector, DocsMinHash, MurmurMH, FdedupSupport
+from fdedup.utils import MurmurMH
 from fdedup.transforms.base import (FdedupPreprocessorTransformBase,
                                     FdedupPreprocessorTransformConfigurationBase,
                                     buckets_cache_key, minhashes_cache_key, mn_min_hash_key,
@@ -74,9 +74,9 @@ class FdedupPreprocessorTransform(FdedupPreprocessorTransformBase):
         buckets, minhashes, docs, removed = (
             self._remove_local_duplicates(buckets=buckets, minhashes=minhashes))
         # populate cache
-        self.minhashes.add_minhashes(updates=minhashes)
-        self.buckets.add_buckets(bck=list(buckets.items()))
         self.docid.add_documents(dr=(list(docs.items()), removed))
+        self.buckets.add_buckets(bck=list(buckets.items()))
+        self.minhashes.add_minhashes(updates=minhashes)
 
 
 class FdedupPreprocessorRuntime(DefaultPythonTransformRuntime):
