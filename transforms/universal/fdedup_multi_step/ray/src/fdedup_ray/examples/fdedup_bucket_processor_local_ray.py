@@ -61,11 +61,11 @@ params = {
     bucket_processor_bucket_cpu_cli_param: .5,
     bucket_processor_minhash_cpu_cli_param: .5,
     bucket_processor_docid_cpu_cli_param: .5,
-    bucket_processor_processor_cpu_cli_param: .8,
+    bucket_processor_processor_cpu_cli_param: .5,
     bucket_processor_num_buckets_cli_param: 1,
     bucket_processor_num_minhash_cli_param: 1,
     bucket_processor_num_docid_cli_param: 1,
-    bucket_processor_num_processors_cli_param: 2,
+    bucket_processor_num_processors_cli_param: 1,
 }
 
 sys.argv = ParamsUtils.dict_to_req(d=params)

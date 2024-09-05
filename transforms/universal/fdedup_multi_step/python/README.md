@@ -22,9 +22,19 @@ Each of the steps has its own configuration options
 * _threshold_ -specifies threshold for Jaccardi distance comparison (default .8)
 * _shingles_size_ - specifies number of worgs per shingle (default 5)
 * _delimiter_ - specifies delimiter for word splitting(default "")
-* _minhash_snapshot_directory_ - specifies minhash snapshot directory (default - None)
+* _minhash_snapshot_directory_ - specifies minhash snapshot directory (default - None).
 * _buckets_snapshot_directory_ - specifies buckets snapshot directory (default - None)
 * _docid_snapshot_directory_ - specifies doc id snapshot directory (default - None)
+
+The last three parameters are introduced here for incremental Fdedup implementations and allow
+to bring results of the previous Fdedup step into computations for a new one. Note here that in
+order to use them, the following should be in place:
+* integer doc ids should be unique across all documents (previous and current runs). 
+[Doc ID transform](../../doc_id) allows now to get the last id used and set arbitrary starting
+integer id.
+* As fuzzy dedup is preserving a document in the cluster with the max length, in order to 
+ensure that all of the document from the previous runs are preserved, their length should
+be set to a very large number. This can be done in minhash snapshots of the previous runs
 
 ### Bucket processor
 
