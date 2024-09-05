@@ -19,6 +19,8 @@ from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
 
 NO_SIMILARITY = -1
 LONG_BUCKET = 5000
+REQUEST_LEN = 8192
+
 
 
 class FdedupSupport:

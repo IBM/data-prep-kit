@@ -18,6 +18,7 @@ from data_processing.transform import AbstractBinaryTransform, TransformConfigur
 from data_processing.utils import UnrecoverableException, CLIArgumentProvider
 from fdedup.transforms.base import (threshold_key, num_permutations_key,
                                     minhash_snapshot_directory_key, doc_id_snapshot_directory_key)
+from fdedup.utils import REQUEST_LEN
 
 # configuration parameters
 short_name = "fdedup_bucket_processor"
@@ -90,9 +91,19 @@ class FdedupBucketProcessorTransformBase(AbstractBinaryTransform):
         for bucket in long_buckets:
             self._submit_bucket_processing([bucket])
         self.logger.debug("Done submitting long buckets")
-
         # And now the rest of buckets
-        bucket_chunks = [short_buckets[i * 100: (i + 1) * 100] for i in range((len(short_buckets) + 99) // 100)]
+        bucket_chunks = []
+        d_ids = set()
+        current_chunk = []
+        for h, b in short_buckets:
+            d_ids |= set(b)
+            current_chunk.append((h,b))
+            if len(d_ids) >= REQUEST_LEN:
+                bucket_chunks.append(current_chunk)
+                current_chunk = []
+                d_ids = set()
+        if len(current_chunk) > 0:
+            bucket_chunks.append(current_chunk)
         for b in bucket_chunks:
             self._submit_bucket_processing(b)
         return [], {"long buckets": len(long_buckets), "short buckets": len(short_buckets)}

@@ -23,10 +23,7 @@ from data_processing.utils import (
     TransformUtils,
 )
 from data_processing.utils import UnrecoverableException
-from fdedup.utils import NO_SIMILARITY
-
-# performance
-REQUEST_LEN = 8192
+from fdedup.utils import NO_SIMILARITY, REQUEST_LEN
 
 # configuration parameters
 short_name = "fdedup_preprocessor"
@@ -137,9 +134,10 @@ class FdedupPreprocessorTransformBase(AbstractTableTransform):
                 continue
             b_docs, b_removed = (
                 FdedupSupport.process_buckets_locally(b_hash=b_hash, bucket=bucket, minhashes=minhashes_dict,
-                                        threshold=self.threshold))
+                                                      threshold=self.threshold))
             docs, removed = (
-                FdedupSupport.merge_doc_ids(current_ids=docs, current_removed=removed, new_ids=b_docs, new_removed=b_removed))
+                FdedupSupport.merge_doc_ids(current_ids=docs, current_removed=removed, new_ids=b_docs,
+                                            new_removed=b_removed))
         # remove minhashes for removed docs
         for cid in removed:
             minhashes_dict.pop(cid, None)

@@ -341,6 +341,10 @@ class BucketsHashProcessor:
         """
         from fdedup.utils import FdedupSupport
         t_start = time.time()
+        d_set = set()
+        for b_hash, bucket in buckets:
+            d_set |= set(bucket)
+        hashes = self._get_minhashes_docs(list(d_set))
         docs = {}
         removed = set()
         for b_hash, bucket in buckets:
@@ -353,7 +357,6 @@ class BucketsHashProcessor:
             start = time.time()
             bucket_len = len(bucket)
             very_long = bucket_len > LONG_BUCKET
-            hashes = self._get_minhashes_docs(bucket)
             b_docs, b_removed = (
                 FdedupSupport.process_buckets_locally(b_hash=b_hash, bucket=bucket, minhashes=hashes, threshold=self.threshold))
             docs, removed = (

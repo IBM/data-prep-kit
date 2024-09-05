@@ -6,4 +6,4 @@ from fdedup.utils.fdedup_classes import (NO_SIMILARITY,
                                          BucketsHash,
                                          BucketsHashProcessor
                                          )
-from fdedup.utils.fdedupsupport import  FdedupSupport
+from fdedup.utils.fdedupsupport import  FdedupSupport, LONG_BUCKET, REQUEST_LEN
