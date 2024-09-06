@@ -24,7 +24,7 @@ fuzzy dedup and should not be modified. We here compute three different cluster 
 - preprocessor
 - bucket processor
 - filter
-For preprocessor and filter we cap number of workers to 800 to ensure that we are not starving S3.
+For preprocessor and filter we cap number of workers to 1000 to ensure that we are not starving S3.
 Number of bucket processors that are used for the actual deduping do not impact S3 and can be made
 as large as desired to improve the throughput 
 """
@@ -38,9 +38,9 @@ threshold = 0.7
 false_positive = 0.5
 false_negative = 0.5
 # Number of workers for initial run
-n_workers = 800
-if n_workers > 800:
-    n_workers = 800
+n_workers = 1000
+if n_workers > 1000:
+    n_workers = 1000
 n_bucket_processors = 1000
 # pod cpus
 ray_node_cpu = 50

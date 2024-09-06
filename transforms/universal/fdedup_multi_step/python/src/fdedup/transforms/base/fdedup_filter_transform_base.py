@@ -25,8 +25,8 @@ from fdedup.transforms.base import doc_column_name_key, int_column_name_key, doc
 # configuration parameters
 short_name = "fdedup_filter"
 filter_cli_prefix = f"{short_name}_"
-cluster_column_name_key = "cluster_column"
-removed_docs_column_name_key = "removed_docs_column"
+cluster_column_name_key = "cluster"
+removed_docs_column_name_key = "removed_docs"
 doc_id_cache_key = "doc_id_cache"
 
 filter_doc_column_name_cli_param = f"{filter_cli_prefix}{doc_column_name_key}"

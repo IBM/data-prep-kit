@@ -18,10 +18,10 @@ from data_processing.test_support.launch.transform_test import (
 )
 from fdedup.transforms.base import (preprocessor_doc_column_name_cli_param,
                                     preprocessor_int_column_name_cli_param,
-                                    delimiters_cli_param,
+                                    preprocessor_delimiters_cli_param,
                                     preprocessor_num_permutations_cli_param,
                                     preprocessor_threshold_cli_param,
-                                    shingles_size_cli_param,
+                                    preprocessor_shingles_size_cli_param,
                                     )
 from fdedup.transforms.python import FdedupPreprocessorPythonTransformRuntimeConfiguration
 
@@ -38,10 +38,10 @@ class TestPythonFdedupPreprocessorTransform(AbstractTransformLauncherTest):
         launcher = PythonTransformLauncher(FdedupPreprocessorPythonTransformRuntimeConfiguration())
         config = {preprocessor_doc_column_name_cli_param: "contents",
                   preprocessor_int_column_name_cli_param: "Unnamed: 0",
-                  delimiters_cli_param: " ",
+                  preprocessor_delimiters_cli_param: " ",
                   preprocessor_num_permutations_cli_param: 64,
                   preprocessor_threshold_cli_param: .8,
-                  shingles_size_cli_param: 5,
+                  preprocessor_shingles_size_cli_param: 5,
 
                   }
         return [(launcher, config, basedir + "/input", basedir + "/preprocessor")]

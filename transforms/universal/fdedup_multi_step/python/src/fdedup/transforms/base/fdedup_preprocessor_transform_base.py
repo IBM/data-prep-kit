@@ -46,10 +46,10 @@ doc_id_snapshot_directory_key = "doc_id_snapshot_directory"
 
 preprocessor_doc_column_name_cli_param = f"{preprocessor_cli_prefix}{doc_column_name_key}"
 preprocessor_int_column_name_cli_param = f"{preprocessor_cli_prefix}{int_column_name_key}"
-delimiters_cli_param = f"{preprocessor_cli_prefix}{delimiters_key}"
+preprocessor_delimiters_cli_param = f"{preprocessor_cli_prefix}{delimiters_key}"
 preprocessor_num_permutations_cli_param = f"{preprocessor_cli_prefix}{num_permutations_key}"
 preprocessor_threshold_cli_param = f"{preprocessor_cli_prefix}{threshold_key}"
-shingles_size_cli_param = f"{preprocessor_cli_prefix}{shingles_size_key}"
+preprocessor_shingles_size_cli_param = f"{preprocessor_cli_prefix}{shingles_size_key}"
 preprocessor_minhash_snapshot_directory_cli_param = f"{preprocessor_cli_prefix}{minhash_snapshot_directory_key}"
 preprocessor_buckets_snapshot_directory_cli_param = f"{preprocessor_cli_prefix}{buckets_snapshot_directory_key}"
 preprocessor_docid_snapshot_directory_cli_param = f"{preprocessor_cli_prefix}{doc_id_snapshot_directory_key}"
@@ -257,12 +257,12 @@ class FdedupPreprocessorTransformConfigurationBase(TransformConfiguration):
             help="threshold"
         )
         parser.add_argument(
-            f"--{shingles_size_cli_param}",
+            f"--{preprocessor_shingles_size_cli_param}",
             type=int,
             default=5,
             help="number of words in shingle")
         parser.add_argument(
-            f"--{delimiters_cli_param}",
+            f"--{preprocessor_delimiters_cli_param}",
             type=str,
             default=" ",
             help="delimiter for splitting document"

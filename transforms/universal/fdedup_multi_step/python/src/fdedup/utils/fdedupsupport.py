@@ -136,8 +136,8 @@ class FdedupSupport:
                     min_len = c_len
                     cluster_id = doc_id
             current_set.discard(remaining)
-            docs, removed = FdedupSupport.merge_doc_ids(current_ids=docs, current_removed=removed,
-                                                        new_ids={remaining: (cluster_id, b_hash)}, new_removed=current_set)
+            docs[remaining] = (cluster_id, b_hash)
+            removed |= current_set
             return docs, removed
 
     @staticmethod

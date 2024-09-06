@@ -17,10 +17,10 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 from fdedup.transforms.base import (preprocessor_doc_column_name_cli_param,
                                     preprocessor_int_column_name_cli_param,
-                                    delimiters_cli_param,
+                                    preprocessor_delimiters_cli_param,
                                     preprocessor_num_permutations_cli_param,
                                     preprocessor_threshold_cli_param,
-                                    shingles_size_cli_param,
+                                    preprocessor_shingles_size_cli_param,
                                     preprocessor_minhash_snapshot_directory_cli_param)
 from fdedup.transforms.python import FdedupPreprocessorPythonTransformRuntimeConfiguration
 
@@ -44,10 +44,10 @@ params = {
     # fdedup parameters
     preprocessor_doc_column_name_cli_param: "contents",
     preprocessor_int_column_name_cli_param: "Unnamed: 0",
-    delimiters_cli_param: " ",
+    preprocessor_delimiters_cli_param: " ",
     preprocessor_num_permutations_cli_param: 64,
     preprocessor_threshold_cli_param: .8,
-    shingles_size_cli_param: 5,
+    preprocessor_shingles_size_cli_param: 5,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

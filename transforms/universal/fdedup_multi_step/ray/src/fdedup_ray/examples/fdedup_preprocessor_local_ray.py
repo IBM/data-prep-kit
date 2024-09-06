@@ -17,10 +17,10 @@ from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from fdedup.transforms.base import (preprocessor_doc_column_name_cli_param,
                                     preprocessor_int_column_name_cli_param,
-                                    delimiters_cli_param,
+                                    preprocessor_delimiters_cli_param,
                                     preprocessor_num_permutations_cli_param,
                                     preprocessor_threshold_cli_param,
-                                    shingles_size_cli_param,
+                                    preprocessor_shingles_size_cli_param,
                                     )
 from fdedup_ray.transforms import (FdedupPreprocessorRayTransformRuntimeConfiguration,
                                    preprocessor_bucket_cpu_cli_param,
@@ -53,9 +53,9 @@ params = {
     # fdedup parameters
     preprocessor_doc_column_name_cli_param: "contents",
     preprocessor_int_column_name_cli_param: "Unnamed: 0",
-    delimiters_cli_param: " ",
+    preprocessor_delimiters_cli_param: " ",
     preprocessor_num_permutations_cli_param: 64,
-    shingles_size_cli_param: 5,
+    preprocessor_shingles_size_cli_param: 5,
     preprocessor_threshold_cli_param: .8,
     preprocessor_num_buckets_cli_param: 1,
     preprocessor_bucket_cpu_cli_param: .5,
