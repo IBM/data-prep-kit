@@ -203,8 +203,17 @@ class AbstractTransformFileProcessor:
                     }
                 )
         # save transformer's statistics
-        if len(stats) > 0:
-            self._publish_stats(stats)
+        # only save numeric values, not lists or strings
+        def is_numeric(x):
+            try:
+                float(x)
+                return True
+            except (ValueError, TypeError):
+                return False
+
+        stats_to_publish = {k: v for k, v in stats.items() if is_numeric(v)}
+        if len(stats_to_publish) > 0:
+            self._publish_stats(stats_to_publish)
 
     def _publish_stats(self, stats: dict[str, Any]) -> None:
         """
