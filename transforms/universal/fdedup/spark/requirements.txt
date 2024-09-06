@@ -3,3 +3,4 @@ pyarrow
 pyyaml
 boto3
 kubernetes
+polars
