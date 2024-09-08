@@ -10,6 +10,7 @@
 # limitations under the License.
 ################################################################################
 import os
+import ast
 
 import kfp.compiler as compiler
 import kfp.components as comp
@@ -77,7 +78,7 @@ def fdedup_bucket_processor(
     ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image},
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access. checkpointing is not supported by dedup
-    data_s3_config: str = "{'input_folder': 'test/fdedup/input/', 'output_folder': 'test/fdedup/output/'}",
+    data_s3_config: str = "{'input_folder': 'test/fdedup_ms/output/snapshot/buckets', 'output_folder': 'test/fdedup_ms/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
@@ -195,7 +196,7 @@ def fdedup_bucket_processor(
             ray_name=ray_name,
             run_id=run_id,
             additional_params=additional_params,
-            exec_params=compute_exec_params.output,
+            exec_params=compute_exec_params.output | {"data_files_to_use": ast.literal_eval("['']")},
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
         )
