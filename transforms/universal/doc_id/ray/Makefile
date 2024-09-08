@@ -33,7 +33,7 @@ setup:: .transforms.setup
 
 # TRANSFORM_PYTHON_VERSION has no effect since requirements do not specify a python transform implementation
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=dummy TOML_VERSION=$(DOC_ID_RAY_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DOC_ID_PYTHON_VERSION) TOML_VERSION=$(DOC_ID_RAY_VERSION) .transforms.set-versions 
 
 build-dist:: .defaults.build-dist
 

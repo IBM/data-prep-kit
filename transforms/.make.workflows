@@ -13,7 +13,6 @@ KFP_ENDPOINT ?= "http://localhost:8080/"
 
 .PHONY: set-versions
 set-versions:
-	echo ${DOCKER_IMAGE_VERSION}
 	cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) set-versions
 	@for file in $(PYTHON_WF); do \
 		cd ${REPOROOT}/kfp/kfp_ray_components && $(MAKE) .reconcile-requirements FILE=${CURDIR}/$$file; \

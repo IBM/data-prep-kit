@@ -65,7 +65,7 @@ class AbstractTransformLauncherTest(AbstractTest):
         Confirm that the two directories contains the same files.
         Stubbed out like this to allow spark tests to override this since spark tends to rename the files.
         """
-        AbstractTest.validate_directory_contents(dir, expected, ignore_columns)
+        self.validate_directory_contents(dir, expected, ignore_columns)
 
     def _install_test_fixtures(self, metafunc):
         # Apply the fixtures for the method with these input names (i.e. test_transform()).

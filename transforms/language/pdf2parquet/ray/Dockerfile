@@ -7,6 +7,8 @@ RUN pip install --upgrade --no-cache-dir pip
 # install pytest
 RUN pip install --no-cache-dir pytest
 
+ARG PIP_INSTALL_EXTRA_ARGS
+
 RUN \
     sudo apt-get update \
     # for opencv, towhee
@@ -21,11 +23,11 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/ 
 RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
 COPY --chown=ray:users python-transform/  python-transform/
-RUN cd python-transform && pip install --no-cache-dir -e .
+RUN cd python-transform && pip install ${PIP_INSTALL_EXTRA_ARGS} --no-cache-dir -e .
 
 
 COPY --chown=ray:users pyproject.toml pyproject.toml 
-RUN pip install --no-cache-dir -e .
+RUN pip install ${PIP_INSTALL_EXTRA_ARGS} --no-cache-dir -e .
 
 # Download models
 RUN python -c 'from deepsearch_glm.utils.load_pretrained_models import load_pretrained_nlp_models; load_pretrained_nlp_models(verbose=True);'

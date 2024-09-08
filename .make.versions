@@ -101,6 +101,8 @@ HEADER_CLEANSER_RAY_VERSION=$(DPK_VERSION)
 
 PII_REDACTOR_PYTHON_VERSION=$(DPK_VERSION)
 
+HTML2PARQUET_PYTHON_VERSION=$(DPK_VERSION)
+
 DPK_TRNASFORM_REV=$(DPK_VERSION)
 
 ################## ################## ################## ################## ################## ##################
@@ -117,3 +119,4 @@ ifeq ($(KFPv2), 1)
 else
         WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
 endif
+

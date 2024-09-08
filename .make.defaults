@@ -39,9 +39,9 @@ DOCKER_FILE?=Dockerfile
 DOCKER?=docker
 DOCKER_PLATFORM?=linux/amd64
 # Can be used by transforms or others to add args to the "docker build" command in .defaults.image target
-DOCKER_BUILD_EXTRA_ARGS=
+DOCKER_BUILD_EXTRA_ARGS?=
 # Can be used by transforms or others to add args to the "pip install" commands referencing toml or requirements.txt files
-PIP_INSTALL_EXTRA_ARGS=
+PIP_INSTALL_EXTRA_ARGS?=
 DOCKER_HOSTNAME?=quay.io
 DOCKER_NAMESPACE ?= dataprep1/data-prep-kit
 DOCKER_REGISTRY_USER?=$(DPK_DOCKER_REGISTRY_USER)
@@ -578,12 +578,12 @@ MINIO_ADMIN_PWD= localminiosecretkey
 	@# Help: Update pyproject.toml to depend on lib versions defined in .make.versions 
 	@if [ -e pyproject.toml ]; then					\
 	    cat pyproject.toml | sed 									\
-		-e 's/"data-prep-toolkit-ray\(..\).*",/"data-prep-toolkit-ray\1$(DPK_LIB_VERSION)",/' 	\
-		-e 's/"data-prep-toolkit-spark\(..\).*",/"data-prep-toolkit-spark\1$(DPK_LIB_VERSION)",/' 	\
-		-e 's/"data-prep-toolkit-kfp\([=><][=><]\).*",/"data-prep-toolkit-kfp\1$(DPK_LIB_KFP_VERSION)",/' 	\
-		-e 's/"data-prep-toolkit\([=><][=><]\).*",/"data-prep-toolkit\1$(DPK_LIB_VERSION)",/' 		\
-		-e 's/"ray\[default\]\([=><][=><]\).*",/"ray\[default\]\1$(RAY)",/'				\
-		-e 's/"data-prep-toolkit-kfp-shared\(..\).*",/"data-prep-toolkit-kfp-shared\1$(DPK_LIB_KFP_VERSION)",/'     \
+		-e 's/"data-prep-toolkit-ray\([=><~][=]\).*"/"data-prep-toolkit-ray\1$(DPK_LIB_VERSION)"/' 	\
+		-e 's/"data-prep-toolkit-spark\([=><~][=]\).*"/"data-prep-toolkit-spark\1$(DPK_LIB_VERSION)"/' 	\
+		-e 's/"data-prep-toolkit-kfp\([=><~][=]\).*"/"data-prep-toolkit-kfp\1$(DPK_LIB_KFP_VERSION)"/' 	\
+		-e 's/"data-prep-toolkit\([=><~][=]\).*"/"data-prep-toolkit\1$(DPK_LIB_VERSION)"/' 		\
+		-e 's/"ray\[default\]\([=><~][=]\).*"/"ray\[default\]\1$(RAY)"/'				\
+		-e 's/"data-prep-toolkit-kfp-shared\(..\).*"/"data-prep-toolkit-kfp-shared\1$(DPK_LIB_KFP_VERSION)"/'     \
 		> tt.toml;				\
 	    mv tt.toml pyproject.toml;			\
 	 fi

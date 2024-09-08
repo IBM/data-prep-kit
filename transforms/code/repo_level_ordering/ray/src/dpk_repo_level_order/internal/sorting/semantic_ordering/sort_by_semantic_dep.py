@@ -49,7 +49,7 @@ supported_exts = {
 
 
 @func_set_timeout(1800)
-def sort_sem(files_df: pd.DataFrame, logger: Logger, title_column_name="new_title"):
+def sort_sem(files_df: pd.DataFrame, logger: Logger, title_column_name="new_title", language_column_name="language"):
     received_shape = files_df.shape
     supported_bools = files_df.ext.isin(supported_exts)
 
@@ -57,7 +57,7 @@ def sort_sem(files_df: pd.DataFrame, logger: Logger, title_column_name="new_titl
         logger.info("Proceeding with semantic sorting")
 
         start_time = time.time()
-        dep_graph = build_edges(files_df, logger, title_column_name)
+        dep_graph = build_edges(files_df, logger, title_column_name, language_column_name)
         graph_time = round(time.time() - start_time, 2)
         logger.info(f"sort_sem: time taken build_edges - {graph_time}")
 

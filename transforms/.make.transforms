@@ -333,10 +333,8 @@ minio-stop:
 	$(call check_defined, TRANSFORM_PYTHON_VERSION)
 	$(MAKE) .defaults.update-toml
 	if [ -e pyproject.toml ]; then	\
-	    dash_name=$$(echo $(TRANSFORM_NAME) | sed -e 's/_/-/g');		\
 	    cat pyproject.toml | sed 	\
-	    -e 's/"dpk-$(TRANSFORM_NAME)-transform-python\([=<>][=<>]\).*",/"dpk-$(TRANSFORM_NAME)-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
-	    -e 's/"dpk-'$${dash_name}'-transform-python\([=<>][=<>]\).*",/"dpk-'$${dash_name}'-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
+	    -e 's/\("dpk[_-].*transform[_-]python[=<>~][=]\).*"/\1$(TRANSFORM_PYTHON_VERSION)"/'	\
 	    > tt.toml;			\
 	    mv tt.toml pyproject.toml;	\
 	fi
