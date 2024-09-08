@@ -24,7 +24,7 @@ This version of fuzzy dedup code is split into 3 transforms:
   by doc ID cache and are snapshotted at the end of this step. Additionally this step produces
   minhash and bucket hash snapshot, which contain only non-duplicate documents. These two 
   snapshots can be used for implementation of the incremental fuzzy dedup (see below)
-* Fuzzy dedup fillter is responsible for re reading of the original data and filtering out
+* Fuzzy dedup filter is responsible for re reading of the original data and filtering out
   all duplicate documents based on the doc ID cache which is created based on the snapshot 
   produced in the previous step.
 

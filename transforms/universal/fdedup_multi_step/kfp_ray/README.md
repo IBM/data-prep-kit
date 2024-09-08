@@ -3,7 +3,20 @@
 
 ## Summary 
 This project allows execution of the [multi step fuzzy dedup](../ray) as a 
-[KubeFlow Pipeline](https://www.kubeflow.org/docs/components/pipelines/overview/)
+[KubeFlow Pipeline](https://www.kubeflow.org/docs/components/pipelines/overview/). As 
+defined [here](../README.md), this version of fuzzy dedup is a combination of 3 transforms:
+* Fuzzy dedup preprocessor
+* Fuzzy dedup bucket processor
+* Fuzzy dedup filter
+
+As a result, we provide here three workflows - one for each step. Each step has its own 
+resource requirements and can be executed independently. Note although, that supporting
+actors parameters - number of doc, minhash and bucket actors and dedup parameters - threshold
+and number of permutations can not change between steps. The number of actors is computed by 
+the preprocessor workflow based on the amount of documents and should be entered in the 
+subsequent ones.
+
+For production purposes it also makes sense to create a "super workflow" combining all 3 steps
 
 The detail pipeline is presented in the [Simplest Transform pipeline tutorial](../../../../kfp/doc/simple_transform_pipeline.md) 
 
