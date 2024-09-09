@@ -1,29 +1,54 @@
-ARG BASE_IMAGE=pyspark-base:3.5.1
-# local kind test
-#ARG BASE_IMAGE=spark-fdedup/pyspark-base-1:latest
+ARG BASE_IMAGE=data-prep-kit-spark-3.5.2:0.3.0
+
 FROM ${BASE_IMAGE}
 
 USER root
+# install pytest
+RUN pip install --no-cache-dir pytest
+
+WORKDIR ${SPARK_HOME}/work-dir
+
+# Copy in the data processing framework source/project and install it
+# This is expected to be placed in the docker context before this is run (see the make image).
+COPY --chown=spark:root data-processing-lib-python/ data-processing-lib-python/
+RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
+COPY --chown=spark:root data-processing-lib-spark/ data-processing-lib-spark/
+RUN cd data-processing-lib-spark && pip install --no-cache-dir -e .
+COPY --chown=spark:root python-transform/  python-transform/
+RUN cd python-transform && pip install --no-cache-dir -e .
+
+# Install project source
+COPY --chown=spark:root src/ src/
+COPY --chown=spark:root pyproject.toml pyproject.toml
 RUN mkdir -p /opt/spark/work-dir/src/templates && \
-    mkdir -p /opt/spark/work-dir/config && \
-    mkdir -p /opt/spark/work-dir/src/transforms
+    mkdir -p /opt/spark/work-dir/config
 
 # install requirements from requirements.txt
-COPY requirements_fuzzy_dedup.txt .
-RUN pip3 install -r requirements_fuzzy_dedup.txt
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
 
-COPY src/spark_transformer_runtime.py /opt/spark/work-dir/src/
-COPY src/data_access.py /opt/spark/work-dir/src/
-COPY src/Murmur_MH.py /opt/spark/work-dir/src/
-COPY src/config.yml /opt/spark/work-dir/src/
-COPY src/fd_signature_calculator.py /opt/spark/work-dir/src/
-COPY src/fd_clusters_calculator.py /opt/spark/work-dir/src/
-COPY src/fd_jaccard_distance_calculator.py /opt/spark/work-dir/src/
-COPY src/fd_clean_data.py /opt/spark/work-dir/src/
-COPY src/spark_fuzzy_controller.py /opt/spark/work-dir/src/
 COPY deployment/kubernetes/spark-executor-pod-template.yaml /opt/spark/work-dir/src/templates/
 COPY config/spark_profile.yaml /opt/spark/work-dir/config/
 
+RUN pip install --no-cache-dir -e .
+
+# copy the main() entry point to the image
+COPY ./src/signature_calc_spark.py .
+
+# copy some of the samples in
+# COPY src/filter_local_spark.py local/
+
+# copy test
+COPY test/ test/
+COPY test-data/ test-data/
+
 USER spark
-# add src folder to PYTHONPATH
-ENV PYTHONPATH=${SPARK_HOME}/work-dir/src/:${PYTHONPATH}
+
+# Set environment
+ENV PYTHONPATH=${SPARK_HOME}/work-dir/:${SPARK_HOME}/work-dir/src/:${PYTHONPATH}
+
+# Put these at the end since they seem to upset the docker cache.
+ARG BUILD_DATE
+ARG GIT_COMMIT
+LABEL build-date=$BUILD_DATE
+LABEL git-commit=$GIT_COMMIT

@@ -1,3 +1,14 @@
+# Define the root of the local git clone for the common rules to be able
+# know where they are running from.
+REPOROOT=../../../..
+# Include a library of common .transform.* targets which most
+# transforms should be able to reuse.  However, feel free
+# to override/redefine the rules below.
+include $(REPOROOT)/transforms/.make.transforms
+
+# This is included in the image name, if defined
+TRANSFORM_NAME=fd-sig-calc
+
 DOCKER_IMAGE_NAME=pyspark-base
 DOCKER_IMAGE_VERSION=latest
 DOCKER_FILE=Dockerfile
@@ -15,7 +26,9 @@ venv:	requirements.txt requirements_fuzzy_dedup.txt
 	pip install -r requirements.txt;	\
 	pip install -r requirements_fuzzy_dedup.txt;
 
-image: # Must be called with DOCKER_IMAGE_NAME=, DOCKER_IMAGE_VERSION= settings.
+image:: .transforms.spark-image
+
+image-direct: # Must be called with DOCKER_IMAGE_NAME=, DOCKER_IMAGE_VERSION= settings.
 	@# Help: Create the docker image $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 	$(DOCKER) build -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) -f $(DOCKER_FILE) .
 

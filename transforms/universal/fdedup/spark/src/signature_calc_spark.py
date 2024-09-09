@@ -14,6 +14,7 @@ import os
 import sys
 
 import polars as pl
+from data_processing.utils import ParamsUtils
 from data_processing_spark.runtime.spark import SparkTransformLauncher
 from signature_calc_transform_spark import (
     SignatureCalculationSparkTransformConfiguration,
@@ -21,6 +22,13 @@ from signature_calc_transform_spark import (
 
 
 if __name__ == "__main__":
+    sys.argv.append("--data_s3_cred")
+    s3_creds = {
+        "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
+        "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
+        "url": os.getenv("AWS_ENDPOINT_URL"),
+    }
+    sys.argv.append(ParamsUtils.convert_to_ast(s3_creds))
     # create launcher
     launcher = SparkTransformLauncher(runtime_config=SignatureCalculationSparkTransformConfiguration())
     # Launch the ray actor(s) to process the input

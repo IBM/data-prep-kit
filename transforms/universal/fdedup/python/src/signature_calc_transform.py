@@ -142,7 +142,7 @@ class SignatureCalculationTransform(AbstractTableTransform):
         df = pl.from_arrow(table)
 
         # read the target columns
-        df = df.select("contents", "int_id_column")
+        df = df.select(self.contents_column, self.document_id_column)
 
         # generate minhash values
         minhashed = df.map_rows(
