@@ -31,5 +31,5 @@ if __name__ == "__main__":
     sys.argv.append(ParamsUtils.convert_to_ast(s3_creds))
     # create launcher
     launcher = SparkTransformLauncher(runtime_config=SignatureCalculationSparkTransformConfiguration())
-    # Launch the ray actor(s) to process the input
+    # Launch the spark worker(s) to process the input
     launcher.launch()
