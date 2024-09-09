@@ -60,6 +60,4 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
         """
         for key, val in stats.items():
             # for all key/values
-            if val > 0:
-                # for values greater then 0
-                self.stats[key] = self.stats.get(key, 0) + val
+            self.stats[key] = self.stats.get(key, 0) + val
