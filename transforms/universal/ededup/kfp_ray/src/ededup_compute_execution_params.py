@@ -10,9 +10,6 @@
 # limitations under the License.
 ################################################################################
 
-from typing import Any
-
-
 def ededup_compute_execution_params(
     worker_options: dict,  # ray worker configuration
     actor_options: dict,  # actor's resource requirements
@@ -22,24 +19,28 @@ def ededup_compute_execution_params(
     runtime_pipeline_id: str,  # pipeline id
     runtime_job_id: str,  # job id
     runtime_code_location: dict,  # code location
-    doc_column: str,  # key for accessing data
-    hash_cpu: float,  # number of CPUs per hash
-    n_samples: int,  # number of samples for parameters computation
+    ededup_doc_column: str,  # key for accessing data
+    ededup_hash_cpu: float,  # number of CPUs per hash
+    ededup_use_snapshot: bool,  # flag to start from snapshot
+    ededup_snapshot_directory: str,  # snapshot directory
+    ededup_n_samples: int,  # number of samples for parameters computation
 ) -> dict:
     """
     Compute exact dedup execution parameters
     :param worker_options: cluster parameters
     :param actor_options: actor request requirements
-    :param n_samples: number of samples to use
+    :param ededup_n_samples: number of samples to use
     :param data_s3_config - s3 config
     :param data_max_files - max files to process
     :param data_num_samples - num samples to process
     :param runtime_pipeline_id - pipeline id
     :param runtime_job_id - job id, or just a unique string
     :param runtime_code_location - code location
-    :param doc_column - key for accessing data
-    :param hash_cpu - number of CPUs per hash
-    :param n_samples - umber of samples for parameters computation
+    :param ededup_doc_column - key for accessing data
+    :param ededup_hash_cpu - number of CPUs per hash
+    :param ededup_use_snapshot - flag to start from existing snapshot
+    :param ededup_snapshot_directory: str - snapshot directory
+    :param ededup_n_samples - umber of samples for parameters computation
     :return: a dictionary with a Ray Job execution parameters
     """
     # required import
@@ -73,7 +74,7 @@ def ededup_compute_execution_params(
     # because S3 is the only viable version for kfp-based implementation, we are here creating DataAccess S3 directly
     data_access = DataAccessS3(s3_credentials=s3_creds, s3_config=s3_config, d_sets=None, checkpoint=False, m_files=-1)
     # sample input data
-    sampling, _ = data_access.sample_input_data(n_samples=n_samples)
+    sampling, _ = data_access.sample_input_data(n_samples=ededup_n_samples)
     avg_doc_size = sampling.get("average doc size KB")
     number_of_docs = sampling.get("estimated number of docs")
     if number_of_docs == 0:
@@ -84,7 +85,7 @@ def ededup_compute_execution_params(
     n_hashes = math.ceil(number_of_docs * 32 / GB)
     print(f"Estimated Required hashes {n_hashes}")
     print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_memory}")
-    required_hash_cpu = n_hashes * hash_cpu
+    required_hash_cpu = n_hashes * ededup_hash_cpu
     required_hash_mem = n_hashes * 2
     if required_hash_cpu > cluster_cpu or required_hash_mem > cluster_memory:
         print(
@@ -118,7 +119,9 @@ def ededup_compute_execution_params(
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": str(runtime_code_location),
-        "ededup_doc_column": doc_column,
-        "ededup_hash_cpu": hash_cpu,
+        "ededup_doc_column": ededup_doc_column,
+        "ededup_hash_cpu": ededup_hash_cpu,
+        "ededup_use_snapshot": ededup_use_snapshot,
+        "ededup_snapshot_directory": ededup_snapshot_directory,
         "ededup_num_hashes": n_hashes,
     }

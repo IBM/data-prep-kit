@@ -38,6 +38,7 @@ def super_pipeline(
     p3_doc_id_doc_column: str = "contents",
     p3_doc_id_hash_column: str = "hash_column",
     p3_doc_id_int_column: str = "int_id_column",
+    p3_doc_id_start_id: int = 0,
     p3_overriding_params: str = '{"ray_worker_options": {"image": "'
     + doc_id_image
     + '"}, "ray_head_options": {"image": "'
@@ -48,6 +49,8 @@ def super_pipeline(
     p4_skip: bool = False,
     p4_ededup_doc_column: str = "contents",
     p4_ededup_hash_cpu: float = 0.5,
+    p4_ededup_use_snapshot: bool = False,
+    p4_ededup_snapshot_directory: str = None,
     p4_ededup_n_samples: int = 10,
     p4_overriding_params: str = '{"ray_worker_options": {"image": "'
     + ededup_image
