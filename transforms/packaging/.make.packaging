@@ -26,9 +26,10 @@ setup: .transforms.setup venv
 	
 
 src:
+	mkdir src
 	for T in $(TRANSFORMS_NAMES); do                    \
 	    echo copy src from  $$T ; \
-		cp -R $(REPOROOT)/transforms/$$T/$(PACKAGING_RUN_TIME)/src/ src/ ; \
+		cp -R $(REPOROOT)/transforms/$$T/$(PACKAGING_RUN_TIME)/src/* src ; \
 		rm -fr *.egg-info ; \
 		rm -fr dist ; \
 		rm -fr build ; \

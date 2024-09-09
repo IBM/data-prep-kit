@@ -1,0 +1,25 @@
+data-prep-toolkit-ray>=0.2.1.dev3
+data_prep_toolkit_transforms>=0.2.1.dev3
+scancode-toolkit==32.1.0 ; platform_system != 'Darwin'
+parameterized
+tqdm==4.66.3
+mmh3==4.1.0
+xxhash==3.4.1
+tqdm==4.66.3
+#The conflict is caused by:
+#    ray fdedup depends on scipy==1.12.0
+#    docling 1.7.0 depends on scipy<2.0.0 and >=1.14.1
+scipy>=1.12.0
+networkx==3.3
+colorlog==6.8.2
+func-timeout==4.3.5
+pandas==2.2.2
+emerge-viz==2.0.0
+
+#Note:
+# when installing data-processing-library-ray, get the following
+# ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+# deepsearch-toolkit 1.0.0 requires platformdirs<4.0.0,>=3.5.1, but you have platformdirs 4.3.2 which is incompatible.
+
+
+

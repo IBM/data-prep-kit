@@ -23,8 +23,8 @@ TRANSFORMS_NAMES = code/proglang_select \
 	code/code_quality \
 	code/repo_level_ordering \
 	code/code2parquet \
-	language/doc_quality \
 	language/doc_chunk \
+	language/doc_quality \
 	language/lang_id \
 	language/text_encoder \
 	language/pdf2parquet \
@@ -35,6 +35,11 @@ TRANSFORMS_NAMES = code/proglang_select \
 	universal/doc_id \
 	universal/filter \
 	universal/resize
+
+# doc chunk has conflict dependencies with pdf2parquet that need to be resolved
+# doc_chunk depends on docling>=1.8.2,<2.0.0
+# pdf2parquet depends on docling==1.7.0
+
 
 test-src:: .transforms.setup venv
 #	source venv/bin/activate && cd ../../../data-processing-lib/python && $(PYTHON) -m pip install .

@@ -1,6 +1,6 @@
 [project]
 name = "data_prep_toolkit_transforms"
-version = "0.2.1.dev2"
+version = "0.2.1.dev3"
 requires-python = ">=3.10,<3.12"
 keywords = ["transforms", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
 description = "Data Preparation Toolkit Transforms"
@@ -16,10 +16,10 @@ requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
+dependencies = {file = ["requirements.transforms.python.txt"]}
 
 [options]
-package_dir = ["src", "test"]
+package_dir = ["src"]
 
 [options.packages.find]
 where = ["src/"]

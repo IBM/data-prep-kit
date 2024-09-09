@@ -33,6 +33,10 @@ TRANSFORMS_NAMES = code/code_quality \
 		universal/tokenization \
 		universal/doc_id
 
+# language/doc_chunk has conflict dependencies with pdf2parquet that need to be resolved
+# doc_chunk depends on docling>=1.8.2,<2.0.0
+# pdf2parquet depends on docling==1.7.0
+
 
 test-src:: .transforms.setup venv
 #	source venv/bin/activate && cd ../../../data-processing-lib/python && $(PYTHON) -m pip install .
