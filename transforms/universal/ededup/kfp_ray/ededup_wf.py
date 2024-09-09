@@ -152,7 +152,7 @@ def ededup(
             ededup_hash_cpu=ededup_hash_cpu,
             ededup_use_snapshot=ededup_use_snapshot,
             ededup_snapshot_directory=ededup_snapshot_directory,
-            n_samples=ededup_n_samples,
+            ededup_n_samples=ededup_n_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
