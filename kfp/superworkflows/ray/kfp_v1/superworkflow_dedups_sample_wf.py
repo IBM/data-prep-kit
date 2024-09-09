@@ -48,6 +48,7 @@ def sample_ray_orchestrator(
     p3_doc_id_doc_column: str = "contents",
     p3_doc_id_hash_column: str = "hash_column",
     p3_doc_id_int_column: str = "int_id_column",
+    p3_doc_id_start_id: int = 0,
     # overriding parameters
     p3_overriding_params: str = '{"ray_worker_options": {"image": "'
     + doc_id_image
@@ -59,6 +60,8 @@ def sample_ray_orchestrator(
     p4_skip: bool = False,
     p4_ededup_doc_column: str = "contents",
     p4_ededup_hash_cpu: float = 0.5,
+    p4_ededup_use_snapshot: bool = False,
+    p4_ededup_snapshot_directory: str = None,
     # data sampling
     p4_ededup_n_samples: int = 10,
     # overriding parameters
