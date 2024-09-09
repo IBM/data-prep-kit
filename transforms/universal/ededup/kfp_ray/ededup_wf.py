@@ -88,6 +88,8 @@ def ededup(
     # ededup
     ededup_hash_cpu: float = 0.5,
     ededup_doc_column: str = "contents",
+    ededup_use_snapshot: bool = False,
+    ededup_snapshot_directory: str = None,
     # data sampling
     ededup_n_samples: int = 10,
     # additional parameters
@@ -126,6 +128,8 @@ def ededup(
     :param runtime_code_location - code location
     :param ededup_hash_cpu - number of CPUs per hash
     :param ededup_doc_column - key for accessing data
+    :param ededup_use_snapshot - flag to start from existing snapshot
+    :param ededup_snapshot_directory: str - snapshot directory
     :param ededup_n_samples - number of samples for parameters computation
     :return: None
     """
@@ -144,8 +148,10 @@ def ededup(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            doc_column=ededup_doc_column,
-            hash_cpu=ededup_hash_cpu,
+            ededup_doc_column=ededup_doc_column,
+            ededup_hash_cpu=ededup_hash_cpu,
+            ededup_use_snapshot=ededup_use_snapshot,
+            ededup_snapshot_directory=ededup_snapshot_directory,
             n_samples=ededup_n_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
