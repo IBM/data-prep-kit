@@ -1,6 +1,11 @@
 ## Data prep kit
 #data-prep-toolkit-transforms==0.2.1.dev1
 #data-prep-toolkit-transforms-ray==0.2.1.dev1
+git+https://github.com/IBM/data-prep-kit.git@t2#subdirectory=data-processing-lib/python
+git+https://github.com/IBM/data-prep-kit.git@t2#subdirectory=transforms/packaging/python
+git+https://github.com/IBM/data-prep-kit.git@t2#subdirectory=data-processing-lib/ray
+git+https://github.com/IBM/data-prep-kit.git@t2#subdirectory=transforms/packaging/ray
+
 
 
 

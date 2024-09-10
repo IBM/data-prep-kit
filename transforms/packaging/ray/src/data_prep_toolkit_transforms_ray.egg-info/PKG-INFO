@@ -1,0 +1,62 @@
+Metadata-Version: 2.1
+Name: data_prep_toolkit_transforms_ray
+Version: 0.2.1.dev3
+Summary: Data Preparation Toolkit Transforms using Ray
+Author-email: Maroun Touma <touma@us.ibm.com>
+License: Apache-2.0
+Keywords: transforms,data preprocessing,data preparation,llm,generative,ai,fine-tuning,llmapps
+Requires-Python: <3.12,>=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: data-prep-toolkit-ray>=0.2.1.dev3
+Requires-Dist: data_prep_toolkit_transforms>=0.2.1.dev3
+Requires-Dist: scancode-toolkit==32.1.0; platform_system != "Darwin"
+Requires-Dist: parameterized
+Requires-Dist: tqdm==4.66.3
+Requires-Dist: mmh3==4.1.0
+Requires-Dist: xxhash==3.4.1
+Requires-Dist: tqdm==4.66.3
+Requires-Dist: scipy>=1.12.0
+Requires-Dist: networkx==3.3
+Requires-Dist: colorlog==6.8.2
+Requires-Dist: func-timeout==4.3.5
+Requires-Dist: pandas==2.2.2
+Requires-Dist: emerge-viz==2.0.0
+
+# DPK Ray Transforms
+
+## installation
+
+The [transforms](https://github.com/IBM/data-prep-kit/blob/dev/transforms/README.md) are delivered as a standard pyton library available on pypi and can be installed using pip install:
+
+`python -m pip install data-prep-toolkit-transforms-ray`
+
+installing the Ray transforms will also install `data_prep_toolkit_transforms` and `data-prep-toolkit-ray`
+
+## List of Ray Transforms availabe in current package
+
+* code
+	* [code2parquet](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/code2parquet/ray/README.md)
+	* proglang_select
+	* header_cleanser (Not available on MacOS)
+	* code_quality
+	* repo_level_ordering
+* language
+	* doc_quality
+	* doc_chunk
+	* lang_id
+	* text_encoder
+	* pdf2parquet
+* universal
+	* fdedup
+	* tokenization
+	* ededup
+	* profiler
+	* doc_id
+	* filter
+	* resize
+
+
+
+
+
+ 
