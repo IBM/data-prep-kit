@@ -15,11 +15,12 @@ import traceback
 from datetime import datetime
 
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.runtime import TransformRuntimeConfiguration
+from data_processing.transform import TransformStatistics
 from data_processing.utils import get_logger
 from data_processing_spark.runtime.spark import (
-    SparkTransformExecutionConfiguration,
     SparkTransformFileProcessor,
+    SparkTransformRuntimeConfiguration,
+    SparkTransformExecutionConfiguration,
 )
 from pyspark import SparkConf, SparkContext
 
@@ -28,15 +29,15 @@ logger = get_logger(__name__)
 
 
 def orchestrate(
-    runtime_config: TransformRuntimeConfiguration,
-    execution_config: SparkTransformExecutionConfiguration,
+    runtime_config: SparkTransformRuntimeConfiguration,
+    execution_configuration: SparkTransformExecutionConfiguration,
     data_access_factory: DataAccessFactoryBase,
 ) -> int:
     """
     orchestrator for transformer execution
-    :param execution_config: orchestrator configuration
     :param data_access_factory: data access factory
     :param runtime_config: transformer runtime configuration
+    :param execution_configuration: orchestrator configuration
     :return: 0 - success or 1 - failure
     """
     start_time = time.time()
@@ -50,7 +51,7 @@ def orchestrate(
     # initialize Spark
     conf = SparkConf().setAppName(runtime_config.get_name()).set("spark.driver.host", "127.0.0.1")
     sc = SparkContext(conf=conf)
-    transform_config = sc.broadcast(runtime_config)
+    spark_runtime_config = sc.broadcast(runtime_config)
     daf = sc.broadcast(data_access_factory)
 
     def process_partition(iterator):
@@ -60,10 +61,17 @@ def orchestrate(
         :return:
         """
         # local statistics dictionary
-        statistics = {}
+        statistics = TransformStatistics()
+        # create transformer runtime
+        d_access_factory = daf.value
+        runtime_conf = spark_runtime_config.value
+        runtime = runtime_conf.create_transform_runtime()
+        # add additional parameters
+        transform_params = runtime.get_transform_config(data_access_factory=d_access_factory, statistics=statistics)
         # create file processor
         file_processor = SparkTransformFileProcessor(
-            data_access_factory=daf.value, runtime_configuration=transform_config.value, statistics=statistics
+            data_access_factory=d_access_factory, transform_parameters=transform_params,
+            runtime_configuration=runtime_conf, statistics=statistics
         )
         first = True
         for f in iterator:
@@ -77,8 +85,10 @@ def orchestrate(
             file_processor.process_file(f_name=f[0])
         # flush
         file_processor.flush()
+        # enhance statistics
+        runtime.compute_execution_stats(statistics)
         # return partition's statistics
-        return list(statistics.items())
+        return list(statistics.get_execution_stats().items())
 
     num_partitions = 0
     try:
@@ -91,9 +101,9 @@ def orchestrate(
         # process data
         logger.debug("Begin processing files")
         # process files split by partitions
-        logger.debug(f"parallelization {execution_config.parallelization}")
-        if execution_config.parallelization > 0:
-            source_rdd = sc.parallelize(files, execution_config.parallelization)
+        logger.debug(f"parallelization {execution_configuration.parallelization}")
+        if execution_configuration.parallelization > 0:
+            source_rdd = sc.parallelize(files, execution_configuration.parallelization)
         else:
             source_rdd = sc.parallelize(files)
         num_partitions = source_rdd.getNumPartitions()
@@ -112,16 +122,16 @@ def orchestrate(
     try:
         # build and save metadata
         logger.debug("Building job metadata")
-        input_params = runtime_config.get_transform_metadata() | execution_config.get_input_params()
+        input_params = runtime_config.get_transform_metadata() | execution_configuration.get_input_params()
         metadata = {
-            "pipeline": execution_config.pipeline_id,
-            "job details": execution_config.job_details
+            "pipeline": execution_configuration.pipeline_id,
+            "job details": execution_configuration.job_details
             | {
                 "start_time": start_ts,
                 "end_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 "status": status,
             },
-            "code": execution_config.code_location,
+            "code": execution_configuration.code_location,
             "job_input_params": input_params | data_access_factory.get_input_params(),
             "execution_stats": {
                 "num partitions": num_partitions,

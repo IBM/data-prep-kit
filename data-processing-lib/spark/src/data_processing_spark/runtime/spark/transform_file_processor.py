@@ -14,7 +14,8 @@ from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime import AbstractTransformFileProcessor
-from data_processing_spark.transform import SparkTransformRuntimeConfiguration
+from data_processing.transform import TransformStatistics
+from data_processing_spark.runtime.spark import SparkTransformRuntimeConfiguration
 
 
 class SparkTransformFileProcessor(AbstractTransformFileProcessor):
@@ -25,17 +26,19 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
     def __init__(
         self,
         data_access_factory: DataAccessFactoryBase,
+        transform_parameters: dict[str, Any],
         runtime_configuration: SparkTransformRuntimeConfiguration,
-        statistics: dict[str, Any],
+        statistics: TransformStatistics,
     ):
         """
         Init method
         """
         super().__init__(
-            data_access_factory=data_access_factory, transform_parameters=runtime_configuration.get_transform_params()
+            data_access_factory=data_access_factory, transform_parameters=transform_parameters
         )
         # Add data access ant statistics to the processor parameters
         self.runtime_configuration = runtime_configuration
+        self.transform_params = transform_parameters
         self.transform = None
         # set up statistics
         self.transform_params["statistics"] = statistics
@@ -58,6 +61,4 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
         :param stats: statistics dictionary
         :return: None
         """
-        for key, val in stats.items():
-            # for all key/values
-            self.stats[key] = self.stats.get(key, 0) + val
+        self.stats.add_stats(stats)

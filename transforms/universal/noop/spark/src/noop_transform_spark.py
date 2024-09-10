@@ -10,8 +10,7 @@
 # limitations under the License.
 ################################################################################
 from data_processing.utils import get_logger
-from data_processing_spark.runtime.spark import SparkTransformLauncher
-from data_processing_spark.transform import SparkTransformRuntimeConfiguration
+from data_processing_spark.runtime.spark import SparkTransformLauncher, SparkTransformRuntimeConfiguration
 from noop_transform import NOOPTransformConfiguration
 
 
