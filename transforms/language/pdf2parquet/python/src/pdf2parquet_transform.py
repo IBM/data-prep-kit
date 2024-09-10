@@ -135,9 +135,7 @@ class Pdf2ParquetTransform(AbstractBinaryTransform):
             raise RuntimeError(f"Uknown contents_type {self.contents_type}.")
         num_pages = len(doc.pages)
         num_tables = len(doc.output.tables) if doc.output.tables is not None else 0
-        num_doc_elements = len(
-            doc.output.main_text if doc.output.main_text is not None else 0
-        )
+        num_doc_elements = len(doc.output.main_text) if doc.output.main_text is not None else 0
 
         self._update_metrics(num_pages=num_pages, elapse_time=elapse_time)
 
