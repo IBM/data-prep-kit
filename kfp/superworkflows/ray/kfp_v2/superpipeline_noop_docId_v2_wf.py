@@ -63,6 +63,7 @@ def super_pipeline(
     p3_doc_id_doc_column: str = "contents",
     p3_doc_id_hash_column: str = "hash_column",
     p3_doc_id_int_column: str = "int_id_column",
+    p3_doc_id_start_id: int = 0,
 ):
     args = locals()
     common_params_prefix = "p1_pipeline_"

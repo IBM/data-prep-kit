@@ -167,7 +167,9 @@ class TestPythonPdf2ParquetTransform(AbstractTransformLauncherTest):
         test_doc: Document,
         expected_doc: Document,
     ):
+
         msg = f"Row {row_index} of table {table_index} are not equal\n\t"
+        assert(test_doc.main_text is not None, msg + "Test document has no content")
         assert len(test_doc.main_text) == len(expected_doc.main_text), (
             msg + f"Main Text lengths do not match."
         )
