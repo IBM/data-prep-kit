@@ -8,13 +8,16 @@ bs4==0.0.2
 # doc_chunk depends on docling>=1.8.2,<2.0.0
 # pdf2parquet depends on docling==1.7.0
 #docling==1.7.0,
-docling==1.8.5,
+#pdf2parquet
+docling-core==1.2.0,
+docling==1.11.0,
+filetype >=1.2.0, <2.0.0,
+#DockChunking
 quackling==0.4.0,
 # quackling will pull 
 #  docling>=1.8.2,<2.0.0 
 #  llama-index-core<0.12.0,>=0.11.1
 #  docling-core<2.0.0,>=1.1.2
-filetype >=1.2.0, <2.0.0
 duckdb==0.10.1
 fasttext==0.9.2
 huggingface-hub >= 0.21.4, <1.0.0
