@@ -19,7 +19,7 @@ from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger
 logger = get_logger(__name__)
 
 
-cli_prefix = "runtime_"
+runtime_cli_prefix = "runtime_"
 
 
 class TransformExecutionConfiguration(CLIArgumentProvider):
@@ -45,8 +45,8 @@ class TransformExecutionConfiguration(CLIArgumentProvider):
         :param parser: parser
         :return:
         """
-        parser.add_argument(f"--{cli_prefix}pipeline_id", type=str, default="pipeline_id", help="pipeline id")
-        parser.add_argument(f"--{cli_prefix}job_id", type=str, default="job_id", help="job id")
+        parser.add_argument(f"--{runtime_cli_prefix}pipeline_id", type=str, default="pipeline_id", help="pipeline id")
+        parser.add_argument(f"--{runtime_cli_prefix}job_id", type=str, default="job_id", help="job id")
 
         help_example_dict = {
             "github": ["https://github.com/somerepo", "Github repository URL."],
@@ -54,7 +54,7 @@ class TransformExecutionConfiguration(CLIArgumentProvider):
             "path": ["transforms/universal/code", "Path within the repository"],
         }
         parser.add_argument(
-            f"--{cli_prefix}code_location",
+            f"--{runtime_cli_prefix}code_location",
             type=ast.literal_eval,
             default=None,
             help="AST string containing code location\n" + ParamsUtils.get_ast_help_text(help_example_dict),
@@ -66,7 +66,7 @@ class TransformExecutionConfiguration(CLIArgumentProvider):
         :param args: user defined arguments
         :return: True, if validate pass or False otherwise
         """
-        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        captured = CLIArgumentProvider.capture_parameters(args, runtime_cli_prefix, False)
         # store parameters locally
         self.pipeline_id = captured["pipeline_id"]
         self.job_details = {
