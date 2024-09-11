@@ -26,7 +26,6 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
     def __init__(
         self,
         data_access_factory: DataAccessFactoryBase,
-        transform_parameters: dict[str, Any],
         runtime_configuration: SparkTransformRuntimeConfiguration,
         statistics: TransformStatistics,
     ):
@@ -34,26 +33,23 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
         Init method
         """
         super().__init__(
-            data_access_factory=data_access_factory, transform_parameters=transform_parameters
+            data_access_factory=data_access_factory, transform_parameters=runtime_configuration.get_transform_params()
         )
         # Add data access ant statistics to the processor parameters
         self.runtime_configuration = runtime_configuration
-        self.transform_params = transform_parameters
         self.transform = None
         # set up statistics
         self.transform_params["statistics"] = statistics
         self.stats = statistics
 
-    def create_transform(self, partition: int):
+    def create_transform(self, transform_parameters: dict[str, Any]):
         """
         Create transform
-        :param partition: partition number
+        :param transform_parameters - transform parameters
         :return: None
         """
         # Create local processor
-        self.transform = self.runtime_configuration.get_transform_class()(
-            self.transform_params | {"partition_index": partition}
-        )
+        self.transform = self.runtime_configuration.get_transform_class()(transform_parameters)
 
     def _publish_stats(self, stats: dict[str, Any]) -> None:
         """

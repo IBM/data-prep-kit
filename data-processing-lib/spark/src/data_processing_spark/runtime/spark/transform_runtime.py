@@ -29,7 +29,7 @@ class DefaultSparkTransformRuntime:
         self.params = params
 
     def get_transform_config(
-        self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics
+        self, partition: int, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics
     ) -> dict[str, Any]:
         """
         Get the dictionary of configuration that will be provided to the transform's initializer.
@@ -39,7 +39,6 @@ class DefaultSparkTransformRuntime:
         expected by the transform in its initializer and/or transform() methods.
         :param data_access_factory - data access factory class being used by the RayOrchestrator.
         :param statistics - reference to statistics actor
-        :param files - list of files to process
         :return: dictionary of transform init params
         """
         return self.params

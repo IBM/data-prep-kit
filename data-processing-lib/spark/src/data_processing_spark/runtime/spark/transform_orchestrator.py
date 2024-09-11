@@ -66,20 +66,21 @@ def orchestrate(
         d_access_factory = daf.value
         runtime_conf = spark_runtime_config.value
         runtime = runtime_conf.create_transform_runtime()
-        # add additional parameters
-        transform_params = runtime.get_transform_config(data_access_factory=d_access_factory, statistics=statistics)
         # create file processor
         file_processor = SparkTransformFileProcessor(
-            data_access_factory=d_access_factory, transform_parameters=transform_params,
-            runtime_configuration=runtime_conf, statistics=statistics
+            data_access_factory=d_access_factory, runtime_configuration=runtime_conf, statistics=statistics
         )
         first = True
         for f in iterator:
             # for every file
             if first:
                 logger.debug(f"partition {f}")
+                # add additional parameters
+                transform_params = (
+                    runtime.get_transform_config(partition=int(f[1]), data_access_factory=d_access_factory,
+                                                 statistics=statistics))
                 # create transform with partition number
-                file_processor.create_transform(partition=int(f[1]))
+                file_processor.create_transform(transform_params)
                 first = False
             # process file
             file_processor.process_file(f_name=f[0])

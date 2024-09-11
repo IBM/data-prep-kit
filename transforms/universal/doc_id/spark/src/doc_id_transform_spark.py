@@ -15,9 +15,11 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.data_access import DataAccessFactoryBase
+from data_processing.transform import TransformStatistics
 from data_processing.utils import CLIArgumentProvider, TransformUtils
 from data_processing_spark.runtime.spark import SparkTransformLauncher
-from data_processing_spark.runtime.spark import SparkTransformRuntimeConfiguration
+from data_processing_spark.runtime.spark import SparkTransformRuntimeConfiguration, DefaultSparkTransformRuntime
 
 
 short_name = "doc_id"
@@ -134,6 +136,32 @@ class DocIDTransformConfiguration(TransformConfiguration):
         return True
 
 
+class DocIDSparkTransformRuntime(DefaultSparkTransformRuntime):
+
+    def __init__(self, params: dict[str, Any]):
+        """
+        Create/config this runtime.
+        :param params: parameters, often provided by the CLI arguments as defined by a TableTansformConfiguration.
+        """
+        super().__init__(params)
+
+        def get_transform_config(
+                self, partition: int, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics
+        ) -> dict[str, Any]:
+            """
+            Get the dictionary of configuration that will be provided to the transform's initializer.
+            This is the opportunity for this runtime to create a new set of configuration based on the
+            config/params provided to this instance's initializer.  This may include the addition
+            of new configuration data such as ray shared memory, new actors, etc, that might be needed and
+            expected by the transform in its initializer and/or transform() methods.
+            :param data_access_factory - data access factory class being used by the RayOrchestrator.
+            :param statistics - reference to statistics actor
+            :return: dictionary of transform init params
+            """
+            return self.params | {"partition_index": partition}
+
+
+
 class DocIDSparkTransformConfiguration(SparkTransformRuntimeConfiguration):
     """
     Implements the SparkTransformConfiguration for NOOP as required by the PythonTransformLauncher.
@@ -145,7 +173,7 @@ class DocIDSparkTransformConfiguration(SparkTransformRuntimeConfiguration):
         """
         Initialization
         """
-        super().__init__(transform_config=DocIDTransformConfiguration())
+        super().__init__(transform_config=DocIDTransformConfiguration(), runtime_class=DocIDSparkTransformRuntime)
 
 
 if __name__ == "__main__":
