@@ -32,6 +32,9 @@ class TestPythonHtml2ParquetTransform(AbstractTransformLauncherTest):
             "data_files_to_use": ast.literal_eval("['.html','.zip']"),
             "html2parquet_output_format": "markdown",
         }
+        # this is added as a fixture to remove these columns from comparison
+        ignore_columns = ["date_acquired", "document_id", "pdf_convert_time", "hash"]
+        ignore_columns = ["date_acquired"]
 
         fixtures = []
         launcher = PythonTransformLauncher(Html2ParquetPythonTransformConfiguration())
@@ -41,6 +44,9 @@ class TestPythonHtml2ParquetTransform(AbstractTransformLauncherTest):
                 config,
                 basedir + "/input",
                 basedir + "/expected",
+                ignore_columns,
+
             )
         )
         return fixtures
+
