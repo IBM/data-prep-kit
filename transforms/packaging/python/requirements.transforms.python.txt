@@ -8,10 +8,10 @@ docling-parse>=1.0.0,
 # doc_chunk depends on docling>=1.8.2,<2.0.0
 # pdf2parquet depends on docling==1.7.0
 #docling==1.7.0,
-docling>=1.8.2,<2.0.0,
+docling>=1.11.0,<2.0.0,
 llama-index-core>=0.11.1,<0.12.0,
 docling-core>=1.1.2,<2.0.0,
-quackling==0.1.1,
+quackling==0.4.0,
 # quackling will pull 
 #  docling>=1.8.2,<2.0.0 
 #  llama-index-core<0.12.0,>=0.11.1
