@@ -27,6 +27,7 @@ TRANSFORMS_NAMES = code/proglang_select \
 	language/doc_quality \
 	language/lang_id \
 	language/text_encoder \
+	language/pii_redactor \
 	language/pdf2parquet \
 	universal/fdedup \
 	universal/tokenization \

@@ -15,8 +15,11 @@ PACKAGING_RUN_TIME=python
 
 #Excluded List
 # ./code/malware
-# ./language/pii_redactor
 # ./universal/html2parquet
+# ./universal/profiler      # Missing implementation 
+# ./universal/fdedup 	    # Missing implementation
+#  code/repo_level_ordering # Missing implementation
+
 
 TRANSFORMS_NAMES = code/code_quality \
 	    	code/code2parquet \
@@ -26,6 +29,7 @@ TRANSFORMS_NAMES = code/code_quality \
 		language/doc_quality \
 		language/lang_id \
 		language/pdf2parquet \
+		language/pii_redactor \
 		language/text_encoder \
 		universal/ededup \
 		universal/filter \
