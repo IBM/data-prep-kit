@@ -24,6 +24,7 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 
 
 ## 📝 Table of Contents
+
 - [About](#about)
 - [Run your first transform](#gettingstarted)
 - [Scaling transforms from laptop to cluster](#laptop_cluster)
@@ -32,6 +33,7 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 - [Papers and Talks](#talks_papers)
 
 ## &#x1F4D6; About <a name = "about"></a>
+
 Data Prep Kit is a toolkit for streamlining data preparation for developers looking to build LLM-enabled applications via fine-tuning, RAG or instruction-tuning.
 Data Prep Kit contributes a set of modules that the developer can get started with to easily build data pipelines suitable for their use case.
 These modules have been tested while producing pre-training datasets for the [Granite open source LLM models](https://huggingface.co/ibm-granite).
@@ -92,6 +94,7 @@ conda create -n data-prep-kit -y python=3.11
 conda activate data-prep-kit
 python --version
 ```
+
 Check if the python version is 3.11. 
 
 If you are using a linux system, install gcc using the below commands:
@@ -100,28 +103,48 @@ If you are using a linux system, install gcc using the below commands:
 conda install gcc_linux-64
 conda install gxx_linux-64
 ```
-Next, install the data prep toolkit library. This library installs both the python and ray versions of the transforms.
-```bash
-pip3 install data-prep-toolkit-transforms-ray
-pip3 install jupyterlab
 
-```
-Test, your installation. If you are able to import these data-prep-kit libraries successfully in python, your installation has succeeded. 
+Next, install the data prep toolkit library. This library installs both the python and ray versions of the transforms.
+
 ```bash
-from data_processing_ray.runtime.ray import RayTransformLauncher
-from data_processing.runtime.pure_python import PythonTransformLauncher
+pip3 install  data-prep-toolkit-transforms-ray
+pip3 install jupyterlab   ipykernel  ipywidgets
+
+## install custom kernel
+python -m ipykernel install --user --name=data-prep-kit --display-name "dataprepkit"
 ```
+
+Test, your installation. If you are able to import these data-prep-kit libraries successfully in python, your installation has succeeded. 
+
+```bash
+## start python interpretter
+$   python
+
+# import DPK libraries
+>>> from data_processing_ray.runtime.ray import RayTransformLauncher
+>>> from data_processing.runtime.pure_python import PythonTransformLauncher
+```
+
+If there are no errors, you are good to go!
+
 ### Run your first transform
 
-Let's try a simple transform to extract content from PDF files. This [notebook](examples/notebooks/Run_your_first_transform.ipynb) demonstrates how to run a data preparation transformation that extracts content from PDF files using the data-prep-kit, leveraging Ray for parallel execution while still allowing local processing. To run this notebook, launch jupyter from the same virtual environment using the command below. 
+Let's try a simple transform to extract content from PDF files. We have following notebooks that demonstrate how to run a data preparation transformation that extracts content from PDF files using the data-prep-kit.
 
-```bash
-conda install ipykernel
-# Add the Conda environment to Jupyter
-python -m ipykernel install --user --name=data-prep-kit --display-name "dataprepkit"
-jupyter-lab
-```
-After opening the jupyter notebook, change the kernel to dataprepkit. 
+**Notebook versions**
+
+You can try one or all 😄
+
+- Option 1: Google Colab friendly notebook (no setup necessary, easiest to get started): [examples/notebooks/Run_your_first_transform_colab.ipynb](examples/notebooks/Run_your_first_transform_colab.ipynb)  | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IBM/data-prep-kit/blob/dev/examples/notebooks/Run_your_first_transform_colab.ipynb)
+- Option 2: Pure python notebook (runs locally) : [examples/notebooks/Run_your_first_transform_python.ipynb](examples/notebooks/Run_your_first_transform_python.ipynb) - easiest to get started
+- Option 3: Ray version (runs locally): This one uses Ray framework for parallel execution while still allowing local processing - [examples/notebooks/Run_your_first_transform_ray.ipynb](examples/notebooks/Run_your_first_transform_ray.ipynb)
+
+
+To run the notebooks, launch jupyter from the same virtual environment you created using the command below. 
+
+`jupyter lab`
+
+After opening the jupyter notebook, change the kernel to `dataprepkit`, so all libraries will be properly loaded.
 
 Explore more examples [here](examples/notebooks).
 
@@ -140,24 +163,28 @@ The annotator design also allows a user to verify the results of the processing 
 
 - **Filter** A filter transform processes the data and outputs the transformed data, e.g., exact deduplication.
 A general purpose [SQL-based filter transform](transforms/universal/filter) enables a powerful mechanism for identifying columns and rows of interest for downstream processing.
+
 For a new module to be added, a user can pick the right design based on the processing to be applied. More details [here](transforms).
 
 One can leverage Python-based processing logic and the Data Processing Library to easily build and contribute new transforms. We have provided an [example transform](transforms/universal/noop) that can serve as a template to add new simple transforms. Follow the step by step [tutorial](data-processing-lib/doc/simplest-transform-tutorial.md) to help you add your own new transform. 
 
-For a deeper understanding of the library's architecture, its transforms, and available runtimes, we encourage the reader to consult the comprehensive [overview document] (../../data-processing-lib/doc/overview.md) alongside dedicated sections on [transforms] (../../data-processing-lib/doc/transforms.md) and [runtimes] (../../data-processing-lib/doc/transform-runtimes.md).
+For a deeper understanding of the library's architecture, its transforms, and available runtimes, we encourage the reader to consult the comprehensive [overview document](data-processing-lib/doc/overview.md) alongside dedicated sections on [transforms](data-processing-lib/doc/transforms.md) and [runtimes](data-processing-lib/doc/transform-runtimes.md).
 
-Additionally, check out our video tutorial (https://www.youtube.com/watch?v=0WUMG6HIgMg) for a visual, example-driven guide on adding custom modules.
+Additionally, check out our [video tutorial](https://www.youtube.com/watch?v=0WUMG6HIgMg) for a visual, example-driven guide on adding custom modules.
 
 
 ## 💻 -> 🖥️☁️ From laptop to cluster <a name = "laptop_cluster"></a>
 Data-prep-kit provides the flexibility to transition your projects from proof-of-concept (PoC) stage to full-scale production mode, offering all the necessary tools to run your data transformations at high volume. In this section, we enable you how to run your transforms at scale and how to automate them. 
 
 ### Scaling of Transforms
+
 To enable processing of large data volumes leveraging multi-mode clusters, [Ray](https://docs.ray.io/en/latest/index.html) 
 or [Spark](https://spark.apache.org) wrappers are provided, to readily scale out the Python implementations.
+
 A generalized workflow is shown [here](doc/data-processing.md).
 
 ### Automation
+
 The toolkit also supports transform execution automation based on 
 [Kubeflow pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/) (KFP),
 tested on a locally deployed [Kind cluster](https://kind.sigs.k8s.io/) and external OpenShift clusters. There is an 
@@ -179,6 +206,7 @@ You can run transforms via docker image or using virtual environments. This [doc
 
 
 ## 🎤 + 📄 Talks and Papers <a name = "talks_papers"></a>
+
 1. [Granite Code Models: A Family of Open Foundation Models for Code Intelligence](https://arxiv.org/abs/2405.04324)
 2. [Scaling Granite Code Models to 128K Context](https://arxiv.org/abs/2407.13739)
 3. Talk on "Building Successful LLM Apps: The Power of high quality data" [Video](https://www.youtube.com/watch?v=u_2uiZBBVIE) [Slides](https://www.slideshare.net/slideshow/data_prep_techniques_challenges_methods-pdf-a190/271527890)
