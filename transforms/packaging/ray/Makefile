@@ -14,7 +14,9 @@ PACKAGING_RUN_TIME=ray
 
 # Excluded from build
 # ./code/malware/ray
-# ./language/pii_redactor/ray
+
+set-versions:
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DPK_TRANSFORMS_VERSION) TOML_VERSION=$(DPK_TRANSFORMS_VERSION) .transforms.set-versions 
 
 
 ## Ray Transforms:  `find . -name src | grep ray/src`
@@ -43,10 +45,12 @@ TRANSFORMS_NAMES = code/proglang_select \
 
 
 test-src:: .transforms.setup venv
-#	source venv/bin/activate && cd ../../../data-processing-lib/python && $(PYTHON) -m pip install .
-#	source venv/bin/activate && cd ../../../data-processing-lib/ray && $(PYTHON) -m pip install .
-	source venv/bin/activate && cd ../python && $(MAKE) src && $(PYTHON) -m pip install .
-	source venv/bin/activate &&  cd ../ray && $(MAKE) src && $(PYTHON) -m pip install .
+	$(MAKE) src
+	$(MAKE) -C ../python src
+	source venv/bin/activate && $(PYTHON) -m pip install ../../../data-processing-lib/python
+	source venv/bin/activate && $(PYTHON) -m pip install ../python
+	source venv/bin/activate && $(PYTHON) -m pip install ../../../data-processing-lib/ray
+	source venv/bin/activate && $(PYTHON) -m pip install .
 	$(MAKE) run-ut
 	@# Help: Do any default transform setup before running make src and setting up a test environment
 
@@ -60,6 +64,6 @@ test-with-pypi:
 	$(MAKE) clean
 	$(MAKE) .defaults.create-venv
 	source venv/bin/activate;       \
-	$(PYTHON) -m pip install data_prep_toolkit_transforms_ray==$(DPK_TRNASFORM_REV) 
+	$(PYTHON) -m pip install data_prep_toolkit_transforms_ray==$(DPK_TRANSFORMS_VERSION) 
 	$(MAKE) test-src
 

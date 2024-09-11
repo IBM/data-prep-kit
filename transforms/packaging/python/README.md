@@ -12,21 +12,23 @@ installing the python transforms will also install  `data-prep-toolkit`
 
 * code
     * [code2parquet](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/code2parquet/python/README.md)
-    * header_cleanser (Not available on MacOS)
-    * code_quality
-    * proglang_select
+    * [header_cleanser (Not available on MacOS)](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/header_cleanser/python/README.md)
+    * [code_quality](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/code_quality/python/README.md)
+    * [proglang_select](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/proglang_select/python/README.md)
 * language
-    * doc_chunk
-	* *doc_quality
-	* lang_id
-	* pdf2parquet
-	* text_encoder
+    * [doc_chunk](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/doc_chunk/python/README.md)
+	* [doc_quality](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/doc_quality/python/README.md)
+	* [lang_id](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/lang_id/python/README.md)
+	* [pdf2parquet](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/pdf2parquet/python/README.md)
+	* [text_encoder](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/text_encoder/python/README.md)
+	* [pii_redactor](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/pii_redactor/python/README.md)
 * universal
-    * ededup
-	* filter
-	* resize
-	* tokenization
-	* doc_id
+    * [ededup](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/ededup/python/README.md)
+	* [filter](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/filter/python/README.md)
+	* [resize](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/resize/python/README.md)
+	* [tokenization](https://github.com/IBM/data-prep-kit/blob/dev/transforms/tokenization/doc_chunk/python/README.md)
+	* [doc_id](https://github.com/IBM/data-prep-kit/blob/dev/transforms/code/doc_id/python/README.md)
+
 	
 
 

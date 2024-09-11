@@ -37,14 +37,14 @@ TRANSFORMS_NAMES = code/code_quality \
 		universal/tokenization \
 		universal/doc_id
 
-# language/doc_chunk has conflict dependencies with pdf2parquet that need to be resolved
-# doc_chunk depends on docling>=1.8.2,<2.0.0
-# pdf2parquet depends on docling==1.7.0
 
+# distribution versions is the same as image version.
+set-versions:
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DPK_TRANSFORMS_VERSION) TOML_VERSION=$(DPK_TRANSFORMS_VERSION) .transforms.set-versions 
 
 test-src:: .transforms.setup venv
-#	source venv/bin/activate && cd ../../../data-processing-lib/python && $(PYTHON) -m pip install .
-	source venv/bin/activate && cd ../python && $(MAKE) src && $(PYTHON) -m pip install .
+	source venv/bin/activate && $(PYTHON) -m pip install ../../../data-processing-lib/python
+	source venv/bin/activate && $(MAKE) src && $(PYTHON) -m pip install .
 	$(MAKE) run-ut
 	@# Help: Do any default transform setup before running make src and setting up a test environment
 
@@ -52,7 +52,7 @@ test-with-pypi:
 	$(MAKE) clean
 	$(MAKE) .defaults.create-venv
 	source venv/bin/activate;       \
-	$(PYTHON) -m pip install data_prep_toolkit_transforms==$(DPK_TRNASFORM_REV) 
+	$(PYTHON) -m pip install data_prep_toolkit_transforms==$(DPK_TRANSFORMS_VERSION) 
 	$(MAKE) run-ut
 	@# Help: Load wheel from pypi and run all unit tests: final step in verification after deploying to pypi)
 
