@@ -1,10 +1,10 @@
 # Use make help, to see the available rules
 REPOROOT=../..
 include $(REPOROOT)/.make.defaults
-SPARK_VERSION=3.5.1
+SPARK_VERSION=3.5.2
 DOCKER_IMAGE_NAME=data-prep-kit-spark-$(SPARK_VERSION)
 DOCKER_IMAGE_LIB_NAME=data-prep-kit-spark
-TAG := "v${DPK_LIB_VERSION}"
+DOCKER_IMAGE_VERSION := "v${DPK_LIB_VERSION}"
 
 
 .check-env::
