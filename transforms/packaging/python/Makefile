@@ -42,9 +42,9 @@ TRANSFORMS_NAMES = code/code_quality \
 set-versions:
 	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DPK_TRANSFORMS_VERSION) TOML_VERSION=$(DPK_TRANSFORMS_VERSION) .transforms.set-versions 
 
-test-src:: .transforms.setup venv
-	source venv/bin/activate && $(PYTHON) -m pip install ../../../data-processing-lib/python
-	source venv/bin/activate && $(MAKE) src && $(PYTHON) -m pip install .
+test-src:: 
+	$(MAKE) src 
+	$(MAKE) .transforms.python-venv
 	$(MAKE) run-ut
 	@# Help: Do any default transform setup before running make src and setting up a test environment
 

@@ -44,13 +44,10 @@ TRANSFORMS_NAMES = code/proglang_select \
 # pdf2parquet depends on docling==1.7.0
 
 
-test-src:: .transforms.setup venv
+test-src:: 
 	$(MAKE) src
 	$(MAKE) -C ../python src
-	source venv/bin/activate && $(PYTHON) -m pip install ../../../data-processing-lib/python
-	source venv/bin/activate && $(PYTHON) -m pip install ../python
-	source venv/bin/activate && $(PYTHON) -m pip install ../../../data-processing-lib/ray
-	source venv/bin/activate && $(PYTHON) -m pip install .
+	make .transforms.ray-venv
 	$(MAKE) run-ut
 	@# Help: Do any default transform setup before running make src and setting up a test environment
 
