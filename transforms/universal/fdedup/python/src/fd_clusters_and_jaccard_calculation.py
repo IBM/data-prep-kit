@@ -43,38 +43,59 @@ class FDClustersAndJaccardCalculator:
         self.doc2remove_output_path = os.path.join(self.output_path, "doc2remove")
         logging.info("Initialized Spark Fuzzy Dedupe Clusters Calculator")
 
-    def sort_clusters(self, minhash_cluster_df: pl.DataFrame) -> pl.DataFrame:
-        sorted_df = minhash_cluster_df.sort(by=["cluster_length"], descending=True)
-        return sorted_df
-
     def process_bands(self, df: pl.DataFrame) -> pl.DataFrame:
-        # Apply row processing
-        processed_rows = df.map_rows(lambda row: self.jaccard_distance_calculation(row))
+        # Define the schema with specific data types
+        schema = {"first_doc": pl.Int64, "docs_to_remove": pl.List(pl.Int64), "docs_to_remove_length": pl.Int64}
+
+        doc_ids_lists = []
+        docs_to_remove_lists = []
+        len_of_docs2remove_lists = []
+        for row in df.iter_rows(named=True):
+            doc_ids_list, docs_to_remove_list, len_of_docs2remove_list = self.jaccard_distance_calculation(row)
+            doc_ids_lists += doc_ids_list
+            docs_to_remove_lists += docs_to_remove_list
+            len_of_docs2remove_lists += len_of_docs2remove_list
+        processed_rows = pl.DataFrame(
+            {
+                "first_doc": doc_ids_lists,
+                "docs_to_remove": docs_to_remove_lists,
+                "docs_to_remove_length": len_of_docs2remove_lists,
+            },
+            schema=schema,
+        )
         return processed_rows
 
-    def jaccard_distance_calculation(self, row: List[pl.Series]) -> List[pl.Series]:
+    def jaccard_distance_calculation(self, row: List[pl.Series]) -> list[list]:
         # Process row and return a new list of Series or a new row
         threshold = 0.8
-        docs_to_remove = []
-
+        doc_ids_list = []
+        docs_to_remove_list = []
+        len_of_docs2remove_list = []
         # Extracting int_id_column values into a list
-        doc_list = [item["int_id_column"] for item in row[1]]
-
+        doc_list = [item["int_id_column"] for item in row["document_data"]]
         # Creating a dictionary with int_id_column as key and minhashes as value
-        doc_minhashes = {item["int_id_column"]: item["minhashes"] for item in row[1]}
+        doc_minhashes = {item["int_id_column"]: item["minhashes"] for item in row["document_data"]}
+        while len(doc_list) > 1:
+            docs_to_remove = []
+            new_doc_list = []
+            # this is the document we are going to keep
+            first_doc = doc_list[0]
+            first_mh = doc_minhashes[first_doc]
+            for int_id_column in doc_list[1:]:
+                doc_mh = doc_minhashes[int_id_column]
+                distance = Murmur_MH.jaccard(np.array(first_mh), np.array(doc_mh))
+                if distance >= threshold:
+                    docs_to_remove.append(int_id_column)
+                else:
+                    new_doc_list.append(int_id_column)
+            if len(docs_to_remove) > 0:
+                docs_to_remove = list(set(docs_to_remove))
+                doc_ids_list.append(first_doc)
+                docs_to_remove_list.append(docs_to_remove)
+                len_of_docs2remove_list.append(len(docs_to_remove))
+            doc_list = new_doc_list
 
-        # this is the document we are going to keep
-        first_doc = doc_list[0]
-        first_mh = doc_minhashes[first_doc]
-
-        for int_id_column in doc_list[1:]:
-            doc_mh = doc_minhashes[int_id_column]
-            distance = Murmur_MH.jaccard(np.array(first_mh), np.array(doc_mh))
-            if distance >= threshold:
-                docs_to_remove.append(int_id_column)
-        docs_to_remove = list(set(docs_to_remove))
-
-        return (first_doc, docs_to_remove, len(docs_to_remove))
+        return doc_ids_list, docs_to_remove_list, len_of_docs2remove_list
 
     def write_data(self, band_output_path, df, file_name, data_type="parquet"):
         file_path = os.path.join(band_output_path, f"{file_name}.{data_type}")
@@ -93,7 +114,8 @@ class FDClustersAndJaccardCalculator:
         num_bands_segments = self.num_segments
         num_bands_index = 0
         num_bands_segment_index = 0
-
+        schema = pl.Schema({"first_doc": pl.Int64, "docs_to_remove": pl.Int64})
+        all_bands_dataframe = pl.DataFrame(schema=schema)
         docs2remove_list = []
         for band_index in range(num_bands_index, num_bands):
             # Define the schema
@@ -120,35 +142,16 @@ class FDClustersAndJaccardCalculator:
                 cluster_length=pl.col("document_data").list.len()
             ).filter(pl.col("cluster_length") > 1)
 
-            bands_dataframe_sorted = self.sort_clusters(bands_dataframe_cluster)
+            bands_dataframe_response = self.process_bands(bands_dataframe_cluster)
 
-            bands_dataframe_response = self.process_bands(bands_dataframe_sorted)
-
-            # Rename columns to match the new schema
-            bands_dataframe_response = bands_dataframe_response.rename(
-                {"column_0": "first_doc", "column_1": "docs_to_remove", "column_2": "docs_to_remove_length"}
-            )
-
-            # Apply the schema (note: Polars does not have a direct method to enforce schema;
-            # this is done by aligning column names and types)
-            doc2remove_dataframe = bands_dataframe_response.select(
-                [
-                    pl.col("first_doc").cast(pl.Int64),
-                    pl.col("docs_to_remove").cast(pl.List(pl.Int64)),
-                    pl.col("docs_to_remove_length").cast(pl.Int64),
-                ]
-            )
-
-            filtered_doc2remove_dataframe = doc2remove_dataframe.filter(pl.col("docs_to_remove_length") > 0)
+            filtered_doc2remove_dataframe = bands_dataframe_response.filter(pl.col("docs_to_remove_length") > 0)
+            filtered_doc2remove_dataframe = filtered_doc2remove_dataframe.drop("docs_to_remove_length")
 
             # Explode the 'minhashes' column
             doc2remove_exploded_dataframe = filtered_doc2remove_dataframe.explode("docs_to_remove")
 
-            # Add a new column with the same values as 'docs_to_remove' list
-            final_df = doc2remove_exploded_dataframe.with_columns(pl.col("docs_to_remove").alias("rm_int_id_column"))
-
             # Convert the 'exploded_minhashes' column to a list of integers
-            docs_to_remove_list = final_df.select("rm_int_id_column").to_series().to_list()
+            docs_to_remove_list = doc2remove_exploded_dataframe.select("docs_to_remove").to_series().to_list()
 
             docs2remove_list.extend(docs_to_remove_list)
             docs2remove_list = list(set(docs2remove_list))
@@ -159,7 +162,7 @@ class FDClustersAndJaccardCalculator:
             # write doc2remove_sdf
             self.write_data(
                 self.doc2remove_output_path,
-                filtered_doc2remove_dataframe,
+                doc2remove_exploded_dataframe,
                 f"doc_remove_band_{band_index}_segment_{band_segment_index}.parquet",
                 self.file_ext,
             )
@@ -172,9 +175,9 @@ class FDClustersAndJaccardCalculator:
             logging.error(f"Failed to group by band hash and band number: {ex}")
 
 
-# update the path accordingly
-output_path = "/data-prep-kit/transforms/universal/fdedup/python/output/"
-input_path = "/data-prep-kit/transforms/universal/fdedup/python/output/"
+# var
+output_path = "/Users/nelson/workspace/Research/DataPreprocessing/ibm/active/data-prep-kit/transforms/universal/fdedup/python/output/"
+input_path = "/Users/nelson/workspace/Research/DataPreprocessing/ibm/active/data-prep-kit/transforms/universal/fdedup/python/output/"
 file_ext = "parquet"
 document_id_column = "int_id_column"
 contents_column = "contents"
