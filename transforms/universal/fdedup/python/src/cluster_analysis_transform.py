@@ -88,7 +88,8 @@ class ClusterAnalysisTransform(AbstractTableTransform):
             cluster_length=pl.col("document_data").list.len()
         ).filter(pl.col("cluster_length") > 1)
 
-        bands_dataframe_response = self.process_bands(bands_dataframe_cluster)
+        bands_dataframe_sorted = self.sort_clusters(bands_dataframe_cluster)
+        bands_dataframe_response = self.process_bands(bands_dataframe_sorted)
 
         filtered_doc2remove_dataframe = bands_dataframe_response.filter(pl.col("docs_to_remove_length") > 0)
         filtered_doc2remove_dataframe = filtered_doc2remove_dataframe.drop("docs_to_remove_length")
@@ -98,6 +99,10 @@ class ClusterAnalysisTransform(AbstractTableTransform):
         table = doc2remove_exploded_dataframe.to_arrow()
         metadata = {"nfiles": doc2remove_exploded_dataframe.count(), "nrows": len(table)}
         return [table], metadata
+
+    def sort_clusters(self, minhash_cluster_df: pl.DataFrame) -> pl.DataFrame:
+        sorted_df = minhash_cluster_df.sort(by=["cluster_length"], descending=True)
+        return sorted_df
 
     def process_bands(self, df: pl.DataFrame) -> pl.DataFrame:
         # Define the schema with specific data types
