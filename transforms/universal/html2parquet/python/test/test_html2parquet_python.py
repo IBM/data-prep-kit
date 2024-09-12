@@ -17,9 +17,9 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from html2parquet_transform_python import HtmlToParquetPythonTransformConfiguration
+from html2parquet_transform_python import Html2ParquetPythonTransformConfiguration
 
-class TestPythonHtmlToParquetTransform(AbstractTransformLauncherTest):
+class TestPythonHtml2ParquetTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -30,16 +30,23 @@ class TestPythonHtmlToParquetTransform(AbstractTransformLauncherTest):
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         config = {
             "data_files_to_use": ast.literal_eval("['.html','.zip']"),
+            "html2parquet_output_format": "markdown",
         }
+        # this is added as a fixture to remove these columns from comparison
+        ignore_columns = ["date_acquired", "document_id", "pdf_convert_time", "hash"]
+        ignore_columns = ["date_acquired"]
 
         fixtures = []
-        launcher = PythonTransformLauncher(HtmlToParquetPythonTransformConfiguration())
+        launcher = PythonTransformLauncher(Html2ParquetPythonTransformConfiguration())
         fixtures.append(
             (
                 launcher,
                 config,
                 basedir + "/input",
                 basedir + "/expected",
+                ignore_columns,
+
             )
         )
         return fixtures
+

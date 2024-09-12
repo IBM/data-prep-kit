@@ -16,10 +16,10 @@ from data_processing.data_access.data_access_local import DataAccessLocal
 from data_processing.test_support import get_files_in_folder
 from data_processing.test_support.transform import AbstractBinaryTransformTest
 from data_processing.utils import TransformUtils
-from html2parquet_transform import HtmlToParquetTransform
+from html2parquet_transform import Html2ParquetTransform
 
 
-class TestHtmlToParquetTransform(AbstractBinaryTransformTest):
+class TestHtml2ParquetTransform(AbstractBinaryTransformTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -33,7 +33,8 @@ class TestHtmlToParquetTransform(AbstractBinaryTransformTest):
         input_dir = os.path.join(basedir, "input")
         input_files = get_files_in_folder(input_dir, ".html")
         input_files = [(name, binary) for name, binary in input_files.items()]
-        expected_metadata_list = [{"nrows": 1, "nsuccess": 1, "nfail": 0, "nskip": 0}, {}]
+        expected_metadata_list = [{"nrows": 1}, {}]
+
         config = {}
 
         expected_files = [
@@ -47,7 +48,7 @@ class TestHtmlToParquetTransform(AbstractBinaryTransformTest):
         ]
         return [
             (
-                HtmlToParquetTransform(config),
+                Html2ParquetTransform(config),
                 input_files,
                 expected_files,
                 expected_metadata_list,

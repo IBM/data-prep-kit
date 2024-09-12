@@ -16,7 +16,7 @@ import sys
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
-from html2parquet_transform_python import HtmlToParquetPythonTransformConfiguration
+from html2parquet_transform_python import Html2ParquetPythonTransformConfiguration
 
 
 # create parameters
@@ -41,6 +41,6 @@ if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = PythonTransformLauncher(runtime_config=HtmlToParquetPythonTransformConfiguration())
+    launcher = PythonTransformLauncher(runtime_config=Html2ParquetPythonTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()
