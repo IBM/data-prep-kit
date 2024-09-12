@@ -12,6 +12,7 @@
 import os.path
 import time
 import traceback
+from pathlib import Path
 from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
@@ -176,9 +177,14 @@ class AbstractTransformFileProcessor:
                 for index in range(count):
                     file_ext = out_files[index]
                     if paths is not None:
-                        dir_name = os.path.dirname(output_file_name)
-                        file_name = os.path.basename(output_file_name)
-                        output_name_indexed = os.path.join(dir_name, paths[index], f"{file_name}{file_ext[1]}")
+                        common_path = os.path.commonpath([self.data_access.input_folder, self.last_file_name])
+                        last_file_name_path = Path(self.last_file_name)
+                        suffix_path = last_file_name_path.relative_to(self.data_access.input_folder)
+                        # dir_name = os.path.dirname(output_file_name)
+                        # file_name = os.path.basename(output_file_name)
+                        output_name_indexed = os.path.join(
+                            self.data_access.output_folder, paths[index], f"{str(suffix_path)}{file_ext[1]}"
+                        )
                     else:
                         output_name_indexed = f"{output_file_name}_{start_index + index}{file_ext[1]}"
 
