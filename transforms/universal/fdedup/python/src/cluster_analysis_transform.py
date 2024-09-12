@@ -178,12 +178,12 @@ class ClusterAnalysisTransformConfiguration(TransformConfiguration):
         By convention a common prefix should be used for all transform-specific CLI args
         (e.g, noop_, pii_, etc.)
         """
-        # parser.add_argument(
-        #     f"--{document_id_column_cli_param}",
-        #     type=str,
-        #     default=document_id_column_default,
-        #     help="name of the column storing the unique ID assigned to each document",
-        # )
+        parser.add_argument(
+            f"--{jaccard_similarity_threshold_cli_param}",
+            type=int,
+            default=jaccard_similarity_threshold_default,
+            help="Jaccard similarity threshold above which two documents are duplicates",
+        )
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
