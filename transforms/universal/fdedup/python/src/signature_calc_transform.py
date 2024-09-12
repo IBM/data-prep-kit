@@ -151,68 +151,59 @@ class SignatureCalculationTransform(AbstractTableTransform):
             )
         )
 
-        # Define new column names and schema
-        # Assuming document_id_column is mapped to column_1
-        document_id_column = "document_id"
-        data_column = "data"
-
-        # Rename columns
-        df_renamed = minhashed.rename(
-            {
-                "column_0": f"{data_column}.minhashes",
-                "column_1": f"{data_column}.document_length",
-                "column_2": document_id_column,
-            }
+        # rename columns, cast minhashes to uint32
+        minhashed = minhashed.select(
+            pl.col("column_0").cast(pl.List(pl.UInt32)).alias("minhashes"),
+            pl.col("column_1").alias("document_length"),
+            pl.col("column_2").alias(self.document_id_column),
         )
 
         # Create a nested structure as a new DataFrame
-        df_transformed = df_renamed.with_columns(
-            [
-                # Create the 'data' column as a Struct with minhashes and document_length
-                pl.struct([pl.col(f"{data_column}.minhashes"), pl.col(f"{data_column}.document_length")]).alias(
-                    data_column
-                )
-            ]
-        ).drop([f"{data_column}.minhashes", f"{data_column}.document_length"])
-
-        # Rename the 'data' column to the final schema
-        minhashed_data_frame = df_transformed.rename({data_column: "data"})
+        # minhashed = minhashed.select(
+        #     pl.col(document_id_column),
+        #     pl.struct(
+        #         [
+        #             pl.col(f"{data_column}.minhashes"),
+        #             pl.col(f"{data_column}.document_length")
+        #         ]
+        #     ).alias(
+        #         data_column
+        #     )
+        # )
 
         # Start bands calculation
-        minhashlsh_num_bands, minhashlsh_length_band = self._optimal_minhashlsh_param(
+        num_bands, num_rows = self._optimal_minhashlsh_param(
             threshold=self.jaccard_similarity_threshold,
             num_perm=self.num_permutations,
             false_positive_weight=0.5,
             false_negative_weight=0.5,
         )
 
-        minhashed_data_frame_processed = self.process_rows_into_bands(
-            minhashed_data_frame, minhashlsh_num_bands, minhashlsh_length_band
-        )
+        band_hashes = self.process_rows_into_bands(minhashed, num_bands, num_rows)
 
         # Define the schema
         schema = pl.Schema(
             {
-                "band_hash": pl.Int64,
+                "band_hash": pl.UInt64,
                 "band_index": pl.Int32,
                 "document_data": pl.Struct(
-                    {"int_id_column": pl.Int64, "minhashes": pl.List(pl.Int32), "document_length": pl.Int32}
+                    {"int_id_column": pl.Int64, "minhashes": pl.List(pl.UInt32), "document_length": pl.Int64}
                 ),
             }
         )
 
-        bands_dataframe = pl.DataFrame(minhashed_data_frame_processed, schema=schema)
+        bands_dataframe = pl.DataFrame(band_hashes, schema=schema)
 
-        segment_bounds_list = [0]
+        segment_bounds_list = []
         upper_bound = np.uint64(np.iinfo(np.uint64).max)
-        segment_bound = upper_bound // self.num_segments
-        for segment_index in range(self.num_segments - 1):
-            segment_bounds_list.append(segment_index * segment_bound)
+        segment_bound = np.uint64(upper_bound // self.num_segments)
+        for segment_index in range(self.num_segments):
+            segment_bounds_list.append(np.uint64(segment_index) * segment_bound)
         segment_bounds_list.append(upper_bound)
         segment_bounds = np.array(segment_bounds_list, dtype=np.uint64)
         tables = []
         paths = []
-        for band_ix in range(minhashlsh_num_bands):
+        for band_ix in range(num_bands):
             # Filtering and dropping the column
             band_df = bands_dataframe.filter(pl.col("band_index") == band_ix).drop("band_index")
             for segment_index in range(self.num_segments):
@@ -243,69 +234,34 @@ class SignatureCalculationTransform(AbstractTableTransform):
         assert b * r <= num_minhashes, f"b*r must be <= num minhashes, was b={b}, r={r}, num_minhashes={num_minhashes}"
         results = []
         for band_index in range(b):
-            band_hash = mmh3.hash64(minhashes[band_index * r : (band_index + 1) * r], seed=seed, signed=True)[0]
+            band_hash, _ = mmh3.hash64(minhashes[band_index * r : (band_index + 1) * r], seed=seed, signed=False)
             results.append(
                 (
                     band_hash,
                     band_index,
                     {
-                        "int_id_column": int_id_column,
-                        "minhashes": minhashes.astype(np.int32).tolist(),
+                        self.document_id_column: int_id_column,
+                        "minhashes": minhashes.astype(np.uint32).tolist(),
                         "document_length": doc_length,
                     },
                 )
             )
         return results
 
-    # Apply the function using Pandas
+    # Apply the function
     def process_rows_into_bands(self, df, minhashlsh_num_bands, minhashlsh_length_band):
         result = []
-        for doc_id, row in df.iter_rows():
+        for row in df.iter_rows():
             bands = self.emit_bands(
-                doc_id,
-                # row["document_id"],
-                np.array(row["data.minhashes"]),
-                row["data.document_length"],
+                row[2],
+                np.array(row[0], dtype=np.uint32),
+                row[1],
                 minhashlsh_num_bands,
                 minhashlsh_length_band,
             )
             for band in bands:
                 result.append(band)
-
         return result
-
-    # def sort_clusters(self, minhash_cluster_df: pl.DataFrame) -> pl.DataFrame:
-    #     sorted_df = minhash_cluster_df.sort(by=["cluster_length"], descending=True)
-    #     return sorted_df
-
-    # def jaccard_distance_calculation(self, row: List[pl.Series]) -> List[pl.Series]:
-    #     # Process row and return a new list of Series or a new row
-    #     threshold = 0.8
-    #     docs_to_remove = []
-
-    #     # Extracting int_id_column values into a list
-    #     doc_list = [item["int_id_column"] for item in row[1]]
-
-    #     # Creating a dictionary with int_id_column as key and minhashes as value
-    #     doc_minhashes = {item["int_id_column"]: item["minhashes"] for item in row[1]}
-
-    #     # this is the document we are going to keep
-    #     first_doc = doc_list[0]
-    #     first_mh = doc_minhashes[first_doc]
-
-    #     for int_id_column in doc_list[1:]:
-    #         doc_mh = doc_minhashes[int_id_column]
-    #         distance = Murmur_MH.jaccard(np.array(first_mh), np.array(doc_mh))
-    #         if distance >= threshold:
-    #             docs_to_remove.append(int_id_column)
-    #     docs_to_remove = list(set(docs_to_remove))
-
-    #     return (first_doc, docs_to_remove, len(docs_to_remove))
-
-    # def process_bands(self, df: pl.DataFrame) -> pl.DataFrame:
-    #     # Apply row processing
-    #     processed_rows = df.map_rows(lambda row: self.jaccard_distance_calculation(row))
-    #     return processed_rows
 
     def _optimal_minhashlsh_param(
         self,
