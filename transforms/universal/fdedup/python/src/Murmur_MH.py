@@ -76,7 +76,6 @@ class Murmur_MH:
             )
             .astype(np.uint32)
             .min(axis=0)
-            .astype(np.int32)
             .tolist(),
             doc_len,
             doc_id,
