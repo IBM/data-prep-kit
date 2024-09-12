@@ -16,7 +16,7 @@ from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import TransformStatistics
 
 
-class DefaultPythonTransformRuntime:
+class DefaultSparkTransformRuntime:
     """
     Transformer runtime used by processor to to create Transform specific environment
     """
@@ -29,7 +29,7 @@ class DefaultPythonTransformRuntime:
         self.params = params
 
     def get_transform_config(
-        self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics, files: list[str]
+        self, partition: int, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics
     ) -> dict[str, Any]:
         """
         Get the dictionary of configuration that will be provided to the transform's initializer.
@@ -39,7 +39,6 @@ class DefaultPythonTransformRuntime:
         expected by the transform in its initializer and/or transform() methods.
         :param data_access_factory - data access factory class being used by the RayOrchestrator.
         :param statistics - reference to statistics actor
-        :param files - list of files to process
         :return: dictionary of transform init params
         """
         return self.params

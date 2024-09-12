@@ -13,7 +13,7 @@
 from argparse import ArgumentParser
 from typing import Any
 
-from data_processing.transform import AbstractTransform
+from data_processing.transform import AbstractBinaryTransform
 from data_processing.utils import CLIArgumentProvider
 
 
@@ -22,7 +22,9 @@ class TransformConfiguration(CLIArgumentProvider):
     This is a base transform configuration class defining transform's input/output parameter
     """
 
-    def __init__(self, name: str, transform_class: type[AbstractTransform], remove_from_metadata: list[str] = []):
+    def __init__(
+        self, name: str, transform_class: type[AbstractBinaryTransform], remove_from_metadata: list[str] = []
+    ):
         """
         Initialization
         :param name: transformer name
@@ -34,12 +36,12 @@ class TransformConfiguration(CLIArgumentProvider):
         self.remove_from_metadata = remove_from_metadata
         self.params = {}
 
-    def get_transform_class(self) -> type[AbstractTransform]:
+    def get_transform_class(self) -> type[AbstractBinaryTransform]:
         """
-        Get the class extending AbstractTransform which implements a specific transformation.
+        Get the class extending AbstractBinaryTransform which implements a specific transformation.
         The class will generally be instantiated with a dictionary of configuration produced by
         the associated TransformRuntime get_transform_config() method.
-        :return: class extending AbstractTransform
+        :return: class extending AbstractBinaryTransform
         """
         return self.transform_class
 

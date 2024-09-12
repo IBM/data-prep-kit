@@ -7,7 +7,7 @@ license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     { name = "David Wood", email = "dawood@us.ibm.com" },
-    { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
+    { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
 dependencies = [
     "dpk-noop-transform-python==0.2.1.dev0",

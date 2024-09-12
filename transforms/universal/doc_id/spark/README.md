@@ -17,7 +17,7 @@ configuration for values are as follows:
 * _doc_id_column_name_ - specifies the name of the DataFrame column that holds the generated document IDs.
 
 ## Running
-You can run the [doc_id_local.py](src/doc_id_local.py) (spark-based implementation) to transform the `test1.parquet` file in [test input data](test-data/input) to an `output` directory.  The directory will contain both the new annotated `test1.parquet` file and the `metadata.json` file.
+You can run the [doc_id_local.py](src/doc_id_local_spark.py) (spark-based implementation) to transform the `test1.parquet` file in [test input data](test-data/input) to an `output` directory.  The directory will contain both the new annotated `test1.parquet` file and the `metadata.json` file.
 
 ### Launched Command Line Options 
 When running the transform with the Spark launcher (i.e. SparkTransformLauncher),

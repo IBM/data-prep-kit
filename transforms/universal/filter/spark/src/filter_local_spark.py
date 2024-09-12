@@ -14,13 +14,13 @@ import os
 import sys
 
 from data_processing.utils import ParamsUtils
-from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
-from filter_transform_spark import (
-    FilterSparkRuntimeConfiguration,
+from data_processing_spark.runtime.spark import SparkTransformLauncher
+from filter_transform import (
     filter_columns_to_drop_cli_param,
     filter_criteria_cli_param,
     filter_logical_operator_cli_param,
 )
+from filter_transform_spark import FilterSparkTransformConfiguration
 
 
 # create parameters
@@ -30,12 +30,11 @@ local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
-
+code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 filter_criteria = [
     "docq_total_words > 100 AND docq_total_words < 200",
     "ibmkenlm_docq_perplex_score < 230",
 ]
-
 filter_logical_operator = "AND"
 filter_columns_to_drop = ["extra", "cluster"]
 
@@ -44,9 +43,6 @@ filter_params = {
     filter_columns_to_drop_cli_param: filter_columns_to_drop,
     filter_logical_operator_cli_param: filter_logical_operator,
 }
-
-code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
-config_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "config/spark_profile_local.yml"))
 params = {
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
@@ -54,12 +50,11 @@ params = {
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
-    "spark_local_config_filepath": config_path,
 }
 if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params | filter_params)
     # create launcher
-    launcher = SparkTransformLauncher(runtime_config=FilterSparkRuntimeConfiguration())
+    launcher = SparkTransformLauncher(runtime_config=FilterSparkTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()
