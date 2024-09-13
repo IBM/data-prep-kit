@@ -88,8 +88,7 @@ class ClusterAnalysisTransform(AbstractTableTransform):
             cluster_length=pl.col("document_data").list.len()
         ).filter(pl.col("cluster_length") > 1)
 
-        bands_dataframe_sorted = self.sort_clusters(bands_dataframe_cluster)
-        bands_dataframe_response = self.process_bands(bands_dataframe_sorted)
+        bands_dataframe_response = self.process_bands(bands_dataframe_cluster)
 
         filtered_doc2remove_dataframe = bands_dataframe_response.filter(pl.col("docs_to_remove_length") > 0)
         filtered_doc2remove_dataframe = filtered_doc2remove_dataframe.drop("docs_to_remove_length")
@@ -99,10 +98,6 @@ class ClusterAnalysisTransform(AbstractTableTransform):
         table = doc2remove_exploded_dataframe.to_arrow()
         metadata = {"nfiles": doc2remove_exploded_dataframe.count(), "nrows": len(table)}
         return [table], metadata
-
-    def sort_clusters(self, minhash_cluster_df: pl.DataFrame) -> pl.DataFrame:
-        sorted_df = minhash_cluster_df.sort(by=["cluster_length"], descending=True)
-        return sorted_df
 
     def process_bands(self, df: pl.DataFrame) -> pl.DataFrame:
         # Define the schema with specific data types
@@ -132,10 +127,18 @@ class ClusterAnalysisTransform(AbstractTableTransform):
         doc_ids_list = []
         docs_to_remove_list = []
         len_of_docs2remove_list = []
+        # sort documents
+        document_data = row["document_data"]
+
+        # Sort the list by 'document_length'
+        sorted_document_data = sorted(document_data, key=lambda x: x["document_length"])
+
         # Extracting int_id_column values into a list
-        doc_list = [item["int_id_column"] for item in row["document_data"]]
+        doc_list = [item["int_id_column"] for item in sorted_document_data]
+
         # Creating a dictionary with int_id_column as key and minhashes as value
-        doc_minhashes = {item["int_id_column"]: item["minhashes"] for item in row["document_data"]}
+        doc_minhashes = {item["int_id_column"]: item["minhashes"] for item in sorted_document_data}
+
         while len(doc_list) > 1:
             docs_to_remove = []
             new_doc_list = []
