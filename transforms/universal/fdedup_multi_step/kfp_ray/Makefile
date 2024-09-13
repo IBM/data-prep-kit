@@ -42,7 +42,8 @@ workflow-build: workflow-venv
 
 .PHONY: workflow-test
 workflow-test: workflow-build
-	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=fdedup_wf.yaml
+	@# Help: We have 3 workflows here, but for the test we just use the first one
+	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=fdedup_preprocessor_wf.yaml
 
 .PHONY: workflow-upload
 workflow-upload: workflow-build

@@ -10,7 +10,6 @@
 # limitations under the License.
 ################################################################################
 import os
-import ast
 
 import kfp.compiler as compiler
 import kfp.components as comp
@@ -156,7 +155,7 @@ def fdedup_bucket_processor(
     with dsl.ExitHandler(clean_up_task):
         # compute execution params
         compute_exec_params = compute_exec_params_op(
-            ray_worker_options=ray_worker_options,
+            worker_options=ray_worker_options,
             runtime_actor_options=runtime_actor_options,
             data_s3_config=data_s3_config,
             data_max_files=data_max_files,
@@ -196,7 +195,7 @@ def fdedup_bucket_processor(
             ray_name=ray_name,
             run_id=run_id,
             additional_params=additional_params,
-            exec_params=compute_exec_params.output | {"data_files_to_use": ast.literal_eval("['']")},
+            exec_params=compute_exec_params.output,
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
         )

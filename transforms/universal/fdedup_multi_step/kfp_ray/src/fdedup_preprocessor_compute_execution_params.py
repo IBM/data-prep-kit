@@ -13,7 +13,7 @@ from typing import Any
 
 
 def fdedup_preprocessor_compute_execution_params(
-    ray_worker_options: dict,  # ray worker configuration
+    worker_options: dict,  # ray worker configuration
     runtime_actor_options: dict,  # actor's resource requirements
     data_s3_config: str,  # s3 configuration
     data_max_files: int,  # max files to process
@@ -39,7 +39,7 @@ def fdedup_preprocessor_compute_execution_params(
 
     """
     Compute fuzzy dedup preprocessor execution parameters
-    :param ray_worker_options: cluster parameters
+    :param worker_options: cluster parameters
     :param runtime_actor_options: actor request requirements
     :param data_s3_config: s3 configuration
     :param data_max_files: max files to process
@@ -132,8 +132,8 @@ def fdedup_preprocessor_compute_execution_params(
     )
     print(f"Fuzzy parameters: num buckets {num_buckets}, bucket length {length_bucket}")
     # Get cluster parameters
-    cluster_cpu = ray_worker_options["replicas"] * ray_worker_options["cpu"]
-    cluster_memory = ray_worker_options["replicas"] * ray_worker_options["memory"]
+    cluster_cpu = worker_options["replicas"] * worker_options["cpu"]
+    cluster_memory = worker_options["replicas"] * worker_options["memory"]
     print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_memory}")
     cluster_cpu *= 0.85
     cluster_memory *= 0.85

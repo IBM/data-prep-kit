@@ -162,7 +162,7 @@ def fdedup_preprocessor(
     with dsl.ExitHandler(clean_up_task):
         # compute execution params
         compute_exec_params = compute_exec_params_op(
-            ray_worker_options=ray_worker_options,
+            worker_options=ray_worker_options,
             runtime_actor_options=runtime_actor_options,
             data_s3_config=data_s3_config,
             data_max_files=data_max_files,
