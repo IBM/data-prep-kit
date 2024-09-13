@@ -124,6 +124,10 @@ class SignatureCalculationTransform(AbstractTableTransform):
         )
         self.word_shingle_size = config.get(word_shingle_size_key, word_shingle_size_default)
         self.num_segments = config.get(num_segments_key, num_segments_default)
+        # use this dataframe to store the minhashes and size for each document
+        self.all_minhashes: pl.DataFrame = None
+        # use this dataframe to store the band hashes for each document
+        self.all_band_hashes: pl.DataFrame = None
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -140,82 +144,118 @@ class SignatureCalculationTransform(AbstractTableTransform):
 
         # load the data from pyarrow table
         df = pl.from_arrow(table)
-
         # read the target columns
         df = df.select(self.contents_column, self.document_id_column)
 
         # generate minhash values
-        minhashed = df.map_rows(
+        minhashes = df.map_rows(
             lambda text: mm_min_hash.minhash2_nosalt(
                 *self._generate_word_shingles(text, window_size=self.word_shingle_size)
             )
         )
-
-        # rename columns, cast minhashes to uint32
-        minhashed = minhashed.select(
+        # rename columns, cast minhashes to list(uint32)
+        minhashes = minhashes.select(
+            pl.col("column_2").alias(self.document_id_column),
             pl.col("column_0").cast(pl.List(pl.UInt32)).alias("minhashes"),
             pl.col("column_1").alias("document_length"),
-            pl.col("column_2").alias(self.document_id_column),
         )
+        # store the minhash calculations to send out at the end of execution
+        if self.all_minhashes is None:
+            self.all_minhashes = minhashes
+        else:
+            self.all_minhashes = self.all_minhashes.vstack(minhashes)
 
-        # Create a nested structure as a new DataFrame
-        # minhashed = minhashed.select(
-        #     pl.col(document_id_column),
-        #     pl.struct(
-        #         [
-        #             pl.col(f"{data_column}.minhashes"),
-        #             pl.col(f"{data_column}.document_length")
-        #         ]
-        #     ).alias(
-        #         data_column
-        #     )
-        # )
-
-        # Start bands calculation
-        num_bands, num_rows = self._optimal_minhashlsh_param(
+        # Calculate optimal parameters for bands calculation
+        self.num_bands, self.num_rows = self._optimal_minhashlsh_param(
             threshold=self.jaccard_similarity_threshold,
             num_perm=self.num_permutations,
             false_positive_weight=0.5,
             false_negative_weight=0.5,
         )
-
-        band_hashes = self.process_rows_into_bands(minhashed, num_bands, num_rows)
-
-        # Define the schema
-        schema = pl.Schema(
+        # Calculate band hashes
+        band_hashes_list = self.process_rows_into_bands(
+            minhashes,
+            self.num_bands,
+            self.num_rows,
+        )
+        band_hash_schema = pl.Schema(
             {
                 "band_hash": pl.UInt64,
                 "band_index": pl.Int32,
-                "document_data": pl.Struct(
-                    {"int_id_column": pl.Int64, "minhashes": pl.List(pl.UInt32), "document_length": pl.Int64}
-                ),
+                self.document_id_column: pl.Int64,
             }
         )
+        band_hashes = pl.DataFrame(band_hashes_list, schema=band_hash_schema)
 
-        bands_dataframe = pl.DataFrame(band_hashes, schema=schema)
+        # store the band hash calculations to send out at the end of execution
+        if self.all_band_hashes is None:
+            self.all_band_hashes = band_hashes
+        else:
+            self.all_band_hashes = self.all_band_hashes.vstack(band_hashes)
 
+        # update metadata stats and return the stats (no tables are returned in transform)
+        metadata = {"nfiles": 1, "nrows": len(table)}
+        return [], metadata
+
+    def flush(self) -> tuple[list[pa.Table], dict[str, Any]]:
+        """
+        This is supporting method for transformers, that implement buffering of tables, for example coalesce.
+        These transformers can have buffers containing tables that were not written to the output. Flush is
+        the hook for them to return back locally stored tables and their statistics. The majority of transformers
+        should use default implementation.
+        If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
+        :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
+        propagated to metadata
+        """
+        # define the upper and lower bounds of each band segment
         segment_bounds_list = []
         upper_bound = np.uint64(np.iinfo(np.uint64).max)
-        segment_bound = np.uint64(upper_bound // self.num_segments)
+        segment_len = np.uint64(upper_bound // self.num_segments)
         for segment_index in range(self.num_segments):
-            segment_bounds_list.append(np.uint64(segment_index) * segment_bound)
+            segment_bounds_list.append(np.uint64(segment_index) * segment_len)
         segment_bounds_list.append(upper_bound)
         segment_bounds = np.array(segment_bounds_list, dtype=np.uint64)
+
+        # tables is a list of tables, one per band 'b' and segment 's'
         tables = []
         paths = []
-        for band_ix in range(num_bands):
-            # Filtering and dropping the column
-            band_df = bands_dataframe.filter(pl.col("band_index") == band_ix).drop("band_index")
+
+        # iterate through the bands, get the band hashes for each band,
+        # divide them into segments, join with minhashes and append to a list of
+        # tables to upload
+        for band_ix in range(self.num_bands):
+            # Filtering on, then dropping the `band_index` column
+            band_df = self.all_band_hashes.filter(pl.col("band_index") == band_ix).drop("band_index")
+            # assign each band hash to a segment of the hashing space
             for segment_index in range(self.num_segments):
                 segment_band_df = band_df.filter(
-                    (pl.col("band_hash") >= segment_bounds[segment_index])
+                    (pl.col("band_hash") > segment_bounds[segment_index])
                     & (pl.col("band_hash") <= segment_bounds[segment_index + 1])
                 )
-                tables.append(segment_band_df.to_arrow())
+                # join the band hash dataframe with the minihash and doc length dataframe
+                segment_band_minhash_df = segment_band_df.join(
+                    self.all_minhashes,
+                    on=self.document_id_column,
+                    how="inner",
+                )
+                # encapsulate document info in a structure
+                segment_band_minhash_df = segment_band_minhash_df.select(
+                    pl.col("band_hash"),
+                    pl.struct(
+                        [
+                            pl.col(self.document_id_column),
+                            pl.col("minhashes"),
+                            pl.col("document_length"),
+                        ]
+                    ).alias("document_data"),
+                )
+                # append the table to the result list, and the path to metadata
+                tables.append(segment_band_minhash_df.to_arrow())
                 paths.append(
                     f"bands/band={band_ix}/segment={segment_index}/",
                 )
-        metadata = {"nfiles": 1, "nrows": len(table), "paths": paths}
+        # add the paths to the metadata
+        metadata = {"paths": paths}
         return tables, metadata
 
     # define shingles generation function
@@ -234,18 +274,12 @@ class SignatureCalculationTransform(AbstractTableTransform):
         assert b * r <= num_minhashes, f"b*r must be <= num minhashes, was b={b}, r={r}, num_minhashes={num_minhashes}"
         results = []
         for band_index in range(b):
-            band_hash, _ = mmh3.hash64(minhashes[band_index * r : (band_index + 1) * r], seed=seed, signed=False)
-            results.append(
-                (
-                    band_hash,
-                    band_index,
-                    {
-                        self.document_id_column: int_id_column,
-                        "minhashes": minhashes.astype(np.uint32).tolist(),
-                        "document_length": doc_length,
-                    },
-                )
+            band_hash, _ = mmh3.hash64(
+                minhashes[band_index * r : (band_index + 1) * r],
+                seed=seed,
+                signed=False,
             )
+            results.append((band_hash, band_index, int_id_column))
         return results
 
     # Apply the function
@@ -253,9 +287,9 @@ class SignatureCalculationTransform(AbstractTableTransform):
         result = []
         for row in df.iter_rows():
             bands = self.emit_bands(
-                row[2],
-                np.array(row[0], dtype=np.uint32),
-                row[1],
+                row[0],  # document id
+                np.array(row[1], dtype=np.uint32),  # minhashes
+                row[2],  # document length
                 minhashlsh_num_bands,
                 minhashlsh_length_band,
             )
