@@ -207,6 +207,7 @@ class SignatureCalculationTransform(AbstractTableTransform):
         :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
         propagated to metadata
         """
+        self.logger.info(f"Starting flush()")
         # define the upper and lower bounds of each band segment
         segment_bounds_list = []
         upper_bound = np.uint64(np.iinfo(np.uint64).max)
@@ -215,11 +216,14 @@ class SignatureCalculationTransform(AbstractTableTransform):
             segment_bounds_list.append(np.uint64(segment_index) * segment_len)
         segment_bounds_list.append(upper_bound)
         segment_bounds = np.array(segment_bounds_list, dtype=np.uint64)
+        self.logger.debug(f"Calculated {len(segment_bounds)} segment_bounds")
 
         # tables is a list of tables, one per band 'b' and segment 's'
         tables = []
         paths = []
 
+        self.logger.debug(f"dataframe self.all_band_hashes has {len(self.all_band_hashes)} rows")
+        self.logger.debug(f"dataframe self.all_minhashes has {len(self.all_minhashes)} rows")
         # iterate through the bands, get the band hashes for each band,
         # divide them into segments, join with minhashes and append to a list of
         # tables to upload
@@ -227,10 +231,14 @@ class SignatureCalculationTransform(AbstractTableTransform):
             # Filtering on, then dropping the `band_index` column
             band_df = self.all_band_hashes.filter(pl.col("band_index") == band_ix).drop("band_index")
             # assign each band hash to a segment of the hashing space
+            self.logger.debug(f"band {band_ix} band_df has {len(band_df)} rows")
             for segment_index in range(self.num_segments):
                 segment_band_df = band_df.filter(
                     (pl.col("band_hash") > segment_bounds[segment_index])
                     & (pl.col("band_hash") <= segment_bounds[segment_index + 1])
+                )
+                self.logger.debug(
+                    f"band {band_ix} segment {segment_index} segment_band_df has {len(segment_band_df)} rows"
                 )
                 # join the band hash dataframe with the minihash and doc length dataframe
                 segment_band_minhash_df = segment_band_df.join(
@@ -238,6 +246,8 @@ class SignatureCalculationTransform(AbstractTableTransform):
                     on=self.document_id_column,
                     how="inner",
                 )
+                self.logger.debug(f"band {band_ix} segment {segment_index} joined segment_band_df and minhashes")
+
                 # encapsulate document info in a structure
                 segment_band_minhash_df = segment_band_minhash_df.select(
                     pl.col("band_hash"),
@@ -249,13 +259,17 @@ class SignatureCalculationTransform(AbstractTableTransform):
                         ]
                     ).alias("document_data"),
                 )
+                self.logger.debug(f"band {band_ix} segment {segment_index} encapsulated document info in a structure")
                 # append the table to the result list, and the path to metadata
                 tables.append(segment_band_minhash_df.to_arrow())
                 paths.append(
                     f"bands/band={band_ix}/segment={segment_index}/",
                 )
+                self.logger.debug(f"band {band_ix} segment {segment_index} appended tables and paths")
         # add the paths to the metadata
         metadata = {"paths": paths}
+        total_table_size = sum([table.nbytes for table in tables])
+        self.logger.info(f"flush(): writing {len(tables)} tables with a total size of {total_table_size:,d} bytes")
         return tables, metadata
 
     # define shingles generation function
