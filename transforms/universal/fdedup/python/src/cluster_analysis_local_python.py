@@ -21,8 +21,8 @@ from data_processing.utils import ParamsUtils
 
 
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "combined_data"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output1"))
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "bands_consolidated"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "docs_to_remove"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
