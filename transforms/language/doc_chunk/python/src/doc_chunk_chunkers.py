@@ -10,14 +10,13 @@
 # limitations under the License.
 ################################################################################
 
-import math
 from abc import ABCMeta, abstractmethod
-from typing import Iterator
+from typing import Iterator, Optional
 
 from docling_core.types import Document as DLDocument
 from llama_index.core import Document as LIDocument
 from llama_index.core.node_parser import MarkdownNodeParser
-from quackling.core.chunkers.hierarchical_chunker import HierarchicalChunker
+from docling_core.transforms.chunker import HierarchicalChunker
 
 
 class ChunkingExecutor(metaclass=ABCMeta):
@@ -29,6 +28,7 @@ class ChunkingExecutor(metaclass=ABCMeta):
 class DLJsonChunker(ChunkingExecutor):
     def __init__(
         self,
+        min_chunk_len: Optional[int],
         output_chunk_column_name: str,
         output_jsonpath_column_name: str,
         output_pageno_column_name_key: str,
@@ -38,7 +38,11 @@ class DLJsonChunker(ChunkingExecutor):
         self.output_jsonpath_column_name = output_jsonpath_column_name
         self.output_pageno_column_name_key = output_pageno_column_name_key
         self.output_bbox_column_name_key = output_bbox_column_name_key
-        self._chunker = HierarchicalChunker(include_metadata=True)
+
+        chunker_kwargs = dict(include_metadata=True)
+        if min_chunk_len is not None:
+            chunker_kwargs["min_chunk_len"] = min_chunk_len
+        self._chunker = HierarchicalChunker(**chunker_kwargs)
 
     def chunk(self, content: str) -> Iterator[dict]:
         doc = DLDocument.model_validate_json(content)

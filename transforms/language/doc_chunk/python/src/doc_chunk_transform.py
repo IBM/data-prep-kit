@@ -25,12 +25,14 @@ short_name = "doc_chunk"
 cli_prefix = f"{short_name}_"
 content_column_name_key = "content_column_name"
 chunking_type_key = "chunking_type"
+dl_min_chunk_len_key = "dl_min_chunk_len"
 output_chunk_column_name_key = "output_chunk_column_name"
 output_jsonpath_column_name_key = "output_jsonpath_column_name"
 output_pageno_column_name_key = "output_pageno_column_name"
 output_bbox_column_name_key = "output_bbox_column_name"
 content_column_name_cli_param = f"{cli_prefix}{content_column_name_key}"
 chunking_type_cli_param = f"{cli_prefix}{chunking_type_key}"
+dl_min_chunk_len_cli_param = f"{cli_prefix}{dl_min_chunk_len_key}"
 output_chunk_column_name_cli_param = f"{cli_prefix}{output_chunk_column_name_key}"
 output_jsonpath_column_name_cli_param = f"{cli_prefix}{output_jsonpath_column_name_key}"
 output_pageno_column_name_cli_param = f"{cli_prefix}{output_pageno_column_name_key}"
@@ -47,6 +49,7 @@ class chunking_types(str, enum.Enum):
 
 default_content_column_name = "contents"
 default_chunking_type = chunking_types.DL_JSON
+default_dl_min_chunk_len = None
 default_output_chunk_column_name = "contents"
 default_output_jsonpath_column_name = "doc_jsonpath"
 default_output_pageno_column_name = "page_number"
@@ -76,6 +79,7 @@ class DocChunkTransform(AbstractTableTransform):
         self.output_chunk_column_name = config.get(output_chunk_column_name_key, default_output_chunk_column_name)
 
         # Parameters for Docling JSON chunking
+        self.dl_min_chunk_len = config.get(dl_min_chunk_len_key, default_dl_min_chunk_len)
         self.output_jsonpath_column_name = config.get(
             output_jsonpath_column_name_key, default_output_jsonpath_column_name
         )
@@ -89,6 +93,7 @@ class DocChunkTransform(AbstractTableTransform):
         self.chunker: ChunkingExecutor
         if self.chunking_type == chunking_types.DL_JSON:
             self.chunker = DLJsonChunker(
+                min_chunk_len=self.dl_min_chunk_len,
                 output_chunk_column_name=self.output_chunk_column_name,
                 output_jsonpath_column_name=self.output_jsonpath_column_name,
                 output_pageno_column_name_key=self.output_pageno_column_name_key,
@@ -161,6 +166,11 @@ class DocChunkTransformConfiguration(TransformConfiguration):
             f"--{content_column_name_cli_param}",
             default=default_content_column_name,
             help="Name of the column containing the text to be chunked",
+        )
+        parser.add_argument(
+            f"--{dl_min_chunk_len_cli_param}",
+            default=default_dl_min_chunk_len,
+            help="Minimum number of characters for the chunk in the dl_json chunker. Setting to None is using the library defaults, i.e. a min_chunk_len=64.",
         )
         parser.add_argument(
             f"--{output_chunk_column_name_cli_param}",
