@@ -91,8 +91,11 @@ class FileCopySpark:
             }
             daf_args.append("--data_local_config")
             daf_args.append(ParamsUtils.convert_to_ast(local_config))
-        daf_parser = argparse.ArgumentParser(daf_args)
+        daf_parser = argparse.ArgumentParser()
         data_access_factory.add_input_params(parser=daf_parser)
+        data_access_factory_args = daf_parser.parse_args(args=daf_args)
+        data_access_factory.apply_input_params(args=data_access_factory_args)
+
         return data_access_factory
 
     def orchestrate(
@@ -111,6 +114,7 @@ class FileCopySpark:
         start_time = time.time()
         start_ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         logger.info(f"orchestrator started at {start_ts}")
+        data_access = data_access_factory.create_data_access()
         # initialize Spark
         spark_session = self._init_spark()
         sc = spark_session.sparkContext
@@ -183,9 +187,16 @@ class FileCopySpark:
                 "job_output_stats": stats,
             }
             logger.debug(f"Saving job metadata: {metadata}.")
-            data_access = data_access_factory.create_data_access()
-            data_access.input_folder = os.path.join(self.root_folder, "bands")
-            data_access.output_folder = os.path.join(self.root_folder, "bands_consolidated")
+
+            if data_access_factory.s3_config is not None:
+                _, root_folder = self.root_folder.split("://")
+                in_path = os.path.join(root_folder, "bands")
+                out_path = os.path.join(root_folder, "bands_consolidated")
+                data_access.input_folder = f"{in_path}{os.sep}"
+                data_access.output_folder = f"{out_path}{os.sep}"
+            else:
+                data_access.input_folder = os.path.join(self.root_folder, "bands")
+                data_access.output_folder = os.path.join(self.root_folder, "bands_consolidated")
             data_access.save_job_metadata(metadata)
             logger.debug("Saved job metadata.")
             return return_code

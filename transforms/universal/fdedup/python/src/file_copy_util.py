@@ -39,8 +39,12 @@ class FileCopyUtil:
             f"band={band}",
             f"segment={segment}",
         )
+        if self.data_access_factory.s3_config is not None:
+            _, root_folder = self.root_folder.split("://")
+        else:
+            root_folder = self.root_folder
         output_path = os.path.join(
-            self.root_folder,
+            root_folder,
             "bands_consolidated",
             f"band_{band}_segment_{segment}.parquet",
         )
@@ -50,6 +54,7 @@ class FileCopyUtil:
             extensions=[".parquet"],
             return_data=True,
         )
+        self.logger.info(f"Found {len(file_dict)} files in input folder {input_folder}")
         consolidated_df = pl.DataFrame()
         for fname, contents in file_dict.items():
             df = pl.read_parquet(io.BytesIO(contents))
@@ -115,9 +120,10 @@ if __name__ == "__main__":
         }
         daf_args.append("--data_local_config")
         daf_args.append(ParamsUtils.convert_to_ast(local_config))
-    daf_parser = argparse.ArgumentParser(daf_args)
-    # add additional arguments
+    daf_parser = argparse.ArgumentParser()
     data_access_factory.add_input_params(parser=daf_parser)
-
-    fcu = FileCopyUtil(data_access_factory=data_access_factory, config=config)
+    data_access_factory_args = daf_parser.parse_args(args=daf_args)
+    data_access_factory.apply_input_params(args=data_access_factory_args)
+    stats = {}
+    fcu = FileCopyUtil(data_access_factory=data_access_factory, config=config, stats=stats)
     fcu.copy_data(args.subfolder_name)
