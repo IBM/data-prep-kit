@@ -26,7 +26,7 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 ## 📝 Table of Contents
 
 - [About](#about)
-- [Run your first transform](#gettingstarted)
+- [Getting Started](#gettingstarted)
 - [Scaling transforms from laptop to cluster](#laptop_cluster)
 - [Repository Use and Navigation](doc/repo.md)
 - [How to Contribute](CONTRIBUTING.md)
