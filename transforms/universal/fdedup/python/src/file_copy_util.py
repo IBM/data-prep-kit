@@ -60,13 +60,17 @@ class FileCopyUtil:
             df = pl.read_parquet(io.BytesIO(contents))
             self.logger.info(f"{fname} has {len(df)} rows")
             consolidated_df = consolidated_df.vstack(df)
-        self.logger.info(f"Writing consolidated_df with {len(consolidated_df)} rows to {output_path}")
         output_table = consolidated_df.to_arrow()
+        self.logger.info(
+            f"Writing to {output_path} table with {output_table.num_rows} rows and {output_table.nbytes:,d} bytes"
+        )
         stats = {
             "input_files": len(file_dict),
             "input_bytes": sum(len(v) for v in file_dict.values()),
+            "input_rows": output_table.num_rows,
             "output_files": 1,
             "output_bytes": output_table.nbytes,
+            "output_rows": output_table.num_rows,
         }
         data_access.save_table(output_path, output_table)
         return stats
