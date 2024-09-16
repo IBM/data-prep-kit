@@ -9,8 +9,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-from typing import Any
-
 
 def fdedup_bucket_processor_compute_execution_params(
     worker_options: dict,  # ray worker configuration
@@ -33,7 +31,7 @@ def fdedup_bucket_processor_compute_execution_params(
     fdedup_bucket_processor_minhash_snapshot_directory: str,  # minhash_snapshot_directory
     fdedup_bucket_processor_buckets_snapshot_directory: str,  # buckets_snapshot_directory
     fdedup_bucket_processor_doc_id_snapshot_directory: str,  # doc id snapshot directory
-) -> dict[str, Any]:
+) -> dict:
     """
     Compute fuzzy dedup bucket processor execution parameters
     :param worker_options: cluster parameters

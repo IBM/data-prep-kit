@@ -9,12 +9,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-from typing import Any
-
 
 def fdedup_filter_compute_execution_params(
     worker_options: dict,  # ray worker configuration
-    actor_options: dict,  # actor's resource requirements
+    runtime_actor_options: dict,  # actor's resource requirements
     data_s3_config: str,  # s3 configuration
     data_max_files: int,  # max files to process
     data_num_samples: int,  # num samples to process
@@ -28,12 +26,12 @@ def fdedup_filter_compute_execution_params(
     fdedup_filter_doc_cpu: float,  # number of CPUs per doc hash
     fdedup_filter_num_doc_id: int,  # number of actors fo doc hash
     fdedup_filter_doc_id_snapshot_directory: str,  # doc id snapshot directory
-) -> dict[str, Any]:
+) -> dict:
 
     """
     Compute fuzzy dedup filter execution parameters
     :param worker_options: cluster parameters
-    :param actor_options: actor request requirements
+    :param runtime_actor_options: actor request requirements
     :param data_s3_config: s3 configuration
     :param data_max_files: max files to process
     :param data_num_samples: num samples to process
@@ -57,7 +55,7 @@ def fdedup_filter_compute_execution_params(
     cluster_cpu *= 0.85
     cluster_memory *= 0.85
     # get actor requirements
-    worker_cpu = actor_options["num_cpus"]
+    worker_cpu = runtime_actor_options["num_cpus"]
     print(f"worker required cpu {worker_cpu}")
     # Define number of workers.
     n_workers = int(
@@ -88,7 +86,7 @@ def fdedup_filter_compute_execution_params(
         "data_max_files": data_max_files,
         "data_num_samples": data_num_samples,
         "runtime_num_workers": n_workers,
-        "runtime_worker_options": str(actor_options),
+        "runtime_worker_options": str(runtime_actor_options),
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": str(runtime_code_location),

@@ -9,8 +9,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-from typing import Any
-
 
 def fdedup_preprocessor_compute_execution_params(
     worker_options: dict,  # ray worker configuration
@@ -35,7 +33,7 @@ def fdedup_preprocessor_compute_execution_params(
     fdedup_preprocessor_doc_id_snapshot_directory: str,  # doc id snapshot directory
     fdedup_preprocessor_n_samples: int,  # number of samples to use for data evaluation
     fdedup_preprocessor_n_docs: int,  # number of source documents
-) -> dict[str, Any]:
+) -> dict:
 
     """
     Compute fuzzy dedup preprocessor execution parameters
@@ -67,7 +65,7 @@ def fdedup_preprocessor_compute_execution_params(
     import sys
 
     from data_processing.data_access import DataAccessFactory
-    from data_processing.utils import GB, KB
+    from data_processing.utils import GB
     from runtime_utils import KFPUtils
     from scipy.integrate import quad as integrate
 
