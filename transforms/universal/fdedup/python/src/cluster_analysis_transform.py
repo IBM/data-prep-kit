@@ -88,15 +88,18 @@ class ClusterAnalysisTransform(AbstractTableTransform):
         bands_dataframe_cluster = bands_dataframe_groups.with_columns(
             cluster_length=pl.col("document_data").list.len()
         ).filter(pl.col("cluster_length") > 1)
-        self.logger.info(f"file_name = {file_name}: has {len(bands_dataframe_cluster)} clusters")
+        self.logger.info(f"file_name = {file_name}")
+        self.logger.info(f"After GroupBy: {len(bands_dataframe_cluster)} clusters")
         bands_dataframe_response = self.process_bands(bands_dataframe_cluster)
 
         filtered_doc2remove_dataframe = bands_dataframe_response.filter(pl.col("docs_to_remove_length") > 0)
         filtered_doc2remove_dataframe = filtered_doc2remove_dataframe.drop("docs_to_remove_length")
+        self.logger.info(f"After Jaccard: {len(filtered_doc2remove_dataframe)} clusters")
 
         # Explode the 'minhashes' column
         doc2remove_exploded_dataframe = filtered_doc2remove_dataframe.explode("docs_to_remove")
         table = doc2remove_exploded_dataframe.to_arrow()
+        self.logger.info(f"{len(doc2remove_exploded_dataframe)} documents marked to remove")
         metadata = {"nfiles": doc2remove_exploded_dataframe.count(), "nrows": len(table)}
         return [table], metadata
 
@@ -131,7 +134,7 @@ class ClusterAnalysisTransform(AbstractTableTransform):
         document_data = row["document_data"]
 
         # Sort the list by 'document_length'
-        sorted_document_data = sorted(document_data, key=lambda x: (-x["document_length"], x["int_column_id"]))
+        sorted_document_data = sorted(document_data, key=lambda x: (-x["document_length"], x["int_id_column"]))
 
         # Extracting int_id_column values into a list
         doc_list = list(set([item["int_id_column"] for item in sorted_document_data]))
