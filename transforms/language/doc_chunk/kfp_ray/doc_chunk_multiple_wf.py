@@ -42,6 +42,7 @@ def compute_exec_params_func(
     doc_chunk_chunking_type: str,
     doc_chunk_content_column_name: str,
     doc_chunk_output_chunk_column_name: str,
+    doc_chunk_dl_min_chunk_len: int,
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -57,6 +58,7 @@ def compute_exec_params_func(
         "doc_chunk_chunking_type": doc_chunk_chunking_type,
         "doc_chunk_content_column_name": doc_chunk_content_column_name,
         "doc_chunk_output_chunk_column_name": doc_chunk_output_chunk_column_name,
+        "doc_chunk_dl_min_chunk_len": doc_chunk_dl_min_chunk_len,
     }
 
 
@@ -117,6 +119,7 @@ def doc_chunk(
     doc_chunk_chunking_type: str = "dl_json",
     doc_chunk_content_column_name: str = "contents",
     doc_chunk_output_chunk_column_name: str = "contents",
+    doc_chunk_dl_min_chunk_len: int = 64,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
@@ -154,6 +157,7 @@ def doc_chunk(
     :param doc_chunk_chunking_type - chunking type to apply
     :param doc_chunk_content_column_name - column name to get content
     :param doc_chunk_output_chunk_column_name - column name to store the chunks
+    :param doc_chunk_dl_min_chunk_len - minimum chunk size
     :return: None
     """
     # create clean_up task
@@ -174,6 +178,7 @@ def doc_chunk(
             doc_chunk_chunking_type=doc_chunk_chunking_type,
             doc_chunk_content_column_name=doc_chunk_content_column_name,
             doc_chunk_output_chunk_column_name=doc_chunk_output_chunk_column_name,
+            doc_chunk_dl_min_chunk_len=doc_chunk_dl_min_chunk_len,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
