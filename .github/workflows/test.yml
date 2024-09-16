@@ -8,12 +8,24 @@ on:
             - "releases/**"
         tags:
             - "*"
+        paths-ignore:
+            - "**.md"
+            - "examples/**"
+            - "**/doc/**"
+            - "**/.gitignore"
+            - "**/.dockerignore"
     pull_request:
         branches:
             - "dev"
             - "releases/**"
+        paths-ignore:
+            - "**.md"
+            - "examples/**"
+            - "**/doc/**"
+            - "**/.gitignore"
+            - "**/.dockerignore"
 env:
-  KFP_BLACK_LIST: "doc_chunk-ray,pdf2parquet-ray,pii_redactor"
+    KFP_BLACK_LIST: "doc_chunk-ray,pdf2parquet-ray,pii_redactor"
 
 jobs:
     check_if_push_images:
