@@ -22,7 +22,7 @@ on:
         paths-ignore:
             - "**.md"
             - "examples/**"
-            - "doc/**"
+            - "**/doc/**"
             - "data-processing-lib/doc/**"
             - "**/.gitignore"
             - "**/.dockerignore"
