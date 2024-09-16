@@ -36,9 +36,7 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 
 Data Prep Kit is a toolkit for streamlining data preparation for developers looking to build LLM-enabled applications via fine-tuning, RAG or instruction-tuning.
 Data Prep Kit contributes a set of modules that the developer can get started with to easily build data pipelines suitable for their use case.
-These modules have been tested while producThe matrix below shows the the combination of modules and supported runtimes. All the modules can be accessed [here](transforms) and can be combined to form data processing pipelines, as shown in the [examples](examples) folder. 
-
-ing pre-training datasets for the [Granite open source LLM models](https://huggingface.co/ibm-granite).
+These modules have been tested while producing pre-training datasets for the [Granite open source LLM models](https://huggingface.co/ibm-granite).
 
 The modules are built on common frameworks (for Spark and Ray), called the *data processing library* that allows the developers to build new custom modules that readily scale across a variety of runtimes.
 
@@ -56,11 +54,11 @@ Data modalities supported _today_: Code and Natural Language.
 
 ### Fastest way to experience Data Prep Kit
 
-Use a Google Colab friendly notebook to try Data Prep Kit with no setup necessary. Let's try a simple transform to extract content from PDF files: [examples/notebooks/Run_your_first_transform_colab.ipynb](examples/notebooks/Run_your_first_transform_colab.ipynb)  | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IBM/data-prep-kit/blob/dev/examples/notebooks/Run_your_first_transform_colab.ipynb) 
-
-To run on a local machine, follow these steps to quickly set up and deploy the Data Prep Kit in your virtual Python environment.
+With no setup necessary, let's use a Google Colab friendly notebook to try Data Prep Kit. This is a simple transform to extract content from PDF files: [examples/notebooks/Run_your_first_transform_colab.ipynb](examples/notebooks/Run_your_first_transform_colab.ipynb)  | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IBM/data-prep-kit/blob/dev/examples/notebooks/Run_your_first_transform_colab.ipynb) 
 
 ### Create a Virtual Environment
+
+To run on a local machine, follow these steps to quickly set up and deploy the Data Prep Kit in your virtual Python environment.
 
 ```bash
 conda create -n data-prep-kit -y python=3.11
