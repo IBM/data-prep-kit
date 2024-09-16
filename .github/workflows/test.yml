@@ -25,7 +25,7 @@ on:
             - "**/.gitignore"
             - "**/.dockerignore"
 env:
-    KFP_BLACK_LIST: "doc_chunk-ray,pdf2parquet-ray,pii_redactor"
+  KFP_BLACK_LIST: "doc_chunk-ray,pdf2parquet-ray,pii_redactor, fdedup_multi_ray"
 
 jobs:
     check_if_push_images:

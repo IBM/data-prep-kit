@@ -6,7 +6,7 @@ REPOROOT=../../../..
 # to override/redefine the rules below. 
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_NAME=fdedup
+TRANSFORM_NAME=fdedup_multi
 
 BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
