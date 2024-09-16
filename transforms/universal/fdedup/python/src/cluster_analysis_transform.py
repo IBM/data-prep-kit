@@ -17,7 +17,7 @@ import numpy as np
 import polars as pl
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import CLIArgumentProvider
+from data_processing.utils import CLIArgumentProvider, get_logger
 from Murmur_MH import Murmur_MH
 
 
@@ -78,6 +78,7 @@ class ClusterAnalysisTransform(AbstractTableTransform):
         self.jaccard_similarity_threshold = config.get(
             jaccard_similarity_threshold_key, jaccard_similarity_threshold_default
         )
+        self.logger = get_logger(__name__)
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         bands_dataframe = pl.from_arrow(table)
@@ -87,7 +88,7 @@ class ClusterAnalysisTransform(AbstractTableTransform):
         bands_dataframe_cluster = bands_dataframe_groups.with_columns(
             cluster_length=pl.col("document_data").list.len()
         ).filter(pl.col("cluster_length") > 1)
-
+        self.logger.info(f"file_name = {file_name}: has {len(bands_dataframe_cluster)} clusters")
         bands_dataframe_response = self.process_bands(bands_dataframe_cluster)
 
         filtered_doc2remove_dataframe = bands_dataframe_response.filter(pl.col("docs_to_remove_length") > 0)
@@ -102,7 +103,6 @@ class ClusterAnalysisTransform(AbstractTableTransform):
     def process_bands(self, df: pl.DataFrame) -> pl.DataFrame:
         # Define the schema with specific data types
         schema = {"first_doc": pl.Int64, "docs_to_remove": pl.List(pl.Int64), "docs_to_remove_length": pl.Int64}
-
         doc_ids_lists = []
         docs_to_remove_lists = []
         len_of_docs2remove_lists = []
@@ -123,7 +123,7 @@ class ClusterAnalysisTransform(AbstractTableTransform):
 
     def jaccard_distance_calculation(self, row: List[pl.Series]) -> list[list]:
         # Process row and return a new list of Series or a new row
-        threshold = 0.8
+        threshold = self.jaccard_similarity_threshold
         doc_ids_list = []
         docs_to_remove_list = []
         len_of_docs2remove_list = []
@@ -131,7 +131,7 @@ class ClusterAnalysisTransform(AbstractTableTransform):
         document_data = row["document_data"]
 
         # Sort the list by 'document_length'
-        sorted_document_data = sorted(document_data, key=lambda x: x["document_length"])
+        sorted_document_data = sorted(document_data, key=lambda x: (-x["document_length"], x["int_column_id"]))
 
         # Extracting int_id_column values into a list
         doc_list = [item["int_id_column"] for item in sorted_document_data]
@@ -175,8 +175,6 @@ class ClusterAnalysisTransformConfiguration(TransformConfiguration):
             transform_class=ClusterAnalysisTransform,
             remove_from_metadata=[],
         )
-        from data_processing.utils import get_logger
-
         self.logger = get_logger(__name__, level="INFO")
 
     def add_input_params(self, parser: ArgumentParser) -> None:
@@ -188,7 +186,7 @@ class ClusterAnalysisTransformConfiguration(TransformConfiguration):
         """
         parser.add_argument(
             f"--{jaccard_similarity_threshold_cli_param}",
-            type=int,
+            type=float,
             default=jaccard_similarity_threshold_default,
             help="Jaccard similarity threshold above which two documents are duplicates",
         )
