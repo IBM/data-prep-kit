@@ -105,10 +105,10 @@ class DataAccessLocal(DataAccess):
         files = sorted(Path(self.input_folder).rglob("*"))
         for file in files:
             if file.is_dir():
-                s_file = str(file)
-                for dir_name in self.d_sets:
-                    if s_file.endswith(dir_name):
-                        folders_to_use.append(s_file)
+                folder = str(file)
+                for s_name in self.d_sets:
+                    if folder.endswith(s_name):
+                        folders_to_use.append(folder)
                         break
         return folders_to_use, 0
 

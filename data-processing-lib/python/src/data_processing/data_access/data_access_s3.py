@@ -100,13 +100,17 @@ class DataAccessS3(DataAccess):
         :return: list of folders and retries
         """
         folders_to_use = []
-        folders, retries = self.arrS3.list_folders(self.input_folder)
+        try:
+            folders, retries = self.arrS3.list_folders(self.input_folder)
+        except Exception as e:
+            self.logger.error(f"Error listing S3 folders for path {self.input_folder} - {e}")
+            return [], 0
         # Only use valid folders
-        for ds in self.d_sets:
-            suffix = ds + "/"
-            for f in folders:
-                if f.endswith(suffix):
-                    folders_to_use.append(f)
+        for folder in folders:
+            s_folder = folder[:-1]
+            for s_name in self.d_sets:
+                if s_folder.endswith(s_name):
+                    folders_to_use.append(folder)
                     break
         return folders_to_use, retries
 
