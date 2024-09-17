@@ -115,5 +115,5 @@ class NOOPTransformConfiguration(TransformConfiguration):
             return False
 
         self.params = self.params | captured
-        self.logger.info(f"noop parameters are : {self.params}")
+        self.logger.info(f"noop parameters are:: {self.params}")
         return True
