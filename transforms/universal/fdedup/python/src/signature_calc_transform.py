@@ -35,6 +35,10 @@ seed_key = "seed"
 """ This key holds the seed used to instantiate the random number generator"""
 num_permutations_key = "num_permutations"
 """ This key holds the number of permutations that determine how many minhashes to calculate for each document"""
+num_bands_key = "num_bands"
+""" This key holds the number of bands to use in the banding technique"""
+num_minhashes_per_band_key = "num_minhashes_per_band"
+""" This key holds the number of minhashes to use in each band"""
 jaccard_similarity_threshold_key = "jaccard_similarity_threshold"
 """ This key holds the Jaccard similarity threshold above which two documents are duplicates"""
 word_shingle_size_key = "word_shingle_size"
@@ -51,6 +55,10 @@ seed_cli_param = f"{cli_prefix}{seed_key}"
 """ The seed used to instantiate the random number generator"""
 num_permutations_cli_param = f"{cli_prefix}{num_permutations_key}"
 """ Number of permutations that determine how many minhashes to calculate for each document"""
+num_bands_cli_param = f"{cli_prefix}{num_bands_key}"
+""" The number of bands to use in the banding technique"""
+num_minhashes_per_band_cli_param = f"{cli_prefix}{num_minhashes_per_band_key}"
+""" The number of minhashes to use in each band"""
 jaccard_similarity_threshold_cli_param = f"{cli_prefix}{jaccard_similarity_threshold_key}"
 """ Jaccard similarity threshold above which two documents are duplicates"""
 word_shingle_size_cli_param = f"{cli_prefix}{word_shingle_size_key}"
@@ -62,6 +70,8 @@ captured_arg_keys = [
     document_id_column_key,
     contents_column_key,
     seed_key,
+    num_bands_key,
+    num_minhashes_per_band_key,
     num_permutations_key,
     jaccard_similarity_threshold_key,
     word_shingle_size_key,
@@ -75,33 +85,80 @@ contents_column_default = "contents"
 """ Default name of the column storing the contents of each document"""
 seed_default = 42
 """ Default seed used to instantiate the random number generator"""
-num_permutations_default = 64
-""" Default number of permutations that determine how many minhashes to calculate for each document"""
-jaccard_similarity_threshold_default = 0.8
-""" Default Jaccard similarity threshold above which two documents are duplicates"""
-word_shingle_size_default = 8
-""" Default size of the word shingles calculated for each document"""
+num_permutations_default = 112
+""" Default number of minhashes used for each document (from FineWeb https://arxiv.org/pdf/2406.17557)"""
+num_bands_default = 14
+""" Default number of bands to use in the banding technique (from FineWeb https://arxiv.org/pdf/2406.17557)"""
+num_minhashes_per_band_default = 8
+""" Default number of minhashes to use in each band (from FineWeb https://arxiv.org/pdf/2406.17557)"""
+word_shingle_size_default = 5
+""" Default size of the word shingles (from FineWeb https://arxiv.org/pdf/2406.17557)"""
+jaccard_similarity_threshold_default = 0.75
+""" Default Jaccard similarity threshold (from FineWeb https://arxiv.org/pdf/2406.17557)"""
 num_segments_default = 1
 """ Default number of segments across which we divide the hashing space for each band"""
+
+
+def _optimal_minhashlsh_param(
+    threshold: float = jaccard_similarity_threshold_default,
+    num_perm: int = num_permutations_default,
+    false_positive_weight: float = 0.5,
+    false_negative_weight: float = 0.5,
+):
+    """
+    Compute the optimal `MinHashLSH` parameter that minimizes the weighted sum
+    of probabilities of false positive and false negative.
+    :param threshold: desired similarity threshold
+    :param num_perm: number of permutations
+    :param false_positive_weight: importance of avoiding false positive results
+    :param false_negative_weight: importance of avoiding false negative results
+    :return: a tuple (optimal number of bands, optimal number of rows)
+    """
+
+    def _false_positive_probability(threshold, b, r):
+        _probability = lambda s: 1 - (1 - s ** float(r)) ** float(b)
+        a, err = integrate(_probability, 0.0, threshold)
+        return a
+
+    def _false_negative_probability(threshold, b, r):
+        _probability = lambda s: 1 - (1 - (1 - s ** float(r)) ** float(b))
+        a, err = integrate(_probability, threshold, 1.0)
+        return a
+
+    min_error = float("inf")
+    opt = (0, 0)
+    for b in range(1, num_perm + 1):
+        max_r = int(num_perm / b)
+        for r in range(1, max_r + 1):
+            fp = _false_positive_probability(threshold, b, r)
+            fn = _false_negative_probability(threshold, b, r)
+            error = fp * false_positive_weight + fn * false_negative_weight
+            if error < min_error:
+                min_error = error
+                opt = (b, r)
+    return opt
 
 
 class SignatureCalculationTransform(AbstractTableTransform):
     """
     This is the first transform of the fuzzy dedup pipeline. First, it calculates,
-    for each document in a dataset, `num_permutations` minhashes.  Based on the
-    values of `jaccard_similarity_threshold` and `num_permutations`, it
-    determines the optimal number of bands, and the length of each band (how
-    many minhashes will be used to get the signature for each band). The band
-    signatures, the minhashes and the document lengths are then saved in the
-    output folder, under a folder structure `bands/band=b/segment=s`. To improve
-    scalability of the next step of fuzzy dedup, the hash space of each band is
-    divided into `num_segments` segments.
+    for each document in a dataset, `num_permutations` minhashes.  It accepts as
+    input the number of bands and the length of each band.  If those two parameters
+    are not specified, then, based on the values of `jaccard_similarity_threshold`
+    and `num_permutations`, it determines the optimal number of bands, and the
+    length of each band (how many minhashes will be used to get the signature for
+    each band). The band signatures, the minhashes and the document lengths are
+    then saved in the output folder, under a folder structure `bands/band=b/segment=s`.
+    To improve scalability of the next step of fuzzy dedup, the hash space of
+    each band is divided into `num_segments` segments.
 
     Args:
         document_id_column: name of the column storing the unique ID assigned to each document
         contents_column_cli_param: name of the column storing the contents of each document
-        seed the seed used to instantiate the random number generator
-        num_permutations: number of permutations that determine how many minhashes to calculate for each document
+        seed: the seed used to instantiate the random number generator
+        num_permutations: number of minhashes to calculate for each document
+        num_bands: number of bands to use for banding technique
+        num_minhashes_per_band: number of minhashes to use in each band
         jaccard_similarity_threshold: Jaccard similarity threshold above which two documents are duplicates
         word_shingle_size: the size of the word shingles calculated for each document
         num_segments the number of segments across which we divide the hashing space for each band
@@ -124,10 +181,23 @@ class SignatureCalculationTransform(AbstractTableTransform):
         )
         self.word_shingle_size = config.get(word_shingle_size_key, word_shingle_size_default)
         self.num_segments = config.get(num_segments_key, num_segments_default)
+        self.num_bands = config.get(num_bands_key, num_bands_default)
+        self.num_rows = config.get(num_minhashes_per_band_key, num_minhashes_per_band_default)
+        # Calculate optimal parameters for bands calculation
+        # self.num_bands, self.num_rows = _optimal_minhashlsh_param(
+        #     threshold=self.jaccard_similarity_threshold,
+        #     num_perm=self.num_permutations,
+        #     false_positive_weight=0.5,
+        #     false_negative_weight=0.5,
+        # )
         # use this dataframe to store the minhashes and size for each document
         self.all_minhashes: pl.DataFrame = None
         # use this dataframe to store the band hashes for each document
         self.all_band_hashes: pl.DataFrame = None
+        # this variable keeps track of how many files were processed since last
+        # data write to properly update metadata
+        self.files_processed = 0
+        self.bytes_processed = 0
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -138,7 +208,8 @@ class SignatureCalculationTransform(AbstractTableTransform):
         """
         self.logger.info(f"Transforming table with {table.num_rows} rows from file {file_name}")
         self.logger.debug("----minhash---")
-
+        self.files_processed += 1
+        self.bytes_processed += table.nbytes
         # instantiate with same seed so every worker use same hash functions
         mm_min_hash = Murmur_MH(num_perm=self.num_permutations, seed=self.seed)
 
@@ -165,13 +236,6 @@ class SignatureCalculationTransform(AbstractTableTransform):
         else:
             self.all_minhashes = self.all_minhashes.vstack(minhashes)
 
-        # Calculate optimal parameters for bands calculation
-        self.num_bands, self.num_rows = self._optimal_minhashlsh_param(
-            threshold=self.jaccard_similarity_threshold,
-            num_perm=self.num_permutations,
-            false_positive_weight=0.5,
-            false_negative_weight=0.5,
-        )
         # Calculate band hashes
         band_hashes_list = self.process_rows_into_bands(
             minhashes,
@@ -193,21 +257,31 @@ class SignatureCalculationTransform(AbstractTableTransform):
         else:
             self.all_band_hashes = self.all_band_hashes.vstack(band_hashes)
 
+        if len(self.all_minhashes) > 750000:
+            tables, metadata = self.write_band_signatures()
+        else:
+            tables = []
+            metadata = {}
         # update metadata stats and return the stats (no tables are returned in transform)
-        metadata = {"nfiles": 1, "nrows": len(table)}
-        return [], metadata
+        return tables, metadata
 
     def flush(self) -> tuple[list[pa.Table], dict[str, Any]]:
         """
-        This is supporting method for transformers, that implement buffering of tables, for example coalesce.
-        These transformers can have buffers containing tables that were not written to the output. Flush is
-        the hook for them to return back locally stored tables and their statistics. The majority of transformers
-        should use default implementation.
-        If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
-        :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
-        propagated to metadata
+                This is supporting method fo        self.files_processed = 0
+                self.bytes_processed = 0
+        r transformers, that implement buffering of tables, for example coalesce.
+                These transformers can have buffers containing tables that were not written to the output. Flush is
+                the hook for them to return back locally stored tables and their statistics. The majority of transformers
+                should use default implementation.
+                If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
+                :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
+                propagated to metadata
         """
         self.logger.info(f"Starting flush()")
+        tables, metadata = self.write_band_signatures()
+        return tables, metadata
+
+    def write_band_signatures(self):
         # define the upper and lower bounds of each band segment
         segment_bounds_list = []
         upper_bound = np.uint64(np.iinfo(np.uint64).max)
@@ -267,9 +341,20 @@ class SignatureCalculationTransform(AbstractTableTransform):
                 )
                 self.logger.debug(f"band {band_ix} segment {segment_index} appended tables and paths")
         # add the paths to the metadata
-        metadata = {"paths": paths}
         total_table_size = sum([table.nbytes for table in tables])
-        self.logger.info(f"flush(): writing {len(tables)} tables with a total size of {total_table_size:,d} bytes")
+        metadata = {
+            "input_files": self.files_processed,
+            "input_docs": len(self.all_minhashes),
+            "input_bytes": self.bytes_processed,
+            "output_files": len(tables),
+            "output_bytes": total_table_size,
+            "paths": paths,
+        }
+        self.logger.info(f"Writing {len(tables)} tables with a total size of {total_table_size:,d} bytes")
+        self.files_processed = 0
+        self.bytes_processed = 0
+        self.all_minhashes = None
+        self.all_band_hashes = None
         return tables, metadata
 
     # define shingles generation function
@@ -310,46 +395,6 @@ class SignatureCalculationTransform(AbstractTableTransform):
             for band in bands:
                 result.append(band)
         return result
-
-    def _optimal_minhashlsh_param(
-        self,
-        threshold: float = 0.8,
-        num_perm: int = 128,
-        false_positive_weight: float = 0.5,
-        false_negative_weight: float = 0.5,
-    ):
-        """
-        Compute the optimal `MinHashLSH` parameter that minimizes the weighted sum
-        of probabilities of false positive and false negative.
-        :param threshold: desired similarity threshold
-        :param num_perm: number of permutations
-        :param false_positive_weight: importance of avoiding false positive results
-        :param false_negative_weight: importance of avoiding false negative results
-        :return: a tuple (optimal number of bands, optimal number of rows)
-        """
-
-        def _false_positive_probability(threshold, b, r):
-            _probability = lambda s: 1 - (1 - s ** float(r)) ** float(b)
-            a, err = integrate(_probability, 0.0, threshold)
-            return a
-
-        def _false_negative_probability(threshold, b, r):
-            _probability = lambda s: 1 - (1 - (1 - s ** float(r)) ** float(b))
-            a, err = integrate(_probability, threshold, 1.0)
-            return a
-
-        min_error = float("inf")
-        opt = (0, 0)
-        for b in range(1, num_perm + 1):
-            max_r = int(num_perm / b)
-            for r in range(1, max_r + 1):
-                fp = _false_positive_probability(threshold, b, r)
-                fn = _false_negative_probability(threshold, b, r)
-                error = fp * false_positive_weight + fn * false_negative_weight
-                if error < min_error:
-                    min_error = error
-                    opt = (b, r)
-        return opt
 
 
 class SignatureCalculationTransformConfiguration(TransformConfiguration):
@@ -411,6 +456,18 @@ class SignatureCalculationTransformConfiguration(TransformConfiguration):
             type=int,
             default=word_shingle_size_default,
             help="the size of the word shingles calculated for each document",
+        )
+        parser.add_argument(
+            f"--{num_bands_cli_param}",
+            type=int,
+            default=num_bands_default,
+            help="the number of bands to use in the banding technique",
+        )
+        parser.add_argument(
+            f"--{num_minhashes_per_band_cli_param}",
+            type=int,
+            default=num_minhashes_per_band_default,
+            help="the number of minhashes to use in each band",
         )
         parser.add_argument(
             f"--{num_segments_cli_param}",
