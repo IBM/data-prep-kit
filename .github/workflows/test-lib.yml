@@ -11,9 +11,9 @@ on:
         paths:
             # Note: the transform workflows are expected to trigger when data-processing-lib/** changes
             - "data-processing-lib/**"
-            - "!**.md"
-            - "!**/doc/**"
-            - "!**/.gitignore"
+            - "!data-processing-lib/**.md"
+            - "!data-processing-lib/**/doc/**"
+            - "!data-processing-lib/**/.gitignore"
     pull_request:
         branches:
             - "dev"
@@ -21,9 +21,9 @@ on:
         paths:
             # Note: the transform workflows are expected to trigger when data-processing-lib/** changes
             - "data-processing-lib/**"
-            - "!**.md"
-            - "!**/doc/**"
-            - "!**/.gitignore"
+            - "!data-processing-lib/**.md"
+            - "!data-processing-lib/**/doc/**"
+            - "!data-processing-lib/**/.gitignore"
 
 jobs:
     check_if_push_images:
