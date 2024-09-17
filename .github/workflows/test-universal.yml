@@ -11,7 +11,6 @@ on:
         paths:
             - "transforms/universal/**"
             - "!**.md"
-            - "!examples/**"
             - "!**/doc/**"
             - "!**/.gitignore"
             - "!**/.dockerignore"
@@ -22,7 +21,6 @@ on:
         paths:
             - "transforms/universal/**"
             - "!**.md"
-            - "!examples/**"
             - "!**/doc/**"
             - "!**/.gitignore"
             - "!**/.dockerignore"
@@ -49,7 +47,7 @@ jobs:
                     publish_images='true'
                   fi
                   echo "publish_images=$publish_images" >> "$GITHUB_OUTPUT"
-    test-universal:
+    test-src:
         runs-on: ubuntu-22.04
         steps:
             - name: Checkout
@@ -66,7 +64,7 @@ jobs:
             - name: Test Universal Transforms
               run: |
                   make -C transforms/universal DOCKER=docker test-src
-    test-universal-images:
+    test-images:
         needs: [check_if_push_images]
         runs-on: ubuntu-22.04
         timeout-minutes: 120
