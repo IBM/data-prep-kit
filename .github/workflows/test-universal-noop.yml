@@ -12,8 +12,6 @@ on:
             - "transforms/universal/noop/**"
             - "data-processing-lib/**"
             - "!**.md"
-            - "!**/doc/**"
-            - "!**/.gitignore"
     pull_request:
         branches:
             - "dev"
@@ -22,8 +20,6 @@ on:
             - "transforms/universal/noop/**"
             - "data-processing-lib/**"
             - "!**.md"
-            - "!**/doc/**"
-            - "!**/.gitignore"
 
 jobs:
     check_if_push_images:
