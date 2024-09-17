@@ -89,7 +89,7 @@ def ededup(
     ededup_hash_cpu: float = 0.5,
     ededup_doc_column: str = "contents",
     ededup_use_snapshot: bool = False,
-    ededup_snapshot_directory: str = None,
+    ededup_snapshot_directory: str = "",
     # data sampling
     ededup_n_samples: int = 10,
     # additional parameters

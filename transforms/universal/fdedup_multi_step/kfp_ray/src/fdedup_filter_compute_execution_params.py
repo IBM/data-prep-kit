@@ -80,6 +80,9 @@ def fdedup_filter_compute_execution_params(
         sys.exit(1)
     required_cpu = (fdedup_filter_num_doc_id * fdedup_filter_doc_cpu + n_workers * worker_cpu)
     print(f"Required execution cpu : {required_cpu}, Required execution memory {r_mem} GB")
+    # process None able parameters
+    if fdedup_filter_doc_id_snapshot_directory is None or len(fdedup_filter_doc_id_snapshot_directory) <= 1:
+        fdedup_filter_doc_id_snapshot_directory = None
     # return results
     return {
         "data_s3_config": data_s3_config,

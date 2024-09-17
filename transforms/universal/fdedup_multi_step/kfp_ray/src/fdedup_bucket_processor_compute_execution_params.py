@@ -103,6 +103,16 @@ def fdedup_bucket_processor_compute_execution_params(
                     + fdedup_bucket_processor_num_doc_id * fdedup_bucket_processor_doc_cpu +
                     n_workers * worker_cpu + b_processors * fdedup_bucket_processor_processor_cpu)
     print(f"Required execution cpu : {required_cpu}, Required execution memory {r_mem} GB")
+    # process None able parameters
+    if (fdedup_bucket_processor_minhash_snapshot_directory is None
+            or len(fdedup_bucket_processor_minhash_snapshot_directory) <= 1):
+        fdedup_bucket_processor_minhash_snapshot_directory = None
+    if (fdedup_bucket_processor_buckets_snapshot_directory is None
+            or len(fdedup_bucket_processor_buckets_snapshot_directory) <= 1):
+        fdedup_bucket_processor_buckets_snapshot_directory = None
+    if (fdedup_bucket_processor_doc_id_snapshot_directory is None
+            or len(fdedup_bucket_processor_doc_id_snapshot_directory) <= 1):
+        fdedup_bucket_processor_doc_id_snapshot_directory = None
     # return results
     return {
         "data_s3_config": data_s3_config,

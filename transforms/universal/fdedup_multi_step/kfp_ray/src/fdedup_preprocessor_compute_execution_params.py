@@ -194,6 +194,16 @@ def fdedup_preprocessor_compute_execution_params(
     required_cpu = (b_actors * fdedup_preprocessor_bucket_cpu + m_actors * fdedup_preprocessor_mhash_cpu
                     + d_actors * fdedup_preprocessor_doc_cpu + n_workers * worker_cpu)
     print(f"Required execution cpu : {required_cpu}, Required execution memory {r_mem} GB")
+    # process None able parameters
+    if (fdedup_preprocessor_minhash_snapshot_directory is None
+            or len(fdedup_preprocessor_minhash_snapshot_directory) <= 1):
+        fdedup_preprocessor_minhash_snapshot_directory = None
+    if (fdedup_preprocessor_buckets_snapshot_directory is None
+            or len(fdedup_preprocessor_buckets_snapshot_directory) <= 1):
+        fdedup_preprocessor_buckets_snapshot_directory = None
+    if (fdedup_preprocessor_doc_id_snapshot_directory is None
+            or len(fdedup_preprocessor_doc_id_snapshot_directory) <= 1):
+        fdedup_preprocessor_doc_id_snapshot_directory = None
     # return results
     return {
         "data_s3_config": data_s3_config,

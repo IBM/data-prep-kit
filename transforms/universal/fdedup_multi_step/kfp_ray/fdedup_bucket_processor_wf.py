@@ -97,9 +97,9 @@ def fdedup_bucket_processor(
     fdedup_bucket_processor_num_permutations: int = 64,
     fdedup_bucket_processor_threshold: float = 0.8,
     # snapshotting
-    fdedup_bucket_processor_minhash_snapshot_directory: str = None,
-    fdedup_bucket_processor_buckets_snapshot_directory: str = None,
-    fdedup_bucket_processor_doc_id_snapshot_directory: str = None,
+    fdedup_bucket_processor_minhash_snapshot_directory: str = "",
+    fdedup_bucket_processor_buckets_snapshot_directory: str = "",
+    fdedup_bucket_processor_doc_id_snapshot_directory: str = "",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):

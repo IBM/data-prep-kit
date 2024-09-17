@@ -98,9 +98,9 @@ def fdedup_preprocessor(
     fdedup_preprocessor_shingles_size: int = 5,
     fdedup_preprocessor_delimiters: str = " ",
     # snapshotting
-    fdedup_preprocessor_minhash_snapshot_directory: str = None,
-    fdedup_preprocessor_buckets_snapshot_directory: str = None,
-    fdedup_preprocessor_doc_id_snapshot_directory: str = None,
+    fdedup_preprocessor_minhash_snapshot_directory: str = "",
+    fdedup_preprocessor_buckets_snapshot_directory: str = "",
+    fdedup_preprocessor_doc_id_snapshot_directory: str = "",
     # data sampling
     fdedup_preprocessor_n_samples: int = 10,
     # number of docs to process

@@ -94,7 +94,7 @@ def fdedup_filter(
     fdedup_filter_doc_cpu: float = 0.5,
     fdedup_filter_num_doc_id: int = 1,
     # snapshotting
-    fdedup_filter_doc_id_snapshot_directory: str = None,
+    fdedup_filter_doc_id_snapshot_directory: str = "",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
