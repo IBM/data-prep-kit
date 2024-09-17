@@ -9,6 +9,7 @@ on:
         tags:
             - "*"
         paths-ignore:
+            - "**" # temporary disable
             - "**.md"
             - "examples/**"
             - "**/doc/**"
@@ -19,6 +20,7 @@ on:
             - "dev"
             - "releases/**"
         paths-ignore:
+            - "**" # temporary disable
             - "**.md"
             - "examples/**"
             - "**/doc/**"
