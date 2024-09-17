@@ -1,4 +1,4 @@
-name: Miscellaneous tests
+name: Test - miscellaneous
 
 on:
     workflow_dispatch:

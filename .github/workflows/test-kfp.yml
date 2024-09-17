@@ -1,4 +1,4 @@
-name: Build and test KFP
+name: Test/build KFP
 
 on:
     workflow_dispatch:

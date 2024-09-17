@@ -1,4 +1,4 @@
-name: Test DPK libraries and (Optionally) Push base DPK images
+name: Test DPK libs and (Optionally) Push base DPK images
 
 on:
     workflow_dispatch:
