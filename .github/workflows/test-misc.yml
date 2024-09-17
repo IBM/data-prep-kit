@@ -1,0 +1,53 @@
+name: Miscellaneous tests
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - "dev"
+            - "releases/**"
+        tags:
+            - "*"
+        paths-ignore:
+            - "**.md"
+            - "examples/**"
+            - "**/doc/**"
+            - "**/.gitignore"
+            - "**/.dockerignore"
+    pull_request:
+        branches:
+            - "dev"
+            - "releases/**"
+        paths-ignore:
+            - "**.md"
+            - "examples/**"
+            - "**/doc/**"
+            - "**/.gitignore"
+            - "**/.dockerignore"
+
+jobs:
+    test-make:
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Test top-level recursive make targets.
+              run: |
+                  make -n clean test build publish set-versions
+    test-tools:
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Test tools
+              run: |
+                  make -C tools DOCKER=docker venv test
+    test-tool-images:
+        runs-on: ubuntu-22.04
+        timeout-minutes: 30
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Build and Test Tool images
+              run: |
+                  make -C tools/ingest2parquet DOCKER=docker test-image
