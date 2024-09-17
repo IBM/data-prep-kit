@@ -8,12 +8,18 @@ on:
             - "releases/**"
         paths:
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/.gitignore"
     pull_request:
         branches:
             - "dev"
             - "releases/**"
         paths:
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/.gitignore"
 jobs:
     build-python-lib:
         runs-on: ubuntu-22.04
