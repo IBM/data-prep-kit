@@ -1,3 +1,6 @@
+#
+# DO NOT EDIT THIS: it is generated from test-transform.template,  Edit there and run make to change these files
+#
 name: Test - transforms/universal/noop
 
 on:
@@ -12,6 +15,8 @@ on:
             - "transforms/universal/noop/**"
             - "data-processing-lib/**"
             - "!**.md"
+            - "!**/doc/**"
+            - "!**/.gitignore"
     pull_request:
         branches:
             - "dev"
@@ -20,6 +25,8 @@ on:
             - "transforms/universal/noop/**"
             - "data-processing-lib/**"
             - "!**.md"
+            - "!**/doc/**"
+            - "!**/.gitignore"
 
 jobs:
     check_if_push_images:

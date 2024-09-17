@@ -1,3 +1,6 @@
+#
+# DO NOT EDIT THIS: it is generated from test-transform.template,  Edit there and run make to change these files
+#
 name: Test - transforms/language/text_encoder
 
 on:
