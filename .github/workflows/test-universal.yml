@@ -9,25 +9,25 @@ on:
         tags:
             - "*"
         paths:
-            - "transforms/universal"
-        paths-ignore:
-            - "**.md"
-            - "examples/**"
-            - "**/doc/**"
-            - "**/.gitignore"
-            - "**/.dockerignore"
+            - "transforms/universal/**"
+        #    paths-ignore:
+        #      - "**.md"
+        #      - "examples/**"
+        #      - "**/doc/**"
+        #      - "**/.gitignore"
+        #      - "**/.dockerignore"
     pull_request:
         branches:
             - "dev"
             - "releases/**"
         paths:
-            - "transforms/universal"
-        paths-ignore:
-            - "**.md"
-            - "examples/**"
-            - "**/doc/**"
-            - "**/.gitignore"
-            - "**/.dockerignore"
+            - "transforms/universal/**"
+        #    paths-ignore:
+        #      - "**.md"
+        #      - "examples/**"
+        #      - "**/doc/**"
+        #      - "**/.gitignore"
+        #      - "**/.dockerignore"
 
 jobs:
     check_if_push_images:
@@ -92,9 +92,8 @@ jobs:
               run: |
                   make -C data-processing-lib/spark DOCKER=docker image 
                   make -C transforms/universal DOCKER=docker test-image
-            - name:
-                  Print space
-                  # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
+            - name: Print space
+              # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
               run: |
                   df -h
                   docker images
