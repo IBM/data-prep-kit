@@ -186,7 +186,7 @@ def fdedup_preprocessor_compute_execution_params(
     )
 
     # Make sure that we have enough memory. We assume that each actor uses 3 GB memory
-    r_mem = 3 * (n_workers + b_actors + m_actors + d_actors)
+    r_mem = 2 * (n_workers + b_actors + m_actors + d_actors)
     if r_mem > cluster_memory:
         print(f"Not enough memory to run de duping, required {r_mem}, available {cluster_memory}")
         print(f"Try to increase the size of the cluster or increase size of the cpu per worker (current {worker_cpu})")

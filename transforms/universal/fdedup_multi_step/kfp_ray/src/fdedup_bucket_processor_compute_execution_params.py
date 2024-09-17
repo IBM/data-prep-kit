@@ -92,7 +92,7 @@ def fdedup_bucket_processor_compute_execution_params(
     )
 
     # Make sure that we have enough memory. We assume that each actor uses 3 GB memory
-    r_mem = 3 * (n_workers + b_processors + fdedup_bucket_processor_num_buckets +
+    r_mem = 2 * (n_workers + b_processors + fdedup_bucket_processor_num_buckets +
                  fdedup_bucket_processor_num_minhashes + fdedup_bucket_processor_num_doc_id)
     if r_mem > cluster_memory:
         print(f"Not enough memory to run de duping, required {r_mem}, available {cluster_memory}")
