@@ -1,4 +1,4 @@
-name: Test - transforms/universal/noop
+name: Test - transforms/language/pii_redactor
 
 on:
     workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         tags:
             - "*"
         paths:
-            - "transforms/universal/noop/**"
+            - "transforms/language/pii_redactor/**"
             - "data-processing-lib/**"
             - "!**/**.md"
             - "!**/doc/**"
@@ -19,7 +19,7 @@ on:
             - "dev"
             - "releases/**"
         paths:
-            - "transforms/universal/noop/**"
+            - "transforms/language/pii_redactor/**"
             - "data-processing-lib/**"
             - "!**/**.md"
             - "!**/doc/**"
@@ -61,9 +61,9 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test transform source in transforms/universal/noop
+            - name: Test transform source in transforms/language/pii_redactor
               run: |
-                  make -C transforms/universal/noop DOCKER=docker test-src
+                  make -C transforms/language/pii_redactor DOCKER=docker test-src
     test-images:
         needs: [check_if_push_images]
         runs-on: ubuntu-22.04
@@ -84,10 +84,10 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test transform image in transforms/universal/noop
+            - name: Test transform image in transforms/language/pii_redactor
               run: |
                   make -C data-processing-lib/spark DOCKER=docker image 
-                  make -C transforms/universal/noop DOCKER=docker test-image
+                  make -C transforms/language/pii_redactor DOCKER=docker test-image
             - name: Print space
               # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
               run: |
@@ -95,4 +95,4 @@ jobs:
                   docker images
             - name: Publish images
               if: needs.check_if_push_images.outputs.publish_images == 'true'
-              run: make -C transforms/universal/noop publish
+              run: make -C transforms/language/pii_redactor publish

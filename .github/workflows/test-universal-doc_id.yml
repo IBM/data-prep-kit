@@ -10,6 +10,7 @@ on:
             - "*"
         paths:
             - "transforms/universal/doc_id/**"
+            - "data-processing-lib/**"
             - "!**/**.md"
             - "!**/doc/**"
             - "!**/.gitignore"
@@ -19,6 +20,7 @@ on:
             - "releases/**"
         paths:
             - "transforms/universal/doc_id/**"
+            - "data-processing-lib/**"
             - "!**/**.md"
             - "!**/doc/**"
             - "!**/.gitignore"
@@ -59,7 +61,7 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test Universal Transforms
+            - name: Test transform source in transforms/universal/doc_id
               run: |
                   make -C transforms/universal/doc_id DOCKER=docker test-src
     test-images:
@@ -82,7 +84,7 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test Universal Transform Images
+            - name: Test transform image in transforms/universal/doc_id
               run: |
                   make -C data-processing-lib/spark DOCKER=docker image 
                   make -C transforms/universal/doc_id DOCKER=docker test-image
