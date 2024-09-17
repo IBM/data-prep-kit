@@ -55,4 +55,4 @@ if __name__ == "__main__":
     # Transform the table
     table_list, metadata = transform.transform(table)
     print(f"\noutput table has {table_list[0].num_rows} rows")
-    print(f"output metadata : {metadata}")
+    print(f"output metadata :: {metadata}")
