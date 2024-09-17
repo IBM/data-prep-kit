@@ -1,4 +1,4 @@
-name: Test - universal/noop
+name: Test - transforms/universal/noop
 
 on:
     workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         tags:
             - "*"
         paths:
-            - "universal/noop/**"
+            - "transforms/universal/noop/**"
             - "!**/**.md"
             - "!**/doc/**"
             - "!**/.gitignore"
@@ -18,7 +18,7 @@ on:
             - "dev"
             - "releases/**"
         paths:
-            - "universal/noop/**"
+            - "transforms/universal/noop/**"
             - "!**/**.md"
             - "!**/doc/**"
             - "!**/.gitignore"
@@ -61,7 +61,7 @@ jobs:
                   df -h
             - name: Test Universal Transforms
               run: |
-                  make -C universal/noop DOCKER=docker test-src
+                  make -C transforms/universal/noop DOCKER=docker test-src
     test-images:
         needs: [check_if_push_images]
         runs-on: ubuntu-22.04
@@ -85,7 +85,7 @@ jobs:
             - name: Test Universal Transform Images
               run: |
                   make -C data-processing-lib/spark DOCKER=docker image 
-                  make -C universal/noop DOCKER=docker test-image
+                  make -C transforms/universal/noop DOCKER=docker test-image
             - name: Print space
               # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
               run: |
@@ -93,4 +93,4 @@ jobs:
                   docker images
             - name: Publish images
               if: needs.check_if_push_images.outputs.publish_images == 'true'
-              run: make -C universal/noop publish
+              run: make -C transforms/universal/noop publish

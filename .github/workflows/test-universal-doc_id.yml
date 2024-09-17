@@ -1,4 +1,4 @@
-name: Test - universal/doc_id
+name: Test - transforms/universal/doc_id
 
 on:
     workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         tags:
             - "*"
         paths:
-            - "universal/doc_id/**"
+            - "transforms/universal/doc_id/**"
             - "!**/**.md"
             - "!**/doc/**"
             - "!**/.gitignore"
@@ -18,7 +18,7 @@ on:
             - "dev"
             - "releases/**"
         paths:
-            - "universal/doc_id/**"
+            - "transforms/universal/doc_id/**"
             - "!**/**.md"
             - "!**/doc/**"
             - "!**/.gitignore"
@@ -61,7 +61,7 @@ jobs:
                   df -h
             - name: Test Universal Transforms
               run: |
-                  make -C universal/doc_id DOCKER=docker test-src
+                  make -C transforms/universal/doc_id DOCKER=docker test-src
     test-images:
         needs: [check_if_push_images]
         runs-on: ubuntu-22.04
@@ -85,7 +85,7 @@ jobs:
             - name: Test Universal Transform Images
               run: |
                   make -C data-processing-lib/spark DOCKER=docker image 
-                  make -C universal/doc_id DOCKER=docker test-image
+                  make -C transforms/universal/doc_id DOCKER=docker test-image
             - name: Print space
               # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
               run: |
@@ -93,4 +93,4 @@ jobs:
                   docker images
             - name: Publish images
               if: needs.check_if_push_images.outputs.publish_images == 'true'
-              run: make -C universal/doc_id publish
+              run: make -C transforms/universal/doc_id publish
