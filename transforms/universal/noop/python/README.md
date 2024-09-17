@@ -51,9 +51,11 @@ make run-cli-sample
 ...
 ```
 Then 
+
 ```shell
 ls output
 ```
+
 To see results of the transform.
 
 ### Transforming data using the transform image
