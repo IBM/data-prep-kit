@@ -29,7 +29,7 @@ on:
             - "!**/.gitignore"
 
 jobs:
-    check_if_push_images:
+    check_if_push_image:
         # check whether the Docker images should be pushed to the remote repository
         # The images are pushed if it is a merge to dev branch or a new tag is created.
         # The latter being part of the release process.
@@ -67,7 +67,7 @@ jobs:
             - name: Test transform source in transforms/universal/ededup
               run: |
                   make -C transforms/universal/ededup DOCKER=docker test-src
-    test-images:
+    test-image:
         needs: [check_if_push_images]
         runs-on: ubuntu-22.04
         timeout-minutes: 120
