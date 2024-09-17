@@ -6,10 +6,14 @@ on:
         branches:
             - "dev"
             - "releases/**"
+        paths:
+            - "data-processing-lib/**"
     pull_request:
         branches:
             - "dev"
             - "releases/**"
+        paths:
+            - "data-processing-lib/**"
 jobs:
     build-python-lib:
         runs-on: ubuntu-22.04
