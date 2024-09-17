@@ -213,7 +213,3 @@ You can run transforms via docker image or using virtual environments. This [doc
 4. Talk on "Hands on session for fine tuning LLMs" [Video](https://www.youtube.com/watch?v=VEHIA3E64DM)
 5. Talk on "Build your own data preparation module using data-prep-kit" [Video](https://www.youtube.com/watch?v=0WUMG6HIgMg)
 
-
-
-
-
