@@ -1,4 +1,4 @@
-name: Build, Test and (Optionally) Push images
+name: Test universal transforms - src and images
 
 on:
     workflow_dispatch:
