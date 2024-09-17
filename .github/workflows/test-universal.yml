@@ -10,24 +10,22 @@ on:
             - "*"
         paths:
             - "transforms/universal/**"
-        paths-ignore:
-            - "**.md"
-            - "examples/**"
-            - "**/doc/**"
-            - "**/.gitignore"
-            - "**/.dockerignore"
+            - "!**.md"
+            - "!examples/**"
+            - "!**/doc/**"
+            - "!**/.gitignore"
+            - "!**/.dockerignore"
     pull_request:
         branches:
             - "dev"
             - "releases/**"
         paths:
             - "transforms/universal/**"
-        paths-ignore:
-            - "**.md"
-            - "examples/**"
-            - "**/doc/**"
-            - "**/.gitignore"
-            - "**/.dockerignore"
+            - "!**.md"
+            - "!examples/**"
+            - "!**/doc/**"
+            - "!**/.gitignore"
+            - "!**/.dockerignore"
 
 jobs:
     check_if_push_images:
