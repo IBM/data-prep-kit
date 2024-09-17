@@ -26,28 +26,40 @@ class FileCopyUtil:
         self.root_folder = config.get("root_folder")
         self.logger = get_logger(__name__, level="INFO")
 
-    def copy_data(self, subfolder_name: str):
-        match = re.match(r"^band=(\d+)/segment=(\d+)$", subfolder_name)
-        if match:
-            band = int(match.group(1))
-            segment = int(match.group(2))
-        else:
-            raise ValueError(f"Wrong subfolder_name {subfolder_name}, should be band=b/segment=s")
-        input_folder = os.path.join(
-            self.root_folder,
-            "bands",
-            f"band={band}",
-            f"segment={segment}",
-        )
+    def copy_data(self, subfolder_name: str, data_type: str):
         if self.data_access_factory.s3_config is not None:
             _, root_folder = self.root_folder.split("://")
         else:
             root_folder = self.root_folder
-        output_path = os.path.join(
-            root_folder,
-            "bands_consolidated",
-            f"band_{band}_segment_{segment}.parquet",
-        )
+
+        if data_type == "bands":
+            match = re.match(r"^band=(\d+)/segment=(\d+)$", subfolder_name)
+            if match:
+                band = int(match.group(1))
+                segment = int(match.group(2))
+            else:
+                raise ValueError(f"Wrong subfolder_name {subfolder_name}, should be band=b/segment=s")
+            input_folder = os.path.join(
+                self.root_folder,
+                "bands",
+                f"band={band}",
+                f"segment={segment}",
+            )
+            output_path = os.path.join(
+                root_folder,
+                "bands_consolidated",
+                f"band_{band}_segment_{segment}.parquet",
+            )
+        elif data_type == "docs_to_remove":
+            input_folder = os.path.join(
+                self.root_folder,
+                subfolder_name,
+            )
+            output_path = os.path.join(
+                root_folder,
+                "docs_to_remove_consolidated",
+                f"docs_to_remove_consolidated.parquet",
+            )
         data_access = self.data_access_factory.create_data_access()
         file_dict, status = data_access.get_folder_files(
             input_folder,
@@ -60,6 +72,8 @@ class FileCopyUtil:
             df = pl.read_parquet(io.BytesIO(contents))
             self.logger.info(f"{fname} has {len(df)} rows")
             consolidated_df = consolidated_df.vstack(df)
+        if "docs_to_remove" in consolidated_df.columns:
+            consolidated_df = consolidated_df.select("docs_to_remove").unique()
         output_table = consolidated_df.to_arrow()
         self.logger.info(
             f"Writing to {output_path} table with {output_table.num_rows} rows and {output_table.nbytes:,d} bytes"
@@ -91,6 +105,12 @@ if __name__ == "__main__":
         help="subfolder name",
     )
     parser.add_argument(
+        "--data_type",
+        type=str,
+        default="doc2remove",
+        help="Processing either bands or doc2remove",
+    )
+    parser.add_argument(
         "--use_s3",
         type=bool,
         default=False,
@@ -101,6 +121,7 @@ if __name__ == "__main__":
     config = {"root_folder": args.root_folder}
     input_folder = args.root_folder
     output_folder = args.root_folder
+    data_type = args.data_type
     data_access_factory: DataAccessFactoryBase = DataAccessFactory()
     daf_args = []
     if args.use_s3:
@@ -130,4 +151,4 @@ if __name__ == "__main__":
     data_access_factory.apply_input_params(args=data_access_factory_args)
     stats = {}
     fcu = FileCopyUtil(data_access_factory=data_access_factory, config=config, stats=stats)
-    fcu.copy_data(args.subfolder_name)
+    fcu.copy_data(args.subfolder_name, args.data_type)

@@ -100,10 +100,7 @@ class FileCopySpark:
         return data_access_factory
 
     def orchestrate(
-        self,
-        runtime_config: dict,
-        execution_config: dict,
-        data_access_factory: DataAccessFactoryBase,
+        self, runtime_config: dict, execution_config: dict, data_access_factory: DataAccessFactoryBase, data_type: str
     ) -> int:
         """
         orchestrator for transformer execution
@@ -121,6 +118,9 @@ class FileCopySpark:
         sc = spark_session.sparkContext
         transform_config = sc.broadcast(runtime_config)
         daf = sc.broadcast(data_access_factory)
+        data_type = data_type
+        print("data_type")
+        print(data_type)
 
         def process_partition(iterator):
             """
@@ -137,18 +137,23 @@ class FileCopySpark:
                 stats=stats,
             )
             for f in iterator:
-                stats = file_processor.copy_data(subfolder_name=f[0])
+                stats = file_processor.copy_data(subfolder_name=f[0], data_type=data_type)
             # return partition's statistics
             return list(stats.items())
 
         num_partitions = 0
         try:
-            # Get files to process
-            files = [
-                f"band={band}/segment={segment}"
-                for band in range(self.num_bands)
-                for segment in range(self.num_segments)
-            ]
+            if data_type == "bands":
+                # Get files to process
+                files = [
+                    f"band={band}/segment={segment}"
+                    for band in range(self.num_bands)
+                    for segment in range(self.num_segments)
+                ]
+            elif data_type == "docs_to_remove":
+                files = ["docs_to_remove"]
+            print(data_type)
+
             if len(files) == 0:
                 logger.error("No input files to process - exiting")
                 return 0
@@ -214,20 +219,26 @@ if __name__ == "__main__":
     parser.add_argument(
         "--root_folder",
         type=str,
-        default=os.getenv("HOME"),
+        default="/Users/nelson/workspace/Research/DataPreprocessing/ibm/active/data-prep-kit/transforms/universal/fdedup/python/output_second/",
         help="root folder",
     )
     parser.add_argument(
         "--num_bands",
         type=int,
-        default=0,
+        default=14,
         help="number of bands",
     )
     parser.add_argument(
         "--num_segments",
         type=int,
-        default=0,
+        default=2,
         help="number of segments",
+    )
+    parser.add_argument(
+        "--data_type",
+        type=str,
+        default="docs_to_remove",
+        help="bands or doc2remove",
     )
     parser.add_argument(
         "--parallelization",
@@ -246,5 +257,5 @@ if __name__ == "__main__":
     data_access_factory = fcs.create_data_access_factory(args.root_folder, args.use_s3)
     app_config = {"root_folder": args.root_folder}
     execution_config = {"parallelization": args.parallelization} if args.parallelization > 0 else {}
-    status = fcs.orchestrate(app_config, execution_config, data_access_factory)
+    status = fcs.orchestrate(app_config, execution_config, data_access_factory, args.data_type)
     print(f"Orchestrate concluded with status {status}")
