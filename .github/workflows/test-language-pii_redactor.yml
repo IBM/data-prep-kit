@@ -11,7 +11,7 @@ on:
         paths:
             - "transforms/language/pii_redactor/**"
             - "data-processing-lib/**"
-            - "!**/**.md"
+            - "!**.md"
             - "!**/doc/**"
             - "!**/.gitignore"
     pull_request:
@@ -21,7 +21,7 @@ on:
         paths:
             - "transforms/language/pii_redactor/**"
             - "data-processing-lib/**"
-            - "!**/**.md"
+            - "!**.md"
             - "!**/doc/**"
             - "!**/.gitignore"
 
