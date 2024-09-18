@@ -1,7 +1,7 @@
 #
 # DO NOT EDIT THIS: it is generated from test-transform.template,  Edit there and run make to change these files
 #
-name: Test - @TARGET_TRANSFORM_DIR@ 
+name: Test - @TARGET_TRANSFORM_DIR@
 
 on:
     workflow_dispatch:
@@ -83,8 +83,12 @@ jobs:
                   df -h
             - name: Test transform image in @TARGET_TRANSFORM_DIR@
               run: |
-                  make -C data-processing-lib/spark DOCKER=docker image 
-                  make -C @TARGET_TRANSFORM_DIR@ DOCKER=docker test-image
+                  if [ -e "@TARGET_TRANSFORM_DIR@/Makefile" ]; then
+                      make -C data-processing-lib/spark DOCKER=docker image 
+                      make -C @TARGET_TRANSFORM_DIR@ DOCKER=docker test-image
+                  else
+                      echo "@TARGET_TRANSFORM_DIR@/Makefile not found - testing disabled for this transform."
+                  fi
             - name: Print space
               # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
               run: |
@@ -92,4 +96,9 @@ jobs:
                   docker images
             - name: Publish images
               if: needs.check_if_push_image.outputs.publish_images == 'true'
-              run: make -C @TARGET_TRANSFORM_DIR@ publish
+              run: |
+                  if [ -e "@TARGET_TRANSFORM_DIR@/Makefile" ]; then
+                      make -C @TARGET_TRANSFORM_DIR@ publish
+                  else
+                      echo "@TARGET_TRANSFORM_DIR@/Makefile not found - publishing disabled for this transform."
+                  fi

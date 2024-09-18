@@ -83,8 +83,12 @@ jobs:
                   df -h
             - name: Test transform image in transforms/language/pii_redactor
               run: |
-                  make -C data-processing-lib/spark DOCKER=docker image 
-                  make -C transforms/language/pii_redactor DOCKER=docker test-image
+                  if [ -e "transforms/language/pii_redactor/Makefile" ]; then
+                      make -C data-processing-lib/spark DOCKER=docker image 
+                      make -C transforms/language/pii_redactor DOCKER=docker test-image
+                  else
+                      echo "transforms/language/pii_redactor/Makefile not found - testing disabled for this transform."
+                  fi
             - name: Print space
               # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
               run: |
@@ -92,4 +96,9 @@ jobs:
                   docker images
             - name: Publish images
               if: needs.check_if_push_image.outputs.publish_images == 'true'
-              run: make -C transforms/language/pii_redactor publish
+              run: |
+                  if [ -e "transforms/language/pii_redactor/Makefile" ]; then
+                      make -C transforms/language/pii_redactor publish
+                  else
+                      echo "transforms/language/pii_redactor/Makefile not found - publishing disabled for this transform."
+                  fi
