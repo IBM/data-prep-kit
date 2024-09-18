@@ -52,11 +52,11 @@ class chunking_types(str, enum.Enum):
 
 
 default_content_column_name = "contents"
-default_doc_id_column_name = "doc_id"
+default_doc_id_column_name = "document_id"
 default_chunking_type = chunking_types.DL_JSON
 default_dl_min_chunk_len = None
 default_output_chunk_column_name = "contents"
-default_output_source_doc_id_column_name = "source_doc_id"
+default_output_source_doc_id_column_name = "source_document_id"
 default_output_jsonpath_column_name = "doc_jsonpath"
 default_output_pageno_column_name = "page_number"
 default_output_bbox_column_name = "bbox"
@@ -196,7 +196,7 @@ class DocChunkTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{output_source_doc_id_column_name_cli_param}",
             default=default_output_source_doc_id_column_name,
-            help="Column name to store the `doc_id` from the input table",
+            help="Column name to store the `document_id` from the input table",
         )
         parser.add_argument(
             f"--{output_jsonpath_column_name_cli_param}",

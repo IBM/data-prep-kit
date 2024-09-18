@@ -16,7 +16,7 @@ The output parquet file will contain all the original columns, but the content w
 
 ### Tracing the origin of the chunks
 
-The transform allows to trace the origin of the chunk with the `source_doc_id` which is set to the value of the `doc_id` column (if present) in the input table.
+The transform allows to trace the origin of the chunk with the `source_doc_id` which is set to the value of the `document_id` column (if present) in the input table.
 The actual name of columns can be customized with the parameters described below.
 
 
@@ -31,10 +31,10 @@ The transform can be tuned with the following parameters.
 |------------|----------|--------------|
 | `chunking_type`        | `dl_json` | Chunking type to apply. Valid options are `li_markdown` for using the LlamaIndex [Markdown chunking](https://docs.llamaindex.ai/en/stable/module_guides/loading/node_parsers/modules/#markdownnodeparser), `dl_json` for using the [Docling JSON chunking](https://github.com/DS4SD/docling). |
 | `content_column_name`        | `contents` | Name of the column containing the text to be chunked. |
-| `doc_id_column_name`         | `doc_id` | Name of the column containing the doc_id to be propagated in the output. |
+| `doc_id_column_name`         | `document_id` | Name of the column containing the doc_id to be propagated in the output. |
 | `dl_min_chunk_len`           | `None` | Minimum number of characters for the chunk in the dl_json chunker. Setting to None is using the library defaults, i.e. a `min_chunk_len=64`. |
 | `output_chunk_column_name`   | `contents` | Column name to store the chunks in the output table. |
-| `output_source_doc_id_column_name`   | `source_doc_id` | Column name to store the `doc_id` from the input table. |
+| `output_source_doc_id_column_name`   | `source_document_id` | Column name to store the `doc_id` from the input table. |
 | `output_jsonpath_column_name`| `doc_jsonpath` | Column name to store the document path of the chunk in the output table. |
 | `output_pageno_column_name`  | `page_number` | Column name to store the page number of the chunk in the output table. |
 | `output_bbox_column_name`    | `bbox` | Column name to store the bbox of the chunk in the output table. |
