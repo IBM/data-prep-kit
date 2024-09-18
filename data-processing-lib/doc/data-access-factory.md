@@ -30,11 +30,15 @@ With this in mind, the following function is provided:
     * input folder 
     * sub-directory selection (aka data sets))
     * file extension
+    * files extensions to checkpoint
     * maximum count
     * random sampling
 * Output file identification (for a given input)
 * Checkpointing  - determines the set of input files that need processing 
-(i.e. which do not have corresponding output files).
+(i.e. which do not have corresponding output files). In the case of parquet files, where
+inputs and outputs are parquet this comparison is fairly simple. In the case of binary
+files it is a little bit more involved as input and output files may have different extensions.
+in this case you need to specify both `files extensions` and `files extensions to checkpoint`  
 * Reading and writing of files.
 
 Each transform runtime uses a DataAccessFactory to create a DataAccess instance which
