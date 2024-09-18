@@ -62,7 +62,7 @@ jobs:
               run: |
                   make -C transforms/universal/filter DOCKER=docker test-src
     test-image:
-        needs: [check_if_push_images]
+        needs: [check_if_push_image]
         runs-on: ubuntu-22.04
         timeout-minutes: 120
         env:
@@ -91,5 +91,5 @@ jobs:
                   df -h
                   docker images
             - name: Publish images
-              if: needs.check_if_push_images.outputs.publish_images == 'true'
+              if: needs.check_if_push_image.outputs.publish_images == 'true'
               run: make -C transforms/universal/filter publish
