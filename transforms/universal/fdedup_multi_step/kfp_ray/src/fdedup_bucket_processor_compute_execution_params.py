@@ -118,7 +118,7 @@ def fdedup_bucket_processor_compute_execution_params(
         "data_s3_config": data_s3_config,
         "data_max_files": data_max_files,
         "data_num_samples": data_num_samples,
-        "data_files_to_use": "[\"\"]",
+        "data_files_to_use": None,
         "runtime_num_workers": n_workers,
         "runtime_worker_options": str(runtime_actor_options),
         "runtime_pipeline_id": runtime_pipeline_id,

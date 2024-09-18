@@ -12,7 +12,6 @@
 
 import os
 import sys
-import ast
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
@@ -48,7 +47,7 @@ params = {
     "run_locally": True,
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
-    "data_files_to_use": ast.literal_eval("['']"),
+    "data_files_to_use": None,
     # orchestrator
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",

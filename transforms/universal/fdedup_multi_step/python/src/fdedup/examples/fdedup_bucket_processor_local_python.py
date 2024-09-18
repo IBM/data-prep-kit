@@ -12,7 +12,6 @@
 
 import os
 import sys
-import ast
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
@@ -37,7 +36,7 @@ code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
-    "data_files_to_use": ast.literal_eval("['']"),
+    "data_files_to_use": None,
     # orchestrator
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
