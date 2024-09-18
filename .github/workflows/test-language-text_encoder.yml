@@ -14,6 +14,10 @@ on:
         paths:
             - "transforms/language/text_encoder/**"
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
     pull_request:
         branches:
             - "dev"
@@ -21,6 +25,10 @@ on:
         paths:
             - "transforms/language/text_encoder/**"
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
 
 jobs:
     check_if_push_image:
@@ -84,7 +92,7 @@ jobs:
             - name: Test transform image in transforms/language/text_encoder
               run: |
                   if [ -e "transforms/language/text_encoder/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image 
+                      make -C data-processing-lib/spark DOCKER=docker image
                       make -C transforms/language/text_encoder DOCKER=docker test-image
                   else
                       echo "transforms/language/text_encoder/Makefile not found - testing disabled for this transform."

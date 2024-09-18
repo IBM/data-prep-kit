@@ -14,6 +14,10 @@ on:
         paths:
             - "transforms/language/doc_chunk/**"
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
     pull_request:
         branches:
             - "dev"
@@ -21,6 +25,10 @@ on:
         paths:
             - "transforms/language/doc_chunk/**"
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
 
 jobs:
     check_if_push_image:
@@ -84,7 +92,7 @@ jobs:
             - name: Test transform image in transforms/language/doc_chunk
               run: |
                   if [ -e "transforms/language/doc_chunk/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image 
+                      make -C data-processing-lib/spark DOCKER=docker image
                       make -C transforms/language/doc_chunk DOCKER=docker test-image
                   else
                       echo "transforms/language/doc_chunk/Makefile not found - testing disabled for this transform."

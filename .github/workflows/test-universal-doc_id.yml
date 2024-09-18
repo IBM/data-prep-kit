@@ -14,6 +14,10 @@ on:
         paths:
             - "transforms/universal/doc_id/**"
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
     pull_request:
         branches:
             - "dev"
@@ -21,6 +25,10 @@ on:
         paths:
             - "transforms/universal/doc_id/**"
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
 
 jobs:
     check_if_push_image:
@@ -84,7 +92,7 @@ jobs:
             - name: Test transform image in transforms/universal/doc_id
               run: |
                   if [ -e "transforms/universal/doc_id/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image 
+                      make -C data-processing-lib/spark DOCKER=docker image
                       make -C transforms/universal/doc_id DOCKER=docker test-image
                   else
                       echo "transforms/universal/doc_id/Makefile not found - testing disabled for this transform."

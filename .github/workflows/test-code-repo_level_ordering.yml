@@ -14,6 +14,10 @@ on:
         paths:
             - "transforms/code/repo_level_ordering/**"
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
     pull_request:
         branches:
             - "dev"
@@ -21,6 +25,10 @@ on:
         paths:
             - "transforms/code/repo_level_ordering/**"
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
 
 jobs:
     check_if_push_image:
@@ -84,7 +92,7 @@ jobs:
             - name: Test transform image in transforms/code/repo_level_ordering
               run: |
                   if [ -e "transforms/code/repo_level_ordering/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image 
+                      make -C data-processing-lib/spark DOCKER=docker image
                       make -C transforms/code/repo_level_ordering DOCKER=docker test-image
                   else
                       echo "transforms/code/repo_level_ordering/Makefile not found - testing disabled for this transform."

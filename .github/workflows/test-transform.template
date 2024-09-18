@@ -14,6 +14,10 @@ on:
         paths:
             - "@TARGET_TRANSFORM_DIR@/**"
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
     pull_request:
         branches:
             - "dev"
@@ -21,6 +25,10 @@ on:
         paths:
             - "@TARGET_TRANSFORM_DIR@/**"
             - "data-processing-lib/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
 
 jobs:
     check_if_push_image:
@@ -84,7 +92,7 @@ jobs:
             - name: Test transform image in @TARGET_TRANSFORM_DIR@
               run: |
                   if [ -e "@TARGET_TRANSFORM_DIR@/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image 
+                      make -C data-processing-lib/spark DOCKER=docker image
                       make -C @TARGET_TRANSFORM_DIR@ DOCKER=docker test-image
                   else
                       echo "@TARGET_TRANSFORM_DIR@/Makefile not found - testing disabled for this transform."
