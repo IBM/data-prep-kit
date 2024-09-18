@@ -73,17 +73,19 @@ class FdedupFilterTransformBase(AbstractTableTransform):
         ids = table.column(self.doc_id_column)
         unique = self._get_unique_ids(ids.to_pylist())
         # Filter out table
-        mask = []
+        mask = [False] * table.num_rows
         clusters = []
         removed = []
         # Actual filtering
         for n in range(table.num_rows):
             doc_id = ids[n].as_py()
+            if not isinstance(doc_id, int):
+                self.logger.error(f"table content is wrong type doc_id {doc_id}, skipping the row")
+                continue
             if doc_id in unique:
-                mask.append(True)
+                mask[n] = True
                 clusters.append(unique.pop(doc_id))
             else:
-                mask.append(False)
                 removed.append(doc_id)
         # build out table
         out_table = TransformUtils.add_column(table=table.filter(mask), name=self.cluster_column, content=clusters)

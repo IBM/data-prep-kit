@@ -196,6 +196,9 @@ class FdedupPreprocessorTransformBase(AbstractTableTransform):
         for n in range(table.num_rows):
             doc = docs[n].as_py()
             doc_id = doc_ids[n].as_py()
+            if not isinstance(doc_id, int) or not isinstance(doc, str):
+                self.logger.error(f"table content is wrong type doc - {doc}, id {doc_id}, skipping the row")
+                continue
             shingles = compute_shingles(txt=doc, word_shingle_size=self.word_shingle_size, delimiter=self.delimiter)
             if len(shingles) > 0:
                 mh = self._generate_minhashes(shingles)
