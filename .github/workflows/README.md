@@ -1,6 +1,6 @@
 # Workflow Management
 
-Here we have the start of a system to automatically generated workflows (currently only for transforms). 
+Here we have the start of a system to automatically generated github workflows (currently only for transforms). 
 In general, the design is to use templates and `make` to generate/update the workflows.
 
 ```
@@ -21,7 +21,6 @@ The Makefile is used to (re)generate all workflows a necessary.  By design, work
 
 When a new transform is added to the repository, 
 
-1. add it to the corresponding macro in the Makefile (in alphabetical order please). 
-1. Run `make` to create the new test .yml for the transform
+1. Run `make` in this directory to create the new test .yml for all transforms found in transforms/{universal,code,language} directories 
 1. commit and push the change to your branch with the new transform.
 

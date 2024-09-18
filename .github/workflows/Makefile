@@ -8,13 +8,19 @@ LANG_TRANSFORMS=doc_chunk doc_quality lang_id pdf2parquet pii_redactor text_enco
 
 
 transform-tests:
-	for i in $(CODE_TRANSFORMS); do	\
-	    cat test-transform.template | sed -e "s?@TARGET_TRANSFORM_DIR@?transforms/code/$$i?g" > test-code-$$i.yml;	\
+	$(MAKE) TRANSFORM_SUBDIR=universal .transform-tests
+	$(MAKE) TRANSFORM_SUBDIR=language .transform-tests
+	$(MAKE) TRANSFORM_SUBDIR=code .transform-tests
+
+# Expects
+#   TRANSFORM_SUBDIR  transforms subdirectory (such as universal)
+.transform-tests:
+	@for i in $$(find ../../transforms/$(TRANSFORM_SUBDIR)  -depth 1 -type d); do	\
+	    dir=$$(basename $$i);							\
+	    yml=test-$(TRANSFORM_SUBDIR)-$$dir.yml;					\
+	    echo Generating $$yml;							\
+	    cat test-transform.template | sed -e "s?@TARGET_TRANSFORM_DIR@?transforms/$${TRANSFORM_SUBDIR}/$$dir?g" > $$yml;	\
 	done
-	for i in $(LANG_TRANSFORMS); do	\
-	    cat test-transform.template | sed -e "s?@TARGET_TRANSFORM_DIR@?transforms/language/$$i?g" > test-language-$$i.yml;	\
-	done
-	for i in $(UNIVERSAL_TRANSFORMS); do	\
-	    cat test-transform.template | sed -e "s?@TARGET_TRANSFORM_DIR@?transforms/universal/$$i?g" > test-universal-$$i.yml;	\
-	done
+
+
 
