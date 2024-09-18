@@ -14,11 +14,13 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from ededup_transform_ray import EdedupRayTransformConfiguration
+from ededup_transform_ray import EdedupRayTransformRuntimeConfiguration
+from ededup_transform_base import doc_column_name_cli_param, int_column_name_cli_param
+from ededup_transform_ray import hash_cpu_cli_params, num_hashes_cli_params
 
 
 # create launcher
-launcher = RayTransformLauncher(EdedupRayTransformConfiguration())
+launcher = RayTransformLauncher(EdedupRayTransformRuntimeConfiguration())
 # create parameters
 s3_cred = {
     "access_key": "localminioaccesskey",
@@ -45,9 +47,10 @@ params = {
     "runtime_creation_delay": 0,
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # ededup params
-    "ededup_hash_cpu": 0.5,
-    "ededup_num_hashes": 2,
-    "ededup_doc_column": "contents",
+    hash_cpu_cli_params: 0.5,
+    num_hashes_cli_params: 2,
+    doc_column_name_cli_param: "contents",
+    int_column_name_cli_param: "document_id",
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

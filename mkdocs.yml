@@ -6,7 +6,7 @@ nav:
     - Home: README.md
     - Overview: data-processing-lib/doc/overview.md
     - Tutorials:
-          - data-processing-lib/doc/transform-tutorials.md
+          - QuickStart: doc/quick-start/quick-start.md
           - Simple: data-processing-lib/doc/simplest-transform-tutorial.md
           - Advanced: data-processing-lib/doc/advanced-transform-tutorial.md
           - KFP Pipeline: kfp/doc/simple_transform_pipeline.md
@@ -27,5 +27,12 @@ markdown_extensions:
     - pymdownx.emoji:
           emoji_index: !!python/name:material.extensions.emoji.twemoji
           emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    - pymdownx.highlight:
+          anchor_linenums: true
+          line_spans: __span
+          pygments_lang_class: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences
 hooks:
     - .github/mkdocs_hook.py

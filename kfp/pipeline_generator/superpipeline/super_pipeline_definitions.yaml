@@ -46,6 +46,10 @@ doc_id_step_parameters:
           type: "str"
           value: "int_id_column"
           description: ""
+        - name: "doc_id_start_id"
+          type: "int"
+          value: 0
+          description: ""
 
 ededup_step_parameters:
     step_parameters:
@@ -64,4 +68,12 @@ ededup_step_parameters:
         - name: "ededup_n_samples"
           type: "int"
           value: 10
+          description: ""
+        - name: "ededup_use_snapshot"
+          type: "bool"
+          value: False
+          description: ""
+        - name: "ededup_snapshot_directory"
+          type: "str"
+          value: None
           description: ""

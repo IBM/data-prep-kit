@@ -19,7 +19,7 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 from data_processing.data_access import DataAccess
-from data_processing.utils import GB, MB, TransformUtils, get_logger
+from data_processing.utils import get_logger
 
 
 logger = get_logger(__name__)
@@ -50,18 +50,14 @@ class DataAccessLocal(DataAccess):
         :param files_to_use: files extensions of files to include
         :param files_to_checkpoint: files extensions of files to use for checkpointing
         """
+        super().__init__(d_sets=d_sets, checkpoint=checkpoint, m_files=m_files, n_samples=n_samples,
+                         files_to_use=files_to_use, files_to_checkpoint=files_to_checkpoint)
         if local_config is None:
             self.input_folder = None
             self.output_folder = None
         else:
             self.input_folder = os.path.abspath(local_config["input_folder"])
             self.output_folder = os.path.abspath(local_config["output_folder"])
-        self.d_sets = d_sets
-        self.checkpoint = checkpoint
-        self.m_files = m_files
-        self.n_samples = n_samples
-        self.files_to_use = files_to_use
-        self.files_to_checkpoint = files_to_checkpoint
 
         logger.debug(f"Local input folder: {self.input_folder}")
         logger.debug(f"Local output folder: {self.output_folder}")
@@ -72,13 +68,6 @@ class DataAccessLocal(DataAccess):
         logger.debug(f"Local files_to_use: {self.files_to_use}")
         logger.debug(f"Local files_to_checkpoint: {self.files_to_checkpoint}")
 
-    def get_num_samples(self) -> int:
-        """
-        Get number of samples for input
-        :return: Number of samples
-        """
-        return self.n_samples
-
     def get_output_folder(self) -> str:
         """
         Get output folder as a string
@@ -86,172 +75,42 @@ class DataAccessLocal(DataAccess):
         """
         return self.output_folder
 
-    @staticmethod
-    def _get_all_files_ext(path: str, extensions: list[str]) -> list[str]:
+    def get_input_folder(self) -> str:
         """
-        Get files with the given extension for a given folder and all sub folders
-        :param path: starting path
-        :param extensions: List of extensions, None - all
+        Get input folder as a string
+        :return: input_folder
+        """
+        return self.input_folder
+
+    def _list_files_folder(self, path: str) -> tuple[list[dict[str, Any]], int]:
+        """
+        Get files for a given folder and all sub folders
+        :param path: path
         :return: List of files
         """
-        files = []
-        for c_path in sorted(Path(path).rglob("*")):
-            # for every file
-            if c_path.is_dir():
+        files = sorted(Path(path).rglob("*"))
+        res = []
+        for file in files:
+            if file.is_dir():
                 continue
-            s_path = str(c_path.absolute())
-            if extensions is not None:
-                _, extension = os.path.splitext(s_path)
-                if extension not in extensions:
-                    continue
-            files.append(s_path)
-        return files
+            res.append({"name": str(file), "size": file.stat().st_size})
+        return res, 0
 
-    def _get_files_folder(
-        self, path: str, cm_files: int, max_file_size: int = 0, min_file_size: int = MB * GB
-    ) -> tuple[list[str], dict[str, float]]:
+    def _get_folders_to_use(self) -> tuple[list[str], int]:
         """
-        Support method.  Lists all parquet files in a directory and their sizes.
-        :param path: input path
-        :param max_file_size: max file size, not sure
-        :param min_file_size: min file size
-        :param cm_files: overwrite for the m_files in the class
-        :return: tuple of file list and profile
+        convert data sets to a list of folders to use
+        :return: list of folders and retries
         """
-        # Get files list, their total size, max and min size of the files in the list.
-        result_files = []
-        total_input_file_size = 0
-        i = 0
-        for c_path in sorted(self._get_all_files_ext(path=path, extensions=self.files_to_use)):
-            if i >= cm_files > 0:
-                break
-            size = Path(c_path).stat().st_size
-            result_files.append(c_path)
-            total_input_file_size += size
-            if min_file_size > size:
-                min_file_size = size
-            if max_file_size < size:
-                max_file_size = size
-            i += 1
-        return (
-            result_files,
-            {
-                "max_file_size": max_file_size / MB,
-                "min_file_size": min_file_size / MB,
-                "total_file_size": total_input_file_size / MB,
-            },
-        )
-
-    def _get_input_files(
-        self,
-        input_path: str,
-        output_path: str,
-        cm_files: int,
-        max_file_size: int = 0,
-        min_file_size: int = MB * GB,
-    ) -> tuple[list[str], dict[str, float]]:
-        """
-        Get list and size of files from input path, that do not exist in the output path
-        :param input_path: input path
-        :param output_path: output path
-        :return: tuple of file list and profile
-        """
-        if not self.checkpoint:
-            return self._get_files_folder(
-                path=input_path, cm_files=cm_files, min_file_size=min_file_size, max_file_size=max_file_size
-            )
-
-        input_files = self._get_all_files_ext(path=input_path, extensions=self.files_to_use)
-        output_files_ext = self._get_all_files_ext(path=output_path, extensions=self.files_to_checkpoint)
-        # In the case of binary transforms, an extension can be different, so just use the file names.
-        # Also remove duplicates
-        output_files = list(set([TransformUtils.get_file_extension(file)[0] for file in output_files_ext]))
-
-        total_input_file_size = 0
-        i = 0
-        result_files = []
-        for filename in sorted(input_files):
-            out_f_name = self.get_output_location(filename)
-            if TransformUtils.get_file_extension(out_f_name)[0] in output_files:
-                continue
-            if i >= cm_files > 0:
-                break
-            result_files.append(filename)
-            size = os.path.getsize(os.path.join(input_path, filename))
-            total_input_file_size += size
-            if min_file_size > size:
-                min_file_size = size
-            if max_file_size < size:
-                max_file_size = size
-            i += 1
-        return (
-            result_files,
-            {
-                "max_file_size": max_file_size / MB,
-                "min_file_size": min_file_size / MB,
-                "total_file_size": total_input_file_size / MB,
-            },
-        )
-
-    def get_files_to_process_internal(self) -> tuple[list[str], dict[str, float], int]:
-        """
-        Get files to process
-        :return: list of files and a dictionary of the files profile:
-            "max_file_size",
-            "min_file_size",
-            "total_file_size"
-        """
-        if self.output_folder is None:
-            logger.error("Get files to process. local configuration is not present, returning empty")
-            return [], {}, 0
-        # Check if we are using data sets
-        if self.d_sets is not None:
-            # get a list of subdirectory paths matching d_sets
-            folders_to_use = []
-            root_dir = Path(self.input_folder)
-            for dir_name in self.d_sets:
-                subdir_path = root_dir / dir_name
-                if subdir_path.is_dir() and subdir_path.parent == root_dir:
-                    folders_to_use.append(subdir_path.name)
-            profile = {
-                "max_file_size": 0.0,
-                "min_file_size": 0.0,
-                "total_file_size": 0.0,
-            }
-            if len(folders_to_use) > 0:
-                # if we have valid folders
-                path_list = []
-                max_file_size = 0
-                min_file_size = MB * GB
-                total_file_size = 0
-                cm_files = self.m_files
-                for folder in folders_to_use:
-                    plist, profile = self._get_input_files(
-                        input_path=os.path.join(self.input_folder, folder),
-                        output_path=os.path.join(self.output_folder, folder),
-                        cm_files=cm_files,
-                        min_file_size=min_file_size,
-                        max_file_size=max_file_size,
-                    )
-                    path_list += [os.path.join(self.input_folder, folder, x) for x in plist]
-                    total_file_size += profile["total_file_size"]
-                    if len(path_list) >= cm_files > 0:
+        folders_to_use = []
+        files = sorted(Path(self.input_folder).rglob("*"))
+        for file in files:
+            if file.is_dir():
+                folder = str(file)
+                for s_name in self.d_sets:
+                    if folder.endswith(s_name):
+                        folders_to_use.append(folder)
                         break
-                    max_file_size = profile["max_file_size"] * MB
-                    min_file_size = profile["min_file_size"] * MB
-                    if cm_files > 0:
-                        cm_files -= len(plist)
-                profile["total_file_size"] = total_file_size
-            else:
-                path_list = []
-        else:
-            # Get input files list
-            path_list, profile = self._get_input_files(
-                input_path=self.input_folder,
-                output_path=self.output_folder,
-                cm_files=self.m_files,
-            )
-        return path_list, profile, 0
+        return folders_to_use, 0
 
     def get_table(self, path: str) -> tuple[pa.table, int]:
         """
@@ -364,36 +223,6 @@ class DataAccessLocal(DataAccess):
         except (FileNotFoundError, gzip.BadGzipFile) as e:
             logger.error(f"Error reading file {path}: {e}")
             raise e
-
-    def get_folder_files(
-        self, path: str, extensions: list[str] = None, return_data: bool = True
-    ) -> tuple[dict[str, bytes], int]:
-        """
-        Get a list of byte content of files. The path here is an absolute path and can be anywhere.
-        :param path: file path
-        :param extensions: a list of file extensions to include. If None, then all files from this and
-                           child ones will be returned
-        :param return_data: flag specifying whether the actual content of files is returned (True), or just
-                            directory is returned (False)
-        :return: A dictionary of file names/binary content will be returned
-        """
-
-        def _get_file_content(f_name: str, dt: bool) -> tuple[bytes, int]:
-            """
-            return file content
-            :param f_name: file name
-            :param dt: flag to return data or None
-            :return: file content
-            """
-            if dt:
-                return self.get_file(f_name)
-            return None, 0
-
-        matching_files = {}
-        for filename in sorted(self._get_all_files_ext(path=path, extensions=extensions)):
-            b, _ = _get_file_content(filename, return_data)
-            matching_files[filename] = b
-        return matching_files, 0
 
     def save_file(self, path: str, data: bytes) -> tuple[dict[str, Any], int]:
         """

@@ -41,8 +41,10 @@ class GroupByRepo:
         ]
 
     def process(self, repo: str, files: List[str]):
-        cumulated_table = self._read_parquet_bulk(files)
-        repo_table = self._filter_table_by_column(cumulated_table, self.repo_column_name, repo)
+        repo_table = self._read_table_for_group(self.repo_column_name, repo, files)
+        if len(repo_table) == 0:
+            # not processing empty table
+            return
 
         def sanitize_path(repo_name):
             return repo_name.replace("/", "%2F")
@@ -61,14 +63,17 @@ class GroupByRepo:
         parquet_path = os.path.join(self.output_dir, f"{repo_name}.parquet")
         self.data_access.save_table(os.path.normpath(parquet_path), table)
 
-    def _read_parquet_bulk(self, files):
-        tables = list(
-            map(
-                lambda x: self.data_access.get_table(os.path.normpath(x))[0].to_pandas(),
-                files,
-            )
-        )
-        df = pd.concat(tables)
+    def _read_table_for_group(self, grouping_column, group, files):
+        """This function reads the files and filters the tables based on grouping_column value"""
+        dfs = []
+        for file in files:
+            table, _ = self.data_access.get_table(os.path.normpath(file))
+            # filtering each table is more memory efficient than
+            # reading all tables and filtering later.
+            filtered_table = self._filter_table_by_column(table, grouping_column, group)
+            dfs.append(filtered_table.to_pandas())
+        df = pd.concat(dfs)
+
         return pa.Table.from_pandas(df)
 
     def _filter_table_by_column(self, table: pa.Table, column_name: str, column_value: str) -> pa.Table:
@@ -108,16 +113,10 @@ class GroupByRepoActor(GroupByRepo):
     """
 
     def __init__(self, params: dict):
-        if params["data_access_creds"] is not None:
-            access_key = params["data_access_creds"]["access_key"]
-            secret_key = params["data_access_creds"]["secret_key"]
-            url = params["data_access_creds"]["url"]
-        else:
-            access_key, secret_key, url = (None, None, None)
         super().__init__(
             params["repo_column_name"],
             params["output_dir"],
-            None,  # params["logger"],
-            params["data_access_factory"].create_data_access(),  # DataAccessAlternative(access_key, secret_key, url),
+            None,
+            params["data_access_factory"].create_data_access(),
             params["mapper"],
         )

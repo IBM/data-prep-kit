@@ -19,7 +19,7 @@ import mmh3
 import numpy as np
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccessFactoryBase
+from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import (
     RANDOM_SEED,
@@ -45,7 +45,6 @@ from fdedup_support import (
     DocsMinHash,
     MurmurMH,
     fuzzy_optimal_param,
-    get_snapshot_folder,
 )
 from ray.actor import ActorHandle
 from ray.util import ActorPool
@@ -331,7 +330,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
         if self.params.get("use_doc_snapshot", False):
             self.logger.info("continuing from the document actors snapshot")
             data_access = data_access_factory.create_data_access()
-            path = f"{get_snapshot_folder(data_access)}docs"
+            path = f"{SnapshotUtils.get_snapshot_folder(data_access)}docs"
             files, retries = data_access.get_folder_files(path=path)
             if retries > 0:
                 statistics.add_stats.remote({"data access retries": retries})
@@ -370,7 +369,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             self.logger.info("continuing from the bucket actors snapshot")
             data_access = data_access_factory.create_data_access()
             # recreate bucket collectors
-            path = f"{get_snapshot_folder(data_access)}buckets"
+            path = f"{SnapshotUtils.get_snapshot_folder(data_access)}buckets"
             files, retries = data_access.get_folder_files(path=path)
             if retries > 0:
                 statistics.add_stats.remote({"data access retries": retries})
@@ -384,7 +383,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
                 time.sleep(self.snapshot_delay)
             self.logger.info(f"Created {len(bucket_collectors)} bucket collectors to continue processing")
             # recreate minhash collectors
-            path = f"{get_snapshot_folder(data_access)}minhash"
+            path = f"{SnapshotUtils.get_snapshot_folder(data_access)}minhash"
             files, retries = data_access.get_folder_files(path=path)
             if retries > 0:
                 statistics.add_stats.remote({"data access retries": retries})

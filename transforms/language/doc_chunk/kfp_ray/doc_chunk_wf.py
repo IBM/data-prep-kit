@@ -31,17 +31,18 @@ component_spec_path = "../../../../kfp/kfp_ray_components/"
 # compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 def compute_exec_params_func(
-    worker_options: str,
-    actor_options: str,
+    worker_options: dict,
+    actor_options: dict,
     data_s3_config: str,
     data_max_files: int,
     data_num_samples: int,
     runtime_pipeline_id: str,
     runtime_job_id: str,
-    runtime_code_location: str,
+    runtime_code_location: dict,
     doc_chunk_chunking_type: str,
     doc_chunk_content_column_name: str,
     doc_chunk_output_chunk_column_name: str,
+    doc_chunk_dl_min_chunk_len: int,
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -49,14 +50,15 @@ def compute_exec_params_func(
         "data_s3_config": data_s3_config,
         "data_max_files": data_max_files,
         "data_num_samples": data_num_samples,
-        "runtime_num_workers": KFPUtils.default_compute_execution_params(worker_options, actor_options),
-        "runtime_worker_options": actor_options,
+        "runtime_num_workers": KFPUtils.default_compute_execution_params(str(worker_options), str(actor_options)),
+        "runtime_worker_options": str(actor_options),
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
-        "runtime_code_location": runtime_code_location,
+        "runtime_code_location": str(runtime_code_location),
         "doc_chunk_chunking_type": doc_chunk_chunking_type,
         "doc_chunk_content_column_name": doc_chunk_content_column_name,
         "doc_chunk_output_chunk_column_name": doc_chunk_output_chunk_column_name,
+        "doc_chunk_dl_min_chunk_len": doc_chunk_dl_min_chunk_len,
     }
 
 
@@ -102,9 +104,8 @@ def doc_chunk(
     # Ray cluster
     ray_name: str = "doc-json-chunk-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image": "' + task_image + '"}',
+    ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image},
+    ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image},
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/doc_chunk/input/', 'output_folder': 'test/doc_chunk/output/'}",
@@ -112,13 +113,14 @@ def doc_chunk(
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
-    runtime_actor_options: str = "{'num_cpus': 0.8}",
+    runtime_actor_options: dict = {'num_cpus': 0.8},
     runtime_pipeline_id: str = "pipeline_id",
-    runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    runtime_code_location: dict = {'github': 'github', 'commit_hash': '12345', 'path': 'path'},
     # doc_chunk parameters
     doc_chunk_chunking_type: str = "dl_json",
     doc_chunk_content_column_name: str = "contents",
     doc_chunk_output_chunk_column_name: str = "contents",
+    doc_chunk_dl_min_chunk_len: int = 64,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
@@ -156,6 +158,7 @@ def doc_chunk(
     :param doc_chunk_chunking_type - chunking type to apply
     :param doc_chunk_content_column_name - column name to get content
     :param doc_chunk_output_chunk_column_name - column name to store the chunks
+    :param doc_chunk_dl_min_chunk_len - minimum chunk size
     :return: None
     """
     # create clean_up task
@@ -176,6 +179,7 @@ def doc_chunk(
             doc_chunk_chunking_type=doc_chunk_chunking_type,
             doc_chunk_content_column_name=doc_chunk_content_column_name,
             doc_chunk_output_chunk_column_name=doc_chunk_output_chunk_column_name,
+            doc_chunk_dl_min_chunk_len=doc_chunk_dl_min_chunk_len,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster

@@ -1,41 +1,21 @@
+# see https://github.com/apache/spark-docker/blob/master/3.5.1/scala2.12-java17-ubuntu/Dockerfile
+# and https://github.com/apache/spark-docker/blob/master/3.5.1/scala2.12-java17-python3-ubuntu/Dockerfile
+# The reasons we are modifying Apache dockerfile are:
+#   1. We support cofiguration of the Python version
+#   2. We are setting non root user
+
 # use the latest open JRE 17 minimal as the build image
-ARG OPENJRE_TAG=17.0.11_9-jre-ubi9-minimal
+ARG OPENJRE_TAG=17-jre-ubi9-minimal
 FROM eclipse-temurin:${OPENJRE_TAG} as build
 
 # download requested Spark distribution and extract into /opt/spark
-ARG SPARK_VERSION=3.5.1
+ARG SPARK_VERSION=3.5.2
 ARG HADOOP_MAJOR_VERSION=3
 RUN wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MAJOR_VERSION}.tgz && \
     tar xf spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MAJOR_VERSION}.tgz -C /opt && \
     mv /opt/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MAJOR_VERSION} /opt/spark
 
-# download the jars needed for spark to work with s3
-WORKDIR /opt/spark/jars
-# this must be the Hadoop version that is used in Spark 3.5.1
-ARG HADOOP_VERSION=3.3.4
-RUN wget https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/${HADOOP_VERSION}/hadoop-aws-${HADOOP_VERSION}.jar && \
-    wget https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-common/${HADOOP_VERSION}/hadoop-common-${HADOOP_VERSION}.jar
-
-# These AWS jars are needed by Hadoop to work with S3
-# There is a new release for these jars each day, any version >= 1.12.305 should work
-ARG AWS_JAVA_VERSION=1.12.724
-RUN wget https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk/${AWS_JAVA_VERSION}/aws-java-sdk-${AWS_JAVA_VERSION}.jar && \
-    wget https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-s3/${AWS_JAVA_VERSION}/aws-java-sdk-s3-${AWS_JAVA_VERSION}.jar && \
-    wget https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-core/${AWS_JAVA_VERSION}/aws-java-sdk-core-${AWS_JAVA_VERSION}.jar && \
-    wget https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-dynamodb/${AWS_JAVA_VERSION}/aws-java-sdk-dynamodb-${AWS_JAVA_VERSION}.jar
-
-# Add further jar files needed to run S3 in Kubernetes
-RUN wget https://repo1.maven.org/maven2/com/fasterxml/woodstox/woodstox-core/6.6.2/woodstox-core-6.6.2.jar && \
-    wget https://repo1.maven.org/maven2/org/codehaus/woodstox/stax2-api/4.2.2/stax2-api-4.2.2.jar && \
-    wget https://repo1.maven.org/maven2/org/apache/commons/commons-configuration2/2.10.1/commons-configuration2-2.10.1.jar && \
-    wget https://repo1.maven.org/maven2/com/google/re2j/re2j/1.7/re2j-1.7.jar
-
-RUN rm hadoop-shaded-guava-1.1.1.jar
-
-# use the latest python 3.11 slim bookworm image
-# ARG PYTHON_IMAGE=python:3.11.9-slim-bookworm
-# FROM $PYTHON_IMAGE
-FROM python:3.11.9-slim-bookworm
+FROM python:3.10-slim
 
 # install additional packages required by spark
 RUN set -ex && \
@@ -77,13 +57,16 @@ RUN mkdir ${SPARK_HOME}/python && \
 
 COPY --from=build ${SPARK_HOME}/python/pyspark ${SPARK_HOME}/python/pyspark
 COPY --from=build ${SPARK_HOME}/python/lib ${SPARK_HOME}/python/lib
-RUN echo "spark:x:185:0::/opt/spark/work-dir:/bin/bash" >> /etc/passwd
+
+# set Spark user
+ARG spark_uid=185
+RUN echo "spark:x:${spark_uid}:0::/opt/spark/work-dir:/bin/bash" >> /etc/passwd
 WORKDIR ${SPARK_HOME}/work-dir
-ENTRYPOINT [ "/opt/entrypoint.sh" ]
 
 # Specify the User that the actual main process will run as
-ARG spark_uid=185
 USER ${spark_uid}
 
 # add pyspark, py4j to PYTHONPATH
 ENV PYTHONPATH=${SPARK_HOME}/python/lib/pyspark.zip:${SPARK_HOME}/python/lib/py4j-0.10.9.7-src.zip:${PYTHONPATH}
+
+ENTRYPOINT [ "/opt/entrypoint.sh" ]

@@ -11,7 +11,10 @@ authors = [
 ]
 dependencies = [
     "data-prep-toolkit==0.2.1.dev0",
-    "docling[ocr]==1.1.2",
+    "docling-core==1.2.0",
+    "docling-ibm-models==1.1.7",
+    "deepsearch-glm==0.21.0",
+    "docling==1.11.0",
     "filetype >=1.2.0, <2.0.0",
 ]
 

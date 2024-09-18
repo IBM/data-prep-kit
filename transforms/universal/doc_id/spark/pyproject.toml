@@ -7,7 +7,7 @@ license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     { name = "Constantin Adam", email = "cmadam@us.ibm.com" },
-    { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
+    { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
 dependencies = [
     "data-prep-toolkit-spark==0.2.1.dev0",

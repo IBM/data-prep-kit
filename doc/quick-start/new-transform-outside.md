@@ -15,6 +15,7 @@ will be useful.
 
 Depending on the target runtime for the transform, you will need one of the following
 dependencies:
+
 * `data-prep-toolkit` - base transform and python runtime framework.
 * `data-prep-toolkit-ray` - ray extensions for ray runtime. Depends on `data-prep-toolkit`.
 * `data-prep-toolkit-spark` - spark extensions for spark runtime. Depends on `data-prep-toolkit`.
@@ -25,6 +26,7 @@ For this quickstart, we will implement a simple transform that adds a column
 containing a string provided on the command line.
 
 ### Create a virtual environment
+
 To start, create a `requirements.txt` file containing the following
 ```
 data-prep-toolkit==0.2.0
@@ -42,6 +44,7 @@ We create the following classes
 2. `HelloTransformConfiguration` - defines CLI arguments to configure HelloTransform
 
 ```python
+
 from typing import Any
 from data_processing.transform import AbstractTableTransform
 import pyarrow as pa
@@ -122,7 +125,7 @@ class HelloPythonConfiguration(PythonTransformRuntimeConfiguration):
 if __name__ == "__main__":
     # Create the runtime launcher to use the HelloTransform
     launcher = PythonTransformLauncher(HelloPythonConfiguration())
-    launcher.launch()f
+    launcher.launch()
 ```
 
 ### Running 

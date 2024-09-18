@@ -44,9 +44,9 @@ class TestGetFilesFolder(TestInit):
         """
         directory = os.path.join(self.dal.input_folder, "empty_dir")
         os.makedirs(directory, exist_ok=True)
-        result = self.dal._get_files_folder(directory, cm_files=0)
+        result = self.dal._get_files_folder(path=directory, files_to_use=None, cm_files=0)
         os.rmdir(directory)
-        assert result == ([], self.size_stat_dict_empty)
+        assert result == ([], self.size_stat_dict_empty, 0)
 
     def test_single_file(self):
         """
@@ -56,10 +56,10 @@ class TestGetFilesFolder(TestInit):
         file_path = directory / "file.parquet"
         os.makedirs(directory, exist_ok=True)
         file_path.touch()
-        result = self.dal._get_files_folder(str(directory), cm_files=0)
+        result = self.dal._get_files_folder(path=str(directory), files_to_use=None, cm_files=0)
         os.remove(file_path)
         os.rmdir(directory)
-        assert result == (["/tmp/input_guf/empty_dir/file.parquet"], self.size_stat_dict)
+        assert result == ([{'name': '/tmp/input_guf/empty_dir/file.parquet', 'size': 0}], self.size_stat_dict, 0)
 
     def test_multiple_files(self):
         """
@@ -73,8 +73,8 @@ class TestGetFilesFolder(TestInit):
         with open(files[0], "w") as fp:
             fp.write(" " * MB)
 
-        file_list, size_dict = self.dal._get_files_folder(str(directory), cm_files=0)
-        results = (file_list, size_dict)
+        file_list, size_dict, retries = self.dal._get_files_folder(path=str(directory), files_to_use=None, cm_files=0)
+        results = ([f["name"] for f in file_list], size_dict)
         expected_results = ([str(file.absolute()) for file in files], self.size_stat_dict_1)
         for file in files:
             os.remove(file)
@@ -89,10 +89,10 @@ class TestGetFilesFolder(TestInit):
         file_path = directory / "file.txt"
         os.makedirs(directory, exist_ok=True)
         file_path.touch()
-        result = self.dal._get_files_folder(str(directory), cm_files=0)
+        result = self.dal._get_files_folder(path=str(directory), files_to_use=[".parquet"], cm_files=0)
         os.remove(file_path)
         os.rmdir(directory)
-        assert result == ([], self.size_stat_dict_empty)
+        assert result == ([], self.size_stat_dict_empty, 0)
 
     def test_non_existent_directory(self):
         """
@@ -101,8 +101,8 @@ class TestGetFilesFolder(TestInit):
         directory = Path("non_existent_dir")
         with patch("pathlib.Path.rglob") as mock_rglob:
             mock_rglob.return_value = []
-            result = self.dal._get_files_folder(str(directory), cm_files=0)
-        assert result == ([], self.size_stat_dict_empty)
+            result = self.dal._get_files_folder(path=str(directory), files_to_use=None, cm_files=0)
+        assert result == ([], self.size_stat_dict_empty, 0)
 
 
 class TestGetInputFiles(TestInit):
@@ -110,8 +110,6 @@ class TestGetInputFiles(TestInit):
         """
         Utility function that sets up input and output directories
         """
-        #        input_path = Path(os.path.join(self.dal.input_folder, f"{prefix}input_dir"))
-        #        output_path = Path(os.path.join(self.dal.output_folder, f"{prefix}output_dir"))
         input_path = Path(self.dal.input_folder)
         output_path = Path(self.dal.output_folder)
         os.makedirs(input_path, exist_ok=True)
@@ -142,7 +140,7 @@ class TestGetInputFiles(TestInit):
         input_path, output_path = self.setup_directories("empty_")
         result = self.dal._get_input_files(str(input_path), str(output_path), cm_files=0)
         self.cleanup(directories_to_remove=[input_path, output_path])
-        assert result == ([], self.size_stat_dict_empty)
+        assert result == ([], self.size_stat_dict_empty, 0)
 
     def test_missing_files(self):
         """
@@ -158,7 +156,7 @@ class TestGetInputFiles(TestInit):
             directories_to_remove=[input_path, output_path],
             files_to_remove=[input_file, output_file],
         )
-        assert result == ([str(input_file.absolute())], self.size_stat_dict)
+        assert result == ([str(input_file.absolute())], self.size_stat_dict, 0)
 
     def test_multiple_missing_files(self):
         """
@@ -171,7 +169,7 @@ class TestGetInputFiles(TestInit):
             file.touch()
         output_file.touch()
 
-        file_list, size_dict = self.dal._get_input_files(str(input_path), str(output_path), cm_files=0)
+        file_list, size_dict, retries = self.dal._get_input_files(str(input_path), str(output_path), cm_files=0)
         result = (file_list, size_dict)
         expected_result = (
             [str(file.absolute()) for file in input_files if str(file.name) != str(output_file.name)],
@@ -195,7 +193,7 @@ class TestGetInputFiles(TestInit):
             mock_rglob.return_value = []
             result = self.dal._get_input_files(str(nonexistent_input_path), str(output_path), cm_files=0)
             self.cleanup(directories_to_remove=[input_path, output_path])
-            assert result == ([], self.size_stat_dict_empty)
+            assert result == ([], self.size_stat_dict_empty, 0)
 
     def test_non_parquet_files(self):
         """
@@ -209,7 +207,7 @@ class TestGetInputFiles(TestInit):
             directories_to_remove=[input_path, output_path],
             files_to_remove=[input_file],
         )
-        assert result == ([], self.size_stat_dict_empty)
+        assert result == ([], self.size_stat_dict_empty, 0)
 
 
 class TestGetFilesToProcess(TestInit):

@@ -75,8 +75,8 @@ class AbstractTest:
     def _install_test_fixtures(self, metafunc):
         raise NotImplemented("Sub-class must implemented this to install the fixtures for its tests.")
 
-    @staticmethod
-    def validate_expected_tables(table_list: list[pa.Table], expected_table_list: list[pa.Table]):
+    @classmethod
+    def validate_expected_tables(cls, table_list: list[pa.Table], expected_table_list: list[pa.Table]):
         """
         Verify with assertion messages that the two lists of Tables are equivalent.
         :param table_list:
@@ -100,10 +100,10 @@ class AbstractTest:
                 r1 = t1.take([j])
                 r2 = t2.take([j])
                 # assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {r2}"
-                AbstractTest.validate_expected_row(i, j, r1, r2)
+                cls.validate_expected_row(i, j, r1, r2)
 
-    @staticmethod
-    def validate_expected_row(table_index: int, row_index: int, test_row: pa.Table, expected_row: pa.Table):
+    @classmethod
+    def validate_expected_row(cls, table_index: int, row_index: int, test_row: pa.Table, expected_row: pa.Table):
         """
         Compare the two rows for equality, allowing float values to be within a percentage
         of each other as defined by global _allowed_float_percent_diff.
@@ -139,8 +139,8 @@ class AbstractTest:
                         diff = abs(test_value - expected_value)
                         assert diff <= allowed_diff, msg
 
-    @staticmethod
-    def validate_expected_files(files_list: list[tuple[bytes, str]], expected_files_list: list[tuple[bytes, str]]):
+    @classmethod
+    def validate_expected_files(cls, files_list: list[tuple[bytes, str]], expected_files_list: list[tuple[bytes, str]]):
         """
         Verify with assertion messages that the two lists of Tables are equivalent.
         :param files_list:
@@ -171,15 +171,15 @@ class AbstractTest:
                 diff <= diff_allowed
             ), f"produced file length {lenf1} vs expected {lenf2}, exceeds allowance of {diff_allowed}"
 
-    @staticmethod
-    def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
+    @classmethod
+    def validate_expected_metadata_lists(cls, metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
         elen = len(expected_metadata)
         assert len(metadata) == elen, f"Number of metadata dictionaries not the expected of {elen}"
         for index in range(elen):
-            AbstractTest.validate_expected_metadata(metadata[index], expected_metadata[index])
+            cls.validate_expected_metadata(metadata[index], expected_metadata[index])
 
-    @staticmethod
-    def validate_expected_metadata(metadata: dict[str, float], expected_metadata: dict[str, float]):
+    @classmethod
+    def validate_expected_metadata(cls, metadata: dict[str, float], expected_metadata: dict[str, float]):
         """
         Verify with assertion messages that the two dictionaries are as expected.
         :param metadata:
@@ -194,8 +194,8 @@ class AbstractTest:
             f"Metadata not equal\n" "\tTransformed: {metadata}  Expected   : {expected_metadata}"
         )
 
-    @staticmethod
-    def validate_directory_contents(directory: str, expected_dir: str, drop_columns: list[str] = []):
+    @classmethod
+    def validate_directory_contents(cls, directory: str, expected_dir: str, drop_columns: list[str] = []):
         """
         Make sure the directory contents are the same.
         :param directory:
@@ -217,28 +217,28 @@ class AbstractTest:
             expected_diffs = 0
         failed = len(dir_cmp.diff_files) != expected_diffs
         if failed:
-            AbstractTest.__confirm_diffs(directory, expected_dir, dir_cmp.diff_files, "/tmp", drop_columns)
+            cls.__confirm_diffs(directory, expected_dir, dir_cmp.diff_files, "/tmp", drop_columns)
 
         # Traverse into the subdirs since dircmp doesn't seem to do that.
         subdirs = [f.name for f in os.scandir(expected_dir) if f.is_dir()]
         for subdir in subdirs:
             d1 = os.path.join(directory, subdir)
             d2 = os.path.join(expected_dir, subdir)
-            AbstractTest.validate_directory_contents(d1, d2, drop_columns)
+            cls.validate_directory_contents(d1, d2, drop_columns)
 
-    @staticmethod
-    def _validate_table_files(parquet1: str, parquet2: str, drop_columns: list[str] = []):
+    @classmethod
+    def _validate_table_files(cls, parquet1: str, parquet2: str, drop_columns: list[str] = []):
         da = DataAccessLocal()
         t1, _ = da.get_table(parquet1)
         t2, _ = da.get_table(parquet2)
         if len(drop_columns) > 0:
             t1 = t1.drop_columns(drop_columns)
             t2 = t2.drop_columns(drop_columns)
-        AbstractTest.validate_expected_tables([t1], [t2])
+        cls.validate_expected_tables([t1], [t2])
 
-    @staticmethod
+    @classmethod
     def __confirm_diffs(
-        src_dir: str, expected_dir: str, diff_files: list, dest_dir: str, drop_columns: list[str] = []
+        cls, src_dir: str, expected_dir: str, diff_files: list, dest_dir: str, drop_columns: list[str] = []
     ):
         """
         Copy all files from the source dir to the dest dir.
@@ -256,7 +256,7 @@ class AbstractTest:
                 # It seems file can be different on disk, but contain the same column/row values.
                 # so for these, do the inmemory comparison.
                 try:
-                    AbstractTest._validate_table_files(expected, src, drop_columns)
+                    cls._validate_table_files(expected, src, drop_columns)
                 except AssertionError as e:
                     logger.info(f"Copying file with difference: {src} to {dest}")
                     shutil.copyfile(src, dest)
