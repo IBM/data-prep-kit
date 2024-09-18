@@ -55,7 +55,7 @@ class NOOPTransform(AbstractTableTransform):
         if self.sleep is not None:
             self.logger.info(f"Sleep for {self.sleep} seconds")
             time.sleep(self.sleep)
-            self.logger.info("Sleep completed - continue")
+            self.logger.info("Sleep completed - continuing")
         # Add some sample metadata.
         self.logger.debug(f"Transformed one table with {len(table)} rows")
         metadata = {"nfiles": 1, "nrows": len(table)}
