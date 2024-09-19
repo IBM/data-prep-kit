@@ -38,7 +38,6 @@ on:
 
 jobs:
     check_if_push_image:
-        if: test -e "transforms/universal/tokenization/Makefile"
         # check whether the Docker images should be pushed to the remote repository
         # The images are pushed if it is a merge to dev branch or a new tag is created.
         # The latter being part of the release process.
@@ -60,7 +59,6 @@ jobs:
                   fi
                   echo "publish_images=$publish_images" >> "$GITHUB_OUTPUT"
     test-src:
-        if: test -e "transforms/universal/tokenization/Makefile"
         runs-on: ubuntu-22.04
         steps:
             - name: Checkout
@@ -82,7 +80,6 @@ jobs:
                       echo "transforms/universal/tokenization/Makefile not found - source testing disabled for this transform."
                   fi
     test-image:
-        if: test -e "transforms/universal/tokenization/Makefile"
         needs: [check_if_push_image]
         runs-on: ubuntu-22.04
         timeout-minutes: 120
