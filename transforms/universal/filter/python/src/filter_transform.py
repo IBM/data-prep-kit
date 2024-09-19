@@ -23,8 +23,6 @@ from data_processing.utils import CLIArgumentProvider
 short_name = "filter"
 cli_prefix = short_name + "_"
 
-# Misc comment to trigger build
-
 filter_criteria_key = "criteria_list"
 """ AST Key holds the list of filter criteria (in SQL WHERE clause format)"""
 filter_logical_operator_key = "logical_operator"
