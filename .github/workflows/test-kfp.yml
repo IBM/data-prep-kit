@@ -1,0 +1,176 @@
+name: Test/build KFP
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - "dev"
+            - "releases/**"
+        tags:
+            - "*"
+        paths:
+            - "kfp/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**/.gitignore"
+    pull_request:
+        branches:
+            - "dev"
+            - "releases/**"
+        paths:
+            - "kfp/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**/.gitignore"
+
+env:
+    KFP_BLACK_LIST: "doc_chunk-ray,pdf2parquet-ray,pii_redactor"
+
+jobs:
+    check_if_push_images:
+        # check whether the Docker images should be pushed to the remote repository
+        # The images are pushed if it is a merge to dev branch or a new tag is created.
+        # The latter being part of the release process.
+        # The images tag is derived from the value of the DOCKER_IMAGE_VERSION variable set in the .make.versions file.
+        runs-on: ubuntu-22.04
+        outputs:
+            publish_images: ${{ steps.version.outputs.publish_images }}
+        steps:
+            - id: version
+              run: |
+                  publish_images='false'
+                  if  [[ ${GITHUB_REF} == refs/heads/dev && ${GITHUB_EVENT_NAME} != 'pull_request' && ${GITHUB_REPOSITORY} == IBM/data-prep-kit ]] ;
+                  then
+                    publish_images='true'
+                  fi
+                  if  [[ ${GITHUB_REF} == refs/tags/* && ${GITHUB_REPOSITORY} == IBM/data-prep-kit ]] ;
+                  then
+                    publish_images='true'
+                  fi
+                  echo "publish_images=$publish_images" >> "$GITHUB_OUTPUT"
+    test-kfp-v1:
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Free up space in github runner
+              # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
+              run: |
+                  df -h
+                  sudo rm -rf "/usr/local/share/boost"
+                  sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+                  sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
+                  sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
+                  df -h
+            - name: Test KFP libs (shared and v1) and run a workflow
+              timeout-minutes: 120
+              run: |
+                  export REPOROOT=$PWD
+                  export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
+                  source $K8S_SETUP_SCRIPTS/requirements.env
+                  export PATH=$PATH:/tmp/
+                  curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+                  chmod 777 /tmp/kind
+                  curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+                  chmod 700 /tmp/get_helm.sh
+                  HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
+                  chmod 777 /tmp/helm
+                  curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
+                  chmod 777 /tmp/kubectl
+                  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
+                  chmod +x /tmp/mc
+                  export DEPLOY_KUBEFLOW=1
+                  make -C $K8S_SETUP_SCRIPTS setup
+                  make -C kfp/kfp_support_lib test
+                  make -C transforms workflow-build
+                  source $K8S_SETUP_SCRIPTS/common.sh
+                  while :
+                  do
+                    dir=("code"  "universal" "language") && index=$(($RANDOM % ${#dir[@]})) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs -type d  -maxdepth 1 -mindepth 1 ))
+                    set -- "${transforms[@]}" && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
+                    transform=$(basename "${transforms[$index]}")
+                    if [ -d ${transforms[$index]}/kfp_ray ] && echo ${KFP_BLACK_LIST} | grep -qv ${transform} ; then
+                      header_text "Running ${transforms[$index]} workflow test"
+                      break
+                    fi
+                  done  
+                  make -C ${transforms[$index]} workflow-test
+                  echo "Run ${transforms[$index]} completed"
+
+    test-kfp-v2:
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Free up space in github runner
+              # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
+              run: |
+                  df -h
+                  sudo rm -rf "/usr/local/share/boost"
+                  sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+                  sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
+                  sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
+                  df -h
+            - name: Test KFP libs (shared and v2) and run a workflow
+              timeout-minutes: 120
+              run: |
+                  export REPOROOT=$PWD
+                  export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
+                  source $K8S_SETUP_SCRIPTS/requirements.env
+                  export PATH=$PATH:/tmp/
+                  curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+                  chmod 777 /tmp/kind
+                  curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+                  chmod 700 /tmp/get_helm.sh
+                  HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
+                  chmod 777 /tmp/helm
+                  curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
+                  chmod 777 /tmp/kubectl
+                  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
+                  chmod +x /tmp/mc
+                  export DEPLOY_KUBEFLOW=1
+                  export KFPv2=1
+                  make -C $K8S_SETUP_SCRIPTS setup
+                  make -C kfp/kfp_support_lib test
+                  make -C transforms workflow-build
+                  source $K8S_SETUP_SCRIPTS/common.sh
+                  while :
+                  do
+                    dir=("code"  "universal" "language") && index=$(($RANDOM % ${#dir[@]})) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs -type d  -maxdepth 1 -mindepth 1 ))
+                    set -- "${transforms[@]}" && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
+                    transform=$(basename "${transforms[$index]}")
+                    if [ -d ${transforms[$index]}/kfp_ray ] && echo ${KFP_BLACK_LIST} | grep -qv ${transform} ; then
+                      header_text "Running ${transforms[$index]} workflow test"
+                      break
+                    fi
+                  done 
+                  make -C ${transforms[$index]} workflow-test
+                  header_text "Run ${transforms[$index]} completed"
+    build-kfp-components:
+        needs: [check_if_push_images]
+        runs-on: ubuntu-22.04
+        timeout-minutes: 30
+        env:
+            DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
+            DOCKER_REGISTRY_KEY: ${{ secrets.DOCKER_REGISTRY_KEY }}
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Free up space in github runner
+              # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
+              run: |
+                  df -h
+                  sudo rm -rf "/usr/local/share/boost"
+                  sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+                  sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
+                  sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
+                  df -h
+            - name: Build
+              run: |
+                  make -C kfp/kfp_ray_components DOCKER=docker image
+                  make KFPv2=1 -C kfp/kfp_ray_components DOCKER=docker image
+            - name: Publish images
+              if: needs.check_if_push_images.outputs.publish_images == 'true'
+              run: make -C kfp/kfp_ray_components publish
