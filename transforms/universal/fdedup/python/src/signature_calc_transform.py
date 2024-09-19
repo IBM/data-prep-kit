@@ -267,18 +267,20 @@ class SignatureCalculationTransform(AbstractTableTransform):
 
     def flush(self) -> tuple[list[pa.Table], dict[str, Any]]:
         """
-                This is supporting method fo        self.files_processed = 0
-                self.bytes_processed = 0
-        r transformers, that implement buffering of tables, for example coalesce.
-                These transformers can have buffers containing tables that were not written to the output. Flush is
-                the hook for them to return back locally stored tables and their statistics. The majority of transformers
-                should use default implementation.
-                If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
-                :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
-                propagated to metadata
+        This is supporting method for transformers, that implement buffering of tables, for example coalesce.
+        These transformers can have buffers containing tables that were not written to the output. Flush is
+        the hook for them to return back locally stored tables and their statistics. The majority of transformers
+        should use default implementation.
+        If there is an error, an exception must be raised - exit()ing is not generally allowed when running in Ray.
+        :return: a tuple of a list of 0 or more converted tables and a dictionary of statistics that will be
+        propagated to metadata
         """
         self.logger.info(f"Starting flush()")
-        tables, metadata = self.write_band_signatures()
+        if self.all_band_hashes is not None and self.all_minhashes is not None:
+            tables, metadata = self.write_band_signatures()
+        else:
+            tables = []
+            metadata = {}
         return tables, metadata
 
     def write_band_signatures(self):
