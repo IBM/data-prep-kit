@@ -13,6 +13,10 @@
 import os
 import sys
 
+from data_cleaning_transform import (
+    document_id_column_cli_param,
+    duplicate_list_location_cli_param,
+)
 from data_cleaning_transform_python import DataCleaningPythonTransformConfiguration
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
@@ -20,20 +24,28 @@ from data_processing.utils import ParamsUtils
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "data_1"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output2"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "cleaned"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
+duplicate_location = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__), "..", "output", "docs_to_remove_consolidated", "docs_to_remove_consolidated.parquet"
+    )
+)
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 params = {
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
+    document_id_column_cli_param: "int_id_column",
+    duplicate_list_location_cli_param: duplicate_location,
     # execution info
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
 }
+
 if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)

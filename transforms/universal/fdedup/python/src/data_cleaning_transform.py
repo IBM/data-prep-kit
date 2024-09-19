@@ -9,6 +9,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+import io
 import os
 from argparse import ArgumentParser, Namespace
 from typing import Any, List, Tuple
@@ -17,38 +18,48 @@ import numpy as np
 import polars as pl
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import CLIArgumentProvider
+from data_processing.utils import CLIArgumentProvider, ParamsUtils, get_logger
 
 
-short_name = "cluster"
+short_name = "fdclean"
 cli_prefix = f"{short_name}_"
+
+# configuration keys
+document_id_column_key = "document_id_column"
+""" This key holds the name of the column storing the unique ID assigned to each document"""
+duplicate_list_location_key = "duplicate_list_location"
+""" This key holds the location of the list of duplicate documents marked for removal"""
+
+# command line arguments
+document_id_column_cli_param = f"{cli_prefix}{document_id_column_key}"
+""" Name of the column storing the unique ID assigned to each document"""
+duplicate_list_location_cli_param = f"{cli_prefix}{duplicate_list_location_key}"
+""" Location of the list of duplicate documents marked for removal"""
+
+captured_arg_keys = [
+    document_id_column_key,
+    duplicate_list_location_key,
+]
+
+# defaults
+document_id_column_default = "int_id_column"
+""" Default name of the column storing the unique ID assigned to each document"""
+duplicate_list_location_default = None
+""" Default location of the list of duplicate documents marked for removal"""
 
 
 class DataCleaningTransform(AbstractTableTransform):
     """
-    This is the second transform of the fuzzy dedup pipeline. It runs in parallel:
-    for each band, the hashing interval is divided into segments. A cluster analysis
-    uses as input all the parquet files from segment of a band. The `bands` output
-    of the signature calculation, the first transform in the fuzzy dedup pipeline
-    contains all the data for a given segment s of a specific band b in the
-    subfolder `bands/band=b/segment=s`.
-    The transform loads all the parquet files in the `bands/band=b/segment=s`
-    subfolder. Each one of these parquet files has two columns: the `band_hash`
-    and a `data` structure, which includes the `document_id`, the `minhashes` and
-    the `document_size` fields. Once all the files have been loaded in a single
-    dataframe, a `group_by` operation on the `band_hash` field is performed in
-    that dataframe. All the documents that have the same band_hash are grouped
-    in a cluster. Subsequently, the documents of each cluster are sorted in
-    descending order according to their size, and a Jaccard similarity is
-    calculated between the cluster documents. The documents for which the Jaccard
-    similarity is above the `jaccard_similarity_threshold` remain in the cluster,
-    the others are removed from the cluster. Finally, from each cluster that has
-    more than one document after running the Jaccard similarity, we select a doc
-    to keep (the largest size document), and mark the other documents as
-    duplicates. The resulting clusters are saved in a file for further analysis.
+    This is the third transform of the fuzzy dedup pipeline. It takes as input
+    the list of the documents to remove (identified as duplicates during the
+    cluster analysis phase, and the original dataset. Each dataset file is
+    imported into a table, and the documents that are in the documents to remove
+    list are filtered out from that table. The output is a new dataset, which
+    keeps the directory structure of the input dataset, but has all the fuzzy
+    duplicates removed.
 
     Args:
-        jaccard_similarity_threshold: Jaccard similarity threshold above which two documents are duplicates
+        duplicate_location: location (local or s3) of the duplicate document list
     """
 
     def __init__(self, config: dict[str, Any]):
@@ -58,24 +69,30 @@ class DataCleaningTransform(AbstractTableTransform):
         defined by the companion runtime, ClusterAnalysisTransformRuntime.
         """
         super().__init__(config)
+        self.logger = get_logger(__name__)
+        self.document_id_column = config.get(document_id_column_key, document_id_column_default)
+        self.duplicate_list_location = config.get(duplicate_list_location_key, duplicate_list_location_default)
+        contents = config.get("df")
+        self.docs_to_remove_df = pl.read_parquet(io.BytesIO(contents))
+        self.logger.info(f"Got docs_to_remove_df with {len(self.docs_to_remove_df)} rows")
+        self.docs_to_remove_df = self.docs_to_remove_df.rename({"docs_to_remove": self.document_id_column})
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
-        bands_dataframe = pl.from_arrow(table)
-        docs2remove_list = []
-
-        # read all files in a given segment
-        # TODO: NB: Please update the path
-        path_to_consolidate_docs_to_remove = "~/data-prep-kit/transforms/universal/fdedup/python/output_second/docs_to_remove_consolidated/docs_to_remove_consolidated.parquet"
-        doc2remove_polars_df = pl.read_parquet(path_to_consolidate_docs_to_remove)
-        # Convert the 'exploded_minhashes' column to a list of integers
-        docs_to_remove_list = doc2remove_polars_df.to_series().to_list()
-        docs2remove_list.extend(docs_to_remove_list)
-        docs2remove_list = list(set(docs2remove_list))
-        # Filter out rows where the 'id' column is in the given list
-        filtered_df = bands_dataframe.filter(~pl.col("int_id_column").is_in(docs2remove_list))
-        table = filtered_df.to_arrow()
-        metadata = {"nfiles": filtered_df.count(), "nrows": len(table)}
-        return [table], metadata
+        self.logger.info(f"Transforming table with {table.num_rows} rows from file {file_name}")
+        input_df = pl.from_arrow(table)
+        filtered_df = input_df.join(self.docs_to_remove_df, on=self.document_id_column, how="anti")
+        filtered_table = filtered_df.to_arrow()
+        metadata = {
+            "input_files": 1,
+            "input_docs": table.num_rows,
+            "input_bytes": table.nbytes,
+            "output_files": 1,
+            "output_docs": filtered_table.num_rows,
+            "output_bytes": filtered_table.nbytes,
+            "filtered_docs": (table.num_rows - filtered_table.num_rows),
+            "filtered_bytes": (table.nbytes - filtered_table.nbytes),
+        }
+        return [filtered_table], metadata
 
 
 class DataCleaningTransformConfiguration(TransformConfiguration):
@@ -89,25 +106,30 @@ class DataCleaningTransformConfiguration(TransformConfiguration):
         super().__init__(
             name=short_name,
             transform_class=DataCleaningTransform,
-            remove_from_metadata=[],
+            remove_from_metadata=["df"],
         )
-        from data_processing.utils import get_logger
-
         self.logger = get_logger(__name__, level="INFO")
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
-        Add Transform-specific arguments to the given  parser.
+        Add Transform-specific arguments to the given parser.
         This will be included in a dictionary used to initialize the NOOPTransform.
         By convention a common prefix should be used for all transform-specific CLI args
         (e.g, noop_, pii_, etc.)
         """
-        # parser.add_argument(
-        #     f"--{document_id_column_cli_param}",
-        #     type=str,
-        #     default=document_id_column_default,
-        #     help="name of the column storing the unique ID assigned to each document",
-        # )
+        parser.add_argument(
+            f"--{document_id_column_cli_param}",
+            type=str,
+            default=document_id_column_default,
+            help="name of the column storing the unique ID assigned to each document",
+        )
+        parser.add_argument(
+            f"--{duplicate_list_location_cli_param}",
+            type=str,
+            required=True,
+            default=duplicate_list_location_default,
+            help="location of duplicate document list that are marked for removal",
+        )
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
