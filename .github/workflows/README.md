@@ -26,12 +26,18 @@ The transforms test workflows also depend on this directory tree and so
 changes  made here will trigger transform tests.
 
 ## Transforms (`transforms` directory tree) 
-We define a unique test workflow for each transform, based on a common template [test-transform.template](test-transform.template).
-The Makefile is used to (re)generate all workflows a necessary.  By design, workflows for a given transform should run when
+We define a unique test workflow for each transform, based on a common 
+template [test-transform.template](test-transform.template).
+The [Makefile](Makefile) is used to (re)generate all workflows a necessary.
+By design, workflows for a given transform should run when
 
 * anything of substance effecting operation is modified in the transform's directory tree.
 * anything in the core libraries in this repo (e.g., data-processing/lib) assuming the transform depends on these.
-* Help! the workflow should NOT run when documentation (e.g., !**.md) is changed, however this case does not seem to be working atm.
+
+Note that the kfp tests (in kfp_ray/Makefile workflow-test) for a given transform are 
+**not** currently being run when the transform's tests are run.
+Currently these are run randomly via the [test-kfp.yml](test-kfp.yml).
+We expect to fix this is in the future.
 
 When a new transform is added to the repository, 
 
