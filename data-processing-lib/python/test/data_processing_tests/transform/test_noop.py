@@ -19,7 +19,7 @@ from data_processing.test_support.transform.table_transform_test import (
 )
 
 
-table = pa.Table.from_pydict({"name": pa.array(["Tom", "Dick", "John"]), "age": pa.array([0, 1, 2])})
+table = pa.Table.from_pydict({"name": pa.array(["Tom", "Dick", "Harry"]), "age": pa.array([0, 1, 2])})
 expected_table = table  # We're a noop after all.
 expected_metadata_list = [{"nfiles": 1, "nrows": 3}, {}]  # transform() result  # flush() result
 
