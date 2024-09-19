@@ -14,6 +14,7 @@ on:
         paths:
             - "transforms/universal/tokenization/**"
             - "data-processing-lib/**"
+            - "!data-processing-lib/**/test/**"
             - "!**.md"
             - "!**/doc/**"
             - "!**/images/**"
@@ -25,6 +26,7 @@ on:
         paths:
             - "transforms/universal/tokenization/**"
             - "data-processing-lib/**"
+            - "!data-processing-lib/**/test/**"
             - "!**.md"
             - "!**/doc/**"
             - "!**/images/**"
