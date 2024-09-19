@@ -55,7 +55,7 @@ class NOOPTransform(AbstractTableTransform):
         if self.sleep is not None:
             self.logger.info(f"Sleep for {self.sleep} seconds")
             time.sleep(self.sleep)
-            self.logger.info("Sleep completed - continuing")
+            self.logger.info("Sleep completed - continue")
         # Add some sample metadata.
         self.logger.debug(f"Transformed one table with {len(table)} rows")
         metadata = {"nfiles": 1, "nrows": len(table)}
@@ -115,5 +115,5 @@ class NOOPTransformConfiguration(TransformConfiguration):
             return False
 
         self.params = self.params | captured
-        self.logger.info(f"noop parameters are::: {self.params}")
+        self.logger.info(f"noop parameters are : {self.params}")
         return True
