@@ -68,7 +68,11 @@ jobs:
                   df -h
             - name: Test transform source in transforms/language/doc_quality
               run: |
-                  make -C transforms/language/doc_quality DOCKER=docker test-src
+                  if [ -e "transforms/language/doc_quality/Makefile" ]; then
+                      make -C transforms/language/doc_quality DOCKER=docker test-src
+                  else
+                      echo "transforms/language/doc_quality/Makefile not found - source testing disabled for this transform."
+                  fi
     test-image:
         needs: [check_if_push_image]
         runs-on: ubuntu-22.04

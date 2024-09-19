@@ -68,7 +68,11 @@ jobs:
                   df -h
             - name: Test transform source in @TARGET_TRANSFORM_DIR@
               run: |
-                  make -C @TARGET_TRANSFORM_DIR@ DOCKER=docker test-src
+                  if [ -e "@TARGET_TRANSFORM_DIR@/Makefile" ]; then
+                      make -C @TARGET_TRANSFORM_DIR@ DOCKER=docker test-src
+                  else
+                      echo "@TARGET_TRANSFORM_DIR@/Makefile not found - source testing disabled for this transform."
+                  fi
     test-image:
         needs: [check_if_push_image]
         runs-on: ubuntu-22.04

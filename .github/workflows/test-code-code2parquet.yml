@@ -68,7 +68,11 @@ jobs:
                   df -h
             - name: Test transform source in transforms/code/code2parquet
               run: |
-                  make -C transforms/code/code2parquet DOCKER=docker test-src
+                  if [ -e "transforms/code/code2parquet/Makefile" ]; then
+                      make -C transforms/code/code2parquet DOCKER=docker test-src
+                  else
+                      echo "transforms/code/code2parquet/Makefile not found - source testing disabled for this transform."
+                  fi
     test-image:
         needs: [check_if_push_image]
         runs-on: ubuntu-22.04
