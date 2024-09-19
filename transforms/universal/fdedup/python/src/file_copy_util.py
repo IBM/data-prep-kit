@@ -27,11 +27,12 @@ class FileCopyUtil:
         self.logger = get_logger(__name__, level="INFO")
 
     def copy_data(self, subfolder_name: str, data_type: str):
+        self.logger.info(f"copy_data(): subfolder_name = {subfolder_name}, data_type = {data_type}")
         if self.data_access_factory.s3_config is not None:
             _, root_folder = self.root_folder.split("://")
         else:
             root_folder = self.root_folder
-
+        self.logger.info(f"copy_data(): root_folder = {root_folder}")
         if data_type == "bands":
             match = re.match(r"^band=(\d+)/segment=(\d+)$", subfolder_name)
             if match:
@@ -60,7 +61,10 @@ class FileCopyUtil:
                 "docs_to_remove_consolidated",
                 f"docs_to_remove_consolidated.parquet",
             )
+            self.logger.info(f"copy_data(): input_folder = {input_folder}, output_path = {output_path}")
+
         data_access = self.data_access_factory.create_data_access()
+        self.logger.info(f"copy_data(): getting the data from the input_folder {input_folder}")
         file_dict, status = data_access.get_folder_files(
             input_folder,
             extensions=[".parquet"],
@@ -70,7 +74,7 @@ class FileCopyUtil:
         consolidated_df = pl.DataFrame()
         for fname, contents in file_dict.items():
             df = pl.read_parquet(io.BytesIO(contents))
-            self.logger.info(f"{fname} has {len(df)} rows")
+            # self.logger.info(f"{fname} has {len(df)} rows")
             consolidated_df = consolidated_df.vstack(df)
         if "docs_to_remove" in consolidated_df.columns:
             consolidated_df = consolidated_df.select("docs_to_remove").unique()
@@ -101,14 +105,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--subfolder_name",
         type=str,
-        default=os.path.join("band=0", "segment=-"),
+        default=os.path.join("band=0", "segment=0"),
         help="subfolder name",
     )
     parser.add_argument(
         "--data_type",
         type=str,
-        default="doc2remove",
-        help="Processing either bands or doc2remove",
+        default="docs_to_remove",
+        help="Processing either bands or docs_to_remove",
     )
     parser.add_argument(
         "--use_s3",
