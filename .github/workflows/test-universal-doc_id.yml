@@ -14,6 +14,7 @@ on:
         paths:
             - "transforms/universal/doc_id/**"
             - "data-processing-lib/**"
+            - "!transforms/universal/doc_id/**/kfp_ray/**" # This is/will be tested in separate workflow
             - "!data-processing-lib/**/test/**"
             - "!data-processing-lib/**/test-data/**"
             - "!**.md"
@@ -27,6 +28,7 @@ on:
         paths:
             - "transforms/universal/doc_id/**"
             - "data-processing-lib/**"
+            - "!transforms/universal/doc_id/**/kfp_ray/**" # This is/will be tested in separate workflow
             - "!data-processing-lib/**/test/**"
             - "!data-processing-lib/**/test-data/**"
             - "!**.md"
