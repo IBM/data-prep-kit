@@ -14,14 +14,14 @@ import os
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-from src.ededup_compute_execution_params import ededup_compute_execution_params
+from src.fdedup_preprocessor_compute_execution_params import fdedup_preprocessor_compute_execution_params
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/ededup-ray:latest"
+task_image = "quay.io/dataprep1/data-prep-kit/fdedup_multi_ray:latest"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "ededup_transform_ray.py"
+EXEC_SCRIPT_NAME: str = "fdedup_preprocessor_transform_ray.py"
 
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
@@ -41,16 +41,16 @@ if os.getenv("KFPv2", "0") == "1":
     import uuid
 
     compute_exec_params_op = dsl.component_decorator.component(
-        func=ededup_compute_execution_params, base_image=base_kfp_image
-    )
-    run_id = uuid.uuid4().hex
-else:
-    compute_exec_params_op = comp.create_component_from_func(
-        func=ededup_compute_execution_params, base_image=base_kfp_image
+        func=fdedup_preprocessor_compute_execution_params, base_image=base_kfp_image
     )
     print(
         "WARNING: the ray cluster name can be non-unique at runtime, please do not execute simultaneous Runs of the "
         + "same version of the same pipeline !!!"
+    )
+    run_id = uuid.uuid4().hex
+else:
+    compute_exec_params_op = comp.create_component_from_func(
+        func=fdedup_preprocessor_compute_execution_params, base_image=base_kfp_image
     )
     run_id = dsl.RUN_ID_PLACEHOLDER
 
@@ -62,22 +62,22 @@ execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "execu
 cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
 
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "ededup"
+TASK_NAME: str = "fdedup_preprocessor"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for ededup",
+    description="Pipeline for fdedup preprocessor",
 )
-def ededup(
+def fdedup_preprocessor(
     # Ray cluster
-    ray_name: str = "ededup-kfp-ray",  # name of Ray cluster
+    ray_name: str = "fdedup-preprocessor_kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
     ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image},
     ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image},
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access. checkpointing is not supported by dedup
-    data_s3_config: str = "{'input_folder': 'test/ededup/input/', 'output_folder': 'test/ededup/output'}",
+    data_s3_config: str = "{'input_folder': 'test/fdedup_ms/input/', 'output_folder': 'test/fdedup_ms/output/'}",
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
@@ -85,18 +85,31 @@ def ededup(
     runtime_actor_options: dict = {"num_cpus": 0.8},
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: dict = {'github': 'github', 'commit_hash': '12345', 'path': 'path'},
-    # ededup
-    ededup_hash_cpu: float = 0.5,
-    ededup_doc_column: str = "contents",
-    ededup_use_snapshot: bool = False,
-    ededup_snapshot_directory: str = "",
+    # columns used
+    fdedup_preprocessor_doc_column: str = "contents",
+    fdedup_preprocessor_doc_id_column: str = "int_id_column",
+    # infrastructure
+    fdedup_preprocessor_bucket_cpu: float = 0.5,
+    fdedup_preprocessor_doc_cpu: float = 0.5,
+    fdedup_preprocessor_mhash_cpu: float = 0.5,
+    # fuzzy parameters
+    fdedup_preprocessor_num_permutations: int = 64,
+    fdedup_preprocessor_threshold: float = 0.8,
+    fdedup_preprocessor_shingles_size: int = 5,
+    fdedup_preprocessor_delimiters: str = " ",
+    # snapshotting
+    fdedup_preprocessor_minhash_snapshot_directory: str = "",
+    fdedup_preprocessor_buckets_snapshot_directory: str = "",
+    fdedup_preprocessor_doc_id_snapshot_directory: str = "",
     # data sampling
-    ededup_n_samples: int = 10,
+    fdedup_preprocessor_n_samples: int = 10,
+    # number of docs to process
+    fdedup_preprocessor_n_docs: int = -1,
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
-    Pipeline to execute EDEDUP transform
+    Pipeline to execute FDEDUP transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -126,11 +139,20 @@ def ededup(
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    :param ededup_hash_cpu - number of CPUs per hash
-    :param ededup_doc_column - key for accessing data
-    :param ededup_use_snapshot - flag to start from existing snapshot
-    :param ededup_snapshot_directory: str - snapshot directory
-    :param ededup_n_samples - number of samples for parameters computation
+    :param fdedup_preprocessor_doc_column - document column name
+    :param fdedup_preprocessor_doc_id_column - integer document id column name
+    :param fdedup_preprocessor_bucket_cpu - number of CPUs per bucket hash
+    :param fdedup_preprocessor_doc_cpu - number of CPUs per doc hash
+    :param fdedup_preprocessor_mhash_cpu - number of CPUs per minhash hash
+    :param fdedup_preprocessor_num_permutations - number of permutations
+    :param fdedup_preprocessor_threshold - threshold
+    :param fdedup_preprocessor_shingles_size - number of words in shingle
+    :param fdedup_preprocessor_delimiters - delimiter for splitting document
+    :param fdedup_preprocessor_minhash_snapshot_directory - snapshot directory for minhashes
+    :param fdedup_preprocessor_buckets_snapshot_directory - snapshot directory for buckets
+    :param fdedup_preprocessor_doc_id_snapshot_directory - snapshot directory for docs
+    :param fdedup_preprocessor_n_samples - number of samples for parameters computation
+    :param fdedup_preprocessor_n_docs - number of documents in the source data
     :return: None
     """
     # create clean_up task
@@ -141,18 +163,27 @@ def ededup(
         # compute execution params
         compute_exec_params = compute_exec_params_op(
             worker_options=ray_worker_options,
-            actor_options=runtime_actor_options,
+            runtime_actor_options=runtime_actor_options,
             data_s3_config=data_s3_config,
             data_max_files=data_max_files,
             data_num_samples=data_num_samples,
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            ededup_doc_column=ededup_doc_column,
-            ededup_hash_cpu=ededup_hash_cpu,
-            ededup_use_snapshot=ededup_use_snapshot,
-            ededup_snapshot_directory=ededup_snapshot_directory,
-            ededup_n_samples=ededup_n_samples,
+            fdedup_preprocessor_doc_column=fdedup_preprocessor_doc_column,
+            fdedup_preprocessor_doc_id_column=fdedup_preprocessor_doc_id_column,
+            fdedup_preprocessor_num_permutations=fdedup_preprocessor_num_permutations,
+            fdedup_preprocessor_threshold=fdedup_preprocessor_threshold,
+            fdedup_preprocessor_shingles_size=fdedup_preprocessor_shingles_size,
+            fdedup_preprocessor_delimiters=fdedup_preprocessor_delimiters,
+            fdedup_preprocessor_bucket_cpu=fdedup_preprocessor_bucket_cpu,
+            fdedup_preprocessor_doc_cpu=fdedup_preprocessor_doc_cpu,
+            fdedup_preprocessor_mhash_cpu=fdedup_preprocessor_mhash_cpu,
+            fdedup_preprocessor_minhash_snapshot_directory=fdedup_preprocessor_minhash_snapshot_directory,
+            fdedup_preprocessor_buckets_snapshot_directory=fdedup_preprocessor_buckets_snapshot_directory,
+            fdedup_preprocessor_doc_id_snapshot_directory=fdedup_preprocessor_doc_id_snapshot_directory,
+            fdedup_preprocessor_n_samples=fdedup_preprocessor_n_samples,
+            fdedup_preprocessor_n_docs=fdedup_preprocessor_n_docs,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)
@@ -184,4 +215,4 @@ def ededup(
 
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile(ededup, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(fdedup_preprocessor, __file__.replace(".py", ".yaml"))

@@ -1,0 +1,118 @@
+# Multistep Fuzzy dedup Python Transform 
+
+Please see the set of
+[transform project conventions](../../../README.md#transform-project-conventions)
+for details on general project conventions, transform configuration,
+testing and IDE set up.
+
+Also see [here](../README.md) on details of implementation
+
+## Summary 
+This is a Python version of multi step fuzzy dedup
+
+## Configuration and command line Options
+
+Each of the steps has its own configuration options
+
+### Preprocessor
+
+* _doc_column_ - specifies name of the column containing documents (default "contents")
+* _doc_id_column_ - specifies the name of the column containing a document id (default "int_document_id")
+* _num_permutations_ - specifies number of permutations for fuzzy dedup (default 64)
+* _threshold_ -specifies threshold for Jaccardi distance comparison (default .8)
+* _shingles_size_ - specifies number of worgs per shingle (default 5)
+* _delimiter_ - specifies delimiter for word splitting(default "")
+* _minhash_snapshot_directory_ - specifies minhash snapshot directory (default - None).
+* _buckets_snapshot_directory_ - specifies buckets snapshot directory (default - None)
+* _docid_snapshot_directory_ - specifies doc id snapshot directory (default - None)
+
+The last three parameters are introduced here for incremental Fdedup implementations and allow
+to bring results of the previous Fdedup step into computations for a new one. Note here that in
+order to use them, the following should be in place:
+* integer doc ids should be unique across all documents (previous and current runs). 
+[Doc ID transform](../../doc_id) allows now to get the last id used and set arbitrary starting
+integer id.
+* As fuzzy dedup is preserving a document in the cluster with the max length, in order to 
+ensure that all of the document from the previous runs are preserved, their length should
+be set to a very large number. This can be done in minhash snapshots of the previous runs
+
+### Bucket processor
+
+* _num_permutations_ - specifies number of permutations for fuzzy dedup (default 64. Has to be the same as in preprocessing)
+* _threshold_ -specifies threshold for Jaccardi distance comparison (default .8. Has to be the same as in preprocessing)
+* _minhash_snapshot_directory_ - specifies location of minhash snapshot files (default `output/snapshot/minhash`)
+* _docid_snapshot_directory_ - specifies location of doc id snapshot files (default `output/snapshot/docs`)
+
+### Filter
+
+* _doc_column_ - specifies name of the column containing documents (default "contents". Has to be the same as in preprocessing)
+* _doc_id_column_ - specifies the name of the column containing a document id (default "int_document_id". Has to be the same as in preprocessing)
+* _cluster_column_ - specifies the name of the `cluster` column (default "cluster")
+* _removed_docs_column_ - specifies the name of the `removed docs` column (default "removed". Note that only the first row has values, the rest are empty arrays)
+* _docid_snapshot_directory_ - specifies directory for doc_id snapshots (default `output/snapshot/docs`)
+
+
+## Launch Command Line Options 
+The following command line arguments are available in addition to 
+the options provided by 
+the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
+They are different for different steps'
+
+### Preprocessor
+
+```
+ --fdedup_preprocessor_doc_column FDEDUP_PREPROCESSOR_DOC_COLUMN
+                        document column name
+  --fdedup_preprocessor_doc_id_column FDEDUP_PREPROCESSOR_DOC_ID_COLUMN
+                        integer document id column name
+  --fdedup_preprocessor_num_permutations FDEDUP_PREPROCESSOR_NUM_PERMUTATIONS
+                        number of permutations
+  --fdedup_preprocessor_threshold FDEDUP_PREPROCESSOR_THRESHOLD
+                        threshold
+  --fdedup_preprocessor_shingles_size FDEDUP_PREPROCESSOR_SHINGLES_SIZE
+                        number of words in shingle
+  --fdedup_preprocessor_delimiter FDEDUP_PREPROCESSOR_DELIMITER
+                        delimiter for splitting document
+  --fdedup_preprocessor_minhash_snapshot_directory FDEDUP_PREPROCESSOR_MINHASH_SNAPSHOT_DIRECTORY
+                        minhash snapshot directory
+  --fdedup_preprocessor_buckets_snapshot_directory FDEDUP_PREPROCESSOR_BUCKETS_SNAPSHOT_DIRECTORY
+                        buckets snapshot directory
+  --fdedup_preprocessor_docid_snapshot_directory FDEDUP_PREPROCESSOR_DOCID_SNAPSHOT_DIRECTORY
+                        doc id snapshot directory
+```
+
+### Bucket processor
+
+```  
+  --fdedup_bucket_processor_num_permutations FDEDUP_BUCKET_PROCESSOR_NUM_PERMUTATIONS
+                        number of permutations
+  --fdedup_bucket_processor_threshold FDEDUP_BUCKET_PROCESSOR_THRESHOLD
+                        threshold
+  --fdedup_bucket_processor_minhash_snapshot_directory FDEDUP_BUCKET_PROCESSOR_MINHASH_SNAPSHOT_DIRECTORY
+                        location of minhash snapshot files
+  --fdedup_bucket_processor_docid_snapshot_directory FDEDUP_BUCKET_PROCESSOR_DOCID_SNAPSHOT_DIRECTORY
+                        location of doc id snapshot files
+```
+
+### Filter
+
+```
+  --fdedup_filter_doc_column FDEDUP_FILTER_DOC_COLUMN
+                        document column name
+  --fdedup_filter_doc_id_column FDEDUP_FILTER_DOC_ID_COLUMN
+                        integer document id column name
+  ----fdedup_filter_cluster_column FDEDUP_FILTER_CLUSTER_COLUMN
+                        cluster column name
+  ----fdedup_filter_removed_docs_column FDEDUP_FILTER_REMOVED_DOCS_COLUMN
+                        removed documents column name
+  ----fdedup_filter_docid_snapshot_directory FDEDUP_FILTER_DOCID_SNAPSHOT_DIRECTORY
+                        ID snapshot directory
+```
+
+These correspond to the configuration keys described above.
+
+## Running images
+
+To use the transform image to transform your data, please refer to the 
+[running images quickstart](../../../../doc/quick-start/run-transform-image.md),
+substituting the name of this transform image and runtime as appropriate.
