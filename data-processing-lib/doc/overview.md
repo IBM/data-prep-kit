@@ -12,11 +12,12 @@ This might include operations such as de-duplication, merging, and splitting.
 The framework uses a plug-in model for the primary functions.  The core
 transformation-specific classes/interfaces are as follows:
 
-* [AbstractTransform](../python/src/data_processing/transform/abstract_transform.py) - 
+* [AbstractBinaryTransform](../python/src/data_processing/transform/binary_transform.py) - 
 a simple, easily-implemented interface allowing the definition transforms
-over arbitrary data types.  Support is provided for both
-[files](../python/src/data_processing/transform/binary_transform.py) of arbitrary data as a byte array and 
-[parquet/arrow](../python/src/data_processing/transform/table_transform.py) tables.
+of arbitrary data as a byte array. Additionally
+[table](../python/src/data_processing/transform/table_transform.py) transform interface
+is provided allowing definition of transforms operating on 
+[pyarrow](https://arrow.apache.org/docs/python/index.html) tables.
 * [TransformConfiguration](../python/src/data_processing/runtime//transform_configuration.py) - defines
 the transform short name, its implementation class,  and command line configuration
 parameters.
@@ -45,7 +46,8 @@ To learn more consider the following:
 * [Transform Exceptions](transform-exceptions.md)
 * [Transform Runtimes](transform-runtimes.md)
 * [Transform Examples](transform-tutorial-examples.md)
-* [Data Access Factory](data-access-factory)
+* [Simplified transform APIs](simplified_transform_apis.md)
+* [Data Access Factory](data-access-factory.md)
 * [Testing Transforms](transform-testing.md)
 * [Utilities](transformer-utilities.md)
 * [Architecture Deep Dive](architecture.md)

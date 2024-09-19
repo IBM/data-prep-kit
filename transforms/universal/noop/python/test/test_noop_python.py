@@ -27,9 +27,21 @@ class TestPythonNOOPTransform(AbstractTransformLauncherTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        basedir = "../test-data"
-        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        src_file_dir = os.path.abspath(os.path.dirname(__file__))
         fixtures = []
+
         launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
-        fixtures.append((launcher, {sleep_cli_param: 0}, basedir + "/input", basedir + "/expected"))
+        input_dir = os.path.join(src_file_dir, "../test-data/input")
+        expected_dir = os.path.join(src_file_dir, "../test-data/expected")
+        transform_config = {sleep_cli_param: 0}
+        fixtures.append(
+            (
+                launcher,
+                transform_config,
+                input_dir,
+                expected_dir,
+                [],  # optional list of column names to ignore in comparing test-generated with expected.
+            )
+        )
+
         return fixtures

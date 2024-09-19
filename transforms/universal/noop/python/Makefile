@@ -6,11 +6,10 @@ REPOROOT=../../../..
 # to override/redefine the rules below. 
 
 # $(REPOROOT)/.make.versions file contains the versions
+include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_RUNTIME=python
 TRANSFORM_NAME=noop
 
-include $(REPOROOT)/transforms/.make.transforms
 
 venv::	.transforms.python-venv
 
@@ -36,7 +35,7 @@ setup:: .transforms.setup
 set-versions:
 	$(MAKE) TRANSFORM_PYTHON_VERSION=$(NOOP_PYTHON_VERSION) TOML_VERSION=$(NOOP_PYTHON_VERSION) .transforms.set-versions 
         
-build-dist:: set-versions .defaults.build-dist 
+build-dist:: .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 

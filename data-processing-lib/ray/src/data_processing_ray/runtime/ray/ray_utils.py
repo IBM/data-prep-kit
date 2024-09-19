@@ -11,12 +11,14 @@
 ################################################################################
 
 import logging
+import sys
 import time
 from typing import Any
 
 import ray
-from data_processing.utils import GB
+from data_processing.utils import GB, UnrecoverableException
 from ray.actor import ActorHandle
+from ray.exceptions import RayError
 from ray.util.actor_pool import ActorPool
 
 
@@ -71,6 +73,22 @@ class RayUtils:
             "memory": resources.get("memory", 0.0) / GB,
             "object_store": resources.get("object_store_memory", 0.0) / GB,
         }
+
+    @staticmethod
+    def get_available_nodes(available_nodes_gauge: Gauge = None) -> int:
+        """
+        Get the list of the alive Ray nodes and optionally expose it to prometheus
+        :param available_nodes_gauge: the gauge used to publish number of available node
+        :return: number of available nodes
+        """
+        # get nodes from Ray
+        nodes = ray.nodes()
+        # filer out available ones
+        nnodes = 0
+        for node in nodes:
+            if node["Alive"]:
+                nnodes += 1
+        return nnodes
 
     @staticmethod
     def create_actors(
@@ -128,6 +146,7 @@ class RayUtils:
             available_memory_gauge=available_memory_gauge,
             object_memory_gauge=object_memory_gauge,
         )
+        terminate = False
         running = 0
         t_start = time.time()
         completed = 0
@@ -140,13 +159,22 @@ class RayUtils:
                 while True:
                     # we can have several workers fail here
                     try:
-                        executors.get_next_unordered()
+                        res = executors.get_next_unordered()
                         break
                     except Exception as e:
+                        if isinstance(e, RayError):
+                            # Ray exception - terminate
+                            logger.error(f"Got Ray worker exception {e}, terminating")
+                            terminate = True
+                            break
                         logger.error(f"Failed to process request worker exception {e}")
                         actor_failures += 1
                         completed += 1
+                        break
+                if terminate:
+                    raise UnrecoverableException
                 executors.submit(lambda a, v: a.process_file.remote(v), path)
+
                 completed += 1
                 files_completed_gauge.set(completed)
                 RayUtils.get_available_resources(
@@ -156,13 +184,13 @@ class RayUtils:
                     object_memory_gauge=object_memory_gauge,
                 )
                 if completed % print_interval == 0:
-                    logger.info(f"Completed {completed} files in {(time.time() - t_start)/60} min")
+                    logger.info(f"Completed {completed} files in {round((time.time() - t_start)/60., 3)} min")
         # Wait for completion
         files_completed_gauge.set(completed)
         # Wait for completion
         logger.info(
-            f"Completed {completed} files ({100 * completed / len(files)}%)  "
-            f"in {(time.time() - t_start)/60} min. Waiting for completion"
+            f"Completed {completed} files ({round(100 * completed / len(files), 3)}%)  "
+            f"in {round((time.time() - t_start)/60., 3)} min. Waiting for completion"
         )
         while executors.has_next():
             while True:
@@ -185,7 +213,7 @@ class RayUtils:
                 object_memory_gauge=object_memory_gauge,
             )
 
-        logger.info(f"Completed processing {completed} files in {(time.time() - t_start)/60.} min")
+        logger.info(f"Completed processing {completed} files in {round((time.time() - t_start)/60, 3)} min")
         return actor_failures
 
     @staticmethod
@@ -203,5 +231,6 @@ class RayUtils:
             except Exception as e:
                 logger.error(f"Failed to process request worker exception {e}")
                 actor_failures += 1
+                not_ready = replies - 1
             replies = not_ready
         return actor_failures

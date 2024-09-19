@@ -19,7 +19,7 @@ import mmh3
 import numpy as np
 import pyarrow as pa
 import ray
-from data_processing.data_access import DataAccessFactoryBase
+from data_processing.data_access import DataAccessFactoryBase, SnapshotUtils
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import (
     RANDOM_SEED,
@@ -45,7 +45,6 @@ from fdedup_support import (
     DocsMinHash,
     MurmurMH,
     fuzzy_optimal_param,
-    get_snapshot_folder,
 )
 from ray.actor import ActorHandle
 from ray.util import ActorPool
@@ -75,10 +74,7 @@ class FdedupTransform(AbstractTableTransform):
             delimiter - delimiter
             random_delay_limit - random delay limit
         """
-        from data_processing.utils import get_logger
-
         super().__init__(config)
-        self.logger = get_logger(__name__)
         self.doc_column = config.get("doc_column", "")
         self.doc_id_column = config.get("doc_id_int_column", "")
         self.word_shingle_size = config.get("word_shingle_size", 1)
@@ -334,7 +330,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
         if self.params.get("use_doc_snapshot", False):
             self.logger.info("continuing from the document actors snapshot")
             data_access = data_access_factory.create_data_access()
-            path = f"{get_snapshot_folder(data_access)}docs"
+            path = f"{SnapshotUtils.get_snapshot_folder(data_access)}docs"
             files, retries = data_access.get_folder_files(path=path)
             if retries > 0:
                 statistics.add_stats.remote({"data access retries": retries})
@@ -373,7 +369,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
             self.logger.info("continuing from the bucket actors snapshot")
             data_access = data_access_factory.create_data_access()
             # recreate bucket collectors
-            path = f"{get_snapshot_folder(data_access)}buckets"
+            path = f"{SnapshotUtils.get_snapshot_folder(data_access)}buckets"
             files, retries = data_access.get_folder_files(path=path)
             if retries > 0:
                 statistics.add_stats.remote({"data access retries": retries})
@@ -387,7 +383,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
                 time.sleep(self.snapshot_delay)
             self.logger.info(f"Created {len(bucket_collectors)} bucket collectors to continue processing")
             # recreate minhash collectors
-            path = f"{get_snapshot_folder(data_access)}minhash"
+            path = f"{SnapshotUtils.get_snapshot_folder(data_access)}minhash"
             files, retries = data_access.get_folder_files(path=path)
             if retries > 0:
                 statistics.add_stats.remote({"data access retries": retries})
@@ -547,7 +543,7 @@ class FdedupRuntime(DefaultRayTransformRuntime):
         RayUtils.wait_for_execution_completion(logger=self.logger, replies=bucket_replies)
         # Wait for pool to complete
         ray.get(bucket_processor_invoker.wait_for_completion.remote())
-        self.logger.info(f"Done processing buckets in {(time.time() - start) / 60} min")
+        self.logger.info(f"Done processing buckets in {round((time.time() - start) / 60.,3)} min")
         # At this point we can save doc actors, in case we would want to restart here
         self.logger.info(f"creating document snapshots")
         doc_replies = [None] * len(self.document_collectors)

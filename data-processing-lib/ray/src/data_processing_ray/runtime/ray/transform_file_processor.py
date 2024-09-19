@@ -14,6 +14,7 @@ from typing import Any
 
 import ray
 from data_processing.runtime import AbstractTransformFileProcessor
+from data_processing.utils import UnrecoverableException
 
 
 @ray.remote(scheduling_strategy="SPREAD")
@@ -31,16 +32,18 @@ class RayTransformFileProcessor(AbstractTransformFileProcessor):
             transform_params: dictionary of parameters for local transform creation
             statistics: object reference to statistics
         """
-        super().__init__()
-        # Create data access
-        self.data_access = params.get("data_access_factory", None).create_data_access()
-        # Add data access ant statistics to the processor parameters
-        transform_params = params.get("transform_params", None)
-        transform_params["data_access"] = self.data_access
-        # Create local processor
-        self.transform = params.get("transform_class", None)(transform_params)
+        super().__init__(
+            data_access_factory=params.get("data_access_factory", None),
+            transform_parameters=dict(params.get("transform_params", {})),
+        )
         # Create statistics
         self.stats = params.get("statistics", None)
+        if self.stats is None:
+            self.logger.error("Transform file processor: statistics is not specified")
+            raise UnrecoverableException("statistics is None")
+        self.transform_params["statistics"] = self.stats
+        # Create local processor
+        self.transform = params.get("transform_class", None)(self.transform_params)
 
     def _publish_stats(self, stats: dict[str, Any]) -> None:
         self.stats.add_stats.remote(stats)

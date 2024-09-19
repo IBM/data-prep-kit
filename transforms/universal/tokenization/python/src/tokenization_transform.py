@@ -42,9 +42,6 @@ class TokenizationTransform(AbstractTableTransform):
         # of TokenizationTransformConfiguration class
 
         super().__init__(config)
-        from data_processing.utils import get_logger
-
-        self.logger = get_logger(__name__)
         self.tokenizer = config.get("tokenizer", "hf-internal-testing/llama-tokenizer")
         self.tokenizer_args = config.get("tokenizer_args", None)
         self.doc_id_column = config.get("doc_id_column", "document_id")
@@ -103,7 +100,7 @@ class TokenizationTransform(AbstractTableTransform):
 
                         if (chunk_idx + 1) % CHUNK_CHECKPOINT_INTERVAL == 0 or (doc_len_so_far == doc_length):
                             elapse_time = int(time.time() - start_time)
-                            self.logger.info(
+                            self.logger.debug(
                                 f"row_idx: {idx:5,} "
                                 f"(doc_id: {doc_id}) "
                                 f"chunk_idx: {chunk_idx:6,} ({doc_len_so_far:11,}/{doc_length:11,} "

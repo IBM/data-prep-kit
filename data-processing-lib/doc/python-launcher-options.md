@@ -47,6 +47,8 @@ options:
                         list of file extensions to choose for input.
   --data_num_samples DATA_NUM_SAMPLES
                         number of random input files to process
+  --runtime_num_processors RUNTIME_NUM_PROCESSORS
+                        size of multiprocessing pool
   --runtime_pipeline_id RUNTIME_PIPELINE_ID
                         pipeline id
   --runtime_job_id RUNTIME_JOB_ID
@@ -58,4 +60,5 @@ options:
                         path: Path within the repository
                         Example: { 'github': 'https://github.com/somerepo', 'commit_hash': '1324', 
                         'path': 'transforms/universal/code' }
+                        
 ```

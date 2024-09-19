@@ -160,11 +160,11 @@ class DataAccessFactory(DataAccessFactoryBase):
         n_samples = arg_dict.get(f"{self.cli_arg_prefix}num_samples", -1)
         files_to_use = arg_dict.get(f"{self.cli_arg_prefix}files_to_use", [".parquet"])
         files_to_checkpoint = arg_dict.get(f"{self.cli_arg_prefix}files_to_checkpoint", [".parquet"])
-        # check which configuration (S3, LakeHouse, or Local) is specified
+        # check which configuration (S3 or Local) is specified
         s3_config_specified = 1 if s3_config is not None else 0
         local_config_specified = 1 if local_config is not None else 0
 
-        # check that only one (S3, LakeHouse, or Local) configuration is specified
+        # check that only one (S3 or Local) configuration is specified
         if s3_config_specified + local_config_specified > 1:
             self.logger.error(
                 f"data factory {self.cli_arg_prefix} "
@@ -174,7 +174,7 @@ class DataAccessFactory(DataAccessFactoryBase):
             )
             return False
 
-        # further validate the specified configuration (S3, LakeHouse, or Local)
+        # further validate the specified configuration (S3 or Local)
         if s3_config_specified == 1:
             if not self._validate_s3_config(s3_config=s3_config):
                 return False

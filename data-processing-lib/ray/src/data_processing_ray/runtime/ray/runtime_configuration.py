@@ -25,7 +25,6 @@ class RayTransformRuntimeConfiguration(TransformRuntimeConfiguration):
         Initialization
         :param transform_config - base configuration class
         :param runtime_class: implementation of the transform runtime
-        :param remove_from_metadata - list of parameters to remove from metadata
         """
         super().__init__(transform_config=transform_config)
         self.runtime_class = runtime_class

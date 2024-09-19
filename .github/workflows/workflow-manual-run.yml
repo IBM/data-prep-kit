@@ -19,7 +19,7 @@ on:
 jobs:
     test-kfp-workflow-run:
         env:
-            KFPv2: ${{ github.event.inputs.kfp_v1 }}
+            KFPv2: ${{ github.event.inputs.kfp_v2 }}
             WORKFLOW_PATH: ${{ github.event.inputs.workflow-path }}
             DEBUG_MODE: ${{ github.event.inputs.debug }}
         runs-on: ubuntu-22.04
@@ -52,9 +52,11 @@ jobs:
                   curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
                   chmod +x /tmp/mc
                   make -C $K8S_SETUP_SCRIPTS setup
-                  make -C $WORKFLOW_PATH workflow-test
                   debug_mode=$(echo "$DEBUG_MODE" | tr '[:upper:]' '[:lower:]')
                   if [ "$debug_mode" == "true" ]; then
+                     make -C $WORKFLOW_PATH workflow-test || true
                      kubectl describe pod -A
                      kubectl get pods -A
+                  else
+                     make -C $WORKFLOW_PATH workflow-test
                   fi

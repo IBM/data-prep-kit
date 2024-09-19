@@ -66,7 +66,8 @@ def test_table_read_write():
         # save the table
         l, result, _ = d_a.save_table(path=output_location, table=r_table)
         print(f"length of saved table {l}, result {result}")
-        assert 36132 == l
+        # expected byte length changed due to compression option updated to ZSTD
+        assert 35419 == l
         table, _ = d_a.get_table(output_location)
         s_columns = table.column_names
         assert len(r_columns) == len(s_columns)
@@ -85,7 +86,7 @@ def test_get_folder():
         input_location = "test/table_read_write/input/"
         _create_and_populate_bucket(d_a=d_a, input_location=input_location, n_files=3)
         # get the folder
-        files, _ = d_a.get_folder_files(path=input_location, extensions=["parquet"])
+        files, _ = d_a.get_folder_files(path=input_location, extensions=[".parquet"])
         print(f"\ngot {len(files)} files")
         assert 3 == len(files)
 

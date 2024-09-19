@@ -174,7 +174,7 @@ This filter operation applied on the table above will return the following resul
 
 
 ## Running
-You can run the Spark filter transform [filter_local.py](src/filter_local.py) to filter the `test1.parquet` file in [test input data](test-data/input) to an `output` directory.  The directory will contain one or several filtered parquet files and the `metadata.json` file.
+You can run the Spark filter transform [filter_local.py](src/filter_local_spark.py) to filter the `test1.parquet` file in [test input data](test-data/input) to an `output` directory.  The directory will contain one or several filtered parquet files and the `metadata.json` file.
 
 #### Running as Spark-based application
 ```

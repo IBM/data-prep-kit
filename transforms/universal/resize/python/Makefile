@@ -7,7 +7,6 @@ REPOROOT=../../../..
 
 # $(REPOROOT)/.make.versions file contains the versions
 
-TRANSFORM_RUNTIME=python
 TRANSFORM_NAME=resize
 
 include $(REPOROOT)/transforms/.make.transforms
@@ -36,7 +35,7 @@ setup:: .transforms.setup
 set-versions:
 	$(MAKE)  TRANSFORM_PYTHON_VERSION=$(RESIZE_PYTHON_VERSION) TOML_VERSION=$(RESIZE_PYTHON_VERSION) .transforms.set-versions
         
-build-dist:: set-versions .defaults.build-dist 
+build-dist:: .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 

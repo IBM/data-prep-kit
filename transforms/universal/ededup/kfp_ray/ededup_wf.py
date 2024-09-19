@@ -73,9 +73,8 @@ def ededup(
     # Ray cluster
     ray_name: str = "ededup-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image": "' + task_image + '"}',
+    ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image},
+    ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image},
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access. checkpointing is not supported by dedup
     data_s3_config: str = "{'input_folder': 'test/ededup/input/', 'output_folder': 'test/ededup/output'}",
@@ -83,12 +82,14 @@ def ededup(
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
-    runtime_actor_options: str = "{'num_cpus': 0.8}",
+    runtime_actor_options: dict = {"num_cpus": 0.8},
     runtime_pipeline_id: str = "pipeline_id",
-    runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    runtime_code_location: dict = {'github': 'github', 'commit_hash': '12345', 'path': 'path'},
     # ededup
     ededup_hash_cpu: float = 0.5,
     ededup_doc_column: str = "contents",
+    ededup_use_snapshot: bool = False,
+    ededup_snapshot_directory: str = None,
     # data sampling
     ededup_n_samples: int = 10,
     # additional parameters
@@ -127,6 +128,8 @@ def ededup(
     :param runtime_code_location - code location
     :param ededup_hash_cpu - number of CPUs per hash
     :param ededup_doc_column - key for accessing data
+    :param ededup_use_snapshot - flag to start from existing snapshot
+    :param ededup_snapshot_directory: str - snapshot directory
     :param ededup_n_samples - number of samples for parameters computation
     :return: None
     """
@@ -145,9 +148,11 @@ def ededup(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            doc_column=ededup_doc_column,
-            hash_cpu=ededup_hash_cpu,
-            n_samples=ededup_n_samples,
+            ededup_doc_column=ededup_doc_column,
+            ededup_hash_cpu=ededup_hash_cpu,
+            ededup_use_snapshot=ededup_use_snapshot,
+            ededup_snapshot_directory=ededup_snapshot_directory,
+            ededup_n_samples=ededup_n_samples,
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         ComponentUtils.set_s3_env_vars_to_component(compute_exec_params, data_s3_access_secret)

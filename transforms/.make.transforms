@@ -132,39 +132,49 @@ extra-help:
 .transforms.spark-build:: .transforms.spark-venv .transforms.spark-image	
 	@# Help: Create the venv and build the transform image 
 
-.PHONY: .transforms.python-test 
-.transforms.python-test::  .transforms.test-src .transforms.python-test-image
+# Here we assume this is used to implement the required "test" target used during ci/cd.
+# As such, and to avoid running out of disk space during ci/cd, we also do a clean at the end
+.PHONY: .transforms.python-test
+.transforms.python-test::  .transforms.test-src .transforms.python-test-image .transforms.clean
 	@# Help: Run both source and image level tests.
 
-.PHONY: .transforms.ray-test 
-.transforms.ray-test::  .transforms.test-src .transforms.ray-test-image
+# Here we assume this is used to implement the required "test" target used during ci/cd.
+# As such, and to avoid running out of disk space during ci/cd, we also do a clean at the end
+.PHONY: .transforms.ray-test
+.transforms.ray-test::  .transforms.test-src .transforms.ray-test-image .transforms.clean
 	@# Help: Run both source and image level tests.
 
-.PHONY: .transforms.spark-test 
-.transforms.spark-test::  .transforms.test-src .transforms.spark-test-image
+# Here we assume this is used to implement the required "test" target used during ci/cd.
+# As such, and to avoid running out of disk space during ci/cd, we also do a clean at the end
+.PHONY: .transforms.spark-test
+.transforms.spark-test::  .transforms.test-src .transforms.spark-test-image .transforms.clean
 	@# Help: Run both source and image level tests.
 
 # Assumes the runtime-specific venv has already been built.
 .PHONY: .transforms.test-src
-.transforms.test-src::  .defaults.test-src .transforms.test-locals
+.transforms.test-src::  .defaults.test-src .transforms.test-locals .transforms.clean
 	@# Help: Run the transform's tests and any '*local' .py files
 
 .PHONY: .transforms.python-test-image
-.transforms.python-test-image:: .transforms.python-image .transforms.test-image-help .defaults.test-image-pytest 
+.transforms.python-test-image:: .transforms.python-image .transforms.test-image-help .defaults.test-image-pytest .transforms.clean
 
 .PHONY: .transforms.ray-test-image
-.transforms.ray-test-image:: .transforms.ray-image .transforms.test-image-help .defaults.test-image-pytest 
+.transforms.ray-test-image:: .transforms.ray-image .transforms.test-image-help .defaults.test-image-pytest .transforms.clean
 
 .PHONY: .transforms.spark-test-image
-.transforms.spark-test-image:: .transforms.spark-image .transforms.test-image-help .defaults.test-image-pytest 
+.transforms.spark-test-image:: .transforms.spark-image .transforms.test-spark_image-help .defaults.test-image-pytest .transforms.clean
 
 .PHONY: .transforms.test-image-pytest
-.transforms.test-image-pytest:: .defaults.test-image-pytest 
+.transforms.test-image-pytest:: .defaults.test-image-pytest
 
 .PHONY: .transforms.test-image-help
 .transforms.test-image-help::
 	@# Help: Test an already-built image (use make image) to be sure the --help option works
 	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) python $(TRANSFORM_RUNTIME_SRC_FILE) --help
+
+.transforms.test-spark_image-help::
+	@# Help: Test an already-built image (use make image) to be sure the --help option works
+	$(DOCKER) run -t --rm $(DOCKER_LOCAL_IMAGE) python3 $(TRANSFORM_RUNTIME_SRC_FILE) --help
 
 .PHONY: test-locals
 test-locals:: .transforms.test-locals
@@ -327,10 +337,8 @@ minio-stop:
 	$(call check_defined, TRANSFORM_PYTHON_VERSION)
 	$(MAKE) .defaults.update-toml
 	if [ -e pyproject.toml ]; then	\
-	    dash_name=$$(echo $(TRANSFORM_NAME) | sed -e 's/_/-/g');		\
 	    cat pyproject.toml | sed 	\
-	    -e 's/"dpk-$(TRANSFORM_NAME)-transform-python\([=<>][=<>]\).*",/"dpk-$(TRANSFORM_NAME)-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
-	    -e 's/"dpk-'$${dash_name}'-transform-python\([=<>][=<>]\).*",/"dpk-'$${dash_name}'-transform-python\1$(TRANSFORM_PYTHON_VERSION)",/'	\
+	    -e 's/\("dpk[_-].*transform[_-]python[=<>~][=]\).*"/\1$(TRANSFORM_PYTHON_VERSION)"/'	\
 	    > tt.toml;			\
 	    mv tt.toml pyproject.toml;	\
 	fi

@@ -13,6 +13,7 @@
 import io
 import json
 import logging
+import os
 import uuid
 import zipfile
 from argparse import ArgumentParser, Namespace
@@ -21,11 +22,7 @@ from typing import Any
 
 import pyarrow as pa
 from data_processing.data_access import DataAccess, DataAccessFactory
-from data_processing.transform import (
-    AbstractBinaryTransform,
-    AbstractTransform,
-    TransformConfiguration,
-)
+from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, str2bool
 
 
@@ -135,6 +132,7 @@ class CodeToParquetTransform(AbstractBinaryTransform):
                                     "hash": TransformUtils.str_to_hash(content_string),
                                     "size": len(content_string),
                                     "date_acquired": datetime.now().isoformat(),
+                                    "repo_name": os.path.splitext(os.path.basename(file_name))[0],
                                 } | self.shared_columns
                                 if self.detect_programming_lang:
                                     lang = self._get_lang_from_ext(ext)
@@ -157,7 +155,7 @@ class CodeToParquetTransformConfiguration(TransformConfiguration):
     configuration with CLI args and combining of metadata.
     """
 
-    def __init__(self, transform_class: type[AbstractTransform] = CodeToParquetTransform):
+    def __init__(self, transform_class: type[AbstractBinaryTransform] = CodeToParquetTransform):
         super().__init__(
             name=shortname,
             transform_class=transform_class,

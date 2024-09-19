@@ -10,49 +10,36 @@
 # limitations under the License.
 ################################################################################
 
-import json
 import os
 
-from data_processing_spark.runtime.spark import local_config_path_cli
-from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
-from data_processing_spark.test_support.launch.abstract_launcher_test import (
-    AbstractSparkTransformLauncherTest,
+from data_processing.test_support.launch.transform_test import (
+    AbstractTransformLauncherTest,
 )
+from data_processing_spark.runtime.spark import SparkTransformLauncher
 from doc_id_transform_spark import (
-    DocIDTransformConfiguration,
-    doc_id_column_name_cli_param,
+    DocIDSparkTransformConfiguration,
+    doc_column_name_cli_param,
+    hash_column_name_cli_param,
+    int_column_name_cli_param,
 )
 
 
-class TestSparkDocIDTransform(AbstractSparkTransformLauncherTest):
+class TestSparkDocIDTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        proj_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-        basedir = os.path.join(proj_dir, "test-data")
-        config_file_path = os.path.join(proj_dir, "config", "spark_profile_local.yml")
+        basedir = "../test-data"
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         fixtures = []
+        launcher = SparkTransformLauncher(DocIDSparkTransformConfiguration())
+        transform_config = {
+            doc_column_name_cli_param: "contents",
+            hash_column_name_cli_param: "hash_column",
+            int_column_name_cli_param: "int_id_column",
+        }
 
-        fixtures.append(
-            (
-                SparkTransformLauncher(DocIDTransformConfiguration()),
-                {
-                    doc_id_column_name_cli_param: "doc_id",
-                    local_config_path_cli: config_file_path,
-                },
-                os.path.join(basedir, "input"),
-                os.path.join(basedir, "expected"),
-            )
-        )
+        fixtures.append((launcher, transform_config, basedir + "/input", basedir + "/expected"))
         return fixtures
-
-    def _validate_directory_contents_match(self, dir: str, expected: str, ignore_columns: list[str] = []):
-        super()._validate_directory_contents_match(dir, expected, ignore_columns)
-        with open(os.path.join(dir, "metadata.json"), "r") as meta_fp:
-            meta_dict = json.load(meta_fp)
-        #     with open(os.path.join(expected, "metadata.json")) as expected_meta_fp:
-        #         expected_meta_dict = json.load(expected_meta_fp)
-        #         assert "nrows" in meta_dict and meta_dict["nrows"] == expected_meta_dict["nrows"]

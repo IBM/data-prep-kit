@@ -21,28 +21,29 @@ allows intermediate publishing from the main branch using version X.Y.Z.dev\<N\>
 Creating the release involves
 
 1. Creating a release branch and tag and updating the main branch versions.
-1. Building and publishing pypi library wheels and docker registry image.
 1. Creating a github release from the release branch and tag.
+1. Building and publishing pypi library wheels and docker registry image.
 
 Each is discussed below.
 
 ### Creating release branch and tag 
 The `scripts/release-branch.sh` is currently run manually to create the branch and tags as follows:
 
-1. Creates the `release/vX.Y.Z` and tag `vX.Y.Z` where `X.Y.Z` are defined in .make.versions 
-1. In the new branch:
+1. Creates the `releases/vX.Y.Z` from the main branch where `X.Y.Z` are defined in .make.versions
+1. Creates the `vX.Y.Z` branch for PR'ing back into the `releases/vX.Y.Z` branch. 
+1. In the new `vX.Y.Z` branch 
     1. Nulls out the version suffix in the new branch's `.make.version` file. 
     1. Applies the unsuffixed versions to the artifacts published from the repo using `make set-versions`..
     1. Commits and pushes branch and tag
-1. In the main branch:
-    1. Increments the minor version (i.e. Z+1) and resets the suffix in the main branch to `dev0` in `.make.versions`..
+1. Creates the `pending-version-change/vX.Y.Z` branch for PR'ing back into the main branch.
+1. In the `pending-version-change/vX.Y.Z` branch
+    1. Increments the minor version (i.e. Z+1) and resets the suffix to `dev0` in `.make.versions`.
     1. Commits and pushes branch 
 
-
-To double-check the version that will be published from the main branch,
+To double-check the version that will be published from the release,
 ```
-git checkout <main branch>
-make DPK_VERSION_SUFFIX= show-version
+git checkout releasing/vX.Y.Z 
+make show-version
 ```
 This will print for example, 1.2.3. 
 
@@ -51,6 +52,21 @@ To run the script from the top of the repo:
 ```shell
 scripts/release-branch.sh
 ```
+
+After running the script, you should
+1. Create a pull request from branch `vX.Y.Z` into the `releases/vX.Y.Z` branch, and merge.
+2. Use the github web UI to create a git release and tag of the `releases/vX.Y.Z` branch
+3. Create a pull request from branch `pending-version-change/vX.Y.Z` into the main branch, and merge. 
+
+### Github release
+After running the `release-branch.sh` script, to create tag `vX.Y.Z` and branch `releases/vX.Y.Z`
+1. Go to the [releases page](https://github.com/IBM/data-prep-kit/releases). 
+2. Select `Draft a new release`
+3. Select `Choose a tag -> vX.Y.Z`
+4. Press `Generate release notes` 
+5. Add a title (e.g., Release X.Y.Z) 
+6. Add any additional relese notes.
+7. Press `Publish release`
 
 ### Publishing wheels and images
 After creating the release branch and tag using the `scripts/release-branch.sh` script:
@@ -72,14 +88,5 @@ this with environment variables).
 See [pypi](https://packaging.python.org/en/latest/specifications/pypirc/) for details.
 
 
-### Github release
-After running the `release-branch.sh` script, to create tag `vX.Y.Z` and branch `releases/vX.Y.Z`
-1. Go to the [releases page](https://github.com/IBM/data-prep-kit/releases). 
-2. Select `Draft a new release`
-3. Select `Choose a tag -> vX.Y.Z`
-4. Press `Generate release notes` 
-5. Add a title (e.g., Release X.Y.Z) 
-6. Add any additional relese notes.
-7. Press `Publish release`
  
 
