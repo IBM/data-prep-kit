@@ -41,5 +41,5 @@ class NOOPPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
 if __name__ == "__main__":
     # launcher = NOOPRayLauncher()
     launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
-    logger.info("Launching noop transform.")
+    logger.info("Launching noop transform")
     launcher.launch()
