@@ -26,12 +26,4 @@ class SparkTransformRuntimeConfiguration(TransformRuntimeConfiguration):
         :param transform_config - base configuration class
         :param runtime_class: implementation of the transform runtime
         """
-        super().__init__(transform_config=transform_config)
-        self.runtime_class = runtime_class
-
-    def create_transform_runtime(self) -> DefaultSparkTransformRuntime:
-        """
-        Create transform runtime with the parameters captured during apply_input_params()
-        :return: transform runtime object
-        """
-        return self.runtime_class(self.transform_config.get_transform_params())
+        super().__init__(transform_config=transform_config, runtime_class=runtime_class)

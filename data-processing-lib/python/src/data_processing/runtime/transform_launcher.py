@@ -36,6 +36,7 @@ class AbstractTransformLauncher:
         self.runtime_config = runtime_config
         self.name = self.runtime_config.get_name()
         self.data_access_factory = data_access_factory
+        self.execution_config = None
 
     def _get_parser(self) -> argparse.ArgumentParser:
         """

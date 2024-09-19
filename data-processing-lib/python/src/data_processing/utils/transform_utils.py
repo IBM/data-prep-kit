@@ -96,7 +96,7 @@ class TransformUtils:
         """
         Get the file's root and extension from the given file path.
         :param file_path : The path of the file.
-        :return: str: The file extension including the dot ('.') if present, otherwise an empty string.
+        :return: str: The file name and extension
         """
         return os.path.splitext(file_path)
 
