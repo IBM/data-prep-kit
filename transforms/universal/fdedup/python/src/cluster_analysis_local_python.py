@@ -38,8 +38,8 @@ params = {
 }
 if __name__ == "__main__":
     # Set the simulated command line args
-    sys.argv = ParamsUtils.dict_to_req(d=params)
-    print(sys.argv)
+    # sys.argv = ParamsUtils.dict_to_req(d=params)
+    # print(sys.argv)
     # create launcher
     launcher = PythonTransformLauncher(runtime_config=ClusterAnalysisPythonTransformConfiguration())
     # Launch the ray actor(s) to process the input
