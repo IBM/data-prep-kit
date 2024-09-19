@@ -53,6 +53,14 @@ def orchestrate(
         return 1
     # create additional execution parameters
     runtime = runtime_config.create_transform_runtime()
+    if runtime_config.get_name() == "fdclean":
+        params = runtime.params
+        duplicate_list_location = params["duplicate_list_location"]
+        if duplicate_list_location.startswith("s3://"):
+            _, duplicate_list_location = duplicate_list_location.split("://")
+        content, retries = data_access.get_file(duplicate_list_location)
+        runtime.params["df"] = content
+
     try:
         # Get files to process
         files, profile, retries = data_access.get_files_to_process()
