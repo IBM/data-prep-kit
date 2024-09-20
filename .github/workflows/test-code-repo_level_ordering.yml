@@ -102,7 +102,9 @@ jobs:
             - name: Test transform image in transforms/code/repo_level_ordering
               run: |
                   if [ -e "transforms/code/repo_level_ordering/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image
+                      if [ -d "transforms/code/repo_level_ordering/spark" ]; then
+                          make -C data-processing-lib/spark DOCKER=docker image
+                      fi
                       make -C transforms/code/repo_level_ordering DOCKER=docker test-image
                   else
                       echo "transforms/code/repo_level_ordering/Makefile not found - testing disabled for this transform."
