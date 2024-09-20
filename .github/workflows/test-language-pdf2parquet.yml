@@ -102,9 +102,7 @@ jobs:
             - name: Test transform image in transforms/language/pdf2parquet
               run: |
                   if [ -e "transforms/language/pdf2parquet/Makefile" ]; then
-                      if [ -d "transforms/language/pdf2parquet/spark" ]; then
-                          make -C data-processing-lib/spark DOCKER=docker image
-                      fi
+                      make -C data-processing-lib/spark DOCKER=docker image
                       make -C transforms/language/pdf2parquet DOCKER=docker test-image
                   else
                       echo "transforms/language/pdf2parquet/Makefile not found - testing disabled for this transform."

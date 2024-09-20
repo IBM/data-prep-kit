@@ -102,9 +102,7 @@ jobs:
             - name: Test transform image in transforms/universal/resize
               run: |
                   if [ -e "transforms/universal/resize/Makefile" ]; then
-                      if [ -d "transforms/universal/resize/spark" ]; then
-                          make -C data-processing-lib/spark DOCKER=docker image
-                      fi
+                      make -C data-processing-lib/spark DOCKER=docker image
                       make -C transforms/universal/resize DOCKER=docker test-image
                   else
                       echo "transforms/universal/resize/Makefile not found - testing disabled for this transform."

@@ -102,9 +102,7 @@ jobs:
             - name: Test transform image in transforms/language/pii_redactor
               run: |
                   if [ -e "transforms/language/pii_redactor/Makefile" ]; then
-                      if [ -d "transforms/language/pii_redactor/spark" ]; then
-                          make -C data-processing-lib/spark DOCKER=docker image
-                      fi
+                      make -C data-processing-lib/spark DOCKER=docker image
                       make -C transforms/language/pii_redactor DOCKER=docker test-image
                   else
                       echo "transforms/language/pii_redactor/Makefile not found - testing disabled for this transform."

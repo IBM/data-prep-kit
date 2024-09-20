@@ -21,8 +21,8 @@ allows intermediate publishing from the main branch using version X.Y.Z.dev\<N\>
 Creating the release involves
 
 1. Creating a release branch and tag and updating the main branch versions.
-1. Building and publishing pypi library wheels and docker registry image.
 1. Creating a github release from the release branch and tag.
+1. Building and publishing pypi library wheels and docker registry image.
 
 Each is discussed below.
 
@@ -58,6 +58,16 @@ After running the script, you should
 2. Use the github web UI to create a git release and tag of the `releases/vX.Y.Z` branch
 3. Create a pull request from branch `pending-version-change/vX.Y.Z` into the main branch, and merge. 
 
+### Github release
+After running the `release-branch.sh` script, to create tag `vX.Y.Z` and branch `releases/vX.Y.Z`
+1. Go to the [releases page](https://github.com/IBM/data-prep-kit/releases). 
+2. Select `Draft a new release`
+3. Select `Choose a tag -> vX.Y.Z`
+4. Press `Generate release notes` 
+5. Add a title (e.g., Release X.Y.Z) 
+6. Add any additional relese notes.
+7. Press `Publish release`
+
 ### Publishing wheels and images
 After creating the release branch and tag using the `scripts/release-branch.sh` script:
 
@@ -78,14 +88,5 @@ this with environment variables).
 See [pypi](https://packaging.python.org/en/latest/specifications/pypirc/) for details.
 
 
-### Github release
-After running the `release-branch.sh` script, to create tag `vX.Y.Z` and branch `releases/vX.Y.Z`
-1. Go to the [releases page](https://github.com/IBM/data-prep-kit/releases). 
-2. Select `Draft a new release`
-3. Select `Choose a tag -> vX.Y.Z`
-4. Press `Generate release notes` 
-5. Add a title (e.g., Release X.Y.Z) 
-6. Add any additional relese notes.
-7. Press `Publish release`
  
 

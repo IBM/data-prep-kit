@@ -86,7 +86,7 @@ def test_get_folder():
         input_location = "test/table_read_write/input/"
         _create_and_populate_bucket(d_a=d_a, input_location=input_location, n_files=3)
         # get the folder
-        files, _ = d_a.get_folder_files(path=input_location, extensions=["parquet"])
+        files, _ = d_a.get_folder_files(path=input_location, extensions=[".parquet"])
         print(f"\ngot {len(files)} files")
         assert 3 == len(files)
 
