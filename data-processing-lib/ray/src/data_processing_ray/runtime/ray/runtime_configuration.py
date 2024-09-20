@@ -10,8 +10,7 @@
 # limitations under the License.
 ################################################################################
 
-from data_processing.runtime import TransformRuntimeConfiguration
-from data_processing.transform import TransformConfiguration
+from data_processing.transform import TransformConfiguration, TransformRuntimeConfiguration
 from data_processing_ray.runtime.ray import DefaultRayTransformRuntime
 
 
