@@ -13,9 +13,8 @@
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
+from data_processing.transform import AbstractBinaryTransform, TransformConfiguration, BaseTransformRuntime
 from data_processing.utils import CLIArgumentProvider
-from data_processing.runtime import BaseTransformRuntime
 
 
 class TransformRuntimeConfiguration(CLIArgumentProvider):

@@ -15,7 +15,7 @@ from typing import Any
 import argparse
 
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
-from data_processing.runtime import TransformRuntimeConfiguration
+from data_processing.transform import TransformRuntimeConfiguration
 from data_processing.utils import ParamsUtils, get_logger
 
 

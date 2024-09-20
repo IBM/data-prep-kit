@@ -11,12 +11,11 @@
 ################################################################################
 
 from typing import Any
-from data_processing.transform import AbstractBinaryTransform
-from data_processing.runtime import TransformRuntimeConfiguration, BaseTransformRuntime
+from data_processing.transform import AbstractBinaryTransform, BaseTransformRuntime, TransformRuntimeConfiguration
 from data_processing.utils import get_logger, UnrecoverableException, TransformUtils
 
 
-class PipelineTransformBase(AbstractBinaryTransform):
+class AbstractPipelineTransform(AbstractBinaryTransform):
     """
     Transform that executes a set of base transforms sequentially. Data is passed between
     participating transforms in memory
@@ -43,6 +42,7 @@ class PipelineTransformBase(AbstractBinaryTransform):
         if self.statistics is None:
             self.logger.error("pipeline transform - Statistics is not defined")
             raise UnrecoverableException("pipeline transform - Statistics is not defined")
+        self.transforms = transforms
         participants = []
         # for every transform in the pipeline
         for transform in transforms:
@@ -54,7 +54,7 @@ class PipelineTransformBase(AbstractBinaryTransform):
             tr = transform.get_transform_class()(transform_params)
             participants.append((tr, runtime))
         # save participating transforms
-        self.transforms = participants
+        self.participants = participants
 
     def _get_transform_params(self, runtime: BaseTransformRuntime) -> dict[str, Any]:
         """
@@ -77,7 +77,7 @@ class PipelineTransformBase(AbstractBinaryTransform):
         # process transforms sequentially
         data = [(byte_array, file_name)]
         stats = {}
-        for transform, _ in self.transforms:
+        for transform, _ in self.participants:
             data, st = self._process_transform(transform=transform, data=data)
             # Accumulate stats
             stats |= st
@@ -123,17 +123,17 @@ class PipelineTransformBase(AbstractBinaryTransform):
         stats = {}
         res = []
         i = 0
-        for transform, _ in self.transforms:
+        for transform, _ in self.participants:
             out_files, st = transform.flush_binary()
             # accumulate statistics
             stats |= st
-            if len(out_files) > 0 and i < len(self.transforms) - 1:
+            if len(out_files) > 0 and i < len(self.participants) - 1:
                 # flush produced output - run it through the rest of the chain
                 data = []
                 for ouf in out_files:
                     data.append((ouf[0], f"file{ouf[1]}"))
-                for n in range(i + 1, len(self.transforms)):
-                    data, st = self._process_transform(transform=self.transforms[n][0], data=data)
+                for n in range(i + 1, len(self.participants)):
+                    data, st = self._process_transform(transform=self.participants[n][0], data=data)
                     # Accumulate stats
                     stats |= st
                     if len(data) == 0:
@@ -143,15 +143,15 @@ class PipelineTransformBase(AbstractBinaryTransform):
             else:
                 res += out_files
         # Done flushing, compute execution stats
-        for _, runtime in self.transforms:
+        for _, runtime in self.participants:
             self._compute_execution_stats(runtime=runtime, st=stats)
         return res, {}
 
-    def _compute_execution_stats(self, runtime: BaseTransformRuntime, st: dict[str, Any]) -> dict[str, Any]:
+    def _compute_execution_stats(self, runtime: BaseTransformRuntime, st: dict[str, Any]) -> None:
         """
         get transform parameters
         :param runtime - runtime
         :param st - statistics
-        :return:
+        :return: None
         """
         raise NotImplemented("must be implemented by subclass")

@@ -10,9 +10,8 @@
 # limitations under the License.
 ################################################################################
 
-from data_processing.runtime import TransformRuntimeConfiguration
 from data_processing.runtime.pure_python import DefaultPythonTransformRuntime
-from data_processing.transform import TransformConfiguration
+from data_processing.transform import TransformConfiguration, TransformRuntimeConfiguration
 
 
 class PythonTransformRuntimeConfiguration(TransformRuntimeConfiguration):
