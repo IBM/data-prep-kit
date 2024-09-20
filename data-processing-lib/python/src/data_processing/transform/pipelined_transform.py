@@ -55,48 +55,57 @@ class PipelinedTransform(AbstractBinaryTransform):
         Returns:
 
         """
-        r_bytes, r_metadata = self._apply_transforms_to_datum(self.transforms, (file_name, byte_array))
+        r_bytes, r_metadata = self._call_transforms_on_datum(self.transforms, (file_name, byte_array))
         return r_bytes, r_metadata
 
-    # def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
-    #     """
-    #     Applies the list of transforms, provided to the initializer, to the input data.
-    #     If a transform produces multiple byte arrays, each will be applied through the downstream transforms.
-    #     Args:
-    #         file_name:
-    #         byte_array:
-    #     Returns:
-    #
-    #     """
-    #     r_bytes, r_metadata = self._apply_transforms_to_datum(self.transforms, (file_name, table))
-    #     tables = self._get_table_list(r_bytes)
-    #     return tables, r_metadata
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[Union[bytes, pa.Table]], dict[str, Any]]:
+        """
+        Applies the list of transforms, provided to the initializer, to the input data.
+        If a transform produces multiple byte arrays, each will be applied through the downstream transforms.
+        Args:
+            file_name:
+            byte_array:
+        Returns:
 
-    # def _get_table_list(self, transformed: list[tuple[pa.Table, str]]):
-    #     tables = []
-    #     for t in transformed:
-    #         tables.append(t[0])
-    #     return tables
+        """
+        r_bytes, r_metadata = self._apply_transforms_to_datum(self.transforms, (file_name, table))
+        tables = self._get_table_list(r_bytes)
+        return tables, r_metadata
 
-    def _apply_transforms_to_data(
+    def _get_table_list(self, transformed: list[tuple[pa.Table, str]]):
+        tables = []
+        for t in transformed:
+            tables.append(t[0])
+        return tables
+
+    def _call_transforms_on_data_list(
         self, transforms: list[AbstractBinaryTransform], data: list[tuple[str, bytearray]]
     ) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
+        """
+
+        Args:
+            transforms:
+            data:
+
+        Returns:
+
+        """
         r_bytes = []
         r_metadata = {}
         for datum in data:
-            processed, metadata = self._apply_transforms_to_datum(transforms, data)
+            processed, metadata = self._call_transforms_on_datum(transforms, data)
             r_bytes.extend(processed)
             r_metadata = r_metadata | metadata
 
         return r_bytes, r_metadata
 
-    def _apply_transforms_to_datum(
+    def _call_transforms_on_datum(
         self,
         transforms: Union[list[AbstractBinaryTransform], list[AbstractTableTransform]],
         datum: Union[tuple[str, bytearray], tuple[str, pa.Table]],
     ) -> tuple[list[tuple[Union[bytes, pa.Table], str]], dict[str, Any]]:
         """
-        Apply the list of transforms to the given datum tuple of filename and byte[]
+        Apply the list of transforms to the given datum tuple of filename and byte[] or Table.
         Args:
             transforms:
             datum:
@@ -142,14 +151,33 @@ class PipelinedTransform(AbstractBinaryTransform):
         datum: Union[pa.Table, bytearray],
         file_name: str,
     ) -> tuple[Union[list[tuple[pa.Table, str], list[tuple[bytes, str]]]], dict[str, Any]]:
-        is_table_transform = isinstance(datum, pa.Table)
-        if is_table_transform:
+        """
+        Call the transform on the given data.
+        If the transform is an AbstractTableTransform and the data is a Table, then use the
+        transform's transform() method to avoid converting to bytes to call the transform_binary() method.
+        Args:
+            transform: an instance of AbstractTableTransform or AbstractBinaryTransform
+            datum:  and instance of pyarrow Table or byte array.
+            file_name:
+        Returns: a list of tuples and a dictionary of metadata.
+            Each tuple is a (datum,str) where if transform is an instance of
+                AbstractTableTransform - datum is a Table, and str is ".parquet"
+                AbstractBinaryTransform - datum is bytes, and str is that returned by the transform.
+        """
+        is_table_data = isinstance(datum, pa.Table)
+        is_bytes_data = isinstance(datum, bytes)
+        if is_table_data:
+            is_table_transform = isinstance(transform, AbstractTableTransform)
+            if not is_table_transform:
+                raise ValueError(f"Data is expected to be a pyarrow Table, but was {type(datum)}")
             tables, metadata = transform.transform(datum, file_name)
             transformation_tuples = []
             for table in tables:
                 transformation_tuples.append((table, ".parquet"))
-        else:
+        elif is_bytes_data:
             transformation_tuples, metadata = transform.transform_binary(file_name, datum)
+        else:
+            raise ValueError(f"Data is expected to be a bytes , but was {type(datum)}")
         return transformation_tuples, metadata
 
     def _call_flush(self, transform: Union[AbstractTableTransform, AbstractBinaryTransform]):
@@ -166,10 +194,10 @@ class PipelinedTransform(AbstractBinaryTransform):
     def flush_binary(self) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         return self._flush_transforms()
 
-    # def flush(self) -> tuple[list[pa.Table], dict[str, Any]]:
-    #     transformed, metadata = self._flush_transforms()
-    #     # but only return the table list and not the extensions as is done for flush_binary()
-    #     tables = self._get_table_list(transformed)
+    def flush(self) -> tuple[list[pa.Table], dict[str, Any]]:
+        transformed, metadata = self._flush_transforms()
+        # but only return the table list and not the extensions as is done for flush_binary()
+        tables = self._get_table_list(transformed)
 
     def _flush_transforms(self) -> tuple[list[Union[tuple[bytes, str], tuple[pa.Table, str]]], dict[str, Any]]:
         """
@@ -190,7 +218,7 @@ class PipelinedTransform(AbstractBinaryTransform):
                 downstream_transforms = self.transforms[index:]
                 if len(downstream_transforms) > 0:
                     # Apply the flushed results to the downstream transforms.
-                    transformation_tuples, metadata = self._apply_transforms_to_data(
+                    transformation_tuples, metadata = self._call_transforms_on_data_list(
                         downstream_transforms, transformation_tuples
                     )
                     r_bytes.extend(transformation_tuples)
