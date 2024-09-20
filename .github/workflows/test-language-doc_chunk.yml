@@ -102,7 +102,9 @@ jobs:
             - name: Test transform image in transforms/language/doc_chunk
               run: |
                   if [ -e "transforms/language/doc_chunk/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image
+                      if [ -d "transforms/language/doc_chunk/spark" ]; then
+                          make -C data-processing-lib/spark DOCKER=docker image
+                      fi
                       make -C transforms/language/doc_chunk DOCKER=docker test-image
                   else
                       echo "transforms/language/doc_chunk/Makefile not found - testing disabled for this transform."

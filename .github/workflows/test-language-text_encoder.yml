@@ -102,7 +102,9 @@ jobs:
             - name: Test transform image in transforms/language/text_encoder
               run: |
                   if [ -e "transforms/language/text_encoder/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image
+                      if [ -d "transforms/language/text_encoder/spark" ]; then
+                          make -C data-processing-lib/spark DOCKER=docker image
+                      fi
                       make -C transforms/language/text_encoder DOCKER=docker test-image
                   else
                       echo "transforms/language/text_encoder/Makefile not found - testing disabled for this transform."

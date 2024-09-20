@@ -102,7 +102,9 @@ jobs:
             - name: Test transform image in transforms/universal/ededup
               run: |
                   if [ -e "transforms/universal/ededup/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image
+                      if [ -d "transforms/universal/ededup/spark" ]; then
+                          make -C data-processing-lib/spark DOCKER=docker image
+                      fi
                       make -C transforms/universal/ededup DOCKER=docker test-image
                   else
                       echo "transforms/universal/ededup/Makefile not found - testing disabled for this transform."
