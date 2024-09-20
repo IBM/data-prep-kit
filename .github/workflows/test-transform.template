@@ -102,7 +102,9 @@ jobs:
             - name: Test transform image in @TARGET_TRANSFORM_DIR@
               run: |
                   if [ -e "@TARGET_TRANSFORM_DIR@/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image
+                      if [ -d "@TARGET_TRANSFORM_DIR@/spark" ]; then
+                          make -C data-processing-lib/spark DOCKER=docker image
+                      fi
                       make -C @TARGET_TRANSFORM_DIR@ DOCKER=docker test-image
                   else
                       echo "@TARGET_TRANSFORM_DIR@/Makefile not found - testing disabled for this transform."

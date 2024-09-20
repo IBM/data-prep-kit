@@ -102,7 +102,9 @@ jobs:
             - name: Test transform image in transforms/code/code_quality
               run: |
                   if [ -e "transforms/code/code_quality/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image
+                      if [ -d "transforms/code/code_quality/spark" ]; then
+                          make -C data-processing-lib/spark DOCKER=docker image
+                      fi
                       make -C transforms/code/code_quality DOCKER=docker test-image
                   else
                       echo "transforms/code/code_quality/Makefile not found - testing disabled for this transform."

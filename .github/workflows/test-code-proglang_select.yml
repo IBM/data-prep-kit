@@ -102,7 +102,9 @@ jobs:
             - name: Test transform image in transforms/code/proglang_select
               run: |
                   if [ -e "transforms/code/proglang_select/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image
+                      if [ -d "transforms/code/proglang_select/spark" ]; then
+                          make -C data-processing-lib/spark DOCKER=docker image
+                      fi
                       make -C transforms/code/proglang_select DOCKER=docker test-image
                   else
                       echo "transforms/code/proglang_select/Makefile not found - testing disabled for this transform."

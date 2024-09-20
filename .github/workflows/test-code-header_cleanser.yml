@@ -102,7 +102,9 @@ jobs:
             - name: Test transform image in transforms/code/header_cleanser
               run: |
                   if [ -e "transforms/code/header_cleanser/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image
+                      if [ -d "transforms/code/header_cleanser/spark" ]; then
+                          make -C data-processing-lib/spark DOCKER=docker image
+                      fi
                       make -C transforms/code/header_cleanser DOCKER=docker test-image
                   else
                       echo "transforms/code/header_cleanser/Makefile not found - testing disabled for this transform."
