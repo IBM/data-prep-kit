@@ -102,7 +102,9 @@ jobs:
             - name: Test transform image in transforms/universal/html2parquet
               run: |
                   if [ -e "transforms/universal/html2parquet/Makefile" ]; then
-                      make -C data-processing-lib/spark DOCKER=docker image
+                      if [ -d "transforms/universal/html2parquet/spark" ]; then
+                          make -C data-processing-lib/spark DOCKER=docker image
+                      fi
                       make -C transforms/universal/html2parquet DOCKER=docker test-image
                   else
                       echo "transforms/universal/html2parquet/Makefile not found - testing disabled for this transform."
