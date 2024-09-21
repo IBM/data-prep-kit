@@ -12,7 +12,7 @@
 
 from typing import Any
 from data_processing.transform import AbstractPipelineTransform
-from data_processing.runtime import TransformRuntimeConfiguration, BaseTransformRuntime
+from data_processing.transform import TransformRuntimeConfiguration, BaseTransformRuntime
 
 
 class PythonPipelineTransform(AbstractPipelineTransform):
@@ -21,14 +21,14 @@ class PythonPipelineTransform(AbstractPipelineTransform):
     participating transforms in memory
     """
 
-    def __init__(self, config: dict[str, Any], transforms: list[TransformRuntimeConfiguration]):
+    def __init__(self, config: dict[str, Any]):
         """
         Initializes pipeline execution for the list of transforms
         :param config - configuration parameters
         :param transforms - list of transforms in the pipeline. Note that transforms will
         be executed
         """
-        super().__init__(config, transforms)
+        super().__init__(config)
 
     def _get_transform_params(self, runtime: BaseTransformRuntime) -> dict[str, Any]:
         """

@@ -57,9 +57,9 @@ class AbstractTransformLauncher:
         :return: list of arguments
         """
         # add additional arguments
-        self.runtime_config.add_input_params(parser=parser)
         self.data_access_factory.add_input_params(parser=parser)
         self.execution_config.add_input_params(parser=parser)
+        self.runtime_config.add_input_params(parser=parser)
         return parser.parse_args()
 
     def _get_parameters(self, args: argparse.Namespace) -> bool:
@@ -68,11 +68,10 @@ class AbstractTransformLauncher:
         and does parameters validation
         :return: True if validation passes or False, if not
         """
-        return (
-                self.runtime_config.apply_input_params(args=args)
+        return (self.runtime_config.apply_input_params(args=args)
                 and self.execution_config.apply_input_params(args=args)
                 and self.data_access_factory.apply_input_params(args=args)
-        )
+                )
 
     def _submit_for_execution(self) -> int:
         """

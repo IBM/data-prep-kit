@@ -11,7 +11,7 @@
 ################################################################################
 
 from typing import Any
-from data_processing.transform import AbstractBinaryTransform, BaseTransformRuntime, TransformRuntimeConfiguration
+from data_processing.transform import AbstractBinaryTransform, BaseTransformRuntime
 from data_processing.utils import get_logger, UnrecoverableException, TransformUtils
 
 
@@ -21,15 +21,16 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
     participating transforms in memory
     """
 
-    def __init__(self, config: dict[str, Any], transforms: list[TransformRuntimeConfiguration]):
+    def __init__(self, config: dict[str, Any]):
         """
         Initializes pipeline execution for the list of transforms
-        :param config - configuration parameters
-        :param transforms - list of transforms in the pipeline. Note that transforms will
+        :param config - configuration parameters - dictionary of transforms in the pipeline.
+        Note that transforms will be executed
         be executed
         """
-        super().__init__(config)
+        super().__init__({})
         self.logger = get_logger(__name__)
+        transforms = config.get("transforms", [])
         if len(transforms) == 0:
             # Empty pipeline
             self.logger.error("Pipeline transform with empty list")
@@ -85,7 +86,17 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
                 # no data returned by this transform
                 return [], stats
         # all done
-        return data, stats
+        return self._convert_output(data), stats
+
+    @staticmethod
+    def _convert_output(data: list[tuple[bytes, str]]) -> list[tuple[bytes, str]]:
+        res = [None] * len(data)
+        i = 0
+        for dt in data:
+            fname = TransformUtils.get_file_extension(dt[1])
+            res[i] = (dt[0], fname[1])
+            i += 1
+        return res
 
     @staticmethod
     def _process_transform(transform: AbstractBinaryTransform, data: list[tuple[bytes, str]]
@@ -107,7 +118,7 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
                 res.append((ouf[0], src[0] + ouf[1]))
             # accumulate statistics
             stats |= st
-            return res, stats
+        return res, stats
 
     def flush_binary(self) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
@@ -139,9 +150,10 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
                     if len(data) == 0:
                         # no data returned by this transform
                         break
-                    res += data
+                    res += self._convert_output(data)
             else:
-                res += out_files
+                res += self._convert_output(out_files)
+            i += 1
         # Done flushing, compute execution stats
         for _, runtime in self.participants:
             self._compute_execution_stats(runtime=runtime, st=stats)

@@ -10,11 +10,9 @@
 # limitations under the License.
 ################################################################################
 
-from typing import Tuple
-
 import pyarrow as pa
-from data_processing.test_support.transform.noop_transform import NOOPTransform
-from data_processing.test_support.transform.table_transform_test import (
+from data_processing.test_support.transform import NOOPTransform
+from data_processing.test_support.transform import (
     AbstractTableTransformTest,
 )
 
@@ -30,7 +28,7 @@ class TestNOOPTransform(AbstractTableTransformTest):
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
 
-    def get_test_transform_fixtures(self) -> list[Tuple]:
+    def get_test_transform_fixtures(self) -> list[tuple]:
         fixtures = [
             (NOOPTransform({"sleep": 0}), [table], [expected_table], expected_metadata_list),
             (NOOPTransform({"sleep": 0}), [table], [expected_table], expected_metadata_list),
