@@ -94,7 +94,10 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
         i = 0
         for dt in data:
             fname = TransformUtils.get_file_extension(dt[1])
-            res[i] = (dt[0], fname[1])
+            ext = fname[1]
+            if len(ext) <= 1:
+                ext = fname[0]
+            res[i] = (dt[0], ext)
             i += 1
         return res
 
