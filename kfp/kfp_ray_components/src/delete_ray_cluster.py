@@ -28,7 +28,7 @@ def cleanup_ray_cluster(
         sys.exit(1)
 
     dict_params = KFPUtils.load_from_json(additional_params.replace("'", '"'))
-    delete_cluster_delay_minutes = (dict_params.get("delete_cluster_delay_minutes", 0),)
+    delete_cluster_delay_minutes = dict_params.get("delete_cluster_delay_minutes", 0)
     time.sleep(delete_cluster_delay_minutes * 60)
     # cleanup
     remote_jobs = RayRemoteJobs(server_url=server_url)
