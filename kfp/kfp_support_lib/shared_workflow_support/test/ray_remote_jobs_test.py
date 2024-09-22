@@ -59,7 +59,7 @@ def test_ray_remote_jobs():
     cm_manager.create_code_map()
 
     # create cluster
-    remote_jobs = RayRemoteJobs(server_url=server_url)
+    remote_jobs = RayRemoteJobs(server_url=server_url, additional_params=additional_params)
     status, error = remote_jobs.create_ray_cluster(
         name="job-test", namespace="default", head_node=head_node, worker_nodes=[worker_node]
     )
