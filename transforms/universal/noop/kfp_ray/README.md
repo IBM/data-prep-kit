@@ -7,7 +7,7 @@ This project allows execution of the [noop Ray transform](../ray) as a
 
 The detail pipeline is presented in the [Simplest Transform pipeline tutorial](../../../../kfp/doc/simple_transform_pipeline.md) 
 
-## Generate
+## Pipeline file generation
 In order to generate a pipeline python file run
 ```shell
 make workflow-generate

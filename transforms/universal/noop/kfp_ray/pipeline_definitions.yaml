@@ -3,7 +3,7 @@ pipeline_parameters:
     description: "Pipeline for noop task"
     script_name: "noop_transform_ray.py"
     prefix: ""
-    multi_s3: True
+    multi_s3: False
     compute_func_name: ""
     compute_func_import: ""
     component_spec_path: ""
@@ -21,4 +21,4 @@ pipeline_transform_input_parameters:
         - name: "noop_sleep_sec"
           type: "int"
           value: 10
-          description: "# noop sleep time"
+          description: "noop sleep time"

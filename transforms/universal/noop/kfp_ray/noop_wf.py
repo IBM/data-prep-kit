@@ -14,6 +14,7 @@ import os
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
+
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
@@ -92,7 +93,7 @@ TASK_NAME: str = "noop"
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="Pipeline for noop",
+    description="Pipeline for noop task",
 )
 def noop(
     # Ray cluster
@@ -117,7 +118,7 @@ def noop(
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
 ):
     """
-    Pipeline to execute NOOP transform
+    Pipeline to execute noop transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -167,6 +168,7 @@ def noop(
             runtime_code_location=runtime_code_location,
             noop_sleep_sec=noop_sleep_sec,
         )
+
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster
         ray_cluster = create_ray_op(
@@ -179,12 +181,12 @@ def noop(
         )
         ComponentUtils.add_settings_to_component(ray_cluster, ONE_HOUR_SEC * 2)
         ray_cluster.after(compute_exec_params)
+
         # Execute job
         execute_job = execute_ray_jobs_op(
             ray_name=ray_name,
             run_id=run_id,
             additional_params=additional_params,
-            # note that the parameters below are specific for NOOP transform
             exec_params=compute_exec_params.output,
             exec_script_name=EXEC_SCRIPT_NAME,
             server_url=server_url,
@@ -192,7 +194,6 @@ def noop(
         ComponentUtils.add_settings_to_component(execute_job, ONE_WEEK_SEC)
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
-
 
 if __name__ == "__main__":
     # Compiling the pipeline

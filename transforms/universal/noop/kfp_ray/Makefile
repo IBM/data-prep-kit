@@ -52,7 +52,4 @@ workflow-upload: workflow-build
 
 .PHONY: workflow-generate
 workflow-generate:
-	cd ../../../../kfp/pipeline_generator/single-pipeline/ && \
-	./run.sh --config_file ../../../transforms/universal/noop/kfp_ray/pipeline_definitions.yaml --output_dir_file ../../../transforms/universal/noop/kfp_ray/ && \
-	cd ../../../transforms/universal/noop/kfp_ray/
-	done
+	../../../../kfp/pipeline_generator/single-pipeline/run.sh -c `pwd`/pipeline_definitions.yaml -od  .
