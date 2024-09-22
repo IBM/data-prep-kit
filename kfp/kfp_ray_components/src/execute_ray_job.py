@@ -21,7 +21,7 @@ if __name__ == "__main__":
     parser.add_argument("-ap", "--additional_params", type=str, default="{}")
     parser.add_argument("-su", "--server_url", type=str, default="")
     # The component converts the dictionary to json string
-    parser.add_argument("-ep", "--exec_params", type=str, default="{}")
+    parser.add_argument("-epu", "--exec_params", type=str, default="{}")
     parser.add_argument("-esn", "--exec_script_name", default="transformer_launcher.py", type=str)
 
     args = parser.parse_args()
