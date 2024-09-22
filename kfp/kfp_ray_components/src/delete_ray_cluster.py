@@ -10,6 +10,7 @@
 # limitations under the License.
 ################################################################################
 import sys
+import time
 
 from runtime_utils import KFPUtils, RayRemoteJobs
 
@@ -18,6 +19,7 @@ from runtime_utils import KFPUtils, RayRemoteJobs
 def cleanup_ray_cluster(
     name: str,  # name of Ray cluster
     server_url: str,  # url of api server
+    additional_params: str,  # additional parameters for
 ):
     # get current namespace
     ns = KFPUtils.get_namespace()
@@ -25,6 +27,9 @@ def cleanup_ray_cluster(
         print(f"Failed to get namespace")
         sys.exit(1)
 
+    dict_params = KFPUtils.load_from_json(additional_params.replace("'", '"'))
+    delete_cluster_delay_minutes = (dict_params.get("delete_cluster_delay_minutes", 0),)
+    time.sleep(delete_cluster_delay_minutes * 60)
     # cleanup
     remote_jobs = RayRemoteJobs(server_url=server_url)
     status, error = remote_jobs.delete_ray_cluster(name=name, namespace=ns)
@@ -38,6 +43,7 @@ if __name__ == "__main__":
     parser.add_argument("-rn", "--ray_name", type=str, default="")
     parser.add_argument("-id", "--run_id", type=str, default="")
     parser.add_argument("-su", "--server_url", default="", type=str)
+    parser.add_argument("-ap", "--additional_params", default="{}", type=str)
     args = parser.parse_args()
 
     cluster_name = KFPUtils.runtime_name(
@@ -48,4 +54,5 @@ if __name__ == "__main__":
     cleanup_ray_cluster(
         name=cluster_name,
         server_url=args.server_url,
+        additional_params=args.additional_params,
     )
