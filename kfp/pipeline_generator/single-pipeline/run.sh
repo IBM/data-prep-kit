@@ -57,9 +57,7 @@ fi
 ROOT_DIR=${PWD}
 
 mkdir -p ${ROOT_DIR}/${DIST_DIR}/
-python3 -m venv venv
-source venv/bin/activate
-pip install jinja2
+
 script_dir="$(dirname "$(readlink -f "$0")")"
 echo $PYTHONPATH
 python3 ${script_dir}/pipeline_generator.py -c ${DEF_FILE} -od ${ROOT_DIR}/${DIST_DIR}/

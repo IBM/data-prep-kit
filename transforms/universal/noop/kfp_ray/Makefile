@@ -51,5 +51,5 @@ workflow-upload: workflow-build
 	done
 
 .PHONY: workflow-generate
-workflow-generate:
-	../../../../kfp/pipeline_generator/single-pipeline/run.sh -c `pwd`/pipeline_definitions.yaml -od  .
+workflow-generate: workflow-venv
+	. ${WORKFLOW_VENV_ACTIVATE}  && ../../../../kfp/pipeline_generator/single-pipeline/run.sh -c `pwd`/pipeline_definitions.yaml -od  .
