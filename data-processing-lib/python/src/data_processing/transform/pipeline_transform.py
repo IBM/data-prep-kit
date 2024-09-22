@@ -56,6 +56,7 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
             participants.append((tr, runtime))
         # save participating transforms
         self.participants = participants
+        self.file_name = ""
 
     def _get_transform_params(self, runtime: BaseTransformRuntime) -> dict[str, Any]:
         """
@@ -76,6 +77,7 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
                 holding the extension to be used when writing out the new bytes.
         """
         # process transforms sequentially
+        self.file_name = file_name
         data = [(byte_array, file_name)]
         stats = {}
         for transform, _ in self.participants:
@@ -94,10 +96,7 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
         i = 0
         for dt in data:
             fname = TransformUtils.get_file_extension(dt[1])
-            ext = fname[1]
-            if len(ext) <= 1:
-                ext = fname[0]
-            res[i] = (dt[0], ext)
+            res[i] = (dt[0], fname[1])
             i += 1
         return res
 
@@ -145,7 +144,7 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
                 # flush produced output - run it through the rest of the chain
                 data = []
                 for ouf in out_files:
-                    data.append((ouf[0], f"file{ouf[1]}"))
+                    data.append((ouf[0], self.file_name))
                 for n in range(i + 1, len(self.participants)):
                     data, st = self._process_transform(transform=self.participants[n][0], data=data)
                     # Accumulate stats
@@ -155,7 +154,7 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
                         break
                     res += self._convert_output(data)
             else:
-                res += self._convert_output(out_files)
+                res += out_files
             i += 1
         # Done flushing, compute execution stats
         for _, runtime in self.participants:
