@@ -10,10 +10,11 @@
 # limitations under the License.
 ################################################################################
 
-from data_processing.runtime.pure_python import PythonTransformLauncher
-from data_processing.runtime.pure_python.runtime_configuration import (
+from data_processing.runtime.pure_python import (
+    PythonTransformLauncher,
     PythonTransformRuntimeConfiguration,
 )
+from data_processing.transform.pure_python import PythonPipelineTransform
 from data_processing.transform import PipelineTransformConfiguration
 from data_processing.utils import get_logger
 from ededup_transform_python import EdedupPythonTransformRuntimeConfiguration
@@ -32,8 +33,10 @@ class EdedupPypelinePythonTransformConfiguration(PythonTransformRuntimeConfigura
         """
         Initialization
         """
-        super().__init__(transform_config=
-                         PipelineTransformConfiguration({"transforms": [EdedupPythonTransformRuntimeConfiguration()]}))
+        super().__init__(
+            transform_config=PipelineTransformConfiguration(
+                config={"transforms": [EdedupPythonTransformRuntimeConfiguration()]},
+                transform_class=PythonPipelineTransform))
 
 
 if __name__ == "__main__":

@@ -24,9 +24,8 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
     def __init__(self, config: dict[str, Any]):
         """
         Initializes pipeline execution for the list of transforms
-        :param config - configuration parameters - dictionary of transforms in the pipeline.
-        Note that transforms will be executed
-        be executed
+        :param config - configuration parameters - list of transforms in the pipeline.
+        Note that transforms will be executed in the order they are defined
         """
         super().__init__({})
         self.logger = get_logger(__name__)
@@ -95,8 +94,8 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
         res = [None] * len(data)
         i = 0
         for dt in data:
-            fname = TransformUtils.get_file_extension(dt[1])
-            res[i] = (dt[0], fname[1])
+            f_name = TransformUtils.get_file_extension(dt[1])
+            res[i] = (dt[0], f_name[1])
             i += 1
         return res
 
@@ -157,15 +156,13 @@ class AbstractPipelineTransform(AbstractBinaryTransform):
                 res += out_files
             i += 1
         # Done flushing, compute execution stats
-        for _, runtime in self.participants:
-            self._compute_execution_stats(runtime=runtime, st=stats)
+        self._compute_execution_statistics(stats)
         return res, {}
 
-    def _compute_execution_stats(self, runtime: BaseTransformRuntime, st: dict[str, Any]) -> None:
+    def _compute_execution_statistics(self, stats: dict[str, Any]) -> None:
         """
-        get transform parameters
-        :param runtime - runtime
-        :param st - statistics
+        Compute execution statistics
+        :param stats: current statistics from flush
         :return: None
         """
         raise NotImplemented("must be implemented by subclass")

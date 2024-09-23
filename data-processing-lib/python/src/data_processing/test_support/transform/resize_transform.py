@@ -22,10 +22,7 @@ from data_processing.utils import (
     UnrecoverableException,
     get_logger,
 )
-from data_processing.runtime.pure_python.runtime_configuration import (
-    PythonTransformRuntimeConfiguration,
-)
-from data_processing.runtime.pure_python import PythonTransformLauncher
+from data_processing.runtime.pure_python import PythonTransformLauncher, PythonTransformRuntimeConfiguration
 
 
 logger = get_logger(__name__)

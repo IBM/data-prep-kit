@@ -11,11 +11,12 @@
 ################################################################################
 
 from typing import Any
+import ray
 from data_processing.transform import AbstractPipelineTransform
 from data_processing.transform import BaseTransformRuntime
 
 
-class PythonPipelineTransform(AbstractPipelineTransform):
+class RayPipelineTransform(AbstractPipelineTransform):
     """
     Transform that executes a set of base transforms sequentially. Data is passed between
     participating transforms in memory
@@ -44,6 +45,8 @@ class PythonPipelineTransform(AbstractPipelineTransform):
         :param stats: current statistics from flush
         :return: None
         """
-        self.statistics.add_stats(stats)
+        current = ray.get(self.statistics.get_execution_stats.remote())
+        current |= stats
         for _, runtime in self.participants:
-            runtime.compute_execution_stats(stats=self.statistics)
+            current = runtime.compute_execution_stats(stats=current)
+        ray.get(self.statistics.update_stats.remote(current))

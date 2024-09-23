@@ -10,10 +10,8 @@
 # limitations under the License.
 ################################################################################
 
-from data_processing.runtime.pure_python import PythonTransformLauncher
-from data_processing.runtime.pure_python.runtime_configuration import (
-    PythonTransformRuntimeConfiguration,
-)
+from data_processing.runtime.pure_python import PythonTransformLauncher, PythonTransformRuntimeConfiguration
+from data_processing.transform.pure_python import PythonPipelineTransform
 from data_processing.transform import PipelineTransformConfiguration
 from data_processing.utils import get_logger
 from data_processing.test_support.transform import NOOPPythonTransformConfiguration, ResizePythonTransformConfiguration
@@ -32,10 +30,10 @@ class ResizeNOOPPythonTransformConfiguration(PythonTransformRuntimeConfiguration
         """
         Initialization
         """
-        super().__init__(transform_config=
-                         PipelineTransformConfiguration({"transforms": [ResizePythonTransformConfiguration(),
-                                                                        NOOPPythonTransformConfiguration()]})
-                         )
+        super().__init__(transform_config=PipelineTransformConfiguration(
+            config={"transforms": [ResizePythonTransformConfiguration(),
+                                   NOOPPythonTransformConfiguration()]},
+            transform_class=PythonPipelineTransform))
 
 
 if __name__ == "__main__":

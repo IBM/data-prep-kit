@@ -13,8 +13,7 @@
 from typing import Any
 from argparse import ArgumentParser, Namespace
 
-from data_processing.transform import TransformConfiguration
-from data_processing.transform.pure_python import PythonPipelineTransform
+from data_processing.transform import TransformConfiguration, AbstractPipelineTransform
 from data_processing.utils import get_logger
 
 logger = get_logger(__name__)
@@ -27,10 +26,14 @@ class PipelineTransformConfiguration(TransformConfiguration):
     configuration with CLI args.
     """
 
-    def __init__(self, config: dict[str, Any]):
+    def __init__(
+            self,
+            config: dict[str, Any],
+            transform_class: type[AbstractPipelineTransform],
+    ):
         super().__init__(
             name="pipeline",
-            transform_class=PythonPipelineTransform,
+            transform_class=transform_class,
         )
         self.params = config
 

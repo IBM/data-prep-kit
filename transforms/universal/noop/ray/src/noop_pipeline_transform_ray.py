@@ -10,16 +10,16 @@
 # limitations under the License.
 ################################################################################
 
-from data_processing.runtime.pure_python import PythonTransformLauncher, PythonTransformRuntimeConfiguration
-from data_processing.transform.pure_python import PythonPipelineTransform
+from data_processing_ray.runtime.ray import RayTransformLauncher, RayTransformRuntimeConfiguration
 from data_processing.transform import PipelineTransformConfiguration
+from data_processing_ray.transform.ray import RayPipelineTransform
 from data_processing.utils import get_logger
-from noop_transform_python import NOOPPythonTransformConfiguration
+from noop_transform_ray import NOOPRayTransformConfiguration
 
 logger = get_logger(__name__)
 
 
-class NOOPPypelinePythonTransformConfiguration(PythonTransformRuntimeConfiguration):
+class NOOPPypelineRayTransformConfiguration(RayTransformRuntimeConfiguration):
     """
     Implements the PythonTransformConfiguration for NOOP as required by the PythonTransformLauncher.
     NOOP does not use a RayRuntime class so the superclass only needs the base
@@ -31,12 +31,12 @@ class NOOPPypelinePythonTransformConfiguration(PythonTransformRuntimeConfigurati
         Initialization
         """
         super().__init__(transform_config=PipelineTransformConfiguration(
-            config={"transforms": [NOOPPythonTransformConfiguration()]},
-            transform_class=PythonPipelineTransform))
+            config={"transforms": [NOOPRayTransformConfiguration()]},
+            transform_class=RayPipelineTransform))
 
 
 if __name__ == "__main__":
     # launcher = NOOPRayLauncher()
-    launcher = PythonTransformLauncher(NOOPPypelinePythonTransformConfiguration())
+    launcher = RayTransformLauncher(NOOPPypelineRayTransformConfiguration())
     logger.info("Launching resize/noop transform")
     launcher.launch()
