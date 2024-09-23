@@ -1,6 +1,6 @@
 # Transforms Pacakges for both Python and Ray
 
-Most available Transforms can be published to pypi as a single package. A detailed list of available Python transforms is available at this (link)[python/README.md]. Similarly the following (link)[ray/README.md] provide a derailed list and installation instructions for Ray transforms
+Most available Transforms can be published to pypi as a single package. A detailed list of available Python transforms is available at this [link](python/README.md). Similarly the following [link](ray/README.md) provide a derailed list and installation instructions for Ray transforms
 
 
 
