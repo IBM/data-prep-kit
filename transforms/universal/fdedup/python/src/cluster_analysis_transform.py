@@ -90,24 +90,36 @@ class ClusterAnalysisTransform(AbstractTableTransform):
         ).filter(pl.col("cluster_length") > 1)
         self.logger.info(f"file_name = {file_name}")
         num_clusters = len(bands_dataframe_cluster)
-        sum_cdocs = bands_dataframe_cluster.select(pl.sum("cluster_length")).item()
-        max_cdocs = bands_dataframe_cluster.select(pl.max("cluster_length")).item()
-        min_cdocs = bands_dataframe_cluster.select(pl.min("cluster_length")).item()
-        avg_cdocs = bands_dataframe_cluster.select(pl.mean("cluster_length")).item()
+        if num_clusters > 0:
+            sum_cdocs = bands_dataframe_cluster.select(pl.sum("cluster_length")).item()
+            max_cdocs = bands_dataframe_cluster.select(pl.max("cluster_length")).item()
+            min_cdocs = bands_dataframe_cluster.select(pl.min("cluster_length")).item()
+            avg_cdocs = bands_dataframe_cluster.select(pl.mean("cluster_length")).item()
+        else:
+            sum_cdocs = 0
+            max_cdocs = 0
+            min_cdocs = 0
+            avg_cdocs = 0
         self.logger.info(f"After GroupBy: {num_clusters} clusters with {sum_cdocs} total docs")
         self.logger.info(f" max/min/avg docs per cluster: {max_cdocs}/{min_cdocs}/{avg_cdocs:.2f}")
         bands_dataframe_response = self.process_bands(bands_dataframe_cluster)
 
         filtered_doc2remove_dataframe = bands_dataframe_response.filter(pl.col("docs_to_remove_length") > 0)
         num_clusters = len(filtered_doc2remove_dataframe)
-        sum_cdocs = filtered_doc2remove_dataframe.select(pl.sum("docs_to_remove_length")).item()
-        max_cdocs = filtered_doc2remove_dataframe.select(pl.max("docs_to_remove_length")).item()
-        min_cdocs = filtered_doc2remove_dataframe.select(pl.min("docs_to_remove_length")).item()
-        avg_cdocs = filtered_doc2remove_dataframe.select(pl.mean("docs_to_remove_length")).item()
+        if num_clusters > 0:
+            sum_cdocs = filtered_doc2remove_dataframe.select(pl.sum("docs_to_remove_length")).item()
+            max_cdocs = filtered_doc2remove_dataframe.select(pl.max("docs_to_remove_length")).item()
+            min_cdocs = filtered_doc2remove_dataframe.select(pl.min("docs_to_remove_length")).item()
+            avg_cdocs = filtered_doc2remove_dataframe.select(pl.mean("docs_to_remove_length")).item()
+        else:
+            sum_cdocs = 0
+            max_cdocs = 0
+            min_cdocs = 0
+            avg_cdocs = 0
         self.logger.info(f"After Jaccard: {num_clusters} clusters with {sum_cdocs} total docs")
         self.logger.info(f" max/min/avg docs per cluster: {max_cdocs}/{min_cdocs}/{avg_cdocs:.2f}")
 
-        # Explode the 'minhashes' column
+        # Explode the 'docs_to_remove' column
         doc2remove_exploded_dataframe = filtered_doc2remove_dataframe.explode("docs_to_remove")
         table = doc2remove_exploded_dataframe.to_arrow()
         self.logger.info(f"{len(doc2remove_exploded_dataframe)} documents marked to remove")

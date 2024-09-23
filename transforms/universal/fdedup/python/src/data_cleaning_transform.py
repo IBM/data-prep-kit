@@ -80,6 +80,14 @@ class DataCleaningTransform(AbstractTableTransform):
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         self.logger.info(f"Transforming table with {table.num_rows} rows from file {file_name}")
         input_df = pl.from_arrow(table)
+        # handle the case when the doc_id columns in the input dataframe and the
+        # docs_to_remove_df  have different types, i.e. one is int32 and the
+        # other is int64
+        input_doc_id_type = input_df[self.document_id_column].dtype
+        if input_doc_id_type != self.docs_to_remove_df[self.document_id_column].dtype:
+            self.docs_to_remove_df = self.docs_to_remove_df.select(
+                pl.col(self.document_id_column).cast(input_doc_id_type)
+            )
         filtered_df = input_df.join(self.docs_to_remove_df, on=self.document_id_column, how="anti")
         filtered_table = filtered_df.to_arrow()
         metadata = {

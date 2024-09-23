@@ -71,7 +71,7 @@ class FileCopySpark:
         output_folder = root_folder
         data_access_factory: DataAccessFactoryBase = DataAccessFactory()
         daf_args = []
-        if args.use_s3:
+        if use_s3:
             s3_creds = {
                 "access_key": os.getenv("AWS_ACCESS_KEY_ID"),
                 "secret_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
