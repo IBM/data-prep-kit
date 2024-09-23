@@ -11,6 +11,10 @@ clean::
 	@# Help: Recursively make $@ all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
+src::
+	@# Help: Recursively setup $@ in all subdirs 
+	$(MAKE) RULE=$@ .recurse
+
 setup::
 
 build::
