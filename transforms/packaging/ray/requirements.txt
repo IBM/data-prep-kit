@@ -16,10 +16,6 @@ func-timeout==4.3.5
 pandas==2.2.2
 emerge-viz==2.0.0
 
-#Note:
-# when installing data-processing-library-ray, get the following
-# ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
-# deepsearch-toolkit 1.0.0 requires platformdirs<4.0.0,>=3.5.1, but you have platformdirs 4.3.2 which is incompatible.
 
 
 

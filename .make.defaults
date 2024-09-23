@@ -480,7 +480,8 @@ endif
 	if [ -e requirements.txt ]; then				\
 		echo Installing requirements from requirements.txt;	\
 		pip install $(PIP_INSTALL_EXTRA_ARGS) $$extra_url -r requirements.txt;		\
-	elif [ -e pyproject.toml ]; then				\
+	fi;	\
+	if [ -e pyproject.toml ]; then				\
 		echo Installing from pyproject.toml;			\
 		pip install $(PIP_INSTALL_EXTRA_ARGS) $$extra_url -e .;	\
 	fi
