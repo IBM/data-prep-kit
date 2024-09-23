@@ -19,6 +19,14 @@ setup::
 
 build::
 
+build-dist::
+	@# Help: Recursively build distributions in all subdirs 
+	$(MAKE) RULE=$@ .recurse
+
+publish-dist::
+	@# Help: Recursively publish distributions in all subdirs 
+	$(MAKE) RULE=$@ .recurse
+
 venv::
 
 image:: 
