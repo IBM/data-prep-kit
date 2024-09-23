@@ -5,12 +5,13 @@ Most available Transforms can be published to pypi as a single package. A detail
 
 
 ## Clone folder and update version number
-
-git clone https://github.com/IBM/data-prep-kit.git release
-cd release
-
+````
+git clone https://github.com/IBM/data-prep-kit.git package-release
+cd package-release
+````
 in `.make.versions`, Set the values for DPK_MAJOR_VERSION, DPK_MINOR_VERSION and DPK_MICRO_VERSION to specify the DPK library to use and as appropriate, set the value for `DPK_TRANSFORMS_VERSION` that will be used to tag the latest version released to pypi 
 
+`make set-versions`
 
 ## Creating src folder
 
@@ -18,7 +19,7 @@ Given that the transforms do not currently have their own name spaces, the first
 
 
 ````
-cd release/transforms/packaging
+cd package-release/transforms/packaging
 make clean
 make src
 ````
@@ -28,7 +29,7 @@ make src
 This procedure will run all the UT for each individual transforms using a single package configuration:
 
 ````
-cd release/transforms/packaging
+cd package-release/transforms/packaging
 make clean
 make src
 make test-src
@@ -36,16 +37,18 @@ make test-src
 
 ## Build and Deploy
 
-This procedure will buid and publish two wheels to pypi.org: one for the python transforms and one for the ray transforms.
+This procedure will buid two wheels: one for the python transforms and one for the ray transforms.
 
 ````
-cd release/transforms/packaging
+cd package-release/transforms/packaging
 make clean
 make src
-make set-version
 make build-dist
-make publish-dist
 ````
+
+To publish the wheels to pypi.org, run:
+
+`make publish-dist`
 
 
 
