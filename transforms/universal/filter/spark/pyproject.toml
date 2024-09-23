@@ -1,6 +1,6 @@
 [project]
 name = "dpk_filter_transform_spark"
-version = "0.2.1.dev0"
+version = "0.2.1.dev3"
 requires-python = ">=3.10"
 description = "Filter Spark Transform"
 license = {text = "Apache-2.0"}
@@ -9,8 +9,8 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
 dependencies = [
-    "dpk_filter_transform_python==0.2.1.dev0",
-    "data-prep-toolkit-spark==0.2.1.dev0",
+    "dpk_filter_transform_python==dummy",
+    "data-prep-toolkit-spark==0.2.1.dev3",
 ]
 
 [project.optional-dependencies]
