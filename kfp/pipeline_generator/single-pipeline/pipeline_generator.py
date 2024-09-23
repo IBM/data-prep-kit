@@ -1,4 +1,4 @@
-PRE_COMMIT = "../pre-commit-config.yaml"
+
 PIPELINE_TEMPLATE_FILE = "simple_pipeline.py"
 
 INPUT_PARAMETERS = "input_parameters"
@@ -13,13 +13,15 @@ DESCRIPTION = "description"
 
 if __name__ == "__main__":
     import argparse
-
+    import os
     import yaml
     from jinja2 import Environment, FileSystemLoader
 
-    environment = Environment(loader=FileSystemLoader("templates/"))
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    environment = Environment(loader=FileSystemLoader(f"{script_dir}/templates/"))
     template = environment.get_template(PIPELINE_TEMPLATE_FILE)
 
+    #pre_commit_config = f"{script_dir}/../pre-commit-config.yaml"
     parser = argparse.ArgumentParser(description="Kubeflow pipeline generator for Foundation Models")
     parser.add_argument("-c", "--config_file", type=str, default="")
     parser.add_argument("-od", "--output_dir_file", type=str, default="")
@@ -50,16 +52,8 @@ if __name__ == "__main__":
         image_pull_secret=common_input_params_values["image_pull_secret"],
         multi_s3=pipeline_parameters["multi_s3"],
     )
-
-    output_file = f"{args.output_dir_file}/{pipeline_parameters[NAME]}_wf.py"
+    output_file = f"{args.output_dir_file}{pipeline_parameters[NAME]}_wf.py"
     with open(output_file, mode="w", encoding="utf-8") as message:
         message.write(content)
         print(f"... wrote {output_file}")
 
-    import sys
-
-    from pre_commit.main import main
-
-    print(f"Pipeline ${output_file} auto generation completed")
-    args = ["run", "--file", f"{output_file}", "-c", PRE_COMMIT]
-    sys.exit(main(args))

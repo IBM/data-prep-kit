@@ -1,55 +1,34 @@
 # (C) Copyright IBM Corp. 2024.
-# Licensed under the Apache License, Version 2.0 (the “License”);
+# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #  http://www.apache.org/licenses/LICENSE-2.0
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an “AS IS” BASIS,
+# distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
 
-import json
 import os
 
-from data_processing_spark.runtime.spark import local_config_path_cli
-from data_processing_spark.runtime.spark.spark_launcher import SparkTransformLauncher
-from data_processing_spark.test_support.launch.abstract_launcher_test import (
-    AbstractSparkTransformLauncherTest,
+from data_processing.test_support.launch.transform_test import (
+    AbstractTransformLauncherTest,
 )
-from noop_transform_spark import NOOPSparkRuntimeConfiguration, sleep_cli_param
-from pyspark.sql import DataFrame, SparkSession
+from data_processing_spark.runtime.spark import SparkTransformLauncher
+from noop_transform_spark import NOOPSparkTransformConfiguration
 
 
-class TestSparkNOOPTransform(AbstractSparkTransformLauncherTest):
+class TestSparkNOOPTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-
-        src_file_dir = os.path.abspath(os.path.dirname(__file__))
+        basedir = "../test-data"
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
         fixtures = []
-
-        launcher = SparkTransformLauncher(NOOPSparkRuntimeConfiguration())
-        input_dir = os.path.join(src_file_dir, "../test-data/input")
-        expected_dir = os.path.join(src_file_dir, "../test-data/expected")
-        config_file_path = os.path.join(src_file_dir, "../config/spark_profile_local.yml")
-        runtime_config = {local_config_path_cli: config_file_path}
-        transform_config = {sleep_cli_param: 0}
-        fixtures.append(
-            (
-                launcher,
-                transform_config | runtime_config,
-                input_dir,
-                expected_dir,
-                [],  # optional list of column names to ignore in comparing test-generated with expected.
-            )
-        )
-
+        launcher = SparkTransformLauncher(NOOPSparkTransformConfiguration())
+        fixtures.append((launcher, {"noop_sleep_sec": 1}, basedir + "/input", basedir + "/expected"))
         return fixtures
-
-    def _validate_metadata_content(self, test_generated: dict, expected: dict, ignore_columns: list[str] = []):
-        assert "nrows" in test_generated and test_generated["nrows"] == expected["nrows"]

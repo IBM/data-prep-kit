@@ -22,10 +22,10 @@ COPY --chown=dpk:root pyproject.toml pyproject.toml
 RUN pip install --no-cache-dir -e .
 
 # copy transform main() entry point to the image 
-COPY ./src/noop_transform_python.py .
+COPY ./src/html2parquet_transform_python.py .
 
 # copy some of the samples in
-COPY ./src/noop_local.py local/
+COPY ./src/html2parquet_local.py local/
 
 # copy test
 COPY test/ test/
