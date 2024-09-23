@@ -9,12 +9,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
 import os
 
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
+
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
@@ -101,19 +101,21 @@ TASK_NAME: str = "{{ pipeline_name }}"
 )
 def {{ pipeline_name }}(
     # Ray cluster
-    ray_name: str = "{{ pipeline_name }}-kfp-ray",
+    ray_name: str = "{{ pipeline_name }}-kfp-ray",  # name of Ray cluster
+    # Add image_pull_secret and image_pull_policy to ray workers if needed
     ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image},
     ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image},
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    {% if multi_s3 == False %}
+    {%- if multi_s3 == False %}
     data_s3_config: str = "{'input_folder': '{{ input_folder }}', 'output_folder': '{{ output_folder }}'}",
-    {% else %}
+    {%- else %}
     data_s3_config: str = ["{'input_folder': '{{ input_folder }}', 'output_folder': '{{ output_folder }}'}"],
-    {% endif %}
+    {%- endif %}
     data_s3_access_secret: str = "{{ s3_access_secret }}",
     data_max_files: int = -1,
     data_num_samples: int = -1,
+    data_checkpointing: bool = False,
     # orchestrator
     runtime_actor_options: dict = {'num_cpus': 0.8},
     runtime_pipeline_id: str = "pipeline_id",
