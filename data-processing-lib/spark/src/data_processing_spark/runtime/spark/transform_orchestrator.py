@@ -100,7 +100,8 @@ def orchestrate(
     if runtime_config.get_name() == "fdclean":
         params = runtime_config.transform_config.params
         duplicate_list_location = params["duplicate_list_location"]
-        _, duplicate_list_location = duplicate_list_location.split("://")
+        if duplicate_list_location.startswith("s3://"):
+            _, duplicate_list_location = duplicate_list_location.split("://")
         content, retries = data_access.get_file(duplicate_list_location)
         runtime_config.transform_config.params["df"] = content
     # initialize Spark
