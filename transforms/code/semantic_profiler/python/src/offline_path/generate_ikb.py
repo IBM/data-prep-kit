@@ -2,9 +2,6 @@ import os
 import argparse
 import pyarrow.csv as pv
 from io import StringIO
-from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
-from ibm_watsonx_ai.foundation_models import ModelInference
-from ibm_watsonx_ai import Credentials
 
 
 def gen_combined_strings(list_str):
@@ -51,57 +48,58 @@ null_library_names = [{col: table[i][j].as_py() for i, col in enumerate(cols)} f
 combined_strings = gen_combined_strings(null_library_names) 
 endtoken = "<end>"
 
-
-credentials = Credentials(api_key=args.api_key, url=args.api_endpoint)
 prompt_name = "My-prompt"
 prompt_template = '''You are responsible for classifying programming language packages based on their functionality into one of the following STRICT categories:
-                ''' + concepts + '''
+                    ''' + concepts + '''
 
-                Instructions:                
+                    Instructions:                
 
-                1. Input: A CSV containing two columns:
-                          a. Library – the name of the package
-                          b. Language – the programming language of the package
-                    Your task is to append a third column called Category where you will classify the package's primary function into one of the following categories.\n
-                                
-                2. Output: The updated CSV with the new Category column.
-                
-                3. Categorization Guidelines:
-                    a. Classify each package based on its primary functionality.
-                    b. Only use categories from the given list. Do not invent or modify categories.
-                
-                4. Output format: Provide the updated CSV data in the exact format as shown below:
-                    a. Columns: Library, Language, Category
-                    b. End the response with <end> to indicate completion.
+                    1. Input: A CSV containing two columns:
+                            a. Library – the name of the package
+                            b. Language – the programming language of the package
+                        Your task is to append a third column called Category where you will classify the package's primary function into one of the following categories.\n
+                                    
+                    2. Output: The updated CSV with the new Category column.
+                    
+                    3. Categorization Guidelines:
+                        a. Classify each package based on its primary functionality.
+                        b. Only use categories from the given list. Do not invent or modify categories.
+                    
+                    4. Output format: Provide the updated CSV data in the exact format as shown below:
+                        a. Columns: Library, Language, Category
+                        b. End the response with <end> to indicate completion.
 
-                5. Only use categories from the given list. Do not invent or modify categories.
+                    5. Only use categories from the given list. Do not invent or modify categories.
 
-                6. Strictly do not provide any explanations or commentary or notes before and/or after the table.
-                
-                Examples:
-                INPUT:
-                ''' + str(input_examples) + "OUTPUT:\n" + str(output_examples).strip("\n")+"\n<end>"
+                    6. Strictly do not provide any explanations or commentary or notes before and/or after the table.
+                    
+                    Examples:
+                    INPUT:
+                    ''' + str(input_examples) + "OUTPUT:\n" + str(output_examples).strip("\n")+"\n<end>"
 
-parameters = {
-    GenParams.DECODING_METHOD: "greedy",
-    GenParams.MAX_NEW_TOKENS: 1000,
-    GenParams.STOP_SEQUENCES: ["<end>"]
-}
+if args.api_type == 'WatsonxAI':
+    credentials = Credentials(api_key=args.api_key, url=args.api_endpoint)
 
-model = ModelInference(
-    model_id=args.model_id, 
-    params=parameters, 
-    credentials=credentials,
-    project_id=args.project_id)
+    parameters = {
+        GenParams.DECODING_METHOD: "greedy",
+        GenParams.MAX_NEW_TOKENS: 1000,
+        GenParams.STOP_SEQUENCES: ["<end>"]
+    }
 
-for combined_string in combined_strings:
-    input_template = prompt_template + f"\n\nINPUT: {combined_string} \nOUTPUT: "
-    response = model.generate_text(input_template)
-    data = response.split(endtoken)[0]  
-    csv_file = StringIO(data.strip()) 
-    table = pv.read_csv(csv_file)
-    with open(args.extracted_data_file, mode='a') as f:
-        pv.write_csv(table, f, write_options=pv.WriteOptions(include_header=False))
+    model = ModelInference(
+        model_id=args.model_id, 
+        params=parameters, 
+        credentials=credentials,
+        project_id=args.project_id)
+
+    for combined_string in combined_strings:
+        input_template = prompt_template + f"\n\nINPUT: {combined_string} \nOUTPUT: "
+        response = model.generate_text(input_template)
+        data = response.split(endtoken)[0]  
+        csv_file = StringIO(data.strip()) 
+        table = pv.read_csv(csv_file)
+        with open(args.extracted_data_file, mode='a') as f:
+            pv.write_csv(table, f, write_options=pv.WriteOptions(include_header=False))
 
 
         
