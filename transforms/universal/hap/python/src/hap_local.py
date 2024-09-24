@@ -11,7 +11,6 @@
 ################################################################################
 
 import os
-
 from data_processing.data_access import DataAccessLocal
 from hap_transform import HAPTransform
 
@@ -23,7 +22,6 @@ local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
 }
-model_dir = "/Users/ian/Desktop/all9/HAP_final/mhap_seed42_wo_trans"
 
 hap_params = {
     "model_name_or_path": 'ibm-granite/granite-guardian-hap-38m',
