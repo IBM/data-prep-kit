@@ -1,4 +1,3 @@
-
 name: Test - transforms/packaging/ray
 
 on:
@@ -11,10 +10,6 @@ on:
             - "*"
         paths:
             - "transforms/packaging/ray/**"
-            - "data-processing-lib/**"
-            - "!transforms/packaging/ray/**/kfp_ray/**" # This is/will be tested in separate workflow
-            - "!data-processing-lib/**/test/**"
-            - "!data-processing-lib/**/test-data/**"
             - "!**.md"
             - "!**/doc/**"
             - "!**/images/**"
@@ -25,10 +20,6 @@ on:
             - "releases/**"
         paths:
             - "transforms/packaging/ray/**"
-            - "data-processing-lib/**"
-            - "!transforms/packaging/ray/**/kfp_ray/**" # This is/will be tested in separate workflow
-            - "!data-processing-lib/**/test/**"
-            - "!data-processing-lib/**/test-data/**"
             - "!**.md"
             - "!**/doc/**"
             - "!**/images/**"

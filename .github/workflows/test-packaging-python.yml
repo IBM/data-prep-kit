@@ -10,10 +10,6 @@ on:
             - "*"
         paths:
             - "transforms/packaging/python/**"
-            - "data-processing-lib/**"
-            - "!transforms/packaging/python/**/kfp_ray/**" # This is/will be tested in separate workflow
-            - "!data-processing-lib/**/test/**"
-            - "!data-processing-lib/**/test-data/**"
             - "!**.md"
             - "!**/doc/**"
             - "!**/images/**"
@@ -24,10 +20,6 @@ on:
             - "releases/**"
         paths:
             - "transforms/packaging/python/**"
-            - "data-processing-lib/**"
-            - "!transforms/packaging/python/**/kfp_ray/**" # This is/will be tested in separate workflow
-            - "!data-processing-lib/**/test/**"
-            - "!data-processing-lib/**/test-data/**"
             - "!**.md"
             - "!**/doc/**"
             - "!**/images/**"
