@@ -111,7 +111,7 @@ class RayUtils:
 
         cls_name = clazz.__class__.__name__.replace('ActorClass(', '').replace(')','')
         actors = [operator() for _ in range(n_actors)]
-        for i in range(40):
+        for i in range(60):
             time.sleep(1)
             alive = list_actors(filters=[("class_name", "=", cls_name), ("state", "=", "ALIVE")])
             if len(actors) == len(alive):
