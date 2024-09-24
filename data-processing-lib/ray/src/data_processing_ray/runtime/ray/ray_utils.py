@@ -111,10 +111,12 @@ class RayUtils:
 
         cls_name = clazz.__class__.__name__.replace('ActorClass(', '').replace(')','')
         actors = [operator() for _ in range(n_actors)]
-        time.sleep(5)
-        alive = list_actors(filters=[("class_name", "=", cls_name), ("state", "=", "ALIVE")])
-        if len(actors) == len(alive):
-            return actors
+        for i in range(10):
+            time.sleep(2)
+            alive = list_actors(filters=[("class_name", "=", cls_name), ("state", "=", "ALIVE")])
+            if len(actors) == len(alive):
+                return actors
+        # failed - raise an exception
         print(f"created {actors}, alive {alive}")
         raise UnrecoverableException(f"out of {len(actors)} created classes only {len(alive)} alive")
 
