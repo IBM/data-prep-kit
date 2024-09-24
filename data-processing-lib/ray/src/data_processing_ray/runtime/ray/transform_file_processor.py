@@ -43,7 +43,11 @@ class RayTransformFileProcessor(AbstractTransformFileProcessor):
             raise UnrecoverableException("statistics is None")
         self.transform_params["statistics"] = self.stats
         # Create local processor
-        self.transform = params.get("transform_class", None)(self.transform_params)
+        try:
+            self.transform = params.get("transform_class", None)(self.transform_params)
+        except Exception as e:
+            self.logger.error(f"Exception creating transform  {e}")
+            raise UnrecoverableException("failed creating transform")
 
-    def _publish_stats(self, stats: dict[str, Any]) -> None:
+def _publish_stats(self, stats: dict[str, Any]) -> None:
         self.stats.add_stats.remote(stats)
