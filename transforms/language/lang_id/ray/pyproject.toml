@@ -1,6 +1,6 @@
 [project]
 name = "dpk_lang_id_transform_ray"
-version = "0.2.1"
+version = "0.2.1.dev3"
 requires-python = ">=3.10"
 description = "Language Identification Ray Transform"
 license = {text = "Apache-2.0"}
@@ -9,8 +9,8 @@ authors = [
     { name = "Daiki Tsuzuku", email = "dtsuzuku@jp.ibm.com" }
 ]
 dependencies = [
-    "dpk-lang_id-transform-python==0.2.1",
-    "data-prep-toolkit-ray==0.2.1",
+    "dpk-lang_id-transform-python==0.2.1.dev3",
+    "data-prep-toolkit-ray==0.2.1.dev3",
 ]
 
 [build-system]
