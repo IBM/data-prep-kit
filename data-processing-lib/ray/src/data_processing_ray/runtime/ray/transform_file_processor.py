@@ -49,5 +49,5 @@ class RayTransformFileProcessor(AbstractTransformFileProcessor):
             self.logger.error(f"Exception creating transform  {e}")
             raise UnrecoverableException("failed creating transform")
 
-def _publish_stats(self, stats: dict[str, Any]) -> None:
+    def _publish_stats(self, stats: dict[str, Any]) -> None:
         self.stats.add_stats.remote(stats)

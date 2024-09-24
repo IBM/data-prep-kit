@@ -87,7 +87,11 @@ class PythonPoolTransformFileProcessor(AbstractTransformFileProcessor):
         self.stats = {}
         if self.transform is None:
             # create transform. Make sure to do this locally
-            self.transform = self.transform_class(self.transform_params)
+            try:
+                self.transform = self.transform_class(self.transform_params)
+            except Exception as e:
+                self.logger.error(f"Exception creating transform  {e}")
+                raise UnrecoverableException("failed creating transform")
         # Invoke superclass method
         super().process_file(f_name=f_name)
         # return collected statistics
