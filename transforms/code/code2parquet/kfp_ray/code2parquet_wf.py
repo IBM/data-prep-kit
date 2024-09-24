@@ -21,11 +21,11 @@ from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, Component
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "code2parquet_transform_ray.py"
 
-task_image = "quay.io/dataprep1/data-prep-kit/code2parquet-ray:latest"
+task_image = "quay.io/dataprep1/data-prep-kit/code2parquet-ray:0.2.1"
 
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.1"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../kfp/kfp_ray_components/"
