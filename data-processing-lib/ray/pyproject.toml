@@ -12,7 +12,7 @@ authors = [
 ]
 dependencies = [
     "data-prep-toolkit>=0.2.1.dev3",
-    "ray[default]==2.24.0",
+    "ray[default]==2.36.1",
     # These two are to fix security issues identified by quay.io
     "fastapi>=0.110.2",
     "pillow>=10.3.0",
