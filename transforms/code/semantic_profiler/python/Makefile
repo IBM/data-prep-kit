@@ -48,13 +48,13 @@ run-cli-sample: .transforms.run-cli-python-sample
 
 run-local-sample: .transforms.run-local-sample
 
-# run-local-python-sample: .transforms.run-local-python-sample
+run-local-python-sample: .transforms.run-local-python-sample
 
-run-local-python-sample:
-	$(MAKE) RUN_FILE=sp_local_python.py \
-	RUN_ARGS="--content 'Contents' --language 'Language'" \
-	.transforms.run-local-python-sample
+# run-local-python-sample:
+# 	$(MAKE) RUN_FILE=sp_local_python.py \
+# 	.transforms.run-local-python-sample
 
+# RUN_ARGS="--sp_ikb 'Contents' --language 'Language'" \
 #run-s3-ray-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start

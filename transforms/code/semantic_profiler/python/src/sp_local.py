@@ -13,20 +13,21 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-from transforms.code.semantic_profiler.python.src.sp_transform import SemanticProfilerTransform
+from sp_transform import SemanticProfilerTransform
 
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 
-sp_params = {"sleep_sec": 1}
+sp_params = {"sleep_sec": 1, "ikb_file": "ikb/ikb_model.csv", "null_libs_file": "ikb/null_libs.csv"}
+
 if __name__ == "__main__":
     # Here we show how to run outside of the runtime
     # Create and configure the transform.
     transform = SemanticProfilerTransform(sp_params)
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
-    table, _ = data_access.get_table(os.path.join(input_folder, "test1.parquet"))
+    table, _ = data_access.get_table(os.path.join(input_folder, "test.parquet"))
     print(f"input table: {table}")
     # Transform the table
     table_list, metadata = transform.transform(table)

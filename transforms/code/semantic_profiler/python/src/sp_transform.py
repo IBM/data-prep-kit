@@ -16,6 +16,7 @@ from typing import Any
 import csv
 
 import pyarrow as pa
+import pyarrow.csv as pacsv
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider
 
@@ -24,10 +25,14 @@ short_name = "sp"
 cli_prefix = f"{short_name}_"
 sleep_key = "sleep_sec"
 pwd_key = "pwd"
+ikb_file = "ikb_file"
+null_libs_file = "null_libs_file"
+
 sleep_cli_param = f"{cli_prefix}{sleep_key}"
 pwd_cli_param = f"{cli_prefix}{pwd_key}"
-ikb_file = ""
-null_libs_file = "ikb/null.csv"
+ikb_file_cli_param = f"{cli_prefix}{ikb_file}"
+null_libs_file_cli_param = f"{cli_prefix}{null_libs_file}"
+
 
 
 def process_row(library, language, category, trie):
@@ -83,12 +88,12 @@ class knowledge_base:
     knowledge_base_trie = None
     entries_with_null_coverage = set()
 
-    def __init__(self, ikb_file):
+    def __init__(self, ikb_file, null_libs_file):
         self.knowledge_base_file = ikb_file
         self.null_file = null_libs_file 
 
     def load_ikb_trie(self):
-        self.knowledge_base_table = csv.read_csv(self.knowledge_base_file)
+        self.knowledge_base_table = pacsv.read_csv(self.knowledge_base_file)
         self.knowledge_base_trie = build_knowledge_base_trie(self.knowledge_base_table)
 
     def write_null_files(self):
@@ -109,10 +114,10 @@ def concept_extractor(libraries,language,ikb):
             extracted_base_name = str.lower(library)
             matched_entry = ikb.knowledge_base_trie.search(extracted_base_name, language)
             if matched_entry:
-                concept_coverage.add(matched_entry['Category'])
+                concept_coverage.add(matched_entry['Category'].strip())
             else:
                 ikb.entries_with_null_coverage.add((library,language))
-    return list(concept_coverage)
+    return ','.join(sorted(list(concept_coverage)))
 
 
 
@@ -132,7 +137,8 @@ class SemanticProfilerTransform(AbstractTableTransform):
         # of SemanticProfilerTransformConfiguration class
         super().__init__(config)
         self.sleep = config.get("sleep_sec", 1)
-        self.ikb_file = config.get("ikb_file", "ikb/ikb_model.csv")
+        self.ikb_file = config.get("ikb_file", "src/ikb/ikb_model.csv")
+        self.null_libs_file = config.get("null_libs_file", "src/ikb/null_libs.csv")
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -143,7 +149,7 @@ class SemanticProfilerTransform(AbstractTableTransform):
         """
         self.logger.debug(f"Transforming one table with {len(table)} rows")
 
-        ikb = knowledge_base(self.ikb_file)
+        ikb = knowledge_base(self.ikb_file, self.null_libs_file)
         ikb.load_ikb_trie()
 
         libraries = table.column('Library').to_pylist()
@@ -204,10 +210,17 @@ class SemanticProfilerTransformConfiguration(TransformConfiguration):
         )
 
         parser.add_argument(
-            f"--{ikb_file}",
+            f"--{ikb_file_cli_param}",
             type=str,
             default="ikb/ikb_model.csv",
             help="Default IKB file",
+        )
+
+        parser.add_argument(
+            f"--{null_libs_file_cli_param}",
+            type=str,
+            default="ikb/null_libs.csv",
+            help="Default Null Libraries file",
         )
 
 

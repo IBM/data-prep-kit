@@ -15,7 +15,7 @@ import sys
 
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
-from transforms.code.semantic_profiler.python.src.sp_transform_python import SemanticProfilerPythonTransformConfiguration
+from sp_transform_python import SemanticProfilerPythonTransformConfiguration
 
 
 # create parameters
@@ -35,6 +35,9 @@ params = {
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # sp params
     "sp_sleep_sec": 1,
+    "sp_ikb_file": "ikb/ikb_model.csv",
+    "sp_null_libs_file": "ikb/null_libs.csv"
+    
 }
 if __name__ == "__main__":
     # Set the simulated command line args

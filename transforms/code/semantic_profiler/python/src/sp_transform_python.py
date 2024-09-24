@@ -17,7 +17,7 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.utils import get_logger
-from transforms.code.semantic_profiler.python.src.sp_transform import SemanticProfilerTransformConfiguration
+from sp_transform import SemanticProfilerTransformConfiguration
 
 
 logger = get_logger(__name__)
