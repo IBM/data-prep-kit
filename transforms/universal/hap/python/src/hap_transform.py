@@ -102,20 +102,6 @@ class HAPTransform(AbstractTableTransform):
         self.df['hap_score'] = df_doc_scores
         print(self.df)
         
-        """  
-        # double check again to see if we have got all the hap_scores for the entire self.df
-        if len(hap_scores_list) != num_rows:
-            raise RuntimeError(
-                f"something is wrong: The len(hap_scores_list) {len(hap_scores_list)}"
-                f"is not the same as num_rows: {num_rows} in self.df"
-            )
-        self.df[self.annotation_column] = hap_scores_list
-        self.df.sort_values(by=["df_index"], inplace=True)
-        self.df.reset_index(drop=True, inplace=True)
-        # drop the sentence_length column before writing df to a parquet file
-        columns_to_drop = ["sentence_len", "df_index"]
-        self.df.drop(columns=columns_to_drop, inplace=True)
-        """
         out_table = pa.Table.from_pandas(self.df)
         metadata = {}
         return [out_table], metadata
