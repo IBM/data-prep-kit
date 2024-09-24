@@ -19,7 +19,7 @@ Given that the transforms do not currently have their own name spaces, the first
 
 
 ````
-cd package-release/transforms/packaging
+cd transforms/packaging
 make clean
 make src
 ````
@@ -29,7 +29,7 @@ make src
 This procedure will run all the UT for each individual transforms using a single package configuration:
 
 ````
-cd package-release/transforms/packaging
+cd transforms/packaging
 make clean
 make src
 make test-src
@@ -40,7 +40,7 @@ make test-src
 This procedure will buid two wheels: one for the python transforms and one for the ray transforms.
 
 ````
-cd package-release/transforms/packaging
+cd transforms/packaging
 make clean
 make src
 make build-dist
