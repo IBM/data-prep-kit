@@ -1,6 +1,6 @@
 [project]
 name = "dpk_html2parquet_transform_python"
-version = "0.2.1"
+version = "0.2.2.dev0"
 requires-python = ">=3.10"
 description = "HTML2PARQUET Python Transform"
 license = {text = "Apache-2.0"}
@@ -10,7 +10,7 @@ authors = [
     { name = "Syed Zawad", email = "szawad@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit==0.2.1",
+    "data-prep-toolkit==0.2.2.dev0",
     "trafilatura==1.12.0"
 
 ]

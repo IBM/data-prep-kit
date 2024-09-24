@@ -1,6 +1,6 @@
 [project]
 name = "dpk_doc_quality_transform_python"
-version = "0.2.1"
+version = "0.2.2.dev0"
 requires-python = ">=3.10"
 description = "Document Quality Python Transform"
 license = {text = "Apache-2.0"}
@@ -9,7 +9,7 @@ authors = [
     { name = "Daiki Tsuzuku", email = "dtsuzuku@jp.ibm.com" }
 ]
 dependencies = [
-    "data-prep-toolkit==0.2.1",
+    "data-prep-toolkit==0.2.2.dev0",
 ]
 
 [build-system]
