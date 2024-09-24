@@ -17,13 +17,13 @@ import kfp.dsl as dsl
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/noop-ray:latest"
+task_image = "quay.io/dataprep1/data-prep-kit/noop-ray:0.2.1"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "noop_transform_ray.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.1"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../kfp/kfp_ray_components/"
