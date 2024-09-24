@@ -11,11 +11,11 @@
 ################################################################################
 
 import logging
-import sys
 import time
 from typing import Any
 
 import ray
+from ray.experimental.state.api import list_actors
 from data_processing.utils import GB, UnrecoverableException
 from ray.actor import ActorHandle
 from ray.exceptions import RayError
@@ -109,7 +109,14 @@ class RayUtils:
             time.sleep(creation_delay)
             return clazz.options(**actor_options).remote(params)
 
-        return [operator() for _ in range(n_actors)]
+        cls_name = clazz.__class__.__name__.replace('ActorClass(', '').replace(')','')
+        actors = [operator() for _ in range(n_actors)]
+        time.sleep(1)
+        alive = list_actors(filters=[("class_name", "=", cls_name), ("state", "=", "ALIVE")])
+        if len(actors) == len(alive):
+            return actors
+        print(f"created {actors}, alive {alive}")
+        raise UnrecoverableException(f"out of {len(actors)} created classes only {len(alive)} alive")
 
     @staticmethod
     def process_files(
@@ -220,6 +227,7 @@ class RayUtils:
     def wait_for_execution_completion(logger: logging.Logger, replies: list[ray.ObjectRef]) -> int:
         """
         Wait for all requests completed
+        :param logger: logger to use
         :param replies: list of request futures
         :return: None
         """
