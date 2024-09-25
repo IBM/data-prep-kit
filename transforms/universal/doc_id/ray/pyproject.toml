@@ -1,6 +1,6 @@
 [project]
 name = "dpk_doc_id_transform_ray"
-version = "0.2.1.dev3"
+version = "0.2.1"
 requires-python = ">=3.10"
 description = "docid Ray Transform"
 license = {text = "Apache-2.0"}
@@ -10,8 +10,8 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
 dependencies = [
-    "dpk_doc_id_transform_python==0.2.1.dev3",
-    "data-prep-toolkit-ray==0.2.1.dev3"
+    "dpk_doc_id_transform_python==0.2.1",
+    "data-prep-toolkit-ray==0.2.1"
 ]
 
 [build-system]

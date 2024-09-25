@@ -1,6 +1,6 @@
 [project]
 name = "dpk_text_encoder_transform_ray"
-version = "0.2.1.dev3"
+version = "0.2.1"
 requires-python = ">=3.10"
 description = "Text Encoder Ray Transform"
 license = {text = "Apache-2.0"}
@@ -11,8 +11,8 @@ authors = [
     { name = "Peter Staar", email = "taa@zurich.ibm.com" },
 ]
 dependencies = [
-    "dpk-text_encoder-transform-python==0.2.1.dev3",
-    "data-prep-toolkit-ray==0.2.1.dev3",
+    "dpk-text_encoder-transform-python==0.2.1",
+    "data-prep-toolkit-ray==0.2.1",
 ]
 
 [build-system]
@@ -33,7 +33,7 @@ dev = [
 ]
 
 [options]
-package_dir = ["src","test"]
+package_dir = ["src"]
 
 [options.packages.find]
 where = ["src/"]
