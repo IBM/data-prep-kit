@@ -10,7 +10,7 @@
 # limitations under the License.
 ################################################################################
 
-from data_processing.utils import CLIArgumentProvider, get_logger
+from data_processing.utils import get_logger
 from data_processing_ray.runtime.ray import RayTransformLauncher
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
@@ -31,7 +31,6 @@ class NOOPRayTransformConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
         """
         Initialization
-        :param base_configuration - base configuration class
         """
         super().__init__(transform_config=NOOPTransformConfiguration())
 
