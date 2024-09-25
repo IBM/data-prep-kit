@@ -32,7 +32,7 @@ dev = [
 ]
 
 [options]
-package_dir = ["src","test"]
+package_dir = ["src"]
 
 [options.packages.find]
 where = ["src/"]
