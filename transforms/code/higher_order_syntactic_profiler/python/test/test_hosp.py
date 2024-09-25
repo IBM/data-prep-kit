@@ -16,7 +16,7 @@ from data_processing.test_support import get_tables_in_folder
 from data_processing.test_support.transform.table_transform_test import (
     AbstractTableTransformTest,
 )
-from sp_transform import SemanticProfilerTransform, null_libs_file, ikb_file
+from hosp_transform import HigherOrderSyntacticProfilerTransform, metrics_list
 
 
 # table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})
@@ -24,7 +24,7 @@ from sp_transform import SemanticProfilerTransform, null_libs_file, ikb_file
 # expected_metadata_list = [{"nfiles": 1, "nrows": 1}, {}]  # transform() result  # flush() result
 
 
-class TestSemanticProfilerTransform(AbstractTableTransformTest):
+class TestHigherOrderSyntacticProfilerTransform(AbstractTableTransformTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -38,8 +38,8 @@ class TestSemanticProfilerTransform(AbstractTableTransformTest):
         expected_tables = get_tables_in_folder(expected_dir)
         
         expected_metadata_list = [{"nfiles": 1, "nrows": len(expected_tables[0])}, {}]
-        config = {ikb_file:"../src/ikb/ikb_model.csv", null_libs_file:"../src/ikb/null_libs.csv"}
+        config = {metrics_list: ["CCR"]}
         fixtures = [
-            (SemanticProfilerTransform(config), input_tables, expected_tables, expected_metadata_list),
+            (HigherOrderSyntacticProfilerTransform(config), input_tables, expected_tables, expected_metadata_list),
         ]
         return fixtures

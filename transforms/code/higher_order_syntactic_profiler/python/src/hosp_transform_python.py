@@ -17,13 +17,13 @@ from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.utils import get_logger
-from transforms.code.higher_order_syntactic_profiler.python.src.hosp_transform import SemanticProfilerTransformConfiguration
+from hosp_transform import HigherOrderSyntacticProfilerTransformConfiguration
 
 
 logger = get_logger(__name__)
 
 
-class SemanticProfilerPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
+class HigherOrderSyntacticProfilerPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
     """
     Implements the PythonTransformConfiguration for SemanticProfiler as required by the PythonTransformLauncher.
     SemanticProfiler does not use a RayRuntime class so the superclass only needs the base
@@ -35,11 +35,11 @@ class SemanticProfilerPythonTransformConfiguration(PythonTransformRuntimeConfigu
         Initialization
         :param base_configuration - base configuration class
         """
-        super().__init__(transform_config=SemanticProfilerTransformConfiguration())
+        super().__init__(transform_config=HigherOrderSyntacticProfilerTransformConfiguration())
 
 
 if __name__ == "__main__":
     # launcher = SemanticProfilerRayLauncher()
-    launcher = PythonTransformLauncher(SemanticProfilerPythonTransformConfiguration())
-    logger.info("Launching sp transform")
+    launcher = PythonTransformLauncher(HigherOrderSyntacticProfilerPythonTransformConfiguration())
+    logger.info("Launching hosp transform")
     launcher.launch()

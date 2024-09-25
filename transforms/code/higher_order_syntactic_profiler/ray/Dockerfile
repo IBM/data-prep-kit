@@ -23,10 +23,10 @@ COPY --chown=ray:users pyproject.toml pyproject.toml
 RUN pip install --no-cache-dir -e .
 
 # copy the main() entry point to the image 
-COPY ./src/sp_transform_ray.py .
+COPY ./src/hosp_transform_ray.py .
 
 # copy some of the samples in
-COPY ./src/sp_local_ray.py local/
+COPY ./src/hosp_local_ray.py local/
 
 # copy test
 COPY test/ test/

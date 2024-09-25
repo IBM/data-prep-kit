@@ -8,7 +8,7 @@ REPOROOT=../../../..
 # $(REPOROOT)/.make.versions file contains the versions
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_NAME=sp
+TRANSFORM_NAME=hosp
 
 
 venv::	.transforms.python-venv
@@ -33,7 +33,7 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(SP_PYTHON_VERSION) TOML_VERSION=$(SP_PYTHON_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(HOSP_PYTHON_VERSION) TOML_VERSION=$(HOSP_PYTHON_VERSION) .transforms.set-versions 
         
 build-dist:: .defaults.build-dist 
 

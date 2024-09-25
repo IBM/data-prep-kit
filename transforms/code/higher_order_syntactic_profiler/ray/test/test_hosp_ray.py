@@ -16,11 +16,11 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from sp_transform import ikb_file_cli_param,null_libs_file_cli_param
-from sp_transform_ray import SemanticProfilerRayTransformConfiguration
+from hosp_transform import hosp_metrics_cli_param
+from hosp_transform_ray import HigherOrderSyntacticProfilerRayTransformConfiguration
 
 
-class TestRaySemanticProfilerTransform(AbstractTransformLauncherTest):
+class TestRayHigherOrderSyntacticProfilerTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -30,11 +30,11 @@ class TestRaySemanticProfilerTransform(AbstractTransformLauncherTest):
         src_file_dir = os.path.abspath(os.path.dirname(__file__))
         fixtures = []
 
-        launcher = RayTransformLauncher(SemanticProfilerRayTransformConfiguration())
+        launcher = RayTransformLauncher(HigherOrderSyntacticProfilerRayTransformConfiguration())
         input_dir = os.path.join(src_file_dir, "../test-data/input")
         expected_dir = os.path.join(src_file_dir, "../test-data/expected")
         runtime_config = {"run_locally": True}
-        transform_config = {ikb_file_cli_param:"../src/ikb/ikb_model.csv", null_libs_file_cli_param: "../src/ikb/null_libs.csv"}
+        transform_config = {hosp_metrics_cli_param: ["CCR"]}
         fixtures.append(
             (
                 launcher,

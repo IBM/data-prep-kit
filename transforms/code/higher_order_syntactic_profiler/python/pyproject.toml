@@ -1,8 +1,8 @@
 [project]
-name = "dpk_sp_transform_python"
+name = "dpk_hosp_transform_python"
 version = "0.2.1.dev0"
 requires-python = ">=3.10"
-description = "SemanticProfiler Python Transform"
+description = "Higher Order Syntactic Profiler Python Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -11,6 +11,8 @@ authors = [
 ]
 dependencies = [
     "data-prep-toolkit==0.2.1.dev0",
+    "networkx==3.0.0",
+    "matplotlib"
 ]
 
 [build-system]

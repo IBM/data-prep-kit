@@ -15,7 +15,7 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from sp_transform_ray import SemanticProfilerRayTransformConfiguration
+from hosp_transform_ray import HigherOrderSyntacticProfilerRayTransformConfiguration
 
 
 # create parameters
@@ -39,14 +39,13 @@ params = {
     "runtime_job_id": "job_id",
     "runtime_creation_delay": 0,
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
-    # noop params
-    "sp_ikb_file": "ikb/ikb_model.csv",
-    "sp_null_libs_file": "ikb/null_libs.csv"
+    # hosp params
+    "hosp_metrics_list": ["CCR"]
 }
 if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = RayTransformLauncher(SemanticProfilerRayTransformConfiguration())
+    launcher = RayTransformLauncher(HigherOrderSyntacticProfilerRayTransformConfiguration())
     # Launch the ray actor(s) to process the input
     launcher.launch()

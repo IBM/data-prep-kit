@@ -13,18 +13,18 @@
 import os
 
 from data_processing.data_access import DataAccessLocal
-from transforms.code.higher_order_syntactic_profiler.python.src.hosp_transform import SemanticProfilerTransform
+from hosp_transform import HigherOrderSyntacticProfilerTransform
 
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 
-sp_params = {"ikb_file": "src/ikb/ikb_model.csv", "null_libs_file": "src/ikb/null_libs.csv"}
+hosp_params = {"metrics_list": ["CCR"]}
 
 if __name__ == "__main__":
     # Here we show how to run outside of the runtime
     # Create and configure the transform.
-    transform = SemanticProfilerTransform(sp_params)
+    transform = HigherOrderSyntacticProfilerTransform(hosp_params)
     # Use the local data access to read a parquet table.
     data_access = DataAccessLocal()
     table, _ = data_access.get_table(os.path.join(input_folder, "test.parquet"))

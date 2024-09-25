@@ -9,7 +9,7 @@ def generateResponseWatsonx(api_key, api_endpoint, model_id, project_id, input_t
     credentials = Credentials(api_key=api_key, url=api_endpoint)
     parameters = {
         GenParams.DECODING_METHOD: "greedy",
-        GenParams.MAX_NEW_TOKENS: 1000,
+        GenParams.MAX_NEW_TOKENS: 100,
         GenParams.STOP_SEQUENCES: ["<end>"]
     }
     model = ModelInference(

@@ -16,8 +16,8 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from sp_transform import ikb_file_cli_param, null_libs_file_cli_param
-from sp_transform_python import SemanticProfilerPythonTransformConfiguration
+from hosp_transform import hosp_metrics_cli_param
+from hosp_transform_python import HigherOrderSyntacticProfilerPythonTransformConfiguration
 
 
 class TestPythonSemanticProfilerTransform(AbstractTransformLauncherTest):
@@ -30,11 +30,11 @@ class TestPythonSemanticProfilerTransform(AbstractTransformLauncherTest):
         src_file_dir = os.path.abspath(os.path.dirname(__file__))
         fixtures = []
 
-        launcher = PythonTransformLauncher(SemanticProfilerPythonTransformConfiguration())
+        launcher = PythonTransformLauncher(HigherOrderSyntacticProfilerPythonTransformConfiguration())
         input_dir = os.path.join(src_file_dir, "../test-data/input")
         expected_dir = os.path.join(src_file_dir, "../test-data/expected")
 
-        transform_config = {ikb_file_cli_param:"../src/ikb/ikb_model.csv", null_libs_file_cli_param: "../src/ikb/null_libs.csv"}
+        transform_config = {hosp_metrics_cli_param: ["CCR"]}
         fixtures.append(
             (
                 launcher,

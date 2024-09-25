@@ -7,7 +7,7 @@ REPOROOT=../../../..
 
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_NAME=sp
+TRANSFORM_NAME=hosp
 
 BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
@@ -34,7 +34,7 @@ setup:: .transforms.setup
 
 # set the version of python transform that this depends on.
 set-versions: 
-	$(MAKE) TRANSFORM_PYTHON_VERSION=${SP_PYTHON_VERSION} TOML_VERSION=$(SP_RAY_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=${HOSP_PYTHON_VERSION} TOML_VERSION=$(HOSP_RAY_VERSION) .transforms.set-versions 
         
 build-dist:: .defaults.build-dist 
 
