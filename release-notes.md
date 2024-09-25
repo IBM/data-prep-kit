@@ -6,7 +6,7 @@
 1. Bug fixes across the repo
 1. Added AI Alliance RAG demo, tutorials and notebooks and tips for running on google colab
 1. Added new transforms and single package for transforms published to pypi
-1. improved CI/CD with targeted workflow triggered on specific changes to specific modules
+1. Improved CI/CD with targeted workflow triggered on specific changes to specific modules
 1. New enhancements for cutting a release
 
 
@@ -15,19 +15,14 @@
 1. Restructure the repository to distinguish/separate runtime libraries
 1. Split data-processing-lib/ray into python and ray
 1. Spark runtime
-1. updated pyarrow version
-1. define required transform() method as abstract to AbstractTableTransform
+1. Updated pyarrow version
+1. Define required transform() method as abstract to AbstractTableTransform
 1. Enables configuration of makefile to use src or pypi for data-prep-kit library dependencies 
 
 
 ### KFP Workloads 
 
-1. Update kfp image version 
-1. Enable kfp in GH action for testing randomly selected workflow and prevent kfp test for transforms that do not support it
-1. Auto generate kfp pipelines
-1. Combine the common KFP support code in a shared library
-1. Update K8s cluster deployment and remove creation of clusterrolebinding in kubeflow installation
-
+1. Add a configurable timeout before destroying the deployed Ray cluster.
 
 ### Transforms
 
