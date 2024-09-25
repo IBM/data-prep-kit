@@ -27,7 +27,7 @@ Once the components are implemented we also implement their interfaces as a comp
 
 * The component’s inputs and outputs.
 * The container image that your component’s code runs in, the command to use to run your component’s code, and the 
-command-line arguments to pass to your component’s code99.
+command-line arguments to pass to your component’s code.
 * The component’s metadata, such as the name and description.
 
 Components specifications are provided here:

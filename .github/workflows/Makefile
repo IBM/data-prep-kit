@@ -11,7 +11,7 @@ LANG_TRANSFORMS=doc_chunk doc_quality lang_id pdf2parquet pii_redactor text_enco
 KFP_BLACK_LIST="doc_chunk,pdf2parquet,pii_redactor"
 
 transform-tests:
-	$(MAKE) TRANSFORM_SUBDIR=universal .transform-tests .transform-kfp-tests
+	$(MAKE) TRANSFORM_SUBDIR=universal .transform-tests 
 	$(MAKE) TRANSFORM_SUBDIR=universal .transform-kfp-tests
 	$(MAKE) TRANSFORM_SUBDIR=language .transform-tests 
 	$(MAKE) TRANSFORM_SUBDIR=language .transform-kfp-tests
