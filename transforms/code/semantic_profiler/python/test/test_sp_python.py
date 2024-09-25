@@ -16,7 +16,7 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from sp_transform import sleep_cli_param, ikb_file_cli_param, null_libs_file_cli_param
+from sp_transform import ikb_file_cli_param, null_libs_file_cli_param
 from sp_transform_python import SemanticProfilerPythonTransformConfiguration
 
 
@@ -34,7 +34,7 @@ class TestPythonSemanticProfilerTransform(AbstractTransformLauncherTest):
         input_dir = os.path.join(src_file_dir, "../test-data/input")
         expected_dir = os.path.join(src_file_dir, "../test-data/expected")
 
-        transform_config = {sleep_cli_param: 0, ikb_file_cli_param:"src/ikb/ikb_model.csv", null_libs_file_cli_param: "src/ikb/null_libs.csv"}
+        transform_config = {ikb_file_cli_param:"src/ikb/ikb_model.csv", null_libs_file_cli_param: "src/ikb/null_libs.csv"}
         fixtures.append(
             (
                 launcher,

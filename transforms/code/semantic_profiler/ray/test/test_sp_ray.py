@@ -9,22 +9,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+
 import os
 
-import pyarrow as pa
-from data_processing.test_support import get_tables_in_folder
-from data_processing.test_support.transform.table_transform_test import (
-    AbstractTableTransformTest,
+from data_processing.test_support.launch.transform_test import (
+    AbstractTransformLauncherTest,
 )
-from sp_transform import SemanticProfilerTransform, null_libs_file, ikb_file
+from data_processing_ray.runtime.ray import RayTransformLauncher
+from sp_transform import ikb_file_cli_param,null_libs_file_cli_param
+from sp_transform_ray import SemanticProfilerRayTransformConfiguration
 
 
-# table = pa.Table.from_pydict({"name": pa.array(["Tom"]), "age": pa.array([23])})
-# expected_table = table  # We're a sp after all.
-# expected_metadata_list = [{"nfiles": 1, "nrows": 1}, {}]  # transform() result  # flush() result
-
-
-class TestSemanticProfilerTransform(AbstractTableTransformTest):
+class TestRayNOOPTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -32,14 +28,20 @@ class TestSemanticProfilerTransform(AbstractTableTransformTest):
 
     def get_test_transform_fixtures(self) -> list[tuple]:
         src_file_dir = os.path.abspath(os.path.dirname(__file__))
+        fixtures = []
+
+        launcher = RayTransformLauncher(SemanticProfilerRayTransformConfiguration())
         input_dir = os.path.join(src_file_dir, "../test-data/input")
         expected_dir = os.path.join(src_file_dir, "../test-data/expected")
-        input_tables = get_tables_in_folder(input_dir)
-        expected_tables = get_tables_in_folder(expected_dir)
-        
-        expected_metadata_list = [{"nfiles": 1, "nrows": len(expected_tables[0])}, {}]
-        config = {ikb_file:"src/ikb/ikb_model.csv", null_libs_file:"src/ikb/null_libs.csv"}
-        fixtures = [
-            (SemanticProfilerTransform(config), input_tables, expected_tables, expected_metadata_list),
-        ]
+        runtime_config = {"run_locally": True}
+        transform_config = {ikb_file_cli_param:"src/ikb/ikb_model.csv", null_libs_file_cli_param: "src/ikb/null_libs.csv"}
+        fixtures.append(
+            (
+                launcher,
+                transform_config | runtime_config,
+                input_dir,
+                expected_dir,
+                [],  # optional list of column names to ignore in comparing test-generated with expected.
+            )
+        )
         return fixtures

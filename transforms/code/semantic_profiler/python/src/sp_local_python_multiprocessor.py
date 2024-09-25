@@ -35,7 +35,6 @@ params = {
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     "runtime_num_processors": 2,
     # sp params
-    "sp_sleep_sec": 1,
     "sp_ikb_file": "ikb/ikb_model.csv",
     "sp_null_libs_file": "ikb/null_libs.csv"
 }

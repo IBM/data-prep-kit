@@ -19,7 +19,7 @@ from sp_transform import SemanticProfilerTransform
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 
-sp_params = {"sleep_sec": 1, "ikb_file": "ikb/ikb_model.csv", "null_libs_file": "ikb/null_libs.csv"}
+sp_params = {"ikb_file": "ikb/ikb_model.csv", "null_libs_file": "ikb/null_libs.csv"}
 
 if __name__ == "__main__":
     # Here we show how to run outside of the runtime

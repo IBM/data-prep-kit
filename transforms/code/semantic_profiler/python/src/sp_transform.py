@@ -23,13 +23,13 @@ from data_processing.utils import CLIArgumentProvider
 
 short_name = "sp"
 cli_prefix = f"{short_name}_"
-sleep_key = "sleep_sec"
-pwd_key = "pwd"
+# sleep_key = "sleep_sec"
+# pwd_key = "pwd"
 ikb_file = "ikb_file"
 null_libs_file = "null_libs_file"
 
-sleep_cli_param = f"{cli_prefix}{sleep_key}"
-pwd_cli_param = f"{cli_prefix}{pwd_key}"
+# sleep_cli_param = f"{cli_prefix}{sleep_key}"
+# pwd_cli_param = f"{cli_prefix}{pwd_key}"
 ikb_file_cli_param = f"{cli_prefix}{ikb_file}"
 null_libs_file_cli_param = f"{cli_prefix}{null_libs_file}"
 
@@ -136,7 +136,7 @@ class SemanticProfilerTransform(AbstractTableTransform):
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of SemanticProfilerTransformConfiguration class
         super().__init__(config)
-        self.sleep = config.get("sleep_sec", 1)
+        # self.sleep = config.get("sleep_sec", 1)
         self.ikb_file = config.get("ikb_file", "src/ikb/ikb_model.csv")
         self.null_libs_file = config.get("null_libs_file", "src/ikb/null_libs.csv")
 
@@ -159,10 +159,10 @@ class SemanticProfilerTransform(AbstractTableTransform):
         table = table.append_column('Concepts', new_col)
         ikb.write_null_files()
 
-        if self.sleep is not None:
-            self.logger.info(f"Sleep for {self.sleep} seconds")
-            time.sleep(self.sleep)
-            self.logger.info("Sleep completed - continue")
+        # if self.sleep is not None:
+        #     self.logger.info(f"Sleep for {self.sleep} seconds")
+        #     time.sleep(self.sleep)
+        #     self.logger.info("Sleep completed - continue")
         # Add some sample metadata.
         self.logger.debug(f"Transformed one table with {len(table)} rows")
         metadata = {"nfiles": 1, "nrows": len(table)}
@@ -180,7 +180,7 @@ class SemanticProfilerTransformConfiguration(TransformConfiguration):
         super().__init__(
             name=short_name,
             transform_class=SemanticProfilerTransform,
-            remove_from_metadata=[pwd_key],
+            # remove_from_metadata=[pwd_key],
         )
         from data_processing.utils import get_logger
 
@@ -193,21 +193,21 @@ class SemanticProfilerTransformConfiguration(TransformConfiguration):
         By convention a common prefix should be used for all transform-specific CLI args
         (e.g, sp_, pii_, etc.)
         """
-        parser.add_argument(
-            f"--{sleep_cli_param}",
-            type=int,
-            default=1,
-            help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
-        )
-        # An example of a command line option that we don't want included
-        # in the metadata collected by the Ray orchestrator
-        # See below for remove_from_metadata addition so that it is not reported.
-        parser.add_argument(
-            f"--{pwd_cli_param}",
-            type=str,
-            default="nothing",
-            help="A dummy password which should be filtered out of the metadata",
-        )
+        # parser.add_argument(
+        #     f"--{sleep_cli_param}",
+        #     type=int,
+        #     default=1,
+        #     help="Sleep actor for a number of seconds while processing the data frame, before writing the file to COS",
+        # )
+        # # An example of a command line option that we don't want included
+        # # in the metadata collected by the Ray orchestrator
+        # # See below for remove_from_metadata addition so that it is not reported.
+        # parser.add_argument(
+        #     f"--{pwd_cli_param}",
+        #     type=str,
+        #     default="nothing",
+        #     help="A dummy password which should be filtered out of the metadata",
+        # )
 
         parser.add_argument(
             f"--{ikb_file_cli_param}",
@@ -231,9 +231,9 @@ class SemanticProfilerTransformConfiguration(TransformConfiguration):
         :return: True, if validate pass or False otherwise
         """
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
-        if captured.get(sleep_key) < 0:
-            print(f"Parameter sp_sleep_sec should be non-negative. you specified {args.sp_sleep_sec}")
-            return False
+        # if captured.get(sleep_key) < 0:
+        #     print(f"Parameter sp_sleep_sec should be non-negative. you specified {args.sp_sleep_sec}")
+        #     return False
 
         self.params = self.params | captured
         self.logger.info(f"sp parameters are : {self.params}")
