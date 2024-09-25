@@ -1,4 +1,5 @@
 ARG BASE_IMAGE=quay.io/dataprep1/data-prep-kit/data-prep-kit-spark-3.5.2:latest
+ARG BASE_IMAGE=data-prep-kit-spark-3.5.2:0.2.1
 FROM ${BASE_IMAGE}
 
 USER root
