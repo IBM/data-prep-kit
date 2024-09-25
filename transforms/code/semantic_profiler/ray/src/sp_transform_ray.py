@@ -38,6 +38,6 @@ class SemanticProfilerRayTransformConfiguration(RayTransformRuntimeConfiguration
 
 if __name__ == "__main__":
     # launcher = NOOPRayLauncher()
-    launcher = RayTransformLauncher(SemanticProfilerTransformConfiguration())
+    launcher = RayTransformLauncher(SemanticProfilerRayTransformConfiguration())
     logger.info("Launching sp transform")
     launcher.launch()

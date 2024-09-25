@@ -20,7 +20,7 @@ from sp_transform import ikb_file_cli_param,null_libs_file_cli_param
 from sp_transform_ray import SemanticProfilerRayTransformConfiguration
 
 
-class TestRayNOOPTransform(AbstractTransformLauncherTest):
+class TestRaySemanticProfilerTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
@@ -34,7 +34,7 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
         input_dir = os.path.join(src_file_dir, "../test-data/input")
         expected_dir = os.path.join(src_file_dir, "../test-data/expected")
         runtime_config = {"run_locally": True}
-        transform_config = {ikb_file_cli_param:"src/ikb/ikb_model.csv", null_libs_file_cli_param: "src/ikb/null_libs.csv"}
+        transform_config = {ikb_file_cli_param:"../src/ikb/ikb_model.csv", null_libs_file_cli_param: "../src/ikb/null_libs.csv"}
         fixtures.append(
             (
                 launcher,

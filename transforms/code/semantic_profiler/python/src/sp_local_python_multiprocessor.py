@@ -35,8 +35,8 @@ params = {
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     "runtime_num_processors": 2,
     # sp params
-    "sp_ikb_file": "ikb/ikb_model.csv",
-    "sp_null_libs_file": "ikb/null_libs.csv"
+    "sp_ikb_file": "src/ikb/ikb_model.csv",
+    "sp_null_libs_file": "src/ikb/null_libs.csv"
 }
 if __name__ == "__main__":
     # Set the simulated command line args

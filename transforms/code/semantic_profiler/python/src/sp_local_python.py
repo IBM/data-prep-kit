@@ -34,8 +34,8 @@ params = {
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # sp params
-    "sp_ikb_file": "ikb/ikb_model.csv",
-    "sp_null_libs_file": "ikb/null_libs.csv"
+    "sp_ikb_file": "src/ikb/ikb_model.csv",
+    "sp_null_libs_file": "src/ikb/null_libs.csv"
     
 }
 if __name__ == "__main__":

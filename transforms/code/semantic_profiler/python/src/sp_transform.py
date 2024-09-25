@@ -137,8 +137,8 @@ class SemanticProfilerTransform(AbstractTableTransform):
         # of SemanticProfilerTransformConfiguration class
         super().__init__(config)
         # self.sleep = config.get("sleep_sec", 1)
-        self.ikb_file = config.get("ikb_file", "src/ikb/ikb_model.csv")
-        self.null_libs_file = config.get("null_libs_file", "src/ikb/null_libs.csv")
+        self.ikb_file = config.get("ikb_file", "../src/ikb/ikb_model.csv")
+        self.null_libs_file = config.get("null_libs_file", "../src/ikb/null_libs.csv")
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """

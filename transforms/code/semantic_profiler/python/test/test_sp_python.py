@@ -34,7 +34,7 @@ class TestPythonSemanticProfilerTransform(AbstractTransformLauncherTest):
         input_dir = os.path.join(src_file_dir, "../test-data/input")
         expected_dir = os.path.join(src_file_dir, "../test-data/expected")
 
-        transform_config = {ikb_file_cli_param:"src/ikb/ikb_model.csv", null_libs_file_cli_param: "src/ikb/null_libs.csv"}
+        transform_config = {ikb_file_cli_param:"../src/ikb/ikb_model.csv", null_libs_file_cli_param: "../src/ikb/null_libs.csv"}
         fixtures.append(
             (
                 launcher,
