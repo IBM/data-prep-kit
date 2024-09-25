@@ -1,4 +1,4 @@
-data-prep-toolkit>=0.2.1.dev3
+data-prep-toolkit>=0.2.2.dev0
 bs4==0.0.2
 #pdf2parquet
 # conflict with chunking....
