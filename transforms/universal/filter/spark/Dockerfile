@@ -1,5 +1,5 @@
-ARG SPARK_BASE_IMAGE=data-prep-kit-spark-3.5.2:latest
-FROM ${SPARK_BASE_IMAGE}
+ARG BASE_IMAGE=data-prep-kit-spark-3.5.2:latest
+FROM ${BASE_IMAGE}
 
 USER root
 # install pytest
