@@ -1,5 +1,5 @@
-ARG BASE_IMAGE=quay.io/dataprep1/data-prep-kit/data-prep-kit-spark-3.5.2:latest
-FROM ${BASE_IMAGE}
+ARG SPARK_BASE_IMAGE=data-prep-kit-spark-3.5.2:latest
+FROM ${SPARK_BASE_IMAGE}
 
 USER root
 # install pytest
