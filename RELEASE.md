@@ -1,12 +1,12 @@
 # Release Management
 
 ## Overview 
-Release are created from the main repository branch using the version
+Releases are created from the main repository branch using the version
 numbers, including an intermediate version suffix, 
-defined in `.make.versions`
+defined in `.make.versions`.
 The following points are important:
 
-1. In general, common a version number is used for all published pypi wheels and docker images.
+1. In general, a common version number is used for all published pypi wheels and docker images.
 1. `.make.versions` contains the version to be used when publishing the **next** release. 
 1. Whenever `.make.versions` is changed, `make set-versions` should be run from the top of the repo.
    1. Corollary: `make set-versions` should ONLY be used from the top of the repo when `.make.versions` changes.
@@ -21,8 +21,8 @@ allows intermediate publishing from the main branch using version X.Y.Z.dev\<N\>
 Creating the release involves
 
 1. Edit the `release-notes.md` to list major/minor changes
-1. Creating a release branch and tag and updating the main branch versions.
-1. Creating a github release from the release branch and tag.
+1. Creating a release branch and updating the main branch versions (using `release-branch.sh`).
+1. Creating a github release and tag from the release branch.
 1. Building and publishing pypi library wheels and docker registry image.
 
 Each is discussed below.
