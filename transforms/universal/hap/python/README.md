@@ -2,7 +2,7 @@
 Please see the set of [transform project conventions](https://github.com/ian-cho/data-prep-kit/blob/dev/transforms/README.md) for details on general project conventions, transform configuration, testing and IDE set up.
 
 ## Prerequisite
-This repo needs NLTK and please `pip install -r requirements.txt` to install NLTK.
+This repo needs NLTK and please refer to `requirements.txt`.
 
 ## Summary
 The hap transform maps a non-empty input table to an output table with an added `hap_score` column. Each row in the table represents a document, and the hap transform performs the following three steps to calculate the hap score for each document:
