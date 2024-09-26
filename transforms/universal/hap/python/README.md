@@ -1,12 +1,16 @@
 # HAP Annotation
 Please see the set of [transform project conventions](https://github.com/ian-cho/data-prep-kit/blob/dev/transforms/README.md) for details on general project conventions, transform configuration, testing and IDE set up.
 
+## Prerequisite
+This repo needs NLTK and please `pip install -r requirements.txt` to install NLTK.
+
 ## Summary
 The hap transform maps a non-empty input table to an output table with an added `hap_score` column. Each row in the table represents a document, and the hap transform performs the following three steps to calculate the hap score for each document:
 
 * Sentence spliting: we use NLTK to split the document into sentence pieces.
 * Hap annotation: each sentence is assigned a hap score between 0 and 1, where 1 represents hap and 0 represents non-hap.
 * Aggregation: the document hap score is determined by selecting the maximum hap score among its sentences.
+
 
 ## Configuration and command line Options
 The set of dictionary keys holding [HAPTransformConfiguration](src/hap_transform.py) 
