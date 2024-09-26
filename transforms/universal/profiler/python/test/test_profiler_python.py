@@ -35,11 +35,16 @@ class TestPythonProfilerTransform(AbstractTransformLauncherTest):
     def _validate_directory_contents_match(self, produced: str, expected: str, ignore_columns: list[str] = []):
         # TODO add checking file content
         # Compare files
-        f_set1 = get_files_in_folder(dir=produced, ext=".csv", return_data=False)
-        f_set2 = get_files_in_folder(dir=expected, ext=".csv", return_data=False)
+        f_set1 = list(get_files_in_folder(dir=produced, ext=".csv", return_data=False).keys())
+        f_set2 = list(get_files_in_folder(dir=expected, ext=".csv", return_data=False).keys())
         assert len(f_set1) == len(f_set2)
+        for i in range(len(f_set1)):
+            pf = os.path.getsize(f_set1[i])
+            ef = os.path.getsize(f_set2[i])
+            assert pf - ef < 50
 
         # Compare metadata
         f_set1 = get_files_in_folder(dir=produced, ext=".json", return_data=False)
         f_set2 = get_files_in_folder(dir=expected, ext=".json", return_data=False)
         assert len(f_set1) == len(f_set2)
+

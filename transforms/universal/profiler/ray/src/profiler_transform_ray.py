@@ -151,7 +151,7 @@ class ProfilerRuntime(DefaultRayTransformRuntime):
         return {"unique words": sum_aggregators, "words memory, GB": sum_aggregator_mem} | stats
 
 
-class ProfilerTableTransformConfiguration(ProfilerTransformConfigurationBase):
+class ProfilerRayTransformConfiguration(ProfilerTransformConfigurationBase):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -199,11 +199,11 @@ class ProfilerTableTransformConfiguration(ProfilerTransformConfigurationBase):
         return True
 
 
-class ProfilerRayTransformConfiguration(RayTransformRuntimeConfiguration):
+class ProfilerRayTransformRuntimeConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=ProfilerTableTransformConfiguration(), runtime_class=ProfilerRuntime)
+        super().__init__(transform_config=ProfilerRayTransformConfiguration(), runtime_class=ProfilerRuntime)
 
 
 if __name__ == "__main__":
-    launcher = RayTransformLauncher(ProfilerRayTransformConfiguration())
+    launcher = RayTransformLauncher(ProfilerRayTransformRuntimeConfiguration())
     launcher.launch()
