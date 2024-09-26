@@ -8,6 +8,16 @@ The hap transform maps a non-empty input table to an output table with an added 
 * Hap annotation: each sentence is assigned a hap score between 0 and 1, where 1 represents hap and 0 represents non-hap.
 * Aggregation: the document hap score is determined by selecting the maximum hap score among its sentences.
 
+## Configuration and command line Options
+The set of dictionary keys holding [HAPTransformConfiguration](src/hap_transform.py) 
+configuration for values are as follows:
+
+* --model_name_or_path - specifies HAP model which should be compatable with HuggingFace's `AutoModelForSequenceClassification` 
+* --batch_size - modify it based on the infrastructure capacity.
+* --max_length - the maximum length for the tokenizer.
+
+
+
 ## input format
 The input is in .parquet format and contains the following columns:
 
@@ -25,7 +35,7 @@ The output is in .parquet format and includes an additional column, in addition 
 | 2  |    Here are only a few examples. And no, I'm not ... | 0.989713     |
 
 ## How to run
-Place your input Parquet file in the `test-data/input/` directory. A sample file, `test1.parquet`, is available in this directory. Also, you can change hap annotation model, batch size, max_length, etc. in the `hap_params`. Once done, run the script.
+Place your input Parquet file in the `test-data/input/` directory. A sample file, `test1.parquet`, is available in this directory. Once done, run the script.
 
 ```python
 python hap_local_python.py
