@@ -11,7 +11,7 @@ authors = [
 ]
 dependencies = [
     "data-prep-toolkit-ray==0.2.2.dev0",
-    "dpk_ededup_transform_python==0.2.2.dev0",
+    "dpk_profiler_transform_python==0.2.2.dev0",
     "tqdm==4.66.3",
 ]
 
