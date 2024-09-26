@@ -15,6 +15,7 @@ from typing import Any
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime import AbstractTransformFileProcessor
 from data_processing.transform import AbstractBinaryTransform, TransformStatistics
+from data_processing.utils import UnrecoverableException
 
 
 class PythonTransformFileProcessor(AbstractTransformFileProcessor):
@@ -43,7 +44,11 @@ class PythonTransformFileProcessor(AbstractTransformFileProcessor):
         )
         self.transform_params["statistics"] = statistics
         # Create local processor
-        self.transform = transform_class(self.transform_params)
+        try:
+            self.transform = transform_class(self.transform_params)
+        except Exception as e:
+            self.logger.error(f"Exception creating transform  {e}")
+            raise UnrecoverableException("failed creating transform")
         # Create statistics
         self.stats = statistics
 
@@ -82,7 +87,11 @@ class PythonPoolTransformFileProcessor(AbstractTransformFileProcessor):
         self.stats = {}
         if self.transform is None:
             # create transform. Make sure to do this locally
-            self.transform = self.transform_class(self.transform_params)
+            try:
+                self.transform = self.transform_class(self.transform_params)
+            except Exception as e:
+                self.logger.error(f"Exception creating transform  {e}")
+                raise UnrecoverableException("failed creating transform")
         # Invoke superclass method
         super().process_file(f_name=f_name)
         # return collected statistics

@@ -27,6 +27,7 @@ RUN cd python-transform && pip install ${PIP_INSTALL_EXTRA_ARGS} --no-cache-dir 
 
 
 COPY --chown=ray:users pyproject.toml pyproject.toml 
+COPY --chown=ray:users requirements.txt requirements.txt
 RUN pip install ${PIP_INSTALL_EXTRA_ARGS} --no-cache-dir -e .
 
 # Download models
