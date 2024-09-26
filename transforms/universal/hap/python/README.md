@@ -25,7 +25,7 @@ The output is in .parquet format and includes an additional column, in addition 
 | 2  |    Here are only a few examples. And no, I'm not ... | 0.989713     |
 
 ## How to run
-Place your input Parquet file in the `test-data/input/` directory. A sample file, `test1.parquet`, is available in this directory. Once done, run the script.
+Place your input Parquet file in the `test-data/input/` directory. A sample file, `test1.parquet`, is available in this directory. Also, you can change hap annotation model, batch size, max_length, etc. in the `hap_params`. Once done, run the script.
 
 ```python
 python hap_local_python.py
