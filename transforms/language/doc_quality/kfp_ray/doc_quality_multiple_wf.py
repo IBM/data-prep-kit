@@ -118,7 +118,7 @@ def doc_quality(
     docq_doc_content_column: str = "contents",
     docq_bad_word_filepath: str = "/home/ray/ldnoobw/en",
     # additional parameters
-    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
+    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5, "delete_cluster_delay_minutes": 0}',
 ):
     """
     Pipeline to execute Document Quality transform
@@ -157,8 +157,8 @@ def doc_quality(
     :return: None
     """
     # create clean_up task
-    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=run_id, server_url=server_url)
-    ComponentUtils.add_settings_to_component(clean_up_task, 60)
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=run_id, server_url=server_url, additional_params=additional_params)
+    ComponentUtils.add_settings_to_component(clean_up_task, ONE_HOUR_SEC * 2)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
         # compute execution params

@@ -22,8 +22,10 @@ To test, build and publish the library
 ```shell
 make test build publish
 ```
+
 To up the version number, edit the Makefile to change VERSION and rerun
 the above.  This will require committing both the `Makefile` and the
 autotmatically updated `pyproject.toml` file.
+
 
 
