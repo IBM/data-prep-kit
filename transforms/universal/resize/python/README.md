@@ -1,4 +1,4 @@
-# Split  files
+# Resize  files
 
 Please see the set of
 [transform project conventions](../../README.md)
