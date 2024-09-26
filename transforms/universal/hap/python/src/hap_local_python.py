@@ -39,5 +39,5 @@ if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=params | hap_params)
     # create launcher
     launcher = PythonTransformLauncher(runtime_config=HAPPythonTransformConfiguration())
-    # Launch the ray actor(s) to process the input
+    # Launch to process the input
     launcher.launch()
