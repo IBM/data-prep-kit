@@ -64,7 +64,7 @@ After running the script, you should
 2. Use the github web UI to create a git release and tag of the `releases/vX.Y.Z` branch
 3. Create a pull request from branch `pending-version-change/vX.Y.Z` into the main branch, and merge. 
 
-### Github release
+### Creating the Github Release
 After running the `release-branch.sh` script, to create tag `vX.Y.Z` and branch `releases/vX.Y.Z`
 and PRing/merging `vX.Y.Z` into `releases/vX.Y.Z`.
 1. Go to the [releases page](https://github.com/IBM/data-prep-kit/releases). 
@@ -76,10 +76,10 @@ and PRing/merging `vX.Y.Z` into `releases/vX.Y.Z`.
 1. Add any additional relese notes.
 1. Press `Publish release`
 
-### Publishing wheels and images
-After creating the release branch and tag using the `scripts/release-branch.sh` script:
+### Building and Publishing Wheels and Images
+After creating the release and tag on github: 
 
-1. Switch to a release branch (e.g. releases/v1.2.3) created by the `release-branch.sh` script
+1. Switch to a release branch (e.g. releases/v1.2.3). 
 1. Be sure you're at the top of the repository (`.../data-prep-kit`)
 1. Optionally, `make show-version` to see the version that will be published
 1. Running the following, either manually or in a git action
