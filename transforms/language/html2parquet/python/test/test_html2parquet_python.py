@@ -33,7 +33,6 @@ class TestPythonHtml2ParquetTransform(AbstractTransformLauncherTest):
             "html2parquet_output_format": "markdown",
         }
         # this is added as a fixture to remove these columns from comparison
-        ignore_columns = ["date_acquired", "document_id", "pdf_convert_time", "hash"]
         ignore_columns = ["date_acquired"]
 
         fixtures = []
