@@ -1,6 +1,0 @@
-venv/
-output/
-models/
-__pycache__/
-.pytest_cache/
-scratch/

@@ -1,3 +1,0 @@
-# for fdedup
-scipy==1.13.0
-

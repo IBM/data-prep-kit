@@ -1,2 +1,0 @@
-data-prep-toolkit==0.2.2.dev0
-trafilatura==1.12.0
