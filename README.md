@@ -10,4 +10,4 @@
 
 [Data Prep Kit (DPK)](https://github.com/IBM/data-prep-kit.git) is a community project to democratize and accelerate unstructured data preparation for LLM app developers.
 
-This branch with various notebooks and examples provided by the open source community is meant to increase awareness and accelerate adoption of DPK by demonstrating how various use cases for data processing can be achieve using Jupyter Notebooks to stitch together a working pipeline of DPK transforms.
+This branch with various notebooks and examples is meant to increase awareness and accelerate adoption of DPK by demonstrating how various use cases for data processing can be achieve using Jupyter Notebooks to stitch together a working pipeline of DPK transforms.
