@@ -9,15 +9,14 @@ authors = [
     { name = "Sungeun An", email = "sungeun.an@ibm.com" },
     { name = "Syed Zawad", email = "szawad@ibm.com" },
 ]
-dependencies = [
-    "data-prep-toolkit==0.2.2.dev0",
-    "trafilatura==1.12.0"
-
-]
+dynamic = ["dependencies"]
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 
 [project.optional-dependencies]
 dev = [
