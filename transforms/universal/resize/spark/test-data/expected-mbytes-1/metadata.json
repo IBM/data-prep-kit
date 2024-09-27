@@ -1,0 +1,45 @@
+{
+    "pipeline": "pipeline_id",
+    "job details": {
+        "job category": "preprocessing",
+        "job name": "Resize",
+        "job type": "ray",
+        "job id": "job_id",
+        "start_time": "2024-04-02 15:02:29",
+        "end_time": "2024-04-02 15:02:30",
+        "status": "success"
+    },
+    "code": null,
+    "job_input_params": {
+        "max_rows_per_table": -1,
+        "max_mbytes_per_table": 1.0,
+        "checkpointing": false,
+        "max_files": -1,
+        "number of workers": 1,
+        "worker options": {
+            "num_cpus": 0.8
+        },
+        "actor creation delay": 0
+    },
+    "execution_stats": {
+        "cpus": 10,
+        "gpus": 0,
+        "memory": 13.490118408575654,
+        "object_store": 2.0
+    },
+    "job_output_stats": {
+        "source_files": 3,
+        "source_size": 280992,
+        "result_files": 1,
+        "result_size": 280992,
+        "table_processing": 0.0011630058288574219
+    },
+    "source": {
+        "name": "/Users/dawood/git/fm-data-engineering/transforms/universal/resize/test-data/input",
+        "type": "path"
+    },
+    "target": {
+        "name": "/tmp/Resize0_y3emip",
+        "type": "path"
+    }
+}
