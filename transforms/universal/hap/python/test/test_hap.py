@@ -14,13 +14,15 @@
 # file as the working directory.
 
 import os
+import sys
+sys.path.append(os.path.join(os.path.abspath('.'),'./../src'))
 
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing.utils import ParamsUtils
 from data_processing.runtime.pure_python import PythonTransformLauncher
-from ..src.hap_transform import HAPPythonTransformConfiguration
+from hap_transform import HAPPythonTransformConfiguration
 
 
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../", "test-data/input"))
