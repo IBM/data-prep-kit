@@ -2,14 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import time
-
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
 from data_processing.utils import get_logger
 from hap_transform import HAPTransformConfiguration
-
 logger = get_logger(__name__)
 
 

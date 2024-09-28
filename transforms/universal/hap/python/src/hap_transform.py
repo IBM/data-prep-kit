@@ -122,7 +122,7 @@ class HAPTransformConfiguration(TransformConfiguration):
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
-        Add Transform-specific arguments to the given  parser.
+        Add Transform-specific arguments to the given parser.
         This will be included in a dictionary used to initialize the HAPTransform.
         By convention a common prefix should be used for all transform-specific CLI args
         (e.g, noop_, pii_, etc.)

@@ -6,10 +6,9 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 from hap_transform_python import HAPPythonTransformConfiguration
 
-
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
@@ -39,5 +38,5 @@ if __name__ == "__main__":
     sys.argv = ParamsUtils.dict_to_req(d=params | hap_params)
     # create launcher
     launcher = PythonTransformLauncher(runtime_config=HAPPythonTransformConfiguration())
-    # Launch to process the input
+    # Launch the ray actor(s) to process the input
     launcher.launch()
