@@ -10,7 +10,6 @@
 # limitations under the License.
 ################################################################################
 import os
-
 from data_processing.test_support import get_tables_in_folder
 from data_processing.test_support.transform.table_transform_test import (
     AbstractTableTransformTest,
@@ -31,7 +30,6 @@ class TestHAPTransform(AbstractTableTransformTest):
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
-
     def get_test_transform_fixtures(self) -> list[tuple]:
         src_file_dir = os.path.abspath(os.path.dirname(__file__))
         input_dir = os.path.join(src_file_dir, "../test-data/input")
@@ -40,8 +38,9 @@ class TestHAPTransform(AbstractTableTransformTest):
         expected_tables = get_tables_in_folder(expected_dir)
     
         expected_metadata_list = [{}, {}]
-        # Transform the table
-	# table_list, metadata = transform.transform(table)
+
+	    # Transform the table
+	    #table_list, metadata = transform.transform(table)
         
         fixtures = [
             (HAPTransform(hap_params), input_tables, expected_tables, expected_metadata_list),
