@@ -9,12 +9,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
 import os
-
 from data_processing.data_access import DataAccessLocal
 from hap_transform import HAPTransform
-
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
@@ -47,8 +44,6 @@ if __name__ == "__main__":
     # Transform the table
     table_list, metadata = transform.transform(table)
       
-   
     for tb in table_list:
         print(f"\noutput table: {tb}")
     print(f"output metadata : {metadata}")
-    

@@ -9,7 +9,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
 import torch, nltk
 import pandas as pd
 import pyarrow as pa
@@ -39,9 +38,6 @@ class HAPTransform(AbstractTableTransform):
     def apply_tokenizer(self, data: list, max_length: int):
         """
         Tokenize a batch of doc text
-        :param data: a list of doc text
-        :param max_length: max doc length for each row in the batch
-        :return: Batch
         """
         tokenized = self.tokenizer(data, max_length=max_length, padding=True, truncation=True, return_tensors="pt").to(device)
         return tokenized
@@ -68,15 +64,13 @@ class HAPTransform(AbstractTableTransform):
             data_sent_ids.extend([i] * len(s_list))
         return data_sents, data_sent_ids
         
-    
     def apply_aggregate(self, nb_doc: int, sent_scores: list[float], sent_ids: list[int]) -> list[float]:
         doc_scores = []
         for i in range(nb_doc):
             temp = [score for idx, score in zip(sent_ids, sent_scores) if i == idx]
             doc_scores.append(max(temp))
         return doc_scores
-            
-            
+                 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         Process a table of document text to generate a hap score for each document
@@ -96,7 +90,6 @@ class HAPTransform(AbstractTableTransform):
         data_sent_scores = self.apply_model(data_sents, self.batch_size)
         
         df_doc_scores = self.apply_aggregate(len(df_doc_list), data_sent_scores, data_sent_ids)
-        
         assert len(df_doc_list) == len(df_doc_scores)
         
         self.df['hap_score'] = df_doc_scores
@@ -105,7 +98,6 @@ class HAPTransform(AbstractTableTransform):
         out_table = pa.Table.from_pandas(self.df)
         metadata = {}
         return [out_table], metadata
-
 
 
 logger = get_logger(__name__)
@@ -175,7 +167,6 @@ class HAPTransformConfiguration(TransformConfiguration):
             help="batch size",
         )
 
-
     def apply_input_params(self, args: Namespace) -> bool:
         """
         Validate and apply the arguments that have been parsed
@@ -190,4 +181,3 @@ class HAPTransformConfiguration(TransformConfiguration):
         self.params["batch_size"] = args.batch_size
         logger.info(f"hap params are {self.params} ")
         return True
-
