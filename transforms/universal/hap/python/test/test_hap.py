@@ -40,11 +40,8 @@ class TestHAPTransform(AbstractTableTransformTest):
         expected_tables = get_tables_in_folder(expected_dir)
     
         expected_metadata_list = [{}, {}]
-
-
-
-	    # Transform the table
-	    #table_list, metadata = transform.transform(table)
+        # Transform the table
+	# table_list, metadata = transform.transform(table)
         
         fixtures = [
             (HAPTransform(hap_params), input_tables, expected_tables, expected_metadata_list),
