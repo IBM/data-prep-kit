@@ -37,7 +37,7 @@ requirements:
 		cp requirements.$(T_SET).txt requirements.txt ;	\
 	fi
 
-tag:
+pkg-name:
 	if [ $(TRANSFORM_PKG) ]; then \
 	    cat pyproject.toml | sed -e 				\
 		's/^name[ ]*=.*/name = "'${TRANSFORM_PKG}'"/' 	\
@@ -45,10 +45,19 @@ tag:
 	    mv tt.toml pyproject.toml;					\
 	fi
 
+is-patch:
+	if [ $(IS_PATCH) ]; then \
+	    cat pyproject.toml | sed -e 				\
+		's/^version[ ]*=[ ]*"\(.*\).dev.*/version = "\1"/' 	\
+		> tt.toml;						\
+	    mv tt.toml pyproject.toml;					\
+	fi
+
 src:
 	mkdir src
 	make requirements
-	make tag
+	make pkg-name
+	make is-patch
 	for T in $(shell echo $(TRANSFORMS_NAMES)); do                    \
 	    echo copy src from  $$T ; \
 		cp -R $(REPOROOT)/transforms/$$T/$(PACKAGING_RUN_TIME)/src/* src ; \
