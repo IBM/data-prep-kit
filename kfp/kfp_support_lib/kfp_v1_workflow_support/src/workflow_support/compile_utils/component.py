@@ -60,6 +60,7 @@ class ComponentUtils:
             try:
                 tolerations = os.getenv("KFP_TOLERATIONS", "")
                 if tolerations != "":
+                    print(f"Note: Applying Tolerations {tolerations} to kubeflow pipelines pods")
                     tolerations = json.loads(tolerations)
                     for toleration in tolerations:
                         component.add_toleration(
@@ -80,6 +81,7 @@ class ComponentUtils:
             try:
                 node_selector = os.getenv("KFP_NODE_SELECTOR", "")
                 if node_selector != "":
+                    print(f"Note: Applying node_selector {node_selector} to kubeflow pipelines pods")
                     node_selector = json.loads(node_selector)
                     component.add_node_selector_constraint(node_selector["label_key"], node_selector["label_value"])
             except Exception as e:
