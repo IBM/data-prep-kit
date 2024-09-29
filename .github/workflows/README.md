@@ -9,7 +9,6 @@ Includes python, ray, spark and kfp_ray as available.
 2. When the core dpk lib components files changes, test all transforms
 3. When the shared kfp components changes or core dpk lib components files changes, 
    test a randomly selected transform test. Otherwise run kfp test for the changed transforms.
-4. Extra credit: If .md or other non-code changes are made, run no tests. 
 
 #### Assumptions
 1. All transforms will have test workflows.  A transform can disable its tests locally
