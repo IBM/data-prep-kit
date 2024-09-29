@@ -1,3 +1,7 @@
+ifndef T_SET
+T_SET=all
+endif
+
 
 venv:  
 	$(MAKE) .defaults.create-venv
@@ -11,6 +15,9 @@ image:: .transforms.python-image
 
 run-ut::
 	source venv/bin/activate;       \
+	if [ -e requirements.test.txt ];	then	\
+		$(PYTHON) -m pip install -r requirements.test.txt ;	 \
+	fi;	\
 	for T in $(TRANSFORMS_NAMES); do                    \
 	    echo running unit test on: $$T ; \
 		$(PYTEST) $(REPOROOT)/transforms/$$T/$(PACKAGING_RUN_TIME)/test; \
@@ -25,9 +32,13 @@ setup: .transforms.setup venv
 	@# Help: Do any default transform setup before running make src and setting up a test environment
 	
 
+requirements:
+	cp requirements.$(T_SET).txt requirements.txt
+
 src:
 	mkdir src
-	for T in $(TRANSFORMS_NAMES); do                    \
+	make requirements
+	for T in $(shell echo $(TRANSFORMS_NAMES)); do                    \
 	    echo copy src from  $$T ; \
 		cp -R $(REPOROOT)/transforms/$$T/$(PACKAGING_RUN_TIME)/src/* src ; \
 		rm -fr *.egg-info ; \
