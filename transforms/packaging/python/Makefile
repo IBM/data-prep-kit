@@ -59,13 +59,20 @@ test-src::
 	@# Help: Do any default transform setup before running make src and setting up a test environment
 
 test-with-pypi:
-	$(MAKE) clean
+	$(MAKE) src 
 	$(MAKE) .defaults.create-venv
 	source venv/bin/activate;       \
 	$(PYTHON) -m pip install . 
 	$(MAKE) run-ut
 	@# Help: Load wheel from pypi and run all unit tests: final step in verification after deploying to pypi)
 
+test-wheel:
+	$(MAKE) clean 
+	$(MAKE) .defaults.create-venv
+	source venv/bin/activate;       \
+	$(PYTHON) -m pip install $(TRANSFORM_PKG) 
+	$(MAKE) run-ut
+	@# Help: Load wheel from pypi and run all unit tests: final step in verification after deploying to pypi)
 
 
 
