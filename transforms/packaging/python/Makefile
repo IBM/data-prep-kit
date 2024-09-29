@@ -13,6 +13,10 @@ include ../.make.packaging
 PACKAGING_RUN_TIME=python
 
 ifeq ($(T_SET), all)
+# Cannot combine language/html2parquet with pdf2parquet due to:
+#The conflict is caused by:
+#    docling-ibm-models 1.1.7 depends on lxml<5.0.0 and >=4.9.1
+#    trafilatura 1.12.0 depends on lxml>=5.2.2; platform_system != "Darwin" or python_version > "3.8"
 TRANSFORMS_NAMES = code/code_quality \
 	    	code/code2parquet \
     		code/header_cleanser \
@@ -23,12 +27,12 @@ TRANSFORMS_NAMES = code/code_quality \
 		language/pdf2parquet \
 		language/pii_redactor \
 		language/text_encoder \
-		language/html2parquet \
 		universal/tokenization \
 		universal/ededup \
 		/universal/doc_id	\
 		universal/filter \
 		universal/resize
+TRANSFORM_PKG = "data_prep_toolkit_transforms"
 endif
 
 ifeq ($(T_SET), lang1)
@@ -41,6 +45,7 @@ TRANSFORMS_NAMES = language/doc_quality \
 		/universal/doc_id	\
 		universal/filter \
 		universal/resize
+TRANSFORM_PKG = "data_prep_toolkit_transforms_lang1"
 endif
 
 # distribution versions is the same as image version.

@@ -1,17 +1,13 @@
-#conflict to be resolved
-#docling-ibm-models 1.1.7 depends on lxml<5.0.0 and >=4.9.1
-#trafilatura 1.12.0 depends on lxml>=5.2.2; platform_system != "Darwin" or python_version > "3.8"
-data-prep-toolkit>=0.2.2.dev0
+data-prep-toolkit>=0.2.1
 # code quality
 bs4==0.0.2
 transformers==4.38.2
 #pdf2parquet
-# conflict with chunking....
-#docling-core==1.2.0,
-docling-ibm-models==1.1.7,
-deepsearch-glm==0.21.0,
+docling-core==1.3.0
+docling-ibm-models==1.1.7
+deepsearch-glm==0.21.0
 docling==1.11.0,
-filetype >=1.2.0, <2.0.0,
+filetype >=1.2.0, <2.0.0
 #Doc chunking
 docling-core==1.3.0,
 llama-index-core>=0.11.0,<0.12.0,
@@ -47,8 +43,7 @@ pandas>=2.2.2
 #The conflict is caused by:
 #    docling-ibm-models 1.1.7 depends on lxml<5.0.0 and >=4.9.1
 #    trafilatura 1.12.0 depends on lxml>=5.2.2; platform_system != "Darwin" or python_version > "3.8"
-# disable testing on Mac
-trafilatura==1.12.0 ; platform_system != 'Darwin'
+#trafilatura==1.12.0
 #tokenization
 transformers==4.38.2
 

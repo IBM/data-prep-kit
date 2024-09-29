@@ -33,11 +33,22 @@ setup: .transforms.setup venv
 	
 
 requirements:
-	cp requirements.$(T_SET).txt requirements.txt
+	if [ -e requirements.$(T_SET).txt ];	then	\
+		cp requirements.$(T_SET).txt requirements.txt ;	\
+	fi
+
+tag:
+	if [ $(TRANSFORM_PKG) ]; then \
+	    cat pyproject.toml | sed -e 				\
+		's/^name[ ]*=.*/name = "'${TRANSFORM_PKG}'"/' 	\
+		> tt.toml;						\
+	    mv tt.toml pyproject.toml;					\
+	fi
 
 src:
 	mkdir src
 	make requirements
+	make tag
 	for T in $(shell echo $(TRANSFORMS_NAMES)); do                    \
 	    echo copy src from  $$T ; \
 		cp -R $(REPOROOT)/transforms/$$T/$(PACKAGING_RUN_TIME)/src/* src ; \
