@@ -29,10 +29,12 @@ The transform can be tuned with the following parameters.
 
 | Parameter  | Default  | Description  |
 |------------|----------|--------------|
-| `chunking_type`        | `dl_json` | Chunking type to apply. Valid options are `li_markdown` for using the LlamaIndex [Markdown chunking](https://docs.llamaindex.ai/en/stable/module_guides/loading/node_parsers/modules/#markdownnodeparser), `dl_json` for using the [Docling JSON chunking](https://github.com/DS4SD/docling). |
+| `chunking_type`        | `dl_json` | Chunking type to apply. Valid options are `li_markdown` for using the LlamaIndex [Markdown chunking](https://docs.llamaindex.ai/en/stable/module_guides/loading/node_parsers/modules/#markdownnodeparser), `dl_json` for using the [Docling JSON chunking](https://github.com/DS4SD/docling), `fixed_size` for chunking text into fixed-sized windows of tokens, where both the window size and overlap between windows are measured in tokens. |
 | `content_column_name`        | `contents` | Name of the column containing the text to be chunked. |
 | `doc_id_column_name`         | `document_id` | Name of the column containing the doc_id to be propagated in the output. |
 | `dl_min_chunk_len`           | `None` | Minimum number of characters for the chunk in the dl_json chunker. Setting to None is using the library defaults, i.e. a `min_chunk_len=64`. |
+| `chunk_size_tokens`          | `128` | Size of the chunk in tokens for the fixed-sized chunker. |
+| `chunk_overlap_tokens`       | `30` | Number of tokens overlapping between chunks for the fixed-sized chunker. |
 | `output_chunk_column_name`   | `contents` | Column name to store the chunks in the output table. |
 | `output_source_doc_id_column_name`   | `source_document_id` | Column name to store the `doc_id` from the input table. |
 | `output_jsonpath_column_name`| `doc_jsonpath` | Column name to store the document path of the chunk in the output table. |

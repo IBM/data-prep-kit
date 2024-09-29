@@ -22,6 +22,7 @@ from doc_chunk_transform_python import DocChunkPythonTransformConfiguration
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 # input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input_md"))
+# input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input_fixed_size"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
 local_conf = {
     "input_folder": input_folder,
@@ -39,6 +40,11 @@ params = {
     # doc_chunk params
     # "doc_chunk_chunking_type": "li_markdown",
     "doc_chunk_chunking_type": "dl_json",
+    # "doc_chunk_chunking_type": "fixed_size",
+    # fixed-size params
+    # "doc_chunk_output_chunk_column_name": "chunk_text",
+    # "doc_chunk_chunk_size_tokens": 128,
+    # "doc_chunk_chunk_overlap_tokens": 30
 }
 if __name__ == "__main__":
     # Set the simulated command line args
