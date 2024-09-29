@@ -64,15 +64,26 @@ test-with-pypi:
 	source venv/bin/activate;       \
 	$(PYTHON) -m pip install . 
 	$(MAKE) run-ut
-	@# Help: Load wheel from pypi and run all unit tests: final step in verification after deploying to pypi)
+	@# Help: Load dependencies from pypi and run all unit tests: final step in verification BEFORE deploying to pypi)
+
 
 test-wheel:
+	-rm -fr venv
+	$(MAKE) .defaults.create-venv
+	source venv/bin/activate;       \
+	$(PYTHON) -m pip install dist/*.whl
+	$(MAKE) run-ut
+	@# Help: Load wheel from local folder and run all unit tests
+
+
+
+test-latest-patch:
 	$(MAKE) clean 
 	$(MAKE) .defaults.create-venv
 	source venv/bin/activate;       \
 	$(PYTHON) -m pip install $(TRANSFORM_PKG) 
 	$(MAKE) run-ut
-	@# Help: Load wheel from pypi and run all unit tests: final step in verification after deploying to pypi)
+	@# Help: Load wheel from pypi and run all unit tests: final step in verification AFTER deploying to pypi)
 
 
 
