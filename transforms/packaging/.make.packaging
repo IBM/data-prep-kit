@@ -53,6 +53,9 @@ is-patch:
 	    mv tt.toml pyproject.toml;					\
 	fi
 
+#####################################################
+# to build a patched release, use make IS_PATCH=1 src
+#####################################################
 src:
 	mkdir src
 	make requirements
@@ -65,7 +68,7 @@ src:
 		rm -fr dist ; \
 		rm -fr build ; \
 	done;
-	@# Help: Setup src folder and remove old distribution
+	@# Help: Setup src folder and remove old distribution. to setup for a patched release use: make IS_PATCH=1 $@
 
 		
 build:: build-dist
@@ -73,6 +76,7 @@ build:: build-dist
 publish:: publish-dist
         
 build-dist:: src .defaults.build-dist 
+	@# Help: build the distribution for publishing to pypi. to build a patch release (no .devN) use: make IS_PATCH=1 $@
 
 publish-dist:: .defaults.publish-dist
 
