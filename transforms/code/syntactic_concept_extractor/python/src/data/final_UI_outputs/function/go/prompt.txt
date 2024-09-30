@@ -1,0 +1,23 @@
+Definitions:
+* AST: Abstract Syntax Tree of a given code, which includes node-related code snippets.
+* code_snippet: The actual text of the whole code. 
+* function definition: The name of the function which is defined
+
+You are given a task of extracting function definitions in a code from a provided Abstract Syntax Tree(AST) of the code, along with its given code snippet.
+Example: '(define (foo arg) ((add1 arg)))' in racket language, refers to defining the function 'foo' with argument 'arg', in which the body represents '(add1 arg)'. We want to extract the function name, in this case, foo. 
+Follow the given instructions carefully:
+
+Instructions:
+* Dont find snippet after a keyword, look for strings before the argument list generally.
+* Stick to higher level nodes. For example, a node for which the snippet is '(define (foo arg) ((add1 arg)))', might have subnodes which have snippets "arg" and "(add1 arg)". Trivially, you can just extract from the node which contains the relevant information. Do not identify such nodes, for which the string like "(define (foo arg) ((add1 arg)))" is only a part of the snippet, i.e. ancestors of such nodes.
+* Identify the nodes relevant to the identifying the function definition, using the previous instruction. Identify by seeing which nodes indicate a user defined function. 
+* Identify the relevant code snippet, do so by extracting the 'code_snippet' field of the node.
+* Along with this, you will generate the rule, which is a python script, you made to extract such feature. Your rules should be general and should extract the function name from each type of nodes that are present. 
+* The function name is generally the string just before the function argument list, keep a track of brackets, etc.
+* For example, to get the relevant function name from '(define (foo arg) ((add1 arg)))', you can extract it through a python script: 
+    ```py
+    # we find that the define keyword is defining a function here so we get the argument to define keyword by getting the snippet after the second '('
+    temp_0 = code_snippet.split('(')[2].strip()
+    # as the function name would be the first keyword, we split by ' ' and remove extra spaces to get the function name 
+    extracted = temp_0.split(' ')[0].strip()
+    ```

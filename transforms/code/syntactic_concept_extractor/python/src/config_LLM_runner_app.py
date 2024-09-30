@@ -1,0 +1,5 @@
+API_KEY = "Cl19NQn7D7y5ERFHfpUYNl8kWKqOTHqkGociOEI4nbsd"
+API_ENDPOINT = "https://us-south.ml.cloud.ibm.com"
+MODEL_ID = "meta-llama/llama-3-70b-instruct"
+PROMPT_NAME = "My-prompt"
+PROJECT_ID = "ba1b3e6d-5e38-4c72-9c36-4a9470cea282"

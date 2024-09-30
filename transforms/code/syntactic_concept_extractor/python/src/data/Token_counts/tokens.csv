@@ -1,0 +1,8 @@
+Method,Package,Comment,Function
+No pruning,9544,6991,10868
+Tree Pruning: depth = 3,6525,3485,4638
+Tree Pruning: depth = 2,4676,2696,3111
+Tree Pruning: depth = 1,2846,1993,2001
+Concept Level Pruning: [test AST depth = 3],3454,1901,2688
+Concept Level Pruning: [test AST depth = 2],3097,1826,2127
+Concept Level Pruning: [test AST depth = 1],2690,1751,1827
