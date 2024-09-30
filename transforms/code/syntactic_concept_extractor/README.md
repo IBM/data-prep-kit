@@ -54,3 +54,10 @@ The implementation for UI-based offline customization tool is present [here](pyt
 
 `streamlit run LLM_runner_app.py`
 
+The high-level system design is as follows:
+
+![White Background Image](sys-overview.png)
+
+For each new target language, the offline phase is utilized to create deterministic rules by harnessing the capabilities of LLMs and working with exemplar code samples from the target language. In this process, Workflow W1 facilitates the creation of rules around syntactic structures based on exemplar code samples, while Workflow W2 is used to establish semantic dimensions for profiling. Subsequently, we derive rules that connect syntactic constructs to the predefined semantic concepts. These rules are then stored in a rule database, ready to be employed during the online phase.
+
+In the online phase, the system dynamically generates profiling outputs for any incoming code snippets. This is achieved by extracting concepts from the snippets using the rules in the database and storing these extractions in a tabular format. The structured tabular format allows for generating additional concept columns, which are then utilized to create comprehensive profiling reports.

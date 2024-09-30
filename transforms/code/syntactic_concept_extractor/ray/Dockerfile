@@ -6,11 +6,6 @@ RUN pip install --upgrade --no-cache-dir pip
 # install pytest
 RUN pip install --no-cache-dir pytest
 
-# Create a user and use it to run the transform
-RUN useradd -ms /bin/bash dpk
-USER dpk
-WORKDIR /home/dpk
-
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
 COPY --chown=ray:users data-processing-lib-python/ data-processing-lib-python/
@@ -34,8 +29,8 @@ COPY ./src/syntactic_concept_extractor_transform_ray.py .
 COPY ./src/syntactic_concept_extractor_local_ray.py local/
 
 # copy test
-# COPY test/ test/
-# COPY test-data/ test-data/
+COPY test/ test/
+COPY test-data/ test-data/
 
 # Set environment
 ENV PYTHONPATH /home/ray

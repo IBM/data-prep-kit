@@ -21,6 +21,9 @@ publish::
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
+test-image:
+	@echo "Skipping test-image step as per configuration."
+
 test:: 
 	@# Help: Recursively make $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse

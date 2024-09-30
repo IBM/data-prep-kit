@@ -1,6 +1,6 @@
 [project]
 name = "dpk_syntactic_concept_extractor_transform_python"
-version = "1.0.0"
+version = "0.2.2.dev0"
 requires-python = ">=3.10"
 description = "Syntactic Concept Extractor Python Transform"
 license = {text = "Apache-2.0"}
@@ -9,7 +9,7 @@ authors = [
     { name = "Pankaj Thorat", email = "pankaj.thorat@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit==0.2.1.dev0",
+    "data-prep-toolkit==0.2.2.dev0",
     "parameterized",
     "pandas",
     "aiolimiter==1.1.0",
@@ -104,6 +104,7 @@ dependencies = [
 	"typing_extensions==4.12.2",
 	"tzdata==2024.1",
 	"urllib3==2.2.2",
+	"uuid",
 	"wcwidth==0.2.13",
 	"wrapt==1.16.0",
 	]

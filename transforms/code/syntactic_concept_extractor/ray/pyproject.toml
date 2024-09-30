@@ -1,6 +1,6 @@
 [project]
 name = "dpk_syntactic_concept_extractor_transform_ray"
-version = "1.0.0"
+version = "0.2.2.dev0"
 requires-python = ">=3.10"
 description = "Syntactic Concept Extractor Ray Transform"
 license = {text = "Apache-2.0"}
@@ -9,9 +9,9 @@ authors = [
     { name = "Pankaj Thorat", email = "pankaj.thorat@ibm.com" },
 ]
 dependencies = [
-	"dpk-syntactic-concept-extractor-transform-python==1.0.0",
-	"data-prep-toolkit-ray==0.2.1.dev0",
-    "data-prep-toolkit==0.2.1.dev0",
+	"dpk-syntactic-concept-extractor-transform-python==0.2.2.dev0",
+    "data-prep-toolkit-ray==0.2.2.dev0",
+    "data-prep-toolkit==0.2.2.dev0",
     "protobuf==5.27.2"
 	]
 

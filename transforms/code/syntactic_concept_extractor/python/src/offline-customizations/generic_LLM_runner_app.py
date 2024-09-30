@@ -219,7 +219,9 @@ if 'language_binding' not in st.session_state:
         "php" : get_language("php"),
         "ocaml" : get_language("ocaml")
     }
-    BINDINGS_DIR = '../../../input/tree-sitter-bindings'
+    RUNTIME_HOST_ARCH = os.environ.get('RUNTIME_HOST_ARCH', 'x86_64')
+    BINDINGS_DIR = os.path.join('..', 'tree-sitter-bindings', RUNTIME_HOST_ARCH)
+
     # uising the normal tree-sitter bindings locally for the laguages present in the cached_requirements json.
     for binding in os.listdir(BINDINGS_DIR):
         print(binding)

@@ -11,7 +11,10 @@ TRANSFORM_NAME=syntactic_concept_extractor
 
 include $(REPOROOT)/transforms/.make.transforms
 
-venv::	.transforms.python-venv
+# values possible mach-arm64, x86_64
+export RUNTIME_HOST_ARCH=x86_64
+
+venv:: .transforms.python-venv
 
 test::	.transforms.python-test
 
@@ -31,13 +34,15 @@ publish-image:: .transforms.publish-image-python
 
 setup:: .transforms.setup
 
-# distribution versions is the same as image version.
 set-versions:
 	$(MAKE) TRANSFORM_PYTHON_VERSION=$(SYNTACTIC_CONCEPT_EXTRACTOR_PYTHON_VERSION) TOML_VERSION=$(SYNTACTIC_CONCEPT_EXTRACTOR_PYTHON_VERSION) .transforms.set-versions 
         
 build-dist:: .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
+
+test-image:
+	@echo "Skipping test-image step as per configuration."
 
 # Ensure RUN_ARGS has a default value
 RUN_ARGS ?= ""

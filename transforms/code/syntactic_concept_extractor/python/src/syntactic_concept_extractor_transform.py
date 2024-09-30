@@ -10,36 +10,28 @@
 # limitations under the License.
 ################################################################################
 
-import functools
 import os
-import time
+import subprocess
 from argparse import ArgumentParser, Namespace
 from typing import Any
 from data_processing.utils import get_logger
+import uuid
+import shutil
+import atexit
 
-import numpy as np
-import pandas as pd
 import pyarrow as pa
-import pyarrow.parquet as pq
-import requests
 from data_processing.transform import AbstractTableTransform
 from tree_sitter import Language, Parser as TSParser
-from tree_sitter_languages import get_language, get_parser
+from tree_sitter_languages import get_language
 
-from collections import Counter
-from UAST import UAST
+
 from UAST_parser import UASTParser
-from concurrent.futures import ThreadPoolExecutor
 import json
 from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
 
 from data_processing.utils import (
-    GB,
     CLIArgumentProvider,
-    TransformUtils,
-    UnrecoverableException,
     get_logger,
-    str2bool,
 )
 
 short_name = "SyntacticConceptExtractor"
@@ -64,11 +56,29 @@ class SyntacticConceptExtractorTransform(AbstractTableTransform):
         self.contents = self.config.get("contents")
         self.language = self.config.get("language")
 
-        # Compute the absolute path to the tree-sitter-bindings directory
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        bindings_path = os.path.join(script_dir, '..', '..', 'input', 'tree-sitter-bindings')
+        def ensure_tree_sitter_bindings():
+            # Get the directory where the script is located
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            # Generate a unique directory for the bindings based on a UUID
+            bindings_dir = os.path.join(script_dir, f"tree-sitter-bindings-{uuid.uuid4()}")
+            # Clone the bindings only if the unique directory does not exist
+            if not os.path.exists(bindings_dir):
+                print(f"Cloning tree-sitter bindings into {bindings_dir}...")
+                result = subprocess.run(["git", "clone", "https://github.com/pankajskku/tree-sitter-bindings.git", bindings_dir])
+                if result.returncode != 0:
+                    raise RuntimeError(f"Failed to clone tree-sitter bindings into {bindings_dir}")
+                return bindings_dir         
 
-        # Verify that the bindings_path exists
+        # Call this function before the main code execution
+        self.bindings_dir = ensure_tree_sitter_bindings()
+
+        # Use the correct architecture for runtime
+        RUNTIME_HOST_ARCH = os.environ.get('RUNTIME_HOST_ARCH', 'x86_64')
+        bindings_path = self.bindings_dir + '/' + RUNTIME_HOST_ARCH # mach-arm64
+        print(f"Bindings bindings_dir: {self.bindings_dir}")
+        print(f"Bindings path: {bindings_path}")
+
+        # Check if the bindings path exists
         if not os.path.exists(bindings_path):
             raise FileNotFoundError(f"Bindings path does not exist: {bindings_path}")
 
@@ -81,7 +91,7 @@ class SyntacticConceptExtractorTransform(AbstractTableTransform):
         JAVA_LANGUAGE = get_language("java")
         JAVASCRIPT_LANGUAGE = Language(os.path.join(bindings_path, 'js-bindings.so'), 'javascript')
         NIM_LANGUAGE = Language(os.path.join(bindings_path, 'nim-bindings.so'), 'nim')
-        OBJECTIVE_C_LANGUAGE = Language(os.path.join(bindings_path, 'objc-bindings.so'), 'objc')
+        #OBJECTIVE_C_LANGUAGE = Language(os.path.join(bindings_path, 'objc-bindings.so'), 'objc')
         OCAML_LANGUAGE = get_language("ocaml")
         PERL_LANGUAGE = get_language("perl")
         PY_LANGUAGE = get_language("python")
@@ -101,7 +111,7 @@ class SyntacticConceptExtractorTransform(AbstractTableTransform):
             "JavaScript": JAVASCRIPT_LANGUAGE,
             "Nim": NIM_LANGUAGE,
             "Ocaml": OCAML_LANGUAGE,
-            "Objective-C": OBJECTIVE_C_LANGUAGE,
+            #"Objective-C": OBJECTIVE_C_LANGUAGE,
             "Perl": PERL_LANGUAGE,
             "Python": PY_LANGUAGE, 
             "Rust": RUST_LANGUAGE,
@@ -120,7 +130,7 @@ class SyntacticConceptExtractorTransform(AbstractTableTransform):
             "JavaScript": 'js',
             "Nim": 'nim',
             "Ocaml": 'ocaml',
-            "Objective-C": 'objc',
+            #"Objective-C": 'objc',
             "Perl": 'perl',
             "Python": 'py',
             "Rust": 'rust',
@@ -166,6 +176,10 @@ class SyntacticConceptExtractorTransform(AbstractTableTransform):
         table_with_uast = get_uast_parquet()
         # report statistics
         stats = {"source_documents": table.num_columns, "result_documents": table_with_uast.num_columns}
+
+        # Register cleanup for when the process exits
+        atexit.register(shutil.rmtree, self.bindings_dir)
+
         return [table_with_uast], stats
     
 class SyntacticConceptExtractorTransformConfiguration(TransformConfiguration):

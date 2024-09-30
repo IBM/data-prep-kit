@@ -7,11 +7,15 @@ REPOROOT=../../../..
 
 include $(REPOROOT)/transforms/.make.transforms
 
-
 TRANSFORM_NAME=syntactic_concept_extractor
+
+# values possible mach-arm64, x86_64
+export RUNTIME_HOST_ARCH=x86_64
 
 BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
+
+venv:: .transforms.python-venv
 
 test::	.transforms.ray-test
 
@@ -40,13 +44,17 @@ build-dist:: .defaults.build-dist
 
 publish-dist:: .defaults.publish-dist
 
-
 # Ensure RUN_ARGS has a default value
 RUN_ARGS ?= ""
 
-# run-cli-sample: .transforms.run-cli-ray-sample
+run-cli-sample: .transforms.run-cli-ray-sample
 
-run-local-ray-sample:
-	@echo "Running local ray sample..."
-	python src/syntactic_concept_extractor_local_ray.py \
-	--data_local_config "{ 'input_folder' : './input', 'output_folder' : './output'}"
+run-local-sample: .transforms.run-local-ray-sample
+
+minio-start:	.minio-start
+
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image
