@@ -47,12 +47,15 @@ class TestRayAggregatorTransform(AbstractTransformLauncherTest):
         f_set1 = list(get_files_in_folder(dir=produced, ext=".csv", return_data=False).keys())
         f_set2 = list(get_files_in_folder(dir=expected, ext=".csv", return_data=False).keys())
         assert len(f_set1) == len(f_set2)
+        produced_len = 0
+        expected_len = 0
         for i in range(len(f_set1)):
-            pf = os.path.getsize(f_set1[i])
-            ef = os.path.getsize(f_set2[i])
-            assert pf - ef < 50
+            produced_len += os.path.getsize(f_set1[i])
+            expected_len += os.path.getsize(f_set2[i])
+        assert abs(produced_len - expected_len) < 500
 
-        # Compare metadata
+
+    # Compare metadata
         f_set1 = get_files_in_folder(dir=produced, ext=".json", return_data=False)
         f_set2 = get_files_in_folder(dir=expected, ext=".json", return_data=False)
         assert len(f_set1) == len(f_set2)

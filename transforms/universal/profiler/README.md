@@ -1,10 +1,19 @@
 # Profiler Transform 
 
-Per the set of 
-[transform project conventions](../../README.md#transform-project-conventions)
-the following runtimes are available:
+Profiler implement a word count. Typical implementation of the word count is done using map reduce.
+* It’s O(N2) complexity
+* shuffling with lots of data movement
 
-* [ray](ray/README.md) - enables the running of the base python transformation
-in a Ray runtime
-* [kfp_ray](kfp_ray/README.md) - enables running the ray docker image for
-the transformer in a kubernetes cluster using a generated `yaml` file.
+Implementation here is using “streaming” aggregation, based on central cache:
+
+* At the heart of the implementation is a cache of partial word counts, implemented as a set of Ray actors and containing
+  word counts processed so far.
+* Individual data processors are responsible for:
+    * Reading data from data plane
+    * tokenizing documents (we use pluggable tokenizer)
+    * Coordinating with distributed cache to collect overall word counts
+
+The complication of mapping this model to transform model is the fact that implementation requires an aggregators cache,
+that transform mode knows nothing about. The solution here is to use transform runtime to create cache
+and pass it as a parameter to transforms.
+

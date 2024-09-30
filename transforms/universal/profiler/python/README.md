@@ -32,7 +32,7 @@ Additionally it writes created word counts to the data storage (as .csv files) a
 
 ## Configuration and command line Options
 
-The set of dictionary keys holding [EdedupTransform](src/profiler_transform_ray.py)
+The set of dictionary keys holding [ProfilerTransform](src/profiler_transform_python.py)
 configuration for values are as follows:
 
 * _doc_column_ - specifies name of the column containing documents
@@ -40,9 +40,9 @@ configuration for values are as follows:
 ## Running
 
 ### Launched Command Line Options
-When running the transform with the Ray launcher (i.e. TransformLauncher),
+When running the transform with the Python launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to
-[the options provided by the launcher](../../../../data-processing-lib/doc/ray-launcher-options.md).
+[the options provided by the launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 
 ```shell
   --profiler_doc_column PROFILER_DOC_COLUMN
@@ -58,18 +58,18 @@ To run the samples, use the following `make` targets
 * `run-local-sample` - runs src/ededup_local_ray.py
 * `run-s3-sample` - runs src/ededup_s3_ray.py
     * Requires prior installation of minio, depending on your platform (e.g., from [here](https://min.io/docs/minio/macos/index.html)
-     and [here](https://min.io/docs/minio/linux/index.html) 
-     and invocation of `make minio-start` to load data into local minio for S3 access.
+      and [here](https://min.io/docs/minio/linux/index.html)
+      and invocation of `make minio-start` to load data into local minio for S3 access.
 
 These targets will activate the virtual environment and set up any configuration needed.
 Use the `-n` option of `make` to see the detail of what is done to run the sample.
 
-For example, 
+For example,
 ```shell
 make run-cli-sample
 ...
 ```
-Then 
+Then
 ```shell
 ls output
 ```
@@ -77,6 +77,6 @@ To see results of the transform.
 
 ### Transforming data using the transform image
 
-To use the transform image to transform your data, please refer to the 
+To use the transform image to transform your data, please refer to the
 [running images quickstart](../../../../doc/quick-start/run-transform-image.md),
 substituting the name of this transform image and runtime as appropriate.
