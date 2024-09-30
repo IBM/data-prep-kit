@@ -1,0 +1,14 @@
+{
+    "use_declaration": {
+        "uast_node_type": "uast_package",
+        "extractor": "text = code_snippet.split('use', 1)[1].strip()\ntext = text.strip(' ;')\nif (' as ' in text):\n    # removing the alias\n    text = text.split(' as ')[0].strip()\nself.extracted = text"
+    },
+    "function_item": {
+        "uast_node_type": "uast_function",
+        "extractor": "temp_0 = code_snippet.split('(')[0].strip() \nself.extracted = temp_0.split(' ')[-1].strip()"
+    },
+    "line_comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "self.extracted = code_snippet[2:].strip()"
+    }
+}

@@ -1,0 +1,2 @@
+['py', 'java', 'cpp']
+max_depth = 1

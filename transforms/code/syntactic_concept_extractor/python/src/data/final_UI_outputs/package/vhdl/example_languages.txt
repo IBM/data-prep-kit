@@ -1,0 +1,2 @@
+['py']
+max_depth = 3

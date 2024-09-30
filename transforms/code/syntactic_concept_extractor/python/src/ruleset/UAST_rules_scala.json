@@ -1,0 +1,18 @@
+{
+    "import_declaration": {
+        "uast_node_type": "uast_package",
+        "extractor": "text = code_snippet.split('import', 1)[1].strip()\nif (' as ' in text):\n    # removing the alias\n    text = text.split(' as ')[0].strip()\nif (' exposing ' in text):\n    # removing the 'exposing' clause\n    text = text.split(' exposing ')[0].strip()\nif ('{' in text):\n    # removing the namespace selector\n    text = text.split('{')[0].strip()\nself.extracted = text"
+    },
+    "comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "self.extracted = code_snippet[2:].strip()"
+    },
+    "block_comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "self.extracted = code_snippet[2:-2].strip()"
+    },
+    "function_definition": {
+        "uast_node_type": "uast_function",
+        "extractor": "temp_0 = code_snippet.split('def')[1].strip() \ntemp_1 = temp_0.split('(')[0].strip() \ntemp_2 = temp_1.split(':')[0].strip() \nself.extracted = temp_2"
+    }
+}

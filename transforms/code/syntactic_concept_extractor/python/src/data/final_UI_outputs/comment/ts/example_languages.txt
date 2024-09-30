@@ -1,0 +1,2 @@
+['py', 'js']
+max_depth = 1
