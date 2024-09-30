@@ -1,17 +1,16 @@
 [project]
-name = "dpk_profiler_transform_ray"
+name = "dpk_profiler_transform_spark"
 version = "0.2.2.dev0"
 requires-python = ">=3.10"
-description = "profiler Ray Transform"
+description = "Profiler Spark Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
-    { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
+    { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit-ray==0.2.2.dev0",
-    "dpk_profiler_transform_python==0.2.2.dev0",
-    "tqdm==4.66.3",
+    "dpk-profiler-transform-python==0.2.2.dev0",
+    "data-prep-toolkit-spark==0.2.2.dev0",
 ]
 
 [build-system]
