@@ -16,6 +16,7 @@ from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime import AbstractTransformFileProcessor
 from data_processing.transform import TransformStatistics
 from data_processing_spark.runtime.spark import SparkTransformRuntimeConfiguration
+from data_processing.utils import UnrecoverableException
 
 
 class SparkTransformFileProcessor(AbstractTransformFileProcessor):
@@ -49,7 +50,11 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
         :return: None
         """
         # Create local processor
-        self.transform = self.runtime_configuration.get_transform_class()(transform_parameters)
+        try:
+            self.transform = self.runtime_configuration.get_transform_class()(transform_parameters)
+        except Exception as e:
+            self.logger.error(f"Exception creating transform  {e}")
+            raise UnrecoverableException("failed creating transform")
 
     def _publish_stats(self, stats: dict[str, Any]) -> None:
         """

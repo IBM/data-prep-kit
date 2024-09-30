@@ -33,7 +33,7 @@ def sample_ray_orchestrator(
     p2_pipeline_input_parent_path: str = "test/doc_id/input/",
     p2_pipeline_output_parent_path: str = "test/super/output/",
     p2_pipeline_parent_path_suffix: str = "",
-    p2_pipeline_additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
+    p2_pipeline_additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5, "delete_cluster_delay_minutes": 0}',
     p2_pipeline_data_s3_access_secret: str = "s3-secret",
     p2_pipeline_runtime_code_location: str = '{"github": "github", "commit_hash": "12345", "path": "path"}',
     p2_pipeline_runtime_actor_options: str = '{"num_cpus": 0.8}',

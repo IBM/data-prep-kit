@@ -1,0 +1,48 @@
+
+venv:  
+	$(MAKE) .defaults.create-venv
+
+test::	test-src
+
+clean:: .transforms.clean
+	-rm -fr src
+
+image:: .transforms.python-image
+
+run-ut::
+	source venv/bin/activate;       \
+	for T in $(TRANSFORMS_NAMES); do                    \
+	    echo running unit test on: $$T ; \
+		$(PYTEST) $(REPOROOT)/transforms/$$T/$(PACKAGING_RUN_TIME)/test; \
+	done;
+	@# Help: Setup environment and run unit tests for all transforms
+
+
+setup: .transforms.setup venv
+	$(MAKE) src
+	source venv/bin/activate;       \
+	$(PYTHON) -m pip install . 
+	@# Help: Do any default transform setup before running make src and setting up a test environment
+	
+
+src:
+	mkdir src
+	for T in $(TRANSFORMS_NAMES); do                    \
+	    echo copy src from  $$T ; \
+		cp -R $(REPOROOT)/transforms/$$T/$(PACKAGING_RUN_TIME)/src/* src ; \
+		rm -fr *.egg-info ; \
+		rm -fr dist ; \
+		rm -fr build ; \
+	done;
+	@# Help: Setup src folder and remove old distribution
+
+		
+build:: build-dist
+        
+publish:: publish-dist
+        
+build-dist:: src .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
+

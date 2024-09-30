@@ -9,6 +9,7 @@
 | code/code2parquet                   |                  [code2parquet_wf.py](../transforms/code/code2parquet/kfp_ray/code2parquet_wf.py)                   |
 | code/code_quality                   |            [code_quality_wf.py](../transforms/code/code_quality/kfp_ray/code_quality_wf.py)            |
 | code/proglang_select                | [proglang_select_wf.py](../transforms/code/proglang_select/kfp_ray/proglang_select_wf.py)              |
+| code/license_select                  | [license_select_wf.py](../transforms/code/license_select/kfp_ray/license_select_wf.py)
 | universal/doc_id                    |                  [doc_id_wf.py](../transforms/universal/doc_id/kfp_ray/doc_id_wf.py)                   |
 | universal/ededup                    |                  [ededup_wf.py](../transforms/universal/ededup/kfp_ray/ededup_wf.py)                   |
 | universal/fdedup                    |                  [fdedup_wf.py](../transforms/universal/fdedup/kfp_ray/fdedup_wf.py)                   |

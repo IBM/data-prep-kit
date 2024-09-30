@@ -1,0 +1,49 @@
+name: Test - transforms/packaging/ray
+
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - "dev"
+            - "releases/**"
+        tags:
+            - "*"
+        paths:
+            - "transforms/packaging/ray/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
+    pull_request:
+        branches:
+            - "dev"
+            - "releases/**"
+        paths:
+            - "transforms/packaging/ray/**"
+            - "!**.md"
+            - "!**/doc/**"
+            - "!**/images/**"
+            - "!**.gitignore"
+
+jobs:
+    test-src:
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Free up space in github runner
+              # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
+              run: |
+                  df -h
+                  sudo rm -rf "/usr/local/share/boost"
+                  sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+                  sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/local/.ghcup
+                  sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
+                  df -h
+            - name: Test transform source in transforms/packaging/ray
+              run: |
+                  if [ -e "transforms/packaging/ray/Makefile" ]; then
+                      make -C transforms/packaging/ray DOCKER=docker test-src
+                  else
+                      echo "transforms/packaging/ray/Makefile not found - source testing disabled for this transform."
+                  fi
