@@ -32,3 +32,19 @@ test-src::
 set-versions:
 	@# Help: Recursively $@ in all subdirs
 	$(MAKE) RULE=$@ .recurse
+
+.PHONY: workflow-venv
+workflow-venv:
+	$(MAKE) -C kfp_ray workflow-venv
+
+.PHONY: workflow-test
+workflow-test:
+	$(MAKE) -C kfp_ray workflow-test
+
+.PHONY: workflow-upload
+workflow-upload:
+	$(MAKE) -C kfp_ray workflow-upload
+
+.PHONY: workflow-build
+workflow-build:
+	$(MAKE) -C  kfp_ray workflow-build

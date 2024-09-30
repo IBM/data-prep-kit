@@ -13,9 +13,21 @@ include $(REPOROOT)/transforms/.make.transforms
 
 venv::	.transforms.python-venv
 
+test::	.transforms.python-test
+
 clean:: .transforms.clean
 
+image:: .transforms.python-image
+
 test-src:: .transforms.test-src
+
+setup:: .transforms.setup
+
+build:: build-dist image
+
+publish: publish-image
+
+publish-image:: .transforms.publish-image-python
 
 setup:: .transforms.setup
 

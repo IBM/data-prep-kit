@@ -13,12 +13,25 @@ TRANSFORM_NAME=syntactic_concept_extractor
 BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
 
+test::	.transforms.ray-test
+
 clean:: .transforms.clean
+
+image:: .transforms.ray-image
 
 test-src:: .transforms.test-src
 
 setup:: .transforms.setup
 
+test-image:: .transforms.ray-test-image
+
+build:: build-dist image
+
+publish: publish-image
+
+publish-image:: .transforms.publish-image-ray
+
+setup:: .transforms.setup
 # distribution versions is the same as image version.
 set-versions:
 	$(MAKE) TRANSFORM_PYTHON_VERSION=$(SYNTACTIC_CONCEPT_EXTRACTOR_RAY_VERSION) TOML_VERSION=$(SYNTACTIC_CONCEPT_EXTRACTOR_RAY_VERSION) .transforms.set-versions 
