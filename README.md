@@ -152,6 +152,7 @@ The matrix below shows the the combination of modules and supported runtimes. Al
 | [Malware annotation](transforms/code/malware/python/README.md)               | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | [Header cleanser](transforms/code/header_cleanser/python/README.md)                  | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 | [Semantic file ordering](transforms/code/repo_level_ordering/ray/README.md)              |                    |:white_check_mark:|                  |                        |
+| [License Select Annotation](transforms/code/license_select/python/README.md)                  | :white_check_mark: |:white_check_mark:|                  |:white_check_mark:      |
 
 
 Contributors are welcome to add new modules to expand to other data modalities as well as add runtime support for existing modules!
