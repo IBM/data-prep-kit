@@ -73,7 +73,7 @@ def orchestrate(
         logger.info(
             f"Number of workers - {preprocessing_params.n_workers} " f"with {preprocessing_params.worker_options} each"
         )
-        # create statistics
+        # log retries
         if retries > 0:
             statistics.add_stats.remote({"data access retries": retries})
         # create executors

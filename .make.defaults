@@ -49,7 +49,7 @@ DOCKER_REGISTRY_KEY?=$(DPK_DOCKER_REGISTRY_KEY)
 DOCKER_REGISTRY_ENDPOINT?=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)
 DOCKER_LOCAL_IMAGE=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 DOCKER_REMOTE_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
-DOCKER_SPARK_BASE_IMAGE_NAME=data-prep-kit-spark-3.5.2
+DOCKER_SPARK_BASE_IMAGE_NAME=data-prep-kit-spark-$(SPARK_VERSION)
 DOCKER_SPARK_BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 RAY_BASE_IMAGE?=docker.io/rayproject/ray:${RAY}-py310
 # Deprecated in favor of DOCKER_REMOTE_IMAGE
@@ -480,7 +480,8 @@ endif
 	if [ -e requirements.txt ]; then				\
 		echo Installing requirements from requirements.txt;	\
 		pip install $(PIP_INSTALL_EXTRA_ARGS) $$extra_url -r requirements.txt;		\
-	elif [ -e pyproject.toml ]; then				\
+	fi;	\
+	if [ -e pyproject.toml ]; then				\
 		echo Installing from pyproject.toml;			\
 		pip install $(PIP_INSTALL_EXTRA_ARGS) $$extra_url -e .;	\
 	fi
@@ -586,6 +587,18 @@ MINIO_ADMIN_PWD= localminiosecretkey
 		-e 's/"data-prep-toolkit-kfp-shared\(..\).*"/"data-prep-toolkit-kfp-shared\1$(DPK_LIB_KFP_VERSION)"/'     \
 		> tt.toml;				\
 	    mv tt.toml pyproject.toml;			\
+	 fi
+	@if [ -e requirements.txt ]; then					\
+	    cat requirements.txt | sed 									\
+		-e 's/data-prep-toolkit-ray\([=><~][=]\).*/data-prep-toolkit-ray\1$(DPK_LIB_VERSION)/' 	\
+		-e 's/data-prep-toolkit-transforms\([=><~][=]\).*/data-prep-toolkit-transforms\1$(DPK_TRANSFORMS_VERSION)/' 	\
+		-e 's/data-prep-toolkit-spark\([=><~][=]\).*/data-prep-toolkit-spark\1$(DPK_LIB_VERSION)/' 	\
+		-e 's/data-prep-toolkit-kfp\([=><~][=]\).*/data-prep-toolkit-kfp\1$(DPK_LIB_KFP_VERSION)/' 	\
+		-e 's/data-prep-toolkit\([=><~][=]\).*/data-prep-toolkit\1$(DPK_LIB_VERSION)/' 		\
+		-e 's/ray\[default\]\([=><~][=]\).*/ray\[default\]\1$(RAY)/'				\
+		-e 's/data-prep-toolkit-kfp-shared\(..\).*/data-prep-toolkit-kfp-shared\1$(DPK_LIB_KFP_VERSION)/'     \
+		> tt.txt;				\
+	    mv tt.txt requirements.txt;			\
 	 fi
 
 # Build the distribution, usually in preparation for publishing using ith the .defaults.publish-dist  target

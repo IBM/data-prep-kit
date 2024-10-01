@@ -15,11 +15,11 @@ import sys
 
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from profiler_transform_ray import ProfilerRayTransformConfiguration
+from profiler_transform_ray import ProfilerRayTransformRuntimeConfiguration
 
 
 # create launcher
-launcher = RayTransformLauncher(ProfilerRayTransformConfiguration())
+launcher = RayTransformLauncher(ProfilerRayTransformRuntimeConfiguration())
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
