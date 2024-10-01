@@ -33,7 +33,7 @@ params = {
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
-    "runtime_num_processors": 2,
+    # "runtime_num_processors": 2,
     # hosp params
     "hosp_metrics_list": ["CCR"]
 }
