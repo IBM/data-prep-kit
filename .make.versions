@@ -111,6 +111,9 @@ HTML2PARQUET_PYTHON_VERSION=$(DPK_VERSION)
 
 DPK_TRANSFORMS_VERSION=$(DPK_VERSION)
 
+HOSP_PYTHON_VERSION=$(DPK_VERSION)
+SP_PYTHON_VERSION=$(DPK_VERSION)
+
 ################## ################## ################## ################## ################## ##################
 # Begin versions that the repo depends on. 
 
