@@ -10,7 +10,6 @@ authors = [
 ]
 dynamic = ["dependencies"]
 
-dependencies = {file = ["requirements.txt"]}
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
