@@ -34,15 +34,8 @@ class HAPTransform(AbstractTableTransform):
         self.batch_size = config.get("batch_size")
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path)
         self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name_or_path)
-        
-    def apply_tokenizer(self, data: list, max_length: int):
-        """
-        Tokenize a batch of doc text
-        """
-        tokenized = self.tokenizer(data, max_length=max_length, padding=True, truncation=True, return_tensors="pt").to(device)
-        return tokenized
 
-    def apply_model(self, data: list, batch_size: int) -> list[float]:
+    def _apply_model(self, data: list, batch_size: int) -> list[float]:
         num_batches = len(data) // batch_size
         data_sent_scores = []
         for i in range(num_batches + 1):
@@ -56,7 +49,7 @@ class HAPTransform(AbstractTableTransform):
                 data_sent_scores.extend(torch.softmax(logits, dim=1).cpu().numpy()[:, 1].tolist())
         return data_sent_scores 
 
-    def apply_sent_split(self, data: list) -> tuple[list[str], list[int]]:
+    def _apply_sent_split(self, data: list) -> tuple[list[str], list[int]]:
         data_sents, data_sent_ids = [], []
         for i, e in enumerate(data):
             s_list = nltk.sent_tokenize(e)
@@ -64,7 +57,7 @@ class HAPTransform(AbstractTableTransform):
             data_sent_ids.extend([i] * len(s_list))
         return data_sents, data_sent_ids
         
-    def apply_aggregate(self, nb_doc: int, sent_scores: list[float], sent_ids: list[int]) -> list[float]:
+    def _apply_aggregate(self, nb_doc: int, sent_scores: list[float], sent_ids: list[int]) -> list[float]:
         doc_scores = []
         for i in range(nb_doc):
             temp = [score for idx, score in zip(sent_ids, sent_scores) if i == idx]
@@ -86,10 +79,10 @@ class HAPTransform(AbstractTableTransform):
             text = " ".join(text.strip().splitlines())
             df_doc_list.append(text)
         
-        data_sents, data_sent_ids = self.apply_sent_split(df_doc_list)
-        data_sent_scores = self.apply_model(data_sents, self.batch_size)
+        data_sents, data_sent_ids = self._apply_sent_split(df_doc_list)
+        data_sent_scores = self._apply_model(data_sents, self.batch_size)
         
-        df_doc_scores = self.apply_aggregate(len(df_doc_list), data_sent_scores, data_sent_ids)
+        df_doc_scores = self._apply_aggregate(len(df_doc_list), data_sent_scores, data_sent_ids)
         assert len(df_doc_list) == len(df_doc_scores)
         
         self.df['hap_score'] = df_doc_scores
