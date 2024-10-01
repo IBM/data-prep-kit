@@ -10,7 +10,6 @@ authors = [
 ]
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
-    "data-prep-toolkit==0.2.2.dev0",
     "torch==2.4.1",
 
 [build-system]
