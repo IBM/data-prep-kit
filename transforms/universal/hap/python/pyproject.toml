@@ -9,7 +9,8 @@ authors = [
     { name = "David Wood", email = "dawood@us.ibm.com" },
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
 ]
-dependencies = [
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
     "data-prep-toolkit==0.2.2.dev0",
     "torch==2.4.1",
     "nltk==3.9.1",
