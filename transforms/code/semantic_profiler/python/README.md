@@ -5,20 +5,24 @@ for details on general project conventions, transform configuration,
 testing and IDE set up.
 
 ## Summary 
-This transform serves as a template for transform writers as it does
-not perform any transformations on the input (i.e., a no-operation transform).
-As such, it simply copies the input parquet files to the output directory.
-It shows the basics of creating a simple 1:1 table transform.
-It also implements a single configuration value to show how configuration
-of the transform is implemented.
+This transform implements semantic profiling of a code dataset. Given an input dataset 
+as a pyarrow table with the UBSRs of code data points, this transform extracts the libraries
+and obtains their semantic mapping by consulting the IKB. The semantic concepts obatined per data
+point are then added as a new column in the input dataset. Those libraries which are not present in the
+IKB are recorded in a separate 'null_libs' file for offline processing. This file is passed as an input
+to the [offline path](src/offline_path/) which reads the libraries and obtains their semantic categories 
+from predefined set by prompting an LLM. The examples passed into the prompt are present in the [examples folder](src/examples/)
 
 ## Configuration and command line Options
 
 The set of dictionary keys holding [SPTransform](src/sp_transform.py) 
 configuration for values are as follows:
 
-* _sp_ikb_file_ - 
-* _sp_null_libs_file_ - 
+* _sp_ikb_file_ - This is the path to the IKB file which is a CSV file and by default located in the [IKB](src/ikb/) folder.
+                  It contains three columns - Library, Language, Category. The set of categories is defined in the 
+                  [concept map file](src/concept_map/).
+* _sp_null_libs_file_ - This is the path to the null_libs file which is also a CSV file containing two columns - 
+                        Library, Language. Its default value is src/ikb/null_libs.csv.
 
 ## Running
 
@@ -28,9 +32,9 @@ the options provided by
 the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 ```
   --sp_ikb_file        SP_IKB_FILE
-                       Sleep actor for a number of seconds while processing the data frame, before writing the file to COS
+                       Path to the IKB file
   --sp_null_libs_file  SP_NULL_LIBS_FILE   
-                       A dummy password which should be filtered out of the metadata
+                       Path to the file to store the libraries for which no match could be found in the IKB
 ```
 These correspond to the configuration keys described above.
 
