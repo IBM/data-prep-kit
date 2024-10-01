@@ -1,10 +1,7 @@
 # Use make help, to see the available rules
 REPOROOT=../..
 include $(REPOROOT)/.make.defaults
-SPARK_VERSION=3.5.2
-DOCKER_IMAGE_NAME=data-prep-kit-spark-$(SPARK_VERSION)
-DOCKER_IMAGE_LIB_NAME=data-prep-kit-spark
-DOCKER_IMAGE_VERSION := latest
+DOCKER_IMAGE_NAME=$(DOCKER_SPARK_BASE_IMAGE_NAME)
 
 
 .check-env::

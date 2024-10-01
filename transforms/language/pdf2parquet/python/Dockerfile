@@ -26,6 +26,7 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 # END OF STEPS destined for a data-prep-kit base image 
 
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
+COPY --chown=dpk:root requirements.txt requirements.txt
 RUN pip install ${PIP_INSTALL_EXTRA_ARGS} --no-cache-dir -e .
 
 # Download models
