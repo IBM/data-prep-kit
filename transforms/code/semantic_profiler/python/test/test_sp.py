@@ -38,7 +38,7 @@ class TestSemanticProfilerTransform(AbstractTableTransformTest):
         expected_tables = get_tables_in_folder(expected_dir)
         
         expected_metadata_list = [{"nfiles": 1, "nrows": len(expected_tables[0])}, {}]
-        config = {ikb_file:"../src/ikb/ikb_model.csv", null_libs_file:"../src/ikb/null_libs.csv"}
+        config = {ikb_file: os.path.join(src_file_dir,"../src/ikb/ikb_model.csv"), null_libs_file: os.path.join(src_file_dir,"../src/ikb/null_libs.csv")}
         fixtures = [
             (SemanticProfilerTransform(config), input_tables, expected_tables, expected_metadata_list),
         ]
