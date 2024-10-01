@@ -49,7 +49,7 @@ class SemanticProfilerTransform(AbstractTableTransform):
         self.ikb_file = config.get("ikb_file", "../src/ikb/ikb_model.csv")
         self.null_libs_file = config.get("null_libs_file", "../src/ikb/null_libs.csv")
 
-    def transform(self, table: pa.Table) -> tuple[list[pa.Table], dict[str, Any]]:
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
         Put Transform-specific to convert one Table to 0 or more tables. It also returns
         a dictionary of execution statistics - arbitrary dictionary
@@ -100,14 +100,14 @@ class SemanticProfilerTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{ikb_file_cli_param}",
             type=str,
-            default="ikb/ikb_model.csv",
+            default=None,
             help="Default IKB file",
         )
 
         parser.add_argument(
             f"--{null_libs_file_cli_param}",
             type=str,
-            default="ikb/null_libs.csv",
+            default=None,
             help="Default Null Libraries file",
         )
 

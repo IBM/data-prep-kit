@@ -33,7 +33,7 @@ params = {
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
-    "runtime_num_processors": 2,
+    # "runtime_num_processors": 2,
     # sp params
     "sp_ikb_file": "src/ikb/ikb_model.csv",
     "sp_null_libs_file": "src/ikb/null_libs.csv"
