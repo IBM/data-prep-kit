@@ -14,12 +14,14 @@ import time
 from argparse import ArgumentParser, Namespace
 from typing import Any
 import csv
+from pathlib import Path
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider
 from UAST import *
+from report import *
 
 
 short_name = "hosp"
@@ -28,8 +30,13 @@ cli_prefix = f"{short_name}_"
 metrics_list = "metrics_list"
 hosp_metrics_cli_param = f"{cli_prefix}{metrics_list}"
 
+base_constructs = ['Library', 'Language', 'Concepts']
+
 
 def uast_read(jsonstring):
+    """
+    Reads an input json string into UAST class object
+    """
     uast = UAST()
     if jsonstring is not None and jsonstring != 'null':
         uast.load_from_json_string(jsonstring)
@@ -37,6 +44,9 @@ def uast_read(jsonstring):
     return None
 
 def extract_ccr(uast):
+    """
+    Calculates the code to comment ratio given an UAST object as input
+    """
     if uast is not None:
         total_comment_loc = 0
         for node_idx in uast.nodes:
@@ -51,6 +61,24 @@ def extract_ccr(uast):
             return None 
     return None
 
+def generate_report(table: pa.Table, metrics_list):
+    """
+    Generates the profiler report given the table name and the metrics list given as input by the user.
+    """
+    columns = base_constructs + metrics_list
+    script_dir = Path(__file__).parent.resolve()
+    template_file = str(script_dir / 'template.html')
+    output_file = str(script_dir / 'output.html')
+    report = Report(template_file)
+    count = 0
+    for column in columns:
+        plot = Plot(table, column)
+        plot_html = plot.generate_distribution_plot()
+        report.add_metric(count, column, plot_html)
+        count+=1
+    report.save(output_file)
+
+
 
 class HigherOrderSyntacticProfilerTransform(AbstractTableTransform):
     """
@@ -61,11 +89,11 @@ class HigherOrderSyntacticProfilerTransform(AbstractTableTransform):
         """
         Initialize based on the dictionary of configuration information.
         This is generally called with configuration parsed from the CLI arguments defined
-        by the companion runtime, SemanticProfilerTransformRuntime.  If running inside the RayMutatingDriver,
+        by the companion runtime, HigherOrderSyntacticProfilerTransformRuntime.  If running inside the RayMutatingDriver,
         these will be provided by that class with help from the RayMutatingDriver.
         """
         # Make sure that the param name corresponds to the name used in apply_input_params method
-        # of SemanticProfilerTransformConfiguration class
+        # of HigherOrderSyntacticProfilerTransformConfiguration class
         super().__init__(config)
         self.metrics_list = config.get("metrics", ["CCR"])
         
@@ -84,7 +112,9 @@ class HigherOrderSyntacticProfilerTransform(AbstractTableTransform):
                     self.logger.info(f"Generating {metric} values")
                     uasts = [uast_read(uast_json) for uast_json in table['UAST'].to_pylist()]
                     ccrs = [extract_ccr(uast) for uast in uasts]
-                    new_table = table.append_column('CCR', pa.array(ccrs))
+                    new_table = table.append_column(metric, pa.array(ccrs))
+        if 'UAST' in new_table.schema.names and 'Concepts' in new_table.schema.names:
+            generate_report(new_table,self.metrics_list)
         self.logger.debug(f"Transformed one table with {len(new_table)} rows")
         metadata = {"nfiles": 1, "nrows": len(new_table)}
         return [new_table], metadata
@@ -110,7 +140,7 @@ class HigherOrderSyntacticProfilerTransformConfiguration(TransformConfiguration)
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
-        This will be included in a dictionary used to initialize the SemanticProfilerTransform.
+        This will be included in a dictionary used to initialize the HigherOrderSyntacticProfilerTransform.
         By convention a common prefix should be used for all transform-specific CLI args
         (e.g, sp_, pii_, etc.)
         """

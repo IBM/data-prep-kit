@@ -23,8 +23,8 @@ logger = get_logger(__name__)
 
 class HigherOrderSyntacticProfilerRayTransformConfiguration(RayTransformRuntimeConfiguration):
     """
-    Implements the RayTransformConfiguration for NOOP as required by the RayTransformLauncher.
-    NOOP does not use a RayRuntime class so the superclass only needs the base
+    Implements the RayTransformConfiguration for HOSP as required by the RayTransformLauncher.
+    HOSP does not use a RayRuntime class so the superclass only needs the base
     python-only configuration.
     """
 
@@ -37,7 +37,7 @@ class HigherOrderSyntacticProfilerRayTransformConfiguration(RayTransformRuntimeC
 
 
 if __name__ == "__main__":
-    # launcher = NOOPRayLauncher()
+    # launcher = HOSPRayLauncher()
     launcher = RayTransformLauncher(HigherOrderSyntacticProfilerRayTransformConfiguration())
     logger.info("Launching hosp transform")
     launcher.launch()

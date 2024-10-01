@@ -25,8 +25,8 @@ logger = get_logger(__name__)
 
 class HigherOrderSyntacticProfilerPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
     """
-    Implements the PythonTransformConfiguration for SemanticProfiler as required by the PythonTransformLauncher.
-    SemanticProfiler does not use a RayRuntime class so the superclass only needs the base
+    Implements the PythonTransformConfiguration for HigherOrderSyntacticProfiler as required by the PythonTransformLauncher.
+    HigherOrderSyntacticProfiler does not use a RayRuntime class so the superclass only needs the base
     python-only configuration.
     """
 
@@ -39,7 +39,7 @@ class HigherOrderSyntacticProfilerPythonTransformConfiguration(PythonTransformRu
 
 
 if __name__ == "__main__":
-    # launcher = SemanticProfilerRayLauncher()
+    # launcher = HigherOrderSyntacticProfilerRayLauncher()
     launcher = PythonTransformLauncher(HigherOrderSyntacticProfilerPythonTransformConfiguration())
     logger.info("Launching hosp transform")
     launcher.launch()

@@ -5,11 +5,11 @@ for details on general project conventions, transform configuration,
 testing and IDE set up.
 
 ## Summary 
-This project wraps the [noop transform](../python) with a Ray runtime.
+This project wraps the [hosp transform](../python) with a Ray runtime.
 
 ## Configuration and command line Options
 
-Noop configuration and command line options are the same as for the [base python](../python) transform. 
+HOSP configuration and command line options are the same as for the [base python](../python) transform. 
 
 ## Running
 
@@ -21,12 +21,9 @@ the set of
 ### Running the samples
 To run the samples, use the following `make` targets
 
-* `run-cli-sample` - runs src/noop_transform.py using command line args
-* `run-local-sample` - runs src/noop_local_ray.py
-* `run-s3-sample` - runs src/noop_s3_ray.py
-    * Requires prior installation of minio, depending on your platform (e.g., from [here](https://min.io/docs/minio/macos/index.html)
-     and [here](https://min.io/docs/minio/linux/index.html) 
-     and invocation of `make minio-start` to load data into local minio for S3 access.
+* `run-cli-sample` - runs src/hosp_transform.py using command line args
+* `run-local-sample` - runs src/hosp_local_ray.py
+    
 
 These targets will activate the virtual environment and set up any configuration needed.
 Use the `-n` option of `make` to see the detail of what is done to run the sample.
