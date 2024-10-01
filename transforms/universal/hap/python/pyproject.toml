@@ -10,7 +10,6 @@ authors = [
 ]
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
-    "torch==2.4.1",
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
