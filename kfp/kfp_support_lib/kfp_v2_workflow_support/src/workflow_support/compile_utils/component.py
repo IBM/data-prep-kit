@@ -42,13 +42,9 @@ class ComponentUtils:
             try:
                 tolerations = os.getenv("KFP_TOLERATIONS", "")
                 if tolerations != "":
-                    print(f"Note: Applying Tolerations {tolerations} to kfp and ray pods")
-
-                    # Add Tolerations as env var so it can used when creating the ray cluster
-                    task.add_pod_annotation("ray_tolerations", tolerations)
-                    kubernetes.use_field_path_as_env(
-                        task, env_name="KFP_TOLERATIONS", field_path="metadata.annotations['ray_tolerations']"
-                    )
+                    # TODO: apply the tolerations defined as env vars to ray pods.
+                    # Currently they can be specified in the pipeline params:
+                    # ray_head_options and ray_worker_options.
 
                     tolerations = json.loads(tolerations)
                     for toleration in tolerations:

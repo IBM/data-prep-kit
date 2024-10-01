@@ -62,7 +62,7 @@ class ComponentUtils:
                 if tolerations != "":
                     print(f"Note: Applying Tolerations {tolerations} to kfp and ray pods")
 
-                    # Add Tolerations as env var so it can used when creating the ray cluster
+                    # Add Tolerations as env var so it can be used when creating the ray cluster
                     component.add_env_variable(k8s_client.V1EnvVar(name="KFP_TOLERATIONS", value=tolerations))
 
                     tolerations = json.loads(tolerations)

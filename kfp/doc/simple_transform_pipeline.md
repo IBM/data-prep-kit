@@ -220,6 +220,7 @@ export KFP_TOLERATIONS='[{"key": "key","operator": "Equal", "value1": "value", "
 export KFP_NODE_SELECTOR='{"label_key":"cloud.google.com/gke-accelerator","label_value":"nvidia-tesla-p4"}'
 
 ```
+In KFP v1, setting `KFP_TOLERATIONS` will apply to the Ray pods, overriding any tolerations specified in the `ray_head_options` and `ray_worker_options` pipeline parameters if they are present.
 
 ## Compiling a pipeline <a name = "compilation"></a>
 
