@@ -42,7 +42,14 @@ class ComponentUtils:
             try:
                 tolerations = os.getenv("KFP_TOLERATIONS", "")
                 if tolerations != "":
-                    print(f"Note: Applying Tolerations {tolerations} to kubeflow pipelines pods")
+                    print(f"Note: Applying Tolerations {tolerations} to kfp and ray pods")
+
+                    # Add Tolerations as env var so it can used when creating the ray cluster
+                    task.add_pod_annotation("ray_tolerations", tolerations)
+                    kubernetes.use_field_path_as_env(
+                        task, env_name="KFP_TOLERATIONS", field_path="metadata.annotations['ray_tolerations']"
+                    )
+
                     tolerations = json.loads(tolerations)
                     for toleration in tolerations:
                         kubernetes.add_toleration(
@@ -52,6 +59,7 @@ class ComponentUtils:
                             value=toleration["value"],
                             effect=toleration["effect"],
                         )
+
             except Exception as e:
                 logger.warning(f"Exception while handling tolerations {e}")
 

@@ -60,7 +60,11 @@ class ComponentUtils:
             try:
                 tolerations = os.getenv("KFP_TOLERATIONS", "")
                 if tolerations != "":
-                    print(f"Note: Applying Tolerations {tolerations} to kubeflow pipelines pods")
+                    print(f"Note: Applying Tolerations {tolerations} to kfp and ray pods")
+
+                    # Add Tolerations as env var so it can used when creating the ray cluster
+                    component.add_env_variable(k8s_client.V1EnvVar(name="KFP_TOLERATIONS", value=tolerations))
+
                     tolerations = json.loads(tolerations)
                     for toleration in tolerations:
                         component.add_toleration(
