@@ -10,6 +10,7 @@
 # limitations under the License.
 ################################################################################
 
+
 def ededup_compute_execution_params(
     worker_options: dict,  # ray worker configuration
     actor_options: dict,  # actor's resource requirements
@@ -94,9 +95,9 @@ def ededup_compute_execution_params(
         )
         sys.exit(1)
     # Define number of workers
-    n_workers = int((0.85 * cluster_cpu - required_hash_cpu) / actor_cpu)
+    n_workers = int((0.85 * (cluster_cpu - 1) - required_hash_cpu) / actor_cpu)
     print(f"Number of workers - {n_workers}")
-    if n_workers < 2:
+    if n_workers < 0:
         print(f"Cluster is too small - estimated number of workers {n_workers}")
         sys.exit(1)
     # Limit amount of workers and processors to prevent S3 saturation
