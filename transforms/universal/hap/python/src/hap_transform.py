@@ -132,7 +132,7 @@ class HAPTransformConfiguration(TransformConfiguration):
             "--doc_text_column",
             type=str,
             required=False,
-            default="doc_text",
+            default="contents",
             help="The column name that contains the document text",
         )
         
