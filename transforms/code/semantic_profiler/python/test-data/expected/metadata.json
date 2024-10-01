@@ -36,11 +36,11 @@
         "nrows": 5
     },
     "source": {
-        "name": "test-data/data_processing/ray/noop/input",
+        "name": "test-data/data_processing/ray/sp/input",
         "type": "path"
     },
     "target": {
-        "name": "/tmp/NOOP4o9gv2bq",
+        "name": "/tmp/SP4o9gv2bq",
         "type": "path"
     }
 }

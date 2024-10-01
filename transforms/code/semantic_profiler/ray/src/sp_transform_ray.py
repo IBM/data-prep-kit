@@ -23,8 +23,8 @@ logger = get_logger(__name__)
 
 class SemanticProfilerRayTransformConfiguration(RayTransformRuntimeConfiguration):
     """
-    Implements the RayTransformConfiguration for NOOP as required by the RayTransformLauncher.
-    NOOP does not use a RayRuntime class so the superclass only needs the base
+    Implements the RayTransformConfiguration for SP as required by the RayTransformLauncher.
+    SP does not use a RayRuntime class so the superclass only needs the base
     python-only configuration.
     """
 

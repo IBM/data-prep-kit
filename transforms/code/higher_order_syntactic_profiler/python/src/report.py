@@ -17,7 +17,14 @@ class Plot:
         self.column_data = self._get_column_data()
 
     def _get_column_data(self):
-        return self.table[self.column_name].to_numpy()
+        column_data = self.table[self.column_name].to_numpy()
+        split_data = []
+        for value in column_data:
+            if isinstance(value, str) and ',' in value:
+                split_data.extend(value.split(','))
+            else:
+                split_data.append(value)
+        return np.array([item.strip() if isinstance(item, str) else item for item in split_data])
 
     def generate_distribution_plot(self):
         data = self.column_data
