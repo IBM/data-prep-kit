@@ -9,7 +9,7 @@ include $(REPOROOT)/transforms/.make.transforms
 #TRANSFORM_RUNTIME_SRC_FILE=hap_transform_python.py
 TRANSFORM_NAME=hap
 
-include $(REPOROOT)/transforms/.make.transforms
+HAP_PYTHON_VERSION= $(DPK_VERSION)
 
 venv::	.transforms.python-venv
 
