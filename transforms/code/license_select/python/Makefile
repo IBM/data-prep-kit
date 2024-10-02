@@ -1,4 +1,3 @@
-
 # Define the root of the local git clone for the common rules to be able
 # know where they are running from.
 REPOROOT=../../../..
@@ -35,7 +34,7 @@ run-local-sample: .transforms.run-local-sample
 
 build:: build-dist image
 
-publish:: publish-dist publish-image
+publish: publish-image
 
 publish-image:: .transforms.publish-image-python
 
@@ -54,3 +53,11 @@ run-local-sample: .transforms.run-local-sample
 run-local-python-sample: .transforms.run-local-python-sample
 
 load-image:: .transforms.load-image
+
+minio-start:	.minio-start
+
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image
