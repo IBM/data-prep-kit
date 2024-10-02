@@ -1,7 +1,9 @@
 ## Data prep kit
-#data-prep-toolkit-transforms==0.2.1.dev1
-#data-prep-toolkit-transforms-ray==0.2.1.dev1
 
+data-prep-toolkit-transforms==0.2.1
+data-prep-toolkit-transforms-ray==0.2.1
+
+deepsearch-toolkit
 
 
 # Milvus
@@ -28,14 +30,9 @@ llama-index
 
 ### llama-index embedding models
 llama-index-embeddings-huggingface
-## llama-index-embeddings-mistralai
-## llama-index-embeddings-openai== 0.1.7
 
 ### llama-index LLM interfaces
 llama-index-llms-replicate
-## llama-index-llms-mistralai
-## llama-index-llms-openai==0.1.12
-# llama-index-llms-llama-cpp
 
 ### llama-index Vector dbs
 llama-index-vector-stores-milvus
