@@ -57,6 +57,9 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/kfp_ray_co
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/shared_workflow_support; \
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB); \
 	$(MAKE) -C ${REPOROOT}/kfp/kfp_ray_components set-versions
+	pip install jinja2
+	pip install pyyaml
+	pip install pre-commit
 	@# Help: Create the virtual environment common to all workflows
 
 .PHONY: .workflows.upload-pipeline

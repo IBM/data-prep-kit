@@ -121,7 +121,7 @@ def doc_chunk(
     doc_chunk_output_chunk_column_name: str = "contents",
     doc_chunk_dl_min_chunk_len: int = 64,
     # additional parameters
-    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
+    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5, "delete_cluster_delay_minutes": 0}',
 ):
     """
     Pipeline to execute chunk documents transform
@@ -131,6 +131,7 @@ def doc_chunk(
         memory - memory
         image - image to use
         image_pull_secret - image pull secret
+        tolerations - (optional) tolerations for the ray pods
     :param ray_worker_options: worker node options (we here are using only 1 worker pool), containing the following:
         replicas - number of replicas to create
         max_replicas - max number of replicas
@@ -139,6 +140,7 @@ def doc_chunk(
         memory - memory
         image - image to use
         image_pull_secret - image pull secret
+        tolerations - (optional) tolerations for the ray pods
     :param server_url - server url
     :param additional_params: additional (support) parameters, containing the following:
         wait_interval - wait interval for API server, sec
@@ -161,8 +163,8 @@ def doc_chunk(
     :return: None
     """
     # create clean_up task
-    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=run_id, server_url=server_url)
-    ComponentUtils.add_settings_to_component(clean_up_task, 60)
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=run_id, server_url=server_url, additional_params=additional_params)
+    ComponentUtils.add_settings_to_component(clean_up_task, ONE_HOUR_SEC * 2)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
         # compute execution params

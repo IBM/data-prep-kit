@@ -16,7 +16,7 @@ DPK_MAJOR_VERSION=0
 # The minor version is incremented manually when significant features have been added that are backward compatible with the previous major.minor release.
 DPK_MINOR_VERSION=2
 # The minor version is incremented AUTOMATICALLY by the release.sh script when a new release is set.
-DPK_MICRO_VERSION=1
+DPK_MICRO_VERSION=2
 # The suffix is generally always set in the main/development branch and only nulled out when creating release branches.
 # It can be manually incremented, for example, to allow publishing a new intermediate version wheel to pypi. 
 DPK_VERSION_SUFFIX=.dev0
@@ -59,10 +59,13 @@ NOOP_PYTHON_VERSION=$(DPK_VERSION)
 NOOP_RAY_VERSION=$(DPK_VERSION)
 NOOP_SPARK_VERSION=$(DPK_VERSION)
 
+PROFILER_PYTHON_VERSION=$(DPK_VERSION)
 PROFILER_RAY_VERSION=$(DPK_VERSION)
+PROFILER_SPARK_VERSION=$(DPK_VERSION)
 
 RESIZE_PYTHON_VERSION=$(DPK_VERSION)
 RESIZE_RAY_VERSION=$(DPK_VERSION)
+RESIZE_SPARK_VERSION=$(DPK_VERSION)
 
 LANG_ID_PYTHON_VERSION=$(DPK_VERSION)
 LANG_ID_RAY_VERSION=$(DPK_VERSION)
@@ -99,9 +102,14 @@ TEXT_ENCODER_RAY_VERSION=$(DPK_VERSION)
 HEADER_CLEANSER_PYTHON_VERSION=$(DPK_VERSION) 
 HEADER_CLEANSER_RAY_VERSION=$(DPK_VERSION)
 
+LICENSE_SELECT_PYTHON_VERSION=$(DPK_VERSION)
+LICENSE_SELECT_RAY_VERSION=$(DPK_VERSION)
+
 PII_REDACTOR_PYTHON_VERSION=$(DPK_VERSION)
 
 HTML2PARQUET_PYTHON_VERSION=$(DPK_VERSION)
+
+DPK_TRANSFORMS_VERSION=$(DPK_VERSION)
 
 ################## ################## ################## ################## ################## ##################
 # Begin versions that the repo depends on. 
@@ -111,9 +119,11 @@ KFP_v2_SDK=2.8.0
 KFP_v1=1.8.5
 KFP_v1_SDK=1.8.22
 RAY=2.24.0
+SPARK_VERSION=3.5.2
 
 ifeq ($(KFPv2), 1)
         WORKFLOW_SUPPORT_LIB=kfp_v2_workflow_support
 else
         WORKFLOW_SUPPORT_LIB=kfp_v1_workflow_support
 endif
+
