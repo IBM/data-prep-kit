@@ -55,7 +55,7 @@ def profiler_compute_execution_params(
     cluster_cpu = w_options["replicas"] * w_options["cpu"]
     cluster_memory = w_options["replicas"] * w_options["memory"]
     print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_memory}")
-    cluster_cpu *= 0.85
+    cluster_cpu -= 1
     cluster_memory *= 0.85
     # get actor requirements
     a_options = actor_options
