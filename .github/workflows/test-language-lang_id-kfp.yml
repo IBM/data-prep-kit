@@ -12,6 +12,8 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
+            - "transforms/.make.workflow"
             - "transforms/language/lang_id/**"
             - "!kfp/**" # This is tested in separate workflow
             - "!data-processing-lib/**" # This is tested in separate workflow
@@ -24,6 +26,8 @@ on:
             - "dev"
             - "releases/**"
         paths:
+            - ".make.*"
+            - "transforms/.make.workflow"
             - "transforms/language/lang_id/**"
             - "!data-processing-lib/**" # This is tested in separate workflow
             - "!kfp/**" # This is tested in separate workflow
@@ -31,7 +35,6 @@ on:
             - "!**/doc/**"
             - "!**/images/**"
             - "!**.gitignore"
-
 
 jobs:
     test-kfp-v1:

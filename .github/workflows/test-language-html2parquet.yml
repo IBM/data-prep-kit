@@ -12,6 +12,8 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/language/html2parquet/**"
             - "data-processing-lib/**"
             - "!transforms/language/html2parquet/**/kfp_ray/**" # This is/will be tested in separate workflow
@@ -26,6 +28,8 @@ on:
             - "dev"
             - "releases/**"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/language/html2parquet/**"
             - "data-processing-lib/**"
             - "!transforms/language/html2parquet/**/kfp_ray/**" # This is/will be tested in separate workflow

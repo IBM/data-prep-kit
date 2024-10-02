@@ -12,6 +12,8 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/language/pii_redactor/**"
             - "data-processing-lib/**"
             - "!transforms/language/pii_redactor/**/kfp_ray/**" # This is/will be tested in separate workflow
@@ -26,6 +28,8 @@ on:
             - "dev"
             - "releases/**"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/language/pii_redactor/**"
             - "data-processing-lib/**"
             - "!transforms/language/pii_redactor/**/kfp_ray/**" # This is/will be tested in separate workflow

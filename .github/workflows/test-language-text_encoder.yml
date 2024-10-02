@@ -12,6 +12,8 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/language/text_encoder/**"
             - "data-processing-lib/**"
             - "!transforms/language/text_encoder/**/kfp_ray/**" # This is/will be tested in separate workflow
@@ -26,6 +28,8 @@ on:
             - "dev"
             - "releases/**"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/language/text_encoder/**"
             - "data-processing-lib/**"
             - "!transforms/language/text_encoder/**/kfp_ray/**" # This is/will be tested in separate workflow

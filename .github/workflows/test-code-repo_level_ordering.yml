@@ -12,6 +12,8 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/code/repo_level_ordering/**"
             - "data-processing-lib/**"
             - "!transforms/code/repo_level_ordering/**/kfp_ray/**" # This is/will be tested in separate workflow
@@ -26,6 +28,8 @@ on:
             - "dev"
             - "releases/**"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/code/repo_level_ordering/**"
             - "data-processing-lib/**"
             - "!transforms/code/repo_level_ordering/**/kfp_ray/**" # This is/will be tested in separate workflow
