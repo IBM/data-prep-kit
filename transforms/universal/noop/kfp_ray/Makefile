@@ -1,4 +1,9 @@
 REPOROOT=${CURDIR}/../../../../
+
+# Include the common configuration for this transform, which may configure
+# later includes
+include ../transform.config
+
 WORKFLOW_VENV_ACTIVATE=${REPOROOT}/transforms/venv/bin/activate
 include $(REPOROOT)/transforms/.make.workflows
 

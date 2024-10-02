@@ -576,8 +576,9 @@ MINIO_ADMIN_PWD= localminiosecretkey
 # Updates the versions references to our repo source as defined in .make.versions
 .PHONY: .defaults.__update-toml-lib-dep-versions
 .defaults.__update-toml-lib-dep-versions:
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	@# Help: Update pyproject.toml to depend on lib versions defined in .make.versions 
-	@if [ -e pyproject.toml ]; then					\
+	if [ -e pyproject.toml ]; then					\
 	    cat pyproject.toml | sed 									\
 		-e 's/"data-prep-toolkit-ray\([=><~][=]\).*"/"data-prep-toolkit-ray\1$(DPK_LIB_VERSION)"/' 	\
 		-e 's/"data-prep-toolkit-spark\([=><~][=]\).*"/"data-prep-toolkit-spark\1$(DPK_LIB_VERSION)"/' 	\
@@ -588,7 +589,7 @@ MINIO_ADMIN_PWD= localminiosecretkey
 		> tt.toml;				\
 	    mv tt.toml pyproject.toml;			\
 	 fi
-	@if [ -e requirements.txt ]; then					\
+	if [ -e requirements.txt ]; then					\
 	    cat requirements.txt | sed 									\
 		-e 's/data-prep-toolkit-ray\([=><~][=]\).*/data-prep-toolkit-ray\1$(DPK_LIB_VERSION)/' 	\
 		-e 's/data-prep-toolkit-transforms\([=><~][=]\).*/data-prep-toolkit-transforms\1$(DPK_TRANSFORMS_VERSION)/' 	\
@@ -600,6 +601,7 @@ MINIO_ADMIN_PWD= localminiosecretkey
 		> tt.txt;				\
 	    mv tt.txt requirements.txt;			\
 	 fi
+endif
 
 # Build the distribution, usually in preparation for publishing using ith the .defaults.publish-dist  target
 .PHONY: .defaults.build-dist 

@@ -1,14 +1,16 @@
 # Define the root of the local git clone for the common rules to be able 
 # know where they are running from.
 REPOROOT=../../../..
+
+# Include the common configuration for this transform, which may configure
+# later includes
+include ../transform.config
+
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
-
-# $(REPOROOT)/.make.versions file contains the versions
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_NAME=noop
 
 
 venv::	.transforms.python-venv
