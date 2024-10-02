@@ -55,7 +55,8 @@ jobs:
                   debug_mode=$(echo "$DEBUG_MODE" | tr '[:upper:]' '[:lower:]')
                   if [ "$debug_mode" == "true" ]; then
                      make -C $WORKFLOW_PATH workflow-test || true
-                     kubectl describe pod -A
+                     kubectl logs --selector app.kubernetes.io/created-by=kuberay-operator -n kubeflow
+                     kubectl logs --selector pipelines.kubeflow.org/pipeline-sdk-type=kfp -n kubeflow
                      kubectl get pods -A
                   else
                      make -C $WORKFLOW_PATH workflow-test
