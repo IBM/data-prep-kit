@@ -114,7 +114,6 @@ class DataCleaningTransformConfiguration(TransformConfiguration):
         super().__init__(
             name=short_name,
             transform_class=DataCleaningTransform,
-            remove_from_metadata=["df"],
         )
         self.logger = get_logger(__name__, level="INFO")
 

@@ -220,8 +220,12 @@ def parse_args():
     parser.add_argument("--input_folder", type=str, required=True, help="Input folder path")
     parser.add_argument("--output_folder", type=str, required=True, help="Output folder path")
 
+    parser.add_argument(
+        "--contents_column", type=str, default="text", help="Name of the column that holds document text"
+    )
     parser.add_argument("--num_permutations", type=int, default=112, help="Number of permutations")
     parser.add_argument("--num_bands", type=int, default=14, help="Number of bands")
+    parser.add_argument("--num_minhashes_per_band", type=int, default=8, help="Number of minhashes per band")
     parser.add_argument("--num_segments", type=int, default=2, help="Number of segments")
 
     # Single argument for service execution

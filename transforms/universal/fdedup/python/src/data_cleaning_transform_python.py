@@ -11,34 +11,76 @@
 ################################################################################
 
 import time
+from typing import Any
 
 from data_cleaning_transform import DataCleaningTransformConfiguration
+from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.runtime.pure_python.runtime_configuration import (
+    DefaultPythonTransformRuntime,
     PythonTransformRuntimeConfiguration,
 )
+from data_processing.transform import TransformStatistics
 from data_processing.utils import get_logger
 
 
 logger = get_logger(__name__)
 
 
+class DataCleaningPythonRuntime(DefaultPythonTransformRuntime):
+    """
+    Data cleaning runtime support
+    """
+
+    def __init__(self, params: dict[str, Any]):
+        from data_processing.utils import get_logger
+
+        super().__init__(params=params)
+        self.logger = get_logger(__name__)
+
+    def get_transform_config(
+        self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics, files: list[str]
+    ) -> dict[str, Any]:
+        """
+        Download the table of duplicate document ids that will be provided to the
+        filtering/annotation method. This is the opportunity for this runtime to
+        create a new set of configuration based on the config/params provided to
+        this instance's initializer. This may include the addition of new
+        configuration data such as ray shared memory, new actors, etc., that
+        might be needed and expected by the transform in its initializer and/or
+        transform() methods.
+        :param data_access_factory - data access factory class being used by the RayOrchestrator.
+        :param statistics - reference to statistics actor
+        :param files - list of files to process
+        :return: dictionary of transform init params
+        """
+        duplicate_list_location = self.params["duplicate_list_location"]
+        data_access = data_access_factory.create_data_access()
+        if duplicate_list_location.startswith("s3://"):
+            _, duplicate_list_location = duplicate_list_location.split("://")
+        self.duplicate_list, retries = data_access.get_file(duplicate_list_location)
+        return self.params | {"df": self.duplicate_list}
+
+
 class DataCleaningPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
     """
-    Implements the PythonTransformConfiguration for NOOP as required by the PythonTransformLauncher.
-    NOOP does not use a RayRuntime class so the superclass only needs the base
-    python-only configuration.
+    Implements the PythonTransformConfiguration for fuzzy dedup data cleaning step
+    as required by the PythonTransformLauncher.
     """
 
     def __init__(self):
         """
         Initialization
-        :param base_configuration - base configuration class
+        :param: transform_configuration - transform configuration class
+        :param: runtime_class - name of the runtime configuration class
         """
-        super().__init__(transform_config=DataCleaningTransformConfiguration())
+        super().__init__(
+            transform_config=DataCleaningTransformConfiguration(),
+            runtime_class=DataCleaningPythonRuntime,
+        )
 
 
 if __name__ == "__main__":
     launcher = PythonTransformLauncher(DataCleaningTransformConfiguration())
-    logger.info("Launching noop transform")
+    logger.info("Launching fuzzy dedup data cleaning transform")
     launcher.launch()
