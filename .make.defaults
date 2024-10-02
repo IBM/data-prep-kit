@@ -24,7 +24,6 @@
 # 	rm -rf other-stuff
 #
 #######################################################################################
-
 SHELL=/bin/bash
 include $(REPOROOT)/.make.versions
 
