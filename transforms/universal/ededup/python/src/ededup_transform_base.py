@@ -40,7 +40,7 @@ snapshot_directory_key = "snapshot_directory"
 doc_column_name_cli_param = f"{cli_prefix}{doc_column_name_key}"
 int_column_name_cli_param = f"{cli_prefix}{int_column_name_key}"
 use_snapshot_cli_param = f"{cli_prefix}{use_snapshot_key}"
-snapshot_directory_cli_param = f"--{cli_prefix}{snapshot_directory_key}"
+snapshot_directory_cli_param = f"{cli_prefix}{snapshot_directory_key}"
 
 class HashFilter:
     """

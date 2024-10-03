@@ -82,7 +82,7 @@ def fdedup(
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
-    runtime_actor_options: dict = {"num_cpus": 0.8},
+    runtime_actor_options: dict = {"num_cpus": 0.7},
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: dict = {'github': 'github', 'commit_hash': '12345', 'path': 'path'},
     # columns used
