@@ -54,27 +54,31 @@ jobs:
             - name: Test KFP libs (shared and v1) and run a workflow
               timeout-minutes: 120
               run: |
-                  export REPOROOT=$PWD
-                  export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
-                  source $K8S_SETUP_SCRIPTS/requirements.env
-                  export PATH=$PATH:/tmp/
-                  curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-                  chmod 777 /tmp/kind
-                  curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-                  chmod 700 /tmp/get_helm.sh
-                  HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
-                  chmod 777 /tmp/helm
-                  curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
-                  chmod 777 /tmp/kubectl
-                  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
-                  chmod +x /tmp/mc
-                  export DEPLOY_KUBEFLOW=1
-                  make -C $K8S_SETUP_SCRIPTS setup
-                  make -C kfp/kfp_support_lib test
-                  make -C transforms/universal/tokenization workflow-build
-                  source $K8S_SETUP_SCRIPTS/common.sh
-                  make -C transforms/universal/tokenization workflow-test
-                  echo "Run transforms/universal/tokenization completed"
+                  if [ -e "@TARGET_TRANSFORM_DIR/Makefile" -a -d "@TARGET_TRANSFORM_DIR/kfp_ray" ]; then
+                      export REPOROOT=$PWD
+                      export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
+                      source $K8S_SETUP_SCRIPTS/requirements.env
+                      export PATH=$PATH:/tmp/
+                      curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+                      chmod 777 /tmp/kind
+                      curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+                      chmod 700 /tmp/get_helm.sh
+                      HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
+                      chmod 777 /tmp/helm
+                      curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
+                      chmod 777 /tmp/kubectl
+                      curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
+                      chmod +x /tmp/mc
+                      export DEPLOY_KUBEFLOW=1
+                      make -C $K8S_SETUP_SCRIPTS setup
+                      make -C kfp/kfp_support_lib test
+                      make -C transforms/universal/tokenization workflow-build
+                      source $K8S_SETUP_SCRIPTS/common.sh
+                      make -C transforms/universal/tokenization workflow-test
+                      echo "Run transforms/universal/tokenization completed"
+                   else
+                      echo "Skipping transforms/universal/tokenization kfp test for lack of Makefile and/or kfp_ray"
+                   fi
 
     test-kfp-v2:
         runs-on: ubuntu-latest
@@ -93,25 +97,29 @@ jobs:
             - name: Test KFP libs (shared and v2) and run a workflow
               timeout-minutes: 120
               run: |
-                  export REPOROOT=$PWD
-                  export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
-                  source $K8S_SETUP_SCRIPTS/requirements.env
-                  export PATH=$PATH:/tmp/
-                  curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-                  chmod 777 /tmp/kind
-                  curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-                  chmod 700 /tmp/get_helm.sh
-                  HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
-                  chmod 777 /tmp/helm
-                  curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
-                  chmod 777 /tmp/kubectl
-                  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
-                  chmod +x /tmp/mc
-                  export DEPLOY_KUBEFLOW=1
-                  export KFPv2=1
-                  make -C $K8S_SETUP_SCRIPTS setup
-                  make -C kfp/kfp_support_lib test
-                  make -C transforms/universal/tokenization workflow-build
-                  source $K8S_SETUP_SCRIPTS/common.sh
-                  make -C transforms/universal/tokenization workflow-test
-                  header_text "Run transforms/universal/tokenization completed"
+                  if [ -e "@TARGET_TRANSFORM_DIR/Makefile" -a -d "@TARGET_TRANSFORM_DIR/kfp_ray" ]; then
+                      export REPOROOT=$PWD
+                      export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
+                      source $K8S_SETUP_SCRIPTS/requirements.env
+                      export PATH=$PATH:/tmp/
+                      curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+                      chmod 777 /tmp/kind
+                      curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+                      chmod 700 /tmp/get_helm.sh
+                      HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
+                      chmod 777 /tmp/helm
+                      curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
+                      chmod 777 /tmp/kubectl
+                      curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
+                      chmod +x /tmp/mc
+                      export DEPLOY_KUBEFLOW=1
+                      export KFPv2=1
+                      make -C $K8S_SETUP_SCRIPTS setup
+                      make -C kfp/kfp_support_lib test
+                      make -C transforms/universal/tokenization workflow-build
+                      source $K8S_SETUP_SCRIPTS/common.sh
+                      make -C transforms/universal/tokenization workflow-test
+                      echo "Run transforms/universal/tokenization completed"
+                  else
+                      echo "Skipping transforms/universal/tokenization kfp test for lack of Makefile and/or kfp_ray"
+                  fi
