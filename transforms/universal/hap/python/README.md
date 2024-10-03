@@ -54,7 +54,8 @@ The table below shows the throughput (tokens per second) of the HAP transform mo
 * 4-layer lightweight toxicity classifier [ibm-granite/granite-guardian-hap-38m](https://huggingface.co/ibm-granite/granite-guardian-hap-38m)
 * 12-layer toxicity classifier [ibm-granite/granite-guardian-hap-125m](https://huggingface.co/ibm-granite/granite-guardian-hap-125m)
  
-We report the average throughput on CPU over three runs.
+We processed 6,000 documents (12 MB in Parquet file size) using the HAP transform module and reported the average CPU throughput over three trials.
+
 | Model used in HAP transform module  | throughput (tokens per second) | 
 |:------:|:------:|
 | granite-guardian-hap-38m  |  6.16 k   |
