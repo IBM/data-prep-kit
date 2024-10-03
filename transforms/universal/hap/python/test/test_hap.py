@@ -19,7 +19,7 @@ from hap_transform import HAPTransformConfiguration, HAPTransform
 hap_params = {
     "model_name_or_path": 'ibm-granite/granite-guardian-hap-38m',
     "annotation_column": "hap_score",
-    "doc_text_column": "doc_text",
+    "doc_text_column": "contents",
     "inference_engine": "CPU",
     "max_length": 512,
     "batch_size": 128,

@@ -138,7 +138,7 @@ class KFPUtils:
         cluster_gpu = w_options["replicas"] * w_options.get("gpu", 0.0)
         logger.info(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_mem}, GPUs {cluster_gpu}")
         # compute number of actors
-        n_actors_cpu = int(cluster_cpu * 0.85 / a_options.get("num_cpus", 0.5))
+        n_actors_cpu = int((cluster_cpu - 1) * 0.7 / a_options.get("num_cpus", 0.5))
         n_actors_memory = int(cluster_mem * 0.85 / (a_options.get("memory", GB) / GB))
         n_actors = min(n_actors_cpu, n_actors_memory)
         # Check if we need gpu calculations as well

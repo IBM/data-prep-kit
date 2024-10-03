@@ -18,21 +18,39 @@ We will create an environment for this workshop with all the required libraries 
 
 ```bash
 conda create -n data-prep-kit-1 -y python=3.11
+```
 
-# activate the new conda environment
+activate the new conda environment
+
+```bash
 conda activate data-prep-kit-1
-# make sure env is swithced to data-prep-kit-1
+```
 
-## Check python version
+Make sure env is swithced to data-prep-kit-1
+
+Check python version
+
+```bash
 python --version
-# should say : 3.11
+```
+
+should say : 3.11
+
+**Note**: If you are on a linux system install these too
+
+```bash
+conda install gcc_linux-64
+
+conda install gxx_linux-64
 ```
 
 ### A-2: Install dependencies
 
 ```bash
 cd examples/notebooks/rag
+```
 
+```bash
 pip  install  -r requirements.txt
 ```
 
