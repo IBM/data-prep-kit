@@ -36,6 +36,12 @@ the [python launcher](../../../../data-processing-lib/doc/python-launcher-option
   --sp_null_libs_file  SP_NULL_LIBS_FILE   
                        Path to the file to store the libraries for which no match could be found in the IKB
 ```
+
+| Parameter  | Default  | Description  |
+|------------|----------|--------------|
+| `SP_IKB_FILE`         | `ikb/ikb_model.csv`        | Path to IKB file. |
+| `SP_NULL_LIBS_FILE`         | `ikb/null_libs.csv`        | Path to file in which libraries with no matching entries in IKB are recorded. |
+
 These correspond to the configuration keys described above.
 
 ### Running the samples

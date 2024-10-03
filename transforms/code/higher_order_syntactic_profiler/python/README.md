@@ -31,8 +31,14 @@ the options provided by
 the [python launcher](../../../../data-processing-lib/doc/python-launcher-options.md).
 ```
   --hosp_metrics_list HOSP_METRICS_LIST
+
                       List of metrics specified by the user for the profiling report.
 ```
+
+| Parameter  | Default  | Description  |
+|------------|----------|--------------|
+| `HOSP_METRICS_LIST`         | `CCR`        | Metrics to be calculated for profiling. Multiple metrics can be entered separated by space. Only valid metric is `CCR` as of now. |
+
 These correspond to the configuration keys described above.
 
 ### Running the samples
