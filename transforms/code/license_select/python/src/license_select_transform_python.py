@@ -1,4 +1,3 @@
-# (C) Copyright IBM Corp. 2024.
 # Licensed under the Apache License, Version 2.0 (the “License”);
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -8,11 +7,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from data_processing.runtime.pure_python import PythonTransformLauncher
+
 ################################################################################
+from data_processing.runtime.pure_python.runtime_configuration import (
+    PythonTransformRuntimeConfiguration,
+)
+from license_select_transform import LicenseSelectTransformConfiguration
 
-# There is no local test for profiler
-# This is just a place holder t satisfy overall framework
+
+class LicenseSelectPythonTransformConfiguration(PythonTransformRuntimeConfiguration):
+    def __init__(self):
+        super().__init__(transform_config=LicenseSelectTransformConfiguration())
 
 
-def test_profiler():
-    pass
+if __name__ == "__main__":
+    launcher = PythonTransformLauncher(LicenseSelectPythonTransformConfiguration())
+    launcher.launch()

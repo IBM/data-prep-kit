@@ -82,7 +82,7 @@ def fdedup(
     data_max_files: int = -1,
     data_num_samples: int = -1,
     # orchestrator
-    runtime_actor_options: dict = {"num_cpus": 0.8},
+    runtime_actor_options: dict = {"num_cpus": 0.7},
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: dict = {'github': 'github', 'commit_hash': '12345', 'path': 'path'},
     # columns used
@@ -117,6 +117,7 @@ def fdedup(
         memory - memory
         image - image to use
         image_pull_secret - image pull secret
+        tolerations - (optional) tolerations for the ray pods
     :param ray_worker_options: worker node options (we here are using only 1 worker pool), containing the following:
         replicas - number of replicas to create
         max_replicas - max number of replicas
@@ -125,6 +126,7 @@ def fdedup(
         memory - memory
         image - image to use
         image_pull_secret - image pull secret
+        tolerations - (optional) tolerations for the ray pods
     :param server_url - server url
     :param additional_params: additional (support) parameters, containing the following:
         wait_interval - wait interval for API server, sec

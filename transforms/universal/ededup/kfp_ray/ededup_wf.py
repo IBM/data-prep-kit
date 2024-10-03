@@ -89,7 +89,7 @@ def ededup(
     ededup_hash_cpu: float = 0.5,
     ededup_doc_column: str = "contents",
     ededup_use_snapshot: bool = False,
-    ededup_snapshot_directory: str = None,
+    ededup_snapshot_directory: str = "",
     # data sampling
     ededup_n_samples: int = 10,
     # additional parameters
@@ -103,6 +103,7 @@ def ededup(
         memory - memory
         image - image to use
         image_pull_secret - image pull secret
+        tolerations - (optional) tolerations for the ray pods
     :param ray_worker_options: worker node options (we here are using only 1 worker pool), containing the following:
         replicas - number of replicas to create
         max_replicas - max number of replicas
@@ -111,6 +112,7 @@ def ededup(
         memory - memory
         image - image to use
         image_pull_secret - image pull secret
+        tolerations - (optional) tolerations for the ray pods
     :param server_url - server url
     :param additional_params: additional (support) parameters, containing the following:
         wait_interval - wait interval for API server, sec

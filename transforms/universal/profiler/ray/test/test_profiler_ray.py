@@ -17,7 +17,7 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from profiler_transform_ray import ProfilerRayTransformConfiguration
+from profiler_transform_ray import ProfilerRayTransformRuntimeConfiguration
 
 
 class TestRayAggregatorTransform(AbstractTransformLauncherTest):
@@ -37,18 +37,25 @@ class TestRayAggregatorTransform(AbstractTransformLauncherTest):
             "profiler_num_aggregators": 2,
             "profiler_doc_column": "contents",
         }
-        launcher = RayTransformLauncher(ProfilerRayTransformConfiguration())
+        launcher = RayTransformLauncher(ProfilerRayTransformRuntimeConfiguration())
         fixtures = [(launcher, config, basedir + "/input", basedir + "/expected")]
         return fixtures
 
-    def _validate_directory_contents_match(self, dir: str, expected: str, ignore_columns: list[str] = []):
+    def _validate_directory_contents_match(self, produced: str, expected: str, ignore_columns: list[str] = []):
         # TODO add checking file content
         # Compare files
-        f_set1 = get_files_in_folder(dir=dir, ext=".csv", return_data=False)
-        f_set2 = get_files_in_folder(dir=expected, ext=".csv", return_data=False)
+        f_set1 = list(get_files_in_folder(dir=produced, ext=".csv", return_data=False).keys())
+        f_set2 = list(get_files_in_folder(dir=expected, ext=".csv", return_data=False).keys())
         assert len(f_set1) == len(f_set2)
+        produced_len = 0
+        expected_len = 0
+        for i in range(len(f_set1)):
+            produced_len += os.path.getsize(f_set1[i])
+            expected_len += os.path.getsize(f_set2[i])
+        assert abs(produced_len - expected_len) < 500
 
-        # Compare metadata
-        f_set1 = get_files_in_folder(dir=dir, ext=".json", return_data=False)
+
+    # Compare metadata
+        f_set1 = get_files_in_folder(dir=produced, ext=".json", return_data=False)
         f_set2 = get_files_in_folder(dir=expected, ext=".json", return_data=False)
         assert len(f_set1) == len(f_set2)
