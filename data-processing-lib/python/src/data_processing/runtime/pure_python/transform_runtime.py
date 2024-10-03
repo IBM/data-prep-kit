@@ -50,4 +50,4 @@ class DefaultPythonTransformRuntime:
         :param stats: output of statistics as aggregated across all calls to all transforms.
         :return: job execution statistics.  These are generally reported as metadata by the Ray Orchestrator.
         """
-        return stats
+        pass

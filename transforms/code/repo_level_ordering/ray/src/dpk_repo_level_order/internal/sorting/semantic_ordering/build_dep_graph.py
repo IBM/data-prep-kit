@@ -54,9 +54,9 @@ def get_parser(file_extension, language):
     return parser
 
 
-def get_parsers(files_df):
+def get_parsers(files_df, language_column_name="language"):
     ext_parsers_map = {}
-    for ext, language in files_df[["ext", "language"]].value_counts().index.values:
+    for ext, language in files_df[["ext", language_column_name]].value_counts().index.values:
         ext_parsers_map[(ext, language)] = get_parser(ext, language)
     return ext_parsers_map
 
@@ -69,6 +69,7 @@ def get_parser_results(
     logger: Logger,
     title_column_name,
     extension_column_name="ext",
+    language_column_name="language",
 ):
     unparsed_files = []
     parser_results = {}
@@ -77,7 +78,7 @@ def get_parser_results(
         try:
             file_name = Path(full_file_name).name
             file_content = file_dict["contents"]
-            parser = ext_parsers_map[(file_dict[extension_column_name], file_dict["language"])]
+            parser = ext_parsers_map[(file_dict[extension_column_name], file_dict[language_column_name])]
             if parser:
                 parser.generate_file_result_from_analysis(
                     analysis,
@@ -421,19 +422,27 @@ def add_files_info_to_analysis_obj(analysis, files_list):
     return analysis
 
 
-def build_edges(files_df_org, logger: Logger, title_column_name="new_title"):
+def build_edges(files_df_org, logger: Logger, title_column_name="new_title", language_column_name="language"):
     full_repo_name = files_df_org.repo_name.to_list()[0]
     analysis = get_analysis_obj(full_repo_name)
     files_df = add_repo_path(files_df_org, analysis, title_column_name)
     files_df.ext = files_df.ext.str.lower()
-    files_df.language = files_df.language.str.lower()
+    files_df.language = files_df[language_column_name].str.lower()
     files = files_df.to_dict(orient="records")
     files_list = get_files_list(files_df, title_column_name)
     files_set = set(files_list)
     logger.info(f"method - build_edges: Number of files received - {len(files_list)}")
     analysis = add_files_info_to_analysis_obj(analysis, files_list)
-    ext_parsers_map = get_parsers(files_df)
-    parser_results = get_parser_results(files, analysis, ext_parsers_map, files_set, logger, title_column_name)
+    ext_parsers_map = get_parsers(files_df, language_column_name)
+    parser_results = get_parser_results(
+        files,
+        analysis,
+        ext_parsers_map,
+        files_set,
+        logger,
+        title_column_name,
+        language_column_name=language_column_name,
+    )
     dep_graph = build_graph_from_results(parser_results, files_set, files_list, analysis, title_column_name)
     logger.info(f"Number of nodes in dependency graph - {len(dep_graph.nodes)}")
     return dep_graph

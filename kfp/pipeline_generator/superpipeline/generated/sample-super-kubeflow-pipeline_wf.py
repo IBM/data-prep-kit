@@ -26,7 +26,7 @@ def super_pipeline(
     p2_pipeline_ray_head_options: str = '{"cpu": 1, "memory": 4, "image_pull_secret": ""}',
     p2_pipeline_ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": ""}',
     p2_pipeline_server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
-    p2_pipeline_additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
+    p2_pipeline_additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5, "delete_cluster_delay_minutes": 0}',
     p2_pipeline_runtime_code_location: str = '{"github": "github", "commit_hash": "12345", "path": "path"}',
     p2_pipeline_input_parent_path: str = "test/doc_id/input/",
     p2_pipeline_output_parent_path: str = "test/super/output/",
@@ -38,6 +38,7 @@ def super_pipeline(
     p3_doc_id_doc_column: str = "contents",
     p3_doc_id_hash_column: str = "hash_column",
     p3_doc_id_int_column: str = "int_id_column",
+    p3_doc_id_start_id: int = 0,
     p3_overriding_params: str = '{"ray_worker_options": {"image": "'
     + doc_id_image
     + '"}, "ray_head_options": {"image": "'
@@ -48,6 +49,8 @@ def super_pipeline(
     p4_skip: bool = False,
     p4_ededup_doc_column: str = "contents",
     p4_ededup_hash_cpu: float = 0.5,
+    p4_ededup_use_snapshot: bool = False,
+    p4_ededup_snapshot_directory: str = None,
     p4_ededup_n_samples: int = 10,
     p4_overriding_params: str = '{"ray_worker_options": {"image": "'
     + ededup_image

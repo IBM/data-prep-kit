@@ -87,7 +87,7 @@ class AbstractTransformFileProcessor:
             raise UnrecoverableException
         # Process other exceptions
         except Exception as e:
-            self.logger.warning(f"Exception {e} processing file {f_name}: {traceback.format_exc()}")
+            self.logger.warning(f"Exception processing file {f_name}: {traceback.format_exc()}")
             self._publish_stats({"transform execution exception": 1})
 
     def flush(self) -> None:
@@ -135,6 +135,12 @@ class AbstractTransformFileProcessor:
                 self.logger.debug(
                     f"Transform did not produce a transformed file for " f"file {self.last_file_name}.parquet"
                 )
+                self._publish_stats(
+                    {
+                        "result_files": len(out_files),
+                        "processing_time": time.time() - t_start,
+                    }
+                )
             case 1:
                 # we have exactly 1 output file
                 file_ext = out_files[0]
@@ -148,18 +154,17 @@ class AbstractTransformFileProcessor:
                 save_res, retries = self.data_access.save_file(path=output_name, data=file_ext[0])
                 if retries > 0:
                     self._publish_stats({"data access retries": retries})
-                if save_res is not None:
-                    # Store execution statistics. Doing this async
-                    self._publish_stats(
-                        {
-                            "result_files": 1,
-                            "result_size": len(file_ext[0]),
-                            "processing_time": time.time() - t_start,
-                        }
-                    )
-                else:
+                if save_res is None:
                     self.logger.warning(f"Failed to write file {output_name}")
                     self._publish_stats({"failed_writes": 1})
+                # Store execution statistics. Doing this async
+                self._publish_stats(
+                    {
+                        "result_files": 1,
+                        "result_size": len(file_ext[0]),
+                        "processing_time": time.time() - t_start,
+                    }
+                )
                 if self.last_file_name_next_index is None:
                     self.last_file_name_next_index = 0
                 else:

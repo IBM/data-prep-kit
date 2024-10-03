@@ -15,7 +15,7 @@ RUN wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SP
     tar xf spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MAJOR_VERSION}.tgz -C /opt && \
     mv /opt/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_MAJOR_VERSION} /opt/spark
 
-FROM python:3.11-slim
+FROM python:3.10-slim
 
 # install additional packages required by spark
 RUN set -ex && \

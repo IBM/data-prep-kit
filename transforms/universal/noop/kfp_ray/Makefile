@@ -49,3 +49,7 @@ workflow-upload: workflow-build
 	@for file in $(YAML_WF); do \
 		$(MAKE) .workflows.upload-pipeline PIPELINE_FILE=$$file; \
 	done
+
+.PHONY: workflow-generate
+workflow-generate: workflow-venv
+	. ${WORKFLOW_VENV_ACTIVATE}  && ../../../../kfp/pipeline_generator/single-pipeline/run.sh -c `pwd`/pipeline_definitions.yaml -od  .

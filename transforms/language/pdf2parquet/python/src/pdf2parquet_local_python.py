@@ -20,7 +20,9 @@ from pdf2parquet_transform_python import Pdf2ParquetPythonTransformConfiguration
 
 
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
+input_folder = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "test-data", "input")
+)
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
 local_conf = {
     "input_folder": input_folder,
@@ -36,14 +38,18 @@ params = {
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # pdf2parquet params
-    #"pdf2parquet_do_table_structure": False,
-    #"pdf2parquet_contents_type": "application/json",
-    #"pdf2parquet_contents_type": "text/markdown",
+    "pdf2parquet_double_precision": 0,
+    # "pdf2parquet_do_table_structure": False,
+    # "pdf2parquet_do_ocr": False,
+    # "pdf2parquet_contents_type": "text/markdown",
+    # "pdf2parquet_contents_type": "application/json",
 }
 if __name__ == "__main__":
     # Set the simulated command line args
     sys.argv = ParamsUtils.dict_to_req(d=params)
     # create launcher
-    launcher = PythonTransformLauncher(runtime_config=Pdf2ParquetPythonTransformConfiguration())
+    launcher = PythonTransformLauncher(
+        runtime_config=Pdf2ParquetPythonTransformConfiguration()
+    )
     # Launch the ray actor(s) to process the input
     launcher.launch()

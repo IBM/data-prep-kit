@@ -33,7 +33,7 @@ def sample_ray_orchestrator(
     p2_pipeline_input_parent_path: str = "test/doc_id/input/",
     p2_pipeline_output_parent_path: str = "test/super/output/",
     p2_pipeline_parent_path_suffix: str = "",
-    p2_pipeline_additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
+    p2_pipeline_additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5, "delete_cluster_delay_minutes": 0}',
     p2_pipeline_data_s3_access_secret: str = "s3-secret",
     p2_pipeline_runtime_code_location: str = '{"github": "github", "commit_hash": "12345", "path": "path"}',
     p2_pipeline_runtime_actor_options: str = '{"num_cpus": 0.8}',
@@ -48,6 +48,7 @@ def sample_ray_orchestrator(
     p3_doc_id_doc_column: str = "contents",
     p3_doc_id_hash_column: str = "hash_column",
     p3_doc_id_int_column: str = "int_id_column",
+    p3_doc_id_start_id: int = 0,
     # overriding parameters
     p3_overriding_params: str = '{"ray_worker_options": {"image": "'
     + doc_id_image
@@ -59,6 +60,8 @@ def sample_ray_orchestrator(
     p4_skip: bool = False,
     p4_ededup_doc_column: str = "contents",
     p4_ededup_hash_cpu: float = 0.5,
+    p4_ededup_use_snapshot: bool = False,
+    p4_ededup_snapshot_directory: str = None,
     # data sampling
     p4_ededup_n_samples: int = 10,
     # overriding parameters

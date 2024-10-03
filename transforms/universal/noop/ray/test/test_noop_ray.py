@@ -27,12 +27,21 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        basedir = "../test-data"
-        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
+        src_file_dir = os.path.abspath(os.path.dirname(__file__))
         fixtures = []
-        # launcher = NOOPRayLauncher()
+
         launcher = RayTransformLauncher(NOOPRayTransformConfiguration())
+        input_dir = os.path.join(src_file_dir, "../test-data/input")
+        expected_dir = os.path.join(src_file_dir, "../test-data/expected")
+        runtime_config = {"run_locally": True}
+        transform_config = {sleep_cli_param: 0}
         fixtures.append(
-            (launcher, {sleep_cli_param: 0, "run_locally": True}, basedir + "/input", basedir + "/expected")
+            (
+                launcher,
+                transform_config | runtime_config,
+                input_dir,
+                expected_dir,
+                [],  # optional list of column names to ignore in comparing test-generated with expected.
+            )
         )
         return fixtures

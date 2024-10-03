@@ -27,5 +27,5 @@ class HeaderCleanserPythonTransformConfiguration(PythonTransformRuntimeConfigura
 
 if __name__ == "__main__":
     launcher = PythonTransformLauncher(HeaderCleanserPythonTransformConfiguration())
-    logger.info("Launching license copyright header removal")
+    logger.info("Launching license copyright header removal.")
     launcher.launch()

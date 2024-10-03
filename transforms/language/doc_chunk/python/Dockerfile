@@ -1,6 +1,6 @@
 FROM docker.io/python:3.10.14-slim-bullseye
 
-RUN pip install --upgrade pip 
+RUN pip install --upgrade --no-cache-dir pip 
 
 # install pytest
 RUN pip install --no-cache-dir pytest
@@ -9,6 +9,8 @@ RUN pip install --no-cache-dir pytest
 RUN useradd -ms /bin/bash dpk
 USER dpk
 WORKDIR /home/dpk
+
+ARG PIP_INSTALL_EXTRA_ARGS
 
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
@@ -19,7 +21,7 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 
 COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
-RUN pip install --no-cache-dir -e .
+RUN pip install ${PIP_INSTALL_EXTRA_ARGS} --no-cache-dir -e .
 
 # copy transform main() entry point to the image 
 COPY ./src/doc_chunk_transform_python.py .

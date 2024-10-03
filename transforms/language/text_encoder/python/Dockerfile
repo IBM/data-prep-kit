@@ -1,6 +1,6 @@
 FROM docker.io/python:3.10.14-slim-bullseye
 
-RUN pip install --upgrade pip 
+RUN pip install --upgrade --no-cache-dir pip 
 
 # install pytest
 RUN pip install --no-cache-dir pytest
@@ -10,6 +10,8 @@ RUN useradd -ms /bin/bash dpk
 USER dpk
 WORKDIR /home/dpk
 
+ARG PIP_INSTALL_EXTRA_ARGS
+
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
 COPY --chown=dpk:root data-processing-lib-python/ data-processing-lib-python/
@@ -18,7 +20,7 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 # END OF STEPS destined for a data-prep-kit base image 
 
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
-RUN pip install --no-cache-dir -e .
+RUN pip install ${PIP_INSTALL_EXTRA_ARGS} --no-cache-dir -e .
 
 # copy transform main() entry point to the image 
 COPY ./src/text_encoder_transform_python.py .

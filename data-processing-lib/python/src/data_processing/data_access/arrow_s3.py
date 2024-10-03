@@ -95,29 +95,27 @@ class ArrowS3:
         :param key: complete folder
         :return: list of folders within a given folder and number of retries
         """
-        bucket, prefix = self._get_bucket_key(key)
-
         def _get_sub_folders(bck: str, p: str) -> tuple[list[str], int]:
+            sub_folders = []
             # use paginator
             paginator = self.s3_client.get_paginator("list_objects_v2")
             # use Delimiter to get folders just folders
             page_iterator = paginator.paginate(Bucket=bck, Prefix=p, Delimiter="/")
-            sub_folders = []
             internal_retries = 0
             for page in page_iterator:
                 # for every page
                 internal_retries += page.get("ResponseMetadata", {}).get("RetryAttempts", 0)
                 for p in page.get("CommonPrefixes", []):
-                    sub_folders.append(p["Prefix"])
+                    sf = p["Prefix"]
+                    sub_folders.append(sf)
                     # apply recursively
-                    sf, r = _get_sub_folders(bck, p["Prefix"])
+                    sf, r = _get_sub_folders(bck=bck, p=sf)
                     internal_retries += r
                     sub_folders.extend(sf)
             return sub_folders, internal_retries
-
-        prefixes, retries = _get_sub_folders(bck=bucket, p=prefix)
-        # remove base prefix
-        return [p.removeprefix(prefix) for p in prefixes], retries
+        bucket, prefix = self._get_bucket_key(key)
+        subs, retries = _get_sub_folders(bck=bucket, p=prefix)
+        return [f"{bucket}/{f}" for f in subs], retries
 
     def read_file(self, key: str) -> tuple[bytes, int]:
         """

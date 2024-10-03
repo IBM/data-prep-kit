@@ -13,14 +13,11 @@
 import argparse
 from typing import Any
 
-from data_processing.runtime import TransformExecutionConfiguration
+from data_processing.runtime import TransformExecutionConfiguration, runtime_cli_prefix
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
 logger = get_logger(__name__)
-
-
-cli_prefix = "runtime_"
 
 
 class SparkTransformExecutionConfiguration(TransformExecutionConfiguration):
@@ -53,7 +50,7 @@ class SparkTransformExecutionConfiguration(TransformExecutionConfiguration):
         typically determined based on the cluster configuration or the available resources
         (number of workers).    
         """
-        parser.add_argument(f"--{cli_prefix}parallelization", type=int, default=-1, help="parallelization.")
+        parser.add_argument(f"--{runtime_cli_prefix}parallelization", type=int, default=-1, help="parallelization.")
         return TransformExecutionConfiguration.add_input_params(self, parser=parser)
 
     def apply_input_params(self, args: argparse.Namespace) -> bool:
@@ -64,7 +61,7 @@ class SparkTransformExecutionConfiguration(TransformExecutionConfiguration):
         """
         if not TransformExecutionConfiguration.apply_input_params(self, args=args):
             return False
-        captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
+        captured = CLIArgumentProvider.capture_parameters(args, runtime_cli_prefix, False)
         # store parameters locally
         self.job_details = {
             "job category": "preprocessing",

@@ -134,6 +134,7 @@ dmypy.json
 **/*.swp
 **/.pydevproject
 .DS_Store
+.directory
 
 
 **/*.back

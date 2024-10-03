@@ -14,7 +14,9 @@ from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime import AbstractTransformFileProcessor
-from data_processing_spark.transform import SparkTransformRuntimeConfiguration
+from data_processing.transform import TransformStatistics
+from data_processing_spark.runtime.spark import SparkTransformRuntimeConfiguration
+from data_processing.utils import UnrecoverableException
 
 
 class SparkTransformFileProcessor(AbstractTransformFileProcessor):
@@ -26,7 +28,7 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
         self,
         data_access_factory: DataAccessFactoryBase,
         runtime_configuration: SparkTransformRuntimeConfiguration,
-        statistics: dict[str, Any],
+        statistics: TransformStatistics,
     ):
         """
         Init method
@@ -41,16 +43,18 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
         self.transform_params["statistics"] = statistics
         self.stats = statistics
 
-    def create_transform(self, partition: int):
+    def create_transform(self, transform_parameters: dict[str, Any]):
         """
         Create transform
-        :param partition: partition number
+        :param transform_parameters - transform parameters
         :return: None
         """
         # Create local processor
-        self.transform = self.runtime_configuration.get_transform_class()(
-            self.transform_params | {"partition_index": partition}
-        )
+        try:
+            self.transform = self.runtime_configuration.get_transform_class()(transform_parameters)
+        except Exception as e:
+            self.logger.error(f"Exception creating transform  {e}")
+            raise UnrecoverableException("failed creating transform")
 
     def _publish_stats(self, stats: dict[str, Any]) -> None:
         """
@@ -58,8 +62,4 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
         :param stats: statistics dictionary
         :return: None
         """
-        for key, val in stats.items():
-            # for all key/values
-            if val > 0:
-                # for values greater then 0
-                self.stats[key] = self.stats.get(key, 0) + val
+        self.stats.add_stats(stats)

@@ -9,8 +9,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
-import argparse
 import time
 
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
@@ -20,7 +18,7 @@ from data_processing_spark.runtime.spark import (
     SparkTransformExecutionConfiguration,
     orchestrate,
 )
-from data_processing_spark.transform import SparkTransformRuntimeConfiguration
+from data_processing_spark.runtime.spark import SparkTransformRuntimeConfiguration
 
 
 logger = get_logger(__name__)
@@ -44,29 +42,6 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         super().__init__(runtime_config, data_access_factory)
         self.execution_config = SparkTransformExecutionConfiguration(name=runtime_config.get_name())
 
-    def __get_parameters(self) -> bool:
-        """
-        This method creates arg parser, fills it with the parameters
-        and does parameters validation
-        :return: True if validation passes or False, if not
-        """
-        parser = argparse.ArgumentParser(
-            description=f"Driver for {self.name} processing",
-            # RawText is used to allow better formatting of ast-based arguments
-            # See uses of ParamsUtils.dict_to_str()
-            formatter_class=argparse.RawTextHelpFormatter,
-        )
-        # add additional arguments
-        self.runtime_config.add_input_params(parser=parser)
-        self.data_access_factory.add_input_params(parser=parser)
-        self.execution_config.add_input_params(parser=parser)
-        args = parser.parse_args()
-        return (
-            self.runtime_config.apply_input_params(args=args)
-            and self.execution_config.apply_input_params(args=args)
-            and self.data_access_factory.apply_input_params(args=args)
-        )
-
     def _submit_for_execution(self) -> int:
         """
         Submit for execution
@@ -79,7 +54,7 @@ class SparkTransformLauncher(AbstractTransformLauncher):
             res = orchestrate(
                 data_access_factory=self.data_access_factory,
                 runtime_config=self.runtime_config,
-                execution_config=self.execution_config,
+                execution_configuration=self.execution_config
             )
             logger.debug("Completed orchestrator")
         except Exception as e:
@@ -87,12 +62,3 @@ class SparkTransformLauncher(AbstractTransformLauncher):
         finally:
             logger.info(f"Completed execution in {(time.time() - start)/60.} min, execution result {res}")
             return res
-
-    def launch(self) -> int:
-        """
-        Execute method orchestrates driver invocation
-        :return:
-        """
-        if self.__get_parameters():
-            return self._submit_for_execution()
-        return 1

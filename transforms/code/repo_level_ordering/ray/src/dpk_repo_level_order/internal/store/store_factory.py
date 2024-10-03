@@ -16,13 +16,45 @@ store_backend_dir_key = "store_backend_dir"
 store_s3_keyid_key = "store_s3_key"
 store_s3_secret_key = "store_s3_secret"
 store_s3_endpoint_key = "store_s3_endpoint"
-
+s3_creds_key = "s3_creds"
 store_ray_cpus_key = "store_ray_cpus"
 store_ray_nworkers_key = "store_ray_nworkers"
 
 store_params_key = "store_params"
 
 store_pool_key = "store_pool"
+
+
+def validate_store_params(store_params):
+    allowed_keys = [
+        store_type_key,
+        store_pool_key,
+        store_backend_dir_key,
+        store_ray_cpus_key,
+        store_ray_nworkers_key,
+        store_s3_keyid_key,
+        store_s3_endpoint_key,
+        store_s3_secret_key,
+        s3_creds_key,
+    ]
+    for k in store_params.keys():
+        if k not in allowed_keys:
+            raise ValueError(f"Unsupported key: {k} in store_params")
+    # required params
+    store_type = store_params[store_type_key]
+    if store_type in [store_type_value_s3, store_type_value_local]:
+        # backedndir is required
+        if store_backend_dir_key not in store_params.keys():
+            raise ValueError(f"{store_backend_dir_key} not set for {store_type}")
+        if store_type is store_type_value_s3:
+            # s3 creds are required
+            for required in [store_s3_keyid_key, store_s3_endpoint_key, store_s3_secret_key]:
+                if required not in store_params.keys():
+                    raise ValueError(f"Required key: {required} not set for {store_type}")
+    if store_type in [store_type_value_ray]:
+        for required in [store_ray_cpus_key, store_ray_nworkers_key, store_pool_key]:
+            if required not in store_params.keys():
+                raise ValueError(f"Required key: {required} not set for {store_type}")
 
 
 def create_store_params(captured):
@@ -59,9 +91,9 @@ def init_store_params(store_params, logger):
             return store_params
         if store_params[store_type_key] == store_type_value_s3:
             store_params = store_params | {
-                store_s3_keyid_key: store_params["s3_creds"]["access_key"],
-                store_s3_secret_key: store_params["s3_creds"]["secret_key"],
-                store_s3_endpoint_key: store_params["s3_creds"]["url"],
+                store_s3_keyid_key: store_params[s3_creds_key]["access_key"],
+                store_s3_secret_key: store_params[s3_creds_key]["secret_key"],
+                store_s3_endpoint_key: store_params[s3_creds_key]["url"],
             }
             return store_params
 
