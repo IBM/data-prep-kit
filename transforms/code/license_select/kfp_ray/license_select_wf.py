@@ -24,7 +24,6 @@ EXEC_SCRIPT_NAME: str = "license_select_transform_ray.py"
 task_image = "quay.io/dataprep1/data-prep-kit/license_select-ray:latest"
 
 
-#
 # components
 base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
 
