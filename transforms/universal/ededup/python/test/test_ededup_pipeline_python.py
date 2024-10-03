@@ -9,34 +9,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+
 import os
+
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from data_processing.test_support.transform.noop_transform import NOOPPythonTransformConfiguration, sleep_cli_param
+from ededup_pipeline_transform_python import EdedupPypelinePythonTransformConfiguration
+from ededup_transform_base import doc_column_name_cli_param, int_column_name_cli_param
 
-class TestPythonNOOPTransform(AbstractTransformLauncherTest):
+
+class TestEdedupPypilinePythonTransform(AbstractTransformLauncherTest):
     """
     Extends the super-class to define the test data for the tests defined there.
     The name of this class MUST begin with the word Test so that pytest recognizes it as a test class.
     """
 
     def get_test_transform_fixtures(self) -> list[tuple]:
-        src_file_dir = os.path.abspath(os.path.dirname(__file__))
+        # The following based on 3 identical input files of about 39kbytes, and 200 rows
         fixtures = []
-        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                               "../../../../../transforms/universal/noop/python/test-data"))
-        launcher = PythonTransformLauncher(NOOPPythonTransformConfiguration())
-        transform_config = {sleep_cli_param: 0}
-        fixtures.append(
-            (
-                launcher,
-                transform_config,
-                basedir + "/input",
-                basedir + "/expected",
-                [],  # optional list of column names to ignore in comparing test-generated with expected.
-            )
-        )
-
-        return fixtures
+        basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data"))
+        launcher = PythonTransformLauncher(EdedupPypelinePythonTransformConfiguration())
+        config = {doc_column_name_cli_param: "contents", int_column_name_cli_param: "document_id"}
+        return [(launcher, config, basedir + "/input", basedir + "/expected")]

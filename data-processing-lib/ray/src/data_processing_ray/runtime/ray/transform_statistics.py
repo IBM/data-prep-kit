@@ -74,3 +74,11 @@ class TransformStatisticsRay(TransformStatistics):
                     self.transform_exceptions_counter.inc(val)
                 if key == "data access retries":
                     self.data_retries_counter.inc(val)
+
+    def update_stats(self, stats=dict[str, Any]) -> None:
+        """
+        Update (overwrite) statistics
+        :param stats - dictionary creating new statistics
+        :return: None
+        """
+        self.stats = stats

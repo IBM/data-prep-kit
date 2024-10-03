@@ -45,7 +45,7 @@ class AbstractTransformFileProcessor:
         self.data_access = data_access_factory.create_data_access()
         # Add data access and statistics to the processor parameters
         self.transform_params = transform_parameters
-        self.transform_params["data_access"] = self.data_access
+        self.transform_params["data_access_factory"] = data_access_factory
 
     def process_file(self, f_name: str) -> None:
         """
@@ -205,7 +205,7 @@ class AbstractTransformFileProcessor:
     def _publish_stats(self, stats: dict[str, Any]) -> None:
         """
         Publishing execution statistics
-        :param stats: Statistics
+        :param stats: dictionary
         :return: None
         """
-        raise ValueError("must be implemented by subclass")
+        raise NotImplemented("must be implemented by subclass")

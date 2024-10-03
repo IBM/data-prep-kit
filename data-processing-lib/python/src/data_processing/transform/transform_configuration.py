@@ -23,7 +23,10 @@ class TransformConfiguration(CLIArgumentProvider):
     """
 
     def __init__(
-        self, name: str, transform_class: type[AbstractBinaryTransform], remove_from_metadata: list[str] = []
+        self,
+        name: str,
+        transform_class: type[AbstractBinaryTransform],
+        remove_from_metadata: list[str] = [],
     ):
         """
         Initialization

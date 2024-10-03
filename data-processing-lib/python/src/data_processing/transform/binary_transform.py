@@ -10,7 +10,7 @@
 # limitations under the License.
 ################################################################################
 
-from typing import Any, TypeVar
+from typing import Any
 
 
 class AbstractBinaryTransform:

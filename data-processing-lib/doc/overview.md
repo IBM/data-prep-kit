@@ -32,7 +32,7 @@ runtime interfacee expected to be implemented by each runtime ([python](python-r
 * [DataAccessFactory](../python/src/data_processing/data_access/data_access_factory_base.py) - is
 used to configure the input and output data files to be processed and creates
 the `DataAccess` instance (see below) according to the CLI parameters.
-* [TransformRuntimeConfiguration](../python/src/data_processing/runtime/runtime_configuration.py) - captures
+* [TransformRuntimeConfiguration](../python/src/data_processing/transform/runtime_configuration.py) - captures
   the `TransformConfiguration` and runtime-specific configuration.
 * [DataAccess](../python/src/data_processing/data_access/data_access.py) - is
   the interface defining data i/o methods and selection.  Implementations for local

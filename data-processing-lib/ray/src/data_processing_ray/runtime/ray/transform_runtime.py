@@ -13,10 +13,11 @@
 from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
+from data_processing.transform import BaseTransformRuntime
 from ray.actor import ActorHandle
 
 
-class DefaultRayTransformRuntime:
+class DefaultRayTransformRuntime(BaseTransformRuntime):
     """
     Transformer runtime used by processor to to create Transform specific environment
     """
@@ -26,7 +27,7 @@ class DefaultRayTransformRuntime:
         Create/config this runtime.
         :param params: parameters, often provided by the CLI arguments as defined by a TableTansformConfiguration.
         """
-        self.params = params
+        super().__init__(params)
 
     def get_transform_config(
         self, data_access_factory: DataAccessFactoryBase, statistics: ActorHandle, files: list[str]

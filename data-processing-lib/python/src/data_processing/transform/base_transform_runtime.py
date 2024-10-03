@@ -10,19 +10,18 @@
 # limitations under the License.
 ################################################################################
 
-from data_processing.transform import TransformConfiguration, TransformRuntimeConfiguration
-from data_processing_ray.runtime.ray import DefaultRayTransformRuntime
+from typing import Any
 
 
-class RayTransformRuntimeConfiguration(TransformRuntimeConfiguration):
-    def __init__(
-        self,
-        transform_config: TransformConfiguration,
-        runtime_class: type[DefaultRayTransformRuntime] = DefaultRayTransformRuntime,
-    ):
+class BaseTransformRuntime:
+    """
+    Base Transformer runtime used by processor to to create Transform specific environment
+    Every Runtime defines specific implementation of this class
+    """
+
+    def __init__(self, params: dict[str, Any]):
         """
-        Initialization
-        :param transform_config - base configuration class
-        :param runtime_class: implementation of the transform runtime
+        Create/config this runtime.
+        :param params: parameters, often provided by the CLI arguments as defined by a TableTansformConfiguration.
         """
-        super().__init__(transform_config=transform_config, runtime_class=runtime_class)
+        self.params = params

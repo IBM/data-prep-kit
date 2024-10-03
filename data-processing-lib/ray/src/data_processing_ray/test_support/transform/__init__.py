@@ -1,1 +1,3 @@
 from data_processing_ray.test_support.transform.noop_transform import NOOPRayTransformConfiguration
+from data_processing_ray.test_support.transform.resize_transform import ResizeRayTransformConfiguration
+from data_processing_ray.test_support.transform.pipeline_transform import ResizeNOOPRayTransformConfiguration

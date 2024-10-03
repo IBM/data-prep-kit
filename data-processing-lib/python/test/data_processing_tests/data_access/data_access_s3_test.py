@@ -33,7 +33,7 @@ def _create_and_populate_bucket(d_a: DataAccessS3, input_location: str, n_files:
     d_a.arrS3.s3_client.create_bucket(Bucket="test")
     # upload file
     loc = os.path.abspath(
-        os.path.join(os.path.dirname(__file__), "../../../test-data/data_processing/input/sample1.parquet")
+        os.path.join(os.path.dirname(__file__), "../../../test-data/data_processing/input/s3_support/sample1.parquet")
     )
     with open(loc, "rb") as file:
         bdata = file.read()

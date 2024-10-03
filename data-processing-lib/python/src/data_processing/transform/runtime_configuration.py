@@ -13,17 +13,22 @@
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
+from data_processing.transform import AbstractBinaryTransform, TransformConfiguration, BaseTransformRuntime
 from data_processing.utils import CLIArgumentProvider
 
 
 class TransformRuntimeConfiguration(CLIArgumentProvider):
-    def __init__(self, transform_config: TransformConfiguration):
+    def __init__(self,
+                 transform_config: TransformConfiguration,
+                 runtime_class: type[BaseTransformRuntime]
+                 ):
         """
         Initialization
         :param transform_config - base configuration class
+        :param runtime_class - base runtime class
         """
         self.transform_config = transform_config
+        self.runtime_class = runtime_class
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         self.transform_config.add_input_params(parser)
@@ -62,3 +67,10 @@ class TransformRuntimeConfiguration(CLIArgumentProvider):
         :return: transform parameters
         """
         return self.transform_config.get_transform_params()
+
+    def create_transform_runtime(self) -> BaseTransformRuntime:
+        """
+        Create transform runtime with the parameters captured during apply_input_params()
+        :return: transform runtime object
+        """
+        return self.runtime_class(self.transform_config.get_transform_params())
