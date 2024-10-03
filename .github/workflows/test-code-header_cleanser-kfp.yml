@@ -111,7 +111,7 @@ jobs:
                   export KFPv2=1
                   make -C $K8S_SETUP_SCRIPTS setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms workflow-build
+                  make -C transforms/code/header_cleanser workflow-build
                   source $K8S_SETUP_SCRIPTS/common.sh
                   make -C transforms/code/header_cleanser workflow-test
                   header_text "Run transforms/code/header_cleanser completed"
