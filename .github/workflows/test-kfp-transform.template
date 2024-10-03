@@ -71,7 +71,7 @@ jobs:
                   export DEPLOY_KUBEFLOW=1
                   make -C $K8S_SETUP_SCRIPTS setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms workflow-build
+                  make -C @TARGET_TRANSFORM_DIR@ workflow-build
                   source $K8S_SETUP_SCRIPTS/common.sh
                   make -C @TARGET_TRANSFORM_DIR@ workflow-test
                   echo "Run @TARGET_TRANSFORM_DIR@ completed"
