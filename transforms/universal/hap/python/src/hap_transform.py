@@ -27,11 +27,11 @@ class HAPTransform(AbstractTableTransform):
 
     def __init__(self, config: dict[str, Any]):
         super().__init__(config)
-        self.model_name_or_path = config.get("model_name_or_path")
-        self.annotation_column = config.get("annotation_column")
-        self.doc_text_column = config.get("doc_text_column")
-        self.max_length = config.get("max_length")
-        self.batch_size = config.get("batch_size")
+        self.model_name_or_path = config.get("model_name_or_path", "ibm-granite/granite-guardian-hap-38m")
+        self.annotation_column = config.get("annotation_column", "hap_score")
+        self.doc_text_column = config.get("doc_text_column", "contents")
+        self.max_length = config.get("max_length", 512)
+        self.batch_size = config.get("batch_size", 128)
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name_or_path)
         self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name_or_path)
 
@@ -70,7 +70,7 @@ class HAPTransform(AbstractTableTransform):
         :param table: Pyarrow table
         :return: a table with an additional hap_score column
         """
-        # make sure that the table contains "doc_text" column
+        # make sure that the table contains "contents" column
         TransformUtils.validate_columns(table=table, required=[self.doc_text_column])
         self.df = table.to_pandas()
         df_doc_list = []
