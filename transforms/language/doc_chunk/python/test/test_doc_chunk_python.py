@@ -65,11 +65,11 @@ class TestPythonDocChunkTransform(AbstractTransformLauncherTest):
             (
                 launcher,
                 {
-                    chunking_type_cli_param: chunking_types.FIXED_SIZE,
+                    chunking_type_cli_param: chunking_types.LI_TOKEN_TEXT,
                     output_chunk_column_name_cli_param: "chunk_text"
                 },
-                basedir + "/input_fixed_size",
-                basedir + "/expected_fixed_size",
+                basedir + "/input_token_text",
+                basedir + "/expected_token_text",
             )
         )
         return fixtures

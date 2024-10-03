@@ -69,9 +69,13 @@ class LIMarkdown(ChunkingExecutor):
             }
 
 
-class FixedTokenSizeChunker(ChunkingExecutor):
+class LITokenTextSplitter(ChunkingExecutor):
     """
-    Chunks input text into fixed-window lengths, measured in tokens, with an overlap also measured in tokens.
+    A text chunker that leverages Llama Index's token-based text splitter. This splitter breaks input text into 
+    fixed-window chunks, with each chunk measured in tokens rather than characters. 
+
+    The chunking process ensures that each chunk contains a specific number of tokens, and an optional overlap between 
+    chunks (also measured in tokens) can be specified to preserve context between the chunks. 
 
     Args:
         output_chunk_column_name (str): Name of the output column containing the text of each chunk.

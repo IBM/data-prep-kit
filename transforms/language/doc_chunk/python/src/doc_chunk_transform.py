@@ -18,7 +18,7 @@ from typing import Any
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
-from doc_chunk_chunkers import ChunkingExecutor, DLJsonChunker, LIMarkdown, FixedTokenSizeChunker
+from doc_chunk_chunkers import ChunkingExecutor, DLJsonChunker, LIMarkdown, LITokenTextSplitter
 
 
 short_name = "doc_chunk"
@@ -50,7 +50,7 @@ chunk_overlap_tokens_cli_param = f"{cli_prefix}{chunk_overlap_tokens_key}"
 class chunking_types(str, enum.Enum):
     LI_MARKDOWN = "li_markdown"
     DL_JSON = "dl_json"
-    FIXED_SIZE = "fixed_size"
+    LI_TOKEN_TEXT = "li_token_text"
 
     def __str__(self):
         return str(self.value)
@@ -123,8 +123,8 @@ class DocChunkTransform(AbstractTableTransform):
             self.chunker = LIMarkdown(
                 output_chunk_column_name=self.output_chunk_column_name,
             )
-        elif self.chunking_type == chunking_types.FIXED_SIZE:
-            self.chunker = FixedTokenSizeChunker(
+        elif self.chunking_type == chunking_types.LI_TOKEN_TEXT:
+            self.chunker = LITokenTextSplitter(
                 output_chunk_column_name=self.output_chunk_column_name,
                 output_chunk_column_id=self.output_chunk_column_id,
                 chunk_size_tokens=self.chunk_size_tokens,
