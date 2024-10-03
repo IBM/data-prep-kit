@@ -8,7 +8,6 @@ LANG_TRANSFORMS=doc_chunk doc_quality lang_id pdf2parquet pii_redactor text_enco
 
 
 # A list that holds transforms that should not be tested with KFP
-KFP_BLACK_LIST="doc_chunk,pdf2parquet,pii_redactor"
 
 transform-tests:
 	$(MAKE) TRANSFORM_SUBDIR=universal .transform-tests 
@@ -29,7 +28,8 @@ transform-tests:
 	done
 
 .transform-kfp-tests:
-	@for i in $$(find ../../transforms/$(TRANSFORM_SUBDIR) -mindepth 1 -maxdepth 1 -type d); do	\
+	@KFP_BLACK_LIST=$$(cd ../..; bash scripts/check-workflows.sh -show-kfp-black-list);		\
+	for i in $$(find ../../transforms/$(TRANSFORM_SUBDIR) -mindepth 1 -maxdepth 1 -type d); do	\
 		dir=$$(basename $$i);				\
 		z=$$(echo ${KFP_BLACK_LIST} | grep -v $$dir);     \
 		if [ ! -d ../../transforms/$(TRANSFORM_SUBDIR)/$$dir/kfp_ray ] || [ -z "$$z" ]; then		\
