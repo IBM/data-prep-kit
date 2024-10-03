@@ -10,7 +10,6 @@
 # limitations under the License.
 ################################################################################
 
-import time
 from typing import Any
 
 from data_cleaning_transform import DataCleaningTransformConfiguration
@@ -29,12 +28,10 @@ logger = get_logger(__name__)
 
 class DataCleaningPythonRuntime(DefaultPythonTransformRuntime):
     """
-    Data cleaning runtime support
+    Data cleaning runtime support for Python
     """
 
     def __init__(self, params: dict[str, Any]):
-        from data_processing.utils import get_logger
-
         super().__init__(params=params)
         self.logger = get_logger(__name__)
 
