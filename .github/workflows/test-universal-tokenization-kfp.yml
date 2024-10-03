@@ -38,7 +38,7 @@ on:
 
 jobs:
     test-kfp-v1:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -77,7 +77,7 @@ jobs:
                   echo "Run transforms/universal/tokenization completed"
 
     test-kfp-v2:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4

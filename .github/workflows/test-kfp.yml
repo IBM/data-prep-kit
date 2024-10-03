@@ -51,7 +51,7 @@ jobs:
         # The images are pushed if it is a merge to dev branch or a new tag is created.
         # The latter being part of the release process.
         # The images tag is derived from the value of the DOCKER_IMAGE_VERSION variable set in the .make.versions file.
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         outputs:
             publish_images: ${{ steps.version.outputs.publish_images }}
         steps:
@@ -68,7 +68,7 @@ jobs:
                   fi
                   echo "publish_images=$publish_images" >> "$GITHUB_OUTPUT"
     test-kfp-v1:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -117,7 +117,7 @@ jobs:
                   echo "Run ${transforms[$index]} completed"
 
     test-kfp-v2:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -167,7 +167,7 @@ jobs:
                   header_text "Run ${transforms[$index]} completed"
     build-kfp-components:
         needs: [check_if_push_images]
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         timeout-minutes: 30
         env:
             DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
