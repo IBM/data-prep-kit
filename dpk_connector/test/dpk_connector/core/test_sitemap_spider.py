@@ -5,14 +5,14 @@ from scrapy import Request
 from scrapy.crawler import Crawler
 from scrapy.http import HtmlResponse
 
-from bluecrawl.core.item import BluecrawlItem
-from bluecrawl.core.spiders.sitemap import BaseSitemapSpider, BluecrawlSitemapSpider
+from dpk_connector.core.item import ConnectorItem
+from dpk_connector.core.spiders.sitemap import BaseSitemapSpider, ConnectorSitemapSpider
 
 
 @pytest.fixture
 def crawler() -> Crawler:
     crawler = Crawler(
-        BluecrawlSitemapSpider,
+        ConnectorSitemapSpider,
         settings={
             "STATS_CLASS": "scrapy.statscollectors.MemoryStatsCollector",
             "REQUEST_FINGERPRINTER_IMPLEMENTATION": "2.7",
@@ -59,7 +59,7 @@ def test_parse(datadir: Path, crawler: Crawler):
         assert body.decode("utf-8") == response_body
         assert headers == {"Content-Type": "text/html"}
 
-    spider = BluecrawlSitemapSpider.from_crawler(
+    spider = ConnectorSitemapSpider.from_crawler(
         crawler, seed_urls=("http://example.com",), callback=callback
     )
     request = Request(
@@ -79,7 +79,7 @@ def test_parse(datadir: Path, crawler: Crawler):
     parsed = spider.parse(response)
 
     item = next(parsed)
-    assert item == BluecrawlItem(
+    assert item == ConnectorItem(
         dropped=False, downloaded=True, system_request=False, sitemap=False
     )
 

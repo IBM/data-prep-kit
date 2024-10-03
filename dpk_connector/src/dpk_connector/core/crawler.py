@@ -18,7 +18,7 @@ from scrapy.crawler import Crawler, CrawlerRunner
 from scrapy.settings import Settings
 from twisted.internet.defer import Deferred
 
-from bluecrawl.core.utils import validate_domain, validate_url
+from dpk_connector.core.utils import validate_domain, validate_url
 
 _lock = threading.Lock()
 _reactor_initialized = False
@@ -119,7 +119,7 @@ def async_crawl(
         raise ValueError(f"Invalid download limit {download_limit}")
 
     settings = Settings()
-    settings.setmodule("bluecrawl.core.settings", priority="project")
+    settings.setmodule("dpk_connector.core.settings", priority="project")
 
     if user_agent:
         settings.set("USER_AGENT", user_agent, priority="spider")
@@ -136,7 +136,7 @@ def async_crawl(
 
     runner = MultiThreadedCrawlerRunner(settings)
     runner.crawl(
-        "bluecrawl-sitemap",
+        "dpk-connector-sitemap",
         seed_urls=seed_urls,
         callback=on_downloaded,
         allow_domains=allow_domains,

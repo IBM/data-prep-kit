@@ -1,6 +1,6 @@
 [project]
-name = "bluecrawl_connector"
-version = "1.0.0.dev0"
+name = "dpk_connector"
+version = "0.2.2.dev0"
 requires-python = ">=3.10"
 keywords = [
     "data",
@@ -50,7 +50,7 @@ dev = [
 package_dir = ["src", "test"]
 
 [options.packages.find]
-where = ["src/bluecrawl"]
+where = ["src/dpk_connector"]
 
 [tool.pytest.ini_options]
 # Currently we use low coverage since we have to run tests separately (see makefile)

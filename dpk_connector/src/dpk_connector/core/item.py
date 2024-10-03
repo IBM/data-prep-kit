@@ -14,7 +14,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class BluecrawlItem:
+class ConnectorItem:
     dropped: bool = False
     downloaded: bool = False
     system_request: bool = False

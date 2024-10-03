@@ -1,6 +1,6 @@
 import pytest
 
-from bluecrawl.core.crawler import crawl
+from dpk_connector.core.crawler import crawl
 
 
 def test_invalid_crawler():

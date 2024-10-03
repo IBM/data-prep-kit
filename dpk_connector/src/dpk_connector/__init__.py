@@ -10,4 +10,4 @@
 # limitations under the License.
 ################################################################################
 
-from bluecrawl.core.crawler import async_crawl, crawl, shutdown  # noqa
+from dpk_connector.core.crawler import async_crawl, crawl, shutdown  # noqa

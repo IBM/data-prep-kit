@@ -10,14 +10,14 @@
 # limitations under the License.
 ################################################################################
 
-BOT_NAME = "bluecrawl"
+BOT_NAME = "dpk-connector"
 
-SPIDER_MODULES = ["bluecrawl.core.spiders"]
+SPIDER_MODULES = ["dpk_connector.core.spiders"]
 
 # Robots
 ROBOTSTXT_OBEY = True
 ROBOTS_MAX_CRAWL_DELAY = 60
-ROBOTSTXT_PARSER = "bluecrawl.core.middlewares.DelayingProtegoRobotParser"
+ROBOTSTXT_PARSER = "dpk_connector.core.middlewares.DelayingProtegoRobotParser"
 
 # Downloader parameters
 CONCURRENT_REQUESTS = 20
@@ -35,16 +35,16 @@ AUTOTHROTTLE_DEBUG = False
 
 # Middlewares/pipelines/extensions
 SPIDER_MIDDLEWARES = {
-    "bluecrawl.core.middlewares.BluecrawlDownloadedStats": 10,
+    "dpk_connector.core.middlewares.ConnectorDownloadedStats": 10,
 }
 DOWNLOADER_MIDDLEWARES = {
     "scrapy.downloadermiddlewares.robotstxt.RobotsTxtMiddleware": None,
-    "bluecrawl.core.middlewares.DelayingRobotsTxtMiddleware": 100,
+    "dpk_connector.core.middlewares.DelayingRobotsTxtMiddleware": 100,
     "scrapy.downloadermiddlewares.stats.DownloaderStats": None,
-    "bluecrawl.core.middlewares.BluecrawlRequestedStats": 850,
+    "dpk_connector.core.middlewares.ConnectorRequestedStats": 850,
 }
 ITEM_PIPELINES = {
-    "bluecrawl.core.pipelines.DropPipeline": 100,
+    "dpk_connector.core.pipelines.DropPipeline": 100,
 }
 EXTENSIONS = {
     "scrapy.extensions.telnet.TelnetConsole": None,
@@ -57,7 +57,7 @@ SCHEDULER_MEMORY_QUEUE = "scrapy.squeues.LifoMemoryQueue"
 # Logging
 LOG_LEVEL = "INFO"
 LOG_SCRAPED_ITEMS = False
-LOG_FORMATTER = "bluecrawl.core.logging.QuietLogFormatter"
+LOG_FORMATTER = "dpk_connector.core.logging.QuietLogFormatter"
 
 # Periodic logging
 PERIODIC_LOG_DELTA = True

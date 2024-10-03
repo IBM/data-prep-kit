@@ -15,7 +15,7 @@ from scrapy import Spider
 from scrapy.crawler import Crawler
 from scrapy.exceptions import DropItem
 
-from bluecrawl.core.item import BluecrawlItem
+from dpk_connector.core.item import ConnectorItem
 
 
 class DropPipeline:
@@ -23,7 +23,7 @@ class DropPipeline:
     def from_crawler(cls, crawler: Crawler):
         return cls()
 
-    def process_item(self, item: BluecrawlItem, spider: Spider) -> Any:
+    def process_item(self, item: ConnectorItem, spider: Spider) -> Any:
         if item.system_request or (not item.downloaded):
             raise DropItem
         return item

@@ -1,4 +1,4 @@
-name: Test Bluecrawl Connector
+name: Test DPK Connector
 
 on:
     workflow_dispatch:
@@ -9,22 +9,22 @@ on:
         tags:
             - "*"
         paths:
-            - "extensions/bluecrawl_connector/**"
-            - "!extensions/bluecrawl_connector/**.md"
+            - "dpk_connector/**"
+            - "!dpk_connector/**.md"
     pull_request:
         branches:
             - "dev"
             - "releases/**"
         paths:
-            - "extensions/bluecrawl_connector/**"
-            - "!extensions/bluecrawl_connector/**.md"
+            - "dpk_connector/**"
+            - "!dpk_connector/**.md"
 
 jobs:
-    test-bluecrawl-connector:
+    test-dpk-connector:
         runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-            - name: Test bluecrawl_connector
+            - name: Test dpk_connector
               run: |
-                  make -C extensions/bluecrawl_connector venv test
+                  make -C dpk_connector venv test

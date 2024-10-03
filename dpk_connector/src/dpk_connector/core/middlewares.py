@@ -26,8 +26,8 @@ from scrapy.utils.httpobj import urlparse_cached
 from scrapy.utils.python import to_unicode
 from twisted.internet.defer import Deferred
 
-from bluecrawl.core.item import BluecrawlItem
-from bluecrawl.core.utils import get_content_type, get_etld1, get_mime_type, get_netloc
+from dpk_connector.core.item import ConnectorItem
+from dpk_connector.core.utils import get_content_type, get_etld1, get_mime_type, get_netloc
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +187,7 @@ def _update_sitemap_stats(stats: StatsCollector, spider: Spider, prefix: str):
     stats.inc_value(f"{prefix}/sitemap", spider=spider)
 
 
-class BluecrawlRequestedStats(DownloaderStats):
+class ConnectorRequestedStats(DownloaderStats):
     """
     Downloader middleware to expose additional stats.
     """
@@ -205,7 +205,7 @@ class BluecrawlRequestedStats(DownloaderStats):
 
     def process_request(self, request: Request, spider: Spider):
         super().process_request(request, spider)
-        prefix = "bluecrawl/requested"
+        prefix = "dpk_connector/requested"
         if not request.meta.get("system_request", False):
             _update_request_stats(
                 self.stats, request, spider, prefix, self.skip_domains
@@ -215,7 +215,7 @@ class BluecrawlRequestedStats(DownloaderStats):
 
     def process_response(self, request: Request, response: Response, spider: Spider):
         ret = super().process_response(request, response, spider)
-        prefix = "bluecrawl/accessed"
+        prefix = "dpk_connector/accessed"
         if not request.meta.get("system_request", False):
             _update_stats(
                 self.stats, request, response, spider, prefix, self.skip_domains
@@ -225,7 +225,7 @@ class BluecrawlRequestedStats(DownloaderStats):
         return ret
 
 
-class BluecrawlDownloadedStats:
+class ConnectorDownloadedStats:
     """
     Spider middleware to expose additional stats.
     """
@@ -244,20 +244,20 @@ class BluecrawlDownloadedStats:
     def process_spider_output(
         self,
         response: Response,
-        result: Iterable[Request | BluecrawlItem],
+        result: Iterable[Request | ConnectorItem],
         spider: Spider,
     ) -> Generator[Any, Any, None]:
         for r in result:
-            if isinstance(r, BluecrawlItem):
+            if isinstance(r, ConnectorItem):
                 if (not r.system_request) and r.downloaded:
                     _update_stats(
                         self.stats,
                         response.request,
                         response,
                         spider,
-                        "bluecrawl/downloaded",
+                        "dpk_connector/downloaded",
                         self.skip_domains,
                     )
                 if r.sitemap:
-                    _update_sitemap_stats(self.stats, spider, "bluecrawl/downloaded")
+                    _update_sitemap_stats(self.stats, spider, "dpk_connector/downloaded")
             yield r

@@ -1,6 +1,6 @@
-# Bluecrawl Connector
+# DPK Connector
 
-Bluecrawl Connector is a scalable and compliant web crawler developed for data acquisition towards LLM development. It is built on [Scrapy](https://scrapy.org/).
+DPK Connector is a scalable and compliant web crawler developed for data acquisition towards LLM development. It is built on [Scrapy](https://scrapy.org/).
 
 ## Virtual Environment
 

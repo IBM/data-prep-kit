@@ -22,8 +22,8 @@ from scrapy.spiders import SitemapSpider
 from scrapy.spiders.sitemap import iterloc
 from scrapy.utils.sitemap import Sitemap, sitemap_urls_from_robots
 
-from bluecrawl.core.item import BluecrawlItem
-from bluecrawl.core.utils import (
+from dpk_connector.core.item import ConnectorItem
+from dpk_connector.core.utils import (
     get_base_url,
     get_content_type,
     get_etld1,
@@ -155,7 +155,7 @@ class BaseSitemapSpider(SitemapSpider):
             )
 
     def _parse_sitemap(self, response: Response):
-        yield BluecrawlItem(dropped=False, downloaded=False, system_request=True, sitemap=True)
+        yield ConnectorItem(dropped=False, downloaded=False, system_request=True, sitemap=True)
 
         seed_url = response.meta["seed_url"]
 
@@ -282,8 +282,8 @@ class BaseSitemapSpider(SitemapSpider):
                     )
 
 
-class BluecrawlSitemapSpider(BaseSitemapSpider):
-    name = "bluecrawl-sitemap"
+class ConnectorSitemapSpider(BaseSitemapSpider):
+    name = "dpk-connector-sitemap"
 
     def __init__(
         self,
@@ -297,7 +297,7 @@ class BluecrawlSitemapSpider(BaseSitemapSpider):
 
     def parse(
         self, response: Response, **kwargs: Any
-    ) -> Generator[Request | BluecrawlItem, Any, None]:
+    ) -> Generator[Request | ConnectorItem, Any, None]:
         drop = False
         content_type = get_content_type(response)
         if not content_type:
@@ -307,7 +307,7 @@ class BluecrawlSitemapSpider(BaseSitemapSpider):
         if not (is_html or should_download):
             drop = True
         if drop:
-            yield BluecrawlItem(
+            yield ConnectorItem(
                 dropped=True, downloaded=False, system_request=False, sitemap=False
             )
             return
@@ -318,11 +318,11 @@ class BluecrawlSitemapSpider(BaseSitemapSpider):
                 str(response.url), response.body, response.headers.to_unicode_dict()
             )
             # to count up downloaded pages and collect stats
-            yield BluecrawlItem(
+            yield ConnectorItem(
                 dropped=False, downloaded=True, system_request=False, sitemap=False
             )
         else:
-            yield BluecrawlItem(
+            yield ConnectorItem(
                 dropped=False, downloaded=False, system_request=False, sitemap=False
             )
 

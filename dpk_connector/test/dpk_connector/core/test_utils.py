@@ -2,7 +2,7 @@
 # Latest GenAI contribution: ibm/granite-20b-code-instruct-v2
 
 import pytest
-from bluecrawl.core.utils import (
+from dpk_connector.core.utils import (
     get_base_url,
     get_content_type,
     get_etld1,
@@ -41,26 +41,26 @@ def test_get_content_type_not_found():
 
 
 def test_urlparse_cached_with_str(mocker: MockerFixture):
-    import bluecrawl.core.utils
+    import dpk_connector.core.utils
 
-    spy = mocker.spy(bluecrawl.core.utils, "urlparse")
+    spy = mocker.spy(dpk_connector.core.utils, "urlparse")
     urlparse_cached("http://example.com")
     spy.assert_called_once_with("http://example.com")
 
 
 def test_urlparse_cached_with_request(mocker: MockerFixture):
-    import bluecrawl.core.utils
+    import dpk_connector.core.utils
 
-    spy = mocker.spy(bluecrawl.core.utils, "_urlparse_cached")
+    spy = mocker.spy(dpk_connector.core.utils, "_urlparse_cached")
     request = Request("http://example.com")
     urlparse_cached(request)
     spy.assert_called_once_with(request)
 
 
 def test_urlparse_cached_with_response(mocker: MockerFixture):
-    import bluecrawl.core.utils
+    import dpk_connector.core.utils
 
-    spy = mocker.spy(bluecrawl.core.utils, "_urlparse_cached")
+    spy = mocker.spy(dpk_connector.core.utils, "_urlparse_cached")
     response = Response("http://example.com")
     urlparse_cached(response)
     spy.assert_called_once_with(response)

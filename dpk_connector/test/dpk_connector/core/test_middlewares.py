@@ -1,5 +1,5 @@
 import pytest
-from bluecrawl.core.middlewares import DelayingProtegoRobotParser
+from dpk_connector.core.middlewares import DelayingProtegoRobotParser
 from pytest_mock import MockerFixture
 
 
@@ -25,7 +25,7 @@ User-agent: ua1
 Crawl-delay: not numeric value
 User-agent: ua2
 """
-    crawler = mocker.patch("bluecrawl.core.middlewares.Crawler")
+    crawler = mocker.patch("dpk_connector.core.middlewares.Crawler")
     parser = DelayingProtegoRobotParser(robots_txt.encode("utf-8"), crawler.spider)
     parser.max_delay = 60
     assert parser.delay(ua) == expected
@@ -53,7 +53,7 @@ User-agent: ua1
 Request-rate: invalid value
 User-agent: ua2
 """
-    crawler = mocker.patch("bluecrawl.core.middlewares.Crawler")
+    crawler = mocker.patch("dpk_connector.core.middlewares.Crawler")
     parser = DelayingProtegoRobotParser(robots_txt.encode("utf-8"), crawler.spider)
     parser.max_delay = 60
     assert parser.delay(ua) == expected

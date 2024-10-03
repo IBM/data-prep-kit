@@ -1,5 +1,5 @@
 # Use make help, to see the available rules
-REPOROOT=../..
+REPOROOT=..
 include $(REPOROOT)/.make.defaults
 
 TAG := "v${DPK_LIB_VERSION}"
