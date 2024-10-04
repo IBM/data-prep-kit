@@ -16,6 +16,7 @@ on:
             - "transforms/.make.transforms"
             - "@TARGET_TRANSFORM_DIR@/**"
             - "data-processing-lib/**"
+            - "!transforms/.make.workflows"
             - "!@TARGET_TRANSFORM_DIR@/**/kfp_ray/**" # This is/will be tested in separate workflow
             - "!data-processing-lib/**/test/**"
             - "!data-processing-lib/**/test-data/**"
