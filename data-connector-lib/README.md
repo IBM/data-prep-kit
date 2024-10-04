@@ -1,6 +1,7 @@
 # DPK Connector
 
 DPK Connector is a scalable and compliant web crawler developed for data acquisition towards LLM development. It is built on [Scrapy](https://scrapy.org/).
+For more details read [the documentation](doc/overview.md).
 
 ## Virtual Environment
 
