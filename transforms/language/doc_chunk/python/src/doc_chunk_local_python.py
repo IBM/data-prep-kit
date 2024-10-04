@@ -40,7 +40,7 @@ params = {
     # doc_chunk params
     # "doc_chunk_chunking_type": "li_markdown",
     "doc_chunk_chunking_type": "dl_json",
-    "doc_chunk_chunking_type": chunking_types.LI_TOKEN_TEXT, 
+    # "doc_chunk_chunking_type": chunking_types.LI_TOKEN_TEXT, 
     # fixed-size params
     # "doc_chunk_output_chunk_column_name": "chunk_text",
     # "doc_chunk_chunk_size_tokens": 128,
