@@ -2,6 +2,11 @@ ifndef T_SET
 T_SET=all
 endif
 
+# Defines the version of the wheel for the package transforms
+# If you change this value, you will need to run "make set-versions" to
+# apply the new version number to the toml files.
+DPK_TRANSFORMS_VERSION=$(DPK_VERSION)
+
 
 venv:  
 	$(MAKE) .defaults.create-venv

@@ -17,7 +17,6 @@ include $(REPOROOT)/transforms/.make.transforms
 # Include the common configuration for this transform
 include ../transform.config
 
-
 BASE_IMAGE=${RAY_BASE_IMAGE}
 
 venv::	.transforms.ray-venv
