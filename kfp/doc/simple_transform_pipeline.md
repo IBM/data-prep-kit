@@ -18,6 +18,7 @@ Note: the project and the explanation below are based on [KFPv1](https://www.kub
   - [Input parameters definition](#inputs)
   - [Pipeline definition](#pipeline)
   - [Additional configuration](#add_config)
+  - [Tolerations and node selector](#tolerations)
 - [Compiling a pipeline](#compilation)
 - [Deploying a pipeline](#deploying)
 - [Executing pipeline and watching execution results](#execution)
@@ -209,6 +210,17 @@ The final thing that we need to do is set some pipeline global configuration:
     # Configure the pipeline level to one week (in seconds)
     dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 ```
+
+### KFP pods Toleration and node selector (Optional)<a name = "tolerations"></a> 
+To apply kuberenetes [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) or [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to KFP pods, you need to set `KFP_TOLERATIONS` or `KFP_NODE_SELECTOR` environment variables respectively before compiling the pipeline. Here's an example:
+
+```bash
+export KFP_TOLERATIONS='[{"key": "key","operator": "Equal", "value1": "value", "effect": "NoSchedule"}]'
+
+export KFP_NODE_SELECTOR='{"label_key":"cloud.google.com/gke-accelerator","label_value":"nvidia-tesla-p4"}'
+
+```
+In KFP v1, setting `KFP_TOLERATIONS` will apply to the Ray pods, overriding any tolerations specified in the `ray_head_options` and `ray_worker_options` pipeline parameters if they are present.
 
 ## Compiling a pipeline <a name = "compilation"></a>
 
