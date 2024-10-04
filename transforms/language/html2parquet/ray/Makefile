@@ -10,7 +10,7 @@ REPOROOT=../../../..
 TRANSFORM_NAME= html2parquet
 
 include $(REPOROOT)/transforms/.make.transforms
-
+BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
 
 test::	.transforms.ray-test
