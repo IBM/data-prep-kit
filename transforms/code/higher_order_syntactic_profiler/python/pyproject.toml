@@ -6,8 +6,7 @@ description = "Higher Order Syntactic Profiler Python Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
-    { name = "David Wood", email = "dawood@us.ibm.com" },
-    { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
+    { name = "Aishwariya Chakraborty", email = "aishwariya.chakraborty1@ibm.com" },
 ]
 dependencies = [
     "data-prep-toolkit==0.2.1.dev0",
