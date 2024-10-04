@@ -9,6 +9,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+import json
+import os
 import sys
 
 from runtime_utils import KFPUtils, RayRemoteJobs
@@ -42,6 +44,16 @@ def start_ray_cluster(
     head_node = head_options | {
         "ray_start_params": {"metrics-export-port": "8080", "num-cpus": "0", "dashboard-host": "0.0.0.0"}
     }
+    tolerations = os.getenv("KFP_TOLERATIONS", "")
+    if tolerations != "":
+        print(f"Adding tolerations {tolerations} for ray pods")
+        tolerations = json.loads(tolerations)
+        if "tolerations" in head_node:
+            print("Warning: head_node tolerations already defined, will overwrite it")
+        if "tolerations" in worker_node:
+            print("Warning: worker_node tolerations already defined, will overwrite it")
+        head_node["tolerations"] = tolerations
+        worker_node["tolerations"] = tolerations
     # create cluster
     remote_jobs = RayRemoteJobs(
         server_url=server_url,
