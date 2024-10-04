@@ -27,7 +27,7 @@ build:: build-dist image
 
 publish: publish-image
 
-publish-image:: .transforms.publish-image-python
+publish-image:: .transforms.publish-image-ray
 
 setup:: .transforms.setup
 
