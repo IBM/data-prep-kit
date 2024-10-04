@@ -102,7 +102,6 @@ jobs:
             - name: Test KFP libs (shared and v2) and run a workflow
               timeout-minutes: 120
               run: |
-
                   if [ -e "@TARGET_TRANSFORM_DIR/Makefile" -a -d "@TARGET_TRANSFORM_DIR/kfp_ray" ]; then
                       export REPOROOT=$PWD
                       export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
