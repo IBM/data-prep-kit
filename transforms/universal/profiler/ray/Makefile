@@ -24,7 +24,7 @@ setup:: .transforms.setup
 
 # TRANSFORM_PYTHON_VERSION has no effect since requirements do not specify a python transform implementation
 set-versions: 
-	$(MAKE)  TRANSFORM_PYTHON_VERSION=dummy TOML_VERSION=$(PROFILER_RAY_VERSION) .transforms.set-versions 
+	$(MAKE)  TRANSFORM_PYTHON_VERSION=$(PROFILER_PYTHON_VERSION) TOML_VERSION=$(PROFILER_RAY_VERSION) .transforms.set-versions
 
 test-image:: .transforms.ray-test-image
 
