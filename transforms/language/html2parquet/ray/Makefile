@@ -49,7 +49,6 @@ run-cli-sample:
 
 run-local-sample: .transforms.run-local-ray-sample
 
-run-local-python-sample: .transforms.run-local-python-sample
 
 #run-s3-ray-sample: .transforms.run-s3-ray-sample
 
