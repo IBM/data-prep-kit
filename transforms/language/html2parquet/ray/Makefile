@@ -17,7 +17,7 @@ test::	.transforms.ray-test
 
 clean:: .transforms.clean
 
-image:: .transforms.python-image
+image:: .transforms.ray-image
 
 test-src:: .transforms.test-src
 
