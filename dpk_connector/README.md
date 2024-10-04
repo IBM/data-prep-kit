@@ -16,9 +16,14 @@ source venv/bin/activate
 or set up your IDE to use the venv directory when developing in this project
 
 ## Library Artifact Build and Publish
+
 To test, build and publish the library
 ```shell
 make test build publish
 ```
 
 To up the version number, edit the Makefile to change VERSION and rerun the above. This will require committing both the `Makefile` and the autotmatically updated `pyproject.toml` file.
+
+## How to use
+
+See [the overview](doc/overview.md).

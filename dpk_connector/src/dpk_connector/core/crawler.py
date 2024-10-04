@@ -100,7 +100,7 @@ def async_crawl(
         allow_mime_types (Collection[str]): A collection of MIME types to allow during the crawl. Default is a collection containing "application/pdf", "text/html", "text/markdown", and "text/plain".
         disallow_mime_types (Collection[str]): A collection of MIME types to disallow during the crawl. Default is an empty collection.
         depth_limit (int): The maximum depth of the crawl. Default is -1, which means no limit.
-        download_limit (int): The maximum number of pages to download. Default is -1, which means no limit.
+        download_limit (int): The maximum number of pages to download. Default is -1, which means no limit. This is a soft limit, meaning that a crawler may download more pages than the specified limit.
 
     Returns:
         Deferred[None]: A Twisted deferred object that can be used to wait for the crawler to finish.
@@ -181,7 +181,7 @@ def crawl(
         allow_mime_types (Collection[str]): A collection of MIME types to allow during the crawl. Default is a collection containing "application/pdf", "text/html", "text/markdown", and "text/plain".
         disallow_mime_types (Collection[str]): A collection of MIME types to disallow during the crawl. Default is an empty collection.
         depth_limit (int): The maximum depth of the crawl. Default is -1, which means no limit.
-        download_limit (int): The maximum number of pages to download. Default is -1, which means no limit.
+        download_limit (int): The maximum number of pages to download. Default is -1, which means no limit. This is a soft limit, meaning that a crawler may download more pages than the specified limit.
 
     Returns:
         None
