@@ -13,7 +13,7 @@ include $(REPOROOT)/transforms/.make.transforms
 
 venv::	.transforms.ray-venv
 
-test::	.transforms.python-test
+test::	.transforms.ray-test
 
 clean:: .transforms.clean
 
