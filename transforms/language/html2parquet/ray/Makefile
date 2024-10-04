@@ -11,7 +11,7 @@ TRANSFORM_NAME= html2parquet
 
 include $(REPOROOT)/transforms/.make.transforms
 
-venv::	.transforms.python-venv
+venv::	.transforms.ray-venv
 
 test::	.transforms.python-test
 
