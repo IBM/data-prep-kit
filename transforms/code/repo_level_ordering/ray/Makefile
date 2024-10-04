@@ -19,8 +19,6 @@ include ../transform.config
 
 BASE_IMAGE=$(RAY_BASE_IMAGE)
 
-TRANSFORM_NAME=repo_level_order
-
 venv::	.transforms.ray-venv
 
 test::	.transforms.ray-test
