@@ -47,7 +47,7 @@ run-cli-sample:
 	    --data_local_config \" { 'input_folder' : '../test-data/input', 'output_folder' : '../output' } \"  \
 	    --data_files_to_use \"['.html','.zip']\"  
 
-run-local-sample: .transforms.run-local-sample
+run-local-sample: .transforms.run-local-ray-sample
 
 run-local-python-sample: .transforms.run-local-python-sample
 
