@@ -1,4 +1,4 @@
-name: Test DPK Connector
+name: Test Data Connector lib
 
 on:
     workflow_dispatch:
