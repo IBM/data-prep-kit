@@ -2,9 +2,6 @@
 REPOROOT=..
 include $(REPOROOT)/.make.defaults
 
-TAG := "v${DPK_LIB_VERSION}"
-
-
 clean::
 	@# Help: Clean up the distribution build and the venv
 	rm -rf dist venv
