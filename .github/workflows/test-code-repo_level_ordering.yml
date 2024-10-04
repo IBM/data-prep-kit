@@ -16,6 +16,7 @@ on:
             - "transforms/.make.transforms"
             - "transforms/code/repo_level_ordering/**"
             - "data-processing-lib/**"
+            - "!transforms/.make.workflows"
             - "!transforms/code/repo_level_ordering/**/kfp_ray/**" # This is/will be tested in separate workflow
             - "!data-processing-lib/**/test/**"
             - "!data-processing-lib/**/test-data/**"
