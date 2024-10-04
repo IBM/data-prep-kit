@@ -39,7 +39,7 @@ build-dist:: set-versions .defaults.build-dist
 
 publish-dist:: .defaults.publish-dist
 
-test-image:: .transforms.python-test-image
+test-image:: .transforms.ray-test-image
 
 run-cli-sample:
 	$(MAKE) RUN_FILE=$(TRANSFORM_NAME)_transform_python.py \
