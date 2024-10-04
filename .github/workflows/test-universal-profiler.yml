@@ -16,7 +16,6 @@ on:
             - "transforms/.make.transforms"
             - "transforms/universal/profiler/**"
             - "data-processing-lib/**"
-            - "!transforms/.make.workflows"
             - "!transforms/universal/profiler/**/kfp_ray/**" # This is/will be tested in separate workflow
             - "!data-processing-lib/**/test/**"
             - "!data-processing-lib/**/test-data/**"

@@ -16,7 +16,6 @@ on:
             - "transforms/.make.transforms"
             - "transforms/universal/doc_id/**"
             - "data-processing-lib/**"
-            - "!transforms/.make.workflows"
             - "!transforms/universal/doc_id/**/kfp_ray/**" # This is/will be tested in separate workflow
             - "!data-processing-lib/**/test/**"
             - "!data-processing-lib/**/test-data/**"

@@ -27,7 +27,7 @@ on:
             - "releases/**"
         paths:
             - ".make.*"
-            - "transforms/.make.workflow"
+            - "transforms/.make.workflows"
             - "transforms/language/lang_id/**"
             - "!data-processing-lib/**" # This is tested in separate workflow
             - "!kfp/**" # This is tested in separate workflow
