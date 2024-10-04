@@ -45,15 +45,27 @@ load-image::
 	@# Help: Recursively make $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
-# kfp implementation is not yet added, so below targets don't do anything.
 .PHONY: workflow-venv
 workflow-venv:
+	if [ -e kfp_ray ]; then                 \
+	    $(MAKE) -C kfp_ray workflow-venv;   \
+	fi
 
 .PHONY: workflow-test
 workflow-test:
-
+	if [ -e kfp_ray ]; then                 \
+	    $(MAKE) -C kfp_ray workflow-test;   \
+	fi
+	
 .PHONY: workflow-upload
 workflow-upload:
+	if [ -e kfp_ray ]; then                 \
+	    $(MAKE) -C kfp_ray workflow-upload; \
+	fi
 
 .PHONY: workflow-build
 workflow-build:
+	if [ -e kfp_ray ]; then                 \
+	    $(MAKE) -C  kfp_ray workflow-build; \
+	fi
+

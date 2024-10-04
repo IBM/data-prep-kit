@@ -12,6 +12,8 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
+            - "transforms/.make.workflow"
             - "transforms/code/code2parquet/**"
             - "!kfp/**" # This is tested in separate workflow
             - "!data-processing-lib/**" # This is tested in separate workflow
@@ -24,6 +26,8 @@ on:
             - "dev"
             - "releases/**"
         paths:
+            - ".make.*"
+            - "transforms/.make.workflow"
             - "transforms/code/code2parquet/**"
             - "!data-processing-lib/**" # This is tested in separate workflow
             - "!kfp/**" # This is tested in separate workflow
@@ -32,10 +36,14 @@ on:
             - "!**/images/**"
             - "!**.gitignore"
 
+# taken from https://stackoverflow.com/questions/66335225/how-to-cancel-previous-runs-in-the-pr-when-you-push-new-commitsupdate-the-curre
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 jobs:
     test-kfp-v1:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -51,30 +59,34 @@ jobs:
             - name: Test KFP libs (shared and v1) and run a workflow
               timeout-minutes: 120
               run: |
-                  export REPOROOT=$PWD
-                  export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
-                  source $K8S_SETUP_SCRIPTS/requirements.env
-                  export PATH=$PATH:/tmp/
-                  curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-                  chmod 777 /tmp/kind
-                  curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-                  chmod 700 /tmp/get_helm.sh
-                  HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
-                  chmod 777 /tmp/helm
-                  curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
-                  chmod 777 /tmp/kubectl
-                  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
-                  chmod +x /tmp/mc
-                  export DEPLOY_KUBEFLOW=1
-                  make -C $K8S_SETUP_SCRIPTS setup
-                  make -C kfp/kfp_support_lib test
-                  make -C transforms workflow-build
-                  source $K8S_SETUP_SCRIPTS/common.sh
-                  make -C transforms/code/code2parquet workflow-test
-                  echo "Run transforms/code/code2parquet completed"
+                  if [ -e "@TARGET_TRANSFORM_DIR/Makefile" -a -d "@TARGET_TRANSFORM_DIR/kfp_ray" ]; then
+                      export REPOROOT=$PWD
+                      export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
+                      source $K8S_SETUP_SCRIPTS/requirements.env
+                      export PATH=$PATH:/tmp/
+                      curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+                      chmod 777 /tmp/kind
+                      curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+                      chmod 700 /tmp/get_helm.sh
+                      HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
+                      chmod 777 /tmp/helm
+                      curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
+                      chmod 777 /tmp/kubectl
+                      curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
+                      chmod +x /tmp/mc
+                      export DEPLOY_KUBEFLOW=1
+                      make -C $K8S_SETUP_SCRIPTS setup
+                      make -C kfp/kfp_support_lib test
+                      make -C transforms/code/code2parquet workflow-build
+                      source $K8S_SETUP_SCRIPTS/common.sh
+                      make -C transforms/code/code2parquet workflow-test
+                      echo "Run transforms/code/code2parquet completed"
+                   else
+                      echo "Skipping transforms/code/code2parquet kfp test for lack of Makefile and/or kfp_ray"
+                   fi
 
     test-kfp-v2:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -90,25 +102,29 @@ jobs:
             - name: Test KFP libs (shared and v2) and run a workflow
               timeout-minutes: 120
               run: |
-                  export REPOROOT=$PWD
-                  export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
-                  source $K8S_SETUP_SCRIPTS/requirements.env
-                  export PATH=$PATH:/tmp/
-                  curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-                  chmod 777 /tmp/kind
-                  curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-                  chmod 700 /tmp/get_helm.sh
-                  HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
-                  chmod 777 /tmp/helm
-                  curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
-                  chmod 777 /tmp/kubectl
-                  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
-                  chmod +x /tmp/mc
-                  export DEPLOY_KUBEFLOW=1
-                  export KFPv2=1
-                  make -C $K8S_SETUP_SCRIPTS setup
-                  make -C kfp/kfp_support_lib test
-                  make -C transforms workflow-build
-                  source $K8S_SETUP_SCRIPTS/common.sh
-                  make -C transforms/code/code2parquet workflow-test
-                  header_text "Run transforms/code/code2parquet completed"
+                  if [ -e "@TARGET_TRANSFORM_DIR/Makefile" -a -d "@TARGET_TRANSFORM_DIR/kfp_ray" ]; then
+                      export REPOROOT=$PWD
+                      export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
+                      source $K8S_SETUP_SCRIPTS/requirements.env
+                      export PATH=$PATH:/tmp/
+                      curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
+                      chmod 777 /tmp/kind
+                      curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+                      chmod 700 /tmp/get_helm.sh
+                      HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
+                      chmod 777 /tmp/helm
+                      curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
+                      chmod 777 /tmp/kubectl
+                      curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
+                      chmod +x /tmp/mc
+                      export DEPLOY_KUBEFLOW=1
+                      export KFPv2=1
+                      make -C $K8S_SETUP_SCRIPTS setup
+                      make -C kfp/kfp_support_lib test
+                      make -C transforms/code/code2parquet workflow-build
+                      source $K8S_SETUP_SCRIPTS/common.sh
+                      make -C transforms/code/code2parquet workflow-test
+                      echo "Run transforms/code/code2parquet completed"
+                  else
+                      echo "Skipping transforms/code/code2parquet kfp test for lack of Makefile and/or kfp_ray"
+                  fi

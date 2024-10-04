@@ -140,7 +140,7 @@ def fdedup_compute_execution_params(
     cluster_cpu = worker_options["replicas"] * worker_options["cpu"]
     cluster_memory = worker_options["replicas"] * worker_options["memory"]
     print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_memory}")
-    cluster_cpu *= 0.85
+    cluster_cpu -= 1
     cluster_memory *= 0.85
     # get actor requirements
     actor_cpu = actor_options["num_cpus"]
@@ -172,7 +172,7 @@ def fdedup_compute_execution_params(
     n_preprocessors = int(
         (0.85 * cluster_cpu - b_actors * bucket_cpu - m_actors * mhash_cpu - d_actors * doc_cpu) / actor_cpu
     )
-    if n_preprocessors < 0:
+    if n_preprocessors <= 0:
         print(f"Not enough CPUs to run fuzzy de duping, computed number of workers is {n_preprocessors}")
         print(f"Required bucket actors {b_actors}, minhash actors {m_actors}, document actors {d_actors}")
         print("Try to increase the size of the cluster")
