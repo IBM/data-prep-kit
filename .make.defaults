@@ -170,8 +170,8 @@ __check_defined = \
 	@version=$$(echo $(PYTHON_VERSION) | sed -e 's/Python[ ]*//');  \
 	major=$$(echo $$version | awk -F. '{print $$1}');	       \
 	minor=$$(echo $$version | awk -F. '{print $$2}');	       \
-	if [ $$major -lt 3 -o $$minor -lt 10 -o $$minor -gt 11 ]; then  \
-		echo Python 3.10 or 3.11 is required, but got $$version;	\
+	if [ $$major -lt 3 -o $$minor -lt 10 -o $$minor -gt 12 ]; then  \
+		echo Python 3.10 - 3.12 is required, but got $$version;	\
 		echo Try overriding PYTHON=$(PYTHON).  For example, "'"make PYTHON=python3.10" ...'";   \
 		exit 1;						 \
 	fi
@@ -553,12 +553,15 @@ MINIO_ADMIN_PWD= localminiosecretkey
 # Changes the version field of the pyproject.toml file to the given version
 # and update the referenced library versions as defined in .make.versions.
 # Expects TOML_VERSION
+
+
 .PHONY: .defaults.update-toml
 .defaults.update-toml:
 	$(call check_defined, TOML_VERSION)
 	if [ -e pyproject.toml ]; then						\
 	    $(MAKE) TOML_VERSION=$(TOML_VERSION) .defaults.__set-toml-version;	\
 	    $(MAKE) .defaults.__update-toml-lib-dep-versions;			\
+	    $(MAKE) .defaults.__update-toml-python-versions;    \
 	fi
 
 # Changes the version field of the pyproject.toml file to the given version
@@ -569,6 +572,18 @@ MINIO_ADMIN_PWD= localminiosecretkey
 	if [ -e pyproject.toml ]; then					\
 	    cat pyproject.toml | sed -e 				\
 		's/^version[ ]*=.*/version = "'${TOML_VERSION}'"/' 	\
+		> tt.toml;						\
+	    mv tt.toml pyproject.toml;					\
+	fi
+
+# Updates the Python supported versions field of the pyproject.toml file to the given versions
+# Expects  REQUIRED_PYTHON_VERSIONS
+.PHONY: .defaults.__update-toml-python-versions
+.defaults.__update-toml-python-versions:
+	@# Help: Set the version= field of pyproject.toml
+	if [ -e pyproject.toml ]; then					\
+	    cat pyproject.toml | sed -e 				\
+	    's/^requires-python[ ]*=.*"/requires-python = "'${REQUIRED_PYTHON_VERSIONS}'"/' \
 		> tt.toml;						\
 	    mv tt.toml pyproject.toml;					\
 	fi

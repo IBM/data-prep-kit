@@ -24,7 +24,7 @@ task_image = "quay.io/dataprep1/data-prep-kit/repo_level_order-ray:latest"
 EXEC_SCRIPT_NAME: str = "repo_level_order_transform_ray.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing_v2:latest"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../kfp/kfp_ray_components/"
@@ -138,7 +138,7 @@ def repo_level_order(
     repo_lvl_grouping_column: str = "repo_name",
     repo_lvl_store_type: str = "ray",
     repo_lvl_store_backend_dir: str = "",
-    repo_lvl_store_ray_cpus: float = "0.5",
+    repo_lvl_store_ray_cpus: float = 0.5,
     repo_lvl_store_ray_nworkers: int = 1,
     repo_lvl_sorting_enabled: bool = False,
     repo_lvl_sorting_algo: str = "SORT_BY_PATH",
