@@ -59,7 +59,7 @@ jobs:
             - name: Test KFP libs (shared and v1) and run a workflow
               timeout-minutes: 120
               run: |
-                  if [ -e "transforms/language/lang_id/Makefile" -a -d "transforms/language/lang_id/kfp_ray" ]; then
+                  if [ -e "transforms/language/lang_id/Makefile" -a -d "transforms/language/lang_id/kfp_ray/Makefile" ]; then
                       export REPOROOT=$PWD
                       export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
                       source $K8S_SETUP_SCRIPTS/requirements.env
@@ -82,7 +82,7 @@ jobs:
                       make -C transforms/language/lang_id workflow-test
                       echo "Run transforms/language/lang_id completed"
                    else
-                      echo "Skipping transforms/language/lang_id kfp test for lack of Makefile and/or kfp_ray"
+                      echo "Skipping transforms/language/lang_id kfp test for lack of Makefile and/or kfp_ray/Makefile"
                    fi
 
     test-kfp-v2:
@@ -102,7 +102,7 @@ jobs:
             - name: Test KFP libs (shared and v2) and run a workflow
               timeout-minutes: 120
               run: |
-                  if [ -e "transforms/language/lang_id/Makefile" -a -d "transforms/language/lang_id/kfp_ray" ]; then
+                  if [ -e "transforms/language/lang_id/Makefile" -a -d "transforms/language/lang_id/kfp_ray/Makefile" ]; then
                       export REPOROOT=$PWD
                       export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
                       source $K8S_SETUP_SCRIPTS/requirements.env
@@ -126,5 +126,5 @@ jobs:
                       make -C transforms/language/lang_id workflow-test
                       echo "Run transforms/language/lang_id completed"
                   else
-                      echo "Skipping transforms/language/lang_id kfp test for lack of Makefile and/or kfp_ray"
+                      echo "Skipping transforms/language/lang_id kfp test for lack of Makefile and/or kfp_ray/Makefile"
                   fi
