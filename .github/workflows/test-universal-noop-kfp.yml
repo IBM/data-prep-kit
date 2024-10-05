@@ -59,7 +59,7 @@ jobs:
             - name: Test KFP libs (shared and v1) and run a workflow
               timeout-minutes: 120
               run: |
-                  if [ -e "transforms/universal/noop/Makefile" -a -d "transforms/universal/noop/kfp_ray/Makefile" ]; then
+                  if [ -e "transforms/universal/noop/Makefile" -a -e "transforms/universal/noop/kfp_ray/Makefile" ]; then
                       export REPOROOT=$PWD
                       export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
                       source $K8S_SETUP_SCRIPTS/requirements.env
@@ -102,7 +102,7 @@ jobs:
             - name: Test KFP libs (shared and v2) and run a workflow
               timeout-minutes: 120
               run: |
-                  if [ -e "transforms/universal/noop/Makefile" -a -d "transforms/universal/noop/kfp_ray/Makefile" ]; then
+                  if [ -e "transforms/universal/noop/Makefile" -a -e "transforms/universal/noop/kfp_ray/Makefile" ]; then
                       export REPOROOT=$PWD
                       export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
                       source $K8S_SETUP_SCRIPTS/requirements.env
