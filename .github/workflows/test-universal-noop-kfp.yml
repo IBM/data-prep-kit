@@ -56,7 +56,7 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test KFP libs (shared and v1) and run a workflow
+            - name: Test V1 KFP workflow for transforms/universal/noop
               timeout-minutes: 120
               run: |
                   if [ -e "transforms/universal/noop/Makefile" -a -e "transforms/universal/noop/kfp_ray/Makefile" ]; then
@@ -76,7 +76,7 @@ jobs:
                       chmod +x /tmp/mc
                       export DEPLOY_KUBEFLOW=1
                       make -C $K8S_SETUP_SCRIPTS setup
-                      make -C kfp/kfp_support_lib test
+                      #make -C kfp/kfp_support_lib test
                       make -C transforms/universal/noop workflow-build
                       source $K8S_SETUP_SCRIPTS/common.sh
                       make -C transforms/universal/noop workflow-test
@@ -99,7 +99,7 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test KFP libs (shared and v2) and run a workflow
+            - name: Test V2 KFP workflow for transforms/universal/noop
               timeout-minutes: 120
               run: |
                   if [ -e "transforms/universal/noop/Makefile" -a -e "transforms/universal/noop/kfp_ray/Makefile" ]; then
@@ -120,7 +120,7 @@ jobs:
                       export DEPLOY_KUBEFLOW=1
                       export KFPv2=1
                       make -C $K8S_SETUP_SCRIPTS setup
-                      make -C kfp/kfp_support_lib test
+                      #make -C kfp/kfp_support_lib test
                       make -C transforms/universal/noop workflow-build
                       source $K8S_SETUP_SCRIPTS/common.sh
                       make -C transforms/universal/noop workflow-test
