@@ -10,17 +10,12 @@
 # limitations under the License.
 ################################################################################
 
-import csv
-import io
-import uuid
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
-import pyarrow as pa
 import ray
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import GB, CLIArgumentProvider, TransformUtils
+from data_processing.utils import CLIArgumentProvider, TransformUtils, UnrecoverableException
 from data_processing_ray.runtime.ray import (
     DefaultRayTransformRuntime,
     RayTransformLauncher,
@@ -30,85 +25,15 @@ from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
 from ray.actor import ActorHandle
+from profiler_transform_base import (
+    DataAggregator,
+    ProfilerTransformBase,
+    ProfilerTransformConfigurationBase,
+    cli_prefix
+)
 
 
-REQUEST_LEN = 8192
-
-short_name = "profiler"
-cli_prefix = f"{short_name}_"
-
-
-@ray.remote(scheduling_strategy="SPREAD")
-class DataAggregator:
-    """
-    Implements an element of distributed cache of data
-    """
-
-    def __init__(self, params: dict[str, Any]):
-        """
-        initialize set of local aggregators
-        :param params - dictionary of input parameters.
-            data_access - data access factory
-        """
-        self.words = {}
-        self.id = str(uuid.uuid4())
-        data_access_factory = params.get("data_access")
-        self.data_access = data_access_factory.create_data_access()
-
-    def add_words(self, words: dict[str, int]) -> None:
-        """
-        Add words to cache
-        :param words: new words dictionary
-        :return: None
-        """
-        # merge dictionaries updating values
-        for k, v in words.items():
-            self.words[k] = self.words.get(k, 0) + v
-
-    def get_size(self) -> tuple[int, float]:
-        """
-        Get size of created aggregators for statistics
-        :return: size of the local set and its memory footprint
-        """
-        return len(self.words), TransformUtils.deep_get_size(self.words) / GB
-
-    def save_data(self) -> tuple[dict[str, Any], int]:
-        """
-        Save data
-        :return: size of table in memory and a dictionary as
-        defined https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/put_object.html
-        in the case of failure dict is None and number of operation retries.
-        Retries are performed on operation failures and are typically due to the resource overload.
-        """
-        if len(self.words) == 0:
-            # No data
-            return {}, 0
-        output_folder = self.data_access.get_output_folder()
-        if not output_folder.endswith("/"):
-            output_folder += "/"
-        """
-        output_path = f"{output_folder}{self.id}.parquet"
-        # convert to parquet
-        words = pa.array(self.words.keys())
-        counts = pa.array(self.words.values())
-        names = ["words", "counts"]
-        table = pa.Table.from_arrays(arrays=[words, counts], names=names)
-        # save table
-        return self.data_access.save_table(path=output_path, table=table)
-        """
-        # convert dictionary to CSV
-        s = io.StringIO()
-        dict_writer = csv.DictWriter(s, ["word", "count"], extrasaction="ignore")
-        for i, datum in enumerate(self.words.items()):
-            row = {"word": datum[0], "count": datum[1]}
-            dict_writer.writerow(row)
-        # reset cursor to the beginning of the StringIO stream
-        s.seek(0)
-        output_path = f"{output_folder}{self.id}.csv"
-        return self.data_access.save_file(path=output_path, data=s.read().encode("utf-8"))
-
-
-class ProfilerTransform(AbstractTableTransform):
+class ProfilerTransform(ProfilerTransformBase):
     """
     Implements Aggregator table transformer.
     """
@@ -123,34 +48,9 @@ class ProfilerTransform(AbstractTableTransform):
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of AggregateTableTransformConfiguration class
         super().__init__(config)
-        self.doc_column = config.get("doc_column", "contents")
         self.aggregators = config.get("aggregators", [])
         if len(self.aggregators) == 0:
-            raise RuntimeError("No aggregators are available")
-
-    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
-        """
-        Building aggregations.
-        :param table: table
-        :param file_name: name of the file to process
-        :return: resulting table, statistics
-        """
-        from base_tokenizer import tokenize
-
-        # make sure that the doc column exists
-        TransformUtils.validate_columns(table=table, required=[self.doc_column])
-        # Inner variables
-        words = {}
-        # Compute words count
-        for text in table[self.doc_column]:
-            # Compute doc hash
-            tokens = tokenize(text=str(text))
-            for token in tokens:
-                words[token] = words.get(token, 0) + 1
-        # submit word counts to cache
-        self._submit_to_cache(words=words)
-        # return
-        return [], {}
+            raise UnrecoverableException("No aggregators are available")
 
     def _submit_to_cache(self, words: dict[str, str]) -> None:
         """
@@ -182,7 +82,7 @@ class ProfilerRuntime(DefaultRayTransformRuntime):
 
     def __init__(self, params: dict[str, Any]):
         """
-        Create filter runtime
+        Create profiler runtime
         :param params: parameters, that should include
             doc_column - name of the doc column
             aggregator_cpu - cpus per hash instance
@@ -205,10 +105,10 @@ class ProfilerRuntime(DefaultRayTransformRuntime):
         :return: dictionary of transform init params
         """
         # aggregator parameters
-        params = {"data_access": data_access_factory}
+        params = {"data_access_factory": data_access_factory}
         # create aggregators
         self.aggregators = RayUtils.create_actors(
-            clazz=DataAggregator,
+            clazz=ray.remote(DataAggregator),
             params=params,
             actor_options={"num_cpus": self.params.get("aggregator_cpu", 0.5)},
             n_actors=self.params.get("num_aggregators", 1),
@@ -248,10 +148,10 @@ class ProfilerRuntime(DefaultRayTransformRuntime):
             remote_replies = not_ready
         if retries > 0:
             stats["data access retries"] = stats.get("data access retries", 0) + retries
-        return {"number of words": sum_aggregators, "word memory, GB": sum_aggregator_mem} | stats
+        return {"unique words": sum_aggregators, "words memory, GB": sum_aggregator_mem} | stats
 
 
-class ProfilerTableTransformConfiguration(TransformConfiguration):
+class ProfilerRayTransformConfiguration(ProfilerTransformConfigurationBase):
     """
     Provides support for configuring and using the associated Transform class include
     configuration with CLI args and combining of metadata.
@@ -259,24 +159,27 @@ class ProfilerTableTransformConfiguration(TransformConfiguration):
 
     def __init__(self):
         super().__init__(
-            name=short_name,
             transform_class=ProfilerTransform,
+            print_config=False,
         )
-        from data_processing.utils import get_logger
-
-        self.logger = get_logger(__name__)
 
     def add_input_params(self, parser: ArgumentParser) -> None:
         """
         Add Transform-specific arguments to the given  parser.
         """
+        super().add_input_params(parser)
         parser.add_argument(
-            f"--{cli_prefix}aggregator_cpu", type=float, default=0.5, help="number of CPUs per aggregator"
+            f"--{cli_prefix}aggregator_cpu",
+            type=float,
+            default=0.5,
+            help="number of CPUs per aggregator"
         )
         parser.add_argument(
-            f"--{cli_prefix}num_aggregators", type=int, default=0, help="number of aggregator actors to use"
+            f"--{cli_prefix}num_aggregators",
+            type=int,
+            default=0,
+            help="number of aggregator actors to use"
         )
-        parser.add_argument(f"--{cli_prefix}doc_column", type=str, default="contents", help="key for accessing data")
 
     def apply_input_params(self, args: Namespace) -> bool:
         """
@@ -284,6 +187,7 @@ class ProfilerTableTransformConfiguration(TransformConfiguration):
         :param args: user defined arguments.
         :return: True, if validate pass or False otherwise
         """
+        super().apply_input_params(args)
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
         self.params = self.params | captured
         if self.params["num_aggregators"] <= 0:
@@ -295,11 +199,11 @@ class ProfilerTableTransformConfiguration(TransformConfiguration):
         return True
 
 
-class ProfilerRayTransformConfiguration(RayTransformRuntimeConfiguration):
+class ProfilerRayTransformRuntimeConfiguration(RayTransformRuntimeConfiguration):
     def __init__(self):
-        super().__init__(transform_config=ProfilerTableTransformConfiguration(), runtime_class=ProfilerRuntime)
+        super().__init__(transform_config=ProfilerRayTransformConfiguration(), runtime_class=ProfilerRuntime)
 
 
 if __name__ == "__main__":
-    launcher = RayTransformLauncher(ProfilerRayTransformConfiguration())
+    launcher = RayTransformLauncher(ProfilerRayTransformRuntimeConfiguration())
     launcher.launch()

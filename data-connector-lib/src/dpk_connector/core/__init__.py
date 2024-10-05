@@ -9,10 +9,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
-
-# There is no local test for profiler
-# This is just a place holder t satisfy overall framework
-
-
-def test_profiler():
-    pass

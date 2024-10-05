@@ -5,7 +5,6 @@ REPOROOT=../../../..
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
-
 include $(REPOROOT)/transforms/.make.transforms
 
 BASE_IMAGE=$(RAY_BASE_IMAGE)
@@ -35,7 +34,7 @@ test-image:: .transforms.ray-test-image
 
 build:: build-dist image
 
-publish:: publish-dist publish-image
+publish: publish-image
 
 publish-image:: .transforms.publish-image-ray
 
@@ -61,5 +60,8 @@ run-local-sample: .transforms.run-local-ray-sample
 run-s3-sample: .transforms.run-s3-ray-sample
 
 minio-start:	.minio-start
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
 
 load-image:: .transforms.load-image

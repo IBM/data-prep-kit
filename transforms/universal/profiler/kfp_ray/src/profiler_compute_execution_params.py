@@ -55,7 +55,7 @@ def profiler_compute_execution_params(
     cluster_cpu = w_options["replicas"] * w_options["cpu"]
     cluster_memory = w_options["replicas"] * w_options["memory"]
     print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_memory}")
-    cluster_cpu *= 0.85
+    cluster_cpu -= 1
     cluster_memory *= 0.85
     # get actor requirements
     a_options = actor_options
@@ -82,7 +82,7 @@ def profiler_compute_execution_params(
     n_aggregators = math.ceil(number_of_docs * 32 / GB)
     print(f"Estimated Required hashes {n_aggregators}")
     print(f"Cluster available CPUs {cluster_cpu}, Memory {cluster_memory}")
-    required_aggregator_cpu = n_aggregators * aggregator_cpu
+    required_aggregator_cpu = math.ceil(n_aggregators * aggregator_cpu)
     required_hash_mem = n_aggregators * 2
     if required_aggregator_cpu > cluster_cpu or required_hash_mem > cluster_memory:
         print(
@@ -93,7 +93,7 @@ def profiler_compute_execution_params(
     # Define number of workers
     n_workers = int((0.85 * cluster_cpu - required_aggregator_cpu) / actor_cpu)
     print(f"Number of workers - {n_workers}")
-    if n_workers < 2:
+    if n_workers <= 0:
         print(f"Cluster is too small - estimated number of workers {n_workers}")
         sys.exit(1)
     # Limit amount of workers and processors to prevent S3 saturation

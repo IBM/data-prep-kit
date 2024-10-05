@@ -50,3 +50,10 @@ run-s3-sample: .transforms.run-s3-ray-sample
 minio-start:	.minio-start
 
 load-image:: .transforms.load-image
+
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image
+

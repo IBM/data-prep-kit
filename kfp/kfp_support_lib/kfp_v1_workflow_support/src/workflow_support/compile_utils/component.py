@@ -10,11 +10,20 @@
 # limitations under the License.
 ################################################################################
 
+import json
 import os
 
 import kfp.dsl as dsl
 from data_processing.utils import get_logger
 from kubernetes import client as k8s_client
+from kubernetes.client import (
+    V1Affinity,
+    V1NodeAffinity,
+    V1NodeSelector,
+    V1NodeSelectorRequirement,
+    V1NodeSelectorTerm,
+    V1Toleration,
+)
 
 
 logger = get_logger(__name__)
@@ -43,12 +52,55 @@ class ComponentUtils:
         :param image_pull_policy: pull policy to set to the component
         :param cache_strategy: cache strategy
         """
+
+        def _add_tolerations() -> None:
+            """
+            Adds Tolerations if specified
+            """
+            try:
+                tolerations = os.getenv("KFP_TOLERATIONS", "")
+                if tolerations != "":
+                    print(f"Note: Applying Tolerations {tolerations} to kfp and ray pods")
+
+                    # Add Tolerations as env var so it can be used when creating the ray cluster
+                    component.add_env_variable(k8s_client.V1EnvVar(name="KFP_TOLERATIONS", value=tolerations))
+
+                    tolerations = json.loads(tolerations)
+                    for toleration in tolerations:
+                        component.add_toleration(
+                            V1Toleration(
+                                key=toleration["key"],
+                                operator=toleration["operator"],
+                                value=toleration["value"],
+                                effect=toleration["effect"],
+                            )
+                        )
+            except Exception as e:
+                logger.warning(f"Exception while handling tolerations {e}")
+
+        def _add_node_selector() -> None:
+            """ "
+            Adds mode selector if specified
+            """
+            try:
+                node_selector = os.getenv("KFP_NODE_SELECTOR", "")
+                if node_selector != "":
+                    print(f"Note: Applying node_selector {node_selector} to kubeflow pipelines pods")
+                    node_selector = json.loads(node_selector)
+                    component.add_node_selector_constraint(node_selector["label_key"], node_selector["label_value"])
+            except Exception as e:
+                logger.warning(f"Exception while handling node_selector {e}")
+
         # Set cashing
         component.execution_options.caching_strategy.max_cache_staleness = cache_strategy
         # image pull policy
         component.container.set_image_pull_policy(image_pull_policy)
         # Set the timeout for the task
         component.set_timeout(timeout)
+        # Add tolerations
+        _add_tolerations()
+        # Add affinity
+        _add_node_selector()
 
     @staticmethod
     def set_s3_env_vars_to_component(

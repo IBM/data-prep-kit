@@ -12,6 +12,8 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/code/code_quality/**"
             - "data-processing-lib/**"
             - "!transforms/code/code_quality/**/kfp_ray/**" # This is/will be tested in separate workflow
@@ -26,6 +28,8 @@ on:
             - "dev"
             - "releases/**"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/code/code_quality/**"
             - "data-processing-lib/**"
             - "!transforms/code/code_quality/**/kfp_ray/**" # This is/will be tested in separate workflow
@@ -36,13 +40,18 @@ on:
             - "!**/images/**"
             - "!**.gitignore"
 
+# Taken from https://stackoverflow.com/questions/66335225/how-to-cancel-previous-runs-in-the-pr-when-you-push-new-commitsupdate-the-curre
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
 jobs:
     check_if_push_image:
         # check whether the Docker images should be pushed to the remote repository
         # The images are pushed if it is a merge to dev branch or a new tag is created.
         # The latter being part of the release process.
         # The images tag is derived from the value of the DOCKER_IMAGE_VERSION variable set in the .make.versions file.
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         outputs:
             publish_images: ${{ steps.version.outputs.publish_images }}
         steps:
@@ -59,7 +68,7 @@ jobs:
                   fi
                   echo "publish_images=$publish_images" >> "$GITHUB_OUTPUT"
     test-src:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -81,7 +90,7 @@ jobs:
                   fi
     test-image:
         needs: [check_if_push_image]
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-latest
         timeout-minutes: 120
         env:
             DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}

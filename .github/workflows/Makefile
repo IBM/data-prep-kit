@@ -7,20 +7,46 @@ CODE_TRANSFORMS=code2parquet code_quality header_cleanser malware proglang_selec
 LANG_TRANSFORMS=doc_chunk doc_quality lang_id pdf2parquet pii_redactor text_encoder
 
 
+# A list that holds transforms that should not be tested with KFP
+
 transform-tests:
-	$(MAKE) TRANSFORM_SUBDIR=universal .transform-tests
-	$(MAKE) TRANSFORM_SUBDIR=language .transform-tests
-	$(MAKE) TRANSFORM_SUBDIR=code .transform-tests
+	$(MAKE) TRANSFORM_SUBDIR=universal .transform-tests 
+	$(MAKE) TRANSFORM_SUBDIR=universal .transform-kfp-tests
+	$(MAKE) TRANSFORM_SUBDIR=language .transform-tests 
+	$(MAKE) TRANSFORM_SUBDIR=language .transform-kfp-tests
+	$(MAKE) TRANSFORM_SUBDIR=code .transform-tests 
+	$(MAKE) TRANSFORM_SUBDIR=code .transform-kfp-tests
 
 # Expects
 #   TRANSFORM_SUBDIR  transforms subdirectory (such as universal)
 .transform-tests:
-	@for i in $$(find ../../transforms/$(TRANSFORM_SUBDIR)  -depth 1 -type d); do	\
+	@for i in $$(find ../../transforms/$(TRANSFORM_SUBDIR) -mindepth 1 -maxdepth 1 -type d); do	\
 	    dir=$$(basename $$i);							\
 	    yml=test-$(TRANSFORM_SUBDIR)-$$dir.yml;					\
 	    echo Generating $$yml;							\
 	    cat test-transform.template | sed -e "s?@TARGET_TRANSFORM_DIR@?transforms/$${TRANSFORM_SUBDIR}/$$dir?g" > $$yml;	\
 	done
+
+.transform-kfp-tests:
+	@KFP_BLACK_LIST=$$(cd ../..; bash scripts/check-workflows.sh -show-kfp-black-list);		\
+	for i in $$(find ../../transforms/$(TRANSFORM_SUBDIR) -mindepth 1 -maxdepth 1 -type d); do	\
+		dir=$$(basename $$i);				\
+		yml=test-$(TRANSFORM_SUBDIR)-$$dir-kfp.yml;                                     \
+		if [ ! -d ../../transforms/$(TRANSFORM_SUBDIR)/$$dir/kfp_ray ]; then		\
+			echo No kfp_ray directory for $$dir. Skipping generation of $$yml;                                                      \
+			continue;			\
+		fi;					\
+		z=$$(echo $${KFP_BLACK_LIST} | grep  $$dir);     \
+		if  [ ! -z "$$z" ]; then		\
+			echo $$dir is black listed. Skipping generation of $$yml;                                                      \
+			continue;			\
+		fi;					\
+		echo Generating $$yml;                                                      \
+		cat test-kfp-transform.template | sed -e "s?@TARGET_TRANSFORM_DIR@?transforms/$${TRANSFORM_SUBDIR}/$$dir?g" > $$yml;    \
+	done
+
+
+
 
 
 
