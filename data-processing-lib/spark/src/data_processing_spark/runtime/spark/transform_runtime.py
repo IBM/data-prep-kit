@@ -37,11 +37,23 @@ class DefaultSparkTransformRuntime:
         config/params provided to this instance's initializer.  This may include the addition
         of new configuration data such as ray shared memory, new actors, etc, that might be needed and
         expected by the transform in its initializer and/or transform() methods.
+        :param partition - the partition assigned to this worker, needed by transforms like doc_id
         :param data_access_factory - data access factory class being used by the RayOrchestrator.
         :param statistics - reference to statistics actor
         :return: dictionary of transform init params
         """
         return self.params
+
+    def get_bcast_params(self, data_access_factory: DataAccessFactoryBase) -> dict[str, Any]:
+        """Allows retrieving and broadcasting to all the workers very large
+        configuration parameters, like the list of document IDs to remove for
+        fuzzy dedup, or the list of blocked web domains for block listing. As the
+        get_transform_config() function requires a partition parameter (subsequently
+        included in the worker config), it cannot be used by the driver to
+        generate broadcasts. Hence the need for this function.
+        :param data_access_factory - creates data_access object to download the large config parameter
+        """
+        return {}
 
     def compute_execution_stats(self, stats: TransformStatistics) -> None:
         """
