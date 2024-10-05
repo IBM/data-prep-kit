@@ -74,7 +74,7 @@ class SyntacticConceptExtractorTransform(AbstractTableTransform):
 
         # Use the correct architecture for runtime
         RUNTIME_HOST_ARCH = os.environ.get('RUNTIME_HOST_ARCH', 'x86_64')
-        bindings_path = self.bindings_dir + '/' + RUNTIME_HOST_ARCH # mach-arm64
+        bindings_path = self.bindings_dir + '/' + RUNTIME_HOST_ARCH # for MAC: mach-arm64
         print(f"Bindings bindings_dir: {self.bindings_dir}")
         print(f"Bindings path: {bindings_path}")
 
