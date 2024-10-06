@@ -234,7 +234,7 @@ __check_defined = \
 	mkdir ${LIB_NAME}
 	cp -p -R ${LIB_PATH}/src ${LIB_NAME}
 	cp -p -R ${LIB_PATH}/pyproject.toml ${LIB_NAME}
-	cp -p -R ${LIB_PATH}/requirements.txt ${LIB_NAME}
+	-cp -p -R ${LIB_PATH}/requirements.txt ${LIB_NAME}
 	cp -p -R ${LIB_PATH}/README.md ${LIB_NAME}
 
 # Build and image using the local Dockerfile and make the data-processing-lib/python
