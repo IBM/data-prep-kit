@@ -16,11 +16,7 @@ requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}]
-
-[build-system]
-requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
-build-backend = "setuptools.build_meta"
+dependencies = {file = ["requirements.txt"]}
 
 [project.optional-dependencies]
 dev = [

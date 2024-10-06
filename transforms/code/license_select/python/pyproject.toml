@@ -1,6 +1,6 @@
 [project]
 name = "dpk_license_select_transform_python"
-version = "0.2.1.dev0"
+version = "0.2.2.dev0"
 requires-python = ">=3.10"
 description = "License Select Python Transform"
 license = {text = "Apache-2.0"}
