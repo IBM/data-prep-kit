@@ -55,3 +55,8 @@ set-versions:
 	@# Help: Recursively $@ in all subdirs 
 	@$(MAKE) RULE=$@ .recurse
 
+
+build-pkg-dist:: 
+	$(MAKE) .defaults.build-dist BUILD_WHEEL_ARG=-w
+
+publish-dist :: .check-env .defaults.publish-dist
