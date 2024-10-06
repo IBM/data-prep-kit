@@ -348,6 +348,11 @@ endif
 .defaults.ray-lib-src-venv:: .defaults.create-venv .defaults.install-ray-lib-src-venv .defaults.install-local-requirements-venv
 	@# Help: Create the venv and install Ray library source, local dependencies and adjacent python source if present.
 
+# Install local requirements last as it generally includes our lib source
+.PHONY: .defaults.kfp-venv
+.defaults.kfp-venv:: .defaults.create-venv .defaults.install-ray-lib-src-venv
+	@# Help: Create the venv and install Ray library source, local dependencies and adjacent python source if present.
+
 # Install all source from the repo for a ray runtime transform into an existing venv 
 # And if there is an adjacent python dir (as for transforms), then also install that source
 .PHONY: .defaults.install-ray-lib-src-venv
