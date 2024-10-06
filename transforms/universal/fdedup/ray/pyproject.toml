@@ -11,10 +11,10 @@ authors = [
 ]
 dependencies = [
     "data-prep-toolkit-ray==0.2.2.dev0",
-    "mmh3==4.1.0",
+    "mmh3>=4.1.0",
     "xxhash==3.4.1",
     "tqdm==4.66.3",
-    "scipy==1.12.0"
+    "scipy>=1.12.0, <2.0.0"
 ]
 
 [build-system]

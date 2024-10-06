@@ -8,13 +8,14 @@ readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     { name = "Daiki Tsuzuku", email = "dtsuzuku@jp.ibm.com" }
 ]
-dependencies = [
-    "data-prep-toolkit==0.2.2.dev0",
-    "fasttext==0.9.2",
-    "langcodes==3.3.0",
-    "huggingface-hub >= 0.21.4, <1.0.0",
-    "numpy==1.26.4",
-]
+dynamic = ["dependencies"]
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]

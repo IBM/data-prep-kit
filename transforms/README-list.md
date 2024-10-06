@@ -5,8 +5,13 @@
 The [transforms](https://github.com/IBM/data-prep-kit/blob/dev/transforms/README.md) are delivered as a standard pyton library available on pypi and can be installed using pip install:
 
 `python -m pip install data-prep-toolkit-transforms`
+or
+`python -m pip install data-prep-toolkit-transforms[ray]`
+
 
 installing the python transforms will also install  `data-prep-toolkit`
+
+installing the ray transforms will also install  `data-prep-toolkit[ray]`
 
 ## List of Transforms in current package
 

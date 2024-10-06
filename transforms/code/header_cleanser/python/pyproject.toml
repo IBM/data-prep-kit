@@ -8,14 +8,15 @@ readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     { name = "Yash kalathiya", email = "yashkalathiya164@gmail.com" },
 ]
-dependencies = [
-    "data-prep-toolkit==0.2.2.dev0",
-    "scancode-toolkit==32.1.0",
-]
+dynamic = ["dependencies"]
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
 
 [project.optional-dependencies]
 dev = [

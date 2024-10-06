@@ -9,11 +9,6 @@ readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     { name = "Xuan-Hong Dang", email = "xuan-hong.dang@ibm.com"},
 ]
-dependencies = [
-    "data-prep-toolkit==0.2.2.dev0",
-    "transformers==4.38.2",
-]
-
 
 [project_urls]
 Repository = "https://github.com/IBM/data-prep-kit"
@@ -21,9 +16,14 @@ Issues = "https://github.com/IBM/data-prep-kit/issues"
 Documentation = "https://ibm.github.io/data-prep-kit/"
 "Transform project" = "https://github.com/IBM/data-prep-kit/tree/dev/transforms/universal/tokenization"
 
+dynamic = ["dependencies"]
+
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 
 [project.optional-dependencies]
 dev = [
