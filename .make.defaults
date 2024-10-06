@@ -302,7 +302,10 @@ endif
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
-	pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_DIR);
+	if [ -e $(PYTHON_PROJECT_DIR)/requirements.txt ]; then \
+		pip install -r  $(PYTHON_PROJECT_DIR)/requirements.txt; \
+	fi; \
+	pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_DIR)
 	@echo Done installing source from $(PYTHON_PROJECT_DIR) into venv
 
 # Install local requirements last as it generally includes our lib source
