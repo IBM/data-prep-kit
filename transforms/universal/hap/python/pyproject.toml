@@ -1,7 +1,7 @@
 [project]
 name = "dpk_hap_transform_python"
-version = "0.2.2.dev0"
-requires-python = ">=3.10"
+version = "0.2.2.dev1"
+requires-python = ">=3.10,<3.13"
 description = "HAP Python Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}

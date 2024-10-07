@@ -22,6 +22,7 @@ REPOROOT=..
 
 # Get some common rules for the whole repo
 include $(REPOROOT)/.make.defaults
+include $(REPOROOT)/.make.versions
 
 ########## ########## ########## ########## ########## ########## ########## ########## 
 # Global rules that are generally to be implemented in the sub-directories and can
@@ -53,6 +54,7 @@ publish::
 
 set-versions:  
 	@# Help: Recursively $@ in all subdirs 
+	$(MAKE) TOML_VERSION=$(DPK_LIB_VERSION) .defaults.update-toml
 	@$(MAKE) RULE=$@ .recurse
 
 

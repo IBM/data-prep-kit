@@ -1,6 +1,7 @@
 REPOROOT=../
 # Use make help, to see the available rules
 include ../.make.defaults
+include .make.transforms
 
 setup::
 	@# Help: Recursively make $@ all subdirs 
@@ -78,6 +79,7 @@ workflow-upload::
 
 set-versions::
 	@# Help: Recursively make $@ in all subdirs
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DPK_TRANSFORMS_VERSION) TOML_VERSION=$(DPK_TRANSFORMS_VERSION) .transforms.set-versions
 	@$(MAKE) RULE=$@ .recurse
 
 
