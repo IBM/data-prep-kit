@@ -30,7 +30,8 @@ The goal is to offer high-level APIs for developers to quickly get started in wo
 - [Scaling transforms from laptop to cluster](#laptop_cluster)
 - [Repository Use and Navigation](doc/repo.md)
 - [How to Contribute](CONTRIBUTING.md)
-- [Papers and Talks](#talks_papers)
+- [Talks and Papers](#talks_papers)
+- [Citations](#citations)
 
 ## &#x1F4D6; About <a name = "about"></a>
 
@@ -220,3 +221,18 @@ You can run transforms via docker image or using virtual environments. This [doc
 5. Talk on "Hands on session for fine tuning LLMs" [Video](https://www.youtube.com/watch?v=VEHIA3E64DM)
 6. Talk on "Build your own data preparation module using data-prep-kit" [Video](https://www.youtube.com/watch?v=0WUMG6HIgMg)
 
+## Citations <a name = "citations"></a>
+
+If you use Data Prep Kit in your research, please cite our paper:
+
+```bash
+@misc{wood2024dataprepkitgettingdataready,
+      title={Data-Prep-Kit: getting your data ready for LLM application development}, 
+      author={David Wood and Boris Lublinsky and Alexy Roytman and Shivdeep Singh and Abdulhamid Adebayo and Revital Eres and Mohammad Nassar and Hima Patel and Yousaf Shah and Constantin Adam and Petros Zerfos and Nirmit Desai and Daiki Tsuzuku and Takuya Goto and Michele Dolfi and Saptha Surendran and Paramesvaran Selvam and Sungeun An and Yuan Chi Chang and Dhiraj Joshi and Hajar Emami-Gohari and Xuan-Hong Dang and Yan Koyfman and Shahrokh Daijavad},
+      year={2024},
+      eprint={2409.18164},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2409.18164}, 
+}
+```
