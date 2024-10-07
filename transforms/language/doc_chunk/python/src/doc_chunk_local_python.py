@@ -17,11 +17,12 @@ import sys
 from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.utils import ParamsUtils
 from doc_chunk_transform_python import DocChunkPythonTransformConfiguration
-
+from doc_chunk_transform import chunking_types
 
 # create parameters
 input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input"))
 # input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input_md"))
+# input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "test-data", "input_token_text"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output"))
 local_conf = {
     "input_folder": input_folder,
@@ -39,6 +40,11 @@ params = {
     # doc_chunk params
     # "doc_chunk_chunking_type": "li_markdown",
     "doc_chunk_chunking_type": "dl_json",
+    # "doc_chunk_chunking_type": chunking_types.LI_TOKEN_TEXT, 
+    # fixed-size params
+    # "doc_chunk_output_chunk_column_name": "chunk_text",
+    # "doc_chunk_chunk_size_tokens": 128,
+    # "doc_chunk_chunk_overlap_tokens": 30
 }
 if __name__ == "__main__":
     # Set the simulated command line args

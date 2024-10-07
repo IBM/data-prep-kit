@@ -18,7 +18,7 @@ from typing import Any
 import pyarrow as pa
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, get_logger
-from doc_chunk_chunkers import ChunkingExecutor, DLJsonChunker, LIMarkdown
+from doc_chunk_chunkers import ChunkingExecutor, DLJsonChunker, LIMarkdown, LITokenTextSplitter
 
 
 short_name = "doc_chunk"
@@ -27,7 +27,10 @@ content_column_name_key = "content_column_name"
 doc_id_column_name_key = "doc_id_column_name"
 chunking_type_key = "chunking_type"
 dl_min_chunk_len_key = "dl_min_chunk_len"
+chunk_size_tokens_key = "chunk_size_tokens"
+chunk_overlap_tokens_key = "chunk_overlap_tokens"
 output_chunk_column_name_key = "output_chunk_column_name"
+output_chunk_column_id_key = "output_chunk_column_id"
 output_source_doc_id_column_name_key = "output_source_doc_id_column_name"
 output_jsonpath_column_name_key = "output_jsonpath_column_name"
 output_pageno_column_name_key = "output_pageno_column_name"
@@ -41,11 +44,13 @@ output_source_doc_id_column_name_cli_param = f"{cli_prefix}{output_source_doc_id
 output_jsonpath_column_name_cli_param = f"{cli_prefix}{output_jsonpath_column_name_key}"
 output_pageno_column_name_cli_param = f"{cli_prefix}{output_pageno_column_name_key}"
 output_bbox_column_name_cli_param = f"{cli_prefix}{output_bbox_column_name_key}"
-
+chunk_size_tokens_cli_param = f"{cli_prefix}{chunk_size_tokens_key}"
+chunk_overlap_tokens_cli_param = f"{cli_prefix}{chunk_overlap_tokens_key}"
 
 class chunking_types(str, enum.Enum):
     LI_MARKDOWN = "li_markdown"
     DL_JSON = "dl_json"
+    LI_TOKEN_TEXT = "li_token_text"
 
     def __str__(self):
         return str(self.value)
@@ -56,11 +61,13 @@ default_doc_id_column_name = "document_id"
 default_chunking_type = chunking_types.DL_JSON
 default_dl_min_chunk_len = None
 default_output_chunk_column_name = "contents"
+default_output_chunk_column_id = "chunk_id"
 default_output_source_doc_id_column_name = "source_document_id"
 default_output_jsonpath_column_name = "doc_jsonpath"
 default_output_pageno_column_name = "page_number"
 default_output_bbox_column_name = "bbox"
-
+default_chunk_size_tokens = 128
+default_chunk_overlap_tokens = 30
 
 class DocChunkTransform(AbstractTableTransform):
     """
@@ -84,6 +91,7 @@ class DocChunkTransform(AbstractTableTransform):
         self.content_column_name = config.get(content_column_name_key, default_content_column_name)
         self.doc_id_column_name = config.get(doc_id_column_name_key, default_doc_id_column_name)
         self.output_chunk_column_name = config.get(output_chunk_column_name_key, default_output_chunk_column_name)
+        self.output_chunk_column_id = config.get(output_chunk_column_id_key, default_output_chunk_column_id)
         self.output_source_doc_id_column_name = config.get(output_source_doc_id_column_name_key, default_output_source_doc_id_column_name)
 
         # Parameters for Docling JSON chunking
@@ -95,6 +103,10 @@ class DocChunkTransform(AbstractTableTransform):
             output_pageno_column_name_key, default_output_pageno_column_name
         )
         self.output_bbox_column_name_key = config.get(output_bbox_column_name_key, default_output_bbox_column_name)
+
+        # Parameters for Fixed-size with overlap chunking 
+        self.chunk_size_tokens = config.get(chunk_size_tokens_key, default_chunk_size_tokens)
+        self.chunk_overlap_tokens = config.get(chunk_overlap_tokens_key, default_chunk_overlap_tokens)
 
         # Initialize chunker
 
@@ -110,6 +122,13 @@ class DocChunkTransform(AbstractTableTransform):
         elif self.chunking_type == chunking_types.LI_MARKDOWN:
             self.chunker = LIMarkdown(
                 output_chunk_column_name=self.output_chunk_column_name,
+            )
+        elif self.chunking_type == chunking_types.LI_TOKEN_TEXT:
+            self.chunker = LITokenTextSplitter(
+                output_chunk_column_name=self.output_chunk_column_name,
+                output_chunk_column_id=self.output_chunk_column_id,
+                chunk_size_tokens=self.chunk_size_tokens,
+                chunk_overlap_tokens=self.chunk_overlap_tokens
             )
         else:
             raise RuntimeError(f"{self.chunking_type=} is not valid.")
@@ -212,6 +231,18 @@ class DocChunkTransformConfiguration(TransformConfiguration):
             f"--{output_bbox_column_name_cli_param}",
             default=default_output_bbox_column_name,
             help="Column name to store the bbox of the chunk",
+        )
+        parser.add_argument(
+            f"--{chunk_size_tokens_cli_param}",
+            default=default_chunk_size_tokens,
+            type=int,
+            help="Size of the chunk in tokens for the fixed-sized chunker",
+        )
+        parser.add_argument(
+            f"--{chunk_overlap_tokens_cli_param}",
+            default=default_chunk_overlap_tokens,
+            type=int,
+            help="Number of tokens overlapping between chunks for the fixed-sized chunker.",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:
