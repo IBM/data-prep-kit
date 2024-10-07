@@ -79,7 +79,7 @@ Next, install the data prep toolkit library. This library installs both the pyth
 
 ```bash
 pip3 install  data-prep-toolkit[ray]==0.2.2
-pip3 install  data-prep-toolkit-transforms[ray]==0.2.2
+pip3 install  data-prep-toolkit-transforms[ray,all]==0.2.2
 pip3 install jupyterlab   ipykernel  ipywidgets
 
 ## install custom kernel
