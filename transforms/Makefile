@@ -1,7 +1,6 @@
 REPOROOT=../
 # Use make help, to see the available rules
 include ../.make.defaults
-include .make.transforms
 
 setup::
 	@# Help: Recursively make $@ all subdirs 
@@ -79,7 +78,7 @@ workflow-upload::
 
 set-versions::
 	@# Help: Recursively make $@ in all subdirs
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DPK_TRANSFORMS_VERSION) TOML_VERSION=$(DPK_TRANSFORMS_VERSION) .transforms.set-versions
+#	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DPK_TRANSFORMS_VERSION) TOML_VERSION=$(DPK_TRANSFORMS_VERSION) .transforms.set-versions
 	@$(MAKE) RULE=$@ .recurse
 
 
@@ -97,6 +96,7 @@ build-pkg-dist::
 	done
 	# Only needs to build the whl
 	$(MAKE) BUILD_WHEEL_ARG=-w .defaults.build-dist
+	-rm -fr src
 
 test-pkg-dist::
 	-rm -fr venv
