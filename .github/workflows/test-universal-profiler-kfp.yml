@@ -13,7 +13,7 @@ on:
             - "*"
         paths:
             - ".make.*"
-            - "transforms/.make.workflow"
+            - "transforms/.make.workflows"
             - "transforms/universal/profiler/**"
             - "!kfp/**" # This is tested in separate workflow
             - "!data-processing-lib/**" # This is tested in separate workflow
@@ -27,7 +27,7 @@ on:
             - "releases/**"
         paths:
             - ".make.*"
-            - "transforms/.make.workflow"
+            - "transforms/.make.workflows"
             - "transforms/universal/profiler/**"
             - "!data-processing-lib/**" # This is tested in separate workflow
             - "!kfp/**" # This is tested in separate workflow
@@ -56,10 +56,10 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test KFP libs (shared and v1) and run a workflow
+            - name: Test V1 KFP workflow for transforms/universal/profiler
               timeout-minutes: 120
               run: |
-                  if [ -e "@TARGET_TRANSFORM_DIR/Makefile" -a -d "@TARGET_TRANSFORM_DIR/kfp_ray" ]; then
+                  if [ -e "transforms/universal/profiler/Makefile" -a -e "transforms/universal/profiler/kfp_ray/Makefile" ]; then
                       export REPOROOT=$PWD
                       export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
                       source $K8S_SETUP_SCRIPTS/requirements.env
@@ -76,13 +76,13 @@ jobs:
                       chmod +x /tmp/mc
                       export DEPLOY_KUBEFLOW=1
                       make -C $K8S_SETUP_SCRIPTS setup
-                      make -C kfp/kfp_support_lib test
+                      #make -C kfp/kfp_support_lib test
                       make -C transforms/universal/profiler workflow-build
                       source $K8S_SETUP_SCRIPTS/common.sh
                       make -C transforms/universal/profiler workflow-test
                       echo "Run transforms/universal/profiler completed"
                    else
-                      echo "Skipping transforms/universal/profiler kfp test for lack of Makefile and/or kfp_ray"
+                      echo "Skipping transforms/universal/profiler kfp test for lack of Makefile and/or kfp_ray/Makefile"
                    fi
 
     test-kfp-v2:
@@ -99,10 +99,10 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
-            - name: Test KFP libs (shared and v2) and run a workflow
+            - name: Test V2 KFP workflow for transforms/universal/profiler
               timeout-minutes: 120
               run: |
-                  if [ -e "@TARGET_TRANSFORM_DIR/Makefile" -a -d "@TARGET_TRANSFORM_DIR/kfp_ray" ]; then
+                  if [ -e "transforms/universal/profiler/Makefile" -a -e "transforms/universal/profiler/kfp_ray/Makefile" ]; then
                       export REPOROOT=$PWD
                       export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
                       source $K8S_SETUP_SCRIPTS/requirements.env
@@ -120,11 +120,11 @@ jobs:
                       export DEPLOY_KUBEFLOW=1
                       export KFPv2=1
                       make -C $K8S_SETUP_SCRIPTS setup
-                      make -C kfp/kfp_support_lib test
+                      #make -C kfp/kfp_support_lib test
                       make -C transforms/universal/profiler workflow-build
                       source $K8S_SETUP_SCRIPTS/common.sh
                       make -C transforms/universal/profiler workflow-test
                       echo "Run transforms/universal/profiler completed"
                   else
-                      echo "Skipping transforms/universal/profiler kfp test for lack of Makefile and/or kfp_ray"
+                      echo "Skipping transforms/universal/profiler kfp test for lack of Makefile and/or kfp_ray/Makefile"
                   fi
