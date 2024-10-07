@@ -61,4 +61,5 @@ set-versions:
 build-pkg-dist:: 
 	$(MAKE) .defaults.build-dist BUILD_WHEEL_ARG=-w
 
-publish-dist :: .check-env .defaults.publish-dist
+publish-dist :: .defaults.publish-dist
+

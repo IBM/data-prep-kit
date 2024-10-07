@@ -1,6 +1,6 @@
 [project]
 name = "dpk_pii_redactor_transform_python"
-version = "0.2.2.dev0"
+version = "0.2.2.dev1"
 requires-python = ">=3.10,<3.13"
 description = "PII redactor Transform for Python"
 license = {text = "Apache-2.0"}

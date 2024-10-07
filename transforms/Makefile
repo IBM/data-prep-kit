@@ -109,4 +109,5 @@ test-pkg-dist::
     done;
 	@# Help: Setup environment and run unit tests for all transforms
 
+publish-dist :: .defaults.publish-dist
 
