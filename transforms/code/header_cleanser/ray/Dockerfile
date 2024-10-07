@@ -17,9 +17,11 @@ COPY --chown=ray:users pyproject.toml pyproject.toml
 RUN pip install --no-cache-dir -e .
 
 # Install system dependencies, including libgomp1
+USER root
 RUN sudo apt-get update && sudo apt-get install -y \
     libgomp1 \
     && sudo rm -rf /var/lib/apt/lists/*
+User ray
     
 # copy source data
 COPY ./src/header_cleanser_transform_ray.py .
