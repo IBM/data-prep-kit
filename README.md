@@ -228,7 +228,12 @@ If you use Data Prep Kit in your research, please cite our paper:
 ```bash
 @misc{wood2024dataprepkitgettingdataready,
       title={Data-Prep-Kit: getting your data ready for LLM application development}, 
-      author={David Wood and Boris Lublinsky and Alexy Roytman and Shivdeep Singh and Abdulhamid Adebayo and Revital Eres and Mohammad Nassar and Hima Patel and Yousaf Shah and Constantin Adam and Petros Zerfos and Nirmit Desai and Daiki Tsuzuku and Takuya Goto and Michele Dolfi and Saptha Surendran and Paramesvaran Selvam and Sungeun An and Yuan Chi Chang and Dhiraj Joshi and Hajar Emami-Gohari and Xuan-Hong Dang and Yan Koyfman and Shahrokh Daijavad},
+      author={David Wood and Boris Lublinsky and Alexy Roytman and Shivdeep Singh 
+      and Abdulhamid Adebayo and Revital Eres and Mohammad Nassar and Hima Patel 
+      and Yousaf Shah and Constantin Adam and Petros Zerfos and Nirmit Desai 
+      and Daiki Tsuzuku and Takuya Goto and Michele Dolfi and Saptha Surendran 
+      and Paramesvaran Selvam and Sungeun An and Yuan Chi Chang and Dhiraj Joshi 
+      and Hajar Emami-Gohari and Xuan-Hong Dang and Yan Koyfman and Shahrokh Daijavad},
       year={2024},
       eprint={2409.18164},
       archivePrefix={arXiv},
