@@ -9,7 +9,7 @@ define set_env_var
 endef
 
 
-KFP_ENDPOINT ?= "http://localhost:8080/" 
+KFP_ENDPOINT?="http://localhost:8080/" 
 
 .PHONY: set-versions
 set-versions:

@@ -2,7 +2,7 @@
 name = "data_prep_toolkit_ray"
 version = "0.2.2.dev0"
 keywords = ["data", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 description = "Data Preparation Toolkit Library for Ray"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
@@ -12,7 +12,7 @@ authors = [
 ]
 dependencies = [
     "data-prep-toolkit>=0.2.2.dev0",
-    "ray[default]==2.24.0",
+    "ray[default]==2.36.1",
     # These two are to fix security issues identified by quay.io
     "fastapi>=0.110.2",
     "pillow>=10.3.0",

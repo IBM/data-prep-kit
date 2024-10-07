@@ -16,7 +16,11 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
-from doc_chunk_transform import chunking_type_cli_param, chunking_types
+from doc_chunk_transform import (
+    chunking_type_cli_param, 
+    output_chunk_column_name_cli_param,
+    chunking_types
+)
 from doc_chunk_transform_python import DocChunkPythonTransformConfiguration
 
 
@@ -53,6 +57,19 @@ class TestPythonDocChunkTransform(AbstractTransformLauncherTest):
                 },
                 basedir + "/input_md",
                 basedir + "/expected_md",
+            )
+        )
+
+        # Run with fixed size token chunker
+        fixtures.append(
+            (
+                launcher,
+                {
+                    chunking_type_cli_param: chunking_types.LI_TOKEN_TEXT,
+                    output_chunk_column_name_cli_param: "chunk_text"
+                },
+                basedir + "/input_token_text",
+                basedir + "/expected_token_text",
             )
         )
         return fixtures
