@@ -53,7 +53,7 @@ docker-save-image::
 	@# Help: Recursively make $@ in all subdirs 
 	$(MAKE) RULE=$@ .recurse
 
-.PHONY: workflow-venv
+.PHONY: workflow-vent
 workflow-venv:
 	if [ -e kfp_ray ]; then                 \
 	    $(MAKE) -C kfp_ray workflow-venv;   \
@@ -76,4 +76,3 @@ workflow-build:
 	if [ -e kfp_ray ]; then                 \
 	    $(MAKE) -C  kfp_ray workflow-build; \
 	fi
-
