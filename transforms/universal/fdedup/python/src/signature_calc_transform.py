@@ -11,6 +11,7 @@
 ################################################################################
 import os
 from argparse import ArgumentParser, Namespace
+from pathlib import Path
 from typing import Any, List
 
 import mmh3
@@ -198,6 +199,8 @@ class SignatureCalculationTransform(AbstractTableTransform):
         # data write to properly update metadata
         self.files_processed = 0
         self.bytes_processed = 0
+        self.data_access = config.get("data_access")
+        self.last_file_name = None
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -208,6 +211,7 @@ class SignatureCalculationTransform(AbstractTableTransform):
         """
         self.logger.info(f"Transforming table with {table.num_rows} rows from file {file_name}")
         self.logger.debug("----minhash---")
+        self.last_file_name = file_name
         self.files_processed += 1
         self.bytes_processed += table.nbytes
         # instantiate with same seed so every worker use same hash functions
@@ -293,16 +297,14 @@ class SignatureCalculationTransform(AbstractTableTransform):
         segment_bounds_list.append(upper_bound)
         segment_bounds = np.array(segment_bounds_list, dtype=np.uint64)
         self.logger.debug(f"Calculated {len(segment_bounds)} segment_bounds")
-
-        # tables is a list of tables, one per band 'b' and segment 's'
-        tables = []
-        paths = []
-
+        # output stats for the metadata
+        num_tables_written = 0
+        num_docs_written = 0
+        num_bytes_written = 0
         self.logger.debug(f"dataframe self.all_band_hashes has {len(self.all_band_hashes)} rows")
         self.logger.debug(f"dataframe self.all_minhashes has {len(self.all_minhashes)} rows")
-        # iterate through the bands, get the band hashes for each band,
-        # divide them into segments, join with minhashes and append to a list of
-        # tables to upload
+        # iterate through the bands, get the band hashes for each band, divide
+        # them into segments, join with minhashes, and upload to storage
         for band_ix in range(self.num_bands):
             # Filtering on, then dropping the `band_index` column
             band_df = self.all_band_hashes.filter(pl.col("band_index") == band_ix).drop("band_index")
@@ -336,28 +338,40 @@ class SignatureCalculationTransform(AbstractTableTransform):
                     ).alias("document_data"),
                 )
                 self.logger.debug(f"band {band_ix} segment {segment_index} encapsulated document info in a structure")
+
                 # append the table to the result list, and the path to metadata
-                tables.append(segment_band_minhash_df.to_arrow())
-                paths.append(
-                    f"bands/band={band_ix}/segment={segment_index}/",
+                common_path = os.path.commonpath([self.data_access.input_folder, self.last_file_name])
+                last_file_name_path = Path(self.last_file_name)
+                suffix_path = last_file_name_path.relative_to(self.data_access.input_folder)
+                save_path = os.path.join(
+                    self.data_access.output_folder,
+                    "bands",
+                    f"band={band_ix}",
+                    f"segment={segment_index}",
+                    suffix_path,
                 )
-                self.logger.debug(f"band {band_ix} segment {segment_index} appended tables and paths")
-        # add the paths to the metadata
-        total_table_size = sum([table.nbytes for table in tables])
+                segment_band_minhash_table = segment_band_minhash_df.to_arrow()
+                bytes_written, _, _ = self.data_access.save_table(save_path, segment_band_minhash_table)
+                if bytes_written > 0:
+                    num_tables_written += 1
+                    num_docs_written += segment_band_minhash_table.num_rows
+                    num_bytes_written += bytes_written
+                    self.logger.debug(f"Uploaded table for band {band_ix} and segment {segment_index}")
+        # add the stats to metadata
         metadata = {
             "input_files": self.files_processed,
             "input_docs": len(self.all_minhashes),
             "input_bytes": self.bytes_processed,
-            "output_files": len(tables),
-            "output_bytes": total_table_size,
-            "paths": paths,
+            "output_files": num_tables_written,
+            "output_docs": num_docs_written,
+            "output_bytes": num_bytes_written,
         }
-        self.logger.info(f"Writing {len(tables)} tables with a total size of {total_table_size:,d} bytes")
+        self.logger.info(f"Wrote {num_tables_written} tables with a total size of {num_bytes_written:,d} bytes")
         self.files_processed = 0
         self.bytes_processed = 0
         self.all_minhashes = None
         self.all_band_hashes = None
-        return tables, metadata
+        return [], metadata
 
     # define shingles generation function
     def _generate_word_shingles(self, text: str, window_size: int = 5, delimiter: str = " ") -> tuple[list, int, int]:
