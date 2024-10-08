@@ -2,7 +2,7 @@ ARG BASE_IMAGE=data-prep-kit-spark-3.5.2:0.3.0
 
 FROM ${BASE_IMAGE}
 
-USER root
+# USER root
 # install pytest
 RUN pip install --no-cache-dir pytest
 
@@ -27,8 +27,8 @@ RUN mkdir -p /opt/spark/work-dir/src/templates && \
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
-COPY deployment/kubernetes/spark-executor-pod-template.yaml /opt/spark/work-dir/src/templates/
-COPY config/spark_profile.yaml /opt/spark/work-dir/config/
+COPY deployment/kubernetes/spark-executor-pod-template.yml /opt/spark/work-dir/src/templates/
+COPY deployment/kubernetes/spark_profile.yml /opt/spark/work-dir/config/
 
 RUN pip install --no-cache-dir -e .
 
