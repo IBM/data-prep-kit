@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- Include Plotly JS -->
+    <style>
+        body {
+            font-size: 14px;
+        }
+
+        h1.title {
+            font-size: 20px;
+        }
+
+        h2.title.is-4 {
+            font-size: 16px;
+        }
+
+        p,
+        li {
+            font-size: 12px;
+        }
+
+        .box {
+            padding: 10px;
+        }
+
+        .metric {
+            margin-bottom: 10px;
+        }
+
+        .metrics-list {
+            border-right: 1px solid #ddd;
+            padding-right: 20px;
+        }
+
+        .metrics-container {
+            padding-left: 20px;
+        }
+
+        .columns {
+            display: flex;
+        }
+
+        .column {
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+
+        .metrics-column {
+            flex: 1;
+        }
+
+        .plots-column {
+            flex: 3;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">{{ heading }}</h1>
+            <p>{{ description }}</p>
+            <hr />
+
+            <div class="columns">
+                <!-- Metrics List on the Left -->
+                <div class="column metrics-column metrics-list">
+                    <h3 class="subtitle">Available Metrics</h3>
+                    <ul>
+                        {% for metric in metrics %}
+                        <li><a onclick="toggleVisibility('{{ metric.id }}')">{{ metric.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Plot Frames on the Right -->
+                <div class="column plots-column metrics-container">
+                    <div id="metrics-container">
+                        {% for metric in metrics %}
+                        <div id="{{ metric.id }}" class="box metric" style="display: none;">
+                            <h2 class="title is-4">{{ metric.name }}</h2>
+                            <p>{{ metric.details }}</p>
+                            {% if metric.graph_html %}
+                            {{ metric.graph_html | safe }} <!-- Render the Plotly graph HTML -->
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function toggleVisibility(id) {
+            var element = document.getElementById(id);
+            element.style.display = element.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
+</body>
+
+</html>

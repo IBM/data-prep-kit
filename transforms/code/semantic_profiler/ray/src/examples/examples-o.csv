@@ -1,0 +1,27 @@
+Library,Language,Category
+algorithms,Python,Algorithms and Data Structures
+asyncio,Python,Networking and Messaging
+arrow,Python,Scheduling and Concurrency
+authlib,Python,Security
+webassets,Python,Web Development
+scipy,Python,Mathematics and Numerics
+pymysql,Python,Database Management
+mimetypes,Python,File Handling
+logging,Python,Logging and Monitoring
+flake8,Python,Code Analysis and Linting
+mamba,Python,Testing
+marshmallow,Python,Data Serialization
+tkinter,Python,Graphical User Interface Design
+com.leansoft.bigqueue,Java,Algorithms and Data Structures
+com.cisco.commons.networking,Java,Networking and Messaging
+net.time4j,Java,Scheduling and Concurrency
+org.apache.shiro,Java,Security
+java.net.http,Java,Web Development
+org.apache.commons.math4,Java,Mathematics and Numerics
+ch.vorburger.mariaDB4j,Java,Database Management
+com.google.jimfs,Java,File Handling
+java.logging,Java,Logging and Monitoring
+org.sonar,Java,Code Analysis and Linting
+org.junit,Java,Testing
+com.cedarsoftware:json-io,Java,Data Serialization
+java.desktop,Java,Graphical User Interface Design
