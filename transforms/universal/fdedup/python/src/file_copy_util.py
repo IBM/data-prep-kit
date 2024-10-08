@@ -32,7 +32,7 @@ class FileCopyUtil:
             _, root_folder = self.root_folder.split("://")
         else:
             root_folder = self.root_folder
-        self.logger.info(f"copy_data(): root_folder = {root_folder}")
+        self.logger.debug(f"copy_data(): root_folder = {root_folder}")
         if data_type == "bands":
             match = re.match(r"^band=(\d+)/segment=(\d+)$", subfolder_name)
             if match:
@@ -41,7 +41,7 @@ class FileCopyUtil:
             else:
                 raise ValueError(f"Wrong subfolder_name {subfolder_name}, should be band=b/segment=s")
             input_folder = os.path.join(
-                self.root_folder,
+                root_folder,
                 "bands",
                 f"band={band}",
                 f"segment={segment}",
@@ -53,7 +53,7 @@ class FileCopyUtil:
             )
         elif data_type == "docs_to_remove":
             input_folder = os.path.join(
-                self.root_folder,
+                root_folder,
                 subfolder_name,
             )
             output_path = os.path.join(
@@ -61,10 +61,10 @@ class FileCopyUtil:
                 "docs_to_remove_consolidated",
                 f"docs_to_remove_consolidated.parquet",
             )
-            self.logger.info(f"copy_data(): input_folder = {input_folder}, output_path = {output_path}")
+            self.logger.debug(f"copy_data(): input_folder = {input_folder}, output_path = {output_path}")
 
         data_access = self.data_access_factory.create_data_access()
-        self.logger.info(f"copy_data(): getting the data from the input_folder {input_folder}")
+        self.logger.debug(f"copy_data(): getting the data from the input_folder {input_folder}")
         file_dict, status = data_access.get_folder_files(
             input_folder,
             extensions=[".parquet"],

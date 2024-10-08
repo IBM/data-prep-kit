@@ -56,5 +56,5 @@ if __name__ == "__main__":
 
     # create launcher
     launcher = PythonTransformLauncher(runtime_config=SignatureCalculationPythonTransformConfiguration())
-    # Launch the ray actor(s) to process the input
+    # Launch python to process the input
     launcher.launch()

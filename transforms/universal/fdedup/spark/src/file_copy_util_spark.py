@@ -31,7 +31,7 @@ class FileCopySpark:
             spark_config = {"spark.driver.host": "127.0.0.1"}
             return SparkSession.builder.appName(app_name).config(map=spark_config).getOrCreate()
         else:
-            # we are running in Kubernetes, use spark_profile.yaml and
+            # we are running in Kubernetes, use spark_profile.yml and
             # environment variables for configuration
 
             server_port = os.environ["KUBERNETES_SERVICE_PORT"]
@@ -39,7 +39,7 @@ class FileCopySpark:
 
             # Read Spark configuration profile
             config_filepath = os.path.abspath(
-                os.path.join(os.getenv("SPARK_HOME"), "work-dir", "config", "spark_profile.yaml")
+                os.path.join(os.getenv("SPARK_HOME"), "work-dir", "config", "spark_profile.yml")
             )
             with open(config_filepath, "r") as config_fp:
                 spark_config = yaml.safe_load(os.path.expandvars(config_fp.read()))
@@ -51,7 +51,7 @@ class FileCopySpark:
                 "work-dir",
                 "src",
                 "templates",
-                "spark-executor-pod-template.yaml",
+                "spark-executor-pod-template.yml",
             )
             spark_config["spark.kubernetes.executor.podTemplateFile"] = executor_pod_template_file
             spark_config["spark.kubernetes.container.image.pullPolicy"] = "Always"
