@@ -1,6 +1,8 @@
 REPOROOT=../
 # Use make help, to see the available rules
 include ../.make.defaults
+include ./transform.config
+
 
 setup::
 	@# Help: Recursively make $@ all subdirs 
@@ -78,11 +80,30 @@ workflow-upload::
 
 set-versions::
 	@# Help: Recursively make $@ in all subdirs
-#	$(MAKE) TRANSFORM_PYTHON_VERSION=$(DPK_TRANSFORMS_VERSION) TOML_VERSION=$(DPK_TRANSFORMS_VERSION) .transforms.set-versions
+	make set-pkg-version
 	@$(MAKE) RULE=$@ .recurse
 
+set-pkg-version:
+	    -e 's/\("data-prep-toollitpk[_-].*transform[_-]python[=<>~][=]\).*"/\1$(TRANSFORM_PYTHON_VERSION)"/'	\
 
-build-pkg-dist::
+
+	echo $(TRANSFORMS_PKG_VERSION)
+	cat pyproject.toml | sed -e 				\
+		's/^version[ ]*=.*/version = "'${TRANSFORMS_PKG_VERSION}'"/' 	\
+		> tt
+	mv tt pyproject.toml
+	echo $(DPK_VERSION)
+	cat requirements.txt |	sed -e \
+		's/data-prep-toolkit\([=><~][=]\).*/data-prep-toolkit\1$(DPK_VERSION)/' 	\
+	    > tt
+	mv tt requirements.txt
+	cat requirements-ray.txt |	sed -e	\
+		's/data-prep-toolkit\[ray\]\([=><~][=]\).*/data-prep-toolkit\[ray\]\1$(DPK_VERSION)/' 	\
+	    > tt
+	mv tt requirements-ray.txt
+
+
+build-pkg-dist:
 	## Most transforms today don't have a package name.... Need to fix that
 	## In the meantime, we will copy everything to a single folder
 	-rm -fr src
@@ -98,7 +119,7 @@ build-pkg-dist::
 	$(MAKE) BUILD_WHEEL_ARG=-w .defaults.build-dist
 	-rm -fr src
 
-test-pkg-dist::
+test-pkg-dist:
 	-rm -fr venv
 	python -m venv venv
 	source venv/bin/activate && $(PYTHON) -m pip  install '$(REPOROOT)/data-processing-lib/dist/data_prep_toolkit-$(DPK_VERSION)-py3-none-any.whl[dev,ray]'
