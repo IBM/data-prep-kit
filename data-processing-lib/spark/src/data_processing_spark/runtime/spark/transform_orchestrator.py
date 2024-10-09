@@ -18,9 +18,9 @@ from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import TransformStatistics
 from data_processing.utils import GB, get_logger
 from data_processing_spark.runtime.spark import (
+    SparkTransformExecutionConfiguration,
     SparkTransformFileProcessor,
     SparkTransformRuntimeConfiguration,
-    SparkTransformExecutionConfiguration,
 )
 from pyspark import SparkConf, SparkContext
 
@@ -45,6 +45,7 @@ def orchestrate(
     logger.info(f"orchestrator started at {start_ts}")
     # create data access
     data_access = data_access_factory.create_data_access()
+    bcast_params = runtime_config.get_bcast_params(data_access_factory)
     if data_access is None:
         logger.error("No DataAccess instance provided - exiting")
         return 1
@@ -53,6 +54,7 @@ def orchestrate(
     sc = SparkContext(conf=conf)
     spark_runtime_config = sc.broadcast(runtime_config)
     daf = sc.broadcast(data_access_factory)
+    spark_bcast_params = sc.broadcast(bcast_params)
 
     def process_partition(iterator):
         """
@@ -63,6 +65,7 @@ def orchestrate(
         # local statistics dictionary
         statistics = TransformStatistics()
         # create transformer runtime
+        bcast_params = spark_bcast_params.value
         d_access_factory = daf.value
         runtime_conf = spark_runtime_config.value
         runtime = runtime_conf.create_transform_runtime()
@@ -77,8 +80,11 @@ def orchestrate(
                 logger.debug(f"partition {f}")
                 # add additional parameters
                 transform_params = (
-                    runtime.get_transform_config(partition=int(f[1]), data_access_factory=d_access_factory,
-                                                 statistics=statistics))
+                    runtime.get_transform_config(
+                        partition=int(f[1]), data_access_factory=d_access_factory, statistics=statistics
+                    )
+                    | bcast_params
+                )
                 # create transform with partition number
                 file_processor.create_transform(transform_params)
                 first = False
@@ -128,7 +134,7 @@ def orchestrate(
         memory = 0.0
         for i in range(executors.size()):
             memory += executors.toList().apply(i)._2()._1()
-        resources = {"cpus": cpus, "gpus": 0, "memory": round(memory/GB, 2), "object_store": 0}
+        resources = {"cpus": cpus, "gpus": 0, "memory": round(memory / GB, 2), "object_store": 0}
         input_params = runtime_config.get_transform_metadata() | execution_configuration.get_input_params()
         metadata = {
             "pipeline": execution_configuration.pipeline_id,
@@ -143,7 +149,8 @@ def orchestrate(
             "execution_stats": {
                 "num partitions": num_partitions,
                 "execution time, min": round((time.time() - start_time) / 60, 3),
-            } | resources,
+            }
+            | resources,
             "job_output_stats": stats,
         }
         logger.debug(f"Saving job metadata: {metadata}.")
