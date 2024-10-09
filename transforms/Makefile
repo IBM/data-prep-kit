@@ -116,7 +116,7 @@ build-pkg-dist:
 		fi \
 	done
 	# Only needs to build the whl
-	$(MAKE) BUILD_WHEEL_ARG=-w .defaults.build-dist
+	$(MAKE) BUILD_WHEEL_EXTRA_ARG=-w .defaults.build-dist
 	-rm -fr src
 
 test-pkg-dist:

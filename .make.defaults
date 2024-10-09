@@ -642,7 +642,7 @@ endif
 	rm -rf dist || true
 	rm -rf src/*egg-info || true
 	${PIP} install --upgrade build
-	${PYTHON} -m build $(BUILD_WHEEL_ARG)
+	${PYTHON} -m build $(BUILD_WHEEL_EXTRA_ARG)
 
 # Publish the distribution in the dist directory, usually created with .defaults.build-dist  target
 .PHONY: .defaults.publish-dist 
