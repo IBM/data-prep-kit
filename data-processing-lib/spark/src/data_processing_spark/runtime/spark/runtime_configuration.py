@@ -36,7 +36,8 @@ class SparkTransformRuntimeConfiguration(TransformRuntimeConfiguration):
         """Allows retrieving and broadcasting to all the workers very large
         configuration parameters, like the list of document IDs to remove for
         fuzzy dedup, or the list of blocked web domains for block listing.  This
-        function is called after spark initialization, and before spark_context.parallelize()
+        function is called by the spark runtime after spark initialization, and
+        before spark_context.parallelize()
         :param data_access_factory - creates data_access object to download the large config parameter
         """
         return {}
