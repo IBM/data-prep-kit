@@ -41,10 +41,10 @@ class AbstractFolderTransform(AbstractTransform):
         raise NotImplemented()
 
     @staticmethod
-    def get_folders(data_access:data_access) -> list(str):
+    def get_folders(d_access: data_access) -> list(str):
         """
         Compute the list of folders to use.
-        :param data_access - data access class
+        :param d_access - data access class
         :return:
         """
         raise NotImplemented()
