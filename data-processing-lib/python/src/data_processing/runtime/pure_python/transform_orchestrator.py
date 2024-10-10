@@ -24,14 +24,13 @@ from data_processing.runtime.pure_python import (
     PythonTransformFileProcessor,
     PythonTransformRuntimeConfiguration,
 )
-from data_processing.transform import AbstractBinaryTransform, TransformStatistics, AbstractFolderTransform
+from data_processing.transform import AbstractTransform, TransformStatistics, AbstractFolderTransform
 from data_processing.utils import GB, get_logger
 
 
 logger = get_logger(__name__)
 
 
-@staticmethod
 def _execution_resources() -> dict[str, Any]:
     """
     Get Execution resource
@@ -47,6 +46,7 @@ def _execution_resources() -> dict[str, Any]:
         "memory": mused,
         "object_store": 0,
     }
+
 
 def orchestrate(
     data_access_factory: DataAccessFactoryBase,
@@ -76,7 +76,7 @@ def orchestrate(
     try:
         if is_folder:
             # folder transform
-            files = AbstractFolderTransform.get_folders(d_access=data_access)
+            files = runtime.get_folders(data_access=data_access)
             logger.info(f"Number of folders is {len(files)}")
         else:
             # Get files to process
@@ -145,7 +145,8 @@ def orchestrate(
             "job_input_params": input_params
             | data_access_factory.get_input_params()
             | execution_config.get_input_params(),
-            "execution_stats": _execution_resources() | {"execution time, min": round((time.time() - start_time) / 60.0, 3)},
+            "execution_stats": _execution_resources() |
+                               {"execution time, min": round((time.time() - start_time) / 60.0, 3)},
             "job_output_stats": stats,
         }
         logger.debug(f"Saving job metadata: {metadata}.")
@@ -209,7 +210,7 @@ def _process_transforms_multiprocessor(
     print_interval: int,
     data_access_factory: DataAccessFactoryBase,
     transform_params: dict[str, Any],
-    transform_class: type[AbstractBinaryTransform],
+    transform_class: type[AbstractTransform],
     is_folder: bool
 ) -> TransformStatistics:
     """
