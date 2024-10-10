@@ -26,11 +26,13 @@ class AbstractTransformFileProcessor:
         self,
         data_access_factory: DataAccessFactoryBase,
         transform_parameters: dict[str, Any],
+        is_folder: bool = False,
     ):
         """
         Init method
         :param data_access_factory: Data Access Factory
         :param transform_parameters: Transform parameters
+        :param is_folder: folder transform flag
         """
         self.logger = get_logger(__name__)
         # validate parameters
@@ -46,6 +48,7 @@ class AbstractTransformFileProcessor:
         # Add data access and statistics to the processor parameters
         self.transform_params = transform_parameters
         self.transform_params["data_access"] = self.data_access
+        self.is_folder = is_folder
 
     def process_file(self, f_name: str) -> None:
         """
@@ -58,25 +61,29 @@ class AbstractTransformFileProcessor:
             self.logger.warning("No data_access found. Returning.")
             return
         t_start = time.time()
-        # Read source file
-        filedata, retries = self.data_access.get_file(path=f_name)
-        if retries > 0:
-            self._publish_stats({"data access retries": retries})
-        if filedata is None:
-            self.logger.warning(f"File read resulted in None for {f_name}. Returning.")
-            self._publish_stats({"failed_reads": 1})
-            return
-        self._publish_stats({"source_files": 1, "source_size": len(filedata)})
+        if not self.is_folder:
+            # Read source file only if we are processing file
+            filedata, retries = self.data_access.get_file(path=f_name)
+            if retries > 0:
+                self._publish_stats({"data access retries": retries})
+            if filedata is None:
+                self.logger.warning(f"File read resulted in None for {f_name}. Returning.")
+                self._publish_stats({"failed_reads": 1})
+                return
+            self._publish_stats({"source_files": 1, "source_size": len(filedata)})
         # Process input file
         try:
-            # execute local processing
-            name_extension = TransformUtils.get_file_extension(f_name)
             self.logger.debug(f"Begin transforming file {f_name}")
-            out_files, stats = self.transform.transform_binary(file_name=f_name, byte_array=filedata)
+            if not self.is_folder:
+                # execute local processing
+                out_files, stats = self.transform.transform_binary(file_name=f_name, byte_array=filedata)
+                name_extension = TransformUtils.get_file_extension(f_name)
+                self.last_file_name = name_extension[0]
+                self.last_file_name_next_index = None
+                self.last_extension = name_extension[1]
+            else:
+                out_files, stats = self.transform.transform(folder_name=f_name)
             self.logger.debug(f"Done transforming file {f_name}, got {len(out_files)} files")
-            self.last_file_name = name_extension[0]
-            self.last_file_name_next_index = None
-            self.last_extension = name_extension[1]
             # save results
             self._submit_file(t_start=t_start, out_files=out_files, stats=stats)
         # Process unrecoverable exceptions
@@ -95,10 +102,10 @@ class AbstractTransformFileProcessor:
         the hook for them to return back locally stored data and their statistics.
         :return: None
         """
-        if self.last_file_name is None:
+        if self.last_file_name is None or self.is_folder:
             # for some reason a given worker never processed anything. Happens in testing
             # when the amount of workers is greater than the amount of files
-            self.logger.debug("skipping flush, no name for file is defined")
+            self.logger.debug("skipping flush, no name for file is defined or this is a folder transform")
             return
         try:
             t_start = time.time()
