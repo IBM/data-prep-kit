@@ -3,13 +3,11 @@
 REPOROOT=../../../..
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
-# to override/redefine the rules below. 
-
-# $(REPOROOT)/.make.versions file contains the versions
-
-TRANSFORM_NAME=syntactic_concept_extractor
-
+# to override/redefine the rules below.
 include $(REPOROOT)/transforms/.make.transforms
+
+# Include the common configuration for this transform
+include ../transform.config
 
 # values possible mach-arm64, x86_64
 export RUNTIME_HOST_ARCH=x86_64

@@ -7,15 +7,14 @@ REPOROOT=../../../..
 
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_NAME=syntactic_concept_extractor
+# Include the common configuration for this transform
+include ../transform.config
 
 # values possible mach-arm64, x86_64
 export RUNTIME_HOST_ARCH=x86_64
 
 BASE_IMAGE=${RAY_BASE_IMAGE}
 venv::	.transforms.ray-venv
-
-venv:: .transforms.python-venv
 
 test::	.transforms.ray-test
 
