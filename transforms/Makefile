@@ -84,10 +84,7 @@ set-versions::
 	@$(MAKE) RULE=$@ .recurse
 
 set-pkg-version:
-	    -e 's/\("data-prep-toollitpk[_-].*transform[_-]python[=<>~][=]\).*"/\1$(TRANSFORM_PYTHON_VERSION)"/'	\
-
-
-	echo $(TRANSFORMS_PKG_VERSION)
+	@# Help: Set tag for this package and its dependencies
 	cat pyproject.toml | sed -e 				\
 		's/^version[ ]*=.*/version = "'${TRANSFORMS_PKG_VERSION}'"/' 	\
 		> tt
@@ -104,6 +101,7 @@ set-pkg-version:
 
 
 build-pkg-dist:
+	@# Help: Build package wheel 
 	## Most transforms today don't have a package name.... Need to fix that
 	## In the meantime, we will copy everything to a single folder
 	-rm -fr src
@@ -120,6 +118,7 @@ build-pkg-dist:
 	-rm -fr src
 
 test-pkg-dist:
+	@# Help: Setup environment and run unit tests for all transforms.
 	-rm -fr venv
 	python -m venv venv
 	source venv/bin/activate && $(PYTHON) -m pip  install '$(REPOROOT)/data-processing-lib/dist/data_prep_toolkit-$(DPK_VERSION)-py3-none-any.whl[dev,ray]'

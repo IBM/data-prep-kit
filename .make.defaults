@@ -234,7 +234,6 @@ __check_defined = \
 	mkdir ${LIB_NAME}
 	cp -p -R ${LIB_PATH}/src ${LIB_NAME}
 	cp -p -R ${LIB_PATH}/pyproject.toml ${LIB_NAME}
-	-cp -p -R ${LIB_PATH}/requirements.txt ${LIB_NAME}
 	cp -p -R ${LIB_PATH}/README.md ${LIB_NAME}
 	if [ -e ${LIB_PATH}/requirements.txt ]; then		\
 	    cp -p ${LIB_PATH}/requirements.txt ${LIB_NAME};	\
