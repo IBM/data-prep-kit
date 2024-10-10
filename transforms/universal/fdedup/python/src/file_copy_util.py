@@ -44,7 +44,7 @@ class FileCopyUtil:
                 root_folder,
                 "bands",
                 f"band={band}",
-                f"segment={segment}",
+                f"segment={segment}/",
             )
             output_path = os.path.join(
                 root_folder,
@@ -54,7 +54,7 @@ class FileCopyUtil:
         elif data_type == "docs_to_remove":
             input_folder = os.path.join(
                 root_folder,
-                subfolder_name,
+                f"{subfolder_name}/",
             )
             output_path = os.path.join(
                 root_folder,

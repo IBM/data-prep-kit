@@ -123,7 +123,7 @@ class ClusterAnalysisTransform(AbstractTableTransform):
         doc2remove_exploded_dataframe = filtered_doc2remove_dataframe.explode("docs_to_remove")
         table = doc2remove_exploded_dataframe.to_arrow()
         self.logger.info(f"{len(doc2remove_exploded_dataframe)} documents marked to remove")
-        metadata = {"nfiles": doc2remove_exploded_dataframe.count(), "nrows": len(table)}
+        metadata = {"nrows": len(table)}
         return [table], metadata
 
     def process_bands(self, df: pl.DataFrame) -> pl.DataFrame:
