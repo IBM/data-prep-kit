@@ -11,7 +11,6 @@
 ################################################################################
 
 from typing import Any
-from data_processing.data_access import data_access
 from data_processing.transform import AbstractTransform
 
 
@@ -37,14 +36,5 @@ class AbstractFolderTransform(AbstractTransform):
         :return: a tuple of a list of 0 or more tuples and a dictionary of statistics that will be propagated
                 to metadata.  Each element of the return list, is a tuple of the transformed bytes and a string
                 holding the extension to be used when writing out the new bytes.
-        """
-        raise NotImplemented()
-
-    @staticmethod
-    def get_folders(d_access: data_access) -> list(str):
-        """
-        Compute the list of folders to use.
-        :param d_access - data access class
-        :return:
         """
         raise NotImplemented()

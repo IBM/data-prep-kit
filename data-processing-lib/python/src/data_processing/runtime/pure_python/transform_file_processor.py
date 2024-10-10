@@ -55,8 +55,7 @@ class PythonTransformFileProcessor(AbstractTransformFileProcessor):
         # Create statistics
         self.stats = statistics
 
-
-def _publish_stats(self, stats: dict[str, Any]) -> None:
+    def _publish_stats(self, stats: dict[str, Any]) -> None:
         self.stats.add_stats(stats)
 
 
