@@ -291,8 +291,9 @@ class DataAccess:
         """
         Get pyArrow table for a given path
         :param path - file path
-        :return: pyArrow table or None, if the table read failed and number of operation retries.
-                 Retries are performed on operation failures and are typically due to the resource overload.
+        :return: Tuple containing
+            pyarrow.Table: PyArrow table if read successfully, None otherwise.
+            the number of retries. Retries are performed on operation failures and are typically due to the resource overload.
         """
         raise NotImplementedError("Subclasses should implement this!")
 
