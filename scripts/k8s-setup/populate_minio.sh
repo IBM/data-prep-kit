@@ -33,6 +33,7 @@ mc cp --recursive ${REPOROOT}/transforms/language/doc_quality/ray/test-data/inpu
 mc cp --recursive ${REPOROOT}/transforms/language/pdf2parquet/ray/test-data/input/2206.01062.pdf kfp/test/pdf2parquet/input
 mc cp --recursive ${REPOROOT}/transforms/language/text_encoder/ray/test-data/input/ kfp/test/text_encoder/input
 mc cp --recursive ${REPOROOT}/transforms/language/doc_chunk/ray/test-data/input/ kfp/test/doc_chunk/input
+mc cp --recursive ${REPOROOT}/transforms/language/html2parquet/ray/test-data/input/test1.html kfp/test/html2parquet/input
 # universal
 mc cp --recursive ${REPOROOT}/transforms/universal/doc_id/ray/test-data/input/ kfp/test/doc_id/input
 mc cp --recursive ${REPOROOT}/transforms/universal/ededup/ray/test-data/input/ kfp/test/ededup/input
