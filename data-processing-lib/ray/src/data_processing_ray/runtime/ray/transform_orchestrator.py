@@ -16,6 +16,7 @@ from datetime import datetime
 
 import ray
 from data_processing.data_access import DataAccessFactoryBase
+from data_processing.transform import AbstractFolderTransform
 from data_processing_ray.runtime.ray import (
     RayTransformExecutionConfiguration,
     RayTransformFileProcessor,
@@ -56,13 +57,18 @@ def orchestrate(
     # create transformer runtime
     runtime = runtime_config.create_transform_runtime()
     resources = RayUtils.get_cluster_resources()
+    is_folder = issubclass(runtime_config.get_transform_class(), AbstractFolderTransform)
     try:
-        # Get files to process
-        files, profile, retries = data_access.get_files_to_process()
-        if len(files) == 0:
-            logger.error("No input files to process - exiting")
-            return 0
-        logger.info(f"Number of files is {len(files)}, source profile {profile}")
+        if is_folder:
+            # folder transform
+            files = AbstractFolderTransform.get_folders(data_access=data_access)
+            logger.info(f"Number of folders is {len(files)}")        # Get files to process
+        else:
+            files, profile, retries = data_access.get_files_to_process()
+            if len(files) == 0:
+                logger.error("No input files to process - exiting")
+                return 0
+            logger.info(f"Number of files is {len(files)}, source profile {profile}")
         # Print interval
         print_interval = int(len(files) / 100)
         if print_interval == 0:
@@ -84,6 +90,7 @@ def orchestrate(
                 data_access_factory=data_access_factory, statistics=statistics, files=files
             ),
             "statistics": statistics,
+            "is_folder": is_folder,
         }
         logger.debug("Creating actors")
         processors = RayUtils.create_actors(
