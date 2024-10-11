@@ -1,4 +1,4 @@
-# RAG with Data Prep Kit
+# RAG with Data Prep Kit + Milvus + IBM Granite
 
 This folder has examples of RAG applications with data prep kit (DPK).
 
@@ -59,7 +59,7 @@ Be sure to [shutdown the notebook](#tips-close-the-notebook-kernels-to-release-t
 
 ## Step-5: Query the documents using LLM (RAG steps 5, 6, 7, 8 & 9)
 
-We will use **Llama** as our LLM running on [Replicate](https://replicate.com/) service.
+We will use **IBM Granite** as our LLM running on [Replicate](https://replicate.com/) service.
 
 
 ### 5.1 - Create an `.env` file
