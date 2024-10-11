@@ -19,7 +19,7 @@ from data_processing.runtime.pure_python import PythonTransformLauncher
 from data_processing.runtime.pure_python.runtime_configuration import (
     PythonTransformRuntimeConfiguration,
 )
-from data_processing.transform import AbstractTableTransform, TransformConfiguration
+from data_processing.transform import AbstractTableTransform, TransformConfiguration, AbstractTransform
 from data_processing.utils import CLIArgumentProvider, get_logger
 
 
@@ -75,10 +75,10 @@ class NOOPTransformConfiguration(TransformConfiguration):
     configuration with CLI args.
     """
 
-    def __init__(self):
+    def __init__(self, clazz: type[AbstractTransform] = NOOPTransform):
         super().__init__(
             name=short_name,
-            transform_class=NOOPTransform,
+            transform_class=clazz,
             remove_from_metadata=[pwd_key],
         )
 
