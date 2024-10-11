@@ -1,6 +1,11 @@
-from .table_transform_test import AbstractTableTransformTest
-from .binary_transform_test import AbstractBinaryTransformTest
-from .noop_transform import (
+from data_processing.test_support.transform.table_transform_test import AbstractTableTransformTest
+from data_processing.test_support.transform.binary_transform_test import AbstractBinaryTransformTest
+from data_processing.test_support.transform.noop_transform import (
     NOOPTransform,
-    NOOPPythonTransformConfiguration,
+    NOOPTransformConfiguration,
+    NOOPPythonTransformConfiguration
+)
+from data_processing.test_support.transform.noop_folder_transform import (
+    NOOPFolderTransform,
+    NOOPFolderPythonTransformConfiguration
 )
