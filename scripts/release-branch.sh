@@ -73,7 +73,7 @@ git push --set-upstream origin $next_version_branch_pr
 git commit --no-verify -s -a -m "Initializing branch to PR back into $DEFAULT_BRANCH holding the next development version"
 git push 
 
-# Change to the next development version (bumped minor version with suffix).
+# Change to the next development version (bump minor version with reset suffix).
 minor=$(cat .make.versions | grep '^DPK_MINOR_VERSION' | sed -e 's/DPK_MINOR_VERSION[ ]*=[ ]*\([0-9]*\).*/\1/') 
 minor=$(($minor + 1))
 cat .make.versions | sed -e "s/^DPK_MINOR_VERSION=.*/DPK_MINOR_VERSION=$minor/"  	\
@@ -89,7 +89,7 @@ make set-versions > /dev/null
 # Push the version change back to the origin
 if [ -z "$debug" ]; then
     echo Committing and pushing version $next_version to $next_version_branch_pr branch.
-    git commit --no-verify -s -a -m "Bump micro version to $next_version" 
+    git commit --no-verify -s -a -m "Bump version to $next_version" 
     #git diff origin/$next_version_branch_pr $next_version_branch_pr 
     git push 
 else
