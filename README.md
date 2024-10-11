@@ -140,7 +140,7 @@ The matrix below shows the the combination of modules and supported runtimes. Al
 | [Filter on annotations](transforms/universal/filter/python/README.md)                | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | [Profiler](transforms/universal/profiler/ray/README.md)                              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | [Resize](transforms/universal/resize/python/README.md)                               | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| [HAP](transforms/universal/hap/python/README.md)                      | :white_check_mark: |  |                    |  |
+| [HAP](transforms/universal/hap/python/README.md)                      | :white_check_mark: | :white_check_mark: |                    |  |
 | [Tokenizer](transforms/universal/tokenization/python/README.md)                      | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | **Language-only**                                                                    |                    |                    |                    |                    |
 | [Language identification](transforms/language/lang_id/python/README.md)              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
