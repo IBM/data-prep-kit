@@ -74,9 +74,10 @@ git commit --no-verify -s -a -m "Initializing branch to PR back into $DEFAULT_BR
 git push 
 
 # Change to the next development version (bumped minor version with suffix).
-micro=$(cat .make.versions | grep '^DPK_MICRO_VERSION=' | sed -e 's/DPK_MICRO_VERSION=\([0-9]*\).*/\1/') 
-micro=$(($micro + 1))
-cat .make.versions | sed -e "s/^DPK_MICRO_VERSION=.*/DPK_MICRO_VERSION=$micro/"  \
+minor=$(cat .make.versions | grep '^DPK_MINOR_VERSION' | sed -e 's/DPK_MINOR_VERSION[ ]*=[ ]*\([0-9]*\).*/\1/') 
+minor=$(($minor + 1))
+cat .make.versions | sed -e "s/^DPK_MINOR_VERSION=.*/DPK_MINOR_VERSION=$minor/"  	\
+ 			 -e "s/^DPK_MICRO_VERSION=.*/DPK_MICRO_VERSION=0/"		\
  			 -e "s/^DPK_VERSION_SUFFIX=.*/DPK_VERSION_SUFFIX=.dev0/"  > tt
 mv tt .make.versions
 next_version=$(make show-version)
