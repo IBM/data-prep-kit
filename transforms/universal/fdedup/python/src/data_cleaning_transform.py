@@ -110,10 +110,10 @@ class DataCleaningTransformConfiguration(TransformConfiguration):
     configuration with CLI args.
     """
 
-    def __init__(self):
+    def __init__(self, transform_class: type[AbstractTableTransform] = DataCleaningTransform):
         super().__init__(
             name=short_name,
-            transform_class=DataCleaningTransform,
+            transform_class=transform_class,
         )
         self.logger = get_logger(__name__, level="INFO")
 

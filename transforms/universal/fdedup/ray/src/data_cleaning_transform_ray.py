@@ -16,9 +16,8 @@ import ray
 from data_cleaning_transform import (
     DataCleaningTransform,
     DataCleaningTransformConfiguration,
-    docs2remove_list,
-    docs2remove_list_key,
-    get_docs_to_remove,
+    duplicate_list_location_default,
+    duplicate_list_location_key,
 )
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.utils import CLIArgumentProvider, get_logger
@@ -45,16 +44,15 @@ class DataCleaningRayTransform(DataCleaningTransform):
         by the companion runtime, LangSelectorTransformRuntime.  If running inside the RayMutatingDriver,
         these will be provided by that class with help from the RayMutatingDriver.
         """
-        docs2remove = config.get(docs2remove_list_key, None)
-        if docs2remove is not None:
+        docs2removedf = config.get("df", None)
+        if docs2removedf is not None:
             # This is recommended for production approach. In this case domain list is build by the
             # runtime once, loaded to the object store and can be accessed by actors without additional reads
             try:
-
-                config[docs2remove_list_key] = ray.get(config.get(docs2remove_list_key))
+                config["df"] = ray.get(config.get("df"))
             except Exception as e:
-                self.logger.warning(f"Exception loading languages list from ray object storage {e}")
-                raise RuntimeError(f"exception loading from object storage for key {docs2remove}")
+                self.logger.warning(f"Exception loading docs2remove list from ray object storage {e}")
+                raise RuntimeError(f"exception loading from object storage for key {docs2removedf}")
         super().__init__(config)
 
 
@@ -90,9 +88,13 @@ class DataCleaningRuntime(DefaultRayTransformRuntime):
         :param files - list of files to remove
         :return: dictionary of filter init params
         """
-        docs_to_remove = get_docs_to_remove(self.params)
-        docs_to_remove_list = ray.put(docs_to_remove)
-        return {docs2remove_list_key: docs_to_remove_list} | self.params
+        duplicate_list_location = self.params.get(duplicate_list_location_key, duplicate_list_location_default)
+        data_access = data_access_factory.create_data_access()
+        if duplicate_list_location.startswith("s3://"):
+            _, duplicate_list_location = duplicate_list_location.split("://")
+        duplicate_list, retries = data_access.get_file(duplicate_list_location)
+        docs_to_remove_list = ray.put(duplicate_list)
+        return {"df": docs_to_remove_list} | self.params
 
 
 class DataCleaningRayTransformConfiguration(RayTransformRuntimeConfiguration):
