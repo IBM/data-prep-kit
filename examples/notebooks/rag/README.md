@@ -1,6 +1,10 @@
 # RAG with Data Prep Kit + Milvus + IBM Granite
 
-This folder has examples of RAG applications with data prep kit (DPK).
+Here is an example RAG application using:
+
+- **Data Prep Kit** to clean and process data
+- **Milvus** as vector database
+- **IBM Granite** as LLM
 
 ## Step-0: Getting Started
 
