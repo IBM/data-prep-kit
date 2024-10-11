@@ -2,6 +2,9 @@ REPOROOT=${CURDIR}/../../../../
 WORKFLOW_VENV_ACTIVATE=${REPOROOT}/transforms/venv/bin/activate
 include $(REPOROOT)/transforms/.make.workflows
 
+# Include the common configuration for this transform
+include ../transform.config
+
 SRC_DIR=${CURDIR}/../ray/
 
 PYTHON_WF := $(shell find ./ -name '*_wf.py')
@@ -12,7 +15,7 @@ workflow-venv: .check_python_version ${WORKFLOW_VENV_ACTIVATE}
 .PHONY: clean
 clean:
 	@# Help: Clean up the virtual environment.
-	rm -rf ${REPOROOT}/transforms/venv
+	rm -rf ${REPOROOT}/transforms/venv 
 
 venv::
 
@@ -30,7 +33,7 @@ publish::
 
 image::
 
-kind-load-image::
+load-image::
 
 docker-load-image::
 
@@ -42,7 +45,7 @@ workflow-build: workflow-venv
 
 .PHONY: workflow-test
 workflow-test: workflow-build
-	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=header_cleanser_wf.yaml
+	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=license_select_wf.yaml
 
 .PHONY: workflow-upload
 workflow-upload: workflow-build

@@ -1,13 +1,21 @@
 # Define the root of the local git clone for the common rules to be able 
 # know where they are running from.
 REPOROOT=../../../..
+
+# Set this, before including .make.defaults, to 
+#   1 if requirements reference the latest code in the data processing library 
+#     in this repo (that is not yet published to pypi).	 This is the default setting.
+#   0 if the transforms DPK dependencies are on wheels published to 
+#     pypi (e.g. data-prep-toolkit=0.2.1)
+#USE_REPO_LIB_SRC=1
+
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
-
 include $(REPOROOT)/transforms/.make.transforms
 
-TRANSFORM_NAME=doc_chunk
+# Include the common configuration for this transform
+include ../transform.config
 
 LINUX_WITH_CPU_TORCH?=true
 OS := $(shell uname -s)

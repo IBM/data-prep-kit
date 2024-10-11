@@ -2,6 +2,9 @@ REPOROOT=${CURDIR}/../../../../
 WORKFLOW_VENV_ACTIVATE=${REPOROOT}/transforms/venv/bin/activate
 include $(REPOROOT)/transforms/.make.workflows
 
+# Include the common configuration for this transform
+include ../transform.config
+
 SRC_DIR=${CURDIR}/../ray/
 
 PYTHON_WF := $(shell find ./ -name '*_wf.py')
@@ -42,7 +45,7 @@ workflow-build: workflow-venv
 
 .PHONY: workflow-test
 workflow-test: workflow-build
-	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=repo_level_order_transform.py
+	$(MAKE) .workflows.test-pipeline TRANSFORM_SRC=${SRC_DIR} PIPELINE_FILE=repo_level_order_wf.yaml
 
 .PHONY: workflow-upload
 workflow-upload: workflow-build

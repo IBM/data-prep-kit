@@ -10,6 +10,9 @@
 # limitations under the License.
 ################################################################################
 
+from typing import Any
+
+from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime import TransformRuntimeConfiguration
 from data_processing.transform import TransformConfiguration
 from data_processing_spark.runtime.spark import DefaultSparkTransformRuntime
@@ -28,6 +31,16 @@ class SparkTransformRuntimeConfiguration(TransformRuntimeConfiguration):
         """
         super().__init__(transform_config=transform_config)
         self.runtime_class = runtime_class
+
+    def get_bcast_params(self, data_access_factory: DataAccessFactoryBase) -> dict[str, Any]:
+        """Allows retrieving and broadcasting to all the workers very large
+        configuration parameters, like the list of document IDs to remove for
+        fuzzy dedup, or the list of blocked web domains for block listing.  This
+        function is called by the spark runtime after spark initialization, and
+        before spark_context.parallelize()
+        :param data_access_factory - creates data_access object to download the large config parameter
+        """
+        return {}
 
     def create_transform_runtime(self) -> DefaultSparkTransformRuntime:
         """
