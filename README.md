@@ -90,7 +90,7 @@ python -m ipykernel install --user --name=data-prep-kit --display-name "dataprep
 Test, your installation. If you are able to import these data-prep-kit libraries successfully in python, your installation has succeeded. 
 
 ```bash
-## start python interpretter
+## start python interpreter
 $   python
 
 # import DPK libraries
