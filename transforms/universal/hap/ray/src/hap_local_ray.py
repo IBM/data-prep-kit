@@ -30,6 +30,9 @@ local_conf = {
 code_location = {"github": "github", "commit_hash": "12345", "path": "path"}
 
 params = {
+     # where to run
+    "run_locally": True,
+
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
