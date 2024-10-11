@@ -69,4 +69,3 @@ ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/kfp_ray_co
 		cd ${REPOROOT} && make setup;  \
 	fi
 	. ${WORKFLOW_VENV_ACTIVATE}  && ${PYTHON} -m workflow_support.pipeline_utils.pipelines_tests_utils -c "upload" -p ${CURDIR}/${PIPELINE_FILE} -e ${KFP_ENDPOINT}
-
