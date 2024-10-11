@@ -37,7 +37,7 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TRANSFORM_PYTHON_VERSION=$(HAP_PYTHON_VERSION) TOML_VERSION=$(HAP_RAY_VERSION) .transforms.set-versions 
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(HAP_PYTHON_VERSION) TOML_VERSION=$(HAP_PYTHON_VERSION) .transforms.set-versions 
 
 build-dist:: set-versions .defaults.build-dist 
 
