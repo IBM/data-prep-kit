@@ -99,7 +99,8 @@ def orchestrate(
     try:
         if is_folder:
             # folder transform
-            files = AbstractFolderTransform.get_folders(d_access=data_access)
+            runtime = runtime_config.create_transform_runtime()
+            files = runtime.get_folders(data_access=data_access)
             logger.info(f"Number of folders is {len(files)}")        # Get files to process
         else:
             # Get files to process
