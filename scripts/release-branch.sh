@@ -24,7 +24,7 @@ else
     tag=test$version
 fi
 release_branch=releases/$tag
-release_branch_pr=$tag
+release_branch_pr=pending-releases/$tag
 
 # Create a new branch for this version and switch to it
 if [ ! -z "$debug" ]; then
