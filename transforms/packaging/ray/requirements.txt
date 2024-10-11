@@ -1,5 +1,5 @@
-data-prep-toolkit-ray>=0.2.2.dev0
-data-prep-toolkit-transforms>=0.2.2.dev0
+data-prep-toolkit-ray>=0.2.2
+data-prep-toolkit-transforms>=0.2.2
 scancode-toolkit==32.1.0 ; platform_system != 'Darwin'
 parameterized
 tqdm==4.66.3

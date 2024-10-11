@@ -23,7 +23,7 @@ task_image = "quay.io/dataprep1/data-prep-kit/lang_id-ray:latest"
 EXEC_SCRIPT_NAME: str = "lang_id_transform_ray.py"
 
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.2"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../kfp/kfp_ray_components/"
