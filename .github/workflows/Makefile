@@ -44,12 +44,6 @@ transform-tests:
 			echo No kfp_ray directory for $$dir. Skipping generation of $$yml;      \
 			continue;			\
 		fi;					\
-		z=$$(echo $${KFP_BLACK_LIST} | grep  $$dir);     \
-		if  [ ! -z "$$z" ]; then		\
-			echo $$dir is black listed. Skipping generation of $$yml;               \
-			continue;			\
-		fi;					\
-		echo Generating $$yml;                  \
 		cat test-kfp-transform.template | sed -e "s?@TARGET_TRANSFORM_DIR@?transforms/$${TRANSFORM_SUBDIR}/$$dir?g" > $$yml;    \
 	    fi;						\
 	done

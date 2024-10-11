@@ -56,33 +56,26 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
+            - name: Import environment variables
+              run: |
+                  cat scripts/k8s-setup/requirements.env >> $GITHUB_ENV
+                  echo "K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup" >> $GITHUB_ENV
+                  echo "REPOROOT=$PWD" >> $GITHUB_ENV
+                  echo "PATH=$PATH:/tmp" >> $GITHUB_ENV
             - name: Test V1 KFP workflow for transforms/code/license_select
               timeout-minutes: 120
               run: |
+                  KFP_BLACK_LIST=$(./scripts/check-workflows.sh -show-kfp-black-list)
                   if [ -e "transforms/code/license_select/Makefile" -a -e "transforms/code/license_select/kfp_ray/Makefile" ]; then
-                      export REPOROOT=$PWD
-                      export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
-                      source $K8S_SETUP_SCRIPTS/requirements.env
-                      export PATH=$PATH:/tmp/
-                      curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-                      chmod 777 /tmp/kind
-                      curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-                      chmod 700 /tmp/get_helm.sh
-                      HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
-                      chmod 777 /tmp/helm
-                      curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
-                      chmod 777 /tmp/kubectl
-                      curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
-                      chmod +x /tmp/mc
-                      export DEPLOY_KUBEFLOW=1
-                      make -C $K8S_SETUP_SCRIPTS setup
-                      #make -C kfp/kfp_support_lib test
-                      make -C transforms/code/license_select workflow-build
-                      source $K8S_SETUP_SCRIPTS/common.sh
-                      make -C transforms/code/license_select workflow-test
-                      echo "Run transforms/code/license_select completed"
-                   else
-                      echo "Skipping transforms/code/license_select kfp test for lack of Makefile and/or kfp_ray/Makefile"
+                     transform=$(basename "transforms/code/license_select")
+                     if echo ${KFP_BLACK_LIST} | grep -qv ${transform}; then
+                        $PWD/scripts/workflow_helper.sh install-tools
+                        $PWD/scripts/workflow_helper.sh test-workflow transforms/code/license_select   
+                     else
+                        $PWD/scripts/workflow_helper.sh build-workflow transforms/code/license_select
+                     fi              
+                  else
+                     echo "Skipping transforms/code/license_select kfp test for lack of Makefile and/or kfp_ray/Makefile"
                    fi
 
     test-kfp-v2:
@@ -99,32 +92,25 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
+            - name: Import environment variables
+              run: |
+                  cat scripts/k8s-setup/requirements.env >> $GITHUB_ENV
+                  echo "K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup" >> $GITHUB_ENV
+                  echo "REPOROOT=$PWD" >> $GITHUB_ENV
+                  echo "PATH=$PATH:/tmp" >> $GITHUB_ENV
+                  echo "KFPv2=1" >> $GITHUB_ENV
             - name: Test V2 KFP workflow for transforms/code/license_select
               timeout-minutes: 120
               run: |
+                  KFP_BLACK_LIST=$(./scripts/check-workflows.sh -show-kfp-black-list)
                   if [ -e "transforms/code/license_select/Makefile" -a -e "transforms/code/license_select/kfp_ray/Makefile" ]; then
-                      export REPOROOT=$PWD
-                      export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
-                      source $K8S_SETUP_SCRIPTS/requirements.env
-                      export PATH=$PATH:/tmp/
-                      curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-                      chmod 777 /tmp/kind
-                      curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-                      chmod 700 /tmp/get_helm.sh
-                      HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
-                      chmod 777 /tmp/helm
-                      curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
-                      chmod 777 /tmp/kubectl
-                      curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
-                      chmod +x /tmp/mc
-                      export DEPLOY_KUBEFLOW=1
-                      export KFPv2=1
-                      make -C $K8S_SETUP_SCRIPTS setup
-                      #make -C kfp/kfp_support_lib test
-                      make -C transforms/code/license_select workflow-build
-                      source $K8S_SETUP_SCRIPTS/common.sh
-                      make -C transforms/code/license_select workflow-test
-                      echo "Run transforms/code/license_select completed"
+                     transform=$(basename "transforms/code/license_select")
+                     if echo ${KFP_BLACK_LIST} | grep -qv ${transform}; then
+                        $PWD/scripts/workflow_helper.sh install-tools
+                        $PWD/scripts/workflow_helper.sh test-workflow transforms/code/license_select   
+                     else
+                        $PWD/scripts/workflow_helper.sh build-workflow transforms/code/license_select
+                     fi              
                   else
-                      echo "Skipping transforms/code/license_select kfp test for lack of Makefile and/or kfp_ray/Makefile"
-                  fi
+                     echo "Skipping transforms/code/license_select kfp test for lack of Makefile and/or kfp_ray/Makefile"
+                   fi
