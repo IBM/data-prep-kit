@@ -1,6 +1,6 @@
 [project]
 name = "dpk_html2parquet_transform_ray"
-version = "0.2.2"
+version = "0.3.0.dev0"
 requires-python = ">=3.10,<3.13"
 description = "HTML2PARQUET Python Transform"
 license = {text = "Apache-2.0"}
