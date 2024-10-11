@@ -1,4 +1,4 @@
-# Split  files
+# Resize  files
 
 Please see the set of
 [transform project conventions](../../README.md)
@@ -10,6 +10,8 @@ testing and IDE set up.
 This is a simple transformer that is resizing the input tables to a specified size. 
 * resizing based on in-memory size of the tables.
 * resized based on the number of rows in the tables. 
+
+Tables can be either split into smaller sizes or aggregated into larger sizes.
 
 ## Building
 
@@ -36,10 +38,6 @@ Only one of the _max_rows_per_table_ and _max_mbytes_per_table_ may be used.
 
 ## Running
 
-We also provide several demos of the transform usage for different data storage options, including
-[local file system](src/resize_local_ray.py), [s3](src/resize_s3_ray.py) and [lakehouse](src/resize_lakehouse.py)
-
-
 ### Launched Command Line Options 
 When running the transform with the Ray launcher (i.e. TransformLauncher),
 the following command line arguments are available in addition to 
@@ -56,3 +54,8 @@ the following command line arguments are available in addition to
                         'disk' makes an estimate of the resulting parquet file size.
 ```
 
+### Transforming data using the transform image
+
+To use the transform image to transform your data, please refer to the 
+[running images quickstart](../../../../doc/quick-start/run-transform-image.md),
+substituting the name of this transform image and runtime as appropriate.

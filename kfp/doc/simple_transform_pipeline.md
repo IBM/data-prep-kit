@@ -18,6 +18,7 @@ Note: the project and the explanation below are based on [KFPv1](https://www.kub
   - [Input parameters definition](#inputs)
   - [Pipeline definition](#pipeline)
   - [Additional configuration](#add_config)
+  - [Tolerations and node selector](#tolerations)
 - [Compiling a pipeline](#compilation)
 - [Deploying a pipeline](#deploying)
 - [Executing pipeline and watching execution results](#execution)
@@ -100,7 +101,7 @@ The input parameters section defines all the parameters required for the pipelin
     # noop parameters
     noop_sleep_sec: int = 10,
     # additional parameters
-    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
+    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5, "delete_cluster_delay_minutes": 0}',
 ```
 
 The parameters used here are as follows:
@@ -111,6 +112,7 @@ The parameters used here are as follows:
   * memory - memory
   * image - image to use
   * image_pull_secret - image pull secret
+  * tolerations - (optional) tolerations for the ray pods
 * ray_worker_options: worker node options (we here are using only 1 worker pool), containing the following:
   * replicas - number of replicas to create
   * max_replicas - max number of replicas
@@ -119,6 +121,7 @@ The parameters used here are as follows:
   * memory - memory
   * image - image to use
   * image_pull_secret - image pull secret
+  * tolerations - (optional) tolerations for the ray pods
 * server_url - server url
 * additional_params: additional (support) parameters, containing the following:
   * wait_interval - wait interval for API server, sec
@@ -139,8 +142,6 @@ The parameters used here are as follows:
 **Note** that here we are specifying initial values for all parameters that will be propagated to the workflow UI
 (see below)
 
-**Note** Parameters are defining both S3 and Lakehouse configuration, but only one at a time can be used.
-
 ### Pipeline definition <a name = "pipeline"></a> 
 
 Now, when all components and input parameters are defined, we can implement pipeline wiring defining sequence of 
@@ -148,8 +149,8 @@ component execution and parameters submitted to every component.
 
 ```python
     # create clean_up task
-    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=dsl.RUN_ID_PLACEHOLDER, server_url=server_url)
-    ComponentUtils.add_settings_to_component(clean_up_task, 60)
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=dsl.RUN_ID_PLACEHOLDER, server_url=server_url, additional_params=additional_params)
+    ComponentUtils.add_settings_to_component(clean_up_task, ONE_HOUR_SEC * 2)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
       # compute execution params
@@ -209,6 +210,17 @@ The final thing that we need to do is set some pipeline global configuration:
     # Configure the pipeline level to one week (in seconds)
     dsl.get_pipeline_conf().set_timeout(ONE_WEEK_SEC)
 ```
+
+### KFP pods Toleration and node selector (Optional)<a name = "tolerations"></a> 
+To apply kuberenetes [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) or [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to KFP pods, you need to set `KFP_TOLERATIONS` or `KFP_NODE_SELECTOR` environment variables respectively before compiling the pipeline. Here's an example:
+
+```bash
+export KFP_TOLERATIONS='[{"key": "key","operator": "Equal", "value1": "value", "effect": "NoSchedule"}]'
+
+export KFP_NODE_SELECTOR='{"label_key":"cloud.google.com/gke-accelerator","label_value":"nvidia-tesla-p4"}'
+
+```
+In KFP v1, setting `KFP_TOLERATIONS` will apply to the Ray pods, overriding any tolerations specified in the `ray_head_options` and `ray_worker_options` pipeline parameters if they are present.
 
 ## Compiling a pipeline <a name = "compilation"></a>
 

@@ -1,6 +1,10 @@
 REPOROOT=${CURDIR}/../../../../
+
 WORKFLOW_VENV_ACTIVATE=${REPOROOT}/transforms/venv/bin/activate
 include $(REPOROOT)/transforms/.make.workflows
+
+# Include the common configuration for this transform
+include ../transform.config
 
 SRC_DIR=${CURDIR}/../ray/
 
@@ -30,7 +34,11 @@ publish::
 
 image::
 
-load-image::
+kind-load-image::
+
+docker-load-image::
+
+docker-save-image::
 
 .PHONY: workflow-build
 workflow-build: workflow-venv
@@ -45,3 +53,7 @@ workflow-upload: workflow-build
 	@for file in $(YAML_WF); do \
 		$(MAKE) .workflows.upload-pipeline PIPELINE_FILE=$$file; \
 	done
+
+.PHONY: workflow-generate
+workflow-generate: workflow-venv
+	. ${WORKFLOW_VENV_ACTIVATE}  && ../../../../kfp/pipeline_generator/single-pipeline/run.sh -c `pwd`/pipeline_definitions.yaml -od  .

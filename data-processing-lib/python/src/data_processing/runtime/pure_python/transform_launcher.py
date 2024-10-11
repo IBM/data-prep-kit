@@ -10,12 +10,11 @@
 # limitations under the License.
 ################################################################################
 
-import argparse
 import time
 
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
-from data_processing.runtime import TransformExecutionConfiguration
 from data_processing.runtime.pure_python import (
+    PythonTransformExecutionConfiguration,
     PythonTransformRuntimeConfiguration,
     orchestrate,
 )
@@ -42,30 +41,7 @@ class PythonTransformLauncher(AbstractTransformLauncher):
         :param data_access_factory: the factory to create DataAccess instances.
         """
         super().__init__(runtime_config, data_access_factory)
-        self.execution_config = TransformExecutionConfiguration(name=runtime_config.get_name())
-
-    def __get_parameters(self) -> bool:
-        """
-        This method creates arg parser, fills it with the parameters
-        and does parameters validation
-        :return: True if validation passes or False, if not
-        """
-        parser = argparse.ArgumentParser(
-            description=f"Driver for {self.name} processing",
-            # RawText is used to allow better formatting of ast-based arguments
-            # See uses of ParamsUtils.dict_to_str()
-            formatter_class=argparse.RawTextHelpFormatter,
-        )
-        # add additional arguments
-        self.runtime_config.add_input_params(parser=parser)
-        self.data_access_factory.add_input_params(parser=parser)
-        self.execution_config.add_input_params(parser=parser)
-        args = parser.parse_args()
-        return (
-            self.runtime_config.apply_input_params(args=args)
-            and self.execution_config.apply_input_params(args=args)
-            and self.data_access_factory.apply_input_params(args=args)
-        )
+        self.execution_config = PythonTransformExecutionConfiguration(name=runtime_config.get_name())
 
     def _submit_for_execution(self) -> int:
         """
@@ -85,14 +61,5 @@ class PythonTransformLauncher(AbstractTransformLauncher):
         except Exception as e:
             logger.info(f"Exception running orchestration\n{e}")
         finally:
-            logger.info(f"Completed execution in {(time.time() - start)/60.} min, execution result {res}")
+            logger.info(f"Completed execution in {round((time.time() - start)/60., 3)} min, execution result {res}")
             return res
-
-    def launch(self) -> int:
-        """
-        Execute method orchestrates driver invocation
-        :return:
-        """
-        if self.__get_parameters():
-            return self._submit_for_execution()
-        return 1

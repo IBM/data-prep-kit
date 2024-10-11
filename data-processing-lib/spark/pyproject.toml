@@ -1,19 +1,20 @@
 [project]
 name = "data_prep_toolkit_spark"
-version = "0.2.1.dev0"
+version = "0.2.2.dev0"
 keywords = ["data", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 description = "Data Preparation Toolkit Library for Spark"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     { name = "David Wood", email = "dawood@us.ibm.com" },
-    { name = "Constantin Adam", email = "cmadam@us.ibm.com" },
+    { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit==0.2.1.dev0",	
-    "pyspark>=3.5.1",
-    "pyyaml>=6.0.1",
+    "data-prep-toolkit==0.2.2.dev0",	
+    "pyspark>=3.5.2",
+    "psutil>=6.0.0",
+    "PyYAML>=6.0.2"
 ]
 
 [project_urls]

@@ -1,4 +1,6 @@
-FROM docker.io/rayproject/ray:2.24.0-py310
+ARG BASE_IMAGE=docker.io/rayproject/ray:2.36.1-py312
+
+FROM ${BASE_IMAGE}
 
 # install libraries
 COPY requirements.txt requirements.txt

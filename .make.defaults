@@ -37,6 +37,11 @@ ABS_REPOROOT=$(shell (cd $(REPOROOT); pwd))
 DOCKER_FILE?=Dockerfile
 #DOCKER_IMAGE_NAME?=xyzzy	# Must be defined by the includeing makefile
 DOCKER?=docker
+DOCKER_PLATFORM?=linux/amd64
+# Can be used by transforms or others to add args to the "docker build" command in .defaults.image target
+DOCKER_BUILD_EXTRA_ARGS?=
+# Can be used by transforms or others to add args to the "pip install" commands referencing toml or requirements.txt files
+PIP_INSTALL_EXTRA_ARGS?=
 DOCKER_HOSTNAME?=quay.io
 DOCKER_NAMESPACE ?= dataprep1/data-prep-kit
 DOCKER_REGISTRY_USER?=$(DPK_DOCKER_REGISTRY_USER)
@@ -44,11 +49,16 @@ DOCKER_REGISTRY_KEY?=$(DPK_DOCKER_REGISTRY_KEY)
 DOCKER_REGISTRY_ENDPOINT?=$(DOCKER_HOSTNAME)/$(DOCKER_NAMESPACE)
 DOCKER_LOCAL_IMAGE=$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
 DOCKER_REMOTE_IMAGE=$(DOCKER_REGISTRY_ENDPOINT)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
-DOCKER_SPARK_BASE_IMAGE_NAME=data-prep-kit-spark-3.5.1
-DOCKER_SPARK_BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE_NAME):$(DPK_LIB_VERSION)
+DOCKER_SPARK_BASE_IMAGE_NAME=data-prep-kit-spark-$(SPARK_VERSION)
+DOCKER_SPARK_BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
+RAY_BASE_IMAGE?=docker.io/rayproject/ray:${RAY}-py310
 # Deprecated in favor of DOCKER_REMOTE_IMAGE
 DOCKER_IMAGE?=$(DOCKER_REMOTE_IMAGE)
 KIND_CLUSTER_NAME=dataprep
+ARTIFACTS_DIR?=$(REPOROOT)/artifacts
+# Set this to 0 to disable installation of data-processing-lib/* into virtual environments
+# Should cause data-prep-kit dependencies to be loaded from pypi instead.
+USE_REPO_LIB_SRC?=1
 
 DPK_PYTHON_LIB_DIR=$(REPOROOT)/data-processing-lib/python
 DPK_RAY_LIB_DIR=$(REPOROOT)/data-processing-lib/ray
@@ -160,8 +170,8 @@ __check_defined = \
 	@version=$$(echo $(PYTHON_VERSION) | sed -e 's/Python[ ]*//');  \
 	major=$$(echo $$version | awk -F. '{print $$1}');	       \
 	minor=$$(echo $$version | awk -F. '{print $$2}');	       \
-	if [ $$major -lt 3 -o $$minor -lt 10 -o $$minor -gt 11 ]; then  \
-		echo Python 3.10 or 3.11 is required, but got $$version;	\
+	if [ $$major -lt 3 -o $$minor -lt 10 -o $$minor -gt 12 ]; then  \
+		echo Python 3.10 - 3.12 is required, but got $$version;	\
 		echo Try overriding PYTHON=$(PYTHON).  For example, "'"make PYTHON=python3.10" ...'";   \
 		exit 1;						 \
 	fi
@@ -179,12 +189,25 @@ __check_defined = \
 	-find . -name '*.egg-info' | xargs rm -rf
 	-find . -name '__pycache__' | xargs rm -rf
 	-rm -rf dist
+	-rm -rf $(ARTIFACTS_DIR) > /dev/null 2>&1
+
+.PHONY: .defaults.docker-save-image
+.defaults.docker-save-image:
+	@# Help: Save docker image as tar file to ${ARTIFACTS_DIR} directory.
+	mkdir -p ${ARTIFACTS_DIR}/
+	docker save -o ${ARTIFACTS_DIR}/${DOCKER_IMAGE_NAME}.tar $(DOCKER_REMOTE_IMAGE)
+
+.PHONY: .defaults.docker-load-image
+.defaults.docker-load-image:
+	@# Help: load docker image from ${ARTIFACTS_DIR} directory.
+	docker load -i ${ARTIFACTS_DIR}/${DOCKER_IMAGE_NAME}.tar
 
 # We create both local and remote tags.  Local seems to be needed when using our spark
 # base image.  Remote seems to be needed by kfp.
 .PHONY: .defaults.image
 .defaults.image:: # Must be called with a DOCKER_IMAGE= settings.
 	@# Help: Create the docker image $(DOCKER_LOCAL_IMAGE) and a tag for $(DOCKER_REMOTE_IMAGE)
+	$(call check_defined, DOCKER_IMAGE_NAME)
 	# The following touch seems to be needed to work around a docker build problem in which
 	# it seemed to be using a pyproject from a previously built image.  Specifically, malware's
 	# ray pyproject.toml seemed to be copied into the image instead of the proglang_select python version.
@@ -195,11 +218,12 @@ __check_defined = \
 	if [ -e pyproject.toml ]; then 	\
 		touch pyproject.toml;	\
 	fi
-	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE)		\
+	$(DOCKER) build -t $(DOCKER_LOCAL_IMAGE) $(DOCKER_BUILD_EXTRA_ARGS)	\
+		--platform $(DOCKER_PLATFORM)  			\
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\
-		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h)  . 
+		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h) . 
 	$(DOCKER) tag $(DOCKER_LOCAL_IMAGE)  $(DOCKER_REMOTE_IMAGE)
 
 # Copy a source tree in LIB_PATH, including src, pyproject.toml to LIB_NAME
@@ -211,15 +235,21 @@ __check_defined = \
 	cp -p -R ${LIB_PATH}/src ${LIB_NAME}
 	cp -p -R ${LIB_PATH}/pyproject.toml ${LIB_NAME}
 	cp -p -R ${LIB_PATH}/README.md ${LIB_NAME}
+	if [ -e ${LIB_PATH}/requirements.txt ]; then		\
+	    cp -p ${LIB_PATH}/requirements.txt ${LIB_NAME};	\
+	fi
+	
 
 # Build and image using the local Dockerfile and make the data-processing-lib/python
 # available in the current directory for use by the Dockerfile (i.e. to install the library).
 .PHONY: .defaults.python-lib-src-image
 .defaults.python-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
 	@# Help: Build the Python $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-lib/python source
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
+endif
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
-	rm -rf data-processing-lib-python
+	-rm -rf data-processing-lib-python
 
 # Build an image using the local Dockerfile and make the data-processing-lib/ray
 # available in the current directory for use by the Dockerfile (i.e. to install the library). 
@@ -228,15 +258,17 @@ __check_defined = \
 .PHONY: .defaults.ray-lib-src-image
 .defaults.ray-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
 	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
 	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray .defaults.copy-lib
+endif
 	if [ -e ../python ]; then								\
 		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
 	fi
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
-	rm -rf data-processing-lib-python
-	rm -rf data-processing-lib-ray
-	rm -rf python-transform 
+	-rm -rf data-processing-lib-python
+	-rm -rf data-processing-lib-ray
+	-rm -rf python-transform 
 
 # Build the base spark image used by spark-based transforms
 .PHONY: .defaults.spark-lib-base-image
@@ -250,27 +282,31 @@ __check_defined = \
 .defaults.spark-lib-src-image:: .defaults.spark-lib-base-image
 	@# Help: Build the Spark $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
 	$(MAKE) IMAGE_NAME_TO_VERIFY=$(DOCKER_SPARK_BASE_IMAGE_NAME) .defaults.verify-image-availability
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
 	$(MAKE) LIB_PATH=$(DPK_SPARK_LIB_DIR) LIB_NAME=data-processing-lib-spark .defaults.copy-lib
+endif
 	if [ -e ../python ]; then								\
 		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
 	fi
 	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE) .defaults.image
-	rm -rf data-processing-lib-python
-	rm -rf data-processing-lib-spark
-	rm -rf python-transform 
+	-rm -rf data-processing-lib-python
+	-rm -rf data-processing-lib-spark
+	-rm -rf python-transform 
 
 # Install the source from the given directory into an existing venv
 # Expected PYTHON_PROJECT_DIR and uses EXTRA_INDEX_URL if set.
 # PYTHON_PROJECT_DIR is expected to have src and pyproject.toml
 .PHONY: .defaults.install-src-venv
 .defaults.install-src-venv:: 
+	@echo Begin installing source from $(PYTHON_PROJECT_DIR) into venv
+	$(call check_defined, PYTHON_PROJECT_DIR)
 	@source venv/bin/activate;				      	\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
-	pip install $${extra_url}  -e $(PYTHON_PROJECT_DIR);		
-	@echo Installed python project source in $(PYTHON_PROJECT_DIR) into venv
+	pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_DIR);
+	@echo Done installing source from $(PYTHON_PROJECT_DIR) into venv
 
 # Install local requirements last as it generally includes our lib source
 .PHONY: .defaults.python-lib-src-venv
@@ -281,6 +317,7 @@ __check_defined = \
 # Expects PIP_TARGET
 .PHONY: .defaults.pip-uninstall
 .defaults.pip-uninstall:
+	$(call check_defined, PIP_TARGET)
 	pip uninstall -y $(PIP_TARGET) 
 
 # Provided for similar reasons as the .defaults.pip-uninstall target.
@@ -288,18 +325,23 @@ __check_defined = \
 # Expects PIP_TARGET
 .PHONY: .defaults.pip-install-NOT-USED-YET
 .defaults.pip-install:
+	$(call check_defined, PIP_TARGET)
 	pip install $(PIP_TARGET) 
 	
 # Install all source from the repo for a python runtime transform into an existing venv 
 .PHONY: .defaults.install-python-lib-src-venv
 .defaults.install-python-lib-src-venv::
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	@# Help: Install Python data processing library source into existing venv
 	@echo Installing Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
-	pip install pytest;						\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;	\
 	echo Installed source from Python processing library for `which $(PYTHON)`
+else
+	@# Help: DO NOT install Python data processing library source into existing venv
+	@echo USE_REPO_LIB_SRC!=1 so do NOT installing Python data processing library source into existing venv
+endif
 
 # Install local requirements last as it generally includes our lib source
 .PHONY: .defaults.ray-lib-src-venv
@@ -310,17 +352,21 @@ __check_defined = \
 # And if there is an adjacent python dir (as for transforms), then also install that source
 .PHONY: .defaults.install-ray-lib-src-venv
 .defaults.install-ray-lib-src-venv::
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	@# Help: Install Ray and Python data processing library source into existing venv
 	@echo Installing Ray and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
-	pip install pytest;						\
-	pip install pytest pytest-cov;					\
 	$(MAKE) PIP_TARGET=data-prep-toolkit-ray .defaults.pip-uninstall;	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;		\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_RAY_LIB_DIR) .defaults.install-src-venv;		\
-	echo Installed source from Ray data processing library for `which $(PYTHON)`;		\
-	if [ -d ../python ]; then                                               		\
+	echo Installed source from Python and Ray data processing libraries for `which $(PYTHON)`
+else
+	@# Help: DO NOT install Python or Ray data processing library source into existing venv
+	@echo USE_REPO_LIB_SRC!=1 so do NOT installing Python or Ray data processing library source into existing venv
+endif
+	@if [ -d ../python ]; then                                               		\
+		source venv/bin/activate;				      			\
 		$(MAKE) PYTHON_PROJECT_DIR=../python .defaults.install-src-venv;    		\
 	fi 
 
@@ -332,18 +378,23 @@ __check_defined = \
 # Install the python-based lib BEFORE spark assuming spark depends on the same version as python source.
 .PHONY: .defaults.install-spark-lib-src-venv
 .defaults.install-spark-lib-src-venv::
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	@# Help: Install Spark and Python data processing library source into existing venv
 	@echo Installing Spark and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
-	pip install pytest;						\
 	$(MAKE) PIP_TARGET=data-prep-toolkit-spark .defaults.pip-uninstall;	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;	\
 	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_SPARK_LIB_DIR) .defaults.install-src-venv;	\
-	if [ -d ../python ]; then                                               \
-		$(MAKE) PYTHON_PROJECT_DIR=../python .defaults.install-src-venv;    \
+	echo Installed source from Python and Spark processing libraries for `which $(PYTHON)`
+else
+	@# Help: DO NOT install Python or Spark data processing library source into existing venv
+	@echo USE_REPO_LIB_SRC!=1 so do NOT installing Python or Spark data processing library source into existing venv
+endif
+	if [ -d ../python ]; then                                               	\
+		source venv/bin/activate;				      		\
+		$(MAKE) PYTHON_PROJECT_DIR=../python .defaults.install-src-venv;    	\
 	fi
-	echo Installed source from Spark processing library for `which $(PYTHON)`
 
 # Run tests in test directory from that dir after adding ../src to PYTHONPATH
 # Assumes a Makefile target of venv to create the venv 
@@ -379,6 +430,8 @@ __check_defined = \
 .PHONY: .defaults.run-src-file
 .defaults.run-src-file:
 	@# Help: Run $(RUN_FILE) (if it exists).
+	$(call check_defined, RUN_FILE)
+	$(call check_defined, RUN_ARGS)
 	@if [ ! -e "src/$(RUN_FILE)" ];	then	\
 	    echo "";					\
 	    echo src/$(RUN_FILE) does not exist.;	\
@@ -400,9 +453,10 @@ __check_defined = \
 .PHONY: .defaults.publish-image
 .defaults.publish-image:: 
 	@# Help: Publish the $(DOCKER_LOCAL_IMAGE) to $(DOCKER_HOSTNAME) container registry
+	$(call check_defined, DOCKER_IMAGE_NAME)
 	-$(DOCKER) logout $(DOCKER_HOSTNAME)
 	$(DOCKER) login $(DOCKER_HOSTNAME) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
-	$(DOCKER) push  $(DOCKER_REMOTE_IMAGE)
+	$(DOCKER) push $(DOCKER_REMOTE_IMAGE)
 
 # Create the local virtual environment, assuming python is already installed and available
 # We upgrade pip as that seems to be required by watson_nlp
@@ -410,15 +464,15 @@ __check_defined = \
 # We use "pip" instead of "$(PIP)" below because otherwise if the user has overriddent PYTHON
 # they will end up installing into that PYTHON and NOT the venv.
 .PHONY: .defaults.venv
-.defaults.venv::	.check_python_version .defaults.create-venv .defaults.install-local-requirements-venv
+.defaults.venv: .defaults.create-venv .defaults.install-local-requirements-venv
 
 .PHONY: .defaults.create-venv
-.defaults.create-venv:
+.defaults.create-venv: .check_python_version
 	@# Help: Create the virtual environment using requirements.txt or pyproject.toml
 	$(PYTHON) -m venv venv
 	@source venv/bin/activate;		\
 	pip install --upgrade pip;		\
-	pip install wheel;			\
+	pip install wheel pytest pytest-cov;
 
 # Install requirements defined in the current directory into an existing venv
 .PHONY: .defaults.install-local-requirements-venv
@@ -428,11 +482,12 @@ __check_defined = \
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
 	if [ -e requirements.txt ]; then				\
-		echo Install requirements from requirements.txt;	\
-		pip install $$extra_url -r requirements.txt;		\
-	elif [ -e pyproject.toml ]; then				\
-		echo Install requirements using pyproject.toml;		\
-		pip install $$extra_url -e .;				\
+		echo Installing requirements from requirements.txt;	\
+		pip install $(PIP_INSTALL_EXTRA_ARGS) $$extra_url -r requirements.txt;		\
+	fi;	\
+	if [ -e pyproject.toml ]; then				\
+		echo Installing from pyproject.toml;			\
+		pip install $(PIP_INSTALL_EXTRA_ARGS) $$extra_url -e .;	\
 	fi
 
 .PHONY: .defaults.check.installed
@@ -502,11 +557,15 @@ MINIO_ADMIN_PWD= localminiosecretkey
 # Changes the version field of the pyproject.toml file to the given version
 # and update the referenced library versions as defined in .make.versions.
 # Expects TOML_VERSION
+
+
 .PHONY: .defaults.update-toml
 .defaults.update-toml:
+	$(call check_defined, TOML_VERSION)
 	if [ -e pyproject.toml ]; then						\
 	    $(MAKE) TOML_VERSION=$(TOML_VERSION) .defaults.__set-toml-version;	\
 	    $(MAKE) .defaults.__update-toml-lib-dep-versions;			\
+	    $(MAKE) .defaults.__update-toml-python-versions;    \
 	fi
 
 # Changes the version field of the pyproject.toml file to the given version
@@ -521,21 +580,47 @@ MINIO_ADMIN_PWD= localminiosecretkey
 	    mv tt.toml pyproject.toml;					\
 	fi
 
+# Updates the Python supported versions field of the pyproject.toml file to the given versions
+# Expects  REQUIRED_PYTHON_VERSIONS
+.PHONY: .defaults.__update-toml-python-versions
+.defaults.__update-toml-python-versions:
+	@# Help: Set the version= field of pyproject.toml
+	if [ -e pyproject.toml ]; then					\
+	    cat pyproject.toml | sed -e 				\
+	    's/^requires-python[ ]*=.*"/requires-python = "'${REQUIRED_PYTHON_VERSIONS}'"/' \
+		> tt.toml;						\
+	    mv tt.toml pyproject.toml;					\
+	fi
+
 # Updates the versions references to our repo source as defined in .make.versions
 .PHONY: .defaults.__update-toml-lib-dep-versions
 .defaults.__update-toml-lib-dep-versions:
+ifeq ($(USE_REPO_LIB_SRC), 1)
 	@# Help: Update pyproject.toml to depend on lib versions defined in .make.versions 
-	@if [ -e pyproject.toml ]; then					\
+	if [ -e pyproject.toml ]; then					\
 	    cat pyproject.toml | sed 									\
-		-e 's/"data-prep-toolkit-ray\(..\).*",/"data-prep-toolkit-ray\1$(DPK_LIB_VERSION)",/' 	\
-		-e 's/"data-prep-toolkit-spark\(..\).*",/"data-prep-toolkit-spark\1$(DPK_LIB_VERSION)",/' 	\
-		-e 's/"data-prep-toolkit-kfp\([=><][=><]\).*",/"data-prep-toolkit-kfp\1$(DPK_LIB_KFP_VERSION)",/' 	\
-		-e 's/"data-prep-toolkit\([=><][=><]\).*",/"data-prep-toolkit\1$(DPK_LIB_VERSION)",/' 		\
-		-e 's/"ray\[default\]\([=><][=><]\).*",/"ray\[default\]\1$(RAY)",/'				\
-		-e 's/"data-prep-toolkit-kfp-shared\(..\).*",/"data-prep-toolkit-kfp-shared\1$(DPK_LIB_KFP_VERSION)",/'     \
+		-e 's/"data-prep-toolkit-ray\([=><~][=]\).*"/"data-prep-toolkit-ray\1$(DPK_LIB_VERSION)"/' 	\
+		-e 's/"data-prep-toolkit-spark\([=><~][=]\).*"/"data-prep-toolkit-spark\1$(DPK_LIB_VERSION)"/' 	\
+		-e 's/"data-prep-toolkit-kfp\([=><~][=]\).*"/"data-prep-toolkit-kfp\1$(DPK_LIB_KFP_VERSION)"/' 	\
+		-e 's/"data-prep-toolkit\([=><~][=]\).*"/"data-prep-toolkit\1$(DPK_LIB_VERSION)"/' 		\
+		-e 's/"ray\[default\]\([=><~][=]\).*"/"ray\[default\]\1$(RAY)"/'				\
+		-e 's/"data-prep-toolkit-kfp-shared\(..\).*"/"data-prep-toolkit-kfp-shared\1$(DPK_LIB_KFP_VERSION)"/'     \
 		> tt.toml;				\
 	    mv tt.toml pyproject.toml;			\
 	 fi
+	if [ -e requirements.txt ]; then					\
+	    cat requirements.txt | sed 									\
+		-e 's/data-prep-toolkit-ray\([=><~][=]\).*/data-prep-toolkit-ray\1$(DPK_LIB_VERSION)/' 	\
+		-e 's/data-prep-toolkit-transforms\([=><~][=]\).*/data-prep-toolkit-transforms\1$(DPK_TRANSFORMS_VERSION)/' 	\
+		-e 's/data-prep-toolkit-spark\([=><~][=]\).*/data-prep-toolkit-spark\1$(DPK_LIB_VERSION)/' 	\
+		-e 's/data-prep-toolkit-kfp\([=><~][=]\).*/data-prep-toolkit-kfp\1$(DPK_LIB_KFP_VERSION)/' 	\
+		-e 's/data-prep-toolkit\([=><~][=]\).*/data-prep-toolkit\1$(DPK_LIB_VERSION)/' 		\
+		-e 's/ray\[default\]\([=><~][=]\).*/ray\[default\]\1$(RAY)/'				\
+		-e 's/data-prep-toolkit-kfp-shared\(..\).*/data-prep-toolkit-kfp-shared\1$(DPK_LIB_KFP_VERSION)/'     \
+		> tt.txt;				\
+	    mv tt.txt requirements.txt;			\
+	 fi
+endif
 
 # Build the distribution, usually in preparation for publishing using ith the .defaults.publish-dist  target
 .PHONY: .defaults.build-dist 

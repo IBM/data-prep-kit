@@ -1,6 +1,6 @@
 # Spark Data Processing Library
 This provides a python framework for developing _transforms_
-on data stored in files - currently parquet files are supported -
+on data stored in files - currently any binary and parquet files are supported -
 and running them in a [Spark](https://spark.apache.org/) cluster.
 Data files may be stored in the local file system or COS/S3.
 For more details see the [documentation](../doc/overview.md).

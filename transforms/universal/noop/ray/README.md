@@ -9,7 +9,7 @@ This project wraps the [noop transform](../python) with a Ray runtime.
 
 ## Configuration and command line Options
 
-Noop configuration and command line options are the same as for the base python transform. 
+Noop configuration and command line options are the same as for the [base python](../python) transform. 
 
 ## Running
 
@@ -41,3 +41,9 @@ Then
 ls output
 ```
 To see results of the transform.
+
+### Transforming data using the transform image
+
+To use the transform image to transform your data, please refer to the 
+[running images quickstart](../../../../doc/quick-start/run-transform-image.md),
+substituting the name of this transform image and runtime as appropriate.

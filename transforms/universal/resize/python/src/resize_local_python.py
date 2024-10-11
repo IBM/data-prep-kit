@@ -38,7 +38,7 @@ params = {
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     # resize configuration
     # "resize_max_mbytes_per_table":  0.02,
-    "resize_max_rows_per_table": 125,
+    "resize_max_rows_per_table": 300,
 }
 sys.argv = ParamsUtils.dict_to_req(d=params)
 

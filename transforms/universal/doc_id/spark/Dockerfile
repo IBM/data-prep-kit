@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=quay.io/dataprep1/data-prep-kit/data-prep-kit-spark-3.5.1:0.1.0
+ARG BASE_IMAGE=quay.io/dataprep1/data-prep-kit/data-prep-kit-spark-3.5.2:latest
 FROM ${BASE_IMAGE}
 
 USER root
@@ -20,16 +20,15 @@ COPY --chown=spark:root src/ src/
 COPY --chown=spark:root pyproject.toml pyproject.toml 
 RUN pip install --no-cache-dir -e .
 
-# copy source main 
+# copy the main() entry point to the image 
 COPY ./src/doc_id_transform_spark.py .
-COPY ./src/doc_id_local.py local/
+
+# copy some of the samples in
+COPY src/doc_id_local_spark.py local/
 
 # copy test
 COPY test/ test/
 COPY test-data/ test-data/
-
-# copy config
-COPY config/ config/
 
 USER spark
 

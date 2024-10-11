@@ -1,17 +1,17 @@
 [project]
 name = "dpk_noop_transform_spark"
-version = "0.2.1.dev0"
-requires-python = ">=3.10"
+version = "0.2.2.dev0"
+requires-python = ">=3.10,<3.13"
 description = "NOOP Spark Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     { name = "David Wood", email = "dawood@us.ibm.com" },
-    { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
+    { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
 dependencies = [
-    "dpk-noop-transform-python==0.2.1.dev0",
-    "data-prep-toolkit-spark==0.2.1.dev0",
+    "dpk-noop-transform-python==0.2.2.dev0",
+    "data-prep-toolkit-spark==0.2.2.dev0",
 ]
 
 [build-system]

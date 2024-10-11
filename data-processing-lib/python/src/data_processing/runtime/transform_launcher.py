@@ -12,6 +12,7 @@
 
 import sys
 from typing import Any
+import argparse
 
 from data_processing.data_access import DataAccessFactory, DataAccessFactoryBase
 from data_processing.runtime import TransformRuntimeConfiguration
@@ -36,8 +37,58 @@ class AbstractTransformLauncher:
         self.name = self.runtime_config.get_name()
         self.data_access_factory = data_access_factory
 
-    def launch(self):
+    def _get_parser(self) -> argparse.ArgumentParser:
+        """
+        This method creates a parser
+        :return: parser
+        """
+        return argparse.ArgumentParser(
+            description=f"Driver for {self.name} processing",
+            # RawText is used to allow better formatting of ast-based arguments
+            # See uses of ParamsUtils.dict_to_str()
+            formatter_class=argparse.RawTextHelpFormatter,
+        )
+
+    def _get_arguments(self, parser: argparse.ArgumentParser) -> argparse.Namespace:
+        """
+        Parse input parameters
+        :param parser: parser
+        :return: list of arguments
+        """
+        # add additional arguments
+        self.runtime_config.add_input_params(parser=parser)
+        self.data_access_factory.add_input_params(parser=parser)
+        self.execution_config.add_input_params(parser=parser)
+        return parser.parse_args()
+
+    def _get_parameters(self, args: argparse.Namespace) -> bool:
+        """
+        This method creates arg parser, fills it with the parameters
+        and does parameters validation
+        :return: True if validation passes or False, if not
+        """
+        return (
+                self.runtime_config.apply_input_params(args=args)
+                and self.execution_config.apply_input_params(args=args)
+                and self.data_access_factory.apply_input_params(args=args)
+        )
+
+    def _submit_for_execution(self) -> int:
+        """
+        Submit for execution
+        :return:
+        """
         raise ValueError("must be implemented by subclass")
+
+    def launch(self):
+        """
+        Execute method orchestrates driver invocation
+        :return:
+        """
+        args = self._get_arguments(self._get_parser())
+        if self._get_parameters(args):
+            return self._submit_for_execution()
+        return 1
 
     def get_transform_name(self) -> str:
         return self.name

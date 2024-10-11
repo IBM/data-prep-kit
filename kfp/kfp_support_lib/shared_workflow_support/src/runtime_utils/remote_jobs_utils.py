@@ -25,14 +25,16 @@ from python_apiserver_client.params import (
     ClusterSpec,
     HeadNodeSpec,
     RayJobRequest,
-    Template,
     WorkerNodeSpec,
     environment_variables_decoder,
+    template_decoder,
     volume_decoder,
 )
 from ray.job_submission import JobStatus
 from runtime_utils import KFPUtils
 
+
+cli_prefix = "KFP"
 
 logger = get_logger(__name__)
 
@@ -119,20 +121,18 @@ class RayRemoteJobs:
         """
         # start with templates
         # head_node
-        cpus = head_node.get("cpu", 1)
-        memory = head_node.get("memory", 1)
-        gpus = head_node.get("gpu", 0)
-        accelerator = head_node.get("gpu_accelerator", None)
+        dct = {}
+        dct["cpu"] = head_node.get("cpu", 1)
+        dct["memory"] = head_node.get("memory", 1)
+        dct["gpu"] = head_node.get("gpu", 0)
+        dct["gpu_accelerator"] = head_node.get("gpu_accelerator", None)
         head_node_template_name = f"{name}-head-template"
-        _, _ = self.api_server_client.delete_compute_template(ns=namespace, name=head_node_template_name)
-        head_template = Template(
-            name=head_node_template_name,
-            namespace=namespace,
-            cpu=cpus,
-            memory=memory,
-            gpu=gpus,
-            gpu_accelerator=accelerator,
-        )
+        dct["name"] = head_node_template_name
+        dct["namespace"] = namespace
+        if "tolerations" in head_node:
+            dct["tolerations"] = head_node.get("tolerations")
+        _, _ = self.api_server_client.delete_compute_template(ns=namespace, name=dct["name"])
+        head_template = template_decoder(dct)
         status, error = self.api_server_client.create_compute_template(head_template)
         if status != 200:
             return status, error
@@ -140,20 +140,18 @@ class RayRemoteJobs:
         index = 0
         # For every worker group
         for worker_node in worker_nodes:
-            cpus = worker_node.get("cpu", 1)
-            memory = worker_node.get("memory", 1)
-            gpus = worker_node.get("gpu", 0)
-            accelerator = worker_node.get("gpu_accelerator", None)
+            dct = {}
+            dct["cpu"] = worker_node.get("cpu", 1)
+            dct["memory"] = worker_node.get("memory", 1)
+            dct["gpu"] = worker_node.get("gpu", 0)
+            dct["gpu_accelerator"] = worker_node.get("gpu_accelerator", None)
             worker_node_template_name = f"{name}-worker-template-{index}"
-            _, _ = self.api_server_client.delete_compute_template(ns=namespace, name=worker_node_template_name)
-            worker_template = Template(
-                name=worker_node_template_name,
-                namespace=namespace,
-                cpu=cpus,
-                memory=memory,
-                gpu=gpus,
-                gpu_accelerator=accelerator,
-            )
+            dct["name"] = worker_node_template_name
+            dct["namespace"] = namespace
+            if "tolerations" in worker_node:
+                dct["tolerations"] = worker_node.get("tolerations")
+            _, _ = self.api_server_client.delete_compute_template(ns=namespace, name=dct["name"])
+            worker_template = template_decoder(dct)
             status, error = self.api_server_client.create_compute_template(worker_template)
             if status != 200:
                 return status, error
@@ -395,7 +393,7 @@ class RayRemoteJobs:
             sys.exit(1)
         if data_access is None:
             return
-        # Here data access is either S3 or lakehouse both of which contain self.output_folder
+        # Here data access is S3 which contains self.output_folder
         try:
             output_folder = data_access.get_output_folder()
         except Exception as e:
@@ -437,7 +435,7 @@ def _execute_remote_job(
 
     logger.info(f"submitted job successfully, submission id {submission}")
     # create data access
-    data_factory = DataAccessFactory()
+    data_factory = DataAccessFactory(cli_arg_prefix=cli_prefix)
     data_factory.apply_input_params(args=data_access_params)
     data_access = data_factory.create_data_access()
     # print execution log
@@ -481,7 +479,7 @@ def execute_ray_jobs(
         wait_interval=additional_params.get("wait_interval", 2),
     )
     # find config parameter
-    config = ParamsUtils.get_config_parameter(e_params)
+    config = ParamsUtils.get_config_parameter(params=e_params)
     if config is None:
         exit(1)
     # get config value
@@ -493,7 +491,7 @@ def execute_ray_jobs(
             name=name,
             ns=ns,
             script=exec_script_name,
-            data_access_params={config: config_value, "data_s3_cred": s3_creds},
+            data_access_params={f"{cli_prefix}s3_config": config_value, f"{cli_prefix}s3_cred": s3_creds},
             params=e_params,
             additional_params=additional_params,
             remote_jobs=remote_jobs,
@@ -511,7 +509,7 @@ def execute_ray_jobs(
                 name=name,
                 ns=ns,
                 script=exec_script_name,
-                data_access_params={config: conf, "data_s3_cred": s3_creds},
+                data_access_params={f"{cli_prefix}s3_config": conf, f"{cli_prefix}s3_cred": s3_creds},
                 params=launch_params,
                 additional_params=additional_params,
                 remote_jobs=remote_jobs,

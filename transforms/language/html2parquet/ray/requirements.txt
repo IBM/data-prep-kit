@@ -1,0 +1,2 @@
+dpk-html2parquet-transform-python==0.2.2.dev0
+data-prep-toolkit-ray==0.2.2.dev0

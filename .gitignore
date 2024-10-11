@@ -134,6 +134,7 @@ dmypy.json
 **/*.swp
 **/.pydevproject
 .DS_Store
+.directory
 
 
 **/*.back
@@ -142,3 +143,6 @@ dmypy.json
 
 # Ignore VSCode folder
 .vscode/
+
+# Ignore artifacts directory created by the `make save-images` target
+artifacts/

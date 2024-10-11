@@ -1,17 +1,21 @@
 # Define the root of the local git clone for the common rules to be able 
 # know where they are running from.
 REPOROOT=../../../..
+
+# Set this, before including .make.defaults, to 
+#   1 if requirements reference the latest code in the data processing library 
+#     in this repo (that is not yet published to pypi).	 This is the default setting.
+#   0 if the transforms DPK dependencies are on wheels published to 
+#     pypi (e.g. data-prep-toolkit=0.2.1)
+#USE_REPO_LIB_SRC=1
+
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
 # to override/redefine the rules below. 
-
-# $(REPOROOT)/.make.versions file contains the versions
-
-TRANSFORM_RUNTIME=python
-TRANSFORM_NAME=code2parquet
-DOCKER_IMAGE_VERSION=${CODE2PARQUET_PYTHON_VERSION}
-
 include $(REPOROOT)/transforms/.make.transforms
+
+# Include the common configuration for this transform
+include ../transform.config
 
 venv::	.transforms.python-venv
 
@@ -35,9 +39,9 @@ setup:: .transforms.setup
 
 # distribution versions is the same as image version.
 set-versions:
-	$(MAKE) TOML_VERSION=$(DOCKER_IMAGE_VERSION) .defaults.update-toml
+	$(MAKE) TRANSFORM_PYTHON_VERSION=$(CODE2PARQUET_PYTHON_VERSION) TOML_VERSION=$(CODE2PARQUET_PYTHON_VERSION) .transforms.set-versions 
         
-build-dist:: set-versions .defaults.build-dist 
+build-dist:: .defaults.build-dist 
 
 publish-dist:: .defaults.publish-dist
 
@@ -60,4 +64,8 @@ run-local-python-sample: .transforms.run-local-python-sample
 
 minio-start:	.minio-start
 
-load-image:: .transforms.load-image
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image

@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
     name: minio
     namespace: kubeflow
+    annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: 64m
 spec:
     ingressClassName: nginx-minio
     rules:

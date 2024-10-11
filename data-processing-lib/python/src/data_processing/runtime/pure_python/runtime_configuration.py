@@ -11,14 +11,27 @@
 ################################################################################
 
 from data_processing.runtime import TransformRuntimeConfiguration
+from data_processing.runtime.pure_python import DefaultPythonTransformRuntime
 from data_processing.transform import TransformConfiguration
 
 
 class PythonTransformRuntimeConfiguration(TransformRuntimeConfiguration):
-    def __init__(self, transform_config: TransformConfiguration):
+    def __init__(
+        self,
+        transform_config: TransformConfiguration,
+        runtime_class: type[DefaultPythonTransformRuntime] = DefaultPythonTransformRuntime,
+    ):
         """
         Initialization
         :param transform_config - base configuration class
+        :param runtime_class: implementation of the transform runtime
         """
-        self.transform_config = transform_config
+        self.runtime_class = runtime_class
         super().__init__(transform_config=transform_config)
+
+    def create_transform_runtime(self) -> DefaultPythonTransformRuntime:
+        """
+        Create transform runtime with the parameters captured during apply_input_params()
+        :return: transform runtime object
+        """
+        return self.runtime_class(self.transform_config.get_transform_params())

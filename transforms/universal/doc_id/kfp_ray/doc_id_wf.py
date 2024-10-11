@@ -17,12 +17,12 @@ import kfp.dsl as dsl
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
-task_image = "quay.io/dataprep1/data-prep-kit/doc_id-ray:0.2.1.dev0"
+task_image = "quay.io/dataprep1/data-prep-kit/doc_id-ray:latest"
 
 # the name of the job script
 EXEC_SCRIPT_NAME: str = "doc_id_transform_ray.py"
 # components
-base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.2.1.dev0"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
 
 # path to kfp component specifications files
 component_spec_path = "../../../../kfp/kfp_ray_components/"
@@ -30,8 +30,8 @@ component_spec_path = "../../../../kfp/kfp_ray_components/"
 # compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
 def compute_exec_params_func(
-    worker_options: str,
-    actor_options: str,
+    worker_options: dict,
+    actor_options: dict,
     data_s3_config: str,
     data_max_files: int,
     data_num_samples: int,
@@ -40,10 +40,11 @@ def compute_exec_params_func(
     data_files_to_use: str,
     runtime_pipeline_id: str,
     runtime_job_id: str,
-    runtime_code_location: str,
+    runtime_code_location: dict,
     doc_id_doc_column: str,
     doc_id_hash_column: str,
     doc_id_int_column: str,
+    doc_id_start_id: int,
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -52,16 +53,17 @@ def compute_exec_params_func(
         "data_max_files": data_max_files,
         "data_num_samples": data_num_samples,
         "data_checkpointing": data_checkpointing,
-        "data_data_sets": data_data_sets,
+        "data_data_sets": data_data_sets.strip(),
         "data_files_to_use": data_files_to_use,
-        "runtime_num_workers": KFPUtils.default_compute_execution_params(worker_options, actor_options),
-        "runtime_worker_options": actor_options,
+        "runtime_num_workers": KFPUtils.default_compute_execution_params(str(worker_options), str(actor_options)),
+        "runtime_worker_options": str(actor_options),
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
-        "runtime_code_location": runtime_code_location,
+        "runtime_code_location": str(runtime_code_location),
         "doc_id_doc_column": doc_id_doc_column,
         "doc_id_hash_column": doc_id_hash_column,
         "doc_id_int_column": doc_id_int_column,
+        "doc_id_start_id": doc_id_start_id,
     }
 
 
@@ -106,9 +108,8 @@ def doc_id(
     # Ray cluster
     ray_name: str = "doc_id-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
-    ray_head_options: str = '{"cpu": 1, "memory": 4, "image": "' + task_image + '" }',
-    ray_worker_options: str = '{"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, '
-    '"image": "' + task_image + '"}',
+    ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image},
+    ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image},
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     data_s3_config: str = "{'input_folder': 'test/doc_id/input/', 'output_folder': 'test/doc_id/output/'}",
@@ -119,15 +120,16 @@ def doc_id(
     data_data_sets: str = "",
     data_files_to_use: str = "['.parquet']",
     # orchestrator
-    runtime_actor_options: str = "{'num_cpus': 0.8}",
+    runtime_actor_options: dict = {'num_cpus': 0.8},
     runtime_pipeline_id: str = "pipeline_id",
-    runtime_code_location: str = "{'github': 'github', 'commit_hash': '12345', 'path': 'path'}",
+    runtime_code_location: dict = {'github': 'github', 'commit_hash': '12345', 'path': 'path'},
     # doc id parameters
     doc_id_doc_column: str = "contents",
     doc_id_hash_column: str = "hash_column",
     doc_id_int_column: str = "int_id_column",
+    doc_id_start_id: int = 0,
     # additional parameters
-    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5}',
+    additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5, "delete_cluster_delay_minutes": 0}',
 ):
     """
     Pipeline to execute NOOP transform
@@ -137,6 +139,7 @@ def doc_id(
         memory - memory
         image - image to use
         image_pull_secret - image pull secret
+        tolerations - (optional) tolerations for the ray pods
     :param ray_worker_options: worker node options (we here are using only 1 worker pool), containing the following:
         replicas - number of replicas to create
         max_replicas - max number of replicas
@@ -145,6 +148,7 @@ def doc_id(
         memory - memory
         image - image to use
         image_pull_secret - image pull secret
+        tolerations - (optional) tolerations for the ray pods
     :param server_url - server url
     :param additional_params: additional (support) parameters, containing the following:
         wait_interval - wait interval for API server, sec
@@ -163,11 +167,12 @@ def doc_id(
     :param doc_id_doc_column - document column
     :param doc_id_hash_column - hash id column
     :param doc_id_int_column - integer id column
+    :param doc_id_start_id - starting id
     :return: None
     """
     # create clean_up task
-    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=run_id, server_url=server_url)
-    ComponentUtils.add_settings_to_component(clean_up_task, 60)
+    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=run_id, server_url=server_url, additional_params=additional_params)
+    ComponentUtils.add_settings_to_component(clean_up_task, ONE_HOUR_SEC * 2)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
         # compute execution params
@@ -186,6 +191,7 @@ def doc_id(
             doc_id_doc_column=doc_id_doc_column,
             doc_id_hash_column=doc_id_hash_column,
             doc_id_int_column=doc_id_int_column,
+            doc_id_start_id=doc_id_start_id
         )
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
         # start Ray cluster

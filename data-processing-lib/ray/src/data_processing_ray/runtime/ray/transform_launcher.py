@@ -46,36 +46,30 @@ class RayTransformLauncher(AbstractTransformLauncher):
         super().__init__(runtime_config, data_access_factory)
         self.execution_config = RayTransformExecutionConfiguration(name=self.name)
 
-    def __get_parameters(self) -> bool:
+    def _get_arguments(self, parser: argparse.ArgumentParser) -> argparse.Namespace:
+        """
+        Parse input parameters
+        :param parser: parser
+        :return: list of arguments
+        """
+        parser.add_argument(
+            "--run_locally", type=lambda x: bool(str2bool(x)), default=False, help="running ray local flag"
+        )
+        return super()._get_arguments(parser)
+
+    def _get_parameters(self, args: argparse.Namespace) -> bool:
         """
         This method creates arg parser, fill it with the parameters
         and does parameters validation
         :return: True id validation passe or False, if not
         """
-        parser = argparse.ArgumentParser(
-            description=f"Driver for {self.name} processing",
-            # RawText is used to allow better formatting of ast-based arguments
-            # See uses of ParamsUtils.dict_to_str()
-            formatter_class=argparse.RawTextHelpFormatter,
-        )
-        parser.add_argument(
-            "--run_locally", type=lambda x: bool(str2bool(x)), default=False, help="running ray local flag"
-        )
-        # add additional arguments
-        self.runtime_config.add_input_params(parser=parser)
-        self.data_access_factory.add_input_params(parser=parser)
-        self.execution_config.add_input_params(parser=parser)
-        args = parser.parse_args()
+        result = super()._get_parameters(args)
         self.run_locally = args.run_locally
         if self.run_locally:
             logger.info("Running locally")
         else:
             logger.info("connecting to existing cluster")
-        return (
-            self.runtime_config.apply_input_params(args=args)
-            and self.data_access_factory.apply_input_params(args=args)
-            and self.execution_config.apply_input_params(args=args)
-        )
+        return result
 
     def _submit_for_execution(self) -> int:
         """
@@ -107,7 +101,7 @@ class RayTransformLauncher(AbstractTransformLauncher):
         except Exception as e:
             logger.info(f"Exception running ray remote orchestration\n{e}")
         finally:
-            logger.info(f"Completed execution in {(time.time() - start)/60.} min, execution result {res}")
+            logger.info(f"Completed execution in {round((time.time() - start)/60., 3)} min, execution result {res}")
             ray.shutdown()
             return res
 
@@ -116,10 +110,7 @@ class RayTransformLauncher(AbstractTransformLauncher):
         Execute method orchestrates driver invocation
         :return: launch result
         """
-        if self.__get_parameters():
-            res = self._submit_for_execution()
-        else:
-            res = 1
+        res = super().launch()
         if not self.run_locally and res > 0:
             # if we are running in kfp exit to signal kfp that we failed
             sys.exit(1)

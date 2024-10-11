@@ -17,7 +17,7 @@ from data_processing.transform import AbstractBinaryTransform
 from data_processing.utils import TransformUtils
 
 
-class AbstractTableTransform(AbstractBinaryTransform[pa.Table]):
+class AbstractTableTransform(AbstractBinaryTransform):
     """
     Extends AbstractBinaryTransform to expect the byte arrays from to contain a pyarrow Table.
     Sub-classes are expected to implement transform() on the parsed Table instances.

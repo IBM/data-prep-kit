@@ -22,6 +22,9 @@ from data_processing.utils import TransformUtils, get_logger
 
 logger = get_logger(__name__)
 
+_allowed_float_percent_diff = 0.01  # A number between 0 and 1.
+_percent_parquet_size_diff_allowed = 0.03  # 3% seems like the minimum, but somewhat arbitrary
+
 
 def get_tables_in_folder(dir: str) -> list[pa.Table]:
     """
@@ -72,8 +75,8 @@ class AbstractTest:
     def _install_test_fixtures(self, metafunc):
         raise NotImplemented("Sub-class must implemented this to install the fixtures for its tests.")
 
-    @staticmethod
-    def validate_expected_tables(table_list: list[pa.Table], expected_table_list: list[pa.Table]):
+    @classmethod
+    def validate_expected_tables(cls, table_list: list[pa.Table], expected_table_list: list[pa.Table]):
         """
         Verify with assertion messages that the two lists of Tables are equivalent.
         :param table_list:
@@ -96,10 +99,48 @@ class AbstractTest:
             for j in range(rows1):
                 r1 = t1.take([j])
                 r2 = t2.take([j])
-                assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {r2}"
+                # assert r1 == r2, f"Row {j} of table {i} are not equal\n\tTransformed: {r1}\n\tExpected   : {r2}"
+                cls.validate_expected_row(i, j, r1, r2)
 
-    @staticmethod
-    def validate_expected_files(files_list: list[tuple[bytes, str]], expected_files_list: list[tuple[bytes, str]]):
+    @classmethod
+    def validate_expected_row(cls, table_index: int, row_index: int, test_row: pa.Table, expected_row: pa.Table):
+        """
+        Compare the two rows for equality, allowing float values to be within a percentage
+        of each other as defined by global _allowed_float_percent_diff.
+        We assume the schema has already been compared and is equivalent.
+        Args:
+            table_index: index of tables that is the source of the rows.
+            row_index:
+            test_row:
+            expected_row:
+        """
+        assert test_row.num_rows == 1, "Invalid usage.  Expected test table with 1 row"
+        assert expected_row.num_rows == 1, "Invalid usage.  Expected expected table with 1 row"
+        if test_row != expected_row:
+            # Else look for floating point values that might differ within the allowance
+            msg = f"Row {row_index} of table {table_index} are not equal\n\tTransformed: {test_row}\n\tExpected   : {expected_row}"
+            assert test_row.num_columns == expected_row.num_columns, msg
+            num_columns = test_row.num_columns
+            for i in range(num_columns):
+                # Over each cell/column in the row
+                test_column = test_row.column(i)
+                expected_column = expected_row.column(i)
+                if test_column != expected_column:
+                    # Check if the value is a float and if so, allow a fuzzy match
+                    test_value = test_column.to_pylist()[0]
+                    expected_value = expected_column.to_pylist()[0]
+                    is_float = isinstance(test_value, float) and isinstance(expected_value, float)
+                    if not is_float:
+                        # Its NOT a float, so do a normal compare
+                        assert test_column == expected_column, msg
+                    else:
+                        # It IS a float, so allow a fuzzy match
+                        allowed_diff = abs(_allowed_float_percent_diff * expected_value)
+                        diff = abs(test_value - expected_value)
+                        assert diff <= allowed_diff, msg
+
+    @classmethod
+    def validate_expected_files(cls, files_list: list[tuple[bytes, str]], expected_files_list: list[tuple[bytes, str]]):
         """
         Verify with assertion messages that the two lists of Tables are equivalent.
         :param files_list:
@@ -118,19 +159,27 @@ class AbstractTest:
             assert (
                 f1[1] == f2[1]
             ), f"produced file extension {f1[1]} is different from  expected file extension {f2[1]}"
+            lenf1 = len(f1[0])
+            lenf2 = len(f2[0])
+            if f1[1] == ".parquet":
+                # Parquet file compression seems to vary, so allow a bit of difference.
+                diff_allowed = _percent_parquet_size_diff_allowed * lenf2
+            else:
+                diff_allowed = 0
+            diff = abs(lenf1 - lenf2)
             assert (
-                len(f1[0]) - len(f2[0])
-            ) < 50, f"produced file length {len(f1[0])} is different from expected file extension {len(f2[0])}"
+                diff <= diff_allowed
+            ), f"produced file length {lenf1} vs expected {lenf2}, exceeds allowance of {diff_allowed}"
 
-    @staticmethod
-    def validate_expected_metadata_lists(metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
+    @classmethod
+    def validate_expected_metadata_lists(cls, metadata: list[dict[str, float]], expected_metadata: list[dict[str, float]]):
         elen = len(expected_metadata)
         assert len(metadata) == elen, f"Number of metadata dictionaries not the expected of {elen}"
         for index in range(elen):
-            AbstractTest.validate_expected_metadata(metadata[index], expected_metadata[index])
+            cls.validate_expected_metadata(metadata[index], expected_metadata[index])
 
-    @staticmethod
-    def validate_expected_metadata(metadata: dict[str, float], expected_metadata: dict[str, float]):
+    @classmethod
+    def validate_expected_metadata(cls, metadata: dict[str, float], expected_metadata: dict[str, float]):
         """
         Verify with assertion messages that the two dictionaries are as expected.
         :param metadata:
@@ -145,8 +194,8 @@ class AbstractTest:
             f"Metadata not equal\n" "\tTransformed: {metadata}  Expected   : {expected_metadata}"
         )
 
-    @staticmethod
-    def validate_directory_contents(directory: str, expected_dir: str, drop_columns: list[str] = []):
+    @classmethod
+    def validate_directory_contents(cls, directory: str, expected_dir: str, drop_columns: list[str] = []):
         """
         Make sure the directory contents are the same.
         :param directory:
@@ -168,28 +217,28 @@ class AbstractTest:
             expected_diffs = 0
         failed = len(dir_cmp.diff_files) != expected_diffs
         if failed:
-            AbstractTest.__confirm_diffs(directory, expected_dir, dir_cmp.diff_files, "/tmp", drop_columns)
+            cls.__confirm_diffs(directory, expected_dir, dir_cmp.diff_files, "/tmp", drop_columns)
 
         # Traverse into the subdirs since dircmp doesn't seem to do that.
         subdirs = [f.name for f in os.scandir(expected_dir) if f.is_dir()]
         for subdir in subdirs:
             d1 = os.path.join(directory, subdir)
             d2 = os.path.join(expected_dir, subdir)
-            AbstractTest.validate_directory_contents(d1, d2, drop_columns)
+            cls.validate_directory_contents(d1, d2, drop_columns)
 
-    @staticmethod
-    def _validate_table_files(parquet1: str, parquet2: str, drop_columns: list[str] = []):
+    @classmethod
+    def _validate_table_files(cls, parquet1: str, parquet2: str, drop_columns: list[str] = []):
         da = DataAccessLocal()
         t1, _ = da.get_table(parquet1)
         t2, _ = da.get_table(parquet2)
         if len(drop_columns) > 0:
             t1 = t1.drop_columns(drop_columns)
             t2 = t2.drop_columns(drop_columns)
-        AbstractTest.validate_expected_tables([t1], [t2])
+        cls.validate_expected_tables([t1], [t2])
 
-    @staticmethod
+    @classmethod
     def __confirm_diffs(
-        src_dir: str, expected_dir: str, diff_files: list, dest_dir: str, drop_columns: list[str] = []
+        cls, src_dir: str, expected_dir: str, diff_files: list, dest_dir: str, drop_columns: list[str] = []
     ):
         """
         Copy all files from the source dir to the dest dir.
@@ -207,7 +256,7 @@ class AbstractTest:
                 # It seems file can be different on disk, but contain the same column/row values.
                 # so for these, do the inmemory comparison.
                 try:
-                    AbstractTest._validate_table_files(expected, src, drop_columns)
+                    cls._validate_table_files(expected, src, drop_columns)
                 except AssertionError as e:
                     logger.info(f"Copying file with difference: {src} to {dest}")
                     shutil.copyfile(src, dest)

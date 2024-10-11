@@ -1,4 +1,8 @@
-FROM docker.io/rayproject/ray:2.24.0-py310
+ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
+
+FROM ${BASE_IMAGE}
+
+RUN pip install --upgrade --no-cache-dir pip
 
 # install pytest
 RUN pip install --no-cache-dir pytest
@@ -9,6 +13,8 @@ COPY --chown=ray:users data-processing-lib-python/ data-processing-lib-python/
 RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/ 
 RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
+COPY --chown=ray:users python-transform/  python-transform/
+RUN cd python-transform && pip install --no-cache-dir -e .
 
 # Install ray project source
 COPY --chown=ray:users src/ src/
@@ -16,8 +22,10 @@ COPY --chown=ray:users pyproject.toml pyproject.toml
 COPY --chown=ray:users README.md README.md
 RUN pip install --no-cache-dir -e .
 
-# copy source data
+# copy the main() entry point to the image 
 COPY ./src/doc_id_transform_ray.py .
+
+# copy some of the samples in
 COPY src/doc_id_local_ray.py local/
 
 # copy test
