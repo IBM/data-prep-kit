@@ -35,6 +35,6 @@ class AbstractFolderTransform(AbstractTransform):
         :param folder_name: the name of the folder containing arbitrary amount of files.
         :return: a tuple of a list of 0 or more tuples and a dictionary of statistics that will be propagated
                 to metadata.  Each element of the return list, is a tuple of the transformed bytes and a string
-                holding the extension to be used when writing out the new bytes.
+                holding the file name to use.
         """
         raise NotImplemented()
