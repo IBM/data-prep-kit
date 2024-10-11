@@ -106,7 +106,6 @@ jobs:
                   export DEPLOY_KUBEFLOW=1
                   make -C $K8S_SETUP_SCRIPTS setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms workflow-build
                   source $K8S_SETUP_SCRIPTS/common.sh
                   while :
                   do
@@ -118,6 +117,7 @@ jobs:
                       break
                     fi
                   done  
+                  make -C ${transforms[$index]} workflow-build
                   make -C ${transforms[$index]} workflow-test
                   echo "Run ${transforms[$index]} completed"
 
@@ -156,7 +156,6 @@ jobs:
                   export KFPv2=1
                   make -C $K8S_SETUP_SCRIPTS setup
                   make -C kfp/kfp_support_lib test
-                  make -C transforms workflow-build
                   source $K8S_SETUP_SCRIPTS/common.sh
                   while :
                   do
@@ -168,6 +167,7 @@ jobs:
                       break
                     fi
                   done 
+                  make -C ${transforms[$index]} workflow-build
                   make -C ${transforms[$index]} workflow-test
                   header_text "Run ${transforms[$index]} completed"
     build-kfp-components:
