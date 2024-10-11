@@ -83,6 +83,7 @@ class AbstractTransformFileProcessor:
                 self.last_extension = name_extension[1]
             else:
                 out_files, stats = self.transform.transform(folder_name=f_name)
+                self.last_file_name = f_name
             self.logger.debug(f"Done transforming file {f_name}, got {len(out_files)} files")
             # save results
             self._submit_file(t_start=t_start, out_files=out_files, stats=stats)
@@ -148,15 +149,21 @@ class AbstractTransformFileProcessor:
                 )
             case 1:
                 # we have exactly 1 output file
-                file_ext = out_files[0]
-                lfn = self.last_file_name
-                if self.last_file_name_next_index is not None:
-                    lfn = f"{lfn}_{self.last_file_name_next_index}"
-                output_name = self.data_access.get_output_location(path=f"{lfn}{file_ext[1]}")
+                if self.is_folder:
+                    # its folder
+                    output_name = out_files[0][1]
+                    dt = out_files[0][0]
+                else:
+                    file_ext = out_files[0]
+                    lfn = self.last_file_name
+                    if self.last_file_name_next_index is not None:
+                        lfn = f"{lfn}_{self.last_file_name_next_index}"
+                    output_name = self.data_access.get_output_location(path=f"{lfn}{file_ext[1]}")
+                    dt = file_ext[0]
                 self.logger.debug(
                     f"Writing transformed file {self.last_file_name}{self.last_extension} to {output_name}"
                 )
-                save_res, retries = self.data_access.save_file(path=output_name, data=file_ext[0])
+                save_res, retries = self.data_access.save_file(path=output_name, data=dt)
                 if retries > 0:
                     self._publish_stats({"data access retries": retries})
                 if save_res is None:
@@ -166,7 +173,7 @@ class AbstractTransformFileProcessor:
                 self._publish_stats(
                     {
                         "result_files": 1,
-                        "result_size": len(file_ext[0]),
+                        "result_size": len(dt),
                         "processing_time": time.time() - t_start,
                     }
                 )
@@ -183,14 +190,21 @@ class AbstractTransformFileProcessor:
                     start_index = 0
                 count = len(out_files)
                 for index in range(count):
-                    file_ext = out_files[index]
-                    output_name_indexed = f"{output_file_name}_{start_index + index}{file_ext[1]}"
-                    file_sizes += len(file_ext[0])
-                    self.logger.debug(
-                        f"Writing transformed file {self.last_file_name}{self.last_extension}, {index + 1} "
-                        f"of {count}  to {output_name_indexed}"
-                    )
-                    save_res, retries = self.data_access.save_file(path=output_name_indexed, data=file_ext[0])
+                    if self.is_folder:
+                        # its a folder
+                        output_name_indexed = out_files[index][1]
+                        dt = out_files[index][0]
+                    else:
+                        # files
+                        file_ext = out_files[index]
+                        output_name_indexed = f"{output_file_name}_{start_index + index}{file_ext[1]}"
+                        self.logger.debug(
+                            f"Writing transformed file {self.last_file_name}{self.last_extension}, {index + 1} "
+                            f"of {count}  to {output_name_indexed}"
+                        )
+                        dt = file_ext[0]
+                    file_sizes += len(dt)
+                    save_res, retries = self.data_access.save_file(path=output_name_indexed, data=dt)
                     if retries > 0:
                         self._publish_stats({"data access retries": retries})
                     if save_res is None:
