@@ -13,16 +13,14 @@
 import os
 import sys
 
+from cluster_analysis_transform_ray import ClusterAnalysisRayTransformConfiguration
 from data_processing.utils import ParamsUtils
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from fdedup_transform_ray import FdedupRayTransformConfiguration
 
 
-# create launcher
-launcher = RayTransformLauncher(FdedupRayTransformConfiguration())
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../test-data/input"))
-output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "../output"))
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "bands_consolidated"))
+output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "docs_to_remove"))
 local_conf = {
     "input_folder": input_folder,
     "output_folder": output_folder,
@@ -34,38 +32,20 @@ params = {
     "run_locally": True,
     # Data access. Only required parameters are specified
     "data_local_config": ParamsUtils.convert_to_ast(local_conf),
-    # Orchestration parameters
+    # orchestrator
     "runtime_worker_options": ParamsUtils.convert_to_ast(worker_options),
-    "runtime_num_workers": 1,
+    "runtime_num_workers": 3,
+    # execution info
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_creation_delay": 0,
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
-    # columns used
-    "fdedup_doc_column": "contents",
-    "fdedup_id_column": "int_id_column",
-    "fdedup_cluster_column": "cluster",
-    # infrastructure
-    "fdedup_bucket_cpu": 0.5,
-    "fdedup_doc_cpu": 0.5,
-    "fdedup_mhash_cpu": 0.5,
-    "fdedup_num_doc_actors": 1,
-    "fdedup_num_bucket_actors": 1,
-    "fdedup_num_minhash_actors": 1,
-    "fdedup_num_preprocessors": 2,
-    # fuzzy parameters
-    "fdedup_num_permutations": 64,
-    "fdedup_threshold": 0.8,
-    "fdedup_shingles_size": 5,
-    "fdedup_delimiters": " ",
-    # Random delay between reads
-    "fdedup_random_delay_limit": 5,
-    # snapshotting
-    "fdedup_snapshot_delay": 1,
-    "fdedup_use_doc_snapshot": False,
-    "fdedup_use_bucket_snapshot": False,
 }
-sys.argv = ParamsUtils.dict_to_req(d=params)
 
-# launch
-launcher.launch()
+if __name__ == "__main__":
+    # Set the simulated command line args
+    sys.argv = ParamsUtils.dict_to_req(d=params)
+    # create launcher
+    launcher = RayTransformLauncher(ClusterAnalysisRayTransformConfiguration())
+    # Launch the ray actor(s) to process the input
+    launcher.launch()
