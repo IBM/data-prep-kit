@@ -5,6 +5,7 @@
 | Transform                           |                                    KFP pipeline                                    |          
 |-------------------------------------|:----------------------------------------------------------------------------------:|
 | language/lang_id                  |                  [lang_id_wf.py](../transforms/language/lang_id/kfp_ray/lang_id_wf.py)                   |
+| language/html2parquet               |                  [html2parquet_wf.py](../transforms/language/html2parquet/kfp_ray/html2parquet_wf.py)                   |
 | code/malware                        |                  [malware_wf.py](../transforms/code/malware/kfp_ray/malware_wf.py)                     |
 | code/code2parquet                   |                  [code2parquet_wf.py](../transforms/code/code2parquet/kfp_ray/code2parquet_wf.py)                   |
 | code/code_quality                   |            [code_quality_wf.py](../transforms/code/code_quality/kfp_ray/code_quality_wf.py)            |
