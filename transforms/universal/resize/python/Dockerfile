@@ -19,6 +19,7 @@ RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=dpk:users src/ src/
 COPY --chown=dpk:users pyproject.toml pyproject.toml
 COPY --chown=dpk:users README.md Readme.md
+COPY --chown=dpk:root requirements.txt requirements.txt
 RUN pip install --no-cache-dir -e .
 
 # copy the main() entry point to the image 

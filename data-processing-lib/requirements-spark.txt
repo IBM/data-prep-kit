@@ -1,0 +1,2 @@
+pyspark>=3.5.2
+psutil>=6.0.0

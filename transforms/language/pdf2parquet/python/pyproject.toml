@@ -1,6 +1,6 @@
 [project]
 name = "dpk_pdf2parquet_transform_python"
-version = "0.2.2.dev0"
+version = "0.2.2.dev1"
 requires-python = ">=3.10,<3.13"
 description = "PDF2PARQUET Python Transform"
 license = {text = "Apache-2.0"}

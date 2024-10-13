@@ -305,7 +305,10 @@ endif
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
-	pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_DIR);
+	if [ -e $(PYTHON_PROJECT_DIR)/requirements.txt ]; then \
+		pip install -r  $(PYTHON_PROJECT_DIR)/requirements.txt; \
+	fi; \
+	pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_DIR)
 	@echo Done installing source from $(PYTHON_PROJECT_DIR) into venv
 
 # Install local requirements last as it generally includes our lib source
@@ -346,6 +349,11 @@ endif
 # Install local requirements last as it generally includes our lib source
 .PHONY: .defaults.ray-lib-src-venv
 .defaults.ray-lib-src-venv:: .defaults.create-venv .defaults.install-ray-lib-src-venv .defaults.install-local-requirements-venv
+	@# Help: Create the venv and install Ray library source, local dependencies and adjacent python source if present.
+
+# Install local requirements last as it generally includes our lib source
+.PHONY: .defaults.kfp-venv
+.defaults.kfp-venv:: .defaults.create-venv .defaults.install-ray-lib-src-venv
 	@# Help: Create the venv and install Ray library source, local dependencies and adjacent python source if present.
 
 # Install all source from the repo for a ray runtime transform into an existing venv 
@@ -633,7 +641,7 @@ endif
 	rm -rf dist || true
 	rm -rf src/*egg-info || true
 	${PIP} install --upgrade build
-	${PYTHON} -m build
+	${PYTHON} -m build $(BUILD_WHEEL_EXTRA_ARG)
 
 # Publish the distribution in the dist directory, usually created with .defaults.build-dist  target
 .PHONY: .defaults.publish-dist 

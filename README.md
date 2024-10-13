@@ -76,10 +76,11 @@ conda install gcc_linux-64
 conda install gxx_linux-64
 ```
 
-Next, install the data prep toolkit library. This library installs both the python and ray versions of the transforms.
+Next, install the data prep toolkit library. This library installs both the python and ray versions of the transforms. For better management of dependencies, it is recommended to install the same tagged version of both the library and the transform. 
 
 ```bash
-pip3 install  data-prep-toolkit-transforms-ray
+pip3 install  data-prep-toolkit[ray]==0.2.2
+pip3 install  data-prep-toolkit-transforms[ray,all]==0.2.2
 pip3 install jupyterlab   ipykernel  ipywidgets
 
 ## install custom kernel
