@@ -40,8 +40,8 @@ def compute_exec_params_func(
     runtime_pipeline_id: str,
     runtime_job_id: str,
     runtime_code_location: dict,
-    output_format: str,
     data_files_to_use: str,
+    html2parquet_output_format: str,
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -54,8 +54,8 @@ def compute_exec_params_func(
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": str(runtime_code_location),
-        "html2parquet_output_format": output_format,
         "data_files_to_use": data_files_to_use,
+        "html2parquet_output_format": html2parquet_output_format,
     }
 
 
@@ -109,13 +109,14 @@ def html2parquet(
     data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
-    data_files_to_use: str = "['.html', '.zip']",
+    data_checkpointing: bool = False,
     # orchestrator
     runtime_actor_options: dict = {'num_cpus': 0.8},
     runtime_pipeline_id: str = "pipeline_id",
     runtime_code_location: dict = {'github': 'github', 'commit_hash': '12345', 'path': 'path'},
     # html2parquet parameters
-    output_format: str = "markdown",
+    data_files_to_use: str = "['.html', '.zip']",
+    html2parquet_output_format: str = "markdown",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5, "delete_cluster_delay_minutes": 0}',
 ):
@@ -152,7 +153,8 @@ def html2parquet(
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    :param output_format - output format 
+    :param data_files_to_use - # file extensions to use for processing
+    :param html2parquet_output_format - # Output format for the contents column.
     :return: None
     """
     # create clean_up task
@@ -170,8 +172,8 @@ def html2parquet(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            output_format=output_format,
             data_files_to_use=data_files_to_use,
+            html2parquet_output_format=html2parquet_output_format,
         )
 
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
