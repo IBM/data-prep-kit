@@ -358,7 +358,10 @@ class DataAccess:
         :param path: input file location
         :return: output file location
         """
-        raise NotImplementedError("Subclasses should implement this!")
+        if self.get_output_folder() is None:
+            self.logger.error("Get out put location. S3 configuration is not provided, returning None")
+            return None
+        return path.replace(self.get_input_folder(), self.get_output_folder())
 
     def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any], int]:
         """
