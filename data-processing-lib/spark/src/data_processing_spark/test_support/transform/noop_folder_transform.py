@@ -10,21 +10,17 @@
 # limitations under the License.
 ################################################################################
 
-
 from data_processing.test_support.transform import NOOPFolderTransform, NOOPTransformConfiguration
 from data_processing.utils import get_logger
-from data_processing_ray.runtime.ray import (
-    RayTransformLauncher,
-    RayTransformRuntimeConfiguration,
-    DefaultRayTransformRuntime
-)
+from data_processing_spark.runtime.spark import SparkTransformLauncher
+from data_processing_spark.runtime.spark import SparkTransformRuntimeConfiguration, DefaultSparkTransformRuntime
 from data_processing.data_access import DataAccess
 
 
 logger = get_logger(__name__)
 
 
-class NOOPFolderRayRuntime(DefaultRayTransformRuntime):
+class NOOPFolderSparkRuntime(DefaultSparkTransformRuntime):
     def get_folders(self, data_access: DataAccess) -> list[str]:
         """
         Get folders to process
@@ -34,9 +30,9 @@ class NOOPFolderRayRuntime(DefaultRayTransformRuntime):
         return [data_access.get_input_folder()]
 
 
-class NOOPFolderRayTransformConfiguration(RayTransformRuntimeConfiguration):
+class NOOPFolderSparkTransformConfiguration(SparkTransformRuntimeConfiguration):
     """
-    Implements the RayTransformConfiguration for NOOP as required by the RayTransformLauncher.
+    Implements the SparkTransformConfiguration for NOOP as required by the PythonTransformLauncher.
     NOOP does not use a RayRuntime class so the superclass only needs the base
     python-only configuration.
     """
@@ -46,11 +42,12 @@ class NOOPFolderRayTransformConfiguration(RayTransformRuntimeConfiguration):
         Initialization
         """
         super().__init__(transform_config=NOOPTransformConfiguration(clazz=NOOPFolderTransform),
-                         runtime_class=NOOPFolderRayRuntime)
+                         runtime_class=NOOPFolderSparkRuntime)
 
 
 if __name__ == "__main__":
-    # launcher = NOOPRayLauncher()
-    launcher = RayTransformLauncher(NOOPFolderRayTransformConfiguration())
+    # create launcher
+    launcher = SparkTransformLauncher(runtime_config=NOOPFolderSparkTransformConfiguration())
     logger.info("Launching noop transform")
+    # Launch the ray actor(s) to process the input
     launcher.launch()
