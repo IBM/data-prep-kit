@@ -57,6 +57,7 @@ ARGS_MAP = {
     "fdclean": [
         data_cleaning_transform.document_id_column_key,
         data_cleaning_transform.duplicate_list_location_key,
+        data_cleaning_transform.operation_mode_key,
     ],
 }
 
@@ -65,10 +66,6 @@ class ServiceOrchestrator:
     def __init__(self, global_params: argparse.Namespace = None):
         self.global_params = global_params
         self.logger = get_logger(__name__)
-
-    def execute_service(self, service_logic, service_params):
-        # Call the generic service logic
-        service_logic(service_params)
 
     def orchestrate(self):
         service_list = self.global_params.services.split(",")
@@ -107,7 +104,14 @@ class ServiceOrchestrator:
             output_folder = in_args_dict["output_folder"]
         elif service_name == "fdclean":
             input_folder = in_args_dict["input_folder"]
-            output_folder = os.path.join(in_args_dict["output_folder"], "cleaned")
+            operation_mode = in_args_dict.get("operation_mode", "filter_duplicates")
+            if operation_mode == "filter_duplicates":
+                output_subfolder = "cleaned"
+            elif operation_mode == "filter_non_duplicates":
+                output_subfolder = "duplicates"
+            else:  # operation_mode == "annotate"
+                output_subfolder = "annotated"
+            output_folder = os.path.join(in_args_dict["output_folder"], output_subfolder)
         else:
             self.logger.error(f"Unknown service name: {service_name}")
         data_io = {
@@ -145,12 +149,48 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output_folder", type=str, required=True, help="Output folder path")
 
     parser.add_argument(
-        "--contents_column", type=str, default="text", help="Name of the column that holds document text"
+        "--operation_mode",
+        choices=["filter_duplicates", "filter_non_duplicates", "annotate"],
+        required=False,
+        help="operation mode for data cleanup: filter out duplicates/non-duplicates, or annotate duplicate documents",
     )
-    parser.add_argument("--num_permutations", type=int, default=112, help="Number of permutations")
-    parser.add_argument("--num_bands", type=int, default=14, help="Number of bands")
-    parser.add_argument("--num_minhashes_per_band", type=int, default=8, help="Number of minhashes per band")
-    parser.add_argument("--num_segments", type=int, default=2, help="Number of segments")
+    parser.add_argument(
+        "--contents_column", type=str, required=False, help="name of the column that stores document text"
+    )
+    parser.add_argument(
+        "--document_id_column", type=str, required=False, help="name of the column that stores document text"
+    )
+    parser.add_argument("--seed", type=int, required=False, help="name of the column that stores document text")
+    parser.add_argument(
+        "--num_permutations", type=int, required=False, help="number of permutations to use for minhash calculation"
+    )
+    parser.add_argument(
+        "--num_bands", type=int, required=False, help="number of bands to use for band hash calculation"
+    )
+    parser.add_argument(
+        "--num_minhashes_per_band", type=int, required=False, help="number of minhashes to use in each band"
+    )
+    parser.add_argument(
+        "--word_shingle_size", type=int, required=False, help="number of words included in one shingle"
+    )
+    parser.add_argument(
+        "--jaccard_similarity_threshold",
+        type=float,
+        required=False,
+        help="jaccard similarity threshold above which two documents are similar",
+    )
+    parser.add_argument(
+        "--num_segments",
+        type=int,
+        required=False,
+        help="the number of segments dividing the hashing space for each band (for scalability)",
+    )
+    parser.add_argument(
+        "--duplicate_list_location",
+        type=str,
+        required=False,
+        help="path to the file with all the duplicate document ids",
+    )
 
     # Single argument for service execution
     parser.add_argument(

@@ -29,12 +29,16 @@ document_id_column_key = "document_id_column"
 """ This key holds the name of the column storing the unique ID assigned to each document"""
 duplicate_list_location_key = "duplicate_list_location"
 """ This key holds the location of the list of duplicate documents marked for removal"""
+operation_mode_key = "operation_mode"
+""" This key holds the operation mode: 'filter_duplicates', 'filter_non_duplicates', or 'annotate'"""
 
 # command line arguments
 document_id_column_cli_param = f"{cli_prefix}{document_id_column_key}"
 """ Name of the column storing the unique ID assigned to each document"""
 duplicate_list_location_cli_param = f"{cli_prefix}{duplicate_list_location_key}"
 """ Location of the list of duplicate documents marked for removal"""
+operation_mode_cli_param = f"{cli_prefix}{operation_mode_key}"
+""" Operation mode, can be one of 'filter_duplicates', 'filter_non_duplicates', or 'annotate'"""
 
 captured_arg_keys = [
     document_id_column_key,
@@ -44,8 +48,10 @@ captured_arg_keys = [
 # defaults
 document_id_column_default = "int_id_column"
 """ Default name of the column storing the unique ID assigned to each document"""
-duplicate_list_location_default = None
+duplicate_list_location_default = os.path.join("docs_to_remove_consolidated", "docs_to_remove_consolidated.parquet")
 """ Default location of the list of duplicate documents marked for removal"""
+operation_mode_default = "filter_duplicates"
+""" Default value for operation mode, will filter out all the duplicate documents"""
 
 
 class DataCleaningTransform(AbstractTableTransform):
@@ -72,6 +78,7 @@ class DataCleaningTransform(AbstractTableTransform):
         self.logger = get_logger(__name__)
         self.document_id_column = config.get(document_id_column_key, document_id_column_default)
         self.duplicate_list_location = config.get(duplicate_list_location_key, duplicate_list_location_default)
+        self.operation_mode = config.get(operation_mode_key, operation_mode_default)
         contents = config.get("df")
         self.docs_to_remove_df = pl.read_parquet(io.BytesIO(contents))
         self.logger.info(f"Got docs_to_remove_df with {len(self.docs_to_remove_df)} rows")
@@ -88,19 +95,27 @@ class DataCleaningTransform(AbstractTableTransform):
             self.docs_to_remove_df = self.docs_to_remove_df.select(
                 pl.col(self.document_id_column).cast(input_doc_id_type)
             )
-        filtered_df = input_df.join(self.docs_to_remove_df, on=self.document_id_column, how="anti")
-        filtered_table = filtered_df.to_arrow()
+        if self.operation_mode == "filter_duplicates":
+            result_df = input_df.join(self.docs_to_remove_df, on=self.document_id_column, how="anti")
+        elif self.operation_mode == "filter_non_duplicates":
+            result_df = input_df.join(self.docs_to_remove_df, on=self.document_id_column, how="inner")
+        else:  # self.operation_mode == "annotation"
+            duplicates_df = self.docs_to_remove_df.with_columns(pl.lit("d").alias("duplicate"))
+            result_df = input_df.join(duplicates_df, on=self.document_id_column, how="left").with_columns(
+                pl.col("duplicate").fill_null("")
+            )
+        result_table = result_df.to_arrow()
         metadata = {
             "input_files": 1,
             "input_docs": table.num_rows,
             "input_bytes": table.nbytes,
             "output_files": 1,
-            "output_docs": filtered_table.num_rows,
-            "output_bytes": filtered_table.nbytes,
-            "filtered_docs": (table.num_rows - filtered_table.num_rows),
-            "filtered_bytes": (table.nbytes - filtered_table.nbytes),
+            "output_docs": result_table.num_rows,
+            "output_bytes": result_table.nbytes,
+            "filtered_docs": (table.num_rows - result_table.num_rows),
+            "filtered_bytes": (table.nbytes - result_table.nbytes),
         }
-        return [filtered_table], metadata
+        return [result_table], metadata
 
 
 class DataCleaningTransformConfiguration(TransformConfiguration):
@@ -133,9 +148,14 @@ class DataCleaningTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{duplicate_list_location_cli_param}",
             type=str,
-            required=True,
             default=duplicate_list_location_default,
             help="location of duplicate document list that are marked for removal",
+        )
+        parser.add_argument(
+            f"--{operation_mode_cli_param}",
+            choices=["filter_duplicates", "filter_non_duplicates", "annotate"],
+            default=operation_mode_default,
+            help="operation mode: filter out duplicates/non-duplicates, or annotate duplicate documents",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:

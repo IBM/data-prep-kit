@@ -10,6 +10,7 @@
 # limitations under the License.
 ################################################################################
 
+import os
 from typing import Any
 
 from data_cleaning_transform import DataCleaningTransformConfiguration
@@ -51,8 +52,10 @@ class DataCleaningPythonRuntime(DefaultPythonTransformRuntime):
         :param files - list of files to process
         :return: dictionary of transform init params
         """
-        duplicate_list_location = self.params["duplicate_list_location"]
         data_access = data_access_factory.create_data_access()
+        duplicate_list_location = os.path.abspath(
+            os.path.join(data_access.output_folder, "..", self.params["duplicate_list_location"])
+        )
         if duplicate_list_location.startswith("s3://"):
             _, duplicate_list_location = duplicate_list_location.split("://")
         self.duplicate_list, retries = data_access.get_file(duplicate_list_location)
