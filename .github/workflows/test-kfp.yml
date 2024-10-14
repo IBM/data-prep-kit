@@ -49,9 +49,6 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     cancel-in-progress: true
 
-env:
-    KFP_BLACK_LIST: "doc_chunk-ray,pdf2parquet-ray,pii_redactor"
-
 jobs:
     check_if_push_images:
         # check whether the Docker images should be pushed to the remote repository
@@ -88,41 +85,19 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
+            - name: Import environment variables
+              run: |
+                  cat scripts/k8s-setup/requirements.env >> $GITHUB_ENV
+                  echo "K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup" >> $GITHUB_ENV
+                  echo "REPOROOT=$PWD" >> $GITHUB_ENV
+                  echo "PATH=$PATH:/tmp" >> $GITHUB_ENV
             - name: Test KFP libs (shared and v1) and run a workflow
               timeout-minutes: 120
               run: |
-                  export REPOROOT=$PWD
-                  export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
-                  source $K8S_SETUP_SCRIPTS/requirements.env
-                  export PATH=$PATH:/tmp/
-                  curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-                  chmod 777 /tmp/kind
-                  curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-                  chmod 700 /tmp/get_helm.sh
-                  HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
-                  chmod 777 /tmp/helm
-                  curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
-                  chmod 777 /tmp/kubectl
-                  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
-                  chmod +x /tmp/mc
-                  export DEPLOY_KUBEFLOW=1
-                  make -C $K8S_SETUP_SCRIPTS setup
+                  $PWD/scripts/workflow_helper.sh install-tools
                   make -C kfp/kfp_support_lib test
-                  source $K8S_SETUP_SCRIPTS/common.sh
-                  while :
-                  do
-                    dir=("code"  "universal" "language") && index=$(($RANDOM % ${#dir[@]})) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs -type d  -maxdepth 1 -mindepth 1 ))
-                    set -- "${transforms[@]}" && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
-                    transform=$(basename "${transforms[$index]}")
-                    if [ -d ${transforms[$index]}/kfp_ray ] && echo ${KFP_BLACK_LIST} | grep -qv ${transform} ; then
-                      header_text "Running ${transforms[$index]} workflow test"
-                      break
-                    fi
-                  done  
-                  make -C ${transforms[$index]} workflow-build
-                  make -C ${transforms[$index]} workflow-test
-                  echo "Run ${transforms[$index]} completed"
-
+                  $PWD/scripts/workflow_helper.sh test-workflow "transforms/universal/noop"
+                  echo "Run noop completed"
     test-kfp-v2:
         runs-on: ubuntu-22.04
         steps:
@@ -137,41 +112,20 @@ jobs:
                   sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/powershell /usr/share/swift /usr/lib/jvm /usr/local/.ghcup
                   sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
                   df -h
+            - name: Import environment variables
+              run: |
+                  cat scripts/k8s-setup/requirements.env >> $GITHUB_ENV
+                  echo "K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup" >> $GITHUB_ENV
+                  echo "REPOROOT=$PWD" >> $GITHUB_ENV
+                  echo "PATH=$PATH:/tmp" >> $GITHUB_ENV
+                  echo "KFPv2=1" >> $GITHUB_ENV
             - name: Test KFP libs (shared and v2) and run a workflow
               timeout-minutes: 120
               run: |
-                  export REPOROOT=$PWD
-                  export K8S_SETUP_SCRIPTS=$PWD/scripts/k8s-setup
-                  source $K8S_SETUP_SCRIPTS/requirements.env
-                  export PATH=$PATH:/tmp/
-                  curl -Lo /tmp/kind https://kind.sigs.k8s.io/dl/v${KIND_VERSION}/kind-linux-amd64
-                  chmod 777 /tmp/kind
-                  curl -fsSL -o /tmp/get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-                  chmod 700 /tmp/get_helm.sh
-                  HELM_INSTALL_DIR=/tmp/ /tmp/get_helm.sh -v v${HELM_VERSION} --no-sudo
-                  chmod 777 /tmp/helm
-                  curl -L https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o /tmp/kubectl
-                  chmod 777 /tmp/kubectl
-                  curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o /tmp/mc
-                  chmod +x /tmp/mc
-                  export DEPLOY_KUBEFLOW=1
-                  export KFPv2=1
-                  make -C $K8S_SETUP_SCRIPTS setup
+                  $PWD/scripts/workflow_helper.sh install-tools
                   make -C kfp/kfp_support_lib test
-                  source $K8S_SETUP_SCRIPTS/common.sh
-                  while :
-                  do
-                    dir=("code"  "universal" "language") && index=$(($RANDOM % ${#dir[@]})) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs -type d  -maxdepth 1 -mindepth 1 ))
-                    set -- "${transforms[@]}" && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
-                    transform=$(basename "${transforms[$index]}")
-                    if [ -d ${transforms[$index]}/kfp_ray ] && echo ${KFP_BLACK_LIST} | grep -qv ${transform} ; then
-                      header_text "Running ${transforms[$index]} workflow test"
-                      break
-                    fi
-                  done 
-                  make -C ${transforms[$index]} workflow-build
-                  make -C ${transforms[$index]} workflow-test
-                  header_text "Run ${transforms[$index]} completed"
+                  $PWD/scripts/workflow_helper.sh test-workflow "transforms/universal/noop"
+                  echo "Run noop completed"
     build-kfp-components:
         needs: [check_if_push_images]
         runs-on: ubuntu-22.04

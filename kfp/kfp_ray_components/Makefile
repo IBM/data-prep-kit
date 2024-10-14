@@ -42,7 +42,7 @@ image: Dockerfile requirements.txt
 
 .PHONE: set-versions
 set-versions:
-	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION)
+	@# Help: Update yaml files to build images tagged as version $(KFP_DOCKER_VERSION).
 	@$(MAKE) .reconcile-requirements FILE=createRayClusterComponent.yaml
 	@$(MAKE) .reconcile-requirements FILE=deleteRayClusterComponent.yaml
 	@$(MAKE) .reconcile-requirements FILE=executeRayJobComponent.yaml
