@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+# This ensures that the script exits immediately if any command
+# returns a non-zero status, preventing cases where the GitHub
+# Action running the script might overlook an error if it occurs.
 set -euo pipefail
 
 op=$1
