@@ -1,26 +1,24 @@
 # Transforms 
 
-[All transforms](../python/src/data_processing/transform/abstract_transform.py)
-are generalized to operate on generically typed `DATA.`
-[Ray](ray-runtime.md) and [Python](python-runtime.md) runtimes 
-currently support `DATA` as both byte arrays 
-and [pyarrow Tables](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html). 
-The [Spark runtime](spark-runtime.md) currently supports the native Spark `DataFrame`.
+Transform is a basic integration unit of DPK that can be executed in any of the supported by the DPK 
+runtimes ([Python](python-runtime.md), [Ray](ray-runtime.md) and [Spark](spark-runtime.md)). All transforms 
+are derived from the 
+[AbstractTransform class](../python/src/data_processing/transform/abstract_transform.py). Theis class
+provides no functionality and is used as just a marker that a given class implements transform.
+There are currently two types of transforms defined in DPK:
 
-All transforms convert their input `DATA` to a list of transformed `DATA` objects
-and optional metadata about the transformation of the `DATA` instance.
-The Transform itself need only be concerned with the conversion 
-of one `DATA` instance at a time. 
-Transforms, where possible, should be implemented without regard to the
-runtime it will run in or where its configuration originates.  
+* [AbstractBinaryTransform](../python/src/data_processing/transform/binary_transform.py) which is a base 
+class for all data transforms. Data transforms convert a file of data producing zero or more data files 
+and metadata. A specific class of the binary transform is 
+[AbstractTableTransform](../python/src/data_processing/transform/table_transform.py) that consumes and produces
+data files containing [pyarrow tables](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
+* [AbstractFolderTransform](../python/src/data_processing/transform/folder_transform.py) which is a base
+class consuming a folder (that can contain an arbitrary set of files, that need to be processed together)
+and proces zero or more data files and metadata.
+
 
 In the discussion that follows, we'll focus on the transformation of pyarrow Tables
-using the `AbstractTableTransform` class (see below), supported by both
-the Ray and Python runtimes.
-Mapping from this tutorial to a Spark runtime can be done by using 
-`data-prep-kit-spark`'s [AbstractSparkTransform](../spark/src/data_processing_spark/runtime/spark/spark_transform.py)
-which operates on a Spark DataFrame instead of a pyarrow Table.
-
+using the `AbstractTableTransform` class (see below), supported by Ray Spark and Python runtimes.
 
 #### AbstractTableTransform class
 [AbstractTableTransform](../python/src/data_processing/transform/table_transform.py) 
