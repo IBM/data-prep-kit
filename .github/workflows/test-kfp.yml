@@ -9,6 +9,7 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
             - "kfp/**"
             - "!kfp/**.md"
             - "!kfp/**/test/**"
@@ -27,6 +28,7 @@ on:
             - "dev"
             - "releases/**"
         paths:
+            - ".make.*"
             - "kfp/**"
             - "!kfp/**/test/**"
             - "!kfp/**.md"
