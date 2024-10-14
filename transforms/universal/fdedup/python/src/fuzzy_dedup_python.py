@@ -76,7 +76,7 @@ class ServiceOrchestrator:
                 self.logger.error(err_msg)
                 raise ValueError(err_msg)
             service_short_name = SERVICE_DICT[service]
-            service_params = self.get_arguments(args, service_short_name)
+            service_params = self.get_arguments(self.global_params, service_short_name)
             self.logger.info(f"Got parameters for {service}")
             status = self.execute_service(service_short_name, service_params)
             if status == 0:
