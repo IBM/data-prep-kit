@@ -1,45 +1,57 @@
-# Define the root of the local git clone for the common rules to be able
+# Define the root of the local git clone for the common rules to be able 
 # know where they are running from.
 REPOROOT=../../../..
+
+# Set this, before including .make.defaults, to 
+#   1 if requirements reference the latest code in the data processing library 
+#     in this repo (that is not yet published to pypi).	 This is the default setting.
+#   0 if the transforms DPK dependencies are on wheels published to 
+#     pypi (e.g. data-prep-toolkit=0.2.1)
+#USE_REPO_LIB_SRC=1
+
 # Include a library of common .transform.* targets which most
 # transforms should be able to reuse.  However, feel free
-# to override/redefine the rules below.
+# to override/redefine the rules below. 
 include $(REPOROOT)/transforms/.make.transforms
 
-# This is included in the image name, if defined
-TRANSFORM_NAME=fd-sig-calc
+# Include the common configuration for this transform
+include ../transform.config
 
-DOCKER_IMAGE_NAME=pyspark-base
-DOCKER_IMAGE_VERSION=latest
-DOCKER_FILE=Dockerfile
-REGISTRY_HOST=docker.io
-REGISTRY_PATH=
-DOCKER=docker
-PYTHON=python
+venv::	.transforms.spark-venv
 
-venv:	requirements.txt
-	@# Help: Create the virtual environment using requirements.txt
-	$(PYTHON) -m venv venv
-	@source venv/bin/activate;		\
-	pip install --upgrade pip;		\
-	pip install wheel;			\
-	pip install -r requirements.txt;
+test::	.transforms.spark-test
+
+clean:: .transforms.clean
 
 image:: .transforms.spark-image
 
-image-direct: # Must be called with DOCKER_IMAGE_NAME=, DOCKER_IMAGE_VERSION= settings.
-	@# Help: Create the docker image $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
-	$(DOCKER) build -t $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) -f $(DOCKER_FILE) .
+test-src:: .transforms.test-src
 
-publish-docker: # Must be called with DOCKER_IMAGE_NAME=, DOCKER_IMAGE_VERSION= settings.
-	@# Help: Publish image $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) to $(REGISTRY_HOST) container registry
-	$(DOCKER) logout $(REGISTRY_HOST)
-	$(DOCKER) login $(REGISTRY_HOST) -u '$(DOCKER_REGISTRY_USER)' -p '$(DOCKER_REGISTRY_KEY)'
-	$(DOCKER) push  $(REGISTRY_PATH)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
+setup:: .transforms.setup
 
-publish-ibm:
-	ibmcloud login -q -u "$(IBM_CLOUD_USER)" -apikey "$(IBM_CLOUD_API_KEY)"
-	ibmcloud cr login --client docker
-	$(DOCKER) tag $(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION) $(REGISTRY_HOST)/$(REGISTRY_PATH)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
-	$(DOCKER) push $(REGISTRY_HOST)/$(REGISTRY_PATH)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
-	# ibmcloud cr image-list | grep $(DOCKER_IMAGE_NAME)
+build:: build-dist image
+
+publish: publish-image
+
+publish-image:: .transforms.publish-image-spark
+
+set-versions:
+	$(MAKE) TRANSFORM_PYTHON_VERSION=dummy TOML_VERSION=$(FDEDUP_SPARK_VERSION) .transforms.set-versions
+        
+build-dist:: .defaults.build-dist 
+
+publish-dist:: .defaults.publish-dist
+
+test-image:: .transforms.spark-test-image
+
+run-cli-sample: .transforms.run-cli-spark-sample
+
+run-local-sample: .transforms.run-local-sample
+
+minio-start:	.minio-start
+
+kind-load-image:: .transforms.kind-load-image
+
+docker-load-image: .defaults.docker-load-image
+
+docker-save-image: .defaults.docker-save-image
