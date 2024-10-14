@@ -10,6 +10,7 @@
 # limitations under the License.
 ################################################################################
 
+import os
 from typing import Any
 
 import ray
@@ -88,8 +89,11 @@ class DataCleaningRuntime(DefaultRayTransformRuntime):
         :param files - list of files to remove
         :return: dictionary of filter init params
         """
-        duplicate_list_location = self.params.get(duplicate_list_location_key, duplicate_list_location_default)
         data_access = data_access_factory.create_data_access()
+        duplicate_list_location = self.params.get(duplicate_list_location_key, duplicate_list_location_default)
+        duplicate_list_location = os.path.abspath(
+            os.path.join(data_access.output_folder, "..", duplicate_list_location)
+        )
         if duplicate_list_location.startswith("s3://"):
             _, duplicate_list_location = duplicate_list_location.split("://")
         duplicate_list, retries = data_access.get_file(duplicate_list_location)
@@ -117,6 +121,6 @@ class DataCleaningRayTransformConfiguration(RayTransformRuntimeConfiguration):
 
 if __name__ == "__main__":
     # launcher = NOOPRayLauncher()
-    launcher = RayTransformLauncher(DataCleaningRayTransformConfiguration())
-    logger.info("Launching  transform")
+    launcher = RayTransformLauncher(runtime_config=DataCleaningRayTransformConfiguration())
+    logger.info("Launching transform")
     launcher.launch()
