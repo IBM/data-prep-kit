@@ -240,7 +240,7 @@ class ClusterAnalysisTransform(AbstractFolderTransform):
         sorted_document_data = sorted(document_data, key=lambda x: (-x["document_length"], x["int_id_column"]))
 
         # Extracting int_id_column values into a list
-        doc_list = list(set([item["int_id_column"] for item in sorted_document_data]))
+        doc_list = [item["int_id_column"] for item in sorted_document_data]
 
         # Creating a dictionary with int_id_column as key and minhashes as value
         doc_minhashes = {item["int_id_column"]: item["minhashes"] for item in sorted_document_data}
