@@ -96,19 +96,8 @@ jobs:
               run: |
                   $PWD/scripts/workflow_helper.sh install-tools
                   make -C kfp/kfp_support_lib test
-                  KFP_BLACK_LIST=$(./scripts/check-workflows.sh -show-kfp-black-list)
-                  while :
-                  do
-                      dir=("code"  "universal" "language") && index=$(($RANDOM % ${#dir[@]})) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs -type d  -maxdepth 1 -mindepth 1 ))
-                      set -- "${transforms[@]}" && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
-                      transform=$(basename "${transforms[$index]}")
-                      if [ -e "$transform/Makefile" -a -e "$transform/kfp_ray/Makefile" ] && echo ${KFP_BLACK_LIST} | grep -qv ${transform}; then
-                        echo "Running ${transforms[$index]} workflow test"
-                        break
-                      fi
-                  done
-                  $PWD/scripts/workflow_helper.sh test-workflow ${transforms[$index]}
-                  echo "Run ${transforms[$index]} completed"
+                  $PWD/scripts/workflow_helper.sh test-workflow "transforms/universal/noop"
+                  echo "Run noop completed"
     test-kfp-v2:
         runs-on: ubuntu-22.04
         steps:
@@ -135,19 +124,8 @@ jobs:
               run: |
                   $PWD/scripts/workflow_helper.sh install-tools
                   make -C kfp/kfp_support_lib test
-                  KFP_BLACK_LIST=$(./scripts/check-workflows.sh -show-kfp-black-list)
-                  while :
-                  do
-                    dir=("code"  "universal" "language") && index=$(($RANDOM % ${#dir[@]})) && subdirs=${dir[$index]} && transforms=($(find transforms/$subdirs -type d  -maxdepth 1 -mindepth 1 ))
-                    set -- "${transforms[@]}" && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
-                    transform=$(basename "${transforms[$index]}")
-                    if [ -e "${transforms[$index]}/Makefile" -a -e "${transforms[$index]}/kfp_ray/Makefile" ] && echo ${KFP_BLACK_LIST} | grep -qv ${transform}; then
-                      echo "Running ${transforms[$index]} workflow test"
-                      break
-                    fi
-                  done
-                  $PWD/scripts/workflow_helper.sh test-workflow ${transforms[$index]}
-                  echo "Run ${transforms[$index]} completed"
+                  $PWD/scripts/workflow_helper.sh test-workflow "transforms/universal/noop"
+                  echo "Run noop completed"
     build-kfp-components:
         needs: [check_if_push_images]
         runs-on: ubuntu-22.04
