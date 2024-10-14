@@ -10,6 +10,7 @@ on:
             - "*"
         paths:
             # Note: the transform workflows are expected to trigger when data-processing-lib/** changes
+            - ".make.*"
             - "data-processing-lib/**"
             - "!data-processing-lib/**.md"
             - "!data-processing-lib/**/doc/**"
@@ -20,6 +21,7 @@ on:
             - "releases/**"
         paths:
             # Note: the transform workflows are expected to trigger when data-processing-lib/** changes
+            - ".make.*"
             - "data-processing-lib/**"
             - "!data-processing-lib/**.md"
             - "!data-processing-lib/**/doc/**"
