@@ -101,7 +101,7 @@ jobs:
                       set -- "${transforms[@]}" && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
                       transform=$(basename "${transforms[$index]}")
                       if [ -e "$transform/Makefile" -a -e "$transform/kfp_ray/Makefile" ] && echo ${KFP_BLACK_LIST} | grep -qv ${transform}; then
-                        header_text "Running ${transforms[$index]} workflow test"
+                        echo "Running ${transforms[$index]} workflow test"
                         break
                       fi
                   done
@@ -140,7 +140,7 @@ jobs:
                     set -- "${transforms[@]}" && transforms=("$@") && size=${#transforms[@]} && index=$(($RANDOM % $size))
                     transform=$(basename "${transforms[$index]}")
                     if [ -e "${transforms[$index]}/Makefile" -a -e "${transforms[$index]}/kfp_ray/Makefile" ] && echo ${KFP_BLACK_LIST} | grep -qv ${transform}; then
-                      header_text "Running ${transforms[$index]} workflow test"
+                      echo "Running ${transforms[$index]} workflow test"
                       break
                     fi
                   done
