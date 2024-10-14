@@ -35,9 +35,23 @@ class Html2ParquetTransform(AbstractBinaryTransform):
         
         # Use Trafilatura library
         if self.output_format == html2parquet_output_format.MARKDOWN:
-            content_string = trafilatura.extract(content_bytes, output_format="markdown")
+            content_string = trafilatura.extract(content_bytes, 
+                output_format="markdown",
+                include_tables=True, 
+                include_images=True,
+                include_links=True,
+                include_formatting=True,
+                favor_precision=True,
+                favor_recall=True)
         elif self.output_format == html2parquet_output_format.TEXT:
-            content_string = trafilatura.extract(content_bytes)
+            content_string = trafilatura.extract(content_bytes, 
+                output_format="txt",
+                include_tables=True, 
+                include_images=True,
+                include_links=True,
+                include_formatting=True,
+                favor_precision=True,
+                favor_recall=True)
         else:
             raise RuntimeError(f"Uknown output_format {self.output_format}.")
 
