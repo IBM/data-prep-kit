@@ -72,4 +72,5 @@ class ClusterAnalysisPythonTransformConfiguration(PythonTransformRuntimeConfigur
 if __name__ == "__main__":
     launcher = PythonTransformLauncher(runtime_config=ClusterAnalysisPythonTransformConfiguration())
     logger.info("Launching fuzzy dedup cluster analysis python transform")
+    # Launch python to process the input
     launcher.launch()
