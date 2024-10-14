@@ -10,6 +10,8 @@
 # limitations under the License.
 ################################################################################
 import os
+import re
+import unicodedata
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from typing import Any, List
@@ -100,44 +102,16 @@ num_segments_default = 1
 """ Default number of segments across which we divide the hashing space for each band"""
 
 
-def _optimal_minhashlsh_param(
-    threshold: float = jaccard_similarity_threshold_default,
-    num_perm: int = num_permutations_default,
-    false_positive_weight: float = 0.5,
-    false_negative_weight: float = 0.5,
-):
-    """
-    Compute the optimal `MinHashLSH` parameter that minimizes the weighted sum
-    of probabilities of false positive and false negative.
-    :param threshold: desired similarity threshold
-    :param num_perm: number of permutations
-    :param false_positive_weight: importance of avoiding false positive results
-    :param false_negative_weight: importance of avoiding false negative results
-    :return: a tuple (optimal number of bands, optimal number of rows)
-    """
-
-    def _false_positive_probability(threshold, b, r):
-        _probability = lambda s: 1 - (1 - s ** float(r)) ** float(b)
-        a, err = integrate(_probability, 0.0, threshold)
-        return a
-
-    def _false_negative_probability(threshold, b, r):
-        _probability = lambda s: 1 - (1 - (1 - s ** float(r)) ** float(b))
-        a, err = integrate(_probability, threshold, 1.0)
-        return a
-
-    min_error = float("inf")
-    opt = (0, 0)
-    for b in range(1, num_perm + 1):
-        max_r = int(num_perm / b)
-        for r in range(1, max_r + 1):
-            fp = _false_positive_probability(threshold, b, r)
-            fn = _false_negative_probability(threshold, b, r)
-            error = fp * false_positive_weight + fn * false_negative_weight
-            if error < min_error:
-                min_error = error
-                opt = (b, r)
-    return opt
+NUMBERS_PATTERN = re.compile(r"\d+(\.\d+)?")
+WHITESPACE_PATTERN = re.compile(r"\s+")
+PUNCTUATION = "!/—”:％１〈&(、━\\【#%「」，】；+^]~“《„';’{|∶´[=-`*．（–？！：$～«〉,><》)?）。…@_.\"}►»" + "".join(
+    map(
+        chr,
+        (x for a, b in ((0, 9), (11, 13), (13, 32), (127, 160)) for x in range(a, b)),
+    )
+)
+PUNCTUATION_SET = set(PUNCTUATION)
+PUNCTUATION_TRANS = str.maketrans(PUNCTUATION, " " * len(PUNCTUATION))
 
 
 class SignatureCalculationTransform(AbstractTableTransform):
@@ -184,13 +158,6 @@ class SignatureCalculationTransform(AbstractTableTransform):
         self.num_segments = config.get(num_segments_key, num_segments_default)
         self.num_bands = config.get(num_bands_key, num_bands_default)
         self.num_rows = config.get(num_minhashes_per_band_key, num_minhashes_per_band_default)
-        # Calculate optimal parameters for bands calculation
-        # self.num_bands, self.num_rows = _optimal_minhashlsh_param(
-        #     threshold=self.jaccard_similarity_threshold,
-        #     num_perm=self.num_permutations,
-        #     false_positive_weight=0.5,
-        #     false_negative_weight=0.5,
-        # )
         # use this dataframe to store the minhashes and size for each document
         self.all_minhashes: pl.DataFrame = None
         # use this dataframe to store the band hashes for each document
@@ -224,8 +191,8 @@ class SignatureCalculationTransform(AbstractTableTransform):
 
         # generate minhash values
         minhashes = df.map_rows(
-            lambda text: mm_min_hash.minhash2_nosalt(
-                *self._generate_word_shingles(text, window_size=self.word_shingle_size)
+            lambda row: mm_min_hash.minhash2_nosalt(
+                *self._generate_word_shingles(row, window_size=self.word_shingle_size)
             )
         )
         # rename columns, cast minhashes to list(uint32)
@@ -374,10 +341,22 @@ class SignatureCalculationTransform(AbstractTableTransform):
         return [], metadata
 
     # define shingles generation function
-    def _generate_word_shingles(self, text: str, window_size: int = 5, delimiter: str = " ") -> tuple[list, int, int]:
-        words = text[0].split()
-        document_id = text[1]
-        doc_len = len(text[0])
+    def _generate_word_shingles(self, row: tuple, window_size: int = 5, delimiter: str = " ") -> tuple[list, int, int]:
+        text = row[0]
+        # lower case
+        text = text.lower()
+        # replace numbers with '0'
+        text = NUMBERS_PATTERN.sub("0", text)
+        # convert punctuation to spaces
+        text = text.translate(PUNCTUATION_TRANS)
+        # remove consecutive spaces, newlines, tabs in the middle and in the beginning / end
+        text = WHITESPACE_PATTERN.sub(" ", text.strip())
+        # diacritics/unicode normalization
+        text = "".join(c for c in unicodedata.normalize("NFD", text) if unicodedata.category(c) != "Mn")
+        text = text.strip()
+        words = text.split()
+        document_id = row[1]
+        doc_len = len(row[0])
         word_count = len(words)
         k_shingles = []
         for i in range(0, max(1, word_count - window_size + 1)):
