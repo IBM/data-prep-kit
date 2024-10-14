@@ -43,7 +43,7 @@ concurrency:
 
 jobs:
     test-kfp-v1:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -79,7 +79,7 @@ jobs:
                    fi
 
     test-kfp-v2:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4

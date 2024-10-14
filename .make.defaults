@@ -22,7 +22,6 @@
 # To augment the the clean rule
 # clean: .clean
 # 	rm -rf other-stuff
-#
 #######################################################################################
 SHELL=/bin/bash
 include $(REPOROOT)/.make.versions

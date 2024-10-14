@@ -9,6 +9,7 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
             - "transforms/packaging/ray/**"
             - "!**.md"
             - "!**/doc/**"
@@ -19,6 +20,7 @@ on:
             - "dev"
             - "releases/**"
         paths:
+            - ".make.*"
             - "transforms/packaging/ray/**"
             - "!**.md"
             - "!**/doc/**"
@@ -27,7 +29,7 @@ on:
 
 jobs:
     test-src:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
