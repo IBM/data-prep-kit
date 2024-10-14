@@ -126,17 +126,6 @@ class DataAccessS3(DataAccess):
             self.logger.error(f"Exception reading table {path} from S3 - {e}")
             return None, 0
 
-    def get_output_location(self, path: str) -> str:
-        """
-        Get output location based on input
-        :param path: input file location
-        :return: output file location
-        """
-        if self.output_folder is None:
-            self.logger.error("Get out put location. S3 configuration is not provided, returning None")
-            return None
-        return path.replace(self.input_folder, self.output_folder)
-
     def save_table(self, path: str, table: pyarrow.Table) -> tuple[int, dict[str, Any], int]:
         """
         Save table to a given location

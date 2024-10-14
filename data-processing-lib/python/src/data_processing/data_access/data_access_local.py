@@ -130,17 +130,6 @@ class DataAccessLocal(DataAccess):
             logger.error(f"Error reading table from {path}: {e}")
             return None, 0
 
-    def get_output_location(self, path: str) -> str:
-        """
-        Get output location based on input
-        :param path: input file location
-        :return: output file location
-        """
-        if self.output_folder is None:
-            logger.error("Get output location. local configuration is not defined, returning None")
-            return None
-        return path.replace(self.input_folder, self.output_folder)
-
     def save_table(self, path: str, table: pa.Table) -> tuple[int, dict[str, Any], int]:
         """
         Saves a pyarrow table to a file and returns information about the operation.

@@ -62,12 +62,15 @@ def orchestrate(
         if is_folder:
             # folder transform
             files = runtime.get_folders(data_access=data_access)
-            logger.info(f"Number of folders is {len(files)}")        # Get files to process
+            logger.info(f"Number of folders is {len(files)}")  # Get files to process
         else:
             files, profile, retries = data_access.get_files_to_process()
             if len(files) == 0:
                 logger.error("No input files to process - exiting")
                 return 0
+            # log retries
+            if retries > 0:
+                statistics.add_stats.remote({"data access retries": retries})
             logger.info(f"Number of files is {len(files)}, source profile {profile}")
         # Print interval
         print_interval = int(len(files) / 100)
@@ -79,9 +82,6 @@ def orchestrate(
         logger.info(
             f"Number of workers - {preprocessing_params.n_workers} " f"with {preprocessing_params.worker_options} each"
         )
-        # log retries
-        if retries > 0:
-            statistics.add_stats.remote({"data access retries": retries})
         # create executors
         processor_params = {
             "data_access_factory": data_access_factory,
