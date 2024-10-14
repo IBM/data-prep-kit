@@ -45,8 +45,8 @@ class ClusterAnalysisSparkRuntime(DefaultSparkTransformRuntime):
         :param data_access - data access object
         :return: list of folder paths
         """
-        bands = self.params["num_bands"]
-        segments = self.params["num_segments"]
+        bands = self.params[num_bands_key]
+        segments = self.params[num_segments_key]
         folders = [os.path.join(f"band={b}", f"segment={s}") for b in range(bands) for s in range(segments)]
         return folders
 
