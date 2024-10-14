@@ -16,7 +16,11 @@ allows intermediate publishing from the main branch using version X.Y.Z.dev\<N\>
 1. Building and publishing is done manually, or soon via a git action, in the branch created by `scripts/release-branch.sh`. 
    1. Wheels can only be published once to pypi for a given version.
    1. Transform and kfp images may be republished to the docker registry.
-   
+1. Releases done via the `release-branch.sh` script will have their micro version number set to 0 (e.g., 1.2.0)
+1. Intermediate releases that bump the micro version may be done by individual transforms. This can mean
+that version X.Y.Z of a transform is equivalent to the X.Y+1.0 release.  The latter created when running
+the `release-branch.sh` script.
+
 ## Cutting the release
 Creating the release involves
 
