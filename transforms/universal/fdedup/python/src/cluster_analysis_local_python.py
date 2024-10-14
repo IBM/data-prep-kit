@@ -21,7 +21,7 @@ from data_processing.utils import ParamsUtils
 
 
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "bands_consolidated"))
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "bands"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "docs_to_remove"))
 local_conf = {
     "input_folder": input_folder,
@@ -35,12 +35,15 @@ params = {
     "runtime_pipeline_id": "pipeline_id",
     "runtime_job_id": "job_id",
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
+    "cluster_num_bands": 14,
+    "cluster_num_segments": 2,
+    "cluster_jaccard_similarity_threshold": 0.0,
 }
 if __name__ == "__main__":
     # Set the simulated command line args
-    # sys.argv = ParamsUtils.dict_to_req(d=params)
-    # print(sys.argv)
+    sys.argv = ParamsUtils.dict_to_req(d=params)
+    print(sys.argv)
     # create launcher
     launcher = PythonTransformLauncher(runtime_config=ClusterAnalysisPythonTransformConfiguration())
-    # Launch the ray actor(s) to process the input
+    # Launch python to process the input
     launcher.launch()
