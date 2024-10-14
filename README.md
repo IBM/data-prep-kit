@@ -133,7 +133,7 @@ The matrix below shows the the combination of modules and supported runtimes. Al
 | **Data Ingestion**                                                                   |                    |                    |                    |                    |
 | [Code (from zip) to Parquet](transforms/code/code2parquet/python/README.md)          | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | [PDF to Parquet](transforms/language/pdf2parquet/python/README.md)                   | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| [HTML to Parquet](transforms/language/html2parquet/python/README.md)                | :white_check_mark: | :white_check_mark: |                    |                    |
+| [HTML to Parquet](transforms/language/html2parquet/python/README.md)                 | :white_check_mark: | :white_check_mark: |                    |                    |
 | **Universal (Code & Language)**                                                      |                    |                    |                    |                    | 
 | [Exact dedup filter](transforms/universal/ededup/ray/README.md)                      | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | [Fuzzy dedup filter](transforms/universal/fdedup/ray/README.md)                      |                    | :white_check_mark: |                    | :white_check_mark: |
@@ -141,7 +141,7 @@ The matrix below shows the the combination of modules and supported runtimes. Al
 | [Filter on annotations](transforms/universal/filter/python/README.md)                | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | [Profiler](transforms/universal/profiler/ray/README.md)                              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | [Resize](transforms/universal/resize/python/README.md)                               | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| [HAP](transforms/universal/hap/python/README.md)                      | :white_check_mark: | :white_check_mark: |                    |  |
+| [HAP](transforms/universal/hap/python/README.md)                                     | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | [Tokenizer](transforms/universal/tokenization/python/README.md)                      | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | **Language-only**                                                                    |                    |                    |                    |                    |
 | [Language identification](transforms/language/lang_id/python/README.md)              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
