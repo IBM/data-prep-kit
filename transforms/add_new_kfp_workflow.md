@@ -11,4 +11,4 @@ This README outlines the steps to add a new KFP workflow for a new transform und
 
 3) Add the path to the transform input directory in the [populate_minio script](../scripts/k8s-setup/populate_minio.sh). This path is used when testing the workflow.
 4) Create a GitHub Action for the kfp workflow using the `make` command in the [.github/workflows/](../.github/workflows/README.md) directory.
-5) Update the workflow in [README.md](../kfp/README.md).
+5) Update the workflows list in [README.md](../kfp/README.md) file.
