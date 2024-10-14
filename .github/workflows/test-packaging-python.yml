@@ -9,6 +9,7 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
             - "transforms/packaging/python/**"
             - "!**.md"
             - "!**/doc/**"
@@ -19,6 +20,7 @@ on:
             - "dev"
             - "releases/**"
         paths:
+            - ".make.*"
             - "transforms/packaging/python/**"
             - "!**.md"
             - "!**/doc/**"

@@ -9,6 +9,7 @@ on:
         tags:
             - "*"
         paths-ignore:
+            - ".make.*"
             - "**.md"
             - "examples/**"
             - "**/doc/**"
@@ -20,6 +21,7 @@ on:
             - "dev"
             - "releases/**"
         paths-ignore:
+            - ".make.*"
             - "**.md"
             - "examples/**"
             - "**/doc/**"
