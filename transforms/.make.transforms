@@ -342,4 +342,11 @@ minio-stop:
 	    > tt.toml;			\
 	    mv tt.toml pyproject.toml;	\
 	fi
+	if [ -e requirements.txt ]; then					\
+	    cat requirements.txt | sed 									\
+	    -e 's/\(dpk[_-].*transform[_-]python[=<>~][=]\).*/\1$(TRANSFORM_PYTHON_VERSION)/'	\
+	    > tt.txt;			\
+	    mv tt.txt requirements.txt; \
+	fi
+
 

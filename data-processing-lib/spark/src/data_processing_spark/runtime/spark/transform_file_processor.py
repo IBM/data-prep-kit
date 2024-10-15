@@ -29,12 +29,15 @@ class SparkTransformFileProcessor(AbstractTransformFileProcessor):
         data_access_factory: DataAccessFactoryBase,
         runtime_configuration: SparkTransformRuntimeConfiguration,
         statistics: TransformStatistics,
+        is_folder: bool,
     ):
         """
         Init method
         """
         super().__init__(
-            data_access_factory=data_access_factory, transform_parameters=runtime_configuration.get_transform_params()
+            data_access_factory=data_access_factory,
+            transform_parameters=runtime_configuration.get_transform_params(),
+            is_folder=is_folder,
         )
         # Add data access ant statistics to the processor parameters
         self.runtime_configuration = runtime_configuration

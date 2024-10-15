@@ -76,10 +76,11 @@ conda install gcc_linux-64
 conda install gxx_linux-64
 ```
 
-Next, install the data prep toolkit library. This library installs both the python and ray versions of the transforms.
+Next, install the data prep toolkit library. This library installs both the python and ray versions of the transforms. For better management of dependencies, it is recommended to install the same tagged version of both the library and the transform. 
 
 ```bash
-pip3 install  data-prep-toolkit-transforms-ray
+pip3 install  'data-prep-toolkit[ray]==0.2.2.dev1'
+pip3 install  'data-prep-toolkit-transforms[ray,all]==0.2.2.dev1'
 pip3 install jupyterlab   ipykernel  ipywidgets
 
 ## install custom kernel
@@ -89,7 +90,7 @@ python -m ipykernel install --user --name=data-prep-kit --display-name "dataprep
 Test, your installation. If you are able to import these data-prep-kit libraries successfully in python, your installation has succeeded. 
 
 ```bash
-## start python interpretter
+## start python interpreter
 $   python
 
 # import DPK libraries
@@ -132,7 +133,7 @@ The matrix below shows the the combination of modules and supported runtimes. Al
 | **Data Ingestion**                                                                   |                    |                    |                    |                    |
 | [Code (from zip) to Parquet](transforms/code/code2parquet/python/README.md)          | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | [PDF to Parquet](transforms/language/pdf2parquet/python/README.md)                   | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| [HTML to Parquet](transforms/language/html2parquet/python/README.md)                | :white_check_mark: | :white_check_mark: |                    |                    |
+| [HTML to Parquet](transforms/language/html2parquet/python/README.md)                 | :white_check_mark: | :white_check_mark: |                    |                    |
 | **Universal (Code & Language)**                                                      |                    |                    |                    |                    | 
 | [Exact dedup filter](transforms/universal/ededup/ray/README.md)                      | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | [Fuzzy dedup filter](transforms/universal/fdedup/ray/README.md)                      |                    | :white_check_mark: |                    | :white_check_mark: |
@@ -140,7 +141,7 @@ The matrix below shows the the combination of modules and supported runtimes. Al
 | [Filter on annotations](transforms/universal/filter/python/README.md)                | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | [Profiler](transforms/universal/profiler/ray/README.md)                              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | [Resize](transforms/universal/resize/python/README.md)                               | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| [HAP](transforms/universal/hap/python/README.md)                      | :white_check_mark: |  |                    |  |
+| [HAP](transforms/universal/hap/python/README.md)                                     | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | [Tokenizer](transforms/universal/tokenization/python/README.md)                      | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | **Language-only**                                                                    |                    |                    |                    |                    |
 | [Language identification](transforms/language/lang_id/python/README.md)              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |

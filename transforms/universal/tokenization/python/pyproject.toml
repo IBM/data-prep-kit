@@ -1,7 +1,7 @@
 [project]
 name = "dpk_tokenization_transform_python"
 keywords = ["tokenizer", "data", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
-version = "0.2.2.dev0"
+version = "0.2.2.dev1"
 requires-python = ">=3.10,<3.13"
 description = "Tokenization Transform for Python"
 license = {text = "Apache-2.0"}
@@ -9,11 +9,6 @@ readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
     { name = "Xuan-Hong Dang", email = "xuan-hong.dang@ibm.com"},
 ]
-dependencies = [
-    "data-prep-toolkit==0.2.2.dev0",
-    "transformers==4.38.2",
-]
-
 
 [project_urls]
 Repository = "https://github.com/IBM/data-prep-kit"
@@ -21,9 +16,14 @@ Issues = "https://github.com/IBM/data-prep-kit/issues"
 Documentation = "https://ibm.github.io/data-prep-kit/"
 "Transform project" = "https://github.com/IBM/data-prep-kit/tree/dev/transforms/universal/tokenization"
 
+dynamic = ["dependencies"]
+
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 
 [project.optional-dependencies]
 dev = [

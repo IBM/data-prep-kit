@@ -59,7 +59,7 @@ or
 **Deploy the latest releases of the data prep toolkit library, all python transforms and all ray transforms**
 
 ```shell
-pip3 install data-prep-toolkit-transforms-ray
+pip3 install data-prep-toolkit-transforms[ray]
 ```
 
 ## Running transforms 

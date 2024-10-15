@@ -8,7 +8,7 @@ on:
             - "releases/**"
 jobs:
     deploy:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         env:
             REPO_URL: "https://github.com/${{ github.repository }}"
             REPO_BRANCH: "dev"

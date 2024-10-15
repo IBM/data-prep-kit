@@ -16,13 +16,17 @@ allows intermediate publishing from the main branch using version X.Y.Z.dev\<N\>
 1. Building and publishing is done manually, or soon via a git action, in the branch created by `scripts/release-branch.sh`. 
    1. Wheels can only be published once to pypi for a given version.
    1. Transform and kfp images may be republished to the docker registry.
+1. Releases done via the `release-branch.sh` script will have their micro version number set to 0 (e.g., 1.2.0)
+1. Intermediate releases that bump the micro version may be done by individual transforms. This can mean
+that version X.Y.Z of a transform is equivalent to the X.Y+1.0 release.  The latter created when running
+the `release-branch.sh` script.
    
 ## Cutting the release
 Creating the release involves
 
-1. Edit the `release-notes.md` to list major/minor changes
+1. Editing the `release-notes.md` to list major/minor changes and commit to the main branch.
 1. Creating a release branch and updating the main branch versions (using `release-branch.sh`).
-1. Creating a github release and tag from the release branch.
+1. Creating a github release and tag from the release branch using the github web UI.
 1. Building and publishing pypi library wheels and docker registry image.
 
 Each is discussed below.
@@ -36,19 +40,21 @@ Commit this to the main branch so it is ready for including in the release branc
 The `scripts/release-branch.sh` is currently run manually to create the branch and tags as follows:
 
 1. Creates the `releases/vX.Y.Z` from the main branch where `X.Y.Z` are defined in .make.versions
-1. Creates the `vX.Y.Z` branch for PR'ing back into the `releases/vX.Y.Z` branch. 
-1. In the new `vX.Y.Z` branch 
+1. Creates the `pending-releases/vX.Y.Z` branch for PR'ing back into the `releases/vX.Y.Z` branch. 
+1. In the new `pending-releases/vX.Y.Z` branch 
     1. Nulls out the version suffix in the new branch's `.make.version` file. 
     1. Applies the unsuffixed versions to the artifacts published from the repo using `make set-versions`..
     1. Commits and pushes branch 
 1. Creates the `pending-version-change/vX.Y.Z` branch for PR'ing back into the main branch.
+    * Note: this branch is named with the new release version (i.e. vX.Y.Z), however
+      the version in this branch is actually X.Y+1.0.dev0.
 1. In the `pending-version-change/vX.Y.Z` branch
     1. Increments the minor version (i.e. Z+1) and resets the suffix to `dev0` in `.make.versions`.
     1. Commits and pushes branch 
 
 To double-check the version that will be published from the release,
 ```
-git checkout vX.Y.Z 
+git checkout pending-releases/vX.Y.Z 
 make show-version
 ```
 This will print for example, 1.2.3. 
@@ -60,7 +66,7 @@ scripts/release-branch.sh
 ```
 
 After running the script, you should
-1. Create a pull request from branch `vX.Y.Z` into the `releases/vX.Y.Z` branch, and merge.
+1. Create a pull request from branch `pending-releases/vX.Y.Z` into the `releases/vX.Y.Z` branch, and merge.
 2. Use the github web UI to create a git release and tag of the `releases/vX.Y.Z` branch
 3. Create a pull request from branch `pending-version-change/vX.Y.Z` into the main branch, and merge. 
 

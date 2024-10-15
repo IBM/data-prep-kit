@@ -1,7 +1,7 @@
 [project]
 name = "dpk_license_select_transform_ray"
-version = "0.2.1.dev0"
-requires-python = ">=3.10"
+version = "0.2.2.dev1"
+requires-python = ">=3.10,<3.13"
 description = "License Select Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
@@ -10,8 +10,8 @@ authors = [
     { name = "Mark Lewis", email = "mark_lewis@uk.ibm.com" },
 ]
 dependencies = [
-    "dpk-license-select-transform-python==0.2.1.dev0",
-    "data-prep-toolkit-ray==0.2.1.dev0",
+    "dpk-license-select-transform-python==0.2.2.dev1",
+    "data-prep-toolkit-ray==0.2.2.dev1",
 ]
 
 [build-system]

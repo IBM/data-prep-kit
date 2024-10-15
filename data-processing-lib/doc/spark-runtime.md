@@ -41,9 +41,11 @@ of this parameter:
 
 ## Transforms
 
-* [SparkTransformRuntimeConfiguration](../spark/src/data_processing_spark/transform/runtime_configuration.py) allows
-    to configure transform to use PySpark
-
+* [SparkTransformRuntimeConfiguration](../spark/src/data_processing_spark/runtime/spark/runtime_configuration.py)
+  allows to configure transform to use PySpark. In addition to its base class
+  [TransformRuntimeConfiguration](../python//src/data_processing/runtime/runtime_configuration.py) features,
+  this class includes `get_bcast_params()` method to get very large configuration settings. Before starting the
+  transform execution, the Spark runtime will broadcast these settings to all the workers.
 
 ## Runtime
 

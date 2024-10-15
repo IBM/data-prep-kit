@@ -1,6 +1,6 @@
 [project]
 name = "dpk_fdedup_transform_ray"
-version = "0.2.2.dev0"
+version = "0.2.2.dev1"
 requires-python = ">=3.10,<3.13"
 description = "fdedup Ray Transform"
 license = {text = "Apache-2.0"}
@@ -10,11 +10,11 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit-ray==0.2.2.dev0",
-    "mmh3==4.1.0",
+    "data-prep-toolkit-ray==0.2.2.dev1",
+    "mmh3>=4.1.0",
     "xxhash==3.4.1",
     "tqdm==4.66.3",
-    "scipy==1.12.0"
+    "scipy>=1.12.0, <2.0.0"
 ]
 
 [build-system]
