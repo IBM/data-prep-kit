@@ -18,7 +18,7 @@ from datetime import datetime
 
 import yaml
 from data_processing.data_access import DataAccessFactoryBase
-from data_processing.transform import TransformStatistics
+from data_processing.transform import TransformStatistics, AbstractFolderTransform
 from data_processing.utils import GB, get_logger
 from data_processing_spark.runtime.spark import (
     SparkTransformExecutionConfiguration,
@@ -117,7 +117,10 @@ def orchestrate(
         runtime = runtime_conf.create_transform_runtime()
         # create file processor
         file_processor = SparkTransformFileProcessor(
-            data_access_factory=d_access_factory, runtime_configuration=runtime_conf, statistics=statistics
+            data_access_factory=d_access_factory,
+            runtime_configuration=runtime_conf,
+            statistics=statistics,
+            is_folder=is_folder,
         )
         first = True
         for f in iterator:
@@ -144,13 +147,20 @@ def orchestrate(
         return list(statistics.get_execution_stats().items())
 
     num_partitions = 0
+    is_folder = issubclass(runtime_config.get_transform_class(), AbstractFolderTransform)
     try:
-        # Get files to process
-        files, profile, retries = data_access.get_files_to_process()
-        if len(files) == 0:
-            logger.error("No input files to process - exiting")
-            return 0
-        logger.info(f"Number of files is {len(files)}, source profile {profile}")
+        if is_folder:
+            # folder transform
+            runtime = runtime_config.create_transform_runtime()
+            files = runtime.get_folders(data_access=data_access)
+            logger.info(f"Number of folders is {len(files)}")        # Get files to process
+        else:
+            # Get files to process
+            files, profile, retries = data_access.get_files_to_process()
+            if len(files) == 0:
+                logger.error("No input files to process - exiting")
+                return 0
+            logger.info(f"Number of files is {len(files)}, source profile {profile}")
         # process data
         logger.debug("Begin processing files")
         # process files split by partitions

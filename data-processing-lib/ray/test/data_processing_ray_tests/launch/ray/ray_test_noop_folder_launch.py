@@ -16,7 +16,7 @@ from data_processing.test_support.launch.transform_test import (
     AbstractTransformLauncherTest,
 )
 from data_processing_ray.runtime.ray import RayTransformLauncher
-from data_processing_ray.test_support.transform import NOOPRayTransformConfiguration
+from data_processing_ray.test_support.transform import NOOPFolderRayTransformConfiguration
 
 
 class TestRayNOOPTransform(AbstractTransformLauncherTest):
@@ -28,6 +28,6 @@ class TestRayNOOPTransform(AbstractTransformLauncherTest):
     def get_test_transform_fixtures(self) -> list[tuple]:
         basedir = "../../../../test-data/data_processing/ray/noop/"
         basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), basedir))
-        launcher = RayTransformLauncher(NOOPRayTransformConfiguration())
+        launcher = RayTransformLauncher(NOOPFolderRayTransformConfiguration())
         fixtures = [(launcher, {"noop_sleep_sec": 0, "run_locally": True}, basedir + "/input", basedir + "/expected")]
         return fixtures
