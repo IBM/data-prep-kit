@@ -27,33 +27,52 @@ class Html2ParquetTransform(AbstractBinaryTransform):
         super().__init__(config)
 
         self.output_format = config.get(html2parquet_output_format_key, html2parquet_output_format.MARKDOWN)
+        self.favor_precision = config.get(html2parquet_favor_precision_key, html2parquet_favor_precision.TRUE)
+        self.favor_recall = config.get(html2parquet_favor_recall_key, html2parquet_favor_recall.TRUE)
+
         if not isinstance(self.output_format, html2parquet_output_format):
             self.output_format = html2parquet_output_format[self.output_format]  
 
+        if not isinstance(self.favor_precision, html2parquet_favor_precision):
+            self.favor_precision = html2parquet_favor_precision[self.favor_precision]
+
+        if not isinstance(self.favor_recall, html2parquet_favor_recall):
+            self.favor_recall = html2parquet_favor_recall[self.favor_recall]  
+
     def _convert_html2parquet(self, member_filename:str, file_name:str, content_bytes: bytes) -> dict:
+
         title = member_filename if member_filename else TransformUtils.get_file_basename(file_name)
         
+        output_format_value = str(self.output_format)
+        if output_format_value not in ["markdown", "txt"]:
+            raise RuntimeError(f"Unknown output_format {self.output_format}.")
+
+        if self.favor_precision == html2parquet_favor_precision.TRUE:
+            favor_precision_value = True
+        elif self.favor_precision == html2parquet_favor_precision.FALSE:
+            favor_precision_value = False
+        else: 
+            raise RuntimeError(f"Unknown favor_precision {self.favor_precision}.")
+
+        if self.favor_recall == html2parquet_favor_recall.TRUE:
+            favor_recall_value = True
+        elif self.favor_recall == html2parquet_favor_recall.FALSE:
+            favor_recall_value = False
+        else: 
+            raise RuntimeError(f"Unknown favor_recall {self.favor_recall}.")
+
+        
         # Use Trafilatura library
-        if self.output_format == html2parquet_output_format.MARKDOWN:
-            content_string = trafilatura.extract(content_bytes, 
-                output_format="markdown",
-                include_tables=True, 
-                include_images=True,
-                include_links=True,
-                include_formatting=True,
-                favor_precision=True,
-                favor_recall=True)
-        elif self.output_format == html2parquet_output_format.TEXT:
-            content_string = trafilatura.extract(content_bytes, 
-                output_format="txt",
-                include_tables=True, 
-                include_images=True,
-                include_links=True,
-                include_formatting=True,
-                favor_precision=True,
-                favor_recall=True)
-        else:
-            raise RuntimeError(f"Uknown output_format {self.output_format}.")
+        content_string = trafilatura.extract(
+            content_bytes,
+            output_format=output_format_value,
+            include_tables=True,
+            include_images=True,
+            include_links=True,
+            include_formatting=True,
+            favor_precision=favor_precision_value,
+            favor_recall=favor_recall_value
+        )
 
 
         if content_string is None:
@@ -130,16 +149,38 @@ logger = get_logger(__name__)
 short_name = "html2parquet"
 cli_prefix = f"{short_name}_"
 html2parquet_output_format_key = f"output_format"
+html2parquet_favor_precision_key = f"favor_precision"
+html2parquet_favor_recall_key = f"favor_recall"
+
 
 class html2parquet_output_format(str, enum.Enum):
     MARKDOWN = "markdown"
-    TEXT = "text"
+    TEXT = "txt"
+
+    def __str__(self):
+        return str(self.value)
+class html2parquet_favor_precision(str, enum.Enum):
+    TRUE = True
+    FALSE = False
+
+    def __str__(self):
+        return str(self.value)
+
+class html2parquet_favor_recall(str, enum.Enum):
+    TRUE = True
+    FALSE = False
 
     def __str__(self):
         return str(self.value)
 
 html2parquet_output_format_default = html2parquet_output_format.MARKDOWN
+html2parquet_favor_precision_default = html2parquet_favor_precision.TRUE
+html2parquet_favor_recall_default = html2parquet_favor_recall.TRUE
+
+
 html2parquet_output_format_cli_param = f"{cli_prefix}{html2parquet_output_format_key}"
+html2parquet_favor_precision_cli_param = f"{cli_prefix}{html2parquet_favor_precision_key}"
+html2parquet_favor_recall_cli_param = f"{cli_prefix}{html2parquet_favor_recall_key}"
 
 
 class Html2ParquetTransformConfiguration(TransformConfiguration):
@@ -148,14 +189,33 @@ class Html2ParquetTransformConfiguration(TransformConfiguration):
             name=short_name,
             transform_class=Html2ParquetTransform,
         )
+
     def add_input_params(self, parser: ArgumentParser) -> None:
         parser.add_argument(
             f"--{html2parquet_output_format_cli_param}",
             type=html2parquet_output_format,
             choices=list(html2parquet_output_format),
             help="Output format for the contents column.",
-            default=html2parquet_output_format.MARKDOWN,
-        ) 
+            default=html2parquet_output_format.MARKDOWN
+        )
+    
+        parser.add_argument(
+            f"--{html2parquet_favor_precision_cli_param}",
+            type=html2parquet_favor_precision,
+            choices=list(html2parquet_favor_precision),
+            help="Prefers less content but more accurate extraction.",
+            default=html2parquet_favor_precision.TRUE
+        )
+
+        parser.add_argument(
+            f"--{html2parquet_favor_recall_cli_param}",
+            type=html2parquet_favor_recall,
+            choices=list(html2parquet_favor_recall),
+            help="Extracts more content when uncertain.",
+            default=html2parquet_favor_recall.TRUE
+        )
+
+
 
     def apply_input_params(self, args: Namespace) -> bool:
         captured = CLIArgumentProvider.capture_parameters(args, cli_prefix, False)
