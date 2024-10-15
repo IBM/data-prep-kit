@@ -14,20 +14,19 @@ import os
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
-
 from workflow_support.compile_utils import ONE_HOUR_SEC, ONE_WEEK_SEC, ComponentUtils
 
 
-task_image = "{{ transform_image }}"
+task_image = "quay.io/dataprep1/data-prep-kit/html2parquet-ray:latest"
 
 # the name of the job script
-EXEC_SCRIPT_NAME: str = "{{ script_name }}"
+EXEC_SCRIPT_NAME: str = "html2parquet_transform_ray.py"
 
 # components
-base_kfp_image = "{{ kfp_base_image }}"
+base_kfp_image = "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
 
 # path to kfp component specifications files
-component_spec_path = "{{ component_spec_path }}"
+component_spec_path = "../../../../kfp/kfp_ray_components/"
 
 # compute execution parameters. Here different transforms might need different implementations. As
 # a result, instead of creating a component we are creating it in place here.
@@ -41,9 +40,8 @@ def compute_exec_params_func(
     runtime_pipeline_id: str,
     runtime_job_id: str,
     runtime_code_location: dict,
-    {%- for pipeline_argument in pipeline_arguments %}
-    {{ pipeline_argument.name }}: {{ pipeline_argument.type }},
-    {%- endfor %}
+    data_files_to_use: str,
+    html2parquet_output_format: str,
 ) -> dict:
     from runtime_utils import KFPUtils
 
@@ -57,9 +55,8 @@ def compute_exec_params_func(
         "runtime_pipeline_id": runtime_pipeline_id,
         "runtime_job_id": runtime_job_id,
         "runtime_code_location": str(runtime_code_location),
-        {%- for pipeline_argument in pipeline_arguments %}
-        "{{ pipeline_argument.name }}": {{ pipeline_argument.name }},
-        {%- endfor %}
+        "data_files_to_use": data_files_to_use,
+        "html2parquet_output_format": html2parquet_output_format,
     }
 
 
@@ -94,48 +91,45 @@ execute_ray_jobs_op = comp.load_component_from_file(component_spec_path + "execu
 cleanup_ray_op = comp.load_component_from_file(component_spec_path + "deleteRayClusterComponent.yaml")
 
 # Task name is part of the pipeline name, the ray cluster name and the job name in DMF.
-TASK_NAME: str = "{{ pipeline_name }}"
+TASK_NAME: str = "html2parquet"
 
 
 @dsl.pipeline(
     name=TASK_NAME + "-ray-pipeline",
-    description="{{ pipeline_description }}",
+    description="Pipeline for html2parquet task",
 )
-def {{ pipeline_name }}(
+def html2parquet(
     # Ray cluster
-    ray_name: str = "{{ pipeline_name }}-kfp-ray",  # name of Ray cluster
+    ray_name: str = "html2parquet-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
-    {%- if image_pull_secret != "" %}
-    ray_head_options: dict = {"cpu": 1, "memory": 4, "image_pull_secret": "{{ image_pull_secret }}", "image": task_image},
-    ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "{{ image_pull_secret }}", "image": task_image},
-    {%- else %}
     ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image},
-    ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image},
-    {%- endif %}
+    ray_worker_options: dict = {
+        "replicas": 2,
+        "max_replicas": 2,
+        "min_replicas": 2,
+        "cpu": 2,
+        "memory": 4,
+        "image": task_image,
+    },
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
-    {%- if multi_s3 == False %}
-    data_s3_config: str = "{'input_folder': '{{ input_folder }}', 'output_folder': '{{ output_folder }}'}",
-    {%- else %}
-    data_s3_config: str = ["{'input_folder': '{{ input_folder }}', 'output_folder': '{{ output_folder }}'}"],
-    {%- endif %}
-    data_s3_access_secret: str = "{{ s3_access_secret }}",
+    data_s3_config: str = "{'input_folder': 'test/html2parquet/input/', 'output_folder': 'test/html2parquet/output/'}",
+    data_s3_access_secret: str = "s3-secret",
     data_max_files: int = -1,
     data_num_samples: int = -1,
     data_checkpointing: bool = False,
     # orchestrator
-    runtime_actor_options: dict = {'num_cpus': 0.8},
+    runtime_actor_options: dict = {"num_cpus": 0.8},
     runtime_pipeline_id: str = "pipeline_id",
-    runtime_code_location: dict = {'github': 'github', 'commit_hash': '12345', 'path': 'path'},
-    # {{ pipeline_name }} parameters
-    {%- for pipeline_argument in pipeline_arguments %}
-    {{ pipeline_argument.name }}: {{ pipeline_argument.type }}{% if pipeline_argument.value is defined %}{% if pipeline_argument.type == "int" %} = {{ pipeline_argument.value }}{% else %} = "{{ pipeline_argument.value }}"{% endif %}{% endif %},
-    {%- endfor %}
+    runtime_code_location: dict = {"github": "github", "commit_hash": "12345", "path": "path"},
+    # html2parquet parameters
+    data_files_to_use: str = "['.html', '.zip']",
+    html2parquet_output_format: str = "markdown",
     # additional parameters
     additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5, "delete_cluster_delay_minutes": 0}',
 ):
     """
-    Pipeline to execute {{ pipeline_name }} transform
+    Pipeline to execute html2parquet transform
     :param ray_name: name of the Ray cluster
     :param ray_head_options: head node options, containing the following:
         cpu - number of cpus
@@ -167,13 +161,14 @@ def {{ pipeline_name }}(
     :param runtime_actor_options - actor options
     :param runtime_pipeline_id - pipeline id
     :param runtime_code_location - code location
-    {%- for pipeline_argument in pipeline_arguments %}
-    :param {{ pipeline_argument.name }} - {{ pipeline_argument.description }}
-    {%- endfor %}
+    :param data_files_to_use - # file extensions to use for processing
+    :param html2parquet_output_format - # Output format for the contents column.
     :return: None
     """
     # create clean_up task
-    clean_up_task = cleanup_ray_op(ray_name=ray_name, run_id=run_id, server_url=server_url, additional_params=additional_params)
+    clean_up_task = cleanup_ray_op(
+        ray_name=ray_name, run_id=run_id, server_url=server_url, additional_params=additional_params
+    )
     ComponentUtils.add_settings_to_component(clean_up_task, ONE_HOUR_SEC * 2)
     # pipeline definition
     with dsl.ExitHandler(clean_up_task):
@@ -188,9 +183,8 @@ def {{ pipeline_name }}(
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,
-            {%- for pipeline_argument in pipeline_arguments %}
-            {{ pipeline_argument.name }}={{ pipeline_argument.name }},
-            {%- endfor %}
+            data_files_to_use=data_files_to_use,
+            html2parquet_output_format=html2parquet_output_format,
         )
 
         ComponentUtils.add_settings_to_component(compute_exec_params, ONE_HOUR_SEC * 2)
@@ -219,6 +213,7 @@ def {{ pipeline_name }}(
         ComponentUtils.set_s3_env_vars_to_component(execute_job, data_s3_access_secret)
         execute_job.after(ray_cluster)
 
+
 if __name__ == "__main__":
     # Compiling the pipeline
-    compiler.Compiler().compile({{ pipeline_name }}, __file__.replace(".py", ".yaml"))
+    compiler.Compiler().compile(html2parquet, __file__.replace(".py", ".yaml"))
