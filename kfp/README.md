@@ -18,6 +18,7 @@
 | universal/noop                      |                     [noop_wf.py](../transforms/universal/noop/kfp_ray/noop_wf.py)                      |
 | universal/profiler                  |                     [profiler_wf.py](../transforms/universal/profiler/kfp_ray/profiler_wf.py)          |
 | universal/tokenization              |         [tokenization_wf.py](../transforms/universal/tokenization/kfp_ray/tokenization_wf.py)          |
+| universal/hap              |         [hap_wf.py](../transforms/universal/hap/kfp_ray/hap_wf.py)          |
 
 
 ## Set up and working steps
