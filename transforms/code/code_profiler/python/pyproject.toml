@@ -9,7 +9,6 @@ authors = [
     { name = "Pankaj Thorat", email = "pankaj.thorat@ibm.com" },
 ]
 
-[tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
 [build-system]
