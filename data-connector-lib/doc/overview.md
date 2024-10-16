@@ -10,6 +10,20 @@ Features:
 - Mime type filters: You can restrict mime types which can be downloaded.
 - Parallel processing: Requests to websites are processed in parallel.
 
+## How to install
+
+### From PyPI
+
+```sh
+pip install data-prep-connector
+```
+
+### From Github
+
+```sh
+pip install git+https://github.com/IBM/data-prep-kit.git@dev#subdirectory=data-connector-lib
+```
+
 ## Example usage
 
 ```python
