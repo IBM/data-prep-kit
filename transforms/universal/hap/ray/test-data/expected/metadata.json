@@ -1,0 +1,50 @@
+{
+  "pipeline": "pipeline_id",
+  "job details": {
+    "job category": "preprocessing",
+    "job name": "hap",
+    "job type": "pure python",
+    "job id": "job_id",
+    "start_time": "2024-10-03 21:38:20",
+    "end_time": "2024-10-03 21:38:29",
+    "status": "success"
+  },
+  "code": {
+    "github": "github",
+    "commit_hash": "12345",
+    "path": "path"
+  },
+  "job_input_params": {
+    "model_name_or_path": "ibm-granite/granite-guardian-hap-38m",
+    "annotation_column": "hap_score",
+    "doc_text_column": "contents",
+    "inference_engine": "CPU",
+    "max_length": 512,
+    "batch_size": 128,
+    "checkpointing": false,
+    "max_files": -1,
+    "random_samples": -1,
+    "files_to_use": [
+      ".parquet"
+    ],
+    "num_processors": 0
+  },
+  "job_output_stats": {
+    "source_files": 2,
+    "source_size": 12124594,
+    "transform execution exception": 1,
+    "result_files": 1,
+    "result_size": 79822,
+    "processing_time": 6.932,
+    "source_doc_count": 50,
+    "result_doc_count": 50
+  },
+  "source": {
+    "name": "/Users/ian/Desktop/data-prep-kit/transforms/universal/hap/python/test-data/input",
+    "type": "path"
+  },
+  "target": {
+    "name": "/Users/ian/Desktop/data-prep-kit/transforms/universal/hap/python/output",
+    "type": "path"
+  }
+}

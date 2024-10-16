@@ -1,0 +1,17 @@
+To find the package related nodes, I need to find which nodes correspond to incorporating external libraries in the code. I will look at the higher level nodes. Hence, I can see that the 'import_declaration' nodes with ids = [1, 15], represent importing packages in the code. Incorporating each of these nodes, I can make a general rule to extract the package(s).
+
+This python script can be executed:
+
+```py
+# as every node has the keyword 'import' and the package is present after that, we take the snippet after the keyword
+text = code_snippet.split('import', 1)[1].strip()
+# remove semicolons and other non-text characters from the end
+text = text.rstrip(';')
+# get the text before the colon, if present
+if (':' in text):
+    text = text.split(':')[0].strip()
+# return the package
+extracted = text
+```
+
+This script will extract the package names from the given AST nodes. It first removes the 'import' keyword and then strips any leading or trailing whitespace. If the snippet contains a colon (:), it splits the text at the colon and takes the first part, which is the package name. Finally, it removes any semicolons or other non-text characters from the end of the package name.

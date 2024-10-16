@@ -1,0 +1,5 @@
+import 'package:lib2/lib2.dart' as lib2;
+import 'package:lib1/lib1.dart';
+import 'package:lib1/lib1.dart' show foo;
+import 'package:lib2/lib2.dart' hide foo;
+import 'package:greetings/hello.dart' deferred as hello;

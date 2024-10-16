@@ -1,0 +1,1 @@
+a+b-b  -- you cannot delete (b-b) because the operations are not associative

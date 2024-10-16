@@ -1,0 +1,12 @@
+#include <iostream>
+/*
+this 
+is
+a
+comment
+*/
+// this is a comment
+int main() {
+    printf("hello world");
+    return 0;
+}

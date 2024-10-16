@@ -1,0 +1,22 @@
+function f_ASCII_2_HEX (
+    r_ASCII_IN : in std_logic_vector(7 downto 0))
+    return std_logic_vector is
+    variable v_TEMP : std_logic_vector(3 downto 0);
+  begin
+    if (r_ASCII_IN = X"41" or r_ASCII_IN = X"61") then
+      v_TEMP := X"A";
+    elsif (r_ASCII_IN = X"42" or r_ASCII_IN = X"62") then
+      v_TEMP := X"B";
+    elsif (r_ASCII_IN = X"43" or r_ASCII_IN = X"63") then
+      v_TEMP := X"C";
+    elsif (r_ASCII_IN = X"44" or r_ASCII_IN = X"64") then
+      v_TEMP := X"D";
+    elsif (r_ASCII_IN = X"45" or r_ASCII_IN = X"65") then
+      v_TEMP := X"E";
+    elsif (r_ASCII_IN = X"46" or r_ASCII_IN = X"66") then
+      v_TEMP := X"F";
+    else
+      v_TEMP := r_ASCII_IN(3 downto 0);  
+    end if;
+    return std_logic_vector(v_TEMP);
+  end;

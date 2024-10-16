@@ -1,0 +1,8 @@
+public class main {
+    public static void foo(int x){
+        System.out.println("hello world");
+    }
+    public static void main(String[] args) {
+        foo(3);
+    }
+}

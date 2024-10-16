@@ -1,0 +1,14 @@
+void swap(int *x, int *y)
+{
+  int temp;
+   
+  // temp gets the value pointed by x
+  temp = *x; 
+     
+  // x gets the value pointed by y 
+  *x = *y;   
+     
+  // y gets the value stored in temp
+  *y = temp; 
+}
+ 

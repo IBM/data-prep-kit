@@ -1,0 +1,37 @@
+name: Execute Ray Job
+description: Executes Ray Job
+
+inputs:
+    - { name: ray_name, type: String, description: "Ray name" }
+    - { name: run_id, type: String, description: "The KFP Run ID" }
+    - { name: additional_params, type: String, description: "additional parameters" }
+    # The component converts the dictionary to json string
+    - { name: exec_params, type: JsonObject, description: "job parameters" }
+    - { name: exec_script_name, type: String, description: "transform script name" }
+    - { name: server_url, type: String, default: "", description: "url of api server" }
+
+implementation:
+    container:
+        image: "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
+        # command is a list of strings (command-line arguments).
+        # The YAML language has two syntaxes for lists and you can use either of them.
+        # Here we use the "flow syntax" - comma-separated strings inside square brackets.
+        command: [
+                python,
+                # Force the stdout and stderr streams to be unbuffered
+                -u,
+                # Path of the program inside the container
+                /pipelines/component/src/execute_ray_job.py,
+                --ray_name,
+                { inputValue: ray_name },
+                --run_id,
+                { inputValue: run_id },
+                --exec_params,
+                { inputValue: exec_params },
+                --additional_params,
+                { inputValue: additional_params },
+                --exec_script_name,
+                { inputValue: exec_script_name },
+                --server_url,
+                { inputValue: server_url },
+            ]

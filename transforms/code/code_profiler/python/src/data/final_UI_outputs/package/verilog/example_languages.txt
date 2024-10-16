@@ -1,0 +1,2 @@
+['java']
+max_depth = 1

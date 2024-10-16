@@ -1,0 +1,30 @@
+Definitions:
+* AST: Abstract Syntax Tree of a given code, which includes node-related code snippets.
+* code_snippet: The actual text of the whole code. 
+* function definition: The name of the function which is defined
+
+You are given a task of extracting function definitions in a code from a provided Abstract Syntax Tree(AST) of the code, along with its given code snippet.
+Example: 'fn add2(x, y): x+ y', refers to defining the function 'add2' with arguments 'x' and 'y', in which the body represents 'x + y'. We want to extract the function name, in this case, 'add2'. 
+Follow the given instructions carefully:
+
+Instructions:
+* Do not include brackets in the function name.
+* Generally, dont find snippet after a keyword, look for strings before the argument list gen
+* Stick to higher level nodes. For example, a node for which the snippet is 'fn add2(x, y): x+ y', might have subnodes which have snippets 'x' and 'x + y'. Trivially, you can just extract from the node which contains the relevant information. Do not identify such nodes, for which the string like 'fn add2(x, y): x+ y' is only a part of the snippet, i.e. ancestors of such nodes.
+* Identify the nodes relevant to the identifying the function definition, using the previous instruction. Identify by seeing which nodes indicate a user defined function. 
+* Identify the relevant code snippet, do so by extracting the 'code_snippet' field of the node.
+* Along with this, you will generate the rule, which is a python script, you made to extract such feature. Your rules should be general and should extract the function name from each type of nodes that are present. 
+* For example, to get the relevant function name from 'fn add2 (x, y): x+ y', you can extract it through a python script: 
+    ```py
+    # we find that the function definition is before the first '(' 
+    text = code_snippet.split('(')[0].strip()
+    # as the function name would be the last keyword, we split by ' ' and remove extra spaces to get the function name 
+    extracted = text.split(' ')[-1].strip()
+    ```
+* Another example, to get the relevant function name from 'func bool f_name(x) { print(x)}', you can extract it through a python script:
+```py
+    # we find that the function definition is before the first '(' 
+    text = code_snippet.split('(')[0].strip()
+    # as the function name would be the last keyword, we split by ' ' and remove extra spaces to get the function name 
+    extracted = text.split(' ')[-1].strip()
+    ```

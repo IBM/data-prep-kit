@@ -1,0 +1,14 @@
+To find the function definition related nodes, I will look at the higher level nodes. Hence, I can see that the 'function_definition' nodes with ids = [13, 27], represent definition of functions in the code. Incorporating each of these nodes, I can make a general rule to extract the definitions.
+
+This python script can be executed:
+
+```py
+# we see that the function name is directly after the 'def' keyword, hence we get the snippet just after 'def' and before the first '(' or ':' 
+temp_0 = code_snippet.split('def')[1].strip() 
+temp_1 = temp_0.split('(')[0].strip() 
+temp_2 = temp_1.split(':')[0].strip() 
+# as our required function name, from the snippet is the whole string, we get the function.
+extracted = temp_2
+```
+
+This script will extract the function names 'abs' and 'absMin' from the given code snippet.

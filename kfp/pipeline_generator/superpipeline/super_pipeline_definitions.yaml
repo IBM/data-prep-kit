@@ -1,0 +1,79 @@
+super_pipeline_metadata:
+    name: "sample-super-kubeflow-pipeline"
+    description: "Pipeline to show how to run combine several transformer pipelines"
+
+super_pipeline_tasks:
+    - name: "doc_id"
+      pipeline_name: "doc_id_wf"
+      image: "quay.io/dataprep1/data-prep-kit/doc_id-ray:latest`"
+    - name: "ededup"
+      pipeline_name: "ededup_wf"
+      image: "quay.io/dataprep1/data-prep-kit/ededup-ray:latest"
+
+super_pipeline_common_parameters:
+    - name: "input_parent_path"
+      type: "str"
+      value: "test/doc_id/input/"
+      description: ""
+    - name: "output_parent_path"
+      type: "str"
+      value: "test/super/output/"
+      description: ""
+    - name: "parent_path_suffix"
+      type: "str"
+      value: ""
+      description: ""
+    - name: "data_s3_access_secret"
+      type: "str"
+      value: "s3-secret"
+      description: ""
+
+doc_id_step_parameters:
+    step_parameters:
+        - name: "skip"
+          type: "bool"
+          value: False
+          description: ""
+        - name: "doc_id_doc_column"
+          type: "str"
+          value: "contents"
+          description: ""
+        - name: "doc_id_hash_column"
+          type: "str"
+          value: "hash_column"
+          description: ""
+        - name: "doc_id_int_column"
+          type: "str"
+          value: "int_id_column"
+          description: ""
+        - name: "doc_id_start_id"
+          type: "int"
+          value: 0
+          description: ""
+
+ededup_step_parameters:
+    step_parameters:
+        - name: "skip"
+          type: "bool"
+          value: False
+          description: ""
+        - name: "ededup_doc_column"
+          type: "str"
+          value: "contents"
+          description: ""
+        - name: "ededup_hash_cpu"
+          type: "float"
+          value: 0.5
+          description: ""
+        - name: "ededup_n_samples"
+          type: "int"
+          value: 10
+          description: ""
+        - name: "ededup_use_snapshot"
+          type: "bool"
+          value: False
+          description: ""
+        - name: "ededup_snapshot_directory"
+          type: "str"
+          value: None
+          description: ""

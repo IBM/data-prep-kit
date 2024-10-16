@@ -1,0 +1,69 @@
+# Default values for kuberay-apiserver.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+# See https://github.com/ray-project/kuberay/blob/master/helm-chart/kuberay-apiserver/values.yaml
+
+replicaCount: 1
+
+name: "kuberay-apiserver"
+image:
+    repository: quay.io/kuberay/apiserver
+    tag: nightly
+    pullPolicy: IfNotPresent
+
+## Install Default RBAC roles and bindings
+rbac:
+    create: true
+    apiVersion: v1
+
+serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: "kuberay-apiserver"
+
+containerPort:
+    - name: http
+      containerPort: 8888
+      protocol: TCP
+    - name: grpc
+      containerPort: 8887
+      protocol: TCP
+
+resources:
+    limits:
+        cpu: 500m
+        memory: 500Mi
+    requests:
+        cpu: 300m
+        memory: 300Mi
+# Only one service type needs to be picked
+service:
+    # ClusterIP service
+    type: ClusterIP
+    ports:
+        - name: http
+          protocol: TCP
+          port: 8888
+          targetPort: 8888
+        - name: rpc
+          protocol: TCP
+          port: 8887
+          targetPort: 8887
+
+# You can only enable an ingress or route, if you are using OpenShift cluster
+# Also note that in order to enable ingress or route you need to use ClusterIP service
+
+ingress:
+    enabled: false
+route:
+    enabled: false
+
+rbacEnable: true
+
+# the chart can be installed by users with permissions to a single namespace only
+singleNamespaceInstall: false
+
+# security definition.
+security:

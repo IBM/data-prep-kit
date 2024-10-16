@@ -1,0 +1,812 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.41">
+    
+    
+      
+        <title>Set up a Kubernetes clusters for KFP execution - Data Prep Kit</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.0253249f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/badge.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#set-up-a-kubernetes-clusters-for-kfp-execution" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Data Prep Kit" class="md-header__button md-logo" aria-label="Data Prep Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Data Prep Kit
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Set up a Kubernetes clusters for KFP execution
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/IBM/data-prep-kit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../data-processing-lib/doc/overview/" class="md-tabs__link">
+        
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../doc/quick-start/quick-start/" class="md-tabs__link">
+          
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Data Prep Kit" class="md-nav__button md-logo" aria-label="Data Prep Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Data Prep Kit
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/IBM/data-prep-kit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../data-processing-lib/doc/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../doc/quick-start/quick-start/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    QuickStart
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../data-processing-lib/doc/simplest-transform-tutorial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Simple
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../data-processing-lib/doc/advanced-transform-tutorial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Advanced
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../simple_transform_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KFP Pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      📝 Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-kind-deployment-supported-platforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      A Kind deployment supported Platforms
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preinstalled-software-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Preinstalled software components
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Preinstalled software components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#kind-deployment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Kind deployment
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#existing-kubernetes-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Existing Kubernetes cluster
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation steps
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Installation steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#installation-on-an-existing-kubernetes-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation on an existing Kubernetes cluster
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clean-up-the-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clean up the cluster
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="set-up-a-kubernetes-clusters-for-kfp-execution">Set up a Kubernetes clusters for KFP execution</h1>
+<h2 id="table-of-contents">📝 Table of Contents</h2>
+<ul>
+<li><a href="#kind_platforms">A Kind deployment supported platforms</a></li>
+<li><a href="#preinstalled">Preinstalled software components</a></li>
+<li><a href="#kind">A Kind deployment</a></li>
+<li><a href="#existing_cluster">An existing cluster</a></li>
+<li><a href="#installation">Installation steps</a></li>
+<li><a href="#installation_existing">Installation on an existing Kubernetes cluster</a></li>
+<li><a href="#cleanup">Clean up the cluster</a></li>
+</ul>
+<p>The project provides instructions and deployment automation to run all components in an all-inclusive fashion on a 
+single machine using a <a href="https://kind.sigs.k8s.io/">Kind cluster</a> and a local data storage (<a href="https://min.io/">MinIO</a>).
+However, this topology is not suitable for processing medium and large datasets, and deployment should be carried out 
+on a real Kubernetes or OpenShift cluster. Therefore, we recommend using Kind cluster for only for local testing and 
+debugging, not production loads. For production loads use a real Kubernetes cluster.</p>
+<p>Running a Kind Kubernetes cluster with Kubeflow pipelines (KFP) and MinIO requires significant
+memory. We recommend deploying it on machines with at least 32 GB of RAM and 8-9 CPU cores. RHEL OS requires 
+more resources, e.g. 64 GB RAM and 32 CPU cores.</p>
+<h2 id="a-kind-deployment-supported-platforms">A Kind deployment supported Platforms <a name = "kind_platforms"></a></h2>
+<p>Executing KFP, MinIO, and Ray on a single Kind cluster pushes the system to its load limits. Therefore, although we are 
+working on extending support for additional platforms, not all platforms/configurations are currently supported.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Operating System</th>
+<th style="text-align: center;">Container Agent</th>
+<th style="text-align: center;">Support</th>
+<th style="text-align: center;">Comments</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">RHEL 7</td>
+<td style="text-align: center;">any</td>
+<td style="text-align: center;">-</td>
+<td style="text-align: center;">Kind <a href="https://github.com/kubernetes-sigs/kind/issues/3311">doesn't support</a> RHEL 7</td>
+</tr>
+<tr>
+<td style="text-align: center;">RHEL 8</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">RHEL 9.4</td>
+<td style="text-align: center;">Docker</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">RHEL 9.4</td>
+<td style="text-align: center;">Podman</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Issues with Ray job executions</td>
+</tr>
+<tr>
+<td style="text-align: center;">Ubuntu 24-04</td>
+<td style="text-align: center;">Docker</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">Ubuntu 24-04</td>
+<td style="text-align: center;">Podman</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">Windows WSL2</td>
+<td style="text-align: center;">Docker</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">Windows WSL2</td>
+<td style="text-align: center;">Podman</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">MacOS amd64</td>
+<td style="text-align: center;">Docker</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">MacOS amd64</td>
+<td style="text-align: center;">Podman</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">MacOS arm64</td>
+<td style="text-align: center;">Docker</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: center;">MacOS arm64</td>
+<td style="text-align: center;">Podman</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Issues with Ray job executions</td>
+</tr>
+</tbody>
+</table>
+<h2 id="preinstalled-software-components">Preinstalled software components <a name = "preinstalled"></a></h2>
+<p>Depending on whether a Kind cluster or an existing Kubernetes cluster is used, different software packages need to be preinstalled.</p>
+<h3 id="kind-deployment">Kind deployment <a name = "kind"></a></h3>
+<p>The following programs should be manually installed:</p>
+<ul>
+<li><a href="https://helm.sh/docs/intro/install/">Helm</a> 3.10.0 or greater must be installed and configured on your machine.</li>
+<li><a href="https://kind.sigs.k8s.io/docs/user/quick-start/#installation">Kind</a> tool for running local Kubernetes clusters 0.14.0 or newer must be installed on your machine.</li>
+<li><a href="https://kubernetes.io/docs/tasks/tools/#kubectl">Kubectl</a> 1.26 or newer must be installed on your machine.</li>
+<li><a href="https://min.io/docs/minio/kubernetes/upstream/index.html">MinIO Client (mc)</a> must be installed on your machine. Please 
+choose your OS system, and process according to "(Optional) Install the MinIO Client". You have to install the <code>mc</code> client only.</li>
+<li><a href="https://git-scm.com/downloads">git client</a>, we use git client to clone installation repository</li>
+<li><a href="https://www.ionos.com/digitalguide/server/configuration/linux-lsof/">lsof</a> usually it is part of Linux or MacOS distribution.</li>
+<li>Container agent such as <a href="https://www.docker.com/">Docker</a> or <a href="https://podman-desktop.io/">Podman</a></li>
+</ul>
+<h3 id="existing-kubernetes-cluster">Existing Kubernetes cluster <a name = "existing_cluster"></a></h3>
+<p>Deployment on an existing cluster requires less pre-installed software
+Only the following programs should be manually installed:</p>
+<ul>
+<li><a href="https://helm.sh/docs/intro/install/">Helm</a> 3.10.0 or greater must be installed and configured on your machine.</li>
+<li><a href="https://kubernetes.io/docs/tasks/tools/#kubectl">Kubectl</a> 1.26 or newer must be installed on your machine, and be 
+able to connect to the external cluster.</li>
+<li>Deployment of the test data requires <a href="https://min.io/docs/minio/kubernetes/upstream/index.html">MinIO Client (mc)</a> Please 
+choose your OS system, and process according to "(Optional) Install the MinIO Client". Only the <code>mc</code> client should be installed.</li>
+</ul>
+<h2 id="installation-steps">Installation steps <a name = "installation"></a></h2>
+<p>Before installation, you have to decide which KFP version do you want to use. 
+In order to use KFP v2, please set the following environment variable:</p>
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KFPv2</span><span class="o">=</span><span class="m">1</span>
+</span></code></pre></div>
+<p>Now, you can create a Kind cluster with all required software installed using the following command: </p>
+<p><div class="language-shell highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w"> </span>make<span class="w"> </span>-C<span class="w"> </span>scripts/k8s-setup<span class="w"> </span>setup
+</span></code></pre></div>
+from this main package directory.
+If you do not want to upload the testing data into the locally deployed Minio, and reduce memory footprint, please set:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">POPULATE_TEST_DATA</span><span class="o">=</span><span class="m">0</span>
+</span></code></pre></div>
+You can access the KFP dashboard at http://localhost:8080/ and the MinIO dashboard at http://localhost:8090/</p>
+<h3 id="installation-on-an-existing-kubernetes-cluster">Installation on an existing Kubernetes cluster <a name = "installation_existing"></a></h3>
+<p>Alternatively you can deploy pipeline to the existing Kubernetes cluster. </p>
+<p>In order to execute data transformers on the remote Kubernetes cluster, the following packages should be installed on the cluster:</p>
+<ul>
+<li><a href="https://www.kubeflow.org/docs/components/pipelines/v1/introduction/">KubeFlow Pipelines</a> (KFP). Currently, we use 
+upstream Argo-based KFP v1.</li>
+<li><a href="https://docs.ray.io/en/latest/cluster/kubernetes/index.html">KubeRay</a> controller and 
+<a href="https://ray-project.github.io/kuberay/components/apiserver/">KubeRay API Server</a> </li>
+</ul>
+<p>You can install the software from their repositories, or you can use our installation scripts.</p>
+<p>Once your local kubectl is configured to connect to the external cluster do the following:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">EXTERNAL_CLUSTER</span><span class="o">=</span><span class="m">1</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>make<span class="w"> </span>-C<span class="w"> </span>scripts/k8s-setup<span class="w"> </span>setup
+</span></code></pre></div></p>
+<ul>
+<li>
+<p>In addition, you should configure external access to the KFP UI (<code>svc/ml-pipeline-ui</code> in the <code>kubeflow</code> ns) and the Ray 
+Server API (<code>svc/kuberay-apiserver-service</code> in the <code>kuberay</code> ns). Depends on your cluster and its deployment it can be 
+LoadBalancer services, Ingresses or Routes. </p>
+</li>
+<li>
+<p>Optionally, you can upload the test data into the <a href="https://min.io/">MinIO</a> Object Store, deployed as part of KFP. In 
+order to do this, please provide external access to the Minio (<code>svc/minio-service</code> in the <code>kubeflow</code> ns) and execute the 
+following commands from the root directory: 
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">MINIO_SERVER</span><span class="o">=</span>&lt;Minio<span class="w"> </span>external<span class="w"> </span>URL&gt;
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>scripts/k8s-setup/s3_secret.yaml
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>scripts/k8s-setup/populate_minio.sh
+</span></code></pre></div></p>
+</li>
+</ul>
+<h2 id="clean-up-the-cluster">Clean up the cluster <a name = "cleanup"></a></h2>
+<p>If you use an external Kubernetes cluster set the <code>EXTERNAL_CLUSTER</code> environment variable.</p>
+<p><div class="language-shell highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">EXTERNAL_CLUSTER</span><span class="o">=</span><span class="m">1</span>
+</span></code></pre></div>
+Now, you can cleanup the external or Kind Kubernetes clusters by running the following command:</p>
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>make<span class="w"> </span>-C<span class="w"> </span>scripts/k8s-setup<span class="w"> </span>clean
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs"], "search": "../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.83f73b43.min.js"></script>
+      
+        <script src="../../../assets/javascripts/badge.js" async></script>
+      
+    
+  </body>
+</html>

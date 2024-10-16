@@ -1,0 +1,24 @@
+Definitions:
+* AST: Abstract Syntax Tree of a given code, which includes node-related code snippets.
+* code_snippet: The actual text of the whole code. 
+* comments: The line(s) of code which does not execute but is present to write extra textual information.
+
+You are given a task of extracting comments in a code from a provided Abstract Syntax Tree(AST) of the code, along with its given code snippet.
+Example: '#| hi\nhow are you? |#' in racket language, refers to a comment saying 'hi\nhow are you?' in the  code file. 
+Follow the given instructions carefully:
+
+Instructions:
+* Do not identify such nodes, for which the comment is only a part of the snippet, i.e. ancestors of a comment node.
+* Identify the nodes relevant to the identifying the comment. Identify by seeing which nodes define comments. 
+* Identify the relevant code snippet, do so by extracting the 'code_snippet' field of the node.
+* Along with this, you will generate the rule, which is a python script, you made to extract such feature. Your rules should be general and should extract the comment from every relevant node present. 
+* For example, to get the relevant comment from '; Hi how are you?' and '#| hi\nhow\nare\nyou?\n|#', you can extract it through a python script: 
+    ```py
+    # if the first character is ';' we can simply remove the first character and get the remaining string
+    if (code_snippet[0] == ';'):
+        extracted = code_snippet[1:].strip()
+
+    # else we can get the remaining string by just removing the first and the last two characters which were '#|' and '|#'
+    else:
+        extracted = code_snippet[2:-2].strip()
+    ```

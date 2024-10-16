@@ -1,0 +1,2 @@
+['cpp', 'py']
+max_depth = 1
