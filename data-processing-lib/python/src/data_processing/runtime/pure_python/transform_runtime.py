@@ -12,7 +12,7 @@
 
 from typing import Any
 
-from data_processing.data_access import DataAccessFactoryBase
+from data_processing.data_access import DataAccessFactoryBase, DataAccess
 from data_processing.transform import TransformStatistics
 
 
@@ -27,6 +27,14 @@ class DefaultPythonTransformRuntime:
         :param params: parameters, often provided by the CLI arguments as defined by a TableTansformConfiguration.
         """
         self.params = params
+
+    def get_folders(self, data_access: DataAccess) -> list[str]:
+        """
+        Get folders to process
+        :param data_access: data access
+        :return: list of folders to process
+        """
+        raise NotImplemented()
 
     def get_transform_config(
         self, data_access_factory: DataAccessFactoryBase, statistics: TransformStatistics, files: list[str]

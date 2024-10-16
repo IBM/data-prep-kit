@@ -13,7 +13,7 @@
 from argparse import ArgumentParser
 from typing import Any
 
-from data_processing.transform import AbstractBinaryTransform
+from data_processing.transform import AbstractTransform
 from data_processing.utils import CLIArgumentProvider
 
 
@@ -23,7 +23,7 @@ class TransformConfiguration(CLIArgumentProvider):
     """
 
     def __init__(
-        self, name: str, transform_class: type[AbstractBinaryTransform], remove_from_metadata: list[str] = []
+        self, name: str, transform_class: type[AbstractTransform], remove_from_metadata: list[str] = []
     ):
         """
         Initialization
@@ -36,7 +36,7 @@ class TransformConfiguration(CLIArgumentProvider):
         self.remove_from_metadata = remove_from_metadata
         self.params = {}
 
-    def get_transform_class(self) -> type[AbstractBinaryTransform]:
+    def get_transform_class(self) -> type[AbstractTransform]:
         """
         Get the class extending AbstractBinaryTransform which implements a specific transformation.
         The class will generally be instantiated with a dictionary of configuration produced by

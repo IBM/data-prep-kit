@@ -1,0 +1,43 @@
+[project]
+name = "data_prep_toolkit"
+version = "0.2.2.dev1"
+keywords = ["data", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
+requires-python = ">=3.10,<3.13"
+description = "Data Preparation Toolkit Library for Ray and Python"
+license = {text = "Apache-2.0"}
+readme = {file = "README.md", content-type = "text/markdown"}
+authors = [
+    { name = "Maroun Touma", email = "touma@us.ibm.com" },
+]
+
+dynamic = ["dependencies", "optional-dependencies"]
+
+[project_urls]
+Repository = "https://github.com/IBM/data-prep-kit"
+Issues = "https://github.com/IBM/data-prep-kit/issues"
+Documentation = "https://ibm.github.io/data-prep-kit/"
+"Transform project" = "https://github.com/IBM/data-prep-kit/tree/dev/transforms/universal/noop"
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic.dependencies]
+file = ["requirements.txt"]
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = { file = ["requirements-dev.txt"]}
+ray = { file = ["requirements-ray.txt"]}
+spark = { file = ["requirements-spark.txt"]}
+
+[tool.setuptools.packages.find]
+where = ["python/src", "ray/src", "spark/src"]
+
+
+[tool.pytest.ini_options]
+# Currently we use low coverage since we have to run tests separately (see makefile)
+#addopts = "--cov --cov-report term-missing --cov-fail-under 25"
+markers = ["unit: unit tests", "integration: integration tests"]
+
+[tool.coverage.run]
+include = ["src/*"]

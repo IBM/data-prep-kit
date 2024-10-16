@@ -14,7 +14,7 @@ from typing import Any
 
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.runtime import AbstractTransformFileProcessor
-from data_processing.transform import AbstractBinaryTransform, TransformStatistics
+from data_processing.transform import AbstractTransform, TransformStatistics
 from data_processing.utils import UnrecoverableException
 
 
@@ -28,7 +28,8 @@ class PythonTransformFileProcessor(AbstractTransformFileProcessor):
         data_access_factory: DataAccessFactoryBase,
         statistics: TransformStatistics,
         transform_params: dict[str, Any],
-        transform_class: type[AbstractBinaryTransform],
+        transform_class: type[AbstractTransform],
+        is_folder: bool,
     ):
         """
         Init method
@@ -36,11 +37,13 @@ class PythonTransformFileProcessor(AbstractTransformFileProcessor):
         :param statistics - reference to statistics class
         :param transform_params - transform parameters
         :param transform_class: transform class
+        :param is_folder: folder transform flag
         """
         # invoke superclass
         super().__init__(
             data_access_factory=data_access_factory,
             transform_parameters=dict(transform_params),
+            is_folder=is_folder,
         )
         self.transform_params["statistics"] = statistics
         # Create local processor
@@ -65,17 +68,20 @@ class PythonPoolTransformFileProcessor(AbstractTransformFileProcessor):
         self,
         data_access_factory: DataAccessFactoryBase,
         transform_params: dict[str, Any],
-        transform_class: type[AbstractBinaryTransform],
+        transform_class: type[AbstractTransform],
+        is_folder: bool
     ):
         """
         Init method
         :param data_access_factory - data access factory
         :param transform_params - transform parameters
         :param transform_class: transform class
+        :param is_folder: folder tranform flag
         """
         super().__init__(
             data_access_factory=data_access_factory,
             transform_parameters=dict(transform_params),
+            is_folder=is_folder,
         )
         # Add data access and statistics to the processor parameters
         self.transform_params["data_access"] = self.data_access

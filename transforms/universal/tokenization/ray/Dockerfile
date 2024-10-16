@@ -13,11 +13,9 @@ COPY --chown=ray:users data-processing-lib-python/ data-processing-lib-python/
 RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/ 
 RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
-COPY --chown=ray:users python-transform/ python-transform 
-RUN cd python-transform && pip install --no-cache-dir -e .
+COPY --chown=ray:users python-transform/ python-transform
+RUN cd python-transform && pip install --no-cache-dir -r requirements.txt && pip install --no-cache-dir -e .
 
-#COPY requirements.txt requirements.txt
-#RUN pip install --no-cache-dir -r  requirements.txt
 
 COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 

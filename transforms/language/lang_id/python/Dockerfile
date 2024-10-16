@@ -25,6 +25,7 @@ USER dpk
 
 COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml 
+COPY --chown=dpk:root requirements.txt requirements.txt
 RUN pip install --no-cache-dir -e .
 
 # clean up apt

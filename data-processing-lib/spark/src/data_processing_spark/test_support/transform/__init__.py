@@ -11,3 +11,4 @@
 ################################################################################
 
 from data_processing_spark.test_support.transform.noop_transform import NOOPSparkTransformConfiguration
+from data_processing_spark.test_support.transform.noop_folder_transform import NOOPFolderSparkTransformConfiguration

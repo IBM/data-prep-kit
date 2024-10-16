@@ -1,5 +1,11 @@
 #!/bin/bash
 
+
+# This ensures that the script exits immediately if any command
+# returns a non-zero status, preventing cases where the GitHub
+# Action running the script might overlook an error if it occurs.
+set -euo pipefail
+
 op=$1
 
 install_tools(){
@@ -25,7 +31,7 @@ test_workflow(){
        local workflow="$1"
 
        echo "Testing $workflow" 
-       DEPLOY_KUBEFLOW=1 make -C $workflow setup                                                                               
+       DEPLOY_KUBEFLOW=1 make -C scripts/k8s-setup setup
        make -C $workflow workflow-test
        echo "Run workflow completed"
 }

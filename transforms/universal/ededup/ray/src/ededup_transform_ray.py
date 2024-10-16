@@ -149,13 +149,12 @@ class EdedupRayRuntime(DefaultRayTransformRuntime):
             statistics.add_stats.remote({"data access retries": retries})
         self.logger.info(f"Found the following snapshot files {files.keys()}")
         # process snapshot files
-        for file in files.keys():
-            # load the file
+        for file in files.values():
+            # convert the file
             try:
-                b_hashes, _ = data_access.get_file(file)
-                snaps = pickle.loads(b_hashes)
+                snaps = pickle.loads(file)
             except Exception as e:
-                self.logger.warning(f"Failed to load hashes from file {file} with exception {e}")
+                self.logger.warning(f"Failed to load hashes with exception {e}")
                 raise UnrecoverableException("failed to load hashes")
             request = [[] for _ in range(len(self.filters))]
             for h in snaps:

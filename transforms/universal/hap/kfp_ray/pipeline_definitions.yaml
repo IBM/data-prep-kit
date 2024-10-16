@@ -1,0 +1,44 @@
+pipeline_parameters:
+    name: "hap"
+    description: "Pipeline for hap task"
+    script_name: "hap_transform_ray.py"
+    prefix: ""
+    multi_s3: False
+    compute_func_name: ""
+    compute_func_import: ""
+    component_spec_path: ""
+
+pipeline_common_input_parameters_values:
+    kfp_base_image: "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
+    transform_image: "quay.io/dataprep1/data-prep-kit/hap-ray:latest"
+    s3_access_secret: "s3-secret"
+    image_pull_secret: ""
+    input_folder: "test/hap/input/"
+    output_folder: "test/hap/output/"
+
+pipeline_transform_input_parameters:
+    pipeline_arguments:
+        - name: "model_name_or_path"
+          type: "str"
+          value: "ibm-granite/granite-guardian-hap-38m"
+          description: "# HAP model path"
+        - name: "annotation_column"
+          type: "str"
+          value: "hap_score"
+          description: "# hap score for each document"
+        - name: "doc_text_column"
+          type: "str"
+          value: "contents"
+          description: "# The column name that contains the document text"
+        - name: "inference_engine"
+          type: "str"
+          value: "CPU"
+          description: "# inference engine used"
+        - name: max_length
+          type: "int"
+          value: 512
+          description: "# inference engine used"
+        - name: "batch_size"
+          type: "int"
+          value: 128
+          description: "# batch size"

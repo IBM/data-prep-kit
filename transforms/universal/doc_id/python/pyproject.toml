@@ -1,6 +1,6 @@
 [project]
 name = "dpk_doc_id_transform_python"
-version = "0.2.2.dev0"
+version = "0.2.2.dev1"
 requires-python = ">=3.10,<3.13"
 description = "ededup Python Transform"
 license = {text = "Apache-2.0"}
@@ -9,13 +9,14 @@ authors = [
     { name = "David Wood", email = "dawood@us.ibm.com" },
     { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
-dependencies = [
-    "data-prep-toolkit==0.2.2.dev0"
-]
+dynamic = ["dependencies"]
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
 
 [project.optional-dependencies]
 dev = [

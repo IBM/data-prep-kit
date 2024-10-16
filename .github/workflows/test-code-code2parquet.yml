@@ -51,7 +51,7 @@ jobs:
         # The images are pushed if it is a merge to dev branch or a new tag is created.
         # The latter being part of the release process.
         # The images tag is derived from the value of the DOCKER_IMAGE_VERSION variable set in the .make.versions file.
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         outputs:
             publish_images: ${{ steps.version.outputs.publish_images }}
         steps:
@@ -68,7 +68,7 @@ jobs:
                   fi
                   echo "publish_images=$publish_images" >> "$GITHUB_OUTPUT"
     test-src:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -90,7 +90,7 @@ jobs:
                   fi
     test-image:
         needs: [check_if_push_image]
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         timeout-minutes: 120
         env:
             DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
