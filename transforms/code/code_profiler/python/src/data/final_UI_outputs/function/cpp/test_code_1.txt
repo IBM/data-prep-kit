@@ -1,0 +1,46 @@
+
+	/*Structure of node*/
+struct node{
+    int data;
+    struct node *left,*right;
+};
+	/*Create a new Node*/
+struct node *newnode(int p){
+    struct node *temp = new node();
+    temp->data = p;
+    temp->left = temp->right = NULL;
+    return temp;
+}int search(struct node* temp,int key){
+    int p=key;
+    while(1){
+        if(temp->data == key){
+            return p;
+        }
+        else if(temp->data > key){
+            p = max(p,temp->data);
+            temp = temp->left;
+        }
+        else if(temp->data < key){
+            temp = temp->right;
+        }
+    }
+    return p;
+}
+
+// Driver program to test above functions 
+int main(){
+    struct node *root = NULL;
+    root = insert(root,20);
+    insert(root,10);
+    insert(root,30);
+    insert(root,5);
+    insert(root,15);
+    insert(root,25);
+    insert(root,35);
+    insert(root,45);
+    display(root);
+    cout<<endl;
+    cout<<"Height of tree is: "<<maxheight(root)<<endl;
+    zigzeg(root);
+    return 0;
+}

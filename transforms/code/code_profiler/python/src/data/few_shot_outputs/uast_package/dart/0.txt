@@ -1,0 +1,15 @@
+To find the package related nodes, I need to find which nodes correspond to incorporating external libraries in the code. I will look at the higher level nodes. Hence, I can see that the 'import_or_export' nodes with ids = [1, 13, 23, 36, 49], represent importing packages in the code. Incorporating each of these nodes, I can make a general rule to extract the package(s).
+
+This python script can be executed:
+
+```py
+# as every code snippet starts with 'import', we will remove it and get the remaining string.
+text = code_snippet.split('import')[1].strip()
+# remove the show/hide/as keywords if present
+if (' show ' in text or ' hide ' in text or ' as ' in text):
+    text = text.split(' ')[0].strip()
+# remove the single quotes
+text = text.replace('\'', '')
+# return the package
+extracted = text.split(':')[1].strip()
+```

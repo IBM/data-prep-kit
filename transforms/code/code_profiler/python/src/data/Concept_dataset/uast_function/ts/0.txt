@@ -1,0 +1,14 @@
+// Export all the classes functions 
+
+/* 
+test
+multi
+line
+*/
+
+import * as ALL_IMPORTS from 'dads';  
+import {dsad, asdsd,dsds , sx}   from "adxsad"
+
+function pow(value: number, exponent: number = 10) {
+  return value ** exponent;
+}

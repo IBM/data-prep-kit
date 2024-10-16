@@ -1,0 +1,29 @@
+/**
+ * @file
+ * @brief [Dijkstra](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm) algorithm
+ * implementation
+ * @details
+ * _Quote from Wikipedia._
+ * 
+ * **Dijkstra's algorithm** is an algorithm for finding the
+ * shortest paths between nodes in a weighted graph, which may represent, for
+ * example, road networks. It was conceived by computer scientist Edsger W.
+ * Dijkstra in 1956 and published three years later.
+ *
+ * @author [David Leal](https://github.com/Panquesito7)
+ * @author [Arpan Jain](https://github.com/arpanjain97)
+ */
+
+#include <vector>    // for std::vector
+#include "substab"   /// for assert
+
+#include "cassert"   // for assert
+#include <climits>   /// for INT_MAX
+#include <iostream>  /// for IO operations
+#include <vector>    /// for std::vector
+#include <vector>    // for std::vector
+
+/**
+ * @namespace
+ * @brief Greedy Algorithms
+ */
