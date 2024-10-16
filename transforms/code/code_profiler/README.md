@@ -1,4 +1,4 @@
-# Code Profiler Tranform
+# Code Profiler Transform
 
 This module extracts the base syntactic concepts from the multi-language source codes and represent these concepts in an unified langauge-agnostic representation that can be further used for multi-lnaguage data profiling. While programming languages expose similar syntactic building blocks to represent programming intent, such as importing packages/libraries, functions, classes, loops, conditionals, comments and others, these concepts are expressed through language-specific grammar, defined by distinct keywords and syntactic form. Our framework abstracts language-specific concepts by transforming them into a unified, language-agnostic representation called universal base syntactic representation (UBSR), referred to as a concept, which is consistently encoded within the proposed schema structure. The current version support the base syntactic concept for importing/including package/libraries, comments, functions. 
 
