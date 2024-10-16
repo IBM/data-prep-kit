@@ -1,0 +1,59 @@
+name: Build, Test, and Upload PyPI package of data-connector-lib
+
+on:
+    release:
+        types:
+            - published
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    # see https://docs.pypi.org/trusted-publishers/
+    id-token: write
+
+jobs:
+    build-package:
+        name: Build data connector library
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+              with:
+                  # for setuptools-scm
+                  fetch-depth: 0
+            - name: Build Packages for pypi
+              run: |
+                  make -C data-connector-lib build
+    publish-test-pypi:
+        name: Publish packages to test.pypi.org
+        # disabled
+        if: false
+        runs-on: ubuntu-22.04
+        needs: build-package
+
+        steps:
+            - name: Fetch build artifacts
+              uses: actions/download-artifact@v4
+              with:
+                  name: Packages
+                  path: dist
+
+            - name: Upload to Test PyPI
+              uses: pypa/gh-action-pypi-publish@release/v1
+              with:
+                  repository-url: https://test.pypi.org/legacy/
+
+    publish-pypi:
+        name: Publish release to pypi.org
+        runs-on: ubuntu-22.04
+        needs: build-package
+        # disabled as of now
+        if: false
+        steps:
+            - name: Fetch build artifacts
+              uses: actions/download-artifact@v4
+              with:
+                  name: Packages
+                  path: dist
+            - name: Upload to PyPI
+              uses: pypa/gh-action-pypi-publish@release/v1
