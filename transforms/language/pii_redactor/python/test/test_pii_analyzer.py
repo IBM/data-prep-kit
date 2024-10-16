@@ -1,3 +1,14 @@
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import pytest
 from pii_analyzer import PIIAnalyzerEngine
 
@@ -14,7 +25,8 @@ def analyzer():
 
 def test_analyse_text_for_pii_data(analyzer):
     input_text = (
-        "This is a sample test which has my name Sowmya and my email as sowmya@techiediver.com and " "self.config"
+        "This is a sample test which has my name Sowmya and my email as sowmya@techiediver.com and "
+        "self.config"
         "Born on 31.05.2021"
     )
     result, entity_types = analyzer.analyze_text(input_text, language="en")

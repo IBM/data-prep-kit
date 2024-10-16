@@ -1,3 +1,14 @@
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 """
 Author: Sowmya.L.R, email:lrsowmya@gmail.com
 """
@@ -82,7 +93,6 @@ class PIIRedactorTransform(AbstractTableTransform):
 
         TransformUtils.validate_columns(table=table, required=[pii_contents_column])
         metadata = {"original_table_rows": table.num_rows, "original_column_count": len(table.column_names)}
-
 
         redacted_texts, entity_types_list = zip(*table[pii_contents_column].to_pandas().apply(self._redact_pii))
         table = table.add_column(0, self.doc_contents_key, [redacted_texts])
