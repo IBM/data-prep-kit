@@ -1,11 +1,25 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 from typing import Any, NamedTuple
+
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
+from universal.doc_id.kfp_ray.doc_id_wf import doc_id
+from universal.noop.kfp_ray.noop_wf import noop
+
 from kfp import dsl
 
-from universal.noop.kfp_ray.noop_wf import noop
-from universal.doc_id.kfp_ray.doc_id_wf import doc_id
 
 noop_image = "quay.io/dataprep1/data-prep-kit/noop-ray:latest"
 doc_id_image = "quay.io/dataprep1/data-prep-kit/doc_id-ray:latest"
@@ -38,7 +52,7 @@ def super_pipeline(
     p1_pipeline_additional_params: str = '{"wait_interval": 2, "wait_cluster_ready_tmout": 400, "wait_cluster_up_tmout": 300, "wait_job_ready_tmout": 400, "wait_print_tmout": 30, "http_retries": 5, "delete_cluster_delay_minutes": 0}',
     p1_pipeline_data_s3_access_secret: str = "s3-secret",
     p1_pipeline_runtime_code_location: dict = {"github": "github", "commit_hash": "12345", "path": "path"},
-    p1_pipeline_runtime_actor_options: dict = {'num_cpus': 0.8},
+    p1_pipeline_runtime_actor_options: dict = {"num_cpus": 0.8},
     # data access
     p1_pipeline_data_max_files: int = -1,
     p1_pipeline_data_num_samples: int = -1,
@@ -49,12 +63,28 @@ def super_pipeline(
     p2_noop_sleep_sec: int = 10,
     p2_ray_name: str = "noop-kfp-ray",
     p2_ray_head_options: dict = {"cpu": 1, "memory": 4, "image_pull_secret": "", "image": noop_image},
-    p2_ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "", "image": noop_image},
+    p2_ray_worker_options: dict = {
+        "replicas": 2,
+        "max_replicas": 2,
+        "min_replicas": 2,
+        "cpu": 2,
+        "memory": 4,
+        "image_pull_secret": "",
+        "image": noop_image,
+    },
     # Document ID step parameters
     p3_name: str = "doc_id",
     p3_ray_name: str = "docid-kfp-ray",
     p3_ray_head_options: dict = {"cpu": 1, "memory": 4, "image_pull_secret": "", "image": doc_id_image},
-    p3_ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "", "image": doc_id_image},
+    p3_ray_worker_options: dict = {
+        "replicas": 2,
+        "max_replicas": 2,
+        "min_replicas": 2,
+        "cpu": 2,
+        "memory": 4,
+        "image_pull_secret": "",
+        "image": doc_id_image,
+    },
     # p3_skip: bool = False,
     # orchestrator
     p3_data_data_sets: str = "",
@@ -70,9 +100,15 @@ def super_pipeline(
     transform1_prefix = "p2_"
     transform2_prefix = "p3_"
     # split the input parameters according to thier prefixes.
-    common_params = {key[len(common_params_prefix) :]: value for key, value in args.items() if key.startswith(common_params_prefix)}
-    task1_params = {key[len(transform1_prefix) :]: value for key, value in args.items() if key.startswith(transform1_prefix)}
-    task2_params = {key[len(transform2_prefix) :]: value for key, value in args.items() if key.startswith(transform2_prefix)}
+    common_params = {
+        key[len(common_params_prefix) :]: value for key, value in args.items() if key.startswith(common_params_prefix)
+    }
+    task1_params = {
+        key[len(transform1_prefix) :]: value for key, value in args.items() if key.startswith(transform1_prefix)
+    }
+    task2_params = {
+        key[len(transform2_prefix) :]: value for key, value in args.items() if key.startswith(transform2_prefix)
+    }
 
     # get the input path, output path of the whole pipeline, and the intermediate path for storing the files between the transforms
     input_path = common_params.get("input_path", "")
@@ -97,7 +133,7 @@ def super_pipeline(
     # call the doc_id pipeline from doc_id_wf.py file with the expected parameters
     doc_id_task = doc_id(**pipeline_prms_to_pass)
     doc_id_task.after(noop_task)
-    
+
 
 if __name__ == "__main__":
     # Compiling the pipeline
