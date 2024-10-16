@@ -9,7 +9,7 @@ authors = [
     { name = "Pankaj Thorat", email = "pankaj.thorat@ibm.com" },
 ]
 
-dependencies = {file = ["requirements.txt"]}
+dynamic = ["dependencies"]
 
 [build-system]
 requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
