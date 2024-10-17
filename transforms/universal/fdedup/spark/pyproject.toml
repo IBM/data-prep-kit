@@ -1,8 +1,8 @@
 [project]
-name = "dpk_fdedup_transform_ray"
-version = "0.2.2.dev1"
-requires-python = ">=3.10,<3.13"
-description = "fdedup Ray Transform"
+name = "dpk_fdedup_transform_spark"
+version = "0.3.0.dev0"
+requires-python = ">=3.10"
+description = "Fuzzy Dedup Spark Transform"
 license = {text = "Apache-2.0"}
 readme = {file = "README.md", content-type = "text/markdown"}
 authors = [
@@ -10,16 +10,9 @@ authors = [
     { name = "Constantin Adam", email = "cmadam@us.ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit-ray==0.2.2.dev1",
-    "mmh3>=4.1.0",
-    "xxhash==3.4.1",
-    "tqdm==4.66.3",
-    "scipy>=1.12.0, <2.0.0"
+    "dpk_fdedup_transform_python==0.3.0.dev0",
+    "data-prep-toolkit-spark==0.2.2.dev0",
 ]
-
-[build-system]
-requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
-build-backend = "setuptools.build_meta"
 
 [project.optional-dependencies]
 dev = [
