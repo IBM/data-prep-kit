@@ -10,6 +10,7 @@ on:
             - "*"
         paths:
             # Note: the transform workflows are expected to trigger when data-processing-lib/** changes
+            - ".make.*"
             - "data-processing-lib/**"
             - "!data-processing-lib/**.md"
             - "!data-processing-lib/**/doc/**"
@@ -20,6 +21,7 @@ on:
             - "releases/**"
         paths:
             # Note: the transform workflows are expected to trigger when data-processing-lib/** changes
+            - ".make.*"
             - "data-processing-lib/**"
             - "!data-processing-lib/**.md"
             - "!data-processing-lib/**/doc/**"
@@ -36,7 +38,7 @@ jobs:
         # The images are pushed if it is a merge to dev branch or a new tag is created.
         # The latter being part of the release process.
         # The images tag is derived from the value of the DOCKER_IMAGE_VERSION variable set in the .make.versions file.
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         outputs:
             publish_images: ${{ steps.version.outputs.publish_images }}
         steps:
@@ -53,7 +55,7 @@ jobs:
                   fi
                   echo "publish_images=$publish_images" >> "$GITHUB_OUTPUT"
     test-python-lib:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -61,7 +63,7 @@ jobs:
               run: |
                   make -C data-processing-lib/python DOCKER=docker venv test
     test-ray-lib:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -69,7 +71,7 @@ jobs:
               run: |
                   make -C data-processing-lib/ray DOCKER=docker venv test
     test-spark-lib:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         steps:
             - name: Checkout
               uses: actions/checkout@v4
@@ -79,7 +81,7 @@ jobs:
     test-data-processing-lib-images:
         needs: [check_if_push_images]
         if: needs.check_if_push_images.outputs.publish_images == 'true'
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-22.04
         env:
             DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
             DOCKER_REGISTRY_KEY: ${{ secrets.DOCKER_REGISTRY_KEY }}

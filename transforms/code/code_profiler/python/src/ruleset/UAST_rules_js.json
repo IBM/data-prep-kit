@@ -1,0 +1,10 @@
+{
+    "comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "if (code_snippet[0:2] == '//'):\n    self.extracted = code_snippet[2:].strip()\nelse:\n    self.extracted = code_snippet[2:-2].strip()"
+    },
+    "import_statement": {
+        "uast_node_type": "uast_package",
+        "extractor": "text = code_snippet.split('import')[1].strip() \ntext = text.split('from')[1].strip()\ntext = text.replace('\"', '').replace('\\'', '').strip(' ;')\nself.extracted = text"
+    }
+}

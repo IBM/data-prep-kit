@@ -1,0 +1,14 @@
+To find the package related nodes, I need to find which nodes correspond to incorporating external libraries in the code. I will look at the higher level nodes. Hence, I can see that the 'ui_import' nodes with ids = [1, 4], represent importing packages in the code. Incorporating each of these nodes, I can make a general rule to extract the package(s).
+
+This python script can be executed:
+
+```py
+# as every code snippet starts with 'import', we will remove it and get the remaining string.
+text = code_snippet.split('import')[1].strip() 
+# remove version numbers if present
+text = text.split()[0]
+# return the package
+extracted = text
+```
+
+This script will extract the package names from the given AST nodes. It removes the 'import' keyword, strips any leading or trailing whitespace, and then takes the first word as the package name (in case there is a version number).

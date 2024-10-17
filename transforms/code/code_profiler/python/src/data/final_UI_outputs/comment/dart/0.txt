@@ -1,0 +1,11 @@
+To find the comment related nodes, I will look at the higher level nodes. Hence, I can see that the 'documentation_comment' node with id = 1, represents a comment in the code. Incorporating this node, I can make a general rule to extract the comments.
+
+This python script can be executed:
+
+```py
+# if the first three characters are '///' we can simply remove the first three characters and get the remaining string
+if (code_snippet[0:3] == '///'):
+    extracted = code_snippet[3:].strip()
+```
+
+This script will extract the comment from the given code snippet.

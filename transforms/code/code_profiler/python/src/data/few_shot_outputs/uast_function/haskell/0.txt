@@ -1,0 +1,12 @@
+To find the function definition related nodes, I will look at the higher level nodes. Hence, I can see that the 'function' nodes with ids = [2], represent definition of functions in the code. Incorporating each of these nodes, I can make a general rule to extract the definitions.
+
+This python script can be executed:
+
+```py
+# we see that the function name is directly before the argument list, hence we get the snippet just before the first space of the argument list.
+temp_0 = code_snippet.split(' ')[0].strip() 
+# as our required function name, from the snippet is the whole string, we get the function.
+extracted = temp_0
+```
+
+Note: The script is slightly different from the previous ones because the function definition in this code snippet is in a different format. The function name is directly before the argument list, separated by a space, so we split by space and get the first element.

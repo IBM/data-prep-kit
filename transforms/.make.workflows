@@ -52,13 +52,13 @@ endif
 
 ${WORKFLOW_VENV_ACTIVATE}: ${REPOROOT}/.make.versions ${REPOROOT}/kfp/kfp_ray_components/requirements.txt ${DPK_RAY_LIB_DIR} ${KFP_LIB_SRC_FILES} ${KFP_LIB_CONFIG_FILE} ${KFP_SHARED_LIB_SRC_FILES}
 	rm -rf ${REPOROOT}/transforms/venv
-	$(MAKE) -C ${REPOROOT}/transforms .defaults.ray-lib-src-venv
+	$(MAKE) -C ${REPOROOT}/transforms .defaults.kfp-venv
 	. ${WORKFLOW_VENV_ACTIVATE};     \
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/shared_workflow_support; \
 	pip install -e $(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB); \
-	$(MAKE) -C ${REPOROOT}/kfp/kfp_ray_components set-versions
-	pip install jinja2
-	pip install pyyaml
+	$(MAKE) -C ${REPOROOT}/kfp/kfp_ray_components set-versions; \
+	pip install jinja2;              \
+	pip install pyyaml;              \
 	pip install pre-commit
 	@# Help: Create the virtual environment common to all workflows
 

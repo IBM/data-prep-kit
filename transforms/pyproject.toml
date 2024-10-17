@@ -1,0 +1,97 @@
+[project]
+name = "data_prep_toolkit_transforms"
+version = "0.2.2.dev1"
+requires-python = ">=3.10,<3.13"
+keywords = ["transforms", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
+description = "Data Preparation Toolkit Transforms using Ray"
+license = {text = "Apache-2.0"}
+readme = {file = "README-list.md", content-type = "text/markdown"}
+authors = [
+    { name = "Maroun Touma", email = "touma@us.ibm.com" },
+]
+dynamic = ["dependencies","optional-dependencies"]
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
+build-backend = "setuptools.build_meta"
+
+
+[tool.setuptools.dynamic.dependencies]
+file = ["requirements.txt"]
+
+[tool.setuptools.dynamic.optional-dependencies]
+dev = { file = ["requirements-dev.txt"]}
+ray = { file = ["requirements-ray.txt"]}
+all = { file = [
+"code/proglang_select/python/requirements.txt",
+"code/header_cleanser/python/requirements.txt",
+"code/license_select/python/requirements.txt",
+"code/code_quality/python/requirements.txt",
+"code/code2parquet/python/requirements.txt",
+
+"language/doc_quality/python/requirements.txt",
+"language/doc_chunk/python/requirements.txt",
+##### Cannot have html2parquet until we solve
+## docling-ibm-models 1.1.7 depends on lxml<5.0.0 and >=4.9.1
+## trafilatura 1.12.0 depends on lxml>=5.2.2; platform_system != "Darwin" or python_version > "3.8"
+## "language/html2parquet/python/requirements.txt",
+##### pii_redactor seem to be failing UT
+## "language/pii_redactor/python/requirements.txt",
+"language/lang_id/python/requirements.txt",
+"language/text_encoder/python/requirements.txt",
+"language/pdf2parquet/python/requirements.txt",
+
+"universal/hap/python/requirements.txt",
+"universal/tokenization/python/requirements.txt",
+"universal/ededup/python/requirements.txt",
+"universal/profiler/python/requirements.txt",
+"universal/doc_id/python/requirements.txt",
+"universal/filter/python/requirements.txt",
+"universal/resize/python/requirements.txt"
+]}
+
+# pyproject.toml must be in a parent and cannot be in sibling
+# i.e. Cannot access '../code/proglang_select/python/..
+
+proglang_select = { file = ["code/proglang_select/python/requirements.txt"]} 
+header_cleanser = {file =  ["code/header_cleanser/python/requirements.txt"]}
+license_select = { file = ["code/license_select/python/requirements.txt"]} 
+code_quality = { file = ["code/code_quality/python/requirements.txt"]} 
+code2parquet = {file =  ["code/code2parquet/python/requirements.txt"]}
+
+doc_quality = { file = ["language/doc_quality/python/requirements.txt"]} 
+doc_chunk = { file = ["language/doc_chunk/python/requirements.txt"]} 
+html2parquet = { file = ["language/html2parquet/python/requirements.txt"]} 
+pii_redactor = { file = ["language/pii_redactor/python/requirements.txt"]} 
+lang_id = { file = ["language/lang_id/python/requirements.txt"]} 
+text_encoder = { file = ["language/text_encoder/python/requirements.txt"]} 
+pdf2parquet = { file = ["language/pdf2parquet/python/requirements.txt"]} 
+
+hap = { file = ["universal/hap/python/requirements.txt"]} 
+tokenization = { file = ["universal/tokenization/python/requirements.txt"]} 
+ededup = { file = ["universal/ededup/python/requirements.txt"]} 
+profiler = { file = ["universal/profiler/python/requirements.txt"]} 
+doc_id = { file = ["universal/doc_id/python/requirements.txt"]} 
+filter = { file = ["universal/filter/python/requirements.txt"]} 
+resize = { file = ["universal/resize/python/requirements.txt"]} 
+
+# Does not seem to work for our custom layout
+# copy all files to a single src and let automatic discovery find them
+
+[options]
+package_dir = ["src","test"]
+
+[options.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+# Currently we use low coverage since we have to run tests separately (see makefile)
+#addopts = "--cov --cov-report term-missing --cov-fail-under 25"
+markers = ["unit: unit tests", "integration: integration tests"]
+
+
+
+
+
+
+

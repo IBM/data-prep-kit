@@ -1,0 +1,6 @@
+{
+    "input": "multi-package.parquet",
+    "dynamic_schema_mapping": "True",
+    "contents": "Contents",
+    "language": "Language"
+}

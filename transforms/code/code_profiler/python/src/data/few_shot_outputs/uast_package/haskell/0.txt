@@ -1,0 +1,28 @@
+To find the package related nodes, I need to find which nodes correspond to incorporating external libraries in the code. I will look at the higher level nodes. Hence, I can see that the 'import' nodes with ids = [2, 6, 13, 31, 36, 49, 62, 76, 83, 98, 106], represent importing packages in the code. Incorporating each of these nodes, I can make a general rule to extract the package(s).
+
+This python script can be executed:
+
+```py
+# I can see that the code snippet includes a package. Hence I just take the string after the first 'import' as the package, but I also remove spaces and ';' characters from the end.
+temp = code_snippet.split('import', 1)[1].strip(' ;')
+# If there is a 'qualified' keyword, we remove that and get the package
+if ('qualified' in temp):
+    temp = temp.split('qualified', 1)[1].strip()
+# If there is a 'as' keyword, we remove that and get the package
+if ('as' in temp):
+    temp = temp.split('as', 1)[0].strip()
+# If there is a 'hiding' keyword, we remove that and get the package
+if ('hiding' in temp):
+    temp = temp.split('hiding', 1)[0].strip()
+# If there is an asterisk import, we remove that and return the final answer
+if ('.*' in temp):
+    # get the parts before the asterisk
+    temp = temp.replace('.*', '')
+# If there are parentheses, we remove them and get the package
+if ('(' in temp):
+    temp = temp.split('(', 1)[0].strip()
+# return the final value
+extracted = temp
+```
+
+This script will extract the package names from the given code snippet and AST. It handles various cases such as 'import', 'import qualified', 'import as', 'import hiding', and asterisk imports.

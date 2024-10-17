@@ -37,6 +37,7 @@ def compute_exec_params_func(
     data_s3_config: str,
     data_max_files: int,
     data_num_samples: int,
+    data_checkpointing: bool,
     runtime_pipeline_id: str,
     runtime_job_id: str,
     runtime_code_location: dict,
@@ -50,6 +51,7 @@ def compute_exec_params_func(
         "data_s3_config": data_s3_config,
         "data_max_files": data_max_files,
         "data_num_samples": data_num_samples,
+        "data_checkpointing": data_checkpointing,
         "runtime_num_workers": KFPUtils.default_compute_execution_params(str(worker_options), str(actor_options)),
         "runtime_worker_options": str(actor_options),
         "runtime_pipeline_id": runtime_pipeline_id,
@@ -103,8 +105,13 @@ def {{ pipeline_name }}(
     # Ray cluster
     ray_name: str = "{{ pipeline_name }}-kfp-ray",  # name of Ray cluster
     # Add image_pull_secret and image_pull_policy to ray workers if needed
+    {%- if image_pull_secret != "" %}
+    ray_head_options: dict = {"cpu": 1, "memory": 4, "image_pull_secret": "{{ image_pull_secret }}", "image": task_image},
+    ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image_pull_secret": "{{ image_pull_secret }}", "image": task_image},
+    {%- else %}
     ray_head_options: dict = {"cpu": 1, "memory": 4, "image": task_image},
     ray_worker_options: dict = {"replicas": 2, "max_replicas": 2, "min_replicas": 2, "cpu": 2, "memory": 4, "image": task_image},
+    {%- endif %}
     server_url: str = "http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888",
     # data access
     {%- if multi_s3 == False %}
@@ -177,6 +184,7 @@ def {{ pipeline_name }}(
             data_s3_config=data_s3_config,
             data_max_files=data_max_files,
             data_num_samples=data_num_samples,
+            data_checkpointing=data_checkpointing,
             runtime_pipeline_id=runtime_pipeline_id,
             runtime_job_id=run_id,
             runtime_code_location=runtime_code_location,

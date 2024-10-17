@@ -1,0 +1,46 @@
+[project]
+name = "dpk_code_profiler_transform_ray"
+version = "0.2.2.dev0"
+requires-python = ">=3.10"
+description = "Code Profiler Ray Transform"
+license = {text = "Apache-2.0"}
+readme = {file = "README.md", content-type = "text/markdown"}
+authors = [
+    { name = "Pankaj Thorat", email = "pankaj.thorat@ibm.com" },
+]
+dependencies = [
+	"dpk-code-profiler-transform-python==0.2.2.dev0",
+    "data-prep-toolkit-ray==0.2.2.dev0",
+    "data-prep-toolkit==0.2.2.dev0",
+	]
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = [
+    "twine",
+    "pytest>=7.3.2",
+    "pytest-dotenv>=0.5.2",
+    "pytest-env>=1.0.0",
+    "pre-commit>=3.3.2",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.10.0",
+    "moto==5.0.5",
+    "markupsafe==2.0.1",
+]
+
+[options]
+package_dir = ["src","test"]
+
+[options.packages.find]
+where = ["src/"]
+
+[tool.pytest.ini_options]
+# Currently we use low coverage since we have to run tests separately (see makefile)
+#addopts = "--cov --cov-report term-missing --cov-fail-under 25"
+markers = ["unit: unit tests", "integration: integration tests"]
+
+[tool.coverage.run]
+include = ["src/*"]

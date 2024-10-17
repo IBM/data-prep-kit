@@ -1,0 +1,6 @@
+/**
+< h2 >MethodName</ h2 >
+< p >Various Description, can use html with images etc.</ p >
+*/
+
+//Within Implementation?

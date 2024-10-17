@@ -1,6 +1,6 @@
 [project]
 name = "dpk_hap_transform_ray"
-version = "0.2.2.dev0"
+version = "0.2.2.dev1"
 requires-python = ">=3.10"
 description = "HAP Ray Transform"
 license = {text = "Apache-2.0"}

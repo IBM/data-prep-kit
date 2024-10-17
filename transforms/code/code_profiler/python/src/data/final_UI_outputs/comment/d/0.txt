@@ -1,0 +1,12 @@
+To find the comment related nodes, I will look at the higher level nodes. Hence, I can see that the 'comment' nodes with ids = [1, 2], represent comments in the code. Incorporating each of these nodes, I can make a general rule to extract the comments.
+
+This python script can be executed:
+
+```py
+if code_snippet.startswith('/*') and code_snippet.endswith('*/'):
+    extracted = code_snippet[2:-2].strip()
+elif code_snippet.startswith('//'):
+    extracted = code_snippet[2:].strip()
+```
+
+This script will extract the comments from the given code snippets. For the first comment, it will remove the first two characters and the last two characters to get the comment, and for the second comment, it will remove the first two characters to get the comment.

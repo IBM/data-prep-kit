@@ -21,7 +21,7 @@ if __name__ == "__main__":
     environment = Environment(loader=FileSystemLoader(f"{script_dir}/templates/"))
     template = environment.get_template(PIPELINE_TEMPLATE_FILE)
 
-    #pre_commit_config = f"{script_dir}/../pre-commit-config.yaml"
+    pre_commit_config = f"{script_dir}/../../../.pre-commit-config.yaml"
     parser = argparse.ArgumentParser(description="Kubeflow pipeline generator for Foundation Models")
     parser.add_argument("-c", "--config_file", type=str, default="")
     parser.add_argument("-od", "--output_dir_file", type=str, default="")
@@ -57,3 +57,10 @@ if __name__ == "__main__":
         message.write(content)
         print(f"... wrote {output_file}")
 
+    # format the pipeline python file
+    import sys
+
+    from pre_commit.main import main
+
+    args = ["run", "--file", f"{output_file}", "-c", f"{pre_commit_config}"]
+    sys.exit(main(args))

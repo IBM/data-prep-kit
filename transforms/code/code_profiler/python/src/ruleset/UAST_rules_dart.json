@@ -1,0 +1,14 @@
+{
+    "import_or_export": {
+        "uast_node_type": "uast_package",
+        "extractor": "text = code_snippet.split('import')[1].strip()\nif (' show ' in text or ' hide ' in text or ' as ' in text):\n    text = text.split(' ')[0].strip()\ntext = text.replace('\\'', '')\nself.extracted = text.split(':')[1].strip()"
+    },
+    "function_signature": {
+        "uast_node_type": "uast_function",
+        "extractor": "temp_0 = code_snippet.split('(')[0].strip() \nself.extracted = temp_0.split(' ')[-1].strip()"
+    },
+    "comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "if (code_snippet[0:2] == '//'):\n    self.extracted = code_snippet[2:].strip()\nelse:\n    self.extracted = code_snippet[2:-2].strip()"
+    }
+}
