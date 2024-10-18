@@ -28,6 +28,7 @@ from dpk_connector.core.utils import (
     get_content_type,
     get_etld1,
     get_focus_path,
+    get_fqdn,
     is_allowed_path,
     urlparse_cached,
 )
@@ -42,6 +43,7 @@ class BaseSitemapSpider(SitemapSpider):
         self,
         seed_urls: Collection[str],
         allow_domains: Collection[str] = (),
+        subdomain_focus: bool = False,
         path_focus: bool = False,
         allow_mime_types: Collection[str] = (),
         disallow_mime_types: Collection[str] = (),
@@ -88,11 +90,16 @@ class BaseSitemapSpider(SitemapSpider):
                     self.focus_paths.add(path)
 
         # Domains and mime types filtering
-        self.allowed_domains = set(
-            allow_domains
-            if len(allow_domains) > 0
-            else [get_etld1(url) for url in seed_urls]
-        )
+        if allow_domains:
+            self.allowed_domains = set(allow_domains)
+        elif subdomain_focus:
+            self.allowed_domains = set()
+            for url in seed_urls:
+                fqdn = get_fqdn(url)
+                if fqdn:
+                    self.allowed_domains.add(fqdn)
+        else:
+            self.allowed_domains = set(get_etld1(url) for url in seed_urls)
         self.allow_mime_types = set(
             [m.lower() for m in allow_mime_types] if len(allow_mime_types) > 0 else ()
         )

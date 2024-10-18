@@ -57,6 +57,11 @@ def get_etld1(url: str) -> str:
     return f"{ext.domain}.{ext.suffix}"
 
 
+def get_fqdn(url: str) -> str:
+    ext = tldextract.extract(url)
+    return ext.fqdn
+
+
 def get_focus_path(url: str) -> str | None:
     parts = urlparse_cached(url)
     if len(parts.path.split("/")) > 2:
