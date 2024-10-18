@@ -3,6 +3,7 @@ import os
 import uuid
 from typing import Callable
 
+import pandas as pd
 import pyarrow as pa
 from dpk_repo_level_order.internal.check_languages import (
     get_dominant_language_repo_packing,
@@ -20,26 +21,47 @@ SORT_SEMANTIC = "SORT_SEMANTIC"
 SORT_SEMANTIC_NORMALISED = "SORT_SEMANTIC_NORMALISED"
 
 
-def semantic_sort(df, logger, title_column_name, language_column_name):
+def semantic_sort(
+    df: pd.DataFrame, logger: logging.Logger, title_column_name: str, language_column_name: str
+) -> pd.DataFrame:
     return sort_sem(
         files_df=df, logger=logger, title_column_name=title_column_name, language_column_name=language_column_name
     )
 
 
-def semantic_sort_normalised(df, logger, title_column_name, language_column_name):
+def semantic_sort_normalised(
+    df: pd.DataFrame, logger: logging.Logger, title_column_name: str, language_column_name: str
+) -> pd.DataFrame:
     check_and_update_title(df)
     return sort_sem(
         files_df=df, logger=logger, title_column_name=title_column_name, language_column_name=language_column_name
     )
 
 
-def default_sort(df, logger, title_column_name, language_column_name):
+def default_sort(
+    df: pd.DataFrame, logger: logging.Logger, title_column_name: str, language_column_name: str
+) -> pd.DataFrame:
     return sort_by_path(df=df, logger=logger, title_column_name=title_column_name)
 
 
 def get_sorting_func(
     sorting_algo: str, title_column_name: str, logger: logging.Logger, language_column_name: str
 ) -> Callable[[pa.Table], pa.Table]:
+    """Get a sorting function based on the specified algorithm.
+
+    Args:
+        sorting_algo (str): The sorting algorithm to use.
+        title_column_name (str): The name of the column containing file
+                                 titles.
+        logger (logging.Logger): A logger object for logging messages.
+        language_column_name (str): The name of the column containing file
+                                    languages.
+
+    Returns:
+        Callable[[pa.Table, str], pa.Table]: A function that takes a PyArrow Table
+                                        and a file name as input and
+                                        returns a sorted PyArrow Table.
+    """
     if sorting_algo == SORT_SEMANTIC:
         sort_by = semantic_sort
         logger.info("semantic sort enabled")
@@ -74,7 +96,26 @@ def get_sorting_func(
     return sorter
 
 
-def get_dominant_language_func(language_column_name, title_column_name):
+def get_dominant_language_func(language_column_name: str, title_column_name: str) -> Callable[[pa.Table, str], str]:
+    """
+    This function takes two column names as input and returns a function
+    that can be applied to a pyarrow table.
+    The returned function determines the dominant programming language in
+    the pyarrow table and returns the filename with the detected language
+    prepended.
+
+        Args:
+            language_column_name (str): Name of the column containing the
+    programming languages.
+            title_column_name (str): Name of the column containing the file
+    titles/paths.
+
+        Returns:
+            Callable[[pa.Table, str], str]: A function that takes a table as
+    input and returns a new table with the filenames modified to include the
+    detected dominant language.
+    """
+
     def dominant_lang_per_repo(table: pa.Table, filename: str) -> str:
         """
         This function takes a table whose rows are documents from a repo
@@ -137,6 +178,28 @@ def superrow_table(table: pa.Table, repo_column_name: str, language_column_name=
 
 
 def get_transforming_func(sorting_func=None, superrows_func=None, filename_func=None, language_column_name="language"):
+    """
+    This function takes three optional functions as input and returns a
+    function that can be applied to a pyarrow table and file name.
+    The returned function performs some transformation on the input table
+    and file name based on the provided functions.
+
+    Args:
+        sorting_func (Callable[[pa.Table, str], pa.Table]): A function that sorts the
+                     rows of a table based on a column. Defaults to None.
+        superrows_func (Callable[[pa.Table, str, str], pa.Table]): A
+                     function that creates new rows in a table based on the values of other
+                     columns. Defaults to None.
+        filename_func (Callable[[pa.Table, str], str]): A function that modifies the
+                     file name. Defaults to None.
+        language_column_name (str): The name of the column containing the
+                     programming languages. Defaults to "language".
+
+    Returns:
+        callable: A function that takes a table and file name as input and
+                     returns a list of transformed tables and file names.
+    """
+
     def my_transform(table, file_name):
         out_table = table
         if sorting_func:

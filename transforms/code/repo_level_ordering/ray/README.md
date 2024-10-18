@@ -7,14 +7,31 @@ testing and IDE set up.
 
 ## Summary 
 
+This transform does repository level packing of data and arranging them to prioritise semantic dependancies. This 
+was done to prepare long context data for [Scaling Granite Code Models to 128K Context](https://arxiv.org/pdf/2407.13739) 
+. Quoting the paper. 
+
+>To create long-context data, we develop a new approach that packs files from the same
+repository together, arranging them to prioritize semantic dependencies. We identify these
+dependencies by analyzing file imports and create a directed acyclic graph, where each
+file is a node and edges represent API imports between files. After breaking any cycles
+in the graph, we perform a topological sort to establish an ordering of files based on their
+semantic dependencies. We then organize the files in a repository by placing documentation
+and build files first, followed by the ordered set of files with semantic dependencies, and
+finally the remaining non-connected files. These non-connected files are arranged according
+to their folder structure, using a depth-first search to traverse the repository. Finally, we
+determine the dominant programming language of a repository based on file extensions
+and presence of build files, to organise repo-ordered files by programming languages
+
+
 This transform can group the data by `repo_name` and apply additional transformations like( sorting or output_by_language or combining rows) on the  grouped data.
 This transform requires the input data to have at least the following columns: 
 
-- repo name: Name of the repo, it is used for grouping in this transform.
+- **repo name**: Name of the repo, it is used for grouping in this transform.
 
-- title : Which is usually file path.
+- **title** : Which is usually file path.
 
-- language: Programming language of content
+- **language**: Programming language of content
 
 The input data for this transform should be in parquet format. The input data is expected to have code data arranged in rows
 such that each row represents a file. The required columns in the input data shoud correspond to a) repository name b) file path
@@ -151,10 +168,11 @@ python src/repo_level_order_transform_ray.py \
        --run_locally True \
        --data_s3_cred "$s3_kreds" \
        --data_s3_config "$s3_conf" \
-       --repo_lvl_store_type  local  \
-       --repo_lvl_store_backend_dir '/tmp/mystore' \
+       --repo_lvl_store_type  ray  \
        --repo_lvl_combine_rows True\
        --repo_lvl_sorting_enabled True\
+       --repo_lvl_store_ray_cpus 0.2 \
+       --repo_lvl_store_ray_nworkers 1 \
        --repo_lvl_sorting_algo SORT_SEMANTIC \
        --repo_lvl_output_by_langs True   
 ```
