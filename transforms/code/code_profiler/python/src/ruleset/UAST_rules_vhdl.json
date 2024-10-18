@@ -1,0 +1,14 @@
+{
+    "library_clause": {
+        "uast_node_type": "uast_package",
+        "extractor": "text = code_snippet.split('library')[1].strip() \ntext = text.rstrip(';')\nself.extracted = text"
+    },
+    "comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "self.extracted = code_snippet[2:].strip()"
+    },
+    "function_body": {
+        "uast_node_type": "uast_function",
+        "extractor": "temp_0 = code_snippet.split('(')[0].strip() \nself.extracted = temp_0.split(' ')[-1].strip()"
+    }
+}

@@ -1,0 +1,7 @@
+dpk-pdf2parquet-transform-python==0.2.2.dev1
+data-prep-toolkit-ray==0.2.2.dev1
+docling-core==1.7.2
+docling-ibm-models==2.0.0
+deepsearch-glm==0.22.0
+docling==1.20.0
+filetype >=1.2.0, <2.0.0

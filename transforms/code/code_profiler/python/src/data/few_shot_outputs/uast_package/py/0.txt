@@ -1,0 +1,38 @@
+To find the package related nodes, I need to find which nodes correspond to incorporating external libraries in the code. I will look at the higher level nodes. Hence, I can see that the 'import_statement' nodes with ids = [1, 5, 11, 20, 33], represent importing packages in the code. Incorporating each of these nodes, I can make a general rule to extract the package(s). 
+This python script can be executed:
+
+```py
+# as every code snippet starts with 'import', we will remove it and get the remaining string.
+text = code_snippet.split('import')[1].strip() 
+# To handle the snippets which have multiple imported packages, we will look at the delimiter, in this case, ','. Hence, we check if it is present, that node has multiple imported packages.
+if (',' in text):
+    # make a list to gather cleaned and final packages
+    all_imps = []
+    # get individual package imports
+    imports = text.split(',')
+    # process every package one by one
+    for imp in imports:
+        # remove empty side spaces.
+        imp = imp.strip()
+        # if it is an aliased import, get rid of the alias and keep the original name.
+        if (' as ' in imp):
+            # removing the alias
+            imp = imp.split(' as ')[0].strip()
+        # finally, add the processed string to the list of imports.
+        all_imps.append(imp)
+    # get all unique imports only, by converting to a set and back.
+    all_imps = list(set(all_imps))
+    # return the required package imports in the form 'a, b, c' where a,b,c are imported pacakges.
+    extracted = (', ').join(all_imps)
+
+# containing a single imported package
+else:
+    # remove empty side spaces.
+    imp = imp.strip()
+    # if it is an aliased import, get rid of the alias and keep the original name.
+    if (' as ' in imp):
+        # removing the alias
+        imp = imp.split(' as ')[0].strip()
+    # return the required package import
+    extracted = imp
+```

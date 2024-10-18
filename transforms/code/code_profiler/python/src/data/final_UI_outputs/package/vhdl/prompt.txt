@@ -1,0 +1,33 @@
+Definitions:
+* AST: Abstract Syntax Tree of a given code, which includes node-related code snippets.
+* code_snippet: The actual text of the whole code. 
+* Imported packages: Name of the external libraries used in the code snippet.
+
+You are given a task of extracting imported packages in a code from a provided Abstract Syntax Tree(AST) of the code, along with its given code snippet.
+Example: '#require X' in racket language, refers to importing the package X in the code file. 
+Follow the given instructions carefully:
+
+Instructions:
+* Stick to higher level nodes. For example, a node for which the snippet is '#require X', might have subnodes which have snippets "#require" and "X'. Trivially, you can just extract from the node which contains the relevant information. 
+* Do not identify such nodes, for which the string like "#require X" is only a part of the snippet, i.e. ancestors of such nodes.
+* Identify the nodes relevant to the identifying the imported or used packages.
+* Identify the relevant code snippet, do so by extracting the 'code_snippet' field of the node.
+* Along with this, you will generate the rule, which is a python script, you made to extract such feature. Your rule should be general and should extract the package name from every package node present.
+* Your code should work on the data given to you.
+* There may be multiple imported packages included in a node, you need to ensure they are all included if there are multiple present.
+* Remove asterisk '*' or underscore '_' in imports, if any. These are wildcards.
+* Remove semicolons, or other non-text characters from the end.
+* Remove comments, if any are present.
+* If the program imports some keywords 'from' a particular file/library, then the particular file/library is the package required, eg use 'x' from 'y', then 'y' is the package.
+* For example, to get the relevant package from '#require "./example.file"', you can extract it through a python script:
+    ```py
+    # we know that the 'required' keyword will be importing the package. Hence we acquire the keyword just next to it.
+    extracted = code_snippet.split('#require', 1)[1].strip()
+    ```
+* And for, 'use x = "y/z";', you identify 'x' as the alias of the package 'y/z'. Hence you can extract it through a python script:
+    ```py
+    # we remove the alias '=' and get the neccessary package, we remove empty spaces and semicolons. We do not remove the '"' character.
+    extracted = temp.split('=', 1)[1].strip(' ;')
+    ```
+* Keep in mind, that you will only extract one node type.
+* Remove sem

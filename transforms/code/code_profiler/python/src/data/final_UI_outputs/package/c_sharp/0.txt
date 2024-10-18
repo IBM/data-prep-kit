@@ -1,0 +1,18 @@
+To find the package related nodes, I need to find which nodes correspond to incorporating external libraries in the code. I will look at the higher level nodes. Hence, I can see that the 'using_directive' nodes with ids = [1, 10], represent importing packages in the code. Incorporating each of these nodes, I can make a general rule to extract the package(s).
+
+This python script can be executed:
+
+```py
+# as every code snippet starts with 'using', we will remove it and get the remaining string.
+text = code_snippet.split('using')[1].strip() 
+# To handle the snippets which have multiple imported packages, we will look at the delimiter, in this case, ';'. Hence, we check if it is present, that node has multiple imported packages.
+if ('=' in text):
+    # get the package name
+    text = text.split('=', 1)[1].strip()
+# remove empty side spaces and semicolons.
+text = text.strip(' ;')
+# return the required package import
+extracted = text
+```
+
+This script will extract the package names from the 'using_directive' nodes, handling both aliased and non-aliased imports, and removing any unnecessary characters.

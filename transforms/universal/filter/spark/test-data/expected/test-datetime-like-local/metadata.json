@@ -1,0 +1,12 @@
+{
+    "total_docs_count": 100,
+    "total_bytes_count": 478602,
+    "total_columns_count": 25,
+    "docs_filtered_out_by 'date_acquired BETWEEN '2023-07-04' AND '2023-07-08''": 76,
+    "bytes_filtered_out_by 'date_acquired BETWEEN '2023-07-04' AND '2023-07-08''": 386230,
+    "docs_filtered_out_by 'title LIKE 'https://%''": 32,
+    "bytes_filtered_out_by 'title LIKE 'https://%''": 136638,
+    "docs_after_filter": 16,
+    "columns_after_filter": 25,
+    "bytes_after_filter": 60034
+}

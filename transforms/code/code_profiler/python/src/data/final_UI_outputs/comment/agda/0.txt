@@ -1,0 +1,14 @@
+To find the comment related nodes, I will look at the higher level nodes. Hence, I can see that the 'comment' nodes with ids = [1, 2], represent comments in the code. Incorporating each of these nodes, I can make a general rule to extract the comments.
+
+This python script can be executed:
+
+```py
+if code_snippet.startswith('{-'):
+    # As the snippets start with '{-' and end with '-}', we can remove two characters from both ends to get the required snippet
+    extracted = code_snippet[2:-2].strip()
+elif code_snippet.startswith('--'):
+    # As the snippets start with '--', we can remove two characters from the start to get the required snippet
+    extracted = code_snippet[2:].strip()
+```
+
+This script will extract the comments from the given code snippets, which are "Here is a comment above a module." and "hi".

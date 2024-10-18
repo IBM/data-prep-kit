@@ -1,0 +1,9 @@
+twine
+pytest>=7.3.2
+pytest-dotenv>=0.5.2
+pytest-env>=1.0.0
+pre-commit>=3.3.2
+pytest-cov>=4.1.0
+pytest-mock>=3.10.0
+moto==5.0.5
+markupsafe==2.0.1

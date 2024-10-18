@@ -1,0 +1,51 @@
+[project]
+name = "dpk_repo_level_order_transform_ray"
+version = "0.2.2.dev1"
+requires-python = ">=3.10,<3.13"
+description = "repo_level_order Ray Transform"
+license = {text = "Apache-2.0"}
+readme = {file = "README.md", content-type = "text/markdown"}
+authors = [
+    { name = "Shivdeep Singh", email = "Shivdeep.Singh@ibm.com" },
+    { name = "Saptha Surendran", email = "Saptha.Surendran@ibm.com" },
+    { name = "Shanmukha Guttula", email = "shagutt1@in.ibm.com" },
+]
+dependencies = [
+    "data-prep-toolkit-ray==0.2.2.dev1",
+    "networkx==3.3",
+    "colorlog==6.8.2",
+    "func-timeout==4.3.5",
+    "pandas==2.2.2",
+    "emerge-viz==2.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = [
+    "twine",
+    "pytest>=7.3.2",
+    "pytest-dotenv>=0.5.2",
+    "pytest-env>=1.0.0",
+    "pre-commit>=3.3.2",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.10.0",
+    "moto==5.0.5",
+    "markupsafe==2.0.1",
+]
+
+[options]
+package_dir = ["src","test"]
+
+[options.packages.find]
+where = ["src/"]
+
+[tool.pytest.ini_options]
+# Currently we use low coverage since we have to run tests separately (see makefile)
+#addopts = "--cov --cov-report term-missing --cov-fail-under 25"
+markers = ["unit: unit tests", "integration: integration tests"]
+
+[tool.coverage.run]
+include = ["src/*"]

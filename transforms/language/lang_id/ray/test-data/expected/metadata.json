@@ -1,0 +1,84 @@
+{
+    "pipeline": "pipeline_id",
+    "job details": {
+        "job category": "preprocessing",
+        "job name": "LangIdentification",
+        "job type": "ray",
+        "job id": "job_id",
+        "start_time": "2024-05-28 18:53:20",
+        "end_time": "2024-05-28 18:53:23",
+        "status": "success"
+    },
+    "code": null,
+    "job_input_params": {
+        "lang_id_model_kind": "fasttext",
+        "lang_id_model_url": "facebook/fasttext-language-identification",
+        "lang_id_content_column_name": "text",
+        "checkpointing": false,
+        "max_files": -1,
+        "random_samples": -1,
+        "files_to_use": [".parquet"],
+        "number of workers": 1,
+        "worker options": {
+            "num_cpus": 0.8
+        },
+        "actor creation delay": 0
+    },
+    "execution_stats": {
+        "cpus": 4,
+        "gpus": 0,
+        "memory": 3.495941162109375,
+        "object_store": 1.7479705810546875
+    },
+    "job_output_stats": {
+        "source_files": 3,
+        "source_size": 464912,
+        "result_files": 3,
+        "result_size": 470832,
+        "processing_time": 0.44434642791748047,
+        "en": 357,
+        "de": 38,
+        "vi": 16,
+        "ko-Hang": 49,
+        "lb": 2,
+        "ca": 5,
+        "rm": 2,
+        "lt": 1,
+        "yue-Hant": 58,
+        "hu": 1,
+        "sv": 3,
+        "it": 2,
+        "vec-Latn": 2,
+        "azb-Arab": 7,
+        "tr": 1,
+        "fr": 4,
+        "ro": 4,
+        "pl": 12,
+        "cs": 7,
+        "es": 3,
+        "ast-Latn": 4,
+        "eo": 2,
+        "oc-Latn": 3,
+        "lmo-Latn": 1,
+        "da": 1,
+        "eu": 1,
+        "nl": 4,
+        "source_doc_count": 600,
+        "result_doc_count": 600,
+        "sk": 1,
+        "lvs-Latn": 1,
+        "li-Latn": 1,
+        "nn": 1,
+        "bo-Tibt": 4,
+        "af": 1,
+        "nb": 1
+    },
+    "source": {
+        "name": "/home/kind/data-prep-kit-inner/transforms/language/language_id/test-data/input",
+        "type": "path"
+    },
+    "target": {
+        "name": "/tmp/LangIdentificationp6jsp6zh",
+        "type": "path"
+    }
+}

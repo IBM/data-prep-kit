@@ -1,0 +1,9 @@
+
+type ible(int atomicNumber) {
+  return _nobleGases[atomicNumber] != null;
+}
+
+
+ible(int atomicNumber) {
+  return d;
+}

@@ -1,0 +1,26 @@
+{
+    "import_statement": {
+        "uast_node_type": "uast_package",
+        "extractor": "text = code_snippet.split('import')[1].strip() \nif (',' in text):\n    # make a list to gather cleaned and final packages\n    all_imps = []\n    # get individual package imports\n    imports = text.split(',')\n    # process every package one by one\n    for imp in imports:\n        # remove empty side spaces.\n        imp = imp.strip()\n        # if it is an aliased import, get rid of the alias and keep the original name.\n        if (' as ' in imp):\n            # removing the alias\n            imp = imp.split(' as ')[0].strip()\n        # if it has an 'except' keyword, remove it and get the package before it\n        if (' except ' in imp):\n            imp = imp.split(' except ')[0].strip()\n        # finally, add the processed string to the list of imports.\n        all_imps.append(imp)\n    # get all unique imports only, by converting to a set and back.\n    all_imps = list(set(all_imps))\n    # return the required package imports in the form 'a, b, c' where a,b,c are imported pacakges.\n    self.extracted = (', ').join(all_imps)\n\nelse:\n    # remove empty side spaces.\n    imp = text.strip()\n    # if it is an aliased import, get rid of the alias and keep the original name.\n    if (' as ' in imp):\n        # removing the alias\n        imp = imp.split(' as ')[0].strip()\n    # if it has an 'except' keyword, remove it and get the package before it\n    if (' except ' in imp):\n        imp = imp.split(' except ')[0].strip()\n    # return the required package import\n    self.extracted = imp"
+    },
+    "include_statement": {
+        "uast_node_type": "uast_package",
+        "extractor": "temp = code_snippet.split('include', 1)[1].strip()\nself.extracted = temp.replace('\"', '').replace(\"'\", '')"
+    },
+    "import_from_statement": {
+        "uast_node_type": "uast_package",
+        "extractor": "text = code_snippet.split('from', 1)[1].strip()\ntext = text.split('import')[0].strip()\nself.extracted = text"
+    },
+    "block_comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "self.extracted = code_snippet[3:-3].strip()"
+    },
+    "comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "self.extracted = code_snippet[1:].strip()"
+    },
+    "proc_declaration": {
+        "uast_node_type": "uast_function",
+        "extractor": "temp_0 = code_snippet.split('proc')[1].split('(')[0].strip() \nself.extracted = temp_0"
+    }
+}

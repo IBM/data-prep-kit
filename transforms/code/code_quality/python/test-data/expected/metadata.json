@@ -1,0 +1,55 @@
+{
+    "pipeline": "pipeline_id",
+    "job details": {
+        "job category": "preprocessing",
+        "job name": "code_quality",
+        "job type": "ray",
+        "job id": "job_id",
+        "start_time": "2024-04-29 01:27:47",
+        "end_time": "2024-04-29 01:27:50",
+        "status": "success"
+    },
+    "code": {
+        "github": "github",
+        "commit_hash": "12345",
+        "path": "path"
+    },
+    "job_input_params": {
+        "code_quality_params": {
+            "contents_column_name": "contents",
+            "language_column_name": "language",
+            "tokenizer": "codeparrot/codeparrot",
+            "hf_token": null
+        },
+        "checkpointing": false,
+        "max_files": -1,
+        "random_samples": -1,
+        "files_to_use": [".parquet"],
+        "number of workers": 3,
+        "worker options": {
+            "num_cpus": 0.8
+        },
+        "actor creation delay": 0
+    },
+    "execution_stats": {
+        "cpus": 8,
+        "gpus": 0,
+        "memory": 4.283995057456195,
+        "object_store": 2.141997527331114
+    },
+    "job_output_stats": {
+        "source_files": 2,
+        "source_size": 431,
+        "result_files": 2,
+        "result_size": 635,
+        "table_processing": 0.1933128833770752
+    },
+    "source": {
+        "name": "/root/codellm/repos/external/forks/data-prep-kit/transforms/code/code_quality/test-data/input",
+        "type": "path"
+    },
+    "target": {
+        "name": "/root/codellm/repos/external/forks/data-prep-kit/transforms/code/code_quality/output",
+        "type": "path"
+    }
+}

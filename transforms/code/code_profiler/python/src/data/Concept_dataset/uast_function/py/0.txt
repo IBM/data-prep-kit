@@ -1,0 +1,5 @@
+def foo(x: int, y: int) -> int:
+    print("hello world")
+    return 0
+
+foo(3,4)

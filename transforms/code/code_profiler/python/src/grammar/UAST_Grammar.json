@@ -1,0 +1,20 @@
+{
+    "uast_root" : {
+        "keyword" : "uast_root"
+    },
+    "uast_package" : {
+        "keyword" : "uast_package"
+    },
+    "uast_comment" : {
+        "keyword" : "uast_comment"
+    },
+    "uast_class" : {
+        "keyword" : "uast_class"
+    },
+    "uast_function" : {
+        "keyword" : "uast_function"
+    },
+    "uast_call" : {
+        "keyword" : "uast_call"
+    }
+}

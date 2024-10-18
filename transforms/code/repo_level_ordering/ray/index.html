@@ -1,0 +1,736 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.41">
+    
+    
+      
+        <title>Repo Level Order Ray Transform - Data Prep Kit</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.0253249f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/badge.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#repo-level-order-ray-transform" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Data Prep Kit" class="md-header__button md-logo" aria-label="Data Prep Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Data Prep Kit
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Repo Level Order Ray Transform
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/IBM/data-prep-kit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../data-processing-lib/doc/overview/" class="md-tabs__link">
+        
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../doc/quick-start/quick-start/" class="md-tabs__link">
+          
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Data Prep Kit" class="md-nav__button md-logo" aria-label="Data Prep Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Data Prep Kit
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/IBM/data-prep-kit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../data-processing-lib/doc/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../doc/quick-start/quick-start/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    QuickStart
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../data-processing-lib/doc/simplest-transform-tutorial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Simple
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../data-processing-lib/doc/advanced-transform-tutorial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Advanced
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../kfp/doc/simple_transform_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KFP Pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-and-command-line-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration and command line Options
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#launched-command-line-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Launched Command Line Options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-the-samples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running the samples
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-the-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using the CLI
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="repo-level-order-ray-transform">Repo Level Order Ray Transform</h1>
+<p>Please see the set of
+<a href="../../../#transform-project-conventions">transform project conventions</a>
+for details on general project conventions, transform configuration,
+testing and IDE set up.</p>
+<h2 id="summary">Summary</h2>
+<p>This transform can group the data by <code>repo_name</code> and apply additional transformations like( sorting or output_by_language or combining rows) on the  grouped data.
+This transform requires the input data to have at least the following columns: </p>
+<ul>
+<li>
+<p>repo name: Name of the repo, it is used for grouping in this transform.</p>
+</li>
+<li>
+<p>title : Which is usually file path.</p>
+</li>
+<li>
+<p>language: Programming language of content</p>
+</li>
+</ul>
+<p>The input data for this transform should be in parquet format. The input data is expected to have code data arranged in rows
+such that each row represents a file. The required columns in the input data shoud correspond to a) repository name b) file path
+c) content. This transform supports searching the repo across the whole dataset and writing the files of a repo as a single 
+parquet file. </p>
+<p>The transform gives the option to write the repo to file in the following ways.</p>
+<p>a) sort the repo content by file path and write a parquet with multiple rows</p>
+<p>b) sort the repo content by file path and write a parquet with a single combined row.</p>
+<p>c) sort the repo content in semantic ordering and write the parquet with multiple rows.</p>
+<p>d) sort the repo content in semantic ordering and write the parquet with a single combined row.</p>
+<p>Additionally this transform can grooup the repos in the folders named after the most dominant language in the repo. For more information on this transform, please refer to <a href="https://arxiv.org/pdf/2407.13739">here</a>.</p>
+<h2 id="configuration-and-command-line-options">Configuration and command line Options</h2>
+<p>This transform is dependant on ray runtime. </p>
+<p>Transform Configuration.</p>
+<ul>
+<li>For output:
+   either the output is directly a file or if dominant language flag is enabled, it should output
+   it in folder of that langauge.</li>
+<li>Enable sorting: 
+   if sorting is enabled, we should be able to choose one of the available ones (SORT_BY_PATH, SORT_SEMANTIC, SORT_SEMANTIC_NORMALISED)<ul>
+<li>SORT_BY_PATH: Normal ascending sort by filename</li>
+<li>SORT_SEMANTIC: Uses semantic analysis to sort the files within a repo.</li>
+<li>SORT_SEMANTIC_NORMALISED: Normalises the title to remove https:// prefix, if present, and then runs SORT_SEMANTIC</li>
+</ul>
+</li>
+<li>Enable superrows:
+   of writing superrows is enabled, then it combines rows of a repo to a single row otherwise writes normal.</li>
+</ul>
+<p>Limitation of transform. This expects a flat input folder structure with parquet files.</p>
+<h2 id="running">Running</h2>
+<h3 id="launched-command-line-options">Launched Command Line Options</h3>
+<p>Ray runtime options of <a href="../../../../data-processing-lib/doc/ray-launcher-options/">ray launcher</a> are available.</p>
+<h3 id="running-the-samples">Running the samples</h3>
+<p>To run the samples, use the following <code>make</code> targets</p>
+<ul>
+<li><code>run-local-sample</code> - runs src/repo_level_order_local_ray.py</li>
+</ul>
+<p>These targets will activate the virtual environment and set up any configuration needed.
+Use the <code>-n</code> option of <code>make</code> to see the detail of what is done to run the sample.</p>
+<p>For example, 
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>make<span class="w"> </span>run-local-sample
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>...
+</span></code></pre></div>
+Then 
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ls<span class="w"> </span>output
+</span></code></pre></div>
+To see results of the transform.</p>
+<h2 id="using-the-cli">Using the CLI</h2>
+<ol>
+<li>Simplest Usage:</li>
+</ol>
+<p>Running on local computer setup with data available on local filesystem.
+Sorting the data at repo level using default algorithm. (SORT_BY_PATH).
+In this configuration, the workers run locally, store is local.
+This is a recommended method if number of available cpus is less.</p>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">INPUT_FOLDER</span><span class="o">=</span><span class="s2">&quot;input_data_folder/&quot;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OUTPUT_FOLDER</span><span class="o">=</span><span class="s2">&quot;output_data_folder/&quot;</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nv">local_conf</span><span class="o">=</span><span class="s2">&quot;{&#39;input_folder&#39; : &#39;</span><span class="nv">$INPUT_FOLDER</span><span class="s2">&#39;, &#39;output_folder&#39; : &#39;</span><span class="nv">$OUTPUT_FOLDER</span><span class="s2">&#39;  }&quot;</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>rm<span class="w"> </span>-rf<span class="w"> </span>/tmp/mystore<span class="w"> </span><span class="c1"># remove if it exists</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>python<span class="w"> </span>src/repo_level_order_transform_ray.py<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">       </span>--run_locally<span class="w"> </span>True<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">       </span>--data_local_config<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$local_conf</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">       </span>--repo_lvl_store_type<span class="w">  </span><span class="nb">local</span><span class="w">  </span><span class="se">\</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">       </span>--repo_lvl_store_backend_dir<span class="w"> </span><span class="s1">&#39;/tmp/mystore&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">       </span>--repo_lvl_sorting_enabled<span class="w"> </span>true,
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">       </span>--repo_lvl_sorting_algo<span class="w"> </span>SORT_SEMANTIC
+</span></code></pre></div>
+<p>NOTE: Make sure you use an empty folder as <code>repo_lvl_store_backend_dir</code>. </p>
+<ol>
+<li>Running on Cluster</li>
+</ol>
+<p>This configuration can be used when data is on S3 like COS storage and computation is done
+on a ray cluster.</p>
+<p>Recommended <code>repo_lvl_store_type</code> for cluster is 'ray'. We need to dedicate some ray actors specially for
+ray store</p>
+<p>for example, if we have a ray cluster with 100 actors available. We can dedicate some for the store. Let us randomly
+use 35 for computation and 10 for store and let remaining free. </p>
+<p>NOTE: The transform reads parquet files in two stages and each stage has its own actor pool for computations. The 
+actor pool to read parquet data in the first stage is managed by the library and the actor pool used in the second stage
+is managed by the ray runtime of the transform. The number of actors in each pool is same and is configured using <code>--runtime_num_workers</code>.
+So we have to carefully choose number of actors required based on the number resources available. 
+The number of workers/actors should be less than 35% of total resources available. </p>
+<p>We need to add the following cli args:</p>
+<p><code>--runtime_num_workers 35</code> 
+ <code>--repo_lvl_store_type "ray" --repo_lvl_store_ray_cpus 0.2 --repo_lvl_store_ray_nworkers 10</code> </p>
+<p>When we want the output with the following configuration enabled:</p>
+<blockquote>
+<p>NOTE: store_backend=<code>s3/local</code> are persistent stores and retain the mappings stores in them, they need to be cleaned/deleted after use. It is recommented to use a different location for store if data is different. They are added to aid in large data processing in multiple stages.
+  store_backend=<code>ray</code>, is not presistent and ephimeral and does not retain any data. It is the simplest to use if resources are available.</p>
+</blockquote>
+<div class="language-sh highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">INPUT_FOLDER</span><span class="o">=</span><span class="s2">&quot;input_cos_bucket&quot;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OUTPUT_FOLDER</span><span class="o">=</span><span class="s2">&quot;output_cos_bucket&quot;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="nv">s3_kreds</span><span class="o">=</span><span class="s2">&quot;{ ... }&quot;</span><span class="w"> </span><span class="c1"># in the deafult way used for all transforms. </span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nv">s3_conf</span><span class="o">=</span><span class="s2">&quot;{&#39;input_folder&#39; : &#39;</span><span class="nv">$INPUT_FOLDER</span><span class="s2">&#39;, &#39;output_folder&#39; : &#39;</span><span class="nv">$OUTPUT_FOLDER</span><span class="s2">&#39;  }&quot;</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>python<span class="w"> </span>src/repo_level_order_transform_ray.py<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">       </span>--run_locally<span class="w"> </span>True<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">       </span>--data_s3_cred<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$s3_kreds</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">       </span>--data_s3_config<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$s3_conf</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">       </span>--repo_lvl_store_type<span class="w">  </span><span class="nb">local</span><span class="w">  </span><span class="se">\</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">       </span>--repo_lvl_store_backend_dir<span class="w"> </span><span class="s1">&#39;/tmp/mystore&#39;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">       </span>--repo_lvl_combine_rows<span class="w"> </span>True<span class="se">\</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">       </span>--repo_lvl_sorting_enabled<span class="w"> </span>True<span class="se">\</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">       </span>--repo_lvl_sorting_algo<span class="w"> </span>SORT_SEMANTIC<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">       </span>--repo_lvl_output_by_langs<span class="w"> </span>True<span class="w">   </span>
+</span></code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
+      
+        <script src="../../../../assets/javascripts/badge.js" async></script>
+      
+    
+  </body>
+</html>
