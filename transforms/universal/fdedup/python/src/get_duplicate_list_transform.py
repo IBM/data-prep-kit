@@ -31,16 +31,21 @@ subfolder_key = "docs_to_remove"
 """ This key holds the name of the subfolder with the duplicate records"""
 consolidated_filename_key = "consolidated_filename"
 """ This key holds the name of the file with the consolidated list of duplicates"""
+sort_output_key = "sort_output"
+""" This key is used to sort"""
 
 # command line arguments
 subfolder_cli_param = f"{cli_prefix}{subfolder_key}"
 """ The name of the subfolder with the duplicate records"""
 consolidated_filename_cli_param = f"{cli_prefix}{consolidated_filename_key}"
 """ The name of the file with the consolidated list of duplicates"""
+sort_output_cli_param = f"{cli_prefix}{sort_output_key}"
+""" Sort the output"""
 
 captured_arg_keys = [
     subfolder_key,
     consolidated_filename_key,
+    sort_output_key,
 ]
 
 # defaults
@@ -48,6 +53,7 @@ subfolder_default = "docs_to_remove"
 """ Default name of the subfolder with the duplicate records"""
 consolidated_filename_default = os.path.join("docs_to_remove_consolidated", "docs_to_remove_consolidated.parquet")
 """ Default name of the file with the consolidated list of duplicates"""
+sort_output_default = False
 
 
 class GetDuplicateListTransform(AbstractFolderTransform):
@@ -69,6 +75,7 @@ class GetDuplicateListTransform(AbstractFolderTransform):
         super().__init__(config)
         self.subfolder = config.get(subfolder_key, subfolder_default)
         self.consolidated_filename = config.get(consolidated_filename_key, consolidated_filename_default)
+        self.sort_output = config.get(sort_output_key, sort_output_default)
         self.data_access = config.get("data_access")
         self.logger = get_logger(__name__)
 
@@ -118,6 +125,9 @@ class GetDuplicateListTransform(AbstractFolderTransform):
             "consolidated_bytes": consolidated_dataframe.to_arrow().nbytes,
             "consolidated_rows": len(consolidated_dataframe),
         }
+        if self.sort_output:
+            consolidated_dataframe = consolidated_dataframe.sort(by="docs_to_remove")
+
         return consolidated_dataframe, consolidation_stats
 
 
@@ -154,6 +164,12 @@ class GetDuplicateListTransformConfiguration(TransformConfiguration):
             type=str,
             default=consolidated_filename_default,
             help="The name of the file with the consolidated list of duplicates",
+        )
+        parser.add_argument(
+            f"--{sort_output_cli_param}",
+            type=bool,
+            default=sort_output_default,
+            help="Sort",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:

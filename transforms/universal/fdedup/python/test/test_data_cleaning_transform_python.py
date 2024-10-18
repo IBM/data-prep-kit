@@ -35,8 +35,8 @@ class TestPythonDataCleaningTransform(AbstractTransformLauncherTest):
             os.path.join(
                 os.path.dirname(__file__),
                 "..",
-                "output",
-                "docs_to_remove_consolidated",
+                "test-data",
+                "expected/get_list_transform/docs_to_remove_consolidated",
                 "docs_to_remove_consolidated.parquet",
             )
         )
@@ -45,5 +45,5 @@ class TestPythonDataCleaningTransform(AbstractTransformLauncherTest):
             duplicate_list_location_cli_param: duplicate_location,
         }
         launcher = PythonTransformLauncher(DataCleaningPythonTransformConfiguration())
-        fixtures = [(launcher, config, basedir + "/input/data_1", basedir + "/expected/data_cleaning/cleaned")]
+        fixtures = [(launcher, config, basedir + "/input", basedir + "/expected/data_cleaning/cleaned")]
         return fixtures

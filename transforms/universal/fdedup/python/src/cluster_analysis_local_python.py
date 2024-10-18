@@ -37,7 +37,7 @@ params = {
     "runtime_code_location": ParamsUtils.convert_to_ast(code_location),
     "cluster_num_bands": 14,
     "cluster_num_segments": 2,
-    "cluster_jaccard_similarity_threshold": 0.0,
+    "cluster_jaccard_similarity_threshold": 0.7,
 }
 if __name__ == "__main__":
     # Set the simulated command line args

@@ -33,6 +33,8 @@ num_segments_key = "num_segments"
 """ This key holds the number of segments dividing the hashing space for each band"""
 jaccard_similarity_threshold_key = "jaccard_similarity_threshold"
 """ This key holds the Jaccard similarity threshold above which two documents are duplicates"""
+sort_output_key = "sort_output"
+""" This key is used to sort"""
 
 # command line arguments
 num_bands_cli_param = f"{cli_prefix}{num_bands_key}"
@@ -41,11 +43,14 @@ jaccard_similarity_threshold_cli_param = f"{cli_prefix}{jaccard_similarity_thres
 """ Jaccard similarity threshold above which two documents are duplicates"""
 num_segments_cli_param = f"{cli_prefix}{num_segments_key}"
 """ The number of segments dividing the hashing space for each band"""
+sort_output_cli_param = f"{cli_prefix}{sort_output_key}"
+""" Sort the output"""
 
 captured_arg_keys = [
     num_bands_key,
     num_segments_key,
     jaccard_similarity_threshold_key,
+    sort_output_key,
 ]
 
 # defaults
@@ -55,6 +60,7 @@ jaccard_similarity_threshold_default = 0.75
 """ Default Jaccard similarity threshold (from FineWeb https://arxiv.org/pdf/2406.17557)"""
 num_segments_default = 1
 """ Default number of segments dividing the hashing space for each band"""
+sort_output_default = False
 
 
 class ClusterAnalysisTransform(AbstractFolderTransform):
@@ -98,6 +104,7 @@ class ClusterAnalysisTransform(AbstractFolderTransform):
         self.jaccard_similarity_threshold = config.get(
             jaccard_similarity_threshold_key, jaccard_similarity_threshold_default
         )
+        self.sort_output = config.get(sort_output_key, sort_output_default)
         self.data_access = config.get("data_access")
         self.logger = get_logger(__name__)
 
@@ -225,6 +232,8 @@ class ClusterAnalysisTransform(AbstractFolderTransform):
             "jaccard_clusters": num_clusters,
             "jaccard_duplicate_docs": sum_cdocs,
         }
+        if self.sort_output:
+            filtered_jaccard_dataframe = filtered_jaccard_dataframe.sort(by="first_doc")
         return filtered_jaccard_dataframe, jaccard_stats
 
     def jaccard_distance_calculation(self, row: List[pl.Series]) -> list[list]:
@@ -307,6 +316,12 @@ class ClusterAnalysisTransformConfiguration(TransformConfiguration):
             type=int,
             default=num_segments_default,
             help="The number of segments dividing the hashing space for each band",
+        )
+        parser.add_argument(
+            f"--{sort_output_cli_param}",
+            type=bool,
+            default=sort_output_default,
+            help="Sort",
         )
 
     def apply_input_params(self, args: Namespace) -> bool:

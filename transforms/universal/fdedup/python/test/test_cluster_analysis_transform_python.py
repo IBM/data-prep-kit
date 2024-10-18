@@ -12,6 +12,7 @@
 
 import os
 
+from cluster_analysis_transform import sort_output_cli_param
 from cluster_analysis_transform_python import (
     ClusterAnalysisPythonTransformConfiguration,
 )
@@ -32,7 +33,8 @@ class TestPythonClusterAnalysisTransform(AbstractTransformLauncherTest):
         config = {
             "cluster_num_bands": 14,
             "cluster_num_segments": 2,
-            "cluster_jaccard_similarity_threshold": 0.0,
+            "cluster_jaccard_similarity_threshold": 0.7,
+            sort_output_cli_param: True,
         }
         launcher = PythonTransformLauncher(ClusterAnalysisPythonTransformConfiguration())
         fixtures = [
