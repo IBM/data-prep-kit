@@ -18,7 +18,7 @@ from typing import Any
 import pyarrow as pa
 from data_processing.data_access import DataAccessFactoryBase
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
-from data_processing.utils import CLIArgumentProvider, get_logger
+from data_processing.utils import CLIArgumentProvider, get_logger, str2bool
 from data_processing_ray.runtime.ray import DefaultRayTransformRuntime, RayUtils
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
@@ -27,6 +27,7 @@ from dpk_repo_level_order.internal.store.store_factory import (
     create_store,
     create_store_params,
     init_store_params,
+    store_type_value_ray,
     validate_store_params,
 )
 from ray.actor import ActorHandle
@@ -108,6 +109,7 @@ class RepoLevelOrderTransform(AbstractTableTransform):
         self.grouping_column = config.get(grouping_column_key, repo_column_default_value)
         store_params = config.get(store_params_key)
         validate_store_params(store_params)
+        self.store_type = store_params[store_type_key]
         self.store = create_store(store_params)
         self.group_batch_size = group_batch_size
 
@@ -125,6 +127,16 @@ class RepoLevelOrderTransform(AbstractTableTransform):
             if batch:
                 batches.append(batch)
         return batches
+
+    def _normalize_file_name_for_store(self, file_name):
+        if self.store_type == store_type_value_ray:
+            # we can store full file_name consiting of full path in this store.
+            return file_name
+        else:
+            # since this store type uses filesystem as backend
+            # can't store full path in store since,
+            # store is currently flat filesystem.
+            return os.path.basename(file_name)
 
     def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
@@ -145,11 +157,8 @@ class RepoLevelOrderTransform(AbstractTableTransform):
             grp_flow = {}
             for group in batch:
                 # This supports only flat folder structure, so all
-                # files should be in the same folder
-                # since store uses filesystem as backend
-                # can't store full path in store since,
-                # store is currently flat filesystem.
-                file_name = os.path.basename(file_name)
+                # files should be in the same folder.
+                file_name = self._normalize_file_name_for_store(file_name)
                 grp_flow[group] = file_name
                 self.logger.debug(f"Updating {group} to store")
 
@@ -286,10 +295,15 @@ class RepoLevelOrderRuntime(DefaultRayTransformRuntime):
 
     def _prepare_inputs(self):
         store = create_store(self.store_params)
-        files_location = self.input_folder
+        store_type = self.store_params[store_type_key]
+
         p_input = []
         for repo, files in store.items_kv():
-            p_input.append((repo, [f"{files_location}/{file}" for file in files]))
+            if store_type == store_type_value_ray:
+                p_input.append((repo, [f"{file}" for file in files]))
+            else:
+                files_location = self.input_folder
+                p_input.append((repo, [f"{files_location}/{file}" for file in files]))
         return p_input
 
     def _group_and_sort(self):
@@ -361,8 +375,8 @@ class RepoLevelOrderTransformConfiguration(TransformConfiguration):
         # See below for remove_from_metadata addition so that it is not reported.
         parser.add_argument(
             f"--{cli_prefix}{stage_one_only_key}",
-            action="store_true",
-            help="If this flag is set, transform only builds the repo grouping and doesn't write output",
+            type=lambda x: bool(str2bool(x)),
+            help="If this flag is True, transform only builds the repo grouping and doesn't write output",
         )
         parser.add_argument(
             f"--{cli_prefix}{grouping_column_key}",
@@ -402,7 +416,7 @@ class RepoLevelOrderTransformConfiguration(TransformConfiguration):
         parser.add_argument(
             f"--{cli_prefix}{sorting_enable_key}",
             default=sort_enable_default,
-            type=bool,
+            type=lambda x: bool(str2bool(x)),
             help=f"Enables sorting of output by algorithm specified using {cli_prefix}{sorting_algo_key}. Defaults to SORT_BY_PATH if no algorithm is specified.",
         )
         parser.add_argument(
@@ -413,13 +427,13 @@ class RepoLevelOrderTransformConfiguration(TransformConfiguration):
         )
         parser.add_argument(
             f"--{cli_prefix}{output_by_langs_key}",
-            type=bool,
+            type=lambda x: bool(str2bool(x)),
             default=output_by_lang_default,
             help="If specified, output is grouped into programming language folders.",
         )
         parser.add_argument(
             f"--{cli_prefix}{output_superrows_key}",
-            type=bool,
+            type=lambda x: bool(str2bool(x)),
             default=superrows_default,
             help="If specified, output rows per repo are combined to form a single repo",
         )

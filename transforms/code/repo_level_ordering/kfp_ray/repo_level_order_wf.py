@@ -68,15 +68,11 @@ def compute_exec_params_func(
         "repo_lvl_store_ray_cpus": repo_lvl_store_ray_cpus,
         "repo_lvl_store_ray_nworkers": repo_lvl_store_ray_nworkers,
         "repo_lvl_sorting_algo": repo_lvl_sorting_algo,
+        "repo_lvl_stage_one_only": repo_lvl_stage_one_only,
+        "repo_lvl_sorting_enabled": repo_lvl_sorting_enabled,
+        "repo_lvl_output_by_langs": repo_lvl_output_by_langs,
+        "repo_lvl_combine_rows": repo_lvl_combine_rows,
     }
-    if repo_lvl_stage_one_only == True:
-        res["repo_lvl_stage_one_only"] = ""
-    if repo_lvl_sorting_enabled == True:
-        res["repo_lvl_sorting_enabled"] = ""
-    if repo_lvl_output_by_langs == True:
-        res["repo_lvl_output_by_langs"] = ""
-    if repo_lvl_combine_rows == True:
-        res["repo_lvl_combine_rows"] = ""
     return res
 
 
