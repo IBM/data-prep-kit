@@ -95,8 +95,7 @@ class BaseSitemapSpider(SitemapSpider):
         elif subdomain_focus:
             self.allowed_domains = set()
             for url in seed_urls:
-                fqdn = get_fqdn(url)
-                if fqdn:
+                if fqdn := get_fqdn(url):
                     self.allowed_domains.add(fqdn)
         else:
             self.allowed_domains = set(get_etld1(url) for url in seed_urls)
@@ -162,7 +161,9 @@ class BaseSitemapSpider(SitemapSpider):
             )
 
     def _parse_sitemap(self, response: Response):
-        yield ConnectorItem(dropped=False, downloaded=False, system_request=True, sitemap=True)
+        yield ConnectorItem(
+            dropped=False, downloaded=False, system_request=True, sitemap=True
+        )
 
         seed_url = response.meta["seed_url"]
 
