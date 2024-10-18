@@ -1,6 +1,6 @@
 [project]
 name = "dpk_fdedup_transform_spark"
-version = "0.3.0.dev0"
+version = "0.2.2.dev1"
 requires-python = ">=3.10"
 description = "Fuzzy Dedup Spark Transform"
 license = {text = "Apache-2.0"}
@@ -10,8 +10,8 @@ authors = [
     { name = "Constantin Adam", email = "cmadam@us.ibm.com" },
 ]
 dependencies = [
-    "dpk_fdedup_transform_python==0.3.0.dev0",
-    "data-prep-toolkit-spark==0.2.2.dev0",
+    "dpk_fdedup_transform_python==0.2.2.dev1",
+    "data-prep-toolkit-spark==0.2.2.dev1",
 ]
 
 [project.optional-dependencies]
