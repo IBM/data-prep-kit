@@ -1,0 +1,10 @@
+output*/
+
+## File system artifacts
+.directory
+.DS_Store
+
+
+## Python output
+__pycache__
+.ipynb_checkpoints/
