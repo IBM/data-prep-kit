@@ -22,10 +22,7 @@ COPY --chown=ray:users images/ images/
 RUN pip install --no-cache-dir -e .
 
 # copy the main() entry point to the image 
-COPY ./src/fdedup_transform_ray.py .
-
-# copy some of the samples in
-COPY src/fdedup_local_ray.py local/
+COPY ./src/fuzzy_dedup_ray.py .
 
 # copy test
 COPY test/ test/
