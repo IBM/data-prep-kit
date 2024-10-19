@@ -36,7 +36,8 @@ RUN pip install --no-cache-dir -e .
 COPY ./src/signature_calc_spark.py .
 
 # copy some of the samples in
-# COPY src/filter_local_spark.py local/
+COPY src/signature_calc_transform_spark.py fdedup_transform_spark.py
+COPY src/signature_calc_spark.py local/fdedup_local_spark.py
 
 # copy test
 COPY test/ test/
@@ -46,6 +47,7 @@ USER spark
 
 # Set environment
 ENV PYTHONPATH=${SPARK_HOME}/work-dir/:${SPARK_HOME}/work-dir/src/:${PYTHONPATH}
+ENV PATH=${SPARK_HOME}/work-dir/.local/bin/:${PATH}
 
 # Put these at the end since they seem to upset the docker cache.
 ARG BUILD_DATE
