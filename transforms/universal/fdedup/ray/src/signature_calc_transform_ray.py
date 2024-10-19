@@ -14,6 +14,7 @@ from data_processing.utils import CLIArgumentProvider, get_logger
 from data_processing_ray.runtime.ray.runtime_configuration import (
     RayTransformRuntimeConfiguration,
 )
+from data_processing_ray.runtime.ray.transform_launcher import RayTransformLauncher
 from signature_calc_transform import SignatureCalculationTransformConfiguration
 
 

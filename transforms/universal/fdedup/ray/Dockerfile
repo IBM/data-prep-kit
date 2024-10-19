@@ -2,6 +2,8 @@ ARG BASE_IMAGE=docker.io/rayproject/ray:2.24.0-py310
 
 FROM ${BASE_IMAGE}
 
+USER ray
+
 RUN pip install --upgrade --no-cache-dir pip 
 
 # install pytest
@@ -13,16 +15,18 @@ COPY --chown=ray:users data-processing-lib-python/ data-processing-lib-python/
 RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
 COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/ 
 RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
+COPY --chown=ray:users python-transform/  python-transform/
+RUN cd python-transform && pip install --no-cache-dir -e .
 
 # Install ray project source
 COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml
 COPY --chown=ray:users README.md README.md
-COPY --chown=ray:users images/ images/
 RUN pip install --no-cache-dir -e .
 
-# copy the main() entry point to the image 
-COPY ./src/fuzzy_dedup_ray.py .
+# copy source files needed by test-image
+COPY ./src/signature_calc_transform_ray.py fdedup_transform_ray.py
+COPY ./src/signature_calc_local_ray.py local/fdedup_local_ray.py
 
 # copy test
 COPY test/ test/

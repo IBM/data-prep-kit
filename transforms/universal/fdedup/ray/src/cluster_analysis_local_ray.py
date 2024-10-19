@@ -19,7 +19,7 @@ from data_processing_ray.runtime.ray import RayTransformLauncher
 
 
 # create parameters
-input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "bands_consolidated"))
+input_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "bands"))
 output_folder = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "output", "docs_to_remove"))
 local_conf = {
     "input_folder": input_folder,
