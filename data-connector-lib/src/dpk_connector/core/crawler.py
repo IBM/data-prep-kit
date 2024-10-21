@@ -74,6 +74,7 @@ def async_crawl(
     user_agent: str = "",
     headers: dict[str, str] = {},
     allow_domains: Collection[str] = (),
+    subdomain_focus: bool = False,
     path_focus: bool = False,
     allow_mime_types: Collection[str] = (
         "application/pdf",
@@ -96,6 +97,7 @@ def async_crawl(
         user_agent (str): The user agent string to use for the crawler. Defaults to "Scrapy/VERSION (+https://scrapy.org)".
         headers (dict[str, str]): A dictionary of additional headers to send with each request. Default is an empty dictionary.
         allow_domains (Collection[str]): A collection of domains to restrict the crawler to. Default is the domains of the seed URLs.
+        subdomain_focus (bool): If specified, only links under the subdomains of the input seed URLs will be extracted. Ignored if `allow_domains` is specified.
         path_focus (bool): If specified, only links under the paths of the input seed URLs will be extracted.
         allow_mime_types (Collection[str]): A collection of MIME types to allow during the crawl. Default is a collection containing "application/pdf", "text/html", "text/markdown", and "text/plain".
         disallow_mime_types (Collection[str]): A collection of MIME types to disallow during the crawl. Default is an empty collection.
@@ -140,6 +142,7 @@ def async_crawl(
         seed_urls=seed_urls,
         callback=on_downloaded,
         allow_domains=allow_domains,
+        subdomain_focus=subdomain_focus,
         path_focus=path_focus,
         allow_mime_types=allow_mime_types,
         disallow_mime_types=disallow_mime_types,
@@ -155,6 +158,7 @@ def crawl(
     user_agent: str = "",
     headers: dict[str, str] = {},
     allow_domains: Collection[str] = (),
+    subdomain_focus: bool = False,
     path_focus: bool = False,
     allow_mime_types: Collection[str] = (
         "application/pdf",
@@ -177,6 +181,7 @@ def crawl(
         user_agent (str): The user agent string to use for the crawler. Defaults to "Scrapy/VERSION (+https://scrapy.org)".
         headers (dict[str, str]): A dictionary of additional headers to send with each request. Default is an empty dictionary.
         allow_domains (Collection[str]): A collection of domains to restrict the crawler to. Default is the domains of the seed URLs.
+        subdomain_focus (bool): If specified, only links under the subdomains of the input seed URLs will be extracted. Ignored if `allow_domains` is specified.
         path_focus (bool): If specified, only links under the paths of the input seed URLs will be extracted.
         allow_mime_types (Collection[str]): A collection of MIME types to allow during the crawl. Default is a collection containing "application/pdf", "text/html", "text/markdown", and "text/plain".
         disallow_mime_types (Collection[str]): A collection of MIME types to disallow during the crawl. Default is an empty collection.
@@ -198,6 +203,7 @@ def crawl(
         user_agent,
         headers,
         allow_domains,
+        subdomain_focus,
         path_focus,
         allow_mime_types,
         disallow_mime_types,

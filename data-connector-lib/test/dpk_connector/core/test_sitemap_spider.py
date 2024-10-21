@@ -1,12 +1,11 @@
 from pathlib import Path
 
 import pytest
+from dpk_connector.core.item import ConnectorItem
+from dpk_connector.core.spiders.sitemap import BaseSitemapSpider, ConnectorSitemapSpider
 from scrapy import Request
 from scrapy.crawler import Crawler
 from scrapy.http import HtmlResponse
-
-from dpk_connector.core.item import ConnectorItem
-from dpk_connector.core.spiders.sitemap import BaseSitemapSpider, ConnectorSitemapSpider
 
 
 @pytest.fixture
@@ -20,6 +19,21 @@ def crawler() -> Crawler:
     )
     crawler._apply_settings()
     return crawler
+
+
+def test_init_subdomain_focus():
+    spider = BaseSitemapSpider(
+        seed_urls=(
+            "http://blog.example.com/",
+            "http://contents.example.com/",
+        ),
+        subdomain_focus=True,
+    )
+    assert spider.seed_urls == {
+        "http://blog.example.com/",
+        "http://contents.example.com/",
+    }
+    assert spider.allowed_domains == {"blog.example.com", "contents.example.com"}
 
 
 def test_init_path_focus():
