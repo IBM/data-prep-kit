@@ -1,0 +1,14 @@
+{
+    "function_declaration": {
+        "uast_node_type": "uast_function",
+        "extractor": "temp_0 = code_snippet.split('(')[0].strip() \nself.extracted = temp_0.split(' ')[-1].strip()"
+    },
+    "import_statement": {
+        "uast_node_type": "uast_package",
+        "extractor": "if 'from' in code_snippet:\n    # get the text after the keyword 'from'\n    text = code_snippet.split('from', 1)[1].strip()\n    # remove quotes and semicolons\n    text = text.replace('\"', '').replace(\"'\", '').strip(' ;')\n    # return the package\n    self.extracted = text\nelse:\n    # get the text after the keyword 'import'\n    text = code_snippet.split('import', 1)[1].strip()\n    # remove curly braces and semicolons\n    text = text.replace('{', '').replace('}', '').strip(' ;')\n    # if it is an aliased import, get rid of the alias and keep the original name.\n    if (' as ' in text):\n        # removing the alias\n        text = text.split(' as ')[0].strip()\n    # return the package\n    self.extracted = text"
+    },
+    "comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "if (code_snippet[0:2] == '//'):\n    self.extracted = code_snippet[2:].strip()\nelse:\n    self.extracted = code_snippet[2:-2].strip()"
+    }
+}

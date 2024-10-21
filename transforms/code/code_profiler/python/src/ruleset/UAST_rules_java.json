@@ -1,0 +1,27 @@
+{
+    "import_declaration": {
+        "uast_node_type": "uast_package",
+	    "extractor":  "self.extracted = code_snippet.split('import', 1)[1].strip(' ;')"
+    },
+    "line_comment" : {
+        "uast_node_type" : "uast_comment",
+        "extractor" : "self.extracted = code_snippet[2:].strip()\n"
+    },
+    "block_comment" : {
+        "uast_node_type" : "uast_comment",
+        "extractor" : "self.extracted = code_snippet[2:-2].strip()\n"
+    },
+    "class_declaration" : {
+        "uast_node_type" : "uast_class",
+        "extractor" : "code_snip = re.sub(' +', ' ', code_snippet)\ntemp = code_snip.split('{', 1)[0].strip().split(' ')\n\nif 'implements' in temp:\n    self.extracted = temp[temp.index('implements') - 1].strip()\nelse:\n    self.extracted = temp[-1].strip()\n"
+    },
+    "method_declaration" : {
+        "uast_node_type" : "uast_function",
+        "extractor" : "self.extracted = code_snippet.split('(', 1)[0].strip().split(' ')[-1].strip()"
+    },
+    "method_invocation" : {
+        "uast_node_type" : "uast_call",
+        "extractor" : "self.extracted = code_snippet.split('(', 1)[0].strip()"
+    }
+
+}

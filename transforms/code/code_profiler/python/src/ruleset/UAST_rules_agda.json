@@ -1,0 +1,14 @@
+{
+    "open": {
+        "uast_node_type": "uast_package",
+        "extractor": "text = code_snippet.split('import', 1)[1].strip()\nif (' as ' in text):\n    # removing the alias\n    text = text.split(' as ')[0].strip()\nself.extracted = text"
+    },
+    "function": {
+        "uast_node_type": "uast_function",
+        "extractor": "temp_0 = code_snippet.strip()\nself.extracted = temp_0.split(' ')[0].strip()"
+    },
+    "comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "if code_snippet.startswith('{-'):\n    # As the snippets start with '{-' and end with '-}', we can remove two characters from both ends to get the required snippet\n    self.extracted = code_snippet[2:-2].strip()\nelif code_snippet.startswith('--'):\n    # As the snippets start with '--', we can remove two characters from the start to get the required snippet\n    self.extracted = code_snippet[2:].strip()"
+    }
+}

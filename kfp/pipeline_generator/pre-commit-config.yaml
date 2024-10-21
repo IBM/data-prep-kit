@@ -1,0 +1,31 @@
+######################################################### {COPYRIGHT-TOP} ###
+# IBM Confidential
+# IBM Watson Machine Learning Core - Internal Tooling
+# Copyright IBM Corp. 2022
+######################################################### {COPYRIGHT-END} ###
+repos:
+    - repo: https://github.com/pre-commit/mirrors-prettier
+      rev: v3.0.0-alpha.9-for-vscode
+      hooks:
+          - id: prettier
+    - repo: https://github.com/psf/black
+      rev: 22.3.0
+      hooks:
+          - id: black
+            args: [--config=.black.toml]
+    - repo: https://github.com/PyCQA/isort
+      rev: 5.12.0
+      hooks:
+          - id: isort
+### Exclude submodules as some are part of other organizations with their own policies
+exclude: |
+    (?x)^(
+        autopilot/.*|
+        codeflare-cli/.*|
+        codeflare-sdk/.*|
+        docker_build_scripts/.*|
+        mcad/.*|
+        datalake/.*|
+        torchx/.*|
+        tsfm/.*
+    )$

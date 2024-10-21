@@ -1,0 +1,14 @@
+{
+    "import_declaration": {
+        "uast_node_type": "uast_package",
+        "extractor": "text = code_snippet.split('import', 1)[1].strip()\ntext = text.rstrip(';')\nif (':' in text):\n    text = text.split(':')[0].strip()\nself.extracted = text"
+    },
+    "function_declaration": {
+        "uast_node_type": "uast_function",
+        "extractor": "temp_0 = code_snippet.split(' ')[1].strip() \nself.extracted = temp_0.split('(')[0].strip()"
+    },
+    "comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "if code_snippet.startswith('/*') and code_snippet.endswith('*/'):\n    self.extracted = code_snippet[2:-2].strip()\nelif code_snippet.startswith('//'):\n    self.extracted = code_snippet[2:].strip()"
+    }
+}

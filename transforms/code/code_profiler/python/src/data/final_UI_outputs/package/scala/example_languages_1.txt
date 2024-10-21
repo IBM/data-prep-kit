@@ -1,0 +1,2 @@
+['haskell', 'elm']
+max_depth = 3

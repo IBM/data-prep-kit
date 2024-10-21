@@ -1,0 +1,26 @@
+package main
+
+import "github"
+
+import g "github.com"
+
+import (
+	x "s" 
+	x "x"
+)
+
+import (
+	dsds "mai"
+	dsdss "giv"
+)
+
+import (
+	"mai/src"
+	. "math"
+)
+
+import (
+	"foo"
+	"math"
+)
+

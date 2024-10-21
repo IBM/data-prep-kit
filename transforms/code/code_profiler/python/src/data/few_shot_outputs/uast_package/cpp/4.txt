@@ -1,0 +1,28 @@
+The package related nodes are the 'preproc_include' nodes with ids = [2, 6, 13, 20, 24, 28, 32]. Incorporating each of these nodes, I can make a general rule to extract the package(s).
+
+This python script can be executed:
+
+```py
+# I can see that the code snippet includes a package. Hence I consider the string after the first '#include'.
+test = code_snippet.split('#include', 1)[1].strip()
+# In the case that there are any comments, we remove them.
+test = test.split('//')[0].strip()
+extracted = test.split('/*')[0].strip()
+# Remove angle brackets and quotes
+extracted = extracted.replace('<', '').replace('>', '').replace('"', '').replace("'", '')
+# Remove semicolons and asterisks
+extracted = extracted.replace(';', '').replace('*', '')
+print(extracted)
+```
+
+This script will extract the imported packages from the code snippet, removing any comments, angle brackets, quotes, semicolons, and asterisks. The output will be:
+
+```
+vector
+substab
+cassert
+climits
+iostream
+vector
+vector
+```

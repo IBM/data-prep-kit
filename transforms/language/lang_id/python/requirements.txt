@@ -1,0 +1,5 @@
+data-prep-toolkit==0.2.2.dev1
+fasttext==0.9.2
+langcodes==3.3.0
+huggingface-hub >= 0.21.4, <1.0.0
+numpy==1.26.4

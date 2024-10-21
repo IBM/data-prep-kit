@@ -1,0 +1,30 @@
+import scala.collection.mutable
+
+import scala.collection.mutable.{HashMap, ArrayBuffer}
+
+import scala.collection.mutable._
+
+import java.util.{Date => JavaDate}
+
+import scala.collection.mutable.{Map => _, _}  // Imports everything except Map
+
+// 6. Chained Imports
+import scala.collection.mutable, scala.math.BigInt
+
+// 7. Importing from an Object
+import scala.math._
+
+val radius = 5
+val area = Pi * radius * radius  // Using Pi from scala.math
+
+package mypackage
+import scala.collection.mutable._
+
+package mypackage
+import subpackage.MyClass  // Assuming subpackage exists
+
+// 10. Importing Implicit Conversions
+import scala.concurrent.ExecutionContext.Implicits.global
+
+import MathUtils.Pi
+

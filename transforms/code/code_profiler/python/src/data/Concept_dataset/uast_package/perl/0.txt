@@ -1,0 +1,6 @@
+use strict;
+use Data::Dumper;
+use strict as 'strict_mode';
+use POSIX qw($EUID);
+use Fcntl ':all';
+use lib '/path/to/directory';

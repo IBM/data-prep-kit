@@ -1,0 +1,10 @@
+#include <iostream>
+
+void foo(int x) {
+    printf("hello world");
+}
+
+int main() {
+    foo(3);
+    return 0;
+}

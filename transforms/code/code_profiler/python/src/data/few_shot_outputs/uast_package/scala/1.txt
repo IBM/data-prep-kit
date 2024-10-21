@@ -1,0 +1,24 @@
+To find the package related nodes, I need to find which nodes correspond to incorporating external libraries in the code. I will look at the higher level nodes. Hence, I can see that the 'import_declaration' nodes with ids = [1, 8, 22, 32, 45, 68, 83, 113, 127, 136, 147], represent importing packages in the code. Incorporating each of these nodes, I can make a general rule to extract the package(s).
+
+This python script can be executed:
+
+```py
+# as every node has the keyword 'import' and the package is present after that, we take the snippet after the keyword
+text = code_snippet.split('import', 1)[1].strip()
+# if it is an aliased import, get rid of the alias and keep the original name.
+if (' as ' in text):
+    # removing the alias
+    text = text.split(' as ')[0].strip()
+# if it has an 'exposing' clause, get rid of it and keep the original name.
+if (' exposing ' in text):
+    # removing the 'exposing' clause
+    text = text.split(' exposing ')[0].strip()
+# if it has a namespace selector, get rid of it and keep the original name.
+if ('{' in text):
+    # removing the namespace selector
+    text = text.split('{')[0].strip()
+# return the package
+extracted = text
+```
+
+This script will extract the package name from each node, removing any aliases, 'exposing' clauses, or namespace selectors.

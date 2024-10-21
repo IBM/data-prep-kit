@@ -1,0 +1,10 @@
+{
+    "use_no_statement": {
+        "uast_node_type": "uast_package",
+        "extractor": "text = code_snippet.split('use', 1)[1].strip()\nif (' as ' in text):\n    text = text.split(' as ')[0].strip()\nif (text.split()[0] == 'lib') :\n    text = text.split('lib',1)[1].strip()\nif (' qw(' in text or ':all' in text):\n    text = text.split(' qw(')[0].strip()\n    text = text.split(':all')[0].strip()\ntext = text.strip(' ;\\'')\nself.extracted = text"
+    },
+    "function_definition": {
+        "uast_node_type": "uast_function",
+        "extractor": "temp_0 = code_snippet.split(' ')[1].strip() \nself.extracted = temp_0.split('{')[0].strip()"
+    }
+}

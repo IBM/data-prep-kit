@@ -1,0 +1,28 @@
+pipeline_parameters:
+    name: "html2parquet"
+    description: "Pipeline for html2parquet task"
+    script_name: "html2parquet_transform_ray.py"
+    prefix: ""
+    multi_s3: False
+    compute_func_name: ""
+    compute_func_import: ""
+    component_spec_path: ""
+
+pipeline_common_input_parameters_values:
+    kfp_base_image: "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
+    transform_image: "quay.io/dataprep1/data-prep-kit/html2parquet-ray:latest"
+    s3_access_secret: "s3-secret"
+    image_pull_secret: ""
+    input_folder: "test/html2parquet/input/"
+    output_folder: "test/html2parquet/output/"
+
+pipeline_transform_input_parameters:
+    pipeline_arguments:
+        - name: data_files_to_use
+          type: "str"
+          value: "['.html', '.zip']"
+          description: "# file extensions to use for processing" 
+        - name: html2parquet_output_format
+          type: "str"
+          value: "markdown"
+          description: "# Output format for the contents column."

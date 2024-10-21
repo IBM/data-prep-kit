@@ -1,0 +1,1047 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../../data-processing-lib/doc/advanced-transform-tutorial/">
+      
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
+    
+    
+      
+        <title>KFP Pipeline - Data Prep Kit</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.0253249f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/badge.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#simplest-transform-pipeline-tutorial" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Data Prep Kit" class="md-header__button md-logo" aria-label="Data Prep Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Data Prep Kit
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              KFP Pipeline
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/IBM/data-prep-kit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../data-processing-lib/doc/overview/" class="md-tabs__link">
+        
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../../doc/quick-start/quick-start/" class="md-tabs__link">
+          
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Data Prep Kit" class="md-nav__button md-logo" aria-label="Data Prep Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Data Prep Kit
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/IBM/data-prep-kit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../data-processing-lib/doc/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../doc/quick-start/quick-start/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    QuickStart
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../data-processing-lib/doc/simplest-transform-tutorial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Simple
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../data-processing-lib/doc/advanced-transform-tutorial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Advanced
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    KFP Pipeline
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    KFP Pipeline
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      📝 Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementing-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementing pipeline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementing pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#imports-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Imports definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#components-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Components definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-parameters-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Input parameters definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pipeline-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pipeline definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kfp-pods-toleration-and-node-selector-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      KFP pods Toleration and node selector (Optional)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compiling-a-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compiling a pipeline
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploying-a-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying a pipeline
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#executing-pipeline-and-watching-execution-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Executing pipeline and watching execution results
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clean-up-the-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clean up the cluster
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      📝 Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementing-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementing pipeline
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementing pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#imports-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Imports definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#components-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Components definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#input-parameters-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Input parameters definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pipeline-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pipeline definition
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#kfp-pods-toleration-and-node-selector-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      KFP pods Toleration and node selector (Optional)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compiling-a-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Compiling a pipeline
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deploying-a-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploying a pipeline
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#executing-pipeline-and-watching-execution-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Executing pipeline and watching execution results
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clean-up-the-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clean up the cluster
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="simplest-transform-pipeline-tutorial">Simplest Transform pipeline tutorial</h1>
+<p>In this example, we implement a pipeline to automate execution of the simple 
+<a href="../../../data-processing-lib/doc/simplest-transform-tutorial/">noop transform</a></p>
+<p>In this tutorial, we will show the following:</p>
+<ul>
+<li>How to write the <code>noop</code> transform automation pipeline, leveraging <a href="../../kfp_ray_components/">KFP components</a>.</li>
+<li>How to compile a pipeline and deploy it to KFP</li>
+<li>How to execute pipeline and view execution results</li>
+</ul>
+<p>Note: the project and the explanation below are based on <a href="https://www.kubeflow.org/docs/components/pipelines/v1/">KFPv1</a></p>
+<h2 id="table-of-contents">📝 Table of Contents</h2>
+<ul>
+<li><a href="#implementing">Implementing pipeline</a></li>
+<li><a href="#imports">Imports definition</a> </li>
+<li><a href="#components">Components definition</a></li>
+<li><a href="#inputs">Input parameters definition</a></li>
+<li><a href="#pipeline">Pipeline definition</a></li>
+<li><a href="#add_config">Additional configuration</a></li>
+<li><a href="#tolerations">Tolerations and node selector</a></li>
+<li><a href="#compilation">Compiling a pipeline</a></li>
+<li><a href="#deploying">Deploying a pipeline</a></li>
+<li><a href="#execution">Executing pipeline and watching execution results</a></li>
+<li><a href="#cleanup&quot;">Clean up the cluster</a></li>
+</ul>
+<h2 id="implementing-pipeline">Implementing pipeline <a name = "implementing"></a></h2>
+<p><a href="../../transforms/universal/noop/kfp_ray/v1/noop_wf.py">Overall implementation</a> roughly contains 5 major sections:</p>
+<ul>
+<li>Imports</li>
+<li>Components definition - definition of the main steps of our pipeline</li>
+<li>Input parameters definition </li>
+<li>Pipeline wiring - definition of the sequence of invocation (with parameter passing) of participating components</li>
+<li>Additional configuration</li>
+</ul>
+<h3 id="imports-definition">Imports definition <a name = "imports"></a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">import</span> <span class="nn">kfp.compiler</span> <span class="k">as</span> <span class="nn">compiler</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span> <span class="nn">kfp.components</span> <span class="k">as</span> <span class="nn">comp</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">import</span> <span class="nn">kfp.dsl</span> <span class="k">as</span> <span class="nn">dsl</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">from</span> <span class="nn">kfp_support.workflow_support.runtime_utils</span> <span class="kn">import</span> <span class="p">(</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  <span class="n">ONE_HOUR_SEC</span><span class="p">,</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  <span class="n">ONE_WEEK_SEC</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  <span class="n">ComponentUtils</span><span class="p">,</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="p">)</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="kn">from</span> <span class="nn">kubernetes</span> <span class="kn">import</span> <span class="n">client</span> <span class="k">as</span> <span class="n">k8s_client</span>
+</span></code></pre></div>
+<h3 id="components-definition">Components definition <a name = "components"></a></h3>
+<p>Our pipeline includes 4 steps - compute execution parameters, create Ray cluster, submit and watch Ray job, clean up 
+Ray cluster. For each step we have to define a component that will execute them:</p>
+<p><div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>    <span class="c1"># components</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">base_kfp_image</span> <span class="o">=</span> <span class="s2">&quot;quay.io/dataprep1/data-prep-kit/kfp-data-processing:0.0.2&quot;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="c1"># compute execution parameters. Here different transforms might need different implementations. As</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="c1"># a result, instead of creating a component we are creating it in place here.</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">compute_exec_params_op</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">func_to_container_op</span><span class="p">(</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>      <span class="n">func</span><span class="o">=</span><span class="n">ComponentUtils</span><span class="o">.</span><span class="n">default_compute_execution_params</span><span class="p">,</span> <span class="n">base_image</span><span class="o">=</span><span class="n">base_kfp_image</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="p">)</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    <span class="c1"># create Ray cluster</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    <span class="n">create_ray_op</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">load_component_from_file</span><span class="p">(</span><span class="s2">&quot;../../../kfp_ray_components/createRayComponent.yaml&quot;</span><span class="p">)</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    <span class="c1"># execute job</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    <span class="n">execute_ray_jobs_op</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">load_component_from_file</span><span class="p">(</span><span class="s2">&quot;../../../kfp_ray_components/executeRayJobComponent.yaml&quot;</span><span class="p">)</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    <span class="c1"># clean up Ray</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    <span class="n">cleanup_ray_op</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">load_component_from_file</span><span class="p">(</span><span class="s2">&quot;../../../kfp_ray_components/cleanupRayComponent.yaml&quot;</span><span class="p">)</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    <span class="c1"># Task name is part of the pipeline name, the ray cluster name and the job name in DMF.</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    <span class="n">TASK_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;noop&quot;</span>
+</span></code></pre></div>
+Note: here we are using shared components described in this <a href="../../kfp_ray_components/">document</a> for <code>create_ray_op</code>, 
+<code>execute_ray_jobs_op</code> and <code>cleanup_ray_op</code>,  while <code>compute_exec_params_op</code> component is built inline, because it might
+differ significantly. For "simple" pipeline cases we can use the 
+<a href="../kfp_support_lib/src/kfp_support/workflow_support/runtime_utils/remote_jobs_utils.py">default implementation</a>,
+while, for example for exact dedup, we are using a very <a href="../../transforms/universal/ededup/kfp_ray/v2/src/ededup_compute_execution_params.py">specialized one</a>.</p>
+<h3 id="input-parameters-definition">Input parameters definition <a name = "inputs"></a></h3>
+<p>The input parameters section defines all the parameters required for the pipeline execution:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>    <span class="c1"># Ray cluster</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="n">ray_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;noop-kfp-ray&quot;</span><span class="p">,</span>  <span class="c1"># name of Ray cluster</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    <span class="n">ray_head_options</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;{&quot;cpu&quot;: 1, &quot;memory&quot;: 4, </span><span class="se">\</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="s1">                 &quot;image&quot;: &quot;&#39;</span> <span class="o">+</span> <span class="n">task_image</span> <span class="o">+</span> <span class="s1">&#39;&quot; }&#39;</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="n">ray_worker_options</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;{&quot;replicas&quot;: 2, &quot;max_replicas&quot;: 2, &quot;min_replicas&quot;: 2, &quot;cpu&quot;: 2, &quot;memory&quot;: 4, </span><span class="se">\</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="s1">                &quot;image&quot;: &quot;&#39;</span> <span class="o">+</span> <span class="n">task_image</span> <span class="o">+</span> <span class="s1">&#39;&quot; }&#39;</span><span class="p">,</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="n">server_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;http://kuberay-apiserver-service.kuberay.svc.cluster.local:8888&quot;</span><span class="p">,</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="c1"># data access</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="n">data_s3_config</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;{&#39;input_folder&#39;: &#39;test/noop/input/&#39;, &#39;output_folder&#39;: &#39;test/noop/output/&#39;}&quot;</span><span class="p">,</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">data_s3_access_secret</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;s3-secret&quot;</span><span class="p">,</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">data_max_files</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    <span class="n">data_num_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="c1"># orchestrator</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>    <span class="n">actor_options</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;{&#39;num_cpus&#39;: 0.8}&quot;</span><span class="p">,</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>    <span class="n">pipeline_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pipeline_id&quot;</span><span class="p">,</span>
+</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    <span class="n">code_location</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;{&#39;github&#39;: &#39;github&#39;, &#39;commit_hash&#39;: &#39;12345&#39;, &#39;path&#39;: &#39;path&#39;}&quot;</span><span class="p">,</span>
+</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>    <span class="c1"># noop parameters</span>
+</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    <span class="n">noop_sleep_sec</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>    <span class="c1"># additional parameters</span>
+</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>    <span class="n">additional_params</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;{&quot;wait_interval&quot;: 2, &quot;wait_cluster_ready_tmout&quot;: 400, &quot;wait_cluster_up_tmout&quot;: 300, &quot;wait_job_ready_tmout&quot;: 400, &quot;wait_print_tmout&quot;: 30, &quot;http_retries&quot;: 5, &quot;delete_cluster_delay_minutes&quot;: 0}&#39;</span><span class="p">,</span>
+</span></code></pre></div>
+<p>The parameters used here are as follows:</p>
+<ul>
+<li>ray_name: name of the Ray cluster</li>
+<li>ray_head_options: head node options, containing the following:</li>
+<li>cpu - number of cpus</li>
+<li>memory - memory</li>
+<li>image - image to use</li>
+<li>image_pull_secret - image pull secret</li>
+<li>tolerations - (optional) tolerations for the ray pods</li>
+<li>ray_worker_options: worker node options (we here are using only 1 worker pool), containing the following:</li>
+<li>replicas - number of replicas to create</li>
+<li>max_replicas - max number of replicas</li>
+<li>min_replicas - min number of replicas</li>
+<li>cpu - number of cpus</li>
+<li>memory - memory</li>
+<li>image - image to use</li>
+<li>image_pull_secret - image pull secret</li>
+<li>tolerations - (optional) tolerations for the ray pods</li>
+<li>server_url - server url</li>
+<li>additional_params: additional (support) parameters, containing the following:</li>
+<li>wait_interval - wait interval for API server, sec</li>
+<li>wait_cluster_ready_tmout - time to wait for cluster ready, sec</li>
+<li>wait_cluster_up_tmout - time to wait for cluster up, sec</li>
+<li>wait_job_ready_tmout - time to wait for job ready, sec</li>
+<li>wait_print_tmout - time between prints, sec</li>
+<li>http_retries - http retries for API server calls</li>
+<li>data_s3_access_secret - s3 access secret</li>
+<li>data_s3_config - s3 configuration</li>
+<li>data_max_files - max files to process</li>
+<li>data_num_samples - num samples to process</li>
+<li>actor_options - actor options</li>
+<li>pipeline_id - pipeline id</li>
+<li>code_location - code location</li>
+<li>noop_sleep_sec - noop sleep time</li>
+</ul>
+<p><strong>Note</strong> that here we are specifying initial values for all parameters that will be propagated to the workflow UI
+(see below)</p>
+<h3 id="pipeline-definition">Pipeline definition <a name = "pipeline"></a></h3>
+<p>Now, when all components and input parameters are defined, we can implement pipeline wiring defining sequence of 
+component execution and parameters submitted to every component. </p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>    <span class="c1"># create clean_up task</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="n">clean_up_task</span> <span class="o">=</span> <span class="n">cleanup_ray_op</span><span class="p">(</span><span class="n">ray_name</span><span class="o">=</span><span class="n">ray_name</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="n">dsl</span><span class="o">.</span><span class="n">RUN_ID_PLACEHOLDER</span><span class="p">,</span> <span class="n">server_url</span><span class="o">=</span><span class="n">server_url</span><span class="p">,</span> <span class="n">additional_params</span><span class="o">=</span><span class="n">additional_params</span><span class="p">)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    <span class="n">ComponentUtils</span><span class="o">.</span><span class="n">add_settings_to_component</span><span class="p">(</span><span class="n">clean_up_task</span><span class="p">,</span> <span class="n">ONE_HOUR_SEC</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="c1"># pipeline definition</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="k">with</span> <span class="n">dsl</span><span class="o">.</span><span class="n">ExitHandler</span><span class="p">(</span><span class="n">clean_up_task</span><span class="p">):</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>      <span class="c1"># compute execution params</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>      <span class="n">compute_exec_params</span> <span class="o">=</span> <span class="n">compute_exec_params_op</span><span class="p">(</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        <span class="n">worker_options</span><span class="o">=</span><span class="n">ray_worker_options</span><span class="p">,</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        <span class="n">actor_options</span><span class="o">=</span><span class="n">actor_options</span><span class="p">,</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>      <span class="p">)</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>      <span class="n">ComponentUtils</span><span class="o">.</span><span class="n">add_settings_to_component</span><span class="p">(</span><span class="n">compute_exec_params</span><span class="p">,</span> <span class="n">ONE_HOUR_SEC</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>      <span class="c1"># start Ray cluster</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>      <span class="n">ray_cluster</span> <span class="o">=</span> <span class="n">create_ray_op</span><span class="p">(</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>        <span class="n">ray_name</span><span class="o">=</span><span class="n">ray_name</span><span class="p">,</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>        <span class="n">run_id</span><span class="o">=</span><span class="n">dsl</span><span class="o">.</span><span class="n">RUN_ID_PLACEHOLDER</span><span class="p">,</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>        <span class="n">ray_head_options</span><span class="o">=</span><span class="n">ray_head_options</span><span class="p">,</span>
+</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>        <span class="n">ray_worker_options</span><span class="o">=</span><span class="n">ray_worker_options</span><span class="p">,</span>
+</span><span id="__span-3-18"><a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>        <span class="n">server_url</span><span class="o">=</span><span class="n">server_url</span><span class="p">,</span>
+</span><span id="__span-3-19"><a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>        <span class="n">additional_params</span><span class="o">=</span><span class="n">additional_params</span><span class="p">,</span>
+</span><span id="__span-3-20"><a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>      <span class="p">)</span>
+</span><span id="__span-3-21"><a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>      <span class="n">ComponentUtils</span><span class="o">.</span><span class="n">add_settings_to_component</span><span class="p">(</span><span class="n">ray_cluster</span><span class="p">,</span> <span class="n">ONE_HOUR_SEC</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+</span><span id="__span-3-22"><a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>      <span class="n">ray_cluster</span><span class="o">.</span><span class="n">after</span><span class="p">(</span><span class="n">compute_exec_params</span><span class="p">)</span>
+</span><span id="__span-3-23"><a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>      <span class="c1"># Execute job</span>
+</span><span id="__span-3-24"><a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>      <span class="n">execute_job</span> <span class="o">=</span> <span class="n">execute_ray_jobs_op</span><span class="p">(</span>
+</span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>        <span class="n">ray_name</span><span class="o">=</span><span class="n">ray_name</span><span class="p">,</span>
+</span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>        <span class="n">run_id</span><span class="o">=</span><span class="n">dsl</span><span class="o">.</span><span class="n">RUN_ID_PLACEHOLDER</span><span class="p">,</span>
+</span><span id="__span-3-27"><a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>        <span class="n">additional_params</span><span class="o">=</span><span class="n">additional_params</span><span class="p">,</span>
+</span><span id="__span-3-28"><a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>        <span class="c1"># note that the parameters below are specific for NOOP transform</span>
+</span><span id="__span-3-29"><a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a>        <span class="n">exec_params</span><span class="o">=</span><span class="p">{</span>
+</span><span id="__span-3-30"><a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>          <span class="s2">&quot;data_s3_config&quot;</span><span class="p">:</span> <span class="n">data_s3_config</span><span class="p">,</span>
+</span><span id="__span-3-31"><a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a>          <span class="s2">&quot;data_max_files&quot;</span><span class="p">:</span> <span class="n">data_max_files</span><span class="p">,</span>
+</span><span id="__span-3-32"><a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a>          <span class="s2">&quot;data_num_samples&quot;</span><span class="p">:</span> <span class="n">data_num_samples</span><span class="p">,</span>
+</span><span id="__span-3-33"><a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a>          <span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="n">compute_exec_params</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+</span><span id="__span-3-34"><a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a>          <span class="s2">&quot;worker_options&quot;</span><span class="p">:</span> <span class="n">actor_options</span><span class="p">,</span>
+</span><span id="__span-3-35"><a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a>          <span class="s2">&quot;pipeline_id&quot;</span><span class="p">:</span> <span class="n">pipeline_id</span><span class="p">,</span>
+</span><span id="__span-3-36"><a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a>          <span class="s2">&quot;job_id&quot;</span><span class="p">:</span> <span class="n">dsl</span><span class="o">.</span><span class="n">RUN_ID_PLACEHOLDER</span><span class="p">,</span>
+</span><span id="__span-3-37"><a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a>          <span class="s2">&quot;code_location&quot;</span><span class="p">:</span> <span class="n">code_location</span><span class="p">,</span>
+</span><span id="__span-3-38"><a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a>          <span class="s2">&quot;noop_sleep_sec&quot;</span><span class="p">:</span> <span class="n">noop_sleep_sec</span><span class="p">,</span>
+</span><span id="__span-3-39"><a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a>        <span class="p">},</span>
+</span><span id="__span-3-40"><a id="__codelineno-3-40" name="__codelineno-3-40" href="#__codelineno-3-40"></a>        <span class="n">exec_script_name</span><span class="o">=</span><span class="n">EXEC_SCRIPT_NAME</span><span class="p">,</span>
+</span><span id="__span-3-41"><a id="__codelineno-3-41" name="__codelineno-3-41" href="#__codelineno-3-41"></a>        <span class="n">server_url</span><span class="o">=</span><span class="n">server_url</span><span class="p">,</span>
+</span><span id="__span-3-42"><a id="__codelineno-3-42" name="__codelineno-3-42" href="#__codelineno-3-42"></a>      <span class="p">)</span>
+</span><span id="__span-3-43"><a id="__codelineno-3-43" name="__codelineno-3-43" href="#__codelineno-3-43"></a>      <span class="n">ComponentUtils</span><span class="o">.</span><span class="n">add_settings_to_component</span><span class="p">(</span><span class="n">execute_job</span><span class="p">,</span> <span class="n">ONE_WEEK_SEC</span><span class="p">)</span>
+</span><span id="__span-3-44"><a id="__codelineno-3-44" name="__codelineno-3-44" href="#__codelineno-3-44"></a>      <span class="n">ComponentUtils</span><span class="o">.</span><span class="n">set_s3_env_vars_to_component</span><span class="p">(</span><span class="n">execute_job</span><span class="p">,</span> <span class="n">data_s3_access_secret</span><span class="p">)</span>
+</span><span id="__span-3-45"><a id="__codelineno-3-45" name="__codelineno-3-45" href="#__codelineno-3-45"></a>      <span class="n">execute_job</span><span class="o">.</span><span class="n">after</span><span class="p">(</span><span class="n">ray_cluster</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Here we first create <code>cleanup_task</code> and the use it as an 
+<a href="https://kubeflow-pipelines.readthedocs.io/en/stable/source/dsl.html#kfp.dsl.ExitHandler">exit handler</a> which will be 
+invoked either the steps into it succeeded or failed.</p>
+<p>Then we create each individual component passing it required parameters and specify execution sequence, for example
+(<code>ray_cluster.after(compute_exec_params)</code>).</p>
+<h3 id="additional-configuration">Additional configuration <a name = "add_config"></a></h3>
+<p>The final thing that we need to do is set some pipeline global configuration:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>    <span class="c1"># Configure the pipeline level to one week (in seconds)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="n">dsl</span><span class="o">.</span><span class="n">get_pipeline_conf</span><span class="p">()</span><span class="o">.</span><span class="n">set_timeout</span><span class="p">(</span><span class="n">ONE_WEEK_SEC</span><span class="p">)</span>
+</span></code></pre></div>
+<h3 id="kfp-pods-toleration-and-node-selector-optional">KFP pods Toleration and node selector (Optional)<a name = "tolerations"></a></h3>
+<p>To apply kuberenetes <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/">Tolerations</a> or <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector">nodeSelector</a> to KFP pods, you need to set <code>KFP_TOLERATIONS</code> or <code>KFP_NODE_SELECTOR</code> environment variables respectively before compiling the pipeline. Here's an example:</p>
+<p><div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KFP_TOLERATIONS</span><span class="o">=</span><span class="s1">&#39;[{&quot;key&quot;: &quot;key&quot;,&quot;operator&quot;: &quot;Equal&quot;, &quot;value1&quot;: &quot;value&quot;, &quot;effect&quot;: &quot;NoSchedule&quot;}]&#39;</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KFP_NODE_SELECTOR</span><span class="o">=</span><span class="s1">&#39;{&quot;label_key&quot;:&quot;cloud.google.com/gke-accelerator&quot;,&quot;label_value&quot;:&quot;nvidia-tesla-p4&quot;}&#39;</span>
+</span></code></pre></div>
+In KFP v1, setting <code>KFP_TOLERATIONS</code> will apply to the Ray pods, overriding any tolerations specified in the <code>ray_head_options</code> and <code>ray_worker_options</code> pipeline parameters if they are present.</p>
+<h2 id="compiling-a-pipeline">Compiling a pipeline <a name = "compilation"></a></h2>
+<p>To compile pipeline execute <code>make workflow-build</code> command in the same directory where your pipeline is. </p>
+<h2 id="deploying-a-pipeline">Deploying a pipeline <a name = "deploying"></a></h2>
+<p>Prepare local Kind or external Kubernetes cluster as described in <a href="../setup/">Set Up a cluster</a></p>
+<p>Once the cluster is up, go to the kfp endpoint (<code>localhost:8080/kfp/</code> for Kind cluster, the end point of the external existing 
+cluster depends on the KFP end-point configuration), which will bring up 
+KFP UI, see below:</p>
+<p><img alt="KFP UI" src="../kfp_ui.png" /></p>
+<p>Click on the <code>Upload pipeline</code> link and follow instructions on the screen to upload your file (<code>noop_wf.yaml</code>) and
+name pipeline noop. Once this is done, you should see something as follows:</p>
+<p><img alt="noop pipeline" src="../noop_pipeline.png" /></p>
+<h2 id="executing-pipeline-and-watching-execution-results">Executing pipeline and watching execution results <a name = "execution"></a></h2>
+<p>Before we can run the pipeline we need to create required secrets (one for image loading in case of secured 
+image registry and one for S3 access). As KFP is deployed in <code>kubeflow</code> namespace, workflow execution will happen
+there as well, which means that secrets have to be created there as well.</p>
+<p>When the MinIO Object Store, deployed as part of KFP, is used, its access secret is deployed as part of the cluster preparation, 
+see <a href="https://github.com/IBM/data-prep-kit/blob/dev/scripts/k8s-setup/s3_secret.yaml">s3_secret.yaml</a>. 
+Creation a secret to pull images from a private repository described <a href="https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/">here</a></p>
+<p>Once this is done we can execute the workflow. </p>
+<p>On the pipeline page (above) click on the <code>create run</code> button. You will see the list of the parameters, that you
+can redefine or use the default values that we specified above. After that,
+go to the bottom of the page and click the <code>start</code> button</p>
+<p>This will start workflow execution. Once it completes you will see something similar to below </p>
+<p><img alt="execution result" src="../execution_result.png" /></p>
+<p>Note that the log (on the left) has the complete execution log.</p>
+<p>Additionally, the log is saved to S3 (location is denoted but the last line in the log)</p>
+<h2 id="clean-up-the-cluster">Clean up the cluster <a name = "cleanup"></a></h2>
+<p>The cluster clean up is described at <a href="./setup#cleanup">Clean up the cluster</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs"], "search": "../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.83f73b43.min.js"></script>
+      
+        <script src="../../../assets/javascripts/badge.js" async></script>
+      
+    
+  </body>
+</html>

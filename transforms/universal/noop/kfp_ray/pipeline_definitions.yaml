@@ -1,0 +1,24 @@
+pipeline_parameters:
+    name: "noop"
+    description: "Pipeline for noop task"
+    script_name: "noop_transform_ray.py"
+    prefix: ""
+    multi_s3: False
+    compute_func_name: ""
+    compute_func_import: ""
+    component_spec_path: ""
+
+pipeline_common_input_parameters_values:
+    kfp_base_image: "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
+    transform_image: "quay.io/dataprep1/data-prep-kit/noop-ray:latest"
+    s3_access_secret: "s3-secret"
+    image_pull_secret: ""
+    input_folder: "test/noop/input/"
+    output_folder: "test/noop/output/"
+
+pipeline_transform_input_parameters:
+    pipeline_arguments:
+        - name: "noop_sleep_sec"
+          type: "int"
+          value: 10
+          description: "noop sleep time"

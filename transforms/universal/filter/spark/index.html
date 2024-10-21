@@ -1,0 +1,895 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.42">
+    
+    
+      
+        <title>Filtering - Data Prep Kit</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.0253249f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/badge.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#filtering" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Data Prep Kit" class="md-header__button md-logo" aria-label="Data Prep Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Data Prep Kit
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Filtering
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/IBM/data-prep-kit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../data-processing-lib/doc/overview/" class="md-tabs__link">
+        
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../doc/quick-start/quick-start/" class="md-tabs__link">
+          
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Data Prep Kit" class="md-nav__button md-logo" aria-label="Data Prep Kit" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Data Prep Kit
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/IBM/data-prep-kit" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../data-processing-lib/doc/overview/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorials
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../doc/quick-start/quick-start/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    QuickStart
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../data-processing-lib/doc/simplest-transform-tutorial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Simple
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../data-processing-lib/doc/advanced-transform-tutorial/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Advanced
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../kfp/doc/simple_transform_pipeline/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    KFP Pipeline
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Summary
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-and-command-line-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration and command line Options
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-1-two-numerical-filtering-criteria-joined-by-and" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example 1 - two numerical filtering criteria joined by AND
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-2-two-numerical-filtering-criteria-joined-by-or" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example 2 - two numerical filtering criteria joined by OR
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-3-two-filtering-criteria-based-on-non-numerical-datetime-and-string-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example 3 - two filtering criteria based on non-numerical (datetime and string) types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-as-spark-based-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running as Spark-based application
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#passing-parameters-through-command-line-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      Passing parameters through command-line-interface
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filter-statistics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Filter Statistics
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#running_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Running">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#launched-command-line-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Launched Command Line Options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transforming-data-using-the-transform-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      Transforming data using the transform image
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="filtering">Filtering</h1>
+<p>Please see the set of
+<a href="../../../">transform project conventions</a>
+for details on general project conventions, transform configuration,
+testing and IDE set up.</p>
+<h2 id="summary">Summary</h2>
+<p>Filtering cleans up data by:
+ * Removing the rows that do not meet a specific set of criteria.
+ * Dropping the columns that are no longer needed (e.g. annotation columns, used for filtering rows).</p>
+<h2 id="configuration-and-command-line-options">Configuration and command line Options</h2>
+<p>The set of dictionary keys holding <a href="https://github.com/IBM/data-prep-kit/blob/dev/transforms/universal/filter/spark/src/filter_transform_spark.py">FilterTransform</a> 
+configuration for values are as follows:</p>
+<ul>
+<li><em>filter_criteria_list</em> - specifies the list of row filter criteria (in SQL WHERE clause format). Each filter criterion is a string. The default value of this parameter is <code>[]</code> (an empty list, meaning that all the rows in the input table will be kept). </li>
+<li><em>filter_logical_operator</em> - specifies the logical operator that joins filter criteria (<code>AND</code> or <code>OR</code>). The default value of this parameter is <code>AND</code>.</li>
+<li><em>filter_columns_to_drop</em> - the list with the names of the columns to drop after row filtering is complete. The default value of this parameter is <code>[]</code> (an empty list, meaning that all the columns in the input table will be kept)</li>
+</ul>
+<h2 id="example">Example</h2>
+<p>Consider a table with eight text documents, where each row has additional info about that document (date acquired, source URL, etc.), and a set of quality signals for that document.  </p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>|----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>│ document | title    | contents | date_acq | extra    | cluster  | ft_lang | ft_score | docq_tot | docq_mea | docq_pe │
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│ ---      | ---      | ---      | uired    | ---      | ---      | ---     | ---      | al_words | n_word_l | rplex_s │
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>│ str      | str      | str      | ---      | struct[5 | i64      | str     | f64      | ---      | en       | core    │
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>│          |          |          | datetime | ]        |          |         |          | i64      | ---      | ---     │
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>│          |          |          | [ns]     |          |          |         |          |          | f64      | f64     │
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>|----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│ CC-MAIN- | https:// | BACKGROU | 2023-07- | {&quot;applic | -1       | en      | 1.0      | 77       | 5.662338 | 226.5   │
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│ 20190221 | www.sema | ND       | 05       | ation/ht |          |         |          |          |          |         │
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│ 132217-2 | nticscho | The      | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│ 01902211 | lar.org/ | Rhinitis |          | ype=resp |          |         |          |          |          |         │
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│ …        | …        | Control  |          | …        |          |         |          |          |          |         │
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│          |          | …        |          |          |          |         |          |          |          |         │
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│ CC-MAIN- | https:// | Travel + | 2023-07- | {&quot;applic | -1       | en      | 1.0      | 321      | 5.05919  | 245.0   │
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>│ 20200528 | www.torn | Leisure: | 27       | ation/ht |          |         |          |          |          |         │
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│ 232803-2 | osnews.g | The 5    | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│ 02005290 | r/en/tou | best     |          | ype=resp |          |         |          |          |          |         │
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│ …        | …        | res…     |          | …        |          |         |          |          |          |         │
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│ CC-MAIN- | https:// | Stourbri | 2023-07- | {&quot;applic | -1       | en      | 1.0      | 646      | 5.27709  | 230.3   │
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>│ 20190617 | www.stou | dge      | 04       | ation/ht |          |         |          |          |          |         │
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│ 103006-2 | rbridgen | College  | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>│ 01906171 | ews.co.u | to close |          | ype=resp |          |         |          |          |          |         │
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>│ …        | …        | BMe…     |          | …        |          |         |          |          |          |         │
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>│ CC-MAIN- | https:// | Our      | 2023-07- | {&quot;applic | -1       | en      | 1.0      | 242      | 5.557851 | 407.2   │
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>│ 20180318 | www.univ | Guidance | 19       | ation/ht |          |         |          |          |          |         │
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│ 184945-2 | ariety.c | Philosop | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│ 01803182 | om/app/s | hy       |          | ype=resp |          |         |          |          |          |         │
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│ …        | …        | High     |          | …        |          |         |          |          |          |         │
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│          |          | sch…     |          |          |          |         |          |          |          |         │
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│ CC-MAIN- | http://h | Hukun    | 2023-07- | {&quot;applic | -1       | en      | 1.0      | 169      | 4.840237 | 240.5   │
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│ 20180120 | urur.com | Hurur    | 18       | ation/ht |          |         |          |          |          |         │
+</span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>│ 083038-2 | /hukun-h | running  | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│ 01801201 | urur-run | for Ward |          | ype=resp |          |         |          |          |          |         │
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>│ …        | …        | 1 c…     |          | …        |          |         |          |          |          |         │
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>│ CC-MAIN- | https:// | Life&#39;s   | 2023-07- | {&quot;applic | -1       | en      | 1.0      | 61       | 4.786885 | 244.0   │
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>│ 20180522 | www.chap | Reverie  | 18       | ation/ht |          |         |          |          |          |         │
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>│ 131652-2 | ters.ind | Kobo     | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>│ 01805221 | igo.ca/e | ebook |  |          | ype=resp |          |         |          |          |          |         │
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>│ …        | …        | Sept…    |          | …        |          |         |          |          |          |         │
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>│ CC-MAIN- | http://w | Kamis,   | 2023-07- | {&quot;applic | 18008253 | en      | 1.0      | 509      | 4.738703 | 224.6   │
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>│ 20181120 | ww.onedo | 10 Maret | 05       | ation/ht | 113      |         |          |          |          |         │
+</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>│ 130743-2 | llarfoll | 2016     | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>│ 01811201 | owers.co | Buy      |          | ype=resp |          |         |          |          |          |         │
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>│ …        | …        | Twitter… |          | …        |          |         |          |          |          |         │
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>│ CC-MAIN- | http://w | Rory     | 2023-07- | {&quot;applic | -1       | en      | 1.0      | 223      | 4.829596 | 167.5   │
+</span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>│ 20171213 | ww.iron- | Fallon   | 09       | ation/ht |          |         |          |          |          |         │
+</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>│ 104259-2 | bru.co.u | joins    | 05:00:00 | tp; msgt |          |         |          |          |          |         │
+</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>│ 01712131 | k/rory-f | Bristol  |          | ype=resp |          |         |          |          |          |         │
+</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>│ …        | …        | Rovers…  |          | …        |          |         |          |          |          |         │
+</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>|----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
+</span></code></pre></div>
+<h4 id="example-1-two-numerical-filtering-criteria-joined-by-and">Example 1 - two numerical filtering criteria joined by AND</h4>
+<p>To filter this table and only keep the documents that have between 100 and 500 words <strong>and</strong> a perplexity score less than 230, and furthermore, drop the <code>extra</code> and <code>cluster</code> columns, invoke filtering with the following parameters:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>filter_criteria_list = [&quot;docq_total_words &gt; 100 AND docq_total_words &lt; 500&quot;, &quot;docq_perplex_score &lt; 230&quot;]
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>filter_logical_operator = &quot;AND&quot;
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>filter_columns_to_drop = [&quot;extra&quot;, &quot;cluster&quot;]
+</span></code></pre></div>
+This filter operation applied on the table above will return the following result:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>│ document    | title       | contents    | date_acquir | ft_lang | ft_score | docq_total_ | docq_mean_w | docq_perple │
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>│ ---         | ---         | ---         | ed          | ---     | ---      | words       | ord_len     | x_score     │
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│ str         | str         | str         | ---         | str     | f64      | ---         | ---         | ---         │
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│             |             |             | datetime[ns |         |          | i64         | f64         | f64         │
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>│             |             |             | ]           |         |          |             |             |             │
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>│ CC-MAIN-201 | http://www. | Rory Fallon | 2023-07-09  | en      | 1.0      | 223         | 4.829596    | 167.5       │
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>│ 71213104259 | iron-bru.co | joins       | 05:00:00    |         |          |             |             |             │
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>│ -201712131… | .uk/rory-f… | Bristol     |             |         |          |             |             |             │
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>│             |             | Rovers…     |             |         |          |             |             |             │
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+</span></code></pre></div></p>
+<h4 id="example-2-two-numerical-filtering-criteria-joined-by-or">Example 2 - two numerical filtering criteria joined by OR</h4>
+<p>To filter this table and only keep the documents that have between 100 and 500 words <strong>or</strong> a perplexity score less than 230, and furthermore, drop the <code>extra</code> and <code>cluster</code> columns, invoke filtering with the following parameters:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>filter_criteria_list = [&quot;docq_total_words &gt; 100 AND docq_total_words &lt; 500&quot;, &quot;docq_perplex_score &lt; 230&quot;]
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>filter_logical_operator = &quot;OR&quot;
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>filter_columns_to_drop = [&quot;extra&quot;, &quot;cluster&quot;]
+</span></code></pre></div>
+This filter operation applied on the table above will return the following result:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>│ document    | title       | contents    | date_acquir | ft_lang | ft_score | docq_total_ | docq_mean_w | docq_perple |
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>│ ---         | ---         | ---         | ed          | ---     | ---      | words       | ord_len     | x_score     │
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>│ str         | str         | str         | ---         | str     | f64      | ---         | ---         | ---         │
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>│             |             |             | datetime[ns |         |          | i64         | f64         | f64         │
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>│             |             |             | ]           |         |          |             |             |             │
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>│ CC-MAIN-201 | https://www | BACKGROUND  | 2023-07-05  | en      | 1.0      | 77          | 5.662338    | 226.5       │
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>│ 90221132217 | .semanticsc | The         | 05:00:00    |         |          |             |             |             │
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>│ -201902211… | holar.org/… | Rhinitis    |             |         |          |             |             |             │
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>│             |             | Control …   |             |         |          |             |             |             │
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>│ CC-MAIN-201 | http://www. | Kamis, 10   | 2023-07-05  | en      | 1.0      | 509         | 4.738703    | 224.6       │
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>│ 81120130743 | onedollarfo | Maret 2016  | 05:00:00    |         |          |             |             |             │
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>│ -201811201… | llowers.co… | Buy         |             |         |          |             |             |             │
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>│             |             | Twitter…    |             |         |          |             |             |             │
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>│ CC-MAIN-201 | http://www. | Rory Fallon | 2023-07-09  | en      | 1.0      | 223         | 4.829596    | 167.5       │
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>│ 71213104259 | iron-bru.co | joins       | 05:00:00    |         |          |             |             |             │
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>│ -201712131… | .uk/rory-f… | Bristol     |             |         |          |             |             |             │
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>│             |             | Rovers…     |             |         |          |             |             |             │
+</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>│ CC-MAIN-202 | https://www | Travel +    | 2023-07-27  | en      | 1.0      | 321         | 5.05919     | 245.0       │
+</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>│ 00528232803 | .tornosnews | Leisure:    | 05:00:00    |         |          |             |             |             │
+</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>│ -202005290… | .gr/en/tou… | The 5 best  |             |         |          |             |             |             │
+</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>│             |             | res…        |             |         |          |             |             |             │
+</span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>│ CC-MAIN-201 | https://www | Our         | 2023-07-19  | en      | 1.0      | 242         | 5.557851    | 407.2       │
+</span><span id="__span-4-25"><a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>│ 80318184945 | .univariety | Guidance    | 05:00:00    |         |          |             |             |             │
+</span><span id="__span-4-26"><a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>│ -201803182… | .com/app/s… | Philosophy  |             |         |          |             |             |             │
+</span><span id="__span-4-27"><a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>│             |             | High sch…   |             |         |          |             |             |             │
+</span><span id="__span-4-28"><a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>│ CC-MAIN-201 | http://huru | Hukun Hurur | 2023-07-18  | en      | 1.0      | 169         | 4.840237    | 240.5       │
+</span><span id="__span-4-29"><a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>│ 80120083038 | r.com/hukun | running for | 05:00:00    |         |          |             |             |             │
+</span><span id="__span-4-30"><a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>│ -201801201… | -hurur-run… | Ward 1 c…   |             |         |          |             |             |             │
+</span><span id="__span-4-31"><a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>|-------------|-------------|-------------|-------------|---------|----------|-------------|-------------|-------------|
+</span></code></pre></div></p>
+<h4 id="example-3-two-filtering-criteria-based-on-non-numerical-datetime-and-string-types">Example 3 - two filtering criteria based on non-numerical (datetime and string) types</h4>
+<p>To filter this table and only keep the documents that were acquired between 2023-07-04 and 2023-07-08 and were downloaded using the <code>HTTPS</code> protocol, without dropping any columns, invoke filtering with the following parameters:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>filter_criteria_list = [&quot;date_acquired BETWEEN &#39;2023-07-04&#39; AND &#39;2023-07-08&#39;&quot;, &quot;title LIKE &#39;https://%&#39;&quot;]
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>filter_logical_operator = &quot;AND&quot;
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>filter_columns_to_drop = []
+</span></code></pre></div></p>
+<p>This filter operation applied on the table above will return the following result:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>|----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>│ document | title    | contents | date_acq | extra    | cluster  | ft_lang | ft_score | docq_tot | docq_mea | docq_pe │
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>│ ---      | ---      | ---      | uired    | ---      | ---      | ---     | ---      | al_words | n_word_l | rplex_s │
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>│ str      | str      | str      | ---      | struct[5 | i64      | str     | f64      | ---      | en       | core    │
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>│          |          |          | datetime | ]        |          |         |          | i64      | ---      | ---     │
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>│          |          |          | [ns]     |          |          |         |          |          | f64      | f64     │
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>|----------|----------|----------|----------|----------|----------|---------|----------|----------|----------|---------|
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>│ CC-MAIN- | https:// | BACKGROU | 2023-07- | {&quot;applic | -1      | en      | 1.0      | 77       | 5.662338 | 226.5    │
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>│ 20190221 | www.sema | ND       | 05       | ation/ht |         |         |          |          |          |          │
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>│ 132217-2 | nticscho | The      | 05:00:00 | tp; msgt |         |         |          |          |          |          │
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>│ 01902211 | lar.org/ | Rhinitis |          | ype=resp |         |         |          |          |          |          │
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>│ …        | …        | Control  |          | …        |         |         |          |          |          |          │
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>│          |          | …        |          |          |         |         |          |          |          |          │
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>│ CC-MAIN- | https:// | Stourbri | 2023-07- | {&quot;applic | -1      | en      | 1.0      | 646      | 5.27709  | 230.3    │
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>│ 20190617 | www.stou | dge      | 04       | ation/ht |         |         |          |          |          |          │
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>│ 103006-2 | rbridgen | College  | 05:00:00 | tp; msgt |         |         |          |          |          |          │
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a>│ 01906171 | ews.co.u | to close |          | ype=resp |         |         |          |          |          |          │
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a>│ …        | …        | BMe…     |          | …        |         |         |          |          |          |          │
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>|----------|----------|----------|----------|----------|---------|---------|----------|----------|----------|----------|
+</span></code></pre></div></p>
+<h2 id="running">Running</h2>
+<p>You can run the Spark filter transform <a href="https://github.com/IBM/data-prep-kit/blob/dev/transforms/universal/filter/spark/src/filter_local_spark.py">filter_local.py</a> to filter the <code>test1.parquet</code> file in <a href="https://github.com/IBM/data-prep-kit/tree/dev/transforms/universal/filter/spark/test-data/input">test input data</a> to an <code>output</code> directory.  The directory will contain one or several filtered parquet files and the <code>metadata.json</code> file.</p>
+<h4 id="running-as-spark-based-application">Running as Spark-based application</h4>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>(venv) cma:spark$ python src/filter_local.py 
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>18:57:46 INFO - data factory data_ is using local data access: input_folder - /home/cma/de/data-prep-kit/transforms/universal/filter/spark/test-data/input output_folder - /home/cma/de/data-prep-kit/transforms/universal/filter/spark/output at &quot;/home/cma/de/data-prep-kit/data-processing-lib/ray/src/data_processing/data_access/data_access_factory.py:185&quot;
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>18:57:46 INFO - data factory data_ max_files -1, n_sample -1 at &quot;/home/cma/de/data-prep-kit/data-processing-lib/ray/src/data_processing/data_access/data_access_factory.py:201&quot;
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>18:57:46 INFO - data factory data_ Not using data sets, checkpointing False, max files -1, random samples -1, files to use [&#39;.parquet&#39;] at &quot;/home/cma/de/data-prep-kit/data-processing-lib/ray/src/data_processing/data_access/data_access_factory.py:214&quot;
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>18:57:46 INFO - pipeline id pipeline_id at &quot;/home/cma/de/data-prep-kit/data-processing-lib/ray/src/data_processing/runtime/execution_configuration.py:80&quot;
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>18:57:46 INFO - code location {&#39;github&#39;: &#39;github&#39;, &#39;commit_hash&#39;: &#39;12345&#39;, &#39;path&#39;: &#39;path&#39;} at &quot;/home/cma/de/data-prep-kit/data-processing-lib/ray/src/data_processing/runtime/execution_configuration.py:83&quot;
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>18:57:46 INFO - spark execution config : {&#39;spark_local_config_filepath&#39;: &#39;/home/cma/de/data-prep-kit/transforms/universal/filter/spark/config/spark_profile_local.yml&#39;, &#39;spark_kube_config_filepath&#39;: &#39;config/spark_profile_kube.yml&#39;} at &quot;/home/cma/de/data-prep-kit/data-processing-lib/spark/src/data_processing_spark/runtime/spark/spark_execution_config.py:42&quot;
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>24/05/26 18:57:47 WARN Utils: Your hostname, li-7aed0a4c-2d51-11b2-a85c-dfad31db696b.ibm.com resolves to a loopback address: 127.0.0.1; using 192.168.1.223 instead (on interface wlp0s20f3)
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>24/05/26 18:57:47 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>Setting default log level to &quot;WARN&quot;.
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>24/05/26 18:57:48 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>18:57:50 INFO - files = [&#39;/home/cma/de/data-prep-kit/transforms/universal/filter/spark/test-data/input/test1.parquet&#39;] at &quot;/home/cma/de/data-prep-kit/data-processing-lib/spark/src/data_processing_spark/runtime/spark/spark_launcher.py:188&quot;
+</span></code></pre></div>
+<p>Then 
+<div class="language-shell highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>ls<span class="w"> </span>output
+</span></code></pre></div>
+To see results of the transform.</p>
+<h4 id="passing-parameters-through-command-line-interface">Passing parameters through command-line-interface</h4>
+<p>When running filtering on a local terminal, double quotes need to be escaped accordingly. For example, to find documents that are written in Java or Python programming languages, a SQL query using the <code>IN</code> keyword is needed in the <code>filter_criteria_list</code> argument. The example below shows how to properly pass this argument to the filter app:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>python filter_transform_spark.py --filter_criteria_list &quot;[\&quot;language IN (&#39;Java&#39;, &#39;Python&#39;)\&quot;]&quot; ...
+</span></code></pre></div>
+When filter runs from the command line, it needs to include the entire <code>filter_criteria_list</code> parameter within double quotes (<code>"</code>), so that the command line parser can determine where the parameter begins and ends. This, however, will conflict with the internal double quotes that are used to specify the conditions inside the list (<code>language IN ('Java', 'Python')</code>). To resolve this problem, the internal double quotes need to be escaped, as in the \"language IN ('Java', 'Python')\" notation.</p>
+<h3 id="filter-statistics">Filter Statistics</h3>
+<p>As shown in the output of the local run of filtering, the metadata contains several statistics:
+* Global statistics:<br />
+  * <code>total_docs_count</code>, <code>total_bytes_count</code>, <code>total_columns_count</code>: total number of documents (rows), bytes, and columns that were present in the input table, before filtering took place<br />
+  * <code>docs_after_filter</code>, <code>bytes_after_filter</code>, <code>columns_after_filter</code>: total number of documents (rows), bytes, and columns that were present in the output table, after filtering took place<br />
+* Per-criteria statistics: these statistics show the impact of each filtering criteria - number of documents and bytes that it filters out, when applied by itself. We ran the local filter with two filtering criteria, and these are the stats for each of them:<br />
+  * <code>docs_filtered_by 'docq_total_words &gt; 100 AND docq_total_words &lt; 200'</code>, <code>bytes_filtered_by 'docq_total_words &gt; 100 AND docq_total_words &lt; 200'</code> - the number of documents and bytes filtered out by the <code>docq_total_words &gt; 100 AND docq_total_words &lt; 200</code> filtering condition<br />
+  * <code>docs_filtered_by 'docq_perplex_score &lt; 230'</code>, <code>bytes_filtered_by 'docq_perplex_score &lt; 230'</code>  - the number of documents and bytes filtered out by the <code>docq_perplex_score &lt; 230</code> filtering condition  </p>
+<h2 id="running_1">Running</h2>
+<h3 id="launched-command-line-options">Launched Command Line Options</h3>
+<p>When running the transform with the Spark launcher (i.e. SparkTransformLauncher),
+the following command line arguments are available in addition to 
+the options provided by the <a href="../../../../data-processing-lib/doc/spark-launcher-options/">spark launcher</a>.</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>  --filter_criteria_list FILTER_CRITERIA_LIST
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>                        list of filter criteria (in SQL WHERE clause format), for example: [
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>                          &quot;docq_total_words &gt; 100 AND docq_total_words &lt; 200&quot;,
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>                          &quot;docq_perplex_score &lt; 230&quot;,
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>                          &quot;date_acquired BETWEEN &#39;2023-07-04&#39; AND &#39;2023-07-08&#39;&quot;,
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>                          &quot;title LIKE &#39;https://%&#39;&quot;,
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>                          &quot;document_id IN (&#39;doc-id-1&#39;, &#39;doc-id-2&#39;, &#39;doc-id-3&#39;)&quot;
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>                        ]
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>  --filter_columns_to_drop FILTER_COLUMNS_TO_DROP
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>                        list of columns to drop after filtering, for example: [&quot;column1&quot;, &quot;column2&quot;]
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>  --filter_logical_operator {AND,OR}
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>                        logical operator (AND or OR) that joins filter criteria
+</span></code></pre></div>
+<h3 id="transforming-data-using-the-transform-image">Transforming data using the transform image</h3>
+<p>To use the transform image to transform your data, please refer to the 
+<a href="../../../../doc/quick-start/run-transform-image/">running images quickstart</a>,
+substituting the name of this transform image and runtime as appropriate.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs"], "search": "../../../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.83f73b43.min.js"></script>
+      
+        <script src="../../../../assets/javascripts/badge.js" async></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,26 @@
+{
+    "import_statement": {
+        "uast_node_type": "uast_package",
+	    "extractor": "text = code_snippet.split('import')[1].strip() \nif (',' in text):\n    imports = text.split(',')\n    all_imps = []\n    for imp in imports:\n        imp = imp.strip().split(' ')[0].strip()\n        if ('.' in imp):\n            imp = imp.split('.')[0]\n        all_imps.append(imp)\n    all_imps = list(set(all_imps))\n    self.extracted = (', ').join(all_imps)\nelse:\n    imp = text.strip().split(' ')[0].strip()\n    if ('.' in imp):\n        imp = imp.split('.')[0]\n    self.extracted = imp\n"
+    },
+    "import_from_statement": {
+        "uast_node_type": "uast_package",
+	    "extractor":  "text = code_snippet.split('from', 1)[1].strip()\ntext = text.split(' import')[0]\ntext = text.strip()\nif ('.' in text) :\n    self.extracted = text.split('.')[0]\nelse:\n    self.extracted = text\n"
+    },
+    "comment" : {
+        "uast_node_type" : "uast_comment",
+        "extractor" : "self.extracted = code_snippet[1:]"
+    },
+    "function_definition" : {
+        "uast_node_type" : "uast_function",
+        "extractor" : "self.extracted = code_snippet.split('(', 1)[0].strip().split(' ')[-1].strip()"
+    },
+    "class_definition" : {
+        "uast_node_type" : "uast_class",
+        "extractor" : "self.extracted = code_snippet.split('class ', 1)[1].split(':', 1)[0].strip()\nif ('(' in self.extracted):\n    self.extracted = self.extracted.split('(', 1)[0].strip()"
+    },
+    "call" : {
+        "uast_node_type" : "uast_call",
+        "extractor" : "self.extracted = code_snippet.split('(', 1)[0].strip()"
+    }
+}

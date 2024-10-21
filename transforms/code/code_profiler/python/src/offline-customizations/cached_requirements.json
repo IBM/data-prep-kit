@@ -1,0 +1,335 @@
+{
+    "concept_to_node_map": {
+        "py": {
+            "package": [
+                "import_statement",
+                "import_from_statement"
+            ],
+            "function": [
+                "function_definition",
+                "function_definition' node with id = 1, represents the definition of a function in the code. Incorporating this node, I can make a general rule to extract the definitions.\n\nThis python script can be executed:\n\n```py\n# we see that the function name is directly before the argument list, hence we get the snippet just before the first bracket of the argument list.\ntemp_0 = code_snippet.split('(')[0].strip() \n# as our required function name, from the snippet is the last one in this string, we split and get the last snippet, which is our function.\nextracted = temp_0.split(' ')[-1].strip()\n```\n\nThis script will extract the function name 'foo' from the given code snippet."
+            ],
+            "comment": [
+                "comment"
+            ]
+        },
+        "cpp": {
+            "package": [
+                "preproc_include",
+                "code snippet includes a package. Hence I consider the string after the first '#include'.\ntest = code_snippet.split('#include', 1)[1].strip()\n# In the case that there are any comments, we remove them.\ntest = test.split('//')[0].strip()\nextracted = test.split('/*')[0].strip()\n# Remove angle brackets and quotes\nextracted = extracted.replace('<', '').replace('>', '').replace('\"', '').replace(\"'\", '')\n# Remove semicolons and asterisks\nextracted = extracted.replace(';', '').replace('*', '')\nprint(extracted)\n```\n\nThis script will extract the imported packages from the code snippet, removing any comments, angle brackets, quotes, semicolons, and asterisks. The output will be:\n\n```\ncassert\nclimits\niostream\nvector\n```",
+                "code snippet includes a package. Hence I consider the string after the first '#include'.\ntest = code_snippet.split('#include', 1)[1].strip()\n# In the case that there are any comments, we remove them.\ntest = test.split('//')[0].strip()\nextracted = test.split('/*')[0].strip()\n# Remove angle brackets and quotes\nextracted = extracted.replace('<', '').replace('>', '').replace('\"', '').replace(\"'\", '')\n# Remove semicolons and asterisks\nextracted = extracted.replace(';', '').replace('*', '')\nprint(extracted)\n```\n\nThis script will extract the imported packages from the code snippet, removing any comments, angle brackets, quotes, semicolons, and asterisks. The output will be:\n\n```\nvector\nsubstab\ncassert\nclimits\niostream\nvector\nvector\n```"
+            ],
+            "function": [
+                "function_declaration",
+                "function_definition"
+            ],
+            "comment": [
+                "comment"
+            ]
+        },
+        "java": {
+            "package": [
+                "import_declaration"
+            ],
+            "function": [
+                "method_declaration"
+            ],
+            "comment": [
+                "line_comment",
+                "block_comment"
+            ]
+        },
+        "js": {
+            "package": [
+                "import_statement"
+            ],
+            "function": [
+                "function_declaration"
+            ],
+            "comment": [
+                "comment"
+            ]
+        },
+        "go": {
+            "package": [
+                "import_declaration"
+            ],
+            "function": [
+                "function_declaration"
+            ],
+            "comment": [
+                "comment"
+            ]
+        },
+        "agda": {
+            "package": [
+                "open"
+            ],
+            "function": [
+                "function"
+            ],
+            "comment": [
+                "comment"
+            ]
+        },
+        "c": {
+            "package": [
+                "preproc_include"
+            ],
+            "function": [
+                "function_definition"
+            ],
+            "comment": [
+                "comment"
+            ]
+        },
+        "c_sharp": {
+            "package": [
+                "using_directive"
+            ],
+            "comment": [
+                "comment"
+            ],
+            "function": [
+                "local_function_statement"
+            ]
+        },
+        "d": {
+            "package": [
+                "import_declaration"
+            ],
+            "function": [
+                "function_declaration"
+            ],
+            "comment": [
+                "comment"
+            ]
+        },
+        "dart": {
+            "package": [
+                "import_or_export"
+            ],
+            "function": [
+                "function_signature"
+            ],
+            "comment": [
+                "comment",
+                "documentation_comment' node with id = 1, represents a comment in the code. Incorporating this node, I can make a general rule to extract the comments.\n\nThis python script can be executed:\n\n```py\n# if the first three characters are '///' we can simply remove the first three characters and get the remaining string\nif (code_snippet[0:3] == '///'):\n    extracted = code_snippet[3:].strip()\n```\n\nThis script will extract the comment from the given code snippet."
+            ]
+        },
+        "elm": {
+            "package": [
+                "import_clause"
+            ],
+            "function": [
+                "function_declaration_left"
+            ],
+            "comment": [
+                "line_comment",
+                "block_comment"
+            ]
+        },
+        "haskell": {
+            "package": [
+                "import"
+            ],
+            "function": [
+                "function"
+            ],
+            "comment": [
+                "comment"
+            ]
+        },
+        "kotlin": {
+            "package": [
+                "import_header"
+            ],
+            "comment": [
+                "multiline_comment",
+                "line_comment"
+            ],
+            "function": [
+                "function_declaration"
+            ]
+        },
+        "nim": {
+            "package": [
+                "import_statement",
+                "include_statement",
+                "import_from_statement"
+            ],
+            "comment": [
+                "block_comment",
+                "comment"
+            ],
+            "function": [
+                "proc_declaration"
+            ]
+        },
+        "objc": {
+            "package": [
+                "preproc_import",
+                "preproc_include"
+            ],
+            "function": [
+                "function_definition"
+            ],
+            "comment": [
+                "comment"
+            ]
+        },
+        "ocaml": {
+            "package": [
+                "open_module"
+            ],
+            "comment": [
+                "comment"
+            ]
+        },
+        "perl": {
+            "package": [
+                "use_no_statement"
+            ],
+            "function": [
+                "function_definition"
+            ]
+        },
+        "qmljs": {
+            "package": [
+                "ui_import"
+            ],
+            "comment": [
+                "comment"
+            ]
+        },
+        "rust": {
+            "package": [
+                "use_declaration"
+            ],
+            "function": [
+                "function_item"
+            ],
+            "comment": [
+                "line_comment"
+            ]
+        },
+        "scala": {
+            "package": [
+                "import_declaration"
+            ],
+            "comment": [
+                "comment",
+                "block_comment"
+            ],
+            "function": [
+                "function_definition"
+            ]
+        },
+        "ts": {
+            "package": [
+                "import_statement"
+            ],
+            "comment": [
+                "comment"
+            ],
+            "function": [
+                "function_declaration"
+            ]
+        },
+        "verilog": {
+            "package": [
+                "package_or_generate_item_declaration",
+                "include_compiler_directive"
+            ],
+            "comment": [
+                "comment"
+            ],
+            "function": [
+                "function_identifier"
+            ]
+        },
+        "vhdl": {
+            "package": [
+                "library_clause"
+            ],
+            "comment": [
+                "comment"
+            ],
+            "function": [
+                "function_body"
+            ]
+        }
+    },
+    "formal_language_example_map": {
+        "C++": "cpp",
+        "Python": "py",
+        "Java": "java",
+        "JavaScript": "js",
+        "Golang": "go",
+        "c": "c",
+        "c_sharp": "c_sharp",
+        "d": "d",
+        "dart": "dart",
+        "haskell": "haskell",
+        "kotlin": "kotlin",
+        "nim": "nim",
+        "objc": "objc",
+        "ocaml": "ocaml",
+        "perl": "perl",
+        "qml": "qmljs",
+        "rust": "rust",
+        "scala": "scala",
+        "TypeScript": "ts",
+        "verilog": "verilog",
+        "vhdl": "vhdl",
+        "agda": "agda",
+        "elm": "elm"
+    },
+    "formal_language_map": {
+        "C++": "cpp",
+        "Python": "py",
+        "Java": "java",
+        "JavaScript": "js",
+        "Golang": "go",
+        "php": "php",
+        "bash": "bash",
+        "elixir": "elixir",
+        "clojure": "clojure",
+        "dot": "dot",
+        "COBOL": "COBOL",
+        "erlang": "erlang",
+        "r": "r",
+        "ruby": "ruby",
+        "julia": "julia",
+        "lua": "lua",
+        "svelte": "svelte",
+        "c": "c",
+        "c_sharp": "c_sharp",
+        "d": "d",
+        "dart": "dart",
+        "haskell": "haskell",
+        "kotlin": "kotlin",
+        "nim": "nim",
+        "objc": "objc",
+        "ocaml": "ocaml",
+        "perl": "perl",
+        "qml": "qmljs",
+        "rust": "rust",
+        "scala": "scala",
+        "TypeScript": "ts",
+        "verilog": "verilog",
+        "vhdl": "vhdl",
+        "agda": "agda",
+        "elm": "elm",
+        "pascal": "pascal"
+    },
+    "formal_concept_map": {
+        "Functions": "function",
+        "Packages": "package",
+        "Comments": "comment"
+    },
+    "formal_model_card_map": {
+        "Llama 3 Instruct: 80b": "meta-llama/llama-3-70b-instruct",
+        "Granite Code Instruct: 34b": "ibm/granite-34b-code-instruct"
+    }
+}

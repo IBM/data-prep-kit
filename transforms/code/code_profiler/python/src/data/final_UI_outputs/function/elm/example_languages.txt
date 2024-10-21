@@ -1,0 +1,2 @@
+['haskell']
+max_depth = 2

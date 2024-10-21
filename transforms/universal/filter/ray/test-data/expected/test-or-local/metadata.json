@@ -1,0 +1,12 @@
+{
+    "total_docs_count": 100,
+    "total_bytes_count": 478602,
+    "total_columns_count": 25,
+    "docs_filtered_out_by 'docq_total_words > 100 AND docq_total_words < 200'": 78,
+    "bytes_filtered_out_by 'docq_total_words > 100 AND docq_total_words < 200'": 429191,
+    "docs_filtered_out_by 'ibmkenlm_docq_perplex_score < 230'": 53,
+    "bytes_filtered_out_by 'ibmkenlm_docq_perplex_score < 230'": 275911,
+    "docs_after_filter": 58,
+    "columns_after_filter": 23,
+    "bytes_after_filter": 228072
+}
