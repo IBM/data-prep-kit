@@ -1,0 +1,10 @@
+pyarrow
+pyyaml
+boto3
+kubernetes
+polars
+disjoint-set
+scipy
+numpy
+sentencepiece
+mmh3
