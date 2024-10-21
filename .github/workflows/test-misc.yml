@@ -45,3 +45,10 @@ jobs:
               uses: actions/checkout@v4
             - name: Make sure all transforms have a test workflow
               run: bash scripts/check-workflows.sh
+    check-licensing:
+        runs-on: ubuntu-22.04
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Make repo content includes license headers.
+              run: bash scripts/check-licensing.sh

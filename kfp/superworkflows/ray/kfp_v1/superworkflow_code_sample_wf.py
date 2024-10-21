@@ -1,3 +1,15 @@
+# (C) Copyright IBM Corp. 2024.
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import kfp.compiler as compiler
 import kfp.components as comp
 import kfp.dsl as dsl
@@ -82,7 +94,7 @@ def sample_code_ray_orchestrator(
     p4_ededup_doc_column: str = "contents",
     p4_ededup_hash_cpu: float = 0.5,
     p4_ededup_use_snapshot: bool = False,
-    p4_ededup_snapshot_directory: str = None,      # data sampling
+    p4_ededup_snapshot_directory: str = None,  # data sampling
     p4_ededup_n_samples: int = 10,
     # overriding parameters
     p4_overriding_params: str = '{"ray_worker_options": {"image": "'
@@ -293,13 +305,21 @@ def sample_code_ray_orchestrator(
 
     # header cleanser
     header_cleanser = run_header_cleanser_op(
-        name=p1_orch_header_cleanser_name, prefix="p11_", params=args, host=orch_host, input_folder=license_check.output
+        name=p1_orch_header_cleanser_name,
+        prefix="p11_",
+        params=args,
+        host=orch_host,
+        input_folder=license_check.output,
     )
     _set_component(header_cleanser, "header_cleanser", license_check)
 
     # tokenization
     tokenization = run_tokenization_op(
-        name=p1_orch_tokenization_wf_name, prefix="p10_", params=args, host=orch_host, input_folder=header_cleanser.output
+        name=p1_orch_tokenization_wf_name,
+        prefix="p10_",
+        params=args,
+        host=orch_host,
+        input_folder=header_cleanser.output,
     )
     _set_component(tokenization, "tokenization", header_cleanser)
 
