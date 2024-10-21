@@ -4,7 +4,7 @@ This transform is chunking documents. It supports multiple _chunker modules_ (se
 
 When using documents converted to JSON, the transform leverages the [Docling Core](https://github.com/DS4SD/docling-core) `HierarchicalChunker`
 to chunk according to the document layout segmentation, i.e. respecting the original document components as paragraphs, tables, enumerations, etc.
-It relies on documents converted with the Docling library in the [pdf2parquet transform](../pdf2parquet) using the option `contents_type: "application/json"`,
+It relies on documents converted with the Docling library in the [pdf2parquet transform](../../pdf2parquet/python/README.md) using the option `contents_type: "application/json"`,
 which provides the required JSON structure.
 
 When using documents converted to Markdown, the transform leverages the [Llama Index](https://docs.llamaindex.ai/en/stable/module_guides/loading/node_parsers/modules/#markdownnodeparser) `MarkdownNodeParser`, which is relying on its internal Markdown splitting logic.
