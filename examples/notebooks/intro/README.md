@@ -14,7 +14,7 @@ conda create -n data-prep-kit -y python=3.11
 conda activate data-prep-kit
 
 # install the following in 'data-prep-kit' environment
-pip3 install data-prep-tooklit==0.2.1
+pip3 install data-prep-toolkit==0.2.1
 pip3 install data-prep-toolkit-transforms==0.2.1
 pip3 install data-prep-toolkit-transforms-ray==0.2.1
 pip3 install jupyterlab   ipykernel  ipywidgets
