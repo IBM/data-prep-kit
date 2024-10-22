@@ -19,6 +19,7 @@ from dpk_connector.core.utils import (
     get_content_type,
     get_etld1,
     get_focus_path,
+    get_fqdn,
     get_header_value,
     get_mime_type,
     is_allowed_path,
@@ -91,6 +92,21 @@ def test_get_base_url():
 )
 def test_get_etld1(url: str, expected: str):
     assert get_etld1(url) == expected
+
+
+@pytest.mark.parametrize(
+    "url,expected",
+    [
+        ("http://www.example.com", "www.example.com"),
+        ("https://www.example.co.uk", "www.example.co.uk"),
+        ("http://www.example.com/path?query=string#fragment", "www.example.com"),
+        ("http://localhost:8080/", ""),
+        ("http://www.example.com:8080/", "www.example.com"),
+        ("http://www.sub.example.com:8080/", "www.sub.example.com"),
+    ],
+)
+def test_get_fqdn(url: str, expected: str):
+    assert get_fqdn(url) == expected
 
 
 @pytest.mark.parametrize(

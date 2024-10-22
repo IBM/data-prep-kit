@@ -95,6 +95,7 @@ def check_empty_comment(code, ignore_lines):
 
     if max_index <= len(code_list):
         max_index = max_index + 2
+    max_index = min(max_index, len(code_list))
 
     for index in range(min_index, max_index):
         if all(
