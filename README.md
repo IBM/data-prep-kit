@@ -150,7 +150,7 @@ The matrix below shows the the combination of modules and supported runtimes. Al
 | [Text encoder](transforms/language/text_encoder/python/README.md)                    | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | [PII Annotator/Redactor](transforms/language/pii_redactor/python/README.md)          | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | **Code-only**                                                                        |                    |                    |                    |                    |
-| [Programming language annnotation](transforms/code/proglang_select/python/README.md) | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| [Programming language annotation](transforms/code/proglang_select/python/README.md)  | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | [Code quality annotation](transforms/code/code_quality/python/README.md)             | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | [Malware annotation](transforms/code/malware/python/README.md)                       | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | [Header cleanser](transforms/code/header_cleanser/python/README.md)                  | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
