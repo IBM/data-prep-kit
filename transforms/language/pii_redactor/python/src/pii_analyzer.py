@@ -1,3 +1,14 @@
+# Licensed under the Apache License, Version 2.0 (the “License”);
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#  http://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an “AS IS” BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+################################################################################
+
 import logging
 
 import spacy
@@ -65,7 +76,8 @@ class PIIAnalyzerEngine:
             List[entity_types]: Types of PII entities identified in the given input text
         """
         analyzer = AnalyzerEngine(nlp_engine=self.nlp_engine, registry=self.registry)
-        analyze_results = analyzer.analyze(text=text, language=language, entities=self.supported_entities,
-                                           score_threshold=self.score_threshold)
+        analyze_results = analyzer.analyze(
+            text=text, language=language, entities=self.supported_entities, score_threshold=self.score_threshold
+        )
         entity_types = [result.entity_type for result in analyze_results]
         return analyze_results, entity_types
