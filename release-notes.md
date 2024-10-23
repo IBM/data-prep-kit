@@ -1,5 +1,21 @@
 # Data Prep Kit Release notes
 
+## Release 0.2.2- HTTP Connector Module - 10/23/2024
+
+### General 
+1. Bug fixes across the repo
+1. Minor enhancements and experimentation with single packaging techniques using \[extra\]
+1. Decoupled the release process for each of the component so we can be more responsive to the needs of our stakeholders
+1. The minor digit for the release for all components is incremented and the patch digit is reset to 0 for all new releases of the data-prep-toolkit
+1. The patch digit for the release of any one component can be increased independently from other component patch number
+
+
+### data-prep-toolkit-Connector
+
+1. Released first version of the data-prep-toolkit-connector for crawling web sites and downloading HTML and PDF files for ingestion by the pipeline
+
+
+
 ## Release 0.2.1 - 9/24/2024
 
 ### General 

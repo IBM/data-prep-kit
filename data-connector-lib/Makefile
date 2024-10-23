@@ -2,6 +2,8 @@
 REPOROOT=..
 include $(REPOROOT)/.make.defaults
 
+DPK_CONNECTOR_VERSION=0.2.2
+
 clean::
 	@# Help: Clean up the distribution build and the venv
 	rm -rf dist venv
@@ -13,7 +15,7 @@ clean::
 setup::
 
 set-versions: .check-env
-	$(MAKE) TOML_VERSION=$(DPK_LIB_VERSION) .defaults.update-toml
+	$(MAKE) TOML_VERSION=$(DPK_CONNECTOR_VERSION) .defaults.update-toml
 
 build:: build-dist
 
