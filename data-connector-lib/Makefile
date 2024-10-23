@@ -13,7 +13,7 @@ clean::
 setup::
 
 set-versions: .check-env
-	$(MAKE) TOML_VERSION=$(DPK_LIB_VERSION) .defaults.update-toml
+	$(MAKE) TOML_VERSION=$(DPK_CONNECTOR_VERSION) .defaults.update-toml
 
 build:: build-dist
 
