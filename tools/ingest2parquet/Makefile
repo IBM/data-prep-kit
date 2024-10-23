@@ -16,7 +16,7 @@ test::	venv test-src test-image
 
 clean:: .defaults.clean
 
-image:: .defaults.ray-lib-whl-image
+image:: .defaults.lib-whl-image
 
 test-src:: .defaults.test-src test-local
 

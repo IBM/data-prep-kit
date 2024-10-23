@@ -115,10 +115,10 @@ extra-help:
 .transforms.python-image:: .defaults.python-lib-whl-image
 
 .PHONY: .transforms.ray-image
-.transforms.ray-image:: .defaults.ray-lib-whl-image
+.transforms.ray-image:: .defaults.lib-whl-image
 
 .PHONY: .transforms.spark-image
-.transforms.spark-image:: .defaults.spark-lib-src-image
+.transforms.spark-image:: .defaults.lib-whl-image
 
 .PHONY: .transforms.python-build
 .transforms.python-build:: .transforms.python-venv .transforms.python-image	

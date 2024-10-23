@@ -297,8 +297,8 @@ __check_defined = \
 # available in the current directory for use by the Dockerfile (i.e. to install the library). 
 # Note that this looks for the ../python directory, which is currently only used in the transform projects,
 # but we add it here as a convenience to avoid duplicating a lot of this in transforms/.make.transforms.
-.PHONY: .defaults.ray-lib-wheel-image
-.defaults.ray-lib-whl-image:: .default.build-lib-wheel
+.PHONY: .defaults.lib-whl-image
+.defaults.lib-whl-image:: .default.build-lib-wheel
 # Must be called with a DOCKER_LOCAL_IMAGE= settings.
 	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE) and library wheel
 	@$(eval LIB_WHEEL_FILE := $(shell find data-processing-dist/*.whl))
@@ -319,21 +319,23 @@ __check_defined = \
 # Note that this looks for the ../python directory, which is currently only used in the transform projects,
 # but we add it here as a convenience to avoid duplicating a lot of this in transforms/.make.transforms.
 # Must be called with a DOCKER_LOCAL_IMAGE= settings.
-.PHONY: .defaults.spark-lib-src-image
-.defaults.spark-lib-src-image:: .defaults.spark-lib-base-image
-	@# Help: Build the Spark $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
-	$(MAKE) IMAGE_NAME_TO_VERIFY=$(DOCKER_SPARK_BASE_IMAGE_NAME) .defaults.verify-image-availability
-ifeq ($(USE_REPO_LIB_SRC), 1)
-	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
-	$(MAKE) LIB_PATH=$(DPK_SPARK_LIB_DIR) LIB_NAME=data-processing-lib-spark .defaults.copy-lib
-endif
-	if [ -e ../python ]; then								\
-		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
-	fi
-	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE) .defaults.image
-	-rm -rf data-processing-lib-python
-	-rm -rf data-processing-lib-spark
-	-rm -rf python-transform 
+#.PHONY: .defaults.spark-lib-src-image
+#.defaults.spark-lib-src-image:: .defaults.spark-lib-base-image
+#	@# Help: Build the Spark $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
+#	$(MAKE) IMAGE_NAME_TO_VERIFY=$(DOCKER_SPARK_BASE_IMAGE_NAME) .defaults.verify-image-availability
+#ifeq ($(USE_REPO_LIB_SRC), 1)
+#	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
+#	$(MAKE) LIB_PATH=$(DPK_SPARK_LIB_DIR) LIB_NAME=data-processing-lib-spark .defaults.copy-lib
+#endif
+#	if [ -e ../python ]; then								\
+#		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
+#	fi
+#	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE) .defaults.image
+#	-rm -rf data-processing-lib-python
+#	-rm -rf data-processing-lib-spark
+#	-rm -rf python-transform 
+
+
 
 # Install the source from the given directory into an existing venv
 # Expected PYTHON_PROJECT_DIR and uses EXTRA_INDEX_URL if set.
