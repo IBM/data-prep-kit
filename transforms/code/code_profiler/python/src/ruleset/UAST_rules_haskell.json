@@ -1,0 +1,14 @@
+{
+    "import": {
+        "uast_node_type": "uast_package",
+        "extractor": "temp = code_snippet.split('import', 1)[1].strip(' ;')\nif ('qualified' in temp):\n    temp = temp.split('qualified', 1)[1].strip()\nif ('as' in temp):\n    temp = temp.split('as', 1)[0].strip()\nif ('hiding' in temp):\n    temp = temp.split('hiding', 1)[0].strip()\nif ('.*' in temp):\n    # get the parts before the asterisk\n    temp = temp.replace('.*', '')\nif ('(' in temp):\n    temp = temp.split('(', 1)[0].strip()\nself.extracted = temp"
+    },
+    "function": {
+        "uast_node_type": "uast_function",
+        "extractor": "temp_0 = code_snippet.split(' ')[0].strip() \nself.extracted = temp_0"
+    },
+    "comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "self.extracted = code_snippet[2:].strip()"
+    }
+}

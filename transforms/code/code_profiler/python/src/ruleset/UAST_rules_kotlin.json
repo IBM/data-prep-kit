@@ -1,0 +1,18 @@
+{
+    "import_header": {
+        "uast_node_type": "uast_package",
+        "extractor": "text = code_snippet.split('import')[1].strip() \nif ('.*' in text):\n    # get the parts before the asterisk\n    text = text.replace('.*', '')\nif (' as ' in text):\n    # removing the alias\n    text = text.split(' as ')[0].strip()\nself.extracted = text"
+    },
+    "multiline_comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "self.extracted = code_snippet[2:-2].strip()"
+    },
+    "line_comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "self.extracted = code_snippet[2:].strip()"
+    },
+    "function_declaration": {
+        "uast_node_type": "uast_function",
+        "extractor": "temp_0 = code_snippet.split('(')[0].strip() \nself.extracted = temp_0.split(' ')[-1].strip()"
+    }
+}

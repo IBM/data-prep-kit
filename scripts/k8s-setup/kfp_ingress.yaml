@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: kubeflow
+    namespace: kubeflow
+spec:
+    ingressClassName: nginx
+    rules:
+        - http:
+              paths:
+                  - path: "/"
+                    pathType: Prefix
+                    backend:
+                        service:
+                            name: ml-pipeline-ui
+                            port:
+                                name: http

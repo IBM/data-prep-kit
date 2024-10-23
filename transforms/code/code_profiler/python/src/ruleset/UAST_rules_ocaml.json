@@ -1,0 +1,10 @@
+{
+    "open_module": {
+        "uast_node_type": "uast_package",
+        "extractor": "temp = code_snippet.split('open', 1)[1].strip()\nself.extracted = temp"
+    },
+    "comment": {
+        "uast_node_type": "uast_comment",
+        "extractor": "self.extracted = code_snippet[3:-2].strip()"
+    }
+}

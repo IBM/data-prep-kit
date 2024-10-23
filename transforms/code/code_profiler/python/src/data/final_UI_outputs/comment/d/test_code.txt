@@ -1,0 +1,7 @@
+/*
+void brokenFunc() {
+    ...
+}
+*/
+
+//hi

@@ -1,0 +1,5 @@
+function [7:0] sum;  
+    input [7:0] a, b;  
+    begin  
+        sum = a + b;  
+    end  

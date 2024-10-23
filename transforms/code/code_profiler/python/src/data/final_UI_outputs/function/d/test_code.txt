@@ -1,0 +1,8 @@
+pure int foo(int i)
+{
+    i++;     // ok, modifying local state
+    //x = i; // error, modifying global state
+    //i = x; // error, reading mutable global state
+    i = y;   // ok, reading immutable global state
+    throw new Exception("failed"); // ok
+}

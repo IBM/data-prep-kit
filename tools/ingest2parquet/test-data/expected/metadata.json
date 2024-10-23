@@ -1,0 +1,16 @@
+{
+    "total_files_given": 2,
+    "total_files_processed": 2,
+    "total_files_failed_to_processed": 0,
+    "total_no_of_rows": 54,
+    "total_bytes_in_memory": 79661,
+    "failure_details": [],
+    "source": {
+        "name": "/Users/sapthasurendran/Documents/GUF/fm-data-engineering/tools/ingest2parquet/test-data/input",
+        "type": "path"
+    },
+    "target": {
+        "name": "/Users/sapthasurendran/Documents/GUF/fm-data-engineering/tools/ingest2parquet/src/../test-data/output",
+        "type": "path"
+    }
+}

@@ -1,0 +1,60 @@
+name: Execute KFP sub workflow
+description: Executes KFP sub workflow
+
+inputs:
+    - { name: name, type: String, description: "Sub workflow name" }
+    - { name: prefix, type: String, description: "Sub flow argument's prefix" }
+    - { name: params, type: JsonObject, default: None, description: "Sub flow parameters" }
+    - { name: host, type: String, default: "http://ml-pipeline:8888", description: "URL of the host to connect to" }
+    - { name: number_pipelines, type: Integer, default: "100", description: "Max number of pipelines to read" }
+    - { name: experiment, type: String, default: "Default", description: "Name of the experiment for the run" }
+    - {
+          name: execution_timeout,
+          type: Integer,
+          default: "-1",
+          description: "Maximum time (in min) to wait for the sub workflow completion; -1 forever",
+      }
+    - {
+          name: time_interval,
+          type: Integer,
+          default: "1",
+          description: "Time interval (min) to check for the job status",
+      }
+    - { name: input_folder, type: String, default: "", description: "input folder" }
+
+outputs:
+    - { name: output, type: String, description: "output folder" }
+
+implementation:
+    container:
+        image: "quay.io/dataprep1/data-prep-kit/kfp-data-processing:latest"
+        # command is a list of strings (command-line arguments).
+        # The YAML language has two syntaxes for lists, and you can use either of them.
+        # Here we use the "flow syntax" - comma-separated strings inside square brackets.
+        command: [
+                python,
+                # Force the stdout and stderr streams to be unbuffered
+                -u,
+                # Path of the program inside the container
+                /pipelines/component/src/subworkflow.py,
+                --name,
+                { inputValue: name },
+                --prefix,
+                { inputValue: prefix },
+                --params,
+                { inputValue: params },
+                --host,
+                { inputValue: host },
+                --number_pipelines,
+                { inputValue: number_pipelines },
+                --experiment,
+                { inputValue: experiment },
+                --execution_timeout,
+                { inputValue: execution_timeout },
+                --time_interval,
+                { inputValue: time_interval },
+                --input_folder,
+                { inputValue: input_folder },
+                --output_folder,
+                { outputPath: output },
+            ]

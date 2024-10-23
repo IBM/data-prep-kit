@@ -1,0 +1,5 @@
+data-prep-toolkit==0.2.2.dev1
+nltk==3.9.1
+transformers==4.38.2
+torch==2.4.1
+pandas==2.2.2

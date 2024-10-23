@@ -1,0 +1,87 @@
+{
+    "pipeline": "pipeline_id",
+    "job details": {
+        "job category": "preprocessing",
+        "job name": "fdedup",
+        "job type": "ray",
+        "job id": "job_id",
+        "start_time": "2024-06-24 19:39:44",
+        "end_time": "2024-06-24 19:39:57",
+        "status": "success"
+    },
+    "code": {
+        "github": "github",
+        "commit_hash": "12345",
+        "path": "path"
+    },
+    "job_input_params": {
+        "doc_column": "contents",
+        "id_column": "int_id_column",
+        "cluster_column": "cluster",
+        "bucket_cpu": 0.5,
+        "mhash_cpu": 0.5,
+        "doc_cpu": 0.5,
+        "num_doc_actors": 1,
+        "num_minhash_actors": 1,
+        "num_bucket_actors": 1,
+        "num_preprocessors": 2,
+        "num_permutations": 64,
+        "threshold": 0.8,
+        "shingles_size": 5,
+        "delimiters": " ",
+        "snapshot_delay": 1,
+        "use_bucket_snapshot": false,
+        "use_doc_snapshot": false,
+        "random_delay_limit": 5,
+        "worker_options": {
+            "num_cpus": 0.8,
+            "max_restarts": -1
+        },
+        "checkpointing": false,
+        "max_files": -1,
+        "random_samples": -1,
+        "files_to_use": [".parquet"],
+        "number of workers": 1,
+        "worker options": {
+            "num_cpus": 0.8,
+            "max_restarts": -1
+        },
+        "actor creation delay": 0
+    },
+    "execution_stats": {
+        "cpus": 16,
+        "gpus": 0,
+        "memory": 14.396823502145708,
+        "object_store": 2.0,
+        "execution time, min": 0.22008283535639445
+    },
+    "job_output_stats": {
+        "number of buckets": 15,
+        "number of docs": 3,
+        "number of removed docs": 2,
+        "number of min hashes": 5,
+        "overall hash memory GB": 7.152557373046875e-6,
+        "de duplication %": 40.0,
+        "source_files": 2,
+        "source_size": 73126,
+        "generated buckets": 15,
+        "generated minhashes": 5,
+        "source_doc_count": 10,
+        "generated doc_ids": 3,
+        "bucket processing time": 0.04204988479614258,
+        "result_files": 1,
+        "result_size": 36941,
+        "processing_time": 2.286285161972046,
+        "source_documents": 5,
+        "result_documents": 3,
+        "result_doc_count": 3
+    },
+    "source": {
+        "name": "/Users/boris/Projects/data-prep-kit/transforms/universal/fdedup/ray/test-data/input",
+        "type": "path"
+    },
+    "target": {
+        "name": "/Users/boris/Projects/data-prep-kit/transforms/universal/fdedup/ray/output",
+        "type": "path"
+    }
+}

@@ -1,0 +1,46 @@
+[project]
+name = "data_prep_toolkit_kfp_v2"
+version = "0.2.2.dev1"
+requires-python = ">=3.10,<3.13"
+description = "Data Preparation Kit Library. KFP support"
+license = {text = "Apache-2.0"}
+readme = {file = "README.md", content-type = "text/markdown"}
+authors = [
+    { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
+    { name = "Alexey Roytman", email = "roytman@il.ibm.com" },
+    { name = "Mohammad Nassar", email = "Mohammad.Nassar@ibm.com" },
+    { name = "Revital Eres", email = "eres@il.ibm.com" },
+]
+dependencies = [
+    "kfp==2.8.0",
+    "kfp-kubernetes==1.2.0",
+    "data-prep-toolkit-kfp-shared==0.2.2.dev1",
+]
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = [
+    "twine",
+    "pytest>=7.3.2",
+    "pytest-dotenv>=0.5.2",
+    "pytest-env>=1.0.0",
+    "pre-commit>=3.3.2",
+    "pytest-cov>=4.1.0",
+    "pytest-mock>=3.10.0",
+]
+
+[options]
+package_dir = ["src"]
+
+[options.packages.find]
+where = ["src/workflow_support"]
+
+[tool.pytest.ini_options]
+addopts = "--cov --cov-report term-missing --cov-fail-under 10"
+markers = ["unit: unit tests", "integration: integration tests"]
+
+[tool.coverage.run]
+include = ["src/*"]

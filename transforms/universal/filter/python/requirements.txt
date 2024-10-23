@@ -1,0 +1,3 @@
+
+data-prep-toolkit==0.2.2.dev1
+duckdb>=0.10.1
