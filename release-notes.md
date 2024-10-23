@@ -6,7 +6,7 @@
 1. Bug fixes across the repo
 1. Minor enhancements and experimentation with single packaging techniques using \[extra\]
 1. Decoupled the release process for each of the component so we can be more responsive to the needs of our stakeholders
-1. The minor digit for the release for al components is incremented and the patch digit is reset to 0 for all new releases of the data-prep-toolkit
+1. The minor digit for the release for all components is incremented and the patch digit is reset to 0 for all new releases of the data-prep-toolkit
 1. The patch digit for the release of any one component can be increased independently from other component patch number
 
 
