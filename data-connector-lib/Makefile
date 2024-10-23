@@ -2,8 +2,6 @@
 REPOROOT=..
 include $(REPOROOT)/.make.defaults
 
-DPK_CONNECTOR_VERSION=0.2.2
-
 clean::
 	@# Help: Clean up the distribution build and the venv
 	rm -rf dist venv

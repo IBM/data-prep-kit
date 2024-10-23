@@ -39,6 +39,8 @@ DPK_LIB_KFP_SHARED=$(DPK_VERSION)
 KFP_DOCKER_VERSION=$(DOCKER_IMAGE_VERSION)
 KFP_DOCKER_VERSION_v2=$(DOCKER_IMAGE_VERSION)
 
+DPK_CONNECTOR_VERSION=0.2.3.dev0
+
 ################## ################## ################## ################## ################## ##################
 # Begin versions that the repo depends on. 
 
