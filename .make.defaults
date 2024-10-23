@@ -441,7 +441,7 @@ ifeq ($(USE_REPO_LIB_SRC), 1)
 	$(MAKE) PIP_TARGET=data-prep-toolkit[spark] .defaults.pip-uninstall;	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
 	$(MAKE) PYTHON_PROJECT_BUILD_DIR=$(DPK_PYTHON_BUILD_DIR) .defaults.install-src-venv;	\
-	$(MAKE) PYTHON_PROJECT_BUILD_DIR=$(DPK_SPARK_BUILD_DIR) .defaults.install-src-venv;	\
+	$(MAKE) PYTHON_PROJECT_BUILD_DIR=$(DPK_SPARK_BUILD_DIR) PROJECT_BUILD_EXTRA=spark .defaults.install-src-venv;	\
 	echo Installed source from Python and Spark processing libraries for `which $(PYTHON)`
 else
 	@# Help: DO NOT install Python or Spark data processing library source into existing venv
