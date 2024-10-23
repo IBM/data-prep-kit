@@ -1,6 +1,6 @@
 [project]
 name = "data_prep_toolkit"
-version = "0.2.2.dev1"
+version = "0.2.2.dev2"
 keywords = ["data", "data preprocessing", "data preparation", "llm", "generative", "ai", "fine-tuning", "llmapps" ]
 requires-python = ">=3.10,<3.13"
 description = "Data Preparation Toolkit Library for Ray and Python"
@@ -23,12 +23,12 @@ requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic.dependencies]
-file = ["requirements.txt"]
+file = ["python/requirements.txt"]
 
 [tool.setuptools.dynamic.optional-dependencies]
-dev = { file = ["requirements-dev.txt"]}
-ray = { file = ["requirements-ray.txt"]}
-spark = { file = ["requirements-spark.txt"]}
+dev = { file = ["requirements.txt"]}
+ray = { file = ["ray/requirements.txt"]}
+spark = { file = ["spark/requirements.txt"]}
 
 [tool.setuptools.packages.find]
 where = ["python/src", "ray/src", "spark/src"]

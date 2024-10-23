@@ -27,15 +27,16 @@ publish:: publish-dist
 
 publish-dist :: .check-env .defaults.publish-dist 
 
-venv::	pyproject.toml
-	@# Help: Create the virtual environment using pyproject.toml 
+venv::
+	@# Help: Create the virtual environment using pyproject.toml for installing python library
+	# pyproject.toml is now common for python, [ray] and [spark]
 	rm -r dist venv || true
 	rm -rf src/*egg-info || true
 	rm makeenv || true
 	$(PYTHON) -m venv venv
 	source venv/bin/activate; 	\
 	pip install --upgrade pip;	\
-	pip install -e .;		\
+	pip install -e ../ ;		\
 	pip install pytest pytest-cov moto==5.0.5 markupsafe==2.0.1
 
 image:: 
