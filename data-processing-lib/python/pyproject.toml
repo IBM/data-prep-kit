@@ -17,6 +17,7 @@ dependencies = [
     "argparse",
     "mmh3",
     "psutil",
+    "polars",
 ]
 
 [project_urls]
