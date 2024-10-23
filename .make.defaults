@@ -256,42 +256,60 @@ __check_defined = \
 #	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
 #	-rm -rf data-processing-lib-python
 	
+.PHONY: .default.build-lib-wheel
 .default.build-lib-wheel:
-        make -C $(REPOROOT)/data-processing-lib build-pkg-dist
+	make -C $(REPOROOT)/data-processing-lib build-pkg-dist
+	rm -rf data-processing-dist && mkdir data-processing-dist
+	cp $(REPOROOT)/data-processing-lib/dist/*.whl data-processing-dist
 
 # Build and image using the local Dockerfile and make the wheel for data-processing-lib
 # available in the current directory for use by the Dockerfile (i.e. to install the library).
-.PHONY: .defaults.python-lib-whl-image
+.PHONY: .defaults.python-lib-whl-image 
 .defaults.python-lib-whl-image:: .default.build-lib-wheel
-    # Must be called with a DOCKER_LOCAL_IMAGE= settings.
-	@# Help: Build the Python $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-lib/python source
-ifeq ($(USE_REPO_LIB_SRC), 1)
-	rm -rf data-processing-dist && mkdir data-processing-dist
-	cp -p -R $(REPOROOT)/data-processing-lib/dist/*.whl data-processing-dist
+	# Must be called with a DOCKER_LOCAL_IMAGE= settings.
+	@# Help: Build the Python $(DOCKER_LOCAL_IMAGE) using the the wheel file for the library
 	@$(eval LIB_WHEEL_FILE := $(shell find data-processing-dist/*.whl))
-	$(eval WHEEL_FILE_NAME := $(shell basename $(LIB_WHEEL_FILE)))
-endif
-	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
+	$(eval LIB_WHEEL_FILE := $(shell basename $(LIB_WHEEL_FILE)))
+	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) WHEEL_FILE_NAME=$(LIB_WHEEL_FILE) .defaults.image
 	-rm -rf data-processing-dist
 
 # Build an image using the local Dockerfile and make the data-processing-lib/ray
 # available in the current directory for use by the Dockerfile (i.e. to install the library). 
 # Note that this looks for the ../python directory, which is currently only used in the transform projects,
 # but we add it here as a convenience to avoid duplicating a lot of this in transforms/.make.transforms.
-.PHONY: .defaults.ray-lib-src-image
-.defaults.ray-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
-	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
-ifeq ($(USE_REPO_LIB_SRC), 1)
-	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
-	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray .defaults.copy-lib
-endif
+#.PHONY: .defaults.ray-lib-src-image
+#.defaults.ray-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
+#	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
+#ifeq ($(USE_REPO_LIB_SRC), 1)
+#	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
+#	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray .defaults.copy-lib
+#endif
+#	if [ -e ../python ]; then								\
+#		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
+#	fi
+#	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
+#	-rm -rf data-processing-lib-python
+#	-rm -rf data-processing-lib-ray
+#	-rm -rf python-transform 
+
+
+# Build an image using the local Dockerfile and make the data-processing wheel 
+# available in the current directory for use by the Dockerfile (i.e. to install the library). 
+# Note that this looks for the ../python directory, which is currently only used in the transform projects,
+# but we add it here as a convenience to avoid duplicating a lot of this in transforms/.make.transforms.
+.PHONY: .defaults.ray-lib-wheel-image
+.defaults.ray-lib-whl-image:: .default.build-lib-wheel
+# Must be called with a DOCKER_LOCAL_IMAGE= settings.
+	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE) and library wheel
+	@$(eval LIB_WHEEL_FILE := $(shell find data-processing-dist/*.whl))
+	$(eval LIB_WHEEL_FILE := $(shell basename $(LIB_WHEEL_FILE)))
 	if [ -e ../python ]; then								\
 		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
 	fi
-	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
-	-rm -rf data-processing-lib-python
-	-rm -rf data-processing-lib-ray
+	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) WHEEL_FILE_NAME=$(LIB_WHEEL_FILE) .defaults.image
 	-rm -rf python-transform 
+	-rm -rf data-processing-dist
+
 
 # Build the base spark image used by spark-based transforms
 .PHONY: .defaults.spark-lib-base-image
@@ -322,7 +340,7 @@ endif
 # PYTHON_PROJECT_DIR is expected to have src and pyproject.toml
 .PHONY: .defaults.install-src-venv
 .defaults.install-src-venv:: 
-	@echo Begin installing source from $(PYTHON_PROJECT_DIR) into venv
+	@echo Begin installing source from $(PYTHON_PROJECT_BUILD_DIR) into venv
 	$(call check_defined, PYTHON_PROJECT_BUILD_DIR)
 	@source venv/bin/activate;				      	\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
@@ -331,11 +349,13 @@ endif
 	if [ -e $(PYTHON_PROJECT_BUILD_DIR)/requirements.txt ]; then \
 		pip install -r  $(PYTHON_PROJECT_BUILD_DIR)/requirements.txt; \
 	fi; \
-	if [ -z "$(PROJECT_BUILD_EXTRA)" ]; then \
-	   pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_BUILD_DIR); \
-	else \
-	   pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_BUILD_DIR)[$(PROJECT_BUILD_EXTRA)]; \
-	fi;
+	if [ -e $(PYTHON_PROJECT_BUILD_DIR)/pyproject.toml ]; then \
+		if [ -z "$(PROJECT_BUILD_EXTRA)" ]; then \
+		   pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_BUILD_DIR); \
+		else \
+	   		pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_BUILD_DIR)[$(PROJECT_BUILD_EXTRA)]; \
+		fi;\
+	fi
 	@echo Done installing source from $(PYTHON_PROJECT_BUILD_DIR) into venv
 
 # Install local requirements last as it generally includes our lib source
@@ -400,9 +420,10 @@ else
 	@# Help: DO NOT install Python or Ray data processing library source into existing venv
 	@echo USE_REPO_LIB_SRC!=1 so do NOT installing Python or Ray data processing library source into existing venv
 endif
+	# Install the module python library if it has one
 	@if [ -d ../python ]; then                                               		\
 		source venv/bin/activate;				      			\
-		$(MAKE) PYTHON_PROJECT_BUILD_DIR=.. .defaults.install-src-venv;    		\
+		$(MAKE) PYTHON_PROJECT_BUILD_DIR=../python .defaults.install-src-venv;    		\
 	fi 
 
 # Install local requirements last as it generally includes our lib source
