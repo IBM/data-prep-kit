@@ -449,7 +449,7 @@ else
 endif
 	if [ -d ../python ]; then                                               	\
 		source venv/bin/activate;				      		\
-		$(MAKE) PYTHON_PROJECT_BUILD_DIR=.. .defaults.install-src-venv;    	\
+		$(MAKE) PYTHON_PROJECT_BUILD_DIR=../python .defaults.install-src-venv;    	\
 	fi
 
 # Run tests in test directory from that dir after adding ../src to PYTHONPATH
