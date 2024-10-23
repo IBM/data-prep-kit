@@ -156,7 +156,10 @@ extra-help:
 	@# Help: Run the transform's tests and any '*local' .py files
 
 .PHONY: .transforms.python-test-image
-.transforms.python-test-image:: .transforms.python-image .transforms.test-image-help .defaults.test-image-pytest .transforms.clean
+.transforms.python-test-image:: .transforms.python-image
+	$(MAKE) .transforms.test-image-help
+#	$(MAKE) .defaults.test-image-pytest
+	$(MAKE) .transforms.clean
 
 .PHONY: .transforms.ray-test-image
 .transforms.ray-test-image:: .transforms.ray-image .transforms.test-image-help .defaults.test-image-pytest .transforms.clean
