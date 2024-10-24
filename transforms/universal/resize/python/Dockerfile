@@ -13,13 +13,13 @@ ARG WHEEL_FILE_NAME
 
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
-COPY --chown=ray:users data-processing-dist data-processing-dist
+COPY --chown=dpk:root data-processing-dist data-processing-dist
 RUN  pip install data-processing-dist/${WHEEL_FILE_NAME}
 
 # Install python project source
-COPY --chown=dpk:users src/ src/
-COPY --chown=dpk:users pyproject.toml pyproject.toml
-COPY --chown=dpk:users README.md Readme.md
+COPY --chown=dpk:root src/ src/
+COPY --chown=dpk:root pyproject.toml pyproject.toml
+COPY --chown=dpk:root README.md Readme.md
 COPY --chown=dpk:root requirements.txt requirements.txt
 RUN pip install --no-cache-dir -e .
 
