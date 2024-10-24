@@ -297,8 +297,8 @@ __check_defined = \
 # available in the current directory for use by the Dockerfile (i.e. to install the library). 
 # Note that this looks for the ../python directory, which is currently only used in the transform projects,
 # but we add it here as a convenience to avoid duplicating a lot of this in transforms/.make.transforms.
-.PHONY: .defaults.lib-whl-image
-.defaults.lib-whl-image:: .default.build-lib-wheel
+.PHONY: .defaults.ray-lib-whl-image
+.defaults.ray-lib-whl-image:: .default.build-lib-wheel
 # Must be called with a DOCKER_LOCAL_IMAGE= settings.
 	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE) and library wheel
 	@$(eval LIB_WHEEL_FILE := $(shell find data-processing-dist/*.whl))
@@ -313,7 +313,7 @@ __check_defined = \
 
 # Build the base spark image used by spark-based transforms
 .PHONY: .defaults.spark-lib-base-image
-.defaults.spark-lib-base-image-spark: 
+.defaults.spark-lib-base-image: 
 	$(MAKE) -C $(DPK_SPARK_LIB_DIR) image
 
 # Note that this looks for the ../python directory, which is currently only used in the transform projects,
@@ -334,6 +334,21 @@ __check_defined = \
 #	-rm -rf data-processing-lib-python
 #	-rm -rf data-processing-lib-spark
 #	-rm -rf python-transform 
+
+.PHONY: .defaults.spark-lib-whl-image
+.defaults.spark-lib-whl-image:: .default.build-lib-wheel .defaults.spark-lib-base-image
+# Must be called with a DOCKER_LOCAL_IMAGE= settings.
+	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE) and library wheel
+	$(MAKE) IMAGE_NAME_TO_VERIFY=$(DOCKER_SPARK_BASE_IMAGE_NAME) .defaults.verify-image-availability
+	@$(eval LIB_WHEEL_FILE := $(shell find data-processing-dist/*.whl))
+	$(eval LIB_WHEEL_FILE := $(shell basename $(LIB_WHEEL_FILE)))
+	if [ -e ../python ]; then								\
+		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
+	fi
+	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE) WHEEL_FILE_NAME=$(LIB_WHEEL_FILE) .defaults.image
+	-rm -rf python-transform 
+	-rm -rf data-processing-dist
+
 
 
 
