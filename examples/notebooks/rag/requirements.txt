@@ -2,7 +2,7 @@
 
 data-prep-toolkit-transforms==0.2.1
 data-prep-toolkit-transforms-ray==0.2.1
-
+data-prep-connector==0.2.2.dev1
 deepsearch-toolkit
 
 
@@ -42,6 +42,7 @@ llama-index-vector-stores-milvus
 # --- Utils
 python-dotenv==1.0.0
 humanfriendly
+mimetypes-magic
 
 ## --- Jupyter Utils
 jupyterlab
@@ -51,3 +52,4 @@ ipywidgets
 IProgress
 chardet==5.2.0
 charset-normalizer==3.3.2
+nest-asyncio
