@@ -152,6 +152,7 @@ class TransformUtils:
 
         df = polars.read_parquet(io.BytesIO(data))
         table = df.to_arrow()
+        return table
 
     @staticmethod
     def convert_arrow_to_binary(table: pa.Table) -> bytes:
