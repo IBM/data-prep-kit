@@ -1,7 +1,7 @@
 [project]
 name = "data_prep_connector"
-version = "0.2.2.dev1"
-requires-python = ">=3.10"
+version = "0.2.3.dev0"
+requires-python = ">=3.10,<3.13"
 keywords = [
     "data",
     "data acquisition",
