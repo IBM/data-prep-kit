@@ -4,7 +4,7 @@ FROM ${BASE_IMAGE}
 RUN pip install --upgrade --no-cache-dir pip 
 
 # install pytest
-RUN pip install --no-cache-dir pytest
+#RUN pip install --no-cache-dir pytest
 
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
@@ -29,8 +29,8 @@ COPY ./src/hap_transform_ray.py .
 COPY ./src/hap_local_ray.py local/
 
 # copy test
-COPY test/ test/
-COPY test-data/ test-data/
+#COPY test/ test/
+#COPY test-data/ test-data/
 
 # Set environment
 ENV PYTHONPATH /home/ray
