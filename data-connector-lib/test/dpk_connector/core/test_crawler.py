@@ -37,3 +37,33 @@ def test_invalid_crawler():
     with pytest.raises(ValueError) as e:
         crawl(["http://example.com"], on_downloaded, download_limit=-10)
     assert isinstance(e.value, ValueError) is True
+
+    with pytest.raises(ValueError) as e:
+        crawl(["http://example.com"], on_downloaded, concurrent_requests=-10)
+    assert isinstance(e.value, ValueError) is True
+
+    with pytest.raises(ValueError) as e:
+        crawl(["http://example.com"], on_downloaded, concurrent_requests_per_domain=-10)
+    assert isinstance(e.value, ValueError) is True
+
+    with pytest.raises(ValueError) as e:
+        crawl(["http://example.com"], on_downloaded, download_delay=-0.1)
+    assert isinstance(e.value, ValueError) is True
+
+    with pytest.raises(ValueError) as e:
+        crawl(["http://example.com"], on_downloaded, download_timeout=-0.1)
+    assert isinstance(e.value, ValueError) is True
+
+    with pytest.raises(ValueError) as e:
+        crawl(["http://example.com"], on_downloaded, autothrottle_max_delay=-0.1)
+    assert isinstance(e.value, ValueError) is True
+
+    with pytest.raises(ValueError) as e:
+        crawl(
+            ["http://example.com"], on_downloaded, autothrottle_target_concurrency=0.5
+        )
+    assert isinstance(e.value, ValueError) is True
+
+    with pytest.raises(ValueError) as e:
+        crawl(["http://example.com"], on_downloaded, robots_max_crawl_delay=-0.1)
+    assert isinstance(e.value, ValueError) is True
