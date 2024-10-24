@@ -12,7 +12,7 @@ authors = [
 ]
 dependencies = [
     "dpk-doc-chunk-transform-python==0.2.2.dev1",
-    "data-prep-toolkit-ray==0.2.2.dev1",
+    "data-prep-toolkit[ray]==0.2.2.dev1",
 ]
 
 [build-system]

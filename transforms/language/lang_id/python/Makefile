@@ -17,8 +17,6 @@ include $(REPOROOT)/transforms/.make.transforms
 # Include the common configuration for this transform
 include ../transform.config
 
-include $(REPOROOT)/transforms/.make.transforms
-
 venv::	.transforms.python-venv
 
 test::	.transforms.python-test

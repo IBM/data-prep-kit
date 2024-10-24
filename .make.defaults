@@ -63,6 +63,11 @@ DPK_PYTHON_LIB_DIR=$(REPOROOT)/data-processing-lib/python
 DPK_RAY_LIB_DIR=$(REPOROOT)/data-processing-lib/ray
 DPK_SPARK_LIB_DIR=$(REPOROOT)/data-processing-lib/spark
 
+DPK_PYTHON_BUILD_DIR=$(REPOROOT)/data-processing-lib
+DPK_RAY_BUILD_DIR=$(REPOROOT)/data-processing-lib
+DPK_SPARK_BUILD_DIR=$(REPOROOT)/data-processing-lib
+
+
 KFPv2?=0
 
 #######################################################################################
@@ -221,6 +226,7 @@ __check_defined = \
 		--platform $(DOCKER_PLATFORM)  			\
 		--build-arg EXTRA_INDEX_URL=$(EXTRA_INDEX_URL)	\
 		--build-arg BASE_IMAGE=$(BASE_IMAGE)  		\
+		--build-arg WHEEL_FILE_NAME=$(WHEEL_FILE_NAME) \
 		--build-arg BUILD_DATE=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')  	\
 		--build-arg GIT_COMMIT=$(shell git log -1 --format=%h) . 
 	$(DOCKER) tag $(DOCKER_LOCAL_IMAGE)  $(DOCKER_REMOTE_IMAGE)
@@ -241,74 +247,133 @@ __check_defined = \
 
 # Build and image using the local Dockerfile and make the data-processing-lib/python
 # available in the current directory for use by the Dockerfile (i.e. to install the library).
-.PHONY: .defaults.python-lib-src-image
-.defaults.python-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
-	@# Help: Build the Python $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-lib/python source
-ifeq ($(USE_REPO_LIB_SRC), 1)
-	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
-endif
-	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
-	-rm -rf data-processing-lib-python
+#.PHONY: .defaults.python-lib-src-image
+#.defaults.python-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
+#	@# Help: Build the Python $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-lib/python source
+#ifeq ($(USE_REPO_LIB_SRC), 1)
+#	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
+#endif
+#	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
+#	-rm -rf data-processing-lib-python
+	
+.PHONY: .default.build-lib-wheel
+.default.build-lib-wheel:
+	make -C $(REPOROOT)/data-processing-lib build-pkg-dist
+	rm -rf data-processing-dist && mkdir data-processing-dist
+	cp $(REPOROOT)/data-processing-lib/dist/*.whl data-processing-dist
+
+# Build and image using the local Dockerfile and make the wheel for data-processing-lib
+# available in the current directory for use by the Dockerfile (i.e. to install the library).
+.PHONY: .defaults.python-lib-whl-image 
+.defaults.python-lib-whl-image:: .default.build-lib-wheel
+	# Must be called with a DOCKER_LOCAL_IMAGE= settings.
+	@# Help: Build the Python $(DOCKER_LOCAL_IMAGE) using the the wheel file for the library
+	@$(eval LIB_WHEEL_FILE := $(shell find data-processing-dist/*.whl))
+	$(eval LIB_WHEEL_FILE := $(shell basename $(LIB_WHEEL_FILE)))
+	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) WHEEL_FILE_NAME=$(LIB_WHEEL_FILE) .defaults.image
+	-rm -rf data-processing-dist
 
 # Build an image using the local Dockerfile and make the data-processing-lib/ray
 # available in the current directory for use by the Dockerfile (i.e. to install the library). 
 # Note that this looks for the ../python directory, which is currently only used in the transform projects,
 # but we add it here as a convenience to avoid duplicating a lot of this in transforms/.make.transforms.
-.PHONY: .defaults.ray-lib-src-image
-.defaults.ray-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
-	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
-ifeq ($(USE_REPO_LIB_SRC), 1)
-	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
-	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray .defaults.copy-lib
-endif
+#.PHONY: .defaults.ray-lib-src-image
+#.defaults.ray-lib-src-image:: # Must be called with a DOCKER_LOCAL_IMAGE= settings.
+#	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
+#ifeq ($(USE_REPO_LIB_SRC), 1)
+#	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
+#	$(MAKE) LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray .defaults.copy-lib
+#endif
+#	if [ -e ../python ]; then								\
+#		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
+#	fi
+#	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
+#	-rm -rf data-processing-lib-python
+#	-rm -rf data-processing-lib-ray
+#	-rm -rf python-transform 
+
+
+# Build an image using the local Dockerfile and make the data-processing wheel 
+# available in the current directory for use by the Dockerfile (i.e. to install the library). 
+# Note that this looks for the ../python directory, which is currently only used in the transform projects,
+# but we add it here as a convenience to avoid duplicating a lot of this in transforms/.make.transforms.
+.PHONY: .defaults.ray-lib-whl-image
+.defaults.ray-lib-whl-image:: .default.build-lib-wheel
+# Must be called with a DOCKER_LOCAL_IMAGE= settings.
+	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE) and library wheel
+	@$(eval LIB_WHEEL_FILE := $(shell find data-processing-dist/*.whl))
+	$(eval LIB_WHEEL_FILE := $(shell basename $(LIB_WHEEL_FILE)))
 	if [ -e ../python ]; then								\
 		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
 	fi
-	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) .defaults.image
-	-rm -rf data-processing-lib-python
-	-rm -rf data-processing-lib-ray
+	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) WHEEL_FILE_NAME=$(LIB_WHEEL_FILE) .defaults.image
 	-rm -rf python-transform 
+	-rm -rf data-processing-dist
+
 
 # Build the base spark image used by spark-based transforms
 .PHONY: .defaults.spark-lib-base-image
-.defaults.spark-lib-base-image-spark: 
+.defaults.spark-lib-base-image: 
 	$(MAKE) -C $(DPK_SPARK_LIB_DIR) image
 
 # Note that this looks for the ../python directory, which is currently only used in the transform projects,
 # but we add it here as a convenience to avoid duplicating a lot of this in transforms/.make.transforms.
 # Must be called with a DOCKER_LOCAL_IMAGE= settings.
-.PHONY: .defaults.spark-lib-src-image
-.defaults.spark-lib-src-image:: .defaults.spark-lib-base-image
-	@# Help: Build the Spark $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
+#.PHONY: .defaults.spark-lib-src-image
+#.defaults.spark-lib-src-image:: .defaults.spark-lib-base-image
+#	@# Help: Build the Spark $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE), requirements.txt and data-processing-libs source
+#	$(MAKE) IMAGE_NAME_TO_VERIFY=$(DOCKER_SPARK_BASE_IMAGE_NAME) .defaults.verify-image-availability
+#ifeq ($(USE_REPO_LIB_SRC), 1)
+#	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
+#	$(MAKE) LIB_PATH=$(DPK_SPARK_LIB_DIR) LIB_NAME=data-processing-lib-spark .defaults.copy-lib
+#endif
+#	if [ -e ../python ]; then								\
+#		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
+#	fi
+#	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE) .defaults.image
+#	-rm -rf data-processing-lib-python
+#	-rm -rf data-processing-lib-spark
+#	-rm -rf python-transform 
+
+.PHONY: .defaults.spark-lib-whl-image
+.defaults.spark-lib-whl-image:: .default.build-lib-wheel .defaults.spark-lib-base-image
+# Must be called with a DOCKER_LOCAL_IMAGE= settings.
+	@# Help: Build the Ray $(DOCKER_LOCAL_IMAGE) using the $(DOCKER_FILE) and library wheel
 	$(MAKE) IMAGE_NAME_TO_VERIFY=$(DOCKER_SPARK_BASE_IMAGE_NAME) .defaults.verify-image-availability
-ifeq ($(USE_REPO_LIB_SRC), 1)
-	$(MAKE) LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python .defaults.copy-lib
-	$(MAKE) LIB_PATH=$(DPK_SPARK_LIB_DIR) LIB_NAME=data-processing-lib-spark .defaults.copy-lib
-endif
+	@$(eval LIB_WHEEL_FILE := $(shell find data-processing-dist/*.whl))
+	$(eval LIB_WHEEL_FILE := $(shell basename $(LIB_WHEEL_FILE)))
 	if [ -e ../python ]; then								\
 		$(MAKE) LIB_PATH=../python LIB_NAME=python-transform .defaults.copy-lib;	\
 	fi
-	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE) .defaults.image
-	-rm -rf data-processing-lib-python
-	-rm -rf data-processing-lib-spark
+	$(MAKE) DOCKER_IMAGE=$(DOCKER_LOCAL_IMAGE) BASE_IMAGE=$(DOCKER_SPARK_BASE_IMAGE) WHEEL_FILE_NAME=$(LIB_WHEEL_FILE) .defaults.image
 	-rm -rf python-transform 
+	-rm -rf data-processing-dist
+
+
+
 
 # Install the source from the given directory into an existing venv
 # Expected PYTHON_PROJECT_DIR and uses EXTRA_INDEX_URL if set.
 # PYTHON_PROJECT_DIR is expected to have src and pyproject.toml
 .PHONY: .defaults.install-src-venv
 .defaults.install-src-venv:: 
-	@echo Begin installing source from $(PYTHON_PROJECT_DIR) into venv
-	$(call check_defined, PYTHON_PROJECT_DIR)
+	@echo Begin installing source from $(PYTHON_PROJECT_BUILD_DIR) into venv
+	$(call check_defined, PYTHON_PROJECT_BUILD_DIR)
 	@source venv/bin/activate;				      	\
 	if [ ! -z "$(EXTRA_INDEX_URL)" ]; then				\
 		extra_url='--extra-index-url $(EXTRA_INDEX_URL)';	\
 	fi;								\
-	if [ -e $(PYTHON_PROJECT_DIR)/requirements.txt ]; then \
-		pip install -r  $(PYTHON_PROJECT_DIR)/requirements.txt; \
+	if [ -e $(PYTHON_PROJECT_BUILD_DIR)/requirements.txt ]; then \
+		pip install -r  $(PYTHON_PROJECT_BUILD_DIR)/requirements.txt; \
 	fi; \
-	pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_DIR)
-	@echo Done installing source from $(PYTHON_PROJECT_DIR) into venv
+	if [ -e $(PYTHON_PROJECT_BUILD_DIR)/pyproject.toml ]; then \
+		if [ -z "$(PROJECT_BUILD_EXTRA)" ]; then \
+		   pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_BUILD_DIR); \
+		else \
+	   		pip install $(PIP_INSTALL_EXTRA_ARGS) $${extra_url}  -e $(PYTHON_PROJECT_BUILD_DIR)[$(PROJECT_BUILD_EXTRA)]; \
+		fi;\
+	fi
+	@echo Done installing source from $(PYTHON_PROJECT_BUILD_DIR) into venv
 
 # Install local requirements last as it generally includes our lib source
 .PHONY: .defaults.python-lib-src-venv
@@ -338,7 +403,7 @@ ifeq ($(USE_REPO_LIB_SRC), 1)
 	@echo Installing Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
-	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;	\
+	$(MAKE) PYTHON_PROJECT_BUILD_DIR=$(DPK_PYTHON_BUILD_DIR) .defaults.install-src-venv;	\
 	echo Installed source from Python processing library for `which $(PYTHON)`
 else
 	@# Help: DO NOT install Python data processing library source into existing venv
@@ -363,18 +428,19 @@ ifeq ($(USE_REPO_LIB_SRC), 1)
 	@# Help: Install Ray and Python data processing library source into existing venv
 	@echo Installing Ray and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
-	$(MAKE) PIP_TARGET=data-prep-toolkit-ray .defaults.pip-uninstall;	\
+	$(MAKE) PIP_TARGET=data-prep-toolkit[ray] .defaults.pip-uninstall;	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
-	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;		\
-	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_RAY_LIB_DIR) .defaults.install-src-venv;		\
+	$(MAKE) PYTHON_PROJECT_BUILD_DIR=$(DPK_PYTHON_BUILD_DIR) .defaults.install-src-venv;		\
+	$(MAKE) PYTHON_PROJECT_BUILD_DIR=$(DPK_RAY_BUILD_DIR) PROJECT_BUILD_EXTRA=ray .defaults.install-src-venv;		\
 	echo Installed source from Python and Ray data processing libraries for `which $(PYTHON)`
 else
 	@# Help: DO NOT install Python or Ray data processing library source into existing venv
 	@echo USE_REPO_LIB_SRC!=1 so do NOT installing Python or Ray data processing library source into existing venv
 endif
+	# Install the module python library if it has one
 	@if [ -d ../python ]; then                                               		\
 		source venv/bin/activate;				      			\
-		$(MAKE) PYTHON_PROJECT_DIR=../python .defaults.install-src-venv;    		\
+		$(MAKE) PYTHON_PROJECT_BUILD_DIR=../python .defaults.install-src-venv;    		\
 	fi 
 
 # Install local requirements last as it generally includes our lib source
@@ -389,10 +455,10 @@ ifeq ($(USE_REPO_LIB_SRC), 1)
 	@# Help: Install Spark and Python data processing library source into existing venv
 	@echo Installing Spark and Python data processing library source to existing venv
 	@source venv/bin/activate;				      	\
-	$(MAKE) PIP_TARGET=data-prep-toolkit-spark .defaults.pip-uninstall;	\
+	$(MAKE) PIP_TARGET=data-prep-toolkit[spark] .defaults.pip-uninstall;	\
 	$(MAKE) PIP_TARGET=data-prep-toolkit .defaults.pip-uninstall;	\
-	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_PYTHON_LIB_DIR) .defaults.install-src-venv;	\
-	$(MAKE) PYTHON_PROJECT_DIR=$(DPK_SPARK_LIB_DIR) .defaults.install-src-venv;	\
+	$(MAKE) PYTHON_PROJECT_BUILD_DIR=$(DPK_PYTHON_BUILD_DIR) .defaults.install-src-venv;	\
+	$(MAKE) PYTHON_PROJECT_BUILD_DIR=$(DPK_SPARK_BUILD_DIR) PROJECT_BUILD_EXTRA=spark .defaults.install-src-venv;	\
 	echo Installed source from Python and Spark processing libraries for `which $(PYTHON)`
 else
 	@# Help: DO NOT install Python or Spark data processing library source into existing venv
@@ -400,7 +466,7 @@ else
 endif
 	if [ -d ../python ]; then                                               	\
 		source venv/bin/activate;				      		\
-		$(MAKE) PYTHON_PROJECT_DIR=../python .defaults.install-src-venv;    	\
+		$(MAKE) PYTHON_PROJECT_BUILD_DIR=../python .defaults.install-src-venv;    	\
 	fi
 
 # Run tests in test directory from that dir after adding ../src to PYTHONPATH
@@ -652,3 +718,4 @@ endif
 	fi
 	${PYTHON} -m twine check dist/*
 	${PYTHON} -m twine upload --verbose --non-interactive dist/*
+

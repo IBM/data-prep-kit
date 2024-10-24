@@ -17,16 +17,17 @@ else
 endif
 
 .PHONY: .lib-src-image
-.lib-src-image:: 
-	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_PYTHON_LIB_DIR) LIB_NAME=data-processing-lib-python
-	$(MAKE) .defaults.copy-lib LIB_PATH=$(DPK_RAY_LIB_DIR) LIB_NAME=data-processing-lib-ray
+.lib-src-image:: .default.build-lib-wheel
+	@$(eval LIB_WHEEL_FILE := $(shell find data-processing-dist/*.whl))
+	$(eval LIB_WHEEL_FILE := $(shell basename $(LIB_WHEEL_FILE)))
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/shared_workflow_support LIB_NAME=shared_workflow_support_lib
 	$(MAKE) .defaults.copy-lib LIB_PATH=$(REPOROOT)/kfp/kfp_support_lib/$(WORKFLOW_SUPPORT_LIB) LIB_NAME=workflow_support_lib
-	$(MAKE) .defaults.image
-	rm -rf data-processing-lib-ray
-	rm -rf data-processing-lib-python
+	$(MAKE) WHEEL_FILE_NAME=$(LIB_WHEEL_FILE) .defaults.image
+	rm -rf data-processing-dist
 	rm -rf shared_workflow_support_lib
 	rm -rf workflow_support_lib
+
+
 
 .PHONY: build
 build: image

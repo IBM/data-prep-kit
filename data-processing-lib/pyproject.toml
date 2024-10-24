@@ -15,7 +15,7 @@ dynamic = ["dependencies", "optional-dependencies"]
 [project_urls]
 Repository = "https://github.com/IBM/data-prep-kit"
 Issues = "https://github.com/IBM/data-prep-kit/issues"
-Documentation = "https://ibm.github.io/data-prep-kit/"
+Documentation = "https://ibm.github.io/data-prep-kit/doc"
 "Transform project" = "https://github.com/IBM/data-prep-kit/tree/dev/transforms/universal/noop"
 
 [build-system]
@@ -23,12 +23,12 @@ requires = ["setuptools>=68.0.0", "wheel", "setuptools_scm[toml]>=7.1.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.dynamic.dependencies]
-file = ["requirements.txt"]
+file = ["python/requirements.txt"]
 
 [tool.setuptools.dynamic.optional-dependencies]
 dev = { file = ["requirements-dev.txt"]}
-ray = { file = ["requirements-ray.txt"]}
-spark = { file = ["requirements-spark.txt"]}
+ray = { file = ["ray/requirements.txt"]}
+spark = { file = ["spark/requirements.txt"]}
 
 [tool.setuptools.packages.find]
 where = ["python/src", "ray/src", "spark/src"]

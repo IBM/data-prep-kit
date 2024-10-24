@@ -1,4 +1,4 @@
-data-prep-toolkit-ray==0.2.2.dev1
+data-prep-toolkit[ray]==0.2.2.dev1
 dpk-hap-transform-python==0.2.2.dev1
 nltk==3.9.1
 transformers==4.38.2

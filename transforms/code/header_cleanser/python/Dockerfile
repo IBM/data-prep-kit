@@ -17,11 +17,12 @@ WORKDIR /home/dpk
 
 # Create directories to mount volumnes for processing data outside of the image.
 # RUN mkdir input && mkdir output
+ARG WHEEL_FILE_NAME
 
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
-COPY --chown=dpk:root data-processing-lib-python/ data-processing-lib-python/
-RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
+COPY --chown=dpk:root data-processing-dist data-processing-dist
+RUN  pip install data-processing-dist/${WHEEL_FILE_NAME}
 
 # END OF STEPS destined for a data-prep-kit base image 
 

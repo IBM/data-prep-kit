@@ -6,14 +6,13 @@ USER root
 RUN pip install --no-cache-dir pytest
 
 WORKDIR ${SPARK_HOME}/work-dir
+ARG WHEEL_FILE_NAME
 
-# Copy in the data processing framework source/project and install it
-# This is expected to be placed in the docker context before this is run (see the make image).
+# Copy and install data processing libraries 
+# These are expected to be placed in the docker context before this is run (see the make image).
+COPY --chown=spark:root data-processing-dist data-processing-dist
+RUN  pip install data-processing-dist/${WHEEL_FILE_NAME}[spark]
 
-COPY --chown=spark:root data-processing-lib-python/ data-processing-lib-python/
-RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
-COPY --chown=spark:root data-processing-lib-spark/ data-processing-lib-spark/
-RUN cd data-processing-lib-spark && pip install --no-cache-dir -e .
 
 # Install project source
 COPY --chown=spark:root src/ src/

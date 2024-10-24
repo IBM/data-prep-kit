@@ -10,7 +10,7 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsky@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit-ray==0.2.2.dev1",
+    "data-prep-toolkit[ray]==0.2.2.dev1",
     "dpk_ededup_transform_python==0.2.2.dev1",
     "tqdm==4.66.3",
 ]

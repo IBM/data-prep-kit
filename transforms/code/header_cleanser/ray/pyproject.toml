@@ -10,7 +10,7 @@ authors = [
 ]
 dependencies = [
     "dpk-header-cleanser-transform-python==0.2.2.dev1",
-    "data-prep-toolkit-ray==0.2.2.dev1",
+    "data-prep-toolkit[ray]==0.2.2.dev1",
     "scancode-toolkit==32.1.0",
 ]
 

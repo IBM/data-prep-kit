@@ -8,6 +8,7 @@ RUN pip install --upgrade --no-cache-dir pip
 RUN pip install --no-cache-dir pytest
 
 ARG PIP_INSTALL_EXTRA_ARGS
+ARG WHEEL_FILE_NAME
 
 RUN \
     sudo apt-get update \
@@ -15,13 +16,12 @@ RUN \
     && sudo apt-get install -y libgl1 libglib2.0-0 curl wget \
     && sudo apt-get clean
 
-
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
-COPY --chown=ray:users data-processing-lib-python/ data-processing-lib-python/
-RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
-COPY --chown=ray:users data-processing-lib-ray/ data-processing-lib-ray/ 
-RUN cd data-processing-lib-ray    && pip install --no-cache-dir -e .
+COPY --chown=ray:users data-processing-dist data-processing-dist
+RUN  pip install data-processing-dist/${WHEEL_FILE_NAME}[ray]
+    
+## Copy the python version of the tansform    
 COPY --chown=ray:users python-transform/  python-transform/
 RUN cd python-transform && pip install ${PIP_INSTALL_EXTRA_ARGS} --no-cache-dir -e .
 

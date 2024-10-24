@@ -9,11 +9,12 @@ RUN pip install --no-cache-dir pytest
 RUN useradd -ms /bin/bash dpk
 USER dpk
 WORKDIR /home/dpk
+ARG WHEEL_FILE_NAME
 
 # Copy and install data processing libraries 
 # These are expected to be placed in the docker context before this is run (see the make image).
-COPY --chown=dpk:root data-processing-lib-python/ data-processing-lib-python/
-RUN cd data-processing-lib-python && pip install --no-cache-dir -e .
+COPY --chown=dpk:root data-processing-dist data-processing-dist
+RUN  pip install data-processing-dist/${WHEEL_FILE_NAME}
 
 COPY --chown=dpk:root src/ src/
 COPY --chown=dpk:root pyproject.toml pyproject.toml
@@ -29,7 +30,7 @@ COPY ./src/code_profiler_transform_python.py .
 COPY ./src/code_profiler_local.py local/
 
 # Copy the tree-sitter bindings (this is the important part)
-COPY --chown=ray:users ../../input/tree-sitter-bindings/ /home/dpk/input/tree-sitter-bindings/
+COPY --chown=dpk:root ../../input/tree-sitter-bindings/ /home/dpk/input/tree-sitter-bindings/
 
 # copy test
 # COPY test/ test/

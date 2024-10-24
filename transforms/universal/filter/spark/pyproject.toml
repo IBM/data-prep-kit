@@ -9,7 +9,7 @@ authors = [
     { name = "Boris Lublinsky", email = "blublinsk@ibm.com" },
 ]
 dependencies = [
-    "data-prep-toolkit-spark==0.2.2.dev1",
+    "data-prep-toolkit[spark]==0.2.2.dev1",
 ]
 
 [project.optional-dependencies]

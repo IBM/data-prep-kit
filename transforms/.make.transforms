@@ -112,13 +112,13 @@ extra-help:
 	@true
 
 .PHONY: .transforms.python-image
-.transforms.python-image:: .defaults.python-lib-src-image
+.transforms.python-image:: .defaults.python-lib-whl-image
 
 .PHONY: .transforms.ray-image
-.transforms.ray-image:: .defaults.ray-lib-src-image
+.transforms.ray-image:: .defaults.ray-lib-whl-image
 
 .PHONY: .transforms.spark-image
-.transforms.spark-image:: .defaults.spark-lib-src-image
+.transforms.spark-image:: .defaults.spark-lib-whl-image
 
 .PHONY: .transforms.python-build
 .transforms.python-build:: .transforms.python-venv .transforms.python-image	
@@ -156,13 +156,19 @@ extra-help:
 	@# Help: Run the transform's tests and any '*local' .py files
 
 .PHONY: .transforms.python-test-image
-.transforms.python-test-image:: .transforms.python-image .transforms.test-image-help .defaults.test-image-pytest .transforms.clean
+.transforms.python-test-image:: .transforms.python-image
+	$(MAKE) .transforms.test-image-help
+#	$(MAKE) .defaults.test-image-pytest
+	$(MAKE) .transforms.clean
 
 .PHONY: .transforms.ray-test-image
 .transforms.ray-test-image:: .transforms.ray-image .transforms.test-image-help .defaults.test-image-pytest .transforms.clean
 
 .PHONY: .transforms.spark-test-image
-.transforms.spark-test-image:: .transforms.spark-image .transforms.test-spark_image-help .defaults.test-image-pytest .transforms.clean
+.transforms.spark-test-image:: .transforms.spark-image
+	$(MAKE) .transforms.test-spark_image-help
+#	$(MAKE) .defaults.test-image-pytest
+	$(MAKE) .transforms.clean
 
 .PHONY: .transforms.test-image-pytest
 .transforms.test-image-pytest:: .defaults.test-image-pytest
