@@ -8,7 +8,7 @@ RUN pip install --upgrade --no-cache-dir pip
 RUN pip install --no-cache-dir pytest
 
 ARG PIP_INSTALL_EXTRA_ARGS
-ARG PIP_INSTALL_EXTRA_ARGS
+ARG WHEEL_FILE_NAME
 
 RUN \
     sudo apt-get update \
