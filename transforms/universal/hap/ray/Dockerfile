@@ -21,6 +21,7 @@ RUN cd python-transform && pip install --no-cache-dir -e .
 
 COPY --chown=ray:users src/ src/
 COPY --chown=ray:users pyproject.toml pyproject.toml 
+COPY --chown=ray:users requirements.txt requirements.txt 
 RUN pip install --no-cache-dir -r requirements.txt -e .
 
 # copy the main() entry point to the image 
