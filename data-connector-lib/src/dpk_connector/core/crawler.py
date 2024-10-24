@@ -85,6 +85,15 @@ def async_crawl(
     disallow_mime_types: Collection[str] = (),
     depth_limit: int = -1,
     download_limit: int = -1,
+    concurrent_requests: int = 20,
+    concurrent_requests_per_domain: int = 10,
+    download_delay: float = 0,
+    randomize_download_delay: bool = True,
+    download_timeout: float = 180,
+    autothrottle_enabled: bool = True,
+    autothrottle_max_delay: float = 300,
+    autothrottle_target_concurrency: float = 10,
+    robots_max_crawl_delay: float = 60,
 ) -> Deferred[None]:
     # Assisted by WCA@IBM
     # Latest GenAI contribution: ibm/granite-20b-code-instruct-v2
@@ -103,12 +112,21 @@ def async_crawl(
         disallow_mime_types (Collection[str]): A collection of MIME types to disallow during the crawl. Default is an empty collection.
         depth_limit (int): The maximum depth of the crawl. Default is -1, which means no limit.
         download_limit (int): The maximum number of pages to download. Default is -1, which means no limit. This is a soft limit, meaning that a crawler may download more pages than the specified limit.
+        concurrent_requests (int): The maximum number of concurrent requests to make. Default is 20.
+        concurrent_requests_per_domain (int): The maximum number of concurrent requests to make per domain. Default is 10.
+        download_delay (float): The delay between consecutive requests. Default is 0.
+        randomize_download_delay (bool): If specified, the download delay will be randomized between 0.5 * `download_delay and 1.5 * `download_delay`. Default is True.
+        download_timeout (float): The timeout for each request. Default is 180 seconds.
+        autothrottle_enabled (bool): If specified, autothrottling will be enabled. Default is True.
+        autothrottle_max_delay (float): The maximum delay between consecutive requests when autothrottling is enabled. Default is 300 seconds.
+        autothrottle_target_concurrency (float): The target concurrency for autothrottling. Default is 10.
+        robots_max_crawl_delay (float): The maximum crawl delay allowed by the robots.txt file. Default is 60 seconds.
 
     Returns:
         Deferred[None]: A Twisted deferred object that can be used to wait for the crawler to finish.
     """
     if not seed_urls:
-        raise ValueError(f"Empty seed URLs.")
+        raise ValueError("Empty seed URLs.")
     for url in seed_urls:
         if not validate_url(url):
             raise ValueError(f"Seed URL {url} is not valid.")
@@ -119,6 +137,24 @@ def async_crawl(
         raise ValueError(f"Invalid depth limit {depth_limit}")
     if download_limit < -1:
         raise ValueError(f"Invalid download limit {download_limit}")
+    if concurrent_requests < 1:
+        raise ValueError(f"Invalid concurrent requests {concurrent_requests}")
+    if concurrent_requests_per_domain < 1:
+        raise ValueError(
+            f"Invalid concurrent reuqests per domain {concurrent_requests_per_domain}"
+        )
+    if download_delay < 0:
+        raise ValueError(f"Invalid download delay {download_delay}")
+    if download_timeout < 0:
+        raise ValueError(f"Invalid donwload timeout {download_timeout}")
+    if autothrottle_max_delay < 0:
+        raise ValueError(f"Invalid autothrottle max delay {autothrottle_max_delay}")
+    if autothrottle_target_concurrency < 1:
+        raise ValueError(
+            f"Invalid autothrottle target concurrency {autothrottle_target_concurrency}"
+        )
+    if robots_max_crawl_delay < 0:
+        raise ValueError(f"Invalid robots max crawl delay {robots_max_crawl_delay}")
 
     settings = Settings()
     settings.setmodule("dpk_connector.core.settings", priority="project")
@@ -126,7 +162,7 @@ def async_crawl(
     if user_agent:
         settings.set("USER_AGENT", user_agent, priority="spider")
     if headers:
-        settings.set("DEFAULT_REQUEST_HEADERS", headers)
+        settings.set("DEFAULT_REQUEST_HEADERS", headers, priority="spider")
     if depth_limit == 0:
         depth_limit = -1
     elif depth_limit == -1:
@@ -135,6 +171,25 @@ def async_crawl(
     if download_limit == -1:
         download_limit = 0
     settings.set("CLOSESPIDER_ITEMCOUNT", download_limit, priority="spider")
+    settings.set("CONCURRENT_REQUESTS", concurrent_requests, priority="spider")
+    settings.set(
+        "CONCURRENT_REQUESTS_PER_DOMAIN",
+        concurrent_requests_per_domain,
+        priority="spider",
+    )
+    settings.set("DOWNLOAD_DELAY", download_delay, priority="spider")
+    settings.set(
+        "RANDOMIZE_DOWNLOAD_DELAY", randomize_download_delay, priority="spider"
+    )
+    settings.set("DOWNLOAD_TIMEOUT", download_timeout, priority="spider")
+    settings.set("AUTOTHROTTLE_ENABLED", autothrottle_enabled, priority="spider")
+    settings.set("AUTOTHROTTLE_MAX_DELAY", autothrottle_max_delay, priority="spider")
+    settings.set(
+        "AUTOTHROTTLE_TARGET_CONCURRENCY",
+        autothrottle_target_concurrency,
+        priority="spider",
+    )
+    settings.set("ROBOTS_MAX_CRAWL_DELAY", robots_max_crawl_delay, priority="spider")
 
     runner = MultiThreadedCrawlerRunner(settings)
     runner.crawl(
@@ -169,6 +224,15 @@ def crawl(
     disallow_mime_types: Collection[str] = (),
     depth_limit: int = -1,
     download_limit: int = -1,
+    concurrent_requests: int = 20,
+    concurrent_requests_per_domain: int = 10,
+    download_delay: float = 0,
+    randomize_download_delay: bool = True,
+    download_timeout: float = 180,
+    autothrottle_enabled: bool = True,
+    autothrottle_max_delay: float = 300,
+    autothrottle_target_concurrency: float = 10,
+    robots_max_crawl_delay: float = 60,
 ) -> None:
     # Assisted by WCA@IBM
     # Latest GenAI contribution: ibm/granite-20b-code-instruct-v2
@@ -187,6 +251,15 @@ def crawl(
         disallow_mime_types (Collection[str]): A collection of MIME types to disallow during the crawl. Default is an empty collection.
         depth_limit (int): The maximum depth of the crawl. Default is -1, which means no limit.
         download_limit (int): The maximum number of pages to download. Default is -1, which means no limit. This is a soft limit, meaning that a crawler may download more pages than the specified limit.
+        concurrent_requests (int): The maximum number of concurrent requests to make. Default is 20.
+        concurrent_requests_per_domain (int): The maximum number of concurrent requests to make per domain. Default is 10.
+        download_delay (float): The delay between consecutive requests. Default is 0.
+        randomize_download_delay (bool): If specified, the download delay will be randomized between 0.5 * `download_delay and 1.5 * `download_delay`. Default is True.
+        download_timeout (float): The timeout for each request. Default is 180 seconds.
+        autothrottle_enabled (bool): If specified, autothrottling will be enabled. Default is True.
+        autothrottle_max_delay (float): The maximum delay between consecutive requests when autothrottling is enabled. Default is 300 seconds.
+        autothrottle_target_concurrency (float): The target concurrency for autothrottling. Default is 10.
+        robots_max_crawl_delay (float): The maximum crawl delay allowed by the robots.txt file. Default is 60 seconds.
 
     Returns:
         None
@@ -209,6 +282,15 @@ def crawl(
         disallow_mime_types,
         depth_limit,
         download_limit,
+        concurrent_requests,
+        concurrent_requests_per_domain,
+        download_delay,
+        randomize_download_delay,
+        download_timeout,
+        autothrottle_enabled,
+        autothrottle_max_delay,
+        autothrottle_target_concurrency,
+        robots_max_crawl_delay,
     )
     d.addBoth(on_completed)
     with condition:
