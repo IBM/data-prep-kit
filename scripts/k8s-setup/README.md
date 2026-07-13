@@ -73,6 +73,24 @@ Open the Kubeflow Pipelines UI at  http://localhost:8080/
 You can work with a real S3 storage, but for testing you can use the Mino server which is deployed as part of the KFP
 installation. You can access the Minio dashboard at http://localhost:8090/
 
+
+> [!WARNING]
+> **SECURITY NOTE: LOCAL TESTING CREDENTIALS ONLY**
+> 
+> The MinIO credentials documented below (`minio`/`minio123`) are **intentionally public** and used exclusively for:
+> - Local development on Kind clusters
+> - CI/CD testing in GitHub Actions
+> - Community contributor testing
+> 
+> These credentials:
+> - Only work with cluster-internal endpoints (not accessible from the internet)
+> - Are used in ephemeral test environments only
+> - **Never** contain production data or sensitive information
+> - Are **not** production credentials
+> 
+> **Do not use these credentials for production deployments.**
+
+
 #### Create a secret
 The MinIO service, deployed as a part of KFP, uses a username (`minio`) as an access_key/password (`minio123`)
 as the secret key.
