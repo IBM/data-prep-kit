@@ -1,5 +1,24 @@
 #!/usr/bin/env bash
 
+
+################################################################################
+# SECURITY NOTE: LOCAL TESTING CREDENTIALS ONLY
+#
+# This script uses intentionally public test credentials (minio/minio123) for:
+# - Local development on Kind clusters
+# - CI/CD testing in GitHub Actions
+# - Community contributor testing
+#
+# These credentials:
+# - Only work with cluster-internal MinIO endpoints
+# - Are used in ephemeral test environments only
+# - NEVER contain production data or sensitive information
+# - Are NOT production credentials
+#
+# DO NOT use these credentials for production deployments.
+################################################################################
+
+
 if [ "$MINIO_SERVER" == "" ]; then
     MINIO_SERVER="http://localhost:8090"
 fi
