@@ -10,20 +10,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 ################################################################################
+import ast
 import os
 from argparse import ArgumentParser, Namespace
 from typing import Any
 
 import pyarrow as pa
-
-import ast
-
 from data_processing.transform import AbstractTableTransform, TransformConfiguration
 from data_processing.utils import CLIArgumentProvider, TransformUtils, load_model
-from dpk_gneissweb_classification.classification_models import FastTextModel, ClassificationModel
+from dpk_gneissweb_classification.classification_models import (
+    ClassificationModel,
+    FastTextModel,
+)
 from dpk_gneissweb_classification.nlp import get_label_ds_pa
 from dpk_gneissweb_classification.nlp_parallel import get_label_ds_pa_parallel
-
 
 
 short_name = "gcls"
@@ -69,55 +69,54 @@ class ClassificationTransform(AbstractTableTransform):
         # Make sure that the param name corresponds to the name used in apply_input_params method
         # of ClassificationTransformConfiguration class
         super().__init__(config)
-        
-        self.model_credential = config.get(model_credential_cli_param, os.environ.get('HF_READ_ACCESS_TOKEN', None))
+
+        self.model_credential = config.get(model_credential_cli_param, os.environ.get("HF_READ_ACCESS_TOKEN", None))
         self.model_file_name = ast.literal_eval(config.get(model_file_name_cli_param)[0])
         self.model_url = ast.literal_eval(config.get(model_url_cli_param)[0])
-        self.model =[]
+        self.model = []
         for url, model_filename in zip(self.model_url, self.model_file_name):
             self.logger.info(f"Loading Model: {url=}, {model_filename=} ")
-            model = load_model(url, 'fasttext', self.model_credential, model_filename=model_filename)
+            model = load_model(url, "fasttext", self.model_credential, model_filename=model_filename)
             self.model.append(model)
             self.logger.info(f"Loading Model: {url=}, {model_filename=} complete")
 
         self.n_processes = config.get(n_processes_cli_param, default_n_processes)
         self.content_column_name = config.get(content_column_name_cli_param, default_content_column_name)
-        self.output_label_column_name = ast.literal_eval(config.get(output_label_column_name_cli_param, default_output_label_column_name)[0])
-        self.output_score_column_name = ast.literal_eval(config.get(output_score_column_name_cli_param, default_output_score_column_name)[0])
+        self.output_label_column_name = ast.literal_eval(
+            config.get(output_label_column_name_cli_param, default_output_label_column_name)[0]
+        )
+        self.output_score_column_name = ast.literal_eval(
+            config.get(output_score_column_name_cli_param, default_output_score_column_name)[0]
+        )
 
-    def transform(self, table: pa.Table, file_name: str | None = None) -> tuple[list[pa.Table], dict[str, Any]]:  # pylint:disable=unused-argument
+    def transform(
+        self, table: pa.Table, file_name: str | None = None
+    ) -> tuple[list[pa.Table], dict[str, Any]]:  # pylint:disable=unused-argument
         """
         Put Transform-specific to convert one Table to 0 or more tables. It also returns
         a dictionary of execution statistics - arbitrary dictionary
         This implementation makes no modifications so effectively implements a copy of the
         input parquet to the output folder, without modification.
         """
-        
-        for label_column_name, score_column_name in zip(self.output_label_column_name,self.output_score_column_name):
+
+        for label_column_name, score_column_name in zip(self.output_label_column_name, self.output_score_column_name):
             TransformUtils.validate_columns(table, [self.content_column_name])
             if label_column_name in table.schema.names:
                 raise Exception(f"column to store label ({label_column_name}) already exist")
             if score_column_name in table.schema.names:
-                raise Exception(
-                    f"column to store score of label ({score_column_name}) already exist"
-                )
+                raise Exception(f"column to store score of label ({score_column_name}) already exist")
         self.logger.debug(f"Transforming one table with {len(table)} rows")
-        for model, url, label_column_name, score_column_name in zip(self.model, 
-                                                                    self.model_url, 
-                                                                    self.output_label_column_name,
-                                                                    self.output_score_column_name):
+        all_stats: dict[str, Any] = {}
+        for model, url, label_column_name, score_column_name in zip(
+            self.model, self.model_url, self.output_label_column_name, self.output_score_column_name
+        ):
             table, stats = get_label_ds_pa(
-                    table,
-                    model, 
-                    url,
-                    self.content_column_name,
-                    label_column_name,
-                    score_column_name,
-                    self.n_processes
-                )
-            
+                table, model, url, self.content_column_name, label_column_name, score_column_name, self.n_processes
+            )
+            all_stats.update(stats)
+
         self.logger.debug(f"Transformed one table with {len(table)} rows")
-        return [table], stats
+        return [table], all_stats
 
 
 class ClassificationTransformConfiguration(TransformConfiguration):
@@ -154,13 +153,7 @@ class ClassificationTransformConfiguration(TransformConfiguration):
             default="",
             help="filename of model",
         )
-        parser.add_argument(
-            f"--{model_url_cli_param}",
-            type=str,
-            nargs="+",
-            default="",
-            help="Url to model"
-        )
+        parser.add_argument(f"--{model_url_cli_param}", type=str, nargs="+", default="", help="Url to model")
         parser.add_argument(
             f"--{content_column_name_cli_param}",
             default=default_content_column_name,
