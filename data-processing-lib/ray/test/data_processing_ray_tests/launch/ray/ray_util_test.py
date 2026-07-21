@@ -14,7 +14,7 @@
 import pyarrow as pa
 import pytest
 import ray
-from data_processing.utils import GB, TransformUtils
+from data_processing.utils import GB, TransformUtils, UnrecoverableException
 from data_processing_ray.runtime.ray import RayUtils, TransformStatisticsRay
 
 
@@ -102,5 +102,26 @@ def test_actor_creation():
 
     assert 1 == res["cpus"] - res1["cpus"]
     assert 1 == res["memory"] - res1["memory"]
+
+    ray.shutdown()
+
+
+def test_actor_creation_detects_startup_failure():
+    """Regression test for #940: create_actors must correctly detect and
+    report an actor that fails during construction, using direct actor
+    pings (__ray_ready__) rather than depending on Ray's dashboard state
+    API, which can be unreliable or unavailable in constrained
+    environments (e.g. Google Colab)."""
+
+    @ray.remote
+    class BrokenActor:
+        def __init__(self, params):
+            raise RuntimeError("deliberate startup failure for test")
+
+    ray.init()
+    support = RayUtils()
+
+    with pytest.raises(UnrecoverableException):
+        support.create_actors(clazz=BrokenActor, params=params, actor_options=actor_options, n_actors=2)
 
     ray.shutdown()
