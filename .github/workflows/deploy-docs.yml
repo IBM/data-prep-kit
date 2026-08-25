@@ -13,8 +13,8 @@ jobs:
             REPO_URL: "https://github.com/${{ github.repository }}"
             REPO_BRANCH: "dev"
         steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-python@v2
+            - uses: actions/checkout@v4
+            - uses: actions/setup-python@v5
               with:
                   python-version: 3.x
             - run: pip install mkdocs-material mkdocstrings[python] mkdocs-badges mkdocs-same-dir
