@@ -19,14 +19,7 @@ import ray
 from data_processing.utils import GB, UnrecoverableException
 from ray.actor import ActorHandle
 from ray.exceptions import RayError
-from ray.experimental.state.api import list_actors
 from ray.util.actor_pool import ActorPool
-
-
-# This value matches the constant `RAY_MAX_LIMIT_FROM_API_SERVER` defined in the ray source code here:
-# https://github.com/ray-project/ray/blob/569f7df9067c5654fb57ba7bc4792b3ba5aaa846/python/ray/util/state/common.py#L50-L53
-
-RAY_MAX_ACTOR_LIMIT = 10000
 
 
 class RayUtils:
@@ -116,15 +109,21 @@ class RayUtils:
             time.sleep(creation_delay)
             return clazz.options(**actor_options).remote(params)
 
-        cls_name = clazz.__class__.__name__.replace("ActorClass(", "").replace(")", "")
         actors = [operator() for _ in range(n_actors)]
-        for i in range(120):
-            time.sleep(1)
-            alive = list_actors(
-                filters=[("class_name", "=", cls_name), ("state", "=", "ALIVE")], limit=RAY_MAX_ACTOR_LIMIT
-            )
-            if len(actors) == len(alive):
-                return actors
+        ready_refs = [actor.__ray_ready__.remote() for actor in actors]
+        ready, _ = ray.wait(ready_refs, num_returns=len(ready_refs), timeout=120)
+
+        alive = []
+        for actor, ref in zip(actors, ready_refs):
+            if ref not in ready:
+                continue
+            try:
+                ray.get(ref)
+                alive.append(actor)
+            except Exception:
+                pass
+        if len(actors) == len(alive):
+            return actors
         # failed - raise an exception
         print(f"created {actors}, alive {alive}")
         raise UnrecoverableException(f"out of {len(actors)} created actors only {len(alive)} alive")
