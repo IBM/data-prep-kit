@@ -17,9 +17,9 @@
 
   </div>
 
-Data Prep Kit accelerates unstructured data preparation for LLM app developers. Developers can use Data Prep Kit to cleanse, transform, and enrich use case-specific unstructured data to pre-train LLMs, fine-tune LLMs, instruct-tune LLMs, or build [Retrieval Augmented Generation (RAG)](https://github.com/data-prep-kit/data-prep-kit/blob/dev/examples/rag-html-1/README.md) applications for LLMs
+Data-Prep-Kit accelerates unstructured data preparation for LLM app developers. Developers can use Data-Prep-Kit to cleanse, transform, and enrich use case-specific unstructured data to pre-train LLMs, fine-tune LLMs, instruct-tune LLMs, or build [Retrieval Augmented Generation (RAG)](https://github.com/data-prep-kit/data-prep-kit/blob/dev/examples/rag-html-1/README.md) applications for LLMs
 
-Data Prep Kit can readily scale from a commodity laptop all the way to data center scale.
+Data-Prep-Kit can readily scale from a commodity laptop all the way to data center scale.
 
 
 ## Features <a name = "features"></a>
@@ -33,7 +33,7 @@ Data Prep Kit can readily scale from a commodity laptop all the way to data cent
 
 ## Installation
 
-The latest version of the Data Prep Kit is available on PyPi for Python 3.10, 3.11, 3.12, and 3.13. It can be installed using: 
+The latest version of the Data-Prep-Kit is available on PyPi for Python 3.10, 3.11, 3.12, and 3.13. It can be installed using: 
 
 ```bash
 pip install uv
@@ -46,9 +46,9 @@ For guidance on creating the virtual environment for installing the data prep ki
 
 ## &#x1F680; Getting Started <a name = "gettingstarted"></a>
 
-### Fastest way to experience Data Prep Kit
+### Fastest way to experience Data-Prep-Kit
 
-With no setup necessary, let's use a Google Colab friendly notebook to try Data Prep Kit. This is a simple transform to extract content from PDF files: [examples/notebooks/Run_your_first_transform_colab.ipynb](examples/notebooks/Run_your_first_transform_colab.ipynb)  | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/data-prep-kit/data-prep-kit/blob/dev/examples/notebooks/Run_your_first_transform_colab.ipynb). ([Here](doc/google-colab.md) are some tips for running Data Prep Kit transforms on Google Colab. For this simple example, these tips are either already taken care of, or are not needed.)  The same notebook can be downloaded and run on the local machine, without cloning the repo or any other setup. 
+With no setup necessary, let's use a Google Colab friendly notebook to try Data-Prep-Kit. This is a simple transform to extract content from PDF files: [examples/notebooks/Run_your_first_transform_colab.ipynb](examples/notebooks/Run_your_first_transform_colab.ipynb)  | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/data-prep-kit/data-prep-kit/blob/dev/examples/notebooks/Run_your_first_transform_colab.ipynb). ([Here](doc/google-colab.md) are some tips for running Data-Prep-Kit transforms on Google Colab. For this simple example, these tips are either already taken care of, or are not needed.)  The same notebook can be downloaded and run on the local machine, without cloning the repo or any other setup. 
 
 ### Examples
 
@@ -162,7 +162,7 @@ For the history of releases and changes, please [see](release-notes.md).
 
 ## Citation <a name = "citations"></a>
 
-If you use Data Prep Kit in your research, please cite our paper:
+If you use Data-Prep-Kit in your research, please cite our paper:
 
 ```bash
 @misc{wood2024dataprepkitgettingdataready,
@@ -186,10 +186,10 @@ All source files must include a Copyright and License header. If you would like 
 
 ## LF AI & Data
 
-Data Prep Kit is hosted as a project in the [LF AI & Data Foundation](https://lfaidata.foundation/projects/).
+Data-Prep-Kit is hosted as a project in the [LF AI & Data Foundation](https://lfaidata.foundation/projects/).
 
 ### IBM ❤️ Open Source AI
 
 The project was started by the Data for AI Models team at IBM Research. 
 
-Copyright © Data Prep Kit Framework - a Series of LF Projects, LLC.
+Copyright © Data-Prep-Kit Framework - a Series of LF Projects, LLC.
