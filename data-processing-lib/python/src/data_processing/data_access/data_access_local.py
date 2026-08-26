@@ -170,8 +170,9 @@ class DataAccessLocal(DataAccess):
         Args:
             path (str): Path to the file containing the table.
 
-        Returns:
+        Returns: Tuple containing
             pyarrow.Table: PyArrow table if read successfully, None otherwise.
+            the number of retries.
         """
         # if the table exists in memory, use it for faster access
         if self.tables.get(path):
