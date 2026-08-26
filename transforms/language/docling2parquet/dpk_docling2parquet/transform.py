@@ -31,7 +31,7 @@ except:
 import pyarrow as pa
 import tempfile
 import os
-from data_processing.transform import AbstractBinaryTransform, TransformConfiguration
+from data_processing.transform import AbstractTableTransform, AbstractBinaryTransform, TransformConfiguration
 from data_processing.utils import TransformUtils, get_dpk_logger, str2bool
 from data_processing.utils.cli_utils import CLIArgumentProvider
 from data_processing.utils.multilock import MultiLock
@@ -69,6 +69,8 @@ docling2parquet_bitmap_area_threshold_key = f"bitmap_area_threshold"
 docling2parquet_pdf_backend_key = f"pdf_backend"
 docling2parquet_double_precision_key = f"double_precision"
 docling2parquet_pipeline_key = f"pipeline"
+docling2parquet_binary_contents_key = f"binary_contents"
+docling2parquet_binary_file_name_key = f"file_name"
 docling2parquet_generate_picture_images_key = f"generate_picture_images"
 docling2parquet_generate_page_images_key = f"generate_page_images"
 docling2parquet_images_scale_key = f"images_scale"
@@ -117,6 +119,8 @@ docling2parquet_ocr_engine_default = docling2parquet_ocr_engine.EASYOCR
 docling2parquet_pdf_backend_default = docling2parquet_pdf_backend.DLPARSE_V2
 docling2parquet_double_precision_default = 8
 docling2parquet_pipeline_default = docling2parquet_pipeline.MULTI_STAGE
+docling2parquet_binary_contents_default="binary_contents"
+docling2parquet_binary_file_name_default="file_name"
 docling2parquet_generate_picture_images_default = False
 docling2parquet_generate_page_images_default = False
 docling2parquet_images_scale_default = 2.0
@@ -139,11 +143,13 @@ docling2parquet_double_precision_cli_param = (
 
 docling2parquet_pipeline_cli_param = f"{cli_prefix}{docling2parquet_pipeline_key}"
 
+docling2parquet_binary_contents_cli_param = f"{cli_prefix}{docling2parquet_binary_contents_key}"
+docling2parquet_binary_file_name_cli_param = f"{cli_prefix}{docling2parquet_binary_file_name_key}"
 docling2parquet_generate_picture_images_cli_param = f"{cli_prefix}{docling2parquet_generate_picture_images_key}"
 docling2parquet_generate_page_images_cli_param = f"{cli_prefix}{docling2parquet_generate_page_images_key}"
 docling2parquet_images_scale_cli_param = f"{cli_prefix}{docling2parquet_images_scale_key}"
 
-class Docling2ParquetTransform(AbstractBinaryTransform):
+class Docling2ParquetTransform(AbstractTableTransform):
     """ """
 
     def __init__(self, config: dict):
@@ -190,6 +196,9 @@ class Docling2ParquetTransform(AbstractBinaryTransform):
         if not isinstance(self.pipeline, docling2parquet_pipeline):
             self.pipeline = docling2parquet_pipeline[self.pipeline]
 
+        self.binary_contents = config.get(docling2parquet_binary_contents_key, docling2parquet_binary_contents_default)
+        self.binary_file_name = config.get(docling2parquet_binary_file_name_key, docling2parquet_binary_file_name_default)
+        
         self.generate_picture_images = config.get(docling2parquet_generate_picture_images_key,
                                                   docling2parquet_generate_picture_images_default)
         self.generate_page_images = config.get(docling2parquet_generate_page_images_key,
@@ -419,6 +428,49 @@ class Docling2ParquetTransform(AbstractBinaryTransform):
         
         return mime, ext
 
+    def process_row(self, row: dict) -> dict:
+        # Detect file type
+        file_name=row[self.binary_file_name]
+        content_bytes=row[self.binary_contents]
+
+        mime, ext = self._detect_mime(file_name, content_bytes)
+        if mime is None or mime not in MimeTypeToFormat:
+            logger.info(f"Content for File {file_name} is not detected as valid format {mime=}. Skipping.")
+            self.skipped_doc_id.append(file_name)
+            return {}
+
+        file_data = self._convert_docling2parquet(
+                doc_filename=file_name,
+                ext=ext,
+                content_bytes=content_bytes,
+                )
+        row['contents']=file_data['contents']
+        row['num_pages']=file_data['num_pages']    
+        return row
+
+
+    def transform(self, table: pa.Table, file_name: str = None) -> tuple[list[pa.Table], dict[str, Any]]:    
+        data = []
+        pylist=table.to_pylist()
+        for ndx in range(len(pylist)):
+            try:
+                new_elt=self.process_row(pylist[ndx])
+                if new_elt:
+                    data.append(new_elt)
+                else:
+                    logger.error(f"Received empty element when processing row index {ndx} in {file_name}")
+            except Exception as e:
+                logger.error(f"Skipping failed row ndx: {ndx} in {file_name}. Exception: {e}")
+        table = pa.Table.from_pylist(data)
+        metadata = {
+            "nrows": len(pylist),
+            "nsuccess": len(data),
+            "nfail": len(pylist) - len(data),
+            "nskip": len(pylist) - len(data),
+        }
+        return [table], metadata
+
+
     def transform_binary(
         self, file_name: str, byte_array: bytes
     ) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
@@ -428,6 +480,10 @@ class Docling2ParquetTransform(AbstractBinaryTransform):
         If file_name is detected as a ZIP archive, it generates a pyarrow table with a row
         for each PDF file detected in the archive.
         """
+
+        if TransformUtils.get_file_extension(file_name)[1] == ".parquet":
+            # let the framework parse the file and call our table transform method
+            return AbstractTableTransform.transform_binary(self, file_name, byte_array)
 
         data = [*self.buffer]
         success_doc_id = []

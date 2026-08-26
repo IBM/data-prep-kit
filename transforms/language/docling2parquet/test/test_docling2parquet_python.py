@@ -40,12 +40,29 @@ class TestPythonDocling2ParquetTransform(AbstractTransformLauncherTest):
             "docling2parquet_double_precision": 0,
         }
 
+        config2 = {
+            "data_files_to_use": ast.literal_eval("['.parquet']"),
+            "docling2parquet_contents_type": "application/json"
+        }
+
         # this is added as a fixture to remove these columns from comparison
         ignore_columns = ["date_acquired", "document_id", "document_convert_time", "hash"]
 
         fixtures = []
         launcher = PythonTransformLauncher(Docling2ParquetPythonTransformConfiguration())
 
+        # Settings for processing parquet files
+        fixtures.append(
+            (
+                launcher,
+                {
+                    **config2,
+                },
+                basedir + "/input_binary",
+                basedir + "/expected_pq",
+                [],
+            )
+        )
         # Default parameters
         fixtures.append(
             (

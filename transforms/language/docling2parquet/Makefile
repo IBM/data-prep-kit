@@ -86,3 +86,8 @@ generate-expected:
 			 --docling2parquet_double_precision 0 \
              --data_local_config "{ 'input_folder' : 'test-data/input', 'output_folder' : 'test-data/expected_json'}"  \
              --docling2parquet_contents_type "application/json"
+	source venv/bin/activate && \
+	$(PYTHON) -m dpk_$(TRANSFORM_NAME).runtime \
+			 --data_files_to_use "['.parquet']" \
+             --data_local_config "{ 'input_folder' : 'test-data/input_binary', 'output_folder' : 'test-data/expected_pq'}"  \
+             --docling2parquet_contents_type "application/json"
