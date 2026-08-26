@@ -70,6 +70,8 @@ jobs:
                   fi
                   echo "publish_images=$publish_images" >> "$GITHUB_OUTPUT"
     test-src:
+    	# Added the '!' to skip if the path IS in the list
+        if: ${{ !contains(fromJSON('["transforms/images/people", "transforms/code/malware"]'), 'transforms/universal/doc_id') }}
         runs-on: ubuntu-22.04
         steps:
             - name: Checkout

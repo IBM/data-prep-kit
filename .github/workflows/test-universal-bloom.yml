@@ -70,18 +70,15 @@ jobs:
                   fi
                   echo "publish_images=$publish_images" >> "$GITHUB_OUTPUT"
     test-src:
+    	# Added the '!' to skip if the path IS in the list
+        if: ${{ !contains(fromJSON('["transforms/images/people", "transforms/code/malware"]'), 'transforms/universal/bloom') }}
         runs-on: ubuntu-22.04
-        env:
-            DOCKER_REGISTRY_USER: ${{ secrets.DOCKER_REGISTRY_USER }}
-            DOCKER_REGISTRY_KEY: ${{ secrets.DOCKER_REGISTRY_KEY }}
-            HF_READ_ACCESS_TOKEN: ${{ secrets.HF_READ_ACCESS_TOKEN }}
         steps:
             - name: Checkout
               uses: actions/checkout@v4
             - name: Free up space in github runner
               # Free space as indicated here : https://github.com/actions/runner-images/issues/2840#issuecomment-790492173
               run: |
-                  printenv
                   df -h
                   sudo rm -rf "/usr/local/share/boost"
                   sudo rm -rf "$AGENT_TOOLSDIRECTORY"

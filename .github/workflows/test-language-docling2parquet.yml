@@ -13,8 +13,13 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/language/docling2parquet/**"
+            - "data-processing-lib/**"
             - "!transforms/language/docling2parquet/**/kfp_ray/**" # This is/will be tested in separate workflow
+            - "!data-processing-lib/**/test/**"
+            - "!data-processing-lib/**/test-data/**"
             - "!**.md"
             - "!**/doc/**"
             - "!**/images/**"
@@ -25,8 +30,13 @@ on:
             - "releases/**"
             - "feature/**"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/language/docling2parquet/**"
+            - "data-processing-lib/**"
             - "!transforms/language/docling2parquet/**/kfp_ray/**" # This is/will be tested in separate workflow
+            - "!data-processing-lib/**/test/**"
+            - "!data-processing-lib/**/test-data/**"
             - "!**.md"
             - "!**/doc/**"
             - "!**/images/**"
@@ -60,6 +70,8 @@ jobs:
                   fi
                   echo "publish_images=$publish_images" >> "$GITHUB_OUTPUT"
     test-src:
+    	# Added the '!' to skip if the path IS in the list
+        if: ${{ !contains(fromJSON('["transforms/images/people", "transforms/code/malware"]'), 'transforms/language/docling2parquet') }}
         runs-on: ubuntu-22.04
         steps:
             - name: Checkout

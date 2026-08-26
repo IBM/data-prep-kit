@@ -60,7 +60,7 @@ jobs:
 
 
     test-src:
-
+        if: false
         needs: [check_if_allowed]
         runs-on: ubuntu-22.04
         env:

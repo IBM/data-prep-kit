@@ -13,6 +13,8 @@ on:
         tags:
             - "*"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/code/code_profiler/**"
             - "data-processing-lib/**"
             - "!transforms/code/code_profiler/**/kfp_ray/**" # This is/will be tested in separate workflow
@@ -28,6 +30,8 @@ on:
             - "releases/**"
             - "feature/**"
         paths:
+            - ".make.*"
+            - "transforms/.make.transforms"
             - "transforms/code/code_profiler/**"
             - "data-processing-lib/**"
             - "!transforms/code/code_profiler/**/kfp_ray/**" # This is/will be tested in separate workflow
@@ -37,6 +41,11 @@ on:
             - "!**/doc/**"
             - "!**/images/**"
             - "!**.gitignore"
+
+# Taken from https://stackoverflow.com/questions/66335225/how-to-cancel-previous-runs-in-the-pr-when-you-push-new-commitsupdate-the-curre
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 jobs:
     check_if_push_image:
@@ -61,6 +70,8 @@ jobs:
                   fi
                   echo "publish_images=$publish_images" >> "$GITHUB_OUTPUT"
     test-src:
+    	# Added the '!' to skip if the path IS in the list
+        if: ${{ !contains(fromJSON('["transforms/images/people", "transforms/code/malware"]'), 'transforms/code/code_profiler') }}
         runs-on: ubuntu-22.04
         steps:
             - name: Checkout
