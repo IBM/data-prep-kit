@@ -41,3 +41,15 @@ class AbstractFolderTransform(AbstractTransform):
                 holding the file name to use.
         """
         pass
+
+    def validate(self, **kwargs) -> None:
+        """
+        Preform parameters validation.
+        """
+        return
+
+    def get_metadata(self) -> dict:
+        """
+        Return the transform matadata
+        """
+        return {}

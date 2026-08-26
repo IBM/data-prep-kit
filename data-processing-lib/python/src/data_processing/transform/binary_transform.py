@@ -13,6 +13,7 @@
 
 from abc import abstractmethod
 from typing import Any
+
 from data_processing.transform import AbstractTransform
 
 
@@ -23,12 +24,14 @@ class AbstractBinaryTransform(AbstractTransform):
     more new binary files.
     """
 
+    config: dict[str, Any]  # REQUIRED
+
     def __init__(self, config: dict[str, Any]):
         """
         Initialize based on the dictionary of configuration information.
         This simply stores the given instance in this instance for later use.
         """
-        self.config = config
+        super().__init__(config=config)
 
     @abstractmethod
     def transform_binary(self, file_name: str, byte_array: bytes) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
@@ -43,6 +46,12 @@ class AbstractBinaryTransform(AbstractTransform):
         """
         pass
 
+    def get_metadata(self) -> dict:
+        """
+        Return the transform matadata
+        """
+        return {}
+
     def flush_binary(self) -> tuple[list[tuple[bytes, str]], dict[str, Any]]:
         """
         This is a supporting method for transformers that implement buffering of data, for example, coalesce.
@@ -55,3 +64,7 @@ class AbstractBinaryTransform(AbstractTransform):
                 holding the extension to be used when writing out the new bytes.
         """
         return [], {}
+
+
+
+

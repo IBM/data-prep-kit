@@ -16,7 +16,7 @@ import io
 import os
 import string
 import sys
-from typing import Any
+from typing import Any, List, Dict
 
 import mmh3
 import pyarrow as pa
@@ -24,6 +24,10 @@ import pyarrow.parquet as pq
 import pyarrow.json as pj
 import zipfile
 
+from data_processing.exceptions import DPKException
+from data_processing.utils import (
+    ExecutionStatus, Metrics, TransformConstants, DocsStructure
+)
 
 from data_processing.utils import get_dpk_logger
 logger = get_dpk_logger()
@@ -117,7 +121,7 @@ class TransformUtils:
         return os.path.basename(file_path)
 
     @staticmethod
-    def validate_columns(table: pa.Table, required: list[str]) -> None:
+    def validate_columns(table: pa.Table, required: list[str], transform_name: str = None) -> None:
         """
         Check if required columns exist in the table
         :param table: table
@@ -131,9 +135,9 @@ class TransformUtils:
                 result = False
                 break
         if not result:
-            raise Exception(
-                f"Not all required columns are present in the table - " f"required {required}, present {columns}"
-            )
+            message=f"Not all required columns for {transform_name} transform are present in the table - required {required}, present {table}"
+            raise DPKException(message)
+
 
     @staticmethod
     def convert_ndjson_to_arrow(data: bytes) -> pa.Table:
@@ -305,3 +309,86 @@ class TransformUtils:
         if return_path[-1] != "/":
             return_path += "/"
         return return_path
+
+    @staticmethod
+    def merge_status(old_stat: ExecutionStatus, new_stat: ExecutionStatus) -> ExecutionStatus:
+        """
+        Merge two JobStatus values by returning the one with the lower numeric code (i.e., higher severity).
+        If the old status is more severe, it is returned; otherwise, the new status is returned.
+        """
+        status_codes = {
+            ExecutionStatus.FAILED: 1,
+            ExecutionStatus.COMPLETED_WITH_ERRORS: 2,
+            ExecutionStatus.COMPLETED_WITH_WARNINGS: 3,
+            ExecutionStatus.CANCELED: 4,
+            ExecutionStatus.CANCELING: 5,
+            ExecutionStatus.PAUSED: 6,
+            ExecutionStatus.RESUMING: 7,
+            ExecutionStatus.RUNNING: 8,
+            ExecutionStatus.STARTING: 9,
+            ExecutionStatus.QUEUED: 10,
+            ExecutionStatus.COMPLETED: 1000
+        }
+        if status_codes[old_stat] < status_codes[new_stat]:
+            return old_stat
+        else:
+            return new_stat
+
+    @staticmethod
+    def get_feature(name, description, type, available_for_filter=False, available_for_vector_db=False,
+                    mandatory_for_vector_db=False):
+        return {
+            TransformConstants.NAME: name,
+            TransformConstants.DESCRIPTION: description,
+            TransformConstants.TYPE: type,
+            TransformConstants.AVAILABLE_FOR_FILTER: available_for_filter,
+            TransformConstants.AVAILABLE_FOR_VECTOR_DB: available_for_vector_db,
+            TransformConstants.MANDATORY_FOR_VECTOR_DB: mandatory_for_vector_db
+        }
+
+    @staticmethod
+    def find_skipped_docs(
+            input_table: pa.Table,
+            output_table: pa.Table,
+            reason: str
+    ) -> Dict[str, Any]:
+        """
+        Compares two PyArrow tables to find documents that are in the input but not
+        in the output, and returns them in a structured format.
+
+        Args:
+            input_table: The PyArrow Table with the initial set of documents.
+                         Must contain both the ID and Name columns.
+            output_table: The PyArrow Table with the processed documents.
+            reason: A string explaining why these documents were skipped.
+            id_column_name: The name of the column containing the document IDs.
+            name_column_name: The name of the column containing the document names.
+
+        Returns:
+            A dictionary containing:
+            A dictionary containing:
+            - 'skipped_docs': A list of DocsStructure dictionaries for skipped items.
+            - 'skipped_docs_count': The integer count of skipped items.
+        """
+        # 1. Get the set of IDs from the output table for fast lookup.
+        output_ids_set = set(output_table.column(TransformConstants.ID).to_pylist())
+
+        # 2. Get the ID and Name columns from the input table.
+        input_ids = input_table.column(TransformConstants.ID).to_pylist()
+        input_names = input_table.column(TransformConstants.NAME).to_pylist()
+
+        # 3. Iterate through the input data and build the list of skipped docs.
+        skipped_docs_list: List[DocsStructure] = []
+        for doc_id, doc_name in zip(input_ids, input_names):
+            # If the ID from the input is NOT in the output set, it was skipped.
+            if doc_id not in output_ids_set:
+                skipped_docs_list.append({
+                    "id": doc_id,
+                    "name": doc_name,
+                    "reason": reason
+                })
+
+        return {
+            Metrics.External.SKIPPED_DOCS: skipped_docs_list,
+            Metrics.External.SKIPPED_DOCS_COUNT: len(skipped_docs_list)
+        }

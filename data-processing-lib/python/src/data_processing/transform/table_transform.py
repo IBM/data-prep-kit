@@ -132,3 +132,20 @@ class AbstractTableTransform(AbstractBinaryTransform):
             out_docs += out_tables[i].num_rows
             out_files[i] = (out_binary, ".parquet")
         return out_files, stats | {"result_doc_count": out_docs}
+
+    def get_removed_and_added_columns(self) -> (set[str], list[pa.Field]):
+        """
+        Return the details of the removed and added columns after the transform.
+
+        Returns:
+          removed_columns set[str]: Set of column names removed during the transform.
+          added_columns list[pa.Field]: List of column schemas added during the transform.
+
+        """
+        pass
+
+    def get_metadata_fields_to_accumulate(self) -> list[str]:
+        """
+        Return the metadata field names that needs to be accumulated.
+        """
+        pass
