@@ -84,7 +84,10 @@ class EdedupRuntime(DefaultPythonTransformRuntime):
         h_size, h_memory = self.filter.get_hash_size()
         stats.add_stats({"number of hashes": h_size, "hash memory, GB": h_memory})
         current = stats.get_execution_stats()
-        dedup_prst = 100 * (1.0 - current.get("result_documents", 1) / current.get("source_documents", 1))
+        source_documents = current.get("source_documents", 0)
+        # dict.get()'s default only applies when the key is absent, not when it's present with
+        # value 0 (e.g. a run over an empty input set) - guard explicitly to avoid a ZeroDivisionError.
+        dedup_prst = 100 * (1.0 - current.get("result_documents", 0) / source_documents) if source_documents else 0.0
         stats.add_stats({"de duplication %": dedup_prst})
         # snapshot execution result
         self.filter.snapshot()

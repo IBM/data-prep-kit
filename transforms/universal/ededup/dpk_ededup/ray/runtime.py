@@ -194,7 +194,10 @@ class EdedupRayRuntime(DefaultRayTransformRuntime):
                 sum_hash = sum_hash + h_size
                 sum_hash_mem = sum_hash_mem + h_memory
             remote_replies = not_ready
-        dedup_prst = 100 * (1.0 - stats.get("result_documents", 1) / stats.get("source_documents", 1))
+        source_documents = stats.get("source_documents", 0)
+        # dict.get()'s default only applies when the key is absent, not when it's present with
+        # value 0 (e.g. a run over an empty input set) - guard explicitly to avoid a ZeroDivisionError.
+        dedup_prst = 100 * (1.0 - stats.get("result_documents", 0) / source_documents) if source_documents else 0.0
         # snapshot execution results
         remote_replies = [f.snapshot.remote() for f in self.filters]
         while remote_replies:
