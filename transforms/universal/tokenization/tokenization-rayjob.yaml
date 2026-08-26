@@ -1,12 +1,16 @@
 ###
+# Pre-requisites On a standalone kind cluster:
+#    helm repo add kuberay https://ray-project.github.io/kuberay-helm/
+#    helm repo update
+#    helm install kuberay-operator kuberay/kuberay-operator --version 1.5.0
 # Usage:
 # export $(cat .env | xargs)
-# envsubst < ededup-rayjob.yaml | kubectl apply -f -
+# envsubst < tokenization-rayjob.yaml | kubectl apply -f -
 ###
 apiVersion: ray.io/v1alpha1
 kind: RayJob
 metadata:
-    name: rayjob-ededup # Name of your RayCluster
+    name: rayjob-tokenization # Name of your RayCluster
 spec:
     shutdownAfterJobFinishes: true
     ttlSecondsAfterFinished: 10
@@ -44,7 +48,7 @@ spec:
                                 valueFrom:
                                     resourceFieldRef:
                                         resource: requests.cpu
-                          image: quay.io/dataprep1/data-prep-kit/ededup-ray:latest
+                          image: quay.io/dataprep1/data-prep-kit/tokenization-ray:latest
                           imagePullPolicy: Always
                           ports:
                               - containerPort: 6379 # Ray port
@@ -60,9 +64,9 @@ spec:
                                   memory: 64Gi
         workerGroupSpecs:
             - groupName: small-group
-              replicas: 4 # Initial number of worker nodes
-              minReplicas: 4
-              maxReplicas: 4
+              replicas: 10 # Initial number of worker nodes
+              minReplicas: 10
+              maxReplicas: 100
               rayStartParams: {}
               template:
                   spec:
@@ -86,28 +90,28 @@ spec:
                                       secretKeyRef:
                                           name: $SECRET_NAME
                                           key: s3-endpoint
-                            image: quay.io/dataprep1/data-prep-kit/ededup-ray:latest
+                            image: quay.io/dataprep1/data-prep-kit/tokenization-ray:latest
                             imagePullPolicy: Always
                             resources:
                                 requests:
-                                    cpu: 8
+                                    cpu: 4
                                     memory: 64Gi
                                 limits:
-                                    cpu: 8
+                                    cpu: 4
                                     memory: 64Gi
     # Job details
     # The command to execute the Python script
     entrypoint: >
-        python -m dpk_ededup.ray.runtime
+        python -m dpk_tokenization.ray.runtime
         --run_locally False
-        --ededup_doc_column contents
-        --ededup_doc_id_column doc_id
-        --ededup_hash_cpu 0.5
-        --ededup_num_hashes 2
-        --data_s3_config "{'input_folder': '$S3_BUCKET_PATH/$EDEDUP_INPUT', 'output_folder': '$S3_BUCKET_PATH/$EDEDUP_OUTPUT'}"
+        --data_s3_config "{'input_folder': '$S3_BUCKET_PATH/$TOKENIZER_INPUT', 'output_folder': '$S3_BUCKET_PATH/$TOKENIZER_OUTPUT'}"
         --data_files_to_use "[ '.parquet' ]" 
-        --data_checkpointing False 
-        --runtime_num_workers 4
+        --data_checkpointing True
+        --tkn_tokenizer s3://blue-pile/blue-pile-raw/tokenizer/granite-4.0-tiktoken-r250219a/
+        --tkn_chunk_size 20_000
+        --tkn_doc_id_column doc_id
+        --tkn_doc_content_column contents
+        --runtime_num_workers 40
         --runtime_worker_options "{ 'num_cpus': 0.8, 'max_restarts': 0, 'max_task_retries': 0 }"
 
 #    --data_max_files -1
