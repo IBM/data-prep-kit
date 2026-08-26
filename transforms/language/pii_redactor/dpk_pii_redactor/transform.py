@@ -82,6 +82,9 @@ class PIIRedactorTransform(AbstractTableTransform):
             analyze_results, entity_types = self._analyze_pii(text)
             anonymized_results = self.anonymizer.anonymize_text(text, analyze_results)
             return anonymized_results.text, entity_types
+        # Empty/whitespace-only text has nothing to analyze; without this branch the
+        # implicit None return breaks zip() in transform() for the whole file.
+        return text, []
 
     def transform(self, table: pa.Table, file_name: Optional[str] = None) -> tuple[list[pa.Table], dict[str, Any]]:
         """
