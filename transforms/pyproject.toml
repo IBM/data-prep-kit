@@ -61,6 +61,7 @@ all = { file = [
 "universal/doc_id/requirements.txt",
 "universal/ededup/requirements.txt",
 "universal/fdedup/requirements.txt",
+"universal/folder2parquet/requirements.txt",
 "universal/hap/requirements.txt",
 "universal/bloom/requirements.txt",
 "universal/tokenization/requirements.txt",
@@ -100,6 +101,7 @@ language = { file = [
 "universal/doc_id/requirements.txt",
 "universal/ededup/requirements.txt",
 "universal/fdedup/requirements.txt",
+"universal/folder2parquet/requirements.txt",
 "universal/hap/requirements.txt",
 "universal/bloom/requirements.txt",
 "universal/tokenization/requirements.txt",
@@ -127,6 +129,7 @@ code = { file = [
 "universal/doc_id/requirements.txt",
 "universal/ededup/requirements.txt",
 "universal/fdedup/requirements.txt",
+"universal/folder2parquet/requirements.txt",
 "universal/hap/requirements.txt",
 "universal/bloom/requirements.txt",
 "universal/tokenization/requirements.txt",
@@ -195,6 +198,7 @@ hap = { file = ["universal/hap/requirements.txt"]}
 bloom = { file = ["universal/bloom/requirements.txt"]}
 ededup = { file = ["universal/ededup/requirements.txt"]}
 fdedup = { file = ["universal/fdedup/requirements.txt"]}
+folder2parquet = { file = ["universal/folder2parquet/requirements.txt"]}
 tokenization = { file = ["universal/tokenization/requirements.txt"]}
 web2parquet = { file = ["universal/web2parquet/requirements.txt"]}
 rep_removal = { file = ["universal/rep_removal/requirements.txt"]}
@@ -225,6 +229,7 @@ dpk_hap = "universal/hap/dpk_hap"
 dpk_bloom = "universal/bloom/dpk_bloom"
 dpk_ededup = "universal/ededup/dpk_ededup"
 dpk_fdedup = "universal/fdedup/dpk_fdedup"
+dpk_folder2parquet = "universal/folder2parquet/dpk_folder2parquet"
 dpk_tokenization = "universal/tokenization/dpk_tokenization"
 dpk_similarity = "language/similarity/dpk_similarity"
 dpk_filter = "universal/filter/dpk_filter"

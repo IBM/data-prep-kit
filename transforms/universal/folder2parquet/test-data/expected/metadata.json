@@ -18,7 +18,7 @@
     "job_input_params": {
         "f2p_content_column": "binary_contents",
         "f2p_fewer_parquets": false,
-        "f2p_file_name": "file_name",
+        "f2p_file_path": "file_path",
         "f2p_document_uuid": "document_uuid",
         "checkpointing": false,
         "max_files": -1,
