@@ -24,7 +24,7 @@ on:
             - "!**/doc/**"
             - "!**/images/**"
             - "!**.gitignore"
-    pull_request_target:
+    pull_request:
         branches:
             - "dev"
             - "releases/**"
