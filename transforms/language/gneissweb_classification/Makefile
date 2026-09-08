@@ -121,3 +121,6 @@ deploy-kuberay:
 	kind load docker-image quay.io/dataprep1/data-prep-kit/gneissweb_classification-ray:latest --name kind-cluster
 	#cd $(REPOROOT)/scripts/k8s-setup/tools && K8S_SETUP_SCRIPTS=../ KUBERAY_APISERVER=1.1.0 KUBERAY_OPERATOR=1.0.0 ./install_kuberay.sh cleanup
 	cd $(REPOROOT)/scripts/k8s-setup/tools && K8S_SETUP_SCRIPTS=../ KUBERAY_APISERVER=1.1.0 KUBERAY_OPERATOR=1.0.0 ./install_kuberay.sh deploy
+
+# CI: touched to trigger this transform test workflow after the
+# pull_request_target -> pull_request change (see PR for details).

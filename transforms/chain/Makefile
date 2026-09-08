@@ -28,3 +28,6 @@ test-src: venv
 
 set-versions:
 	echo "Do nothing"
+
+# CI: touched to trigger this transform test workflow after the
+# pull_request_target -> pull_request change (see PR for details).

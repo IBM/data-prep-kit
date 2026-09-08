@@ -35,3 +35,6 @@ run-cli-ray-sample:
 				--lang_id_model_url "facebook/fasttext-language-identification" \
 				--lang_id_content_column_name "text"
 
+
+# CI: touched to trigger this transform test workflow after the
+# pull_request_target -> pull_request change (see PR for details).
