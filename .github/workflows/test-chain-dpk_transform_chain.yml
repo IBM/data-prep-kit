@@ -20,7 +20,7 @@ on:
             - "!**/doc/**"
             - "!**/images/**"
             - "!**.gitignore"
-    pull_request_target:
+    pull_request:
         branches:
             - "dev"
             - "releases/**"
@@ -39,45 +39,11 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     cancel-in-progress: true
 jobs:
-    check_if_allowed:
-        # check if user allowed to run restricted workflows
-        runs-on: ubuntu-22.04
-        outputs:
-            restricted_access: ${{ steps.permission.outputs.restricted_access }}
-        steps:
-            - id: permission
-              run: |
-                echo "Check if ${{ github.triggering_actor }} is allowed to run priviledge workflows"
-                restricted_acccess=${{ github.event.pull_request.head.repo.fork }}
-                if [[ "${{ vars.PRIVILEGED_USERS }}" == *+${{ github.triggering_actor }}+* ]]; then
-                        restricted_access=false
-                fi
-
-                if $restricted_access; then
-                    echo "User ${{ github.triggering_actor }} is not in Authorized users list: ${{ vars.PRIVILEGED_USERS }} "
-                    exit 1
-                fi
-
-
     test-src:
-
-        needs: [check_if_allowed]
         runs-on: ubuntu-22.04
-        env:
-            HF_READ_ACCESS_TOKEN: ${{ secrets.HF_READ_ACCESS_TOKEN }}
         steps:
-            - name: Expose secret to trusted users working in a fork
-              if: "!needs.check_if_allowed.outputs.restricted_access"
-              run: |
-                  echo "Checking actor:${{ github.actor }} Trigger_actor:${{ github.triggering_actor }} user.login=${{ github.event.pull_request.user.login }}"
-                  echo "Checking PR.head.sha:${{ github.event.pull_request.head.sha }} github.ref: ${{ github.ref }}"
-
             - name: Checkout
               uses: actions/checkout@v4
-              with:
-                # Requires careful code review prior to triggering workflow
-                ref: ${{ github.event.pull_request.head.sha }}
-
             - name: Test transform source in transforms/chain
               run: |
                   if [ -e "transforms/chain/Makefile" ]; then
