@@ -1,0 +1,135 @@
+###
+# Pre-requisites On a standalone kind cluster:
+#    helm repo add kuberay https://ray-project.github.io/kuberay-helm/
+#    helm repo update
+#    helm install kuberay-operator kuberay/kuberay-operator --version 1.5.0
+# Usage:
+# export $(cat .env | xargs)
+# envsubst < tokenization2arrow-rayjob.yaml | kubectl apply -f -
+###
+apiVersion: ray.io/v1alpha1
+kind: RayJob
+metadata:
+    name: rayjob-tokenization2arrow # Name of your RayCluster
+spec:
+    shutdownAfterJobFinishes: true
+    ttlSecondsAfterFinished: 10
+    rayClusterSpec:
+        rayVersion: "2.36.1" # Specify the Ray version
+        headGroupSpec:
+            # Service type for the head node, can be ClusterIP or NodePort
+            serviceType: ClusterIP
+            # Ray container image for the head node
+            rayStartParams:
+                dashboard-host: "0.0.0.0"
+            template:
+                spec:
+                    containers:
+                        - name: ray-head
+                          env:
+                              - name: DPK_LOG_LEVEL
+                                value: DEBUG
+                              - name: HF_READ_ACCESS_TOKEN
+                                valueFrom:
+                                    secretKeyRef:
+                                        name: hf-secret
+                                        key: hf-token
+                              - name: DPL_LAKEHOUSE_TOKEN
+                                valueFrom:
+                                    secretKeyRef:
+                                        name: lh-secret
+                                        key: lh-token
+                              - name: S3_ACCESS_KEY
+                                valueFrom:
+                                    secretKeyRef:
+                                        name: s3-secret
+                                        key: s3-key
+                              - name: S3_SECRET_KEY
+                                valueFrom:
+                                    secretKeyRef:
+                                        name: s3-secret
+                                        key: s3-secret
+                              - name: S3_ENDPOINT
+                                valueFrom:
+                                    secretKeyRef:
+                                        name: s3-secret
+                                        key: s3-endpoint
+                              - name: WORKER_CPU_REQUEST
+                                valueFrom:
+                                    resourceFieldRef:
+                                        resource: requests.cpu
+                          image: quay.io/dataprep1/data-prep-kit/tokenization2arrow-ray:latest
+                          imagePullPolicy: Always
+                          ports:
+                              - containerPort: 6379 # Ray port
+                                name: ray-client
+                              - containerPort: 8265 # Ray Dashboard port
+                                name: dashboard
+                          resources:
+                              requests:
+                                  cpu: 8
+                                  memory: 64Gi
+                              limits:
+                                  cpu: 8
+                                  memory: 64Gi
+        workerGroupSpecs:
+            - groupName: small-group
+              replicas: 10 # Initial number of worker nodes
+              minReplicas: 10
+              maxReplicas: 100
+              rayStartParams: {}
+              template:
+                  spec:
+                      containers:
+                          - name: ray-worker
+                            env:
+                                - name: DPK_LOG_LEVEL
+                                  value: DEBUG
+                                - name: HF_READ_ACCESS_TOKEN
+                                  valueFrom:
+                                      secretKeyRef:
+                                          name: hf-secret
+                                          key: hf-token
+                                - name: DPL_LAKEHOUSE_TOKEN
+                                  valueFrom:
+                                      secretKeyRef:
+                                          name: lh-secret
+                                          key: lh-token
+                                - name: S3_ACCESS_KEY
+                                  valueFrom:
+                                      secretKeyRef:
+                                          name: s3-secret
+                                          key: s3-key
+                                - name: S3_SECRET_KEY
+                                  valueFrom:
+                                      secretKeyRef:
+                                          name: s3-secret
+                                          key: s3-secret
+                                - name: S3_ENDPOINT
+                                  valueFrom:
+                                      secretKeyRef:
+                                          name: s3-secret
+                                          key: s3-endpoint
+                            image: quay.io/dataprep1/data-prep-kit/tokenization2arrow-ray:latest
+                            imagePullPolicy: Always
+                            resources:
+                                requests:
+                                    cpu: 4
+                                    memory: 64Gi
+                                limits:
+                                    cpu: 4
+                                    memory: 64Gi
+    # Job details
+    # The command to execute the Python script
+    entrypoint: >
+        python -m dpk_tokenization2arrow.ray.runtime
+        --run_locally False
+        --data_config "{'da_class':'data_access.DataAccessS3', input_folder': '$S3_BUCKET_PATH/$TOKENIZER2ARROW_INPUT', 'output_folder': '$S3_BUCKET_PATH/$TOKENIZER2ARROW_OUTPUT'}"
+        --data_files_to_use "[ '.parquet' ]" 
+        --data_checkpointing True
+        --tkn_tokenizer bigcode/starcoder
+        --tkn_chunk_size 20_000
+        --tkn_doc_id_column doc_id
+        --tkn_doc_content_column contents
+        --runtime_num_workers 40
+        --runtime_worker_options "{ 'num_cpus': 0.8, 'max_restarts': 0, 'max_task_retries': 0 }"
